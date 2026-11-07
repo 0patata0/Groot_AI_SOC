@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WAF_IDS = [10100, 10101, 10200, 10300, 10400, 10500, 10501, 10600, 10601, 10602]
 SURICATA_IDS = [1000000, 1000001, 1000002, 1000010, 1000030, 1000031, 1000032,
                 1000033, 1000050, 1000051, 1000070, 1000071, 2034802, 2034806]
-WAZUH_IDS = [100100, 100101, 100102, 100103, 100110, 100111, 100112,
+WAZUH_IDS = [100100, 100101, 100102, 100103, 100110, 100111, 100112, 100114, 100115,
              100120, 100121, 100122, 100123, 100124, 100125, 100126,
              100127, 100128, 100129, 100130, 100131]
 WAF = b'SecRuleEngine On\nSecRule ARGS "@rx test" "id:10100,phase:2,pass,log"\n'
@@ -73,12 +73,12 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(result['details']['noalert_count'], 1)
         self.assertEqual(result['duplicate_ids'], [])
 
-    def test_actual_wazuh_includes_level_zero_base_in_nineteen_definitions(self):
+    def test_actual_wazuh_includes_base_and_reviewed_dns_in_twenty_one_definitions(self):
         data = (ROOT / 'infra/groot-b/local_rules.xml').read_bytes()
         result = self.complete('wazuh', data, WAZUH_IDS)
-        self.assertEqual(result['details']['level0_count'], 1)
+        self.assertEqual(result['details']['level0_count'], 2)
         self.assertEqual(result['details']['level_counts'], {
-            '0': 1, '1': 2, '3': 1, '4': 2, '5': 2, '6': 3,
+            '0': 2, '1': 2, '3': 2, '4': 2, '5': 2, '6': 3,
             '7': 1, '8': 1, '9': 1, '10': 2, '12': 3})
         self.assertEqual(result['duplicate_ids'], [])
 
@@ -86,7 +86,7 @@ class InventoryTests(unittest.TestCase):
         result = self.complete('wazuh', (ROOT / 'infra/groot-b/local_rules.xml').read_bytes(), WAZUH_IDS)
         self.assertEqual(result['contiguous_id_groups'], [
             {'start': 100100, 'end': 100103}, {'start': 100110, 'end': 100112},
-            {'start': 100120, 'end': 100131}])
+            {'start': 100114, 'end': 100115}, {'start': 100120, 'end': 100131}])
         expanded = [number for group in result['contiguous_id_groups']
                     for number in range(group['start'], group['end'] + 1)]
         self.assertEqual(expanded, WAZUH_IDS)

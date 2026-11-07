@@ -133,6 +133,32 @@ class ChatRead(unittest.TestCase):
                 w.management_read_request(r,a,pending=True)
 
     @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_ids_policy_native_selection_rejects_unasked_waf_on_first_and_retry(self):
+        from jsonschema import Draft202012Validator
+        name='mcp__rule_a__get_service_action_target'
+        tool={'type':'function','function':{'name':name,'parameters':{
+            'type':'object','additionalProperties':False,'required':['target'],
+            'properties':{'target':{'type':'string','enum':['a:waf','a:suricata']}}}}}
+        for question in ('IDS 관리자 예외 보여줘','IDS 예외?'):
+            a=agent();a.valid_tool_names={name};r=request();r['tools']=[tool];before=copy.deepcopy(r)
+            env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,tools=[name],request=question)))
+            with patch.dict(w.os.environ,env,clear=True):
+                for _ in range(2):
+                    out=w.management_read_request(r,a,pending=True);lease=a._capstone_management_selection
+                    schema=out['response_format']['json_schema']['schema'];validator=Draft202012Validator(schema)
+                    def value(target):return {'request_nonce':lease['nonce'],'calls':[{'tool':name,'arguments':{'target':target}}]}
+                    self.assertTrue(validator.is_valid(value('a:suricata')))
+                    self.assertFalse(validator.is_valid(value('a:waf')))
+                    self.assertEqual(schema['properties']['calls']['maxItems'],1)
+                    self.assertEqual(lease['catalog'][name]['properties']['target']['enum'],['a:suricata'])
+            self.assertEqual(r,before)
+        r['tools']=[copy.deepcopy(tool)]
+        r['tools'][0]['function']['parameters']['properties']['target']['enum']=['a:waf']
+        with patch.dict(w.os.environ,env,clear=True):
+            with self.assertRaisesRegex(RuntimeError,'chat_ids_policy_target_unregistered'):
+                w.management_read_request(r,a,pending=True)
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
     def test_three_hosts_remain_required_and_current_duplicates_are_coalesced(self):
         from openai.types.chat import ChatCompletion
         a=agent();a.valid_tool_names={NAME};r=request();r['tools']=[self.tool]

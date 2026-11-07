@@ -373,6 +373,8 @@ def security_inventory_report(plan,calls):
         counters=d.get('runtime',{}).get('engine_counters',{})
         if counters.get('status')=='observed':
             lines+=['엔진 실조회: 적재 '+str(counters['rules_loaded'])+' · 실패 '+str(counters['rules_failed'])+' · 건너뜀 '+str(counters['rules_skipped'])+' · 마지막 적재 '+str(counters['last_reload_kst'])+' (KST).']
+        if target=='a:suricata' and 'threshold_configuration' in d.get('runtime',{}):
+            lines+=['',ids_policy_report(d['runtime']['threshold_configuration'])]
         if d.get('duplicate_rule_ids'):
             lines+=['중복 ID 정의: '+cell(json.dumps(d['duplicate_rule_ids'],ensure_ascii=False))+'. 정의를 합치거나 누락하지 않았습니다.']
         waf=d.get('runtime',{}).get('waf_configuration',{})
@@ -709,10 +711,20 @@ def rule_scope_text(question):
 
 def ids_runtime_question(question):
     text = rule_scope_text(question)
-    if ids_change_method_question(question):return True
+    if ids_change_method_question(question) or ids_policy_question(question):return True
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
         and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드|실행\s*(?:상태|여부|중)', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
+
+
+def ids_policy_question(question):
+    text=READ.scope_text(CONTRACT.normalize_query_text(SHARED._unquoted_text(question)))
+    return bool(re.search(r'IDS|Suricata|수리카타',text,re.I)
+        and re.search(r'예외|suppress|threshold|임계값|경보\s*억제',text,re.I)
+        and not re.search(r'WAF|Wazuh|방화벽|\bFW\b|도구\s*없이|조회하지|설명만|일반적으로|개념|무슨\s*뜻',text,re.I)
+        and not re.search(r'(?:등록|설정)\s*(?:해|하(?:고|라|세요|자))|넣어줘|지워줘|빼줘',text)
+        and not READ.wants_write(text) and not EVIDENCE.incident_investigation_request(text)
+        and not re.search(r'왜|원인|분석',text))
 
 
 def ids_change_method_question(question):
@@ -2154,6 +2166,9 @@ def missing_reads(question, calls, diagnostic_targets=()):
         valid=bool(data and data.get('target')=='a:suricata' and isinstance(data.get('observation'),dict))
         if ids_change_method_question(question):
             valid=bool(valid and ids_actions_verified(data) and isinstance(data.get('impact'),str) and data['impact'].strip())
+        if ids_policy_question(question):
+            valid=bool(valid and ids_policy_valid(data.get('threshold_configuration'))
+                       and data['threshold_configuration']['status']=='observed')
         # Keep the target ID machine-readable: schema narrowing consumes it.
         return [] if valid else ['a:suricata']
     if scope == {'mcp__system_diagnostics__get_system_diagnostics'}:
@@ -2169,6 +2184,9 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    if ids_policy_question(question) and any(c.get('server')=='rule-a' and c.get('name')=='get_service_action_target'
+            and c.get('arguments',{}).get('target')=='a:suricata' for c in calls):
+        return {}  # Unavailable/partial policy is not repaired by a blind repeat.
     if pipeline_lookup_request(question):
         name='mcp__system_diagnostics__get_system_diagnostics'
         schema=result.get(name,{})
@@ -2598,6 +2616,56 @@ def ids_actions_verified(data):
             all(isinstance(a,str) and a in ('restart','reload') for a in actions) and len(set(actions))==len(actions))
 
 
+def ids_policy_valid(policy):
+    if (not isinstance(policy,dict) or policy.get('schema')!=1 or policy.get('status') not in ('observed','partial')
+            or policy.get('configuration_selected') is not True or policy.get('runtime_load_verified') is not False
+            or policy.get('scope')!='current_selected_threshold_configuration_not_engine_memory'
+            or not re.fullmatch('[0-9a-f]{64}',str(policy.get('sha256','')))
+            or not EVIDENCE.parse_instant(policy.get('observed_at_kst'))
+            or not isinstance(policy.get('entries'),list) or type(policy.get('statement_count')) is not int
+            or policy['statement_count']!=len(policy['entries']) or len(policy['entries'])>512
+            or not isinstance(policy.get('warnings'),list) or not all(isinstance(x,str) for x in policy['warnings'])):
+        return False
+    for row in policy['entries']:
+        if (not isinstance(row,dict) or type(row.get('line')) is not int or row['line']<1
+                or not isinstance(row.get('definition'),str) or type(row.get('parsed')) is not bool):return False
+        if row['parsed'] and (row.get('kind') not in ('suppress','threshold','event_filter','rate_filter')
+                or not isinstance(row.get('parameters'),dict)
+                or any(type(row.get(k)) is not int or not 0<=row[k]<2**32 for k in ('gen_id','sig_id'))):return False
+        if row['parsed']:
+            p=row['parameters']
+            if not all(isinstance(k,str) and isinstance(v,str) for k,v in p.items()):return False
+            if any(not re.fullmatch(r'[0-9]{1,10}',p.get(k,'')) or int(p[k])!=row[k] for k in ('gen_id','sig_id')):return False
+            if row['kind']=='suppress' and (('track' in p)!=('ip' in p)
+                    or p.get('track') not in (None,'by_src','by_dst','by_either')):return False
+    return (not policy['warnings'] and all(r['parsed'] for r in policy['entries'])) if policy['status']=='observed' else bool(policy['warnings'])
+
+
+def ids_policy_report(policy):
+    if not ids_policy_valid(policy):
+        return '**IDS 경보 예외·임계값 조회**\n설정 파일의 선택·원문 조회를 검증하지 못했습니다. 예외가 없거나 전체 허용이라고 판단하지 않습니다.'
+    lines=['**IDS 경보 예외·임계값 조회**',
+        '현재 선택된 설정 파일 '+str(policy['statement_count'])+'개 지시를 조회했습니다. '+
+        ('일부 구문은 미해석으로 전체 확인 미완료입니다.' if policy['status']=='partial' else '파일 내용 기준의 설정 확인입니다.'),
+        '', '| 종류 | GID / SID | 방향 | 주소·범위 | 조건·동작 |', '| --- | --- | --- | --- | --- |']
+    for row in policy['entries'][:20]:
+        if not row['parsed']:
+            values=['미해석 '+str(row['line'])+'행','미확인','미확인','미확인',row['definition']]
+        else:
+            p=row['parameters'];kind=row['kind'];track={'by_src':'출발지','by_dst':'목적지','by_either':'출발지 또는 목적지','by_rule':'규칙별','by_both':'양방향 IP 쌍','by_flow':'흐름별'}.get(p.get('track'),'해당 규칙 전체')
+            conditions=('해당 경보 억제' if kind=='suppress' else json.dumps({k:v for k,v in p.items() if k not in ('gen_id','sig_id','track')},ensure_ascii=False,separators=(',',':')))
+            values=[kind,str(row['gen_id'])+' / '+str(row['sig_id']),track,p.get('ip','주소 제한 없음'),conditions]
+        lines+=['| '+' | '.join(cell(v) for v in values)+' |']
+    if not policy['entries']:lines+=['| 활성 지시 없음 | — | — | — | 조회한 파일에 한정 |']
+    if len(policy['entries'])>20:lines+=['전체 '+str(len(policy['entries']))+'개 중20개 표시. 나머지 정의도 MCP 응답에 보존했습니다.']
+    lines+=['','suppress는 지정 GID/SID·주소의 경보 억제입니다. 일반 접속 허용이나 다른 공격 전체 면제를 뜻하지 않습니다. GID/SID 0은 전체 범위를 나타낼 수 있습니다.',
+            '주소 변수가 있으면 실제 주소 범위는 별도 확인이 필요합니다. 과거 경보 유무·엔진 메모리의 적용 결과는 이 파일 조회만으로 확정하지 않습니다.',
+            '출처: '+cell(policy.get('container_path'))+' · SHA256 '+cell(policy['sha256']),
+            '관측 시각 KST: '+cell(policy['observed_at_kst'])]
+    if policy['warnings']:lines+=['미확인 사항: '+cell('; '.join(map(str,policy['warnings'])))]
+    return '\n'.join(lines)
+
+
 def ids_observed_kst(value):
     if type(value) not in (int,float):return '미확인'
     try:return datetime.fromtimestamp(value,EVIDENCE.KST).isoformat()
@@ -2615,6 +2683,8 @@ def service_report(question, calls):
     data = payload(relevant[-1])
     if not data or data.get('target') != 'a:suricata' or not isinstance(data.get('observation'), dict):
         return 'IDS 상태 조회에 실패하여 현재 가동 여부를 확인하지 못했습니다. 비활성이나 정상으로 판단하지 않습니다.'
+    if ids_policy_question(question):
+        return ids_policy_report(data.get('threshold_configuration'))
     if ids_change_method_question(question):
         actions = data.get('allowed_actions')
         runtime = data.get('rule_source_evidence', {})

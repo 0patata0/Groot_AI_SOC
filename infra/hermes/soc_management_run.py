@@ -2900,6 +2900,9 @@ def management_read_request(request, agent, *, pending=False):
     diagnostic='mcp__system_diagnostics__get_system_diagnostics'
     current=bool(chat and chat['tools'] in (None,[diagnostic]) and not pipeline
         and chat_lookup_harness().current_diagnostic_lookup(chat['request']))
+    ids_tool='mcp__rule_a__get_service_action_target'
+    ids_policy=bool(chat and chat['tools']==[ids_tool]
+        and chat_lookup_harness().ids_policy_question(chat['request']))
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2908,6 +2911,7 @@ def management_read_request(request, agent, *, pending=False):
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
         if current and name!=diagnostic:continue
+        if ids_policy and name!=ids_tool:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2921,6 +2925,9 @@ def management_read_request(request, agent, *, pending=False):
         if current and selected is not None:
             selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
             if selected is None:raise RuntimeError('chat_diagnostic_target_unregistered')
+        if ids_policy and selected is not None:
+            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
+            if selected is None:raise RuntimeError('chat_ids_policy_target_unregistered')
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)
@@ -2930,7 +2937,7 @@ def management_read_request(request, agent, *, pending=False):
     nonce=uuid.uuid4().hex
     schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
         'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
-            'type':'array','minItems':1,'maxItems':1 if pipeline else 4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
+            'type':'array','minItems':1,'maxItems':1 if pipeline or ids_policy else 4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
     if current:
         schema['properties']['calls']['maxItems']=min(4,len(catalog[diagnostic]['properties']['target']['enum']))
     from jsonschema import Draft202012Validator

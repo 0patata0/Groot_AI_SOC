@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T14:46:29.115920+09:00",
+  "scope": "IDS selected threshold configuration read and bot rendering, not packet exemption E2E",
+  "query_version": "1.19.116",
+  "tests": {
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 478,
+        "unique": 478
+      },
+      "service": {
+        "rc": 0,
+        "count": 48,
+        "unique": 48
+      },
+      "claims": {
+        "rc": 0,
+        "count": 30,
+        "unique": 30
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 276,
+        "unique": 276
+      },
+      "query": {
+        "rc": 0,
+        "count": 408,
+        "unique": 408
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "unique": 79
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62
+      },
+      "rules": {
+        "rc": 0,
+        "count": 144,
+        "unique": 144
+      },
+      "inventory": {
+        "rc": 0,
+        "count": 65,
+        "unique": 65
+      },
+      "actions": {
+        "rc": 0,
+        "count": 23,
+        "unique": 23
+      }
+    },
+    "total_run": 1613,
+    "unique": 1585,
+    "skip": 0
+  },
+  "live": {
+    "a": {
+      "at_kst": "2026-11-07T14:41:04.204089+09:00",
+      "manifest": 3,
+      "protected": 7,
+      "sensor_unchanged": true,
+      "active_service_proposals": 0,
+      "failed_units": 0,
+      "confirmed_rollback_noop": true
+    },
+    "b": {
+      "at_kst": "2026-11-07T14:46:29.115920+09:00",
+      "query": "1.19.116",
+      "manifest": 29,
+      "protected": 8,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "bots_ws_worker": true,
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "b_failed_units": 0,
+      "rollback_confirmed_noop": true
+    }
+  },
+  "chats": [
+    {
+      "engine": "hermes",
+      "case": "normal",
+      "question": "IDS 관리자 예외 보여줘",
+      "elapsed_seconds": 24.548,
+      "actual_reads": 1,
+      "protected_calls": 0,
+      "correct_target": true,
+      "policy_sha256": "cd541a570ac97a97b5795f2b0eb606606e8e67aa6c30cb02fec99e78d46138e2",
+      "result_sha256": "6fd93fcba5bb7c14db76f566fd7e868872f1202d32dd58afcd05c6db0f1d5eea",
+      "observed_at_kst": "2026-11-07T14:42:51.327168+09:00",
+      "markdown_table": true,
+      "native_call_verified": true
+    },
+    {
+      "engine": "hermes",
+      "case": "short",
+      "question": "IDS 예외?",
+      "elapsed_seconds": 22.997,
+      "actual_reads": 1,
+      "protected_calls": 0,
+      "correct_target": true,
+      "policy_sha256": "cd541a570ac97a97b5795f2b0eb606606e8e67aa6c30cb02fec99e78d46138e2",
+      "result_sha256": "4a72454b25534ba5aa1f73309a7cda96961bb830bddba6bada312d48a3931e78",
+      "observed_at_kst": "2026-11-07T14:44:36.033469+09:00",
+      "markdown_table": true,
+      "native_call_verified": true
+    },
+    {
+      "engine": "ollama",
+      "case": "normal",
+      "question": "IDS 관리자 예외 보여줘",
+      "elapsed_seconds": 16.542,
+      "actual_reads": 1,
+      "protected_calls": 0,
+      "correct_target": true,
+      "policy_sha256": "cd541a570ac97a97b5795f2b0eb606606e8e67aa6c30cb02fec99e78d46138e2",
+      "result_sha256": "3bfff1a85bada6db160493b6ab27da490f4f43b15a1637853ee02c86f9f6d557",
+      "observed_at_kst": "2026-11-07T14:43:46.569699+09:00",
+      "markdown_table": true,
+      "native_call_verified": false
+    },
+    {
+      "engine": "ollama",
+      "case": "short",
+      "question": "IDS 예외?",
+      "elapsed_seconds": 17.331,
+      "actual_reads": 1,
+      "protected_calls": 0,
+      "correct_target": true,
+      "policy_sha256": "cd541a570ac97a97b5795f2b0eb606606e8e67aa6c30cb02fec99e78d46138e2",
+      "result_sha256": "040f4a88c342d2fd294760110d41ec92dc6e213ad7b05aaeb432e824517ce630",
+      "observed_at_kst": "2026-11-07T14:46:17.032551+09:00",
+      "markdown_table": true,
+      "native_call_verified": false
+    }
+  ],
+  "source_sha256": {
+    "infra/mcp/security_rule_inventory.py": "1795a2fdac52c7e5c0f1cad77df24c95a29ad461804b9815097145dc9252af7b",
+    "infra/mcp/service_action_executor.py": "f9b270a05af3b278d8ab2a90825bd541a38fec221a954915a03e70a847e65d19",
+    "infra/mcp/rule_change_mcp.py": "23c715314cc4c9767fc6ee53c6513e84dd016bf25926e65e457d1f5db0f477ff",
+    "infra/mcp/test_suricata_threshold_inventory.py": "7a8f74f40aee9d08bf9b404cca489cc556cd99f0c9140a783ace1ad14a15cae7",
+    "infra/mcp/test_service_action_executor.py": "fa9ab6ee2e860cdb2ce2c469abd3ce3b2e69bc9ad4cee621b43444566f9876cb",
+    "infra/mcp/test_rule_inventory.py": "d2b15ebca6a7b007ec3f46f83bc0ac8eb1aa01563eb8ba88f2cf24179ac34f65",
+    "infra/ollama-trial/harness.py": "e6a633eb3a6ff41d4d45c7c9b80e3fdf1ba46d066d636b4099ca6bc583c54769",
+    "infra/hermes/query-completion/__init__.py": "3ec312b44335aa73041e6da66a471383bcf06f27f163a79540eb2afdb615b266",
+    "infra/hermes/query-completion/plugin.yaml": "318101861ab9a9e6395fe26f84e48b951159b9e7932787b4b05f8a191658c86b",
+    "infra/hermes/query-completion/test_ids_threshold.py": "55d8c0dab68049fa0c23533466239a736f6139afa5fcc905764c2c6c07a03864",
+    "infra/hermes/soc_management_run.py": "ef75bd49a3468d026f54d84c34f735638abacf3ac3459bb92659b6bd6e3688cb",
+    "infra/hermes/test_soc_management_chat_read.py": "d8d205ebb2cf362718b0845f7344b9638637017e37dc5438b59e61484cf15e07"
+  },
+  "failures_preserved": [
+    "initial Wazuh fixture expected 19 instead of actual 21 definitions; parser/XML unchanged",
+    "initial Hermes normal query read IDS and unrelated WAF; fixed native target selection",
+    "new gate source pin initially mismatched in isolated tests; exact pin restored, all 10 profiles rerun",
+    "post-restart first health reads preceded WebSocket receipt refresh; later verified"
+  ],
+  "not_executed": [
+    "packet/attack test",
+    "full new OS install",
+    "browser/mobile UI visual test",
+    "in-memory suppression table proof",
+    "model training or promotion"
+  ]
+}

@@ -453,6 +453,15 @@ class ServiceActionService:
                 result["rule_source_evidence"] = {"status": "unavailable",
                     "evidence_scope": "rule source not verified; do not infer its path or loading failure"}
             result["rule_engine_evidence"] = self._rule_engine_evidence(observation)
+            try:
+                with self.engine.locked():
+                    result['threshold_configuration'] = self.helper._load_extension('security_rule_inventory').suricata_thresholds(self.engine,self.helper)
+                if result['threshold_configuration'].get('container_id') not in (None,observation['container_id']):
+                    raise self.error('container changed between policy observations')
+            except (OSError,self.error):
+                result['threshold_configuration'] = {'schema':1,'status':'unavailable',
+                    'configuration_selected':False,'runtime_load_verified':False,
+                    'warnings':['threshold_configuration_unavailable']}
         return result
 
     def _rule_engine_evidence(self, observation):

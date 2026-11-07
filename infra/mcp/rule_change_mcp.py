@@ -106,7 +106,7 @@ SERVICE_TARGETS = ["a:waf", "a:suricata", "a:chatproxy", "b:wazuh-manager", "b:w
 TOOLS.extend([
     {
         "name": "get_service_action_target",
-        "description": "Read current state and allowed actions of one fixed service. a:vector and a:wazuh-agent/b:wazuh-agent are HOST systemd services, including failed/stopped state; restart only. b:wazuh-manager is a separate manager container. IDS is a:suricata on A. Use time_display KST directly; original observation stays unchanged for approval hash. No package installation or arbitrary unit/configuration changes.",
+        "description": "Read current state and allowed actions of one fixed service. a:vector and a:wazuh-agent/b:wazuh-agent are HOST systemd services, including failed/stopped state; restart only. b:wazuh-manager is a separate manager container. IDS is a:suricata on A; also reads its selected threshold/suppression policy with SID, direction, address, file SHA and KST. Alert suppression is not general attack/access permission; current configuration is not proof of engine memory or past alert absence. Use time_display KST directly; original observation stays unchanged for approval hash. No package installation or arbitrary unit/configuration changes.",
         "inputSchema": {"type": "object", "additionalProperties": False,
                         "properties": {"target": {"type": "string", "enum": SERVICE_TARGETS}}, "required": ["target"]},
         "annotations": {"title": "Read allowed service", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},

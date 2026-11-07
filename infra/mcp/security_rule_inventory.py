@@ -9,6 +9,7 @@ import base64
 import fnmatch
 import hashlib
 import io
+import ipaddress
 import json
 import posixpath
 import re
@@ -20,6 +21,7 @@ import selectors
 import subprocess
 import tarfile
 import time
+from pathlib import Path
 
 TARGETS = {'a:waf': 'a:modsecurity-custom', 'a:suricata': 'a:suricata-local',
            'b:wazuh': 'b:wazuh-local-rules'}
@@ -501,6 +503,104 @@ def suricata_rules(data, source, origin, parser):
     return rows
 
 
+def threshold_statements(raw):
+    """Retain every active statement; unknown syntax is a coverage gap."""
+    if len(raw)>65536:raise ValueError('threshold_file_too_large')
+    entries=[];warnings=[];pending='';first=0
+    for number,line in enumerate(raw.decode('utf-8').splitlines(),1):
+        line=line.split('#',1)[0].strip()
+        if not line:continue
+        if not pending:first=number
+        pending+=(' ' if pending else '')+line.rstrip('\\').rstrip()
+        if line.endswith('\\'):continue
+        statement=pending;pending=''
+        row={'line':first,'definition':statement,'parsed':False}
+        try:
+            kind,body=statement.split(None,1)
+            if kind not in ('suppress','threshold','event_filter','rate_filter'):raise ValueError()
+            fields={}
+            for part in re.split(r',\s*(?=[a-z_]+\s)',body):
+                key,value=part.strip().split(None,1)
+                if key in fields:raise ValueError()
+                fields[key]=value.strip()
+            required=({'gen_id','sig_id'} if kind=='suppress' else
+                {'gen_id','sig_id','type','track','count','seconds'} if kind in ('threshold','event_filter') else
+                {'gen_id','sig_id','track','count','seconds','new_action','timeout'})
+            allowed=required|({'track','ip'} if kind=='suppress' else set())
+            if not required<=set(fields)<=allowed:raise ValueError()
+            numbers={}
+            for key in ('gen_id','sig_id','count','seconds','timeout'):
+                if key not in fields:continue
+                if not re.fullmatch(r'[0-9]{1,10}',fields[key]):raise ValueError()
+                numbers[key]=int(fields[key])
+                if not 0<=numbers[key]<2**32 or key in ('count','seconds','timeout') and not numbers[key]:raise ValueError()
+            if kind=='suppress':
+                if ('track' in fields)!=('ip' in fields):raise ValueError()
+                if fields.get('track') not in (None,'by_src','by_dst','by_either'):raise ValueError()
+                expression=fields.get('ip');resolved=[];variables=[]
+                if expression:
+                    parts=expression[1:-1].split(',') if expression.startswith('[') and expression.endswith(']') else [expression]
+                    for item in parts:
+                        item=item.strip()
+                        if re.fullmatch(r'\$[A-Za-z_][A-Za-z0-9_]*',item):variables.append(item)
+                        else:resolved.append(str(ipaddress.ip_network(item,strict=False)))
+                row.update(address_networks=resolved,address_variables=variables,
+                           address_resolution_complete=not variables,
+                           meaning='alert_suppression_only_not_access_or_attack_allowlist')
+            else:
+                if fields['track'] not in ('by_src','by_dst','by_rule','by_both','by_flow'):raise ValueError()
+                if kind in ('threshold','event_filter'):
+                    if fields['type'] not in ('threshold','limit','both') or not numbers['gen_id'] or not numbers['sig_id']:raise ValueError()
+                elif fields['new_action'] not in ('alert','drop','pass','reject'):raise ValueError()
+                row['meaning']='alert_frequency_control' if kind!='rate_filter' else 'rule_action_rate_control'
+            row.update(kind=kind,parameters=fields,**numbers,parsed=True)
+        except (ValueError,TypeError):warnings.append('unparsed_threshold_statement_line_'+str(first))
+        entries.append(row)
+        if len(entries)>512:raise ValueError('threshold_statement_limit')
+    if pending:
+        entries.append({'line':first,'definition':pending,'parsed':False})
+        warnings.append('unfinished_threshold_statement_line_'+str(first))
+    return entries,warnings
+
+
+def suricata_thresholds(engine, parser):
+    """Read only the fixed mounted policy; caller holds the engine read lock.
+
+    Command selection plus matching host/container bytes is configuration
+    evidence, never an in-memory suppression table or actual alert outcome.
+    """
+    result={'schema':1,'status':'unavailable','configuration_selected':False,
+            'runtime_load_verified':False,'container_path':'/rules/threshold.in',
+            'scope':'current_selected_threshold_configuration_not_engine_memory'}
+    try:
+        spec=engine.spec('a:suricata-local');runtime=engine._inspect(spec)
+        before=json.loads(engine.runner.call([parser.DOCKER,'inspect',spec['container']]))[0]
+        cmd=before.get('Config',{}).get('Cmd',[])
+        if not isinstance(cmd,list) or not all(isinstance(v,str) for v in cmd):raise ValueError('threshold_command_unavailable')
+        selected=[]
+        for i,arg in enumerate(cmd):
+            if arg=='--set' and i+1<len(cmd) and cmd[i+1].startswith('threshold-file='):selected.append(cmd[i+1].split('=',1)[1])
+            if arg.startswith('--set=threshold-file='):selected.append(arg.split('=',2)[2])
+        if selected!=['/rules/threshold.in']:raise ValueError('threshold_selection_not_unique_fixed_path')
+        path=str(Path(spec['mount_source'])/'threshold.in')
+        raw,_=parser._read_regular(path,65536)
+        remote=engine.runner.call([parser.DOCKER,'exec',runtime['container_id'],'sha256sum','/rules/threshold.in']).decode().split()
+        if remote!=[digest(raw),'/rules/threshold.in']:raise ValueError('threshold_host_container_bytes_differ')
+        second,_=parser._read_regular(path,65536)
+        after=json.loads(engine.runner.call([parser.DOCKER,'inspect',spec['container']]))[0]
+        def identity(info):return {'id':info['Id'],'started_at':info['State']['StartedAt'],'config':info['Config'],'mounts':info['Mounts']}
+        if (raw!=second or identity(before)!=identity(after) or before['Id']!=runtime['container_id']
+                or before['State']['StartedAt']!=runtime['started_at']):raise ValueError('threshold_changed_during_read')
+        entries,warnings=threshold_statements(raw)
+        result.update(status='partial' if warnings else 'observed',configuration_selected=True,
+            source_path=path,sha256=digest(raw),bytes=len(raw),container_id=before['Id'],
+            observed_at_kst=datetime.now(timezone(timedelta(hours=9))).isoformat(),
+            command_sha256=digest(cmd),statement_count=len(entries),entries=entries,warnings=warnings)
+    except (OSError,ValueError,KeyError,TypeError,IndexError,parser.RuleChangeError) as exc:
+        result['warnings']=['threshold_configuration_unavailable:'+type(exc).__name__]
+    return result
+
+
 def inventory(engine, parser, request, command=bounded_command, api_reader=None, native_check=None):
     target=request.get('target'); origin=request.get('origin','all'); view=request.get('view','summary')
     offset=request.get('offset',0); limit=request.get('limit',20); rid=request.get('rule_id'); correlation=request.get('correlation_only',False)
@@ -530,6 +630,9 @@ def inventory(engine, parser, request, command=bounded_command, api_reader=None,
                    for k,v,o in [('et_path',et,'builtin'),('path',current,'custom')]]
             runtime.update(rule_source_option='-S',rule_source_path='/rules/all.rules',combined_is_exact_et_plus_local=True,
                            combined_sha256=aux['all_sha256'])
+            runtime['threshold_configuration']=suricata_thresholds(engine,parser)
+            if runtime['threshold_configuration']['status']!='observed':
+                warnings.extend(runtime['threshold_configuration'].get('warnings',[]))
         elif target == 'b:wazuh':
             read_api = api_reader or wazuh_api_reader(parser)
             items = read_api()
@@ -577,7 +680,11 @@ def inventory(engine, parser, request, command=bounded_command, api_reader=None,
             runtime[field + '_kst'] = instant.astimezone(timezone(timedelta(hours=9))).isoformat()
     if len(rows)>MAX_ROWS:
         raise ValueError('rule_count_limit')
-    snapshot=digest({'files':files,'identity':identity})
+    snapshot_parts={'files':files,'identity':identity}
+    if target=='a:suricata':
+        policy=runtime['threshold_configuration']
+        snapshot_parts['threshold_configuration']={k:policy.get(k) for k in ('status','sha256','command_sha256')}
+    snapshot=digest(snapshot_parts)
     if expected and expected!=snapshot:
         raise ValueError('inventory_snapshot_changed_restart_pagination')
     counts={'definitions':len(rows),'builtin':sum(r['origin']=='builtin' for r in rows),

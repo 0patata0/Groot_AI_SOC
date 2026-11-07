@@ -142,6 +142,26 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(unavailable['rule_source_evidence']['status'], 'unavailable')
         self.assertEqual(unavailable['base_state_sha256'], result['base_state_sha256'])
 
+    def test_threshold_evidence_does_not_change_approval_or_dispatch(self):
+        from types import SimpleNamespace
+        policy={'schema':1,'status':'observed','container_id':'a'*64,'sha256':'e'*64}
+        with mock.patch.object(helper,'_load_extension',return_value=SimpleNamespace(suricata_thresholds=lambda engine,parser:policy)):
+            out=self.svc.get_target('a:suricata')
+        self.assertEqual(out['threshold_configuration'],policy)
+        self.assertEqual(out['base_state_sha256'],service.digest(self.backend.observation))
+        self.assertEqual(self.backend.actions,[]);self.assertFalse(self.broker.cards)
+        self.assertFalse(list(self.svc.state_dir.glob('*.json')))
+
+    def test_threshold_other_container_or_unavailable_extension_is_not_trusted(self):
+        from types import SimpleNamespace
+        with mock.patch.object(helper,'_load_extension',return_value=SimpleNamespace(suricata_thresholds=lambda *args:{'container_id':'b'*64,'status':'observed'})):
+            out=self.svc.get_target('a:suricata')
+        self.assertEqual(out['threshold_configuration']['status'],'unavailable')
+        with mock.patch.object(helper,'_load_extension',side_effect=helper.RuleChangeError('unavailable')):
+            missing=self.svc.get_target('a:suricata')
+        self.assertEqual(missing['threshold_configuration']['status'],'unavailable')
+        self.assertEqual(missing['base_state_sha256'],out['base_state_sha256'])
+
     def tearDown(self):
         self.tmp.cleanup()
 

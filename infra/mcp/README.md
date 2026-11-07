@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+11/8 [제한된 journal 조회 후보](journal-excerpts.md): 기존 `get_system_diagnostics`의 `view=journal`로 등록 서비스·KST 구간의 마스킹된 메시지와 SHA를 반환한다. Mac104·Linux83검사와 B 격리 환경의 실제 비특권 읽기32행/오류원문8행을 확인했다. **운영 A/B/C 배포와 봇의 원문 표시·판단 연결은 아직 미완료**이며 아래 기존 운영 범위와 구분한다. 새 도구 이름·TCP 포트·일반 sudo/Docker 권한은 추가하지 않는다.
+
 현재 security-events1.3.2/query79/common1.5.35는 [시간·필터 보완](../hermes/chat-read-scope.md)을 반영한다. `search_wazuh_alerts(program_name="systemd")`는 `predecoder.program_name` 정확 검색이며 자유 DSL이 아니다. 적용 필터와 프로그램명을 반환하고7읽기·권한·진단1.2.2를 유지한다. 이전32조합은 등록/SDK 검증이었고, 최종 Native provider의 제약 손실은79에서 별도로 수정·40조합 검사했다. 고유1,287PASS; 복합 실제 채팅95.209초/품질 실패로60초 목표는 미완료다.
 
 2026-11-06: 기존 진단 MCP가 과거 사건의 정확한 KST 구간도 읽는다. 제한된 오류 색인이며 현재 상태/전체 journal과 구분한다. [설치·권한·실측·공백](journal-history.md).

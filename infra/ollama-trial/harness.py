@@ -3,6 +3,7 @@
 The installer copies the two canonical Hermes sources verbatim. Development
 imports those same sources, rather than maintaining a second rules parser.
 """
+import copy
 import hashlib
 import html
 from datetime import datetime, timezone, timedelta
@@ -1793,6 +1794,7 @@ def diagnostic_history_request(question):
     if not re.search(r'systemd|\.service\b|서비스|서버|호스트|Vector|벡터|Docker|도커|Hermes|헤르메스|Ollama|올라마|인덱서|Indexer|Mattermost|매터모스트|파이프라인|수집기', text, re.I):
         return False
     if re.search(r'룰|규칙|rules?', text, re.I): return False
+    if re.search(r'비교|대조|연속|재조회|두\s*번|세\s*번|여러\s*번|\d+\s*(?:번|회)|\d{4}[-/.]\d',text): return True
     if re.search(r'경보|반복|이력|과거|당시|어제|그제|지난|원인|왜|조사|장애인지', text):
         return True
     failure = re.search(r'오류|에러|실패|장애|고장|\b(?:failure|failed|error)\b', text, re.I)
@@ -1913,6 +1915,8 @@ def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
     if diagnostic_history_request(question): return None
+    # One snapshot cannot satisfy a comparison, explicit date or resampling.
+    if re.search(r'비교|대조|연속|재조회|두\s*번|세\s*번|여러\s*번|\d+\s*(?:번|회)|\d{4}[-/.]\d',text): return None
     if request_kind(question) != 'other': return None
     if ids_runtime_question(question): return None  # Preserve the existing engine/load proof path.
     if re.search(r'무슨\s*뜻|뜻이|개념|일반적으로|사용법|설명만|번역|동작\s*원리|작동\s*원리|도구\s*없이|조회하지',text): return None
@@ -1940,8 +1944,10 @@ def diagnostic_request(question):
     for unit, name, default in [('capstone-vector.service', 'vector', 'a'),
                                 ('capstone-management.service', 'management', 'b'),
                                 ('wazuh-agent.service', 'wazuh-agent', None)]:
-        if re.search(r'(?<![A-Za-z0-9@_.:-])'+re.escape(unit)+r'(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',text):
-            if host or default: wanted.append((host or default) + ':' + name)
+        for match in re.finditer(r'(?<![A-Za-z0-9@_.:-])'+re.escape(unit)+r'(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',text):
+            preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
+            selected=(preceding[-1] if preceding else host) or default
+            if selected:wanted.append(selected+':'+name)
     for pattern,name,default in [
         (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
         (r'Suricata|IDS|수리카타','suricata','a'),(r'WAF|ModSecurity','waf','a'),
@@ -1951,7 +1957,7 @@ def diagnostic_request(question):
         (r'LLM|모델','llm','b'),(r'사건.*(?:처리|전달)|관리.*파이프라인','management-pipeline','b'),
         (r'수집.*(?:경로|전달|파이프라인)|ingestion','ingestion','b'),
         (r'\bsoc-bot\b','soc-bot',None),(r'\bDocker\b|도커','docker',None),
-        (r'\bVector\b|벡터','vector','a')]:
+        (r'(?<![A-Za-z])Vector(?![A-Za-z])|벡터','vector','a')]:
         for match in re.finditer(pattern,text,re.I):
             if re.search(r'[abc]:$',text[max(0,match.start()-2):match.start()]): continue
             preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
@@ -1964,6 +1970,15 @@ def pipeline_lookup_request(question):
     """Current queue counts only; '조사 대기' names a metric, not an investigation."""
     return (not PIPELINE_INVESTIGATION.search(READ.scope_text(normalized(question)))
         and diagnostic_request(question)=={'all':False,'requested':['b:management-pipeline'],'unresolved':False})
+
+
+def current_diagnostic_lookup(question):
+    """A single current observation, not a temporal comparison or resampling."""
+    text=READ.scope_text(normalized(question))
+    return bool(diagnostic_request(question) and not re.search(
+        r'오늘|금일|최근|지난|어제|그제|내일|부터|까지|이후|이전|사이|비교|대조|'
+        r'반복|연속|재조회|다시|두\s*번|세\s*번|여러\s*번|'
+        r'\d+\s*(?:분|시간|일|번|회)|\d{1,2}:\d{2}|\d{4}[-/.]\d',text))
 
 
 def diagnostic_scope(question, targets):
@@ -2135,6 +2150,23 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
         if not missing_reads(question,calls,diagnostic_targets):return {}
         schema['properties']={'target':{**target,'enum':['b:management-pipeline']}}
         schema['required']=['target'];schema['additionalProperties']=False
+        return {name:schema}
+    if current_diagnostic_lookup(question):
+        name='mcp__system_diagnostics__get_system_diagnostics'
+        schema=result.get(name,{})
+        target=schema.get('properties',{}).get('target',{})
+        registered=target.get('enum')
+        if (not isinstance(registered,list) or not registered
+                or not all(isinstance(t,str) for t in registered)
+                or set(schema.get('required',[])) & {'since_kst','until_kst'}):return {}
+        selected,_=diagnostic_scope(question,registered)
+        observations=diagnostic_observations(calls)
+        pending=[t for t in selected if not observations.get(t)]
+        if not pending:return {}
+        schema['properties']['target']={**target,'enum':pending}
+        # Current observations cannot be replaced with an unasked past window.
+        for key in ('since_kst','until_kst'):schema['properties'].pop(key,None)
+        schema['additionalProperties']=False
         return {name:schema}
     if systemd_comparison_request(question):
         result={name:schema for name,schema in result.items() if name in SYSTEMD_COMPARE_TOOLS}
@@ -2443,7 +2475,7 @@ def policy_explanation(question, tools):
 
 
 def validated_selection(value, schema):
-    """Validate every model-selected read; collapse only exact duplicates."""
+    """Validate every choice; collapse exact or registered diagnostic defaults."""
     from jsonschema import Draft202012Validator
     strict = json.loads(json.dumps(schema))
     strict['properties']['calls'].pop('uniqueItems', None)
@@ -2456,6 +2488,21 @@ def validated_selection(value, schema):
             # This endpoint always returns the same latest full snapshot;
             # history/row-limit arguments do not change aggregate scope.
             identity={'tool':item['tool'],'arguments':{'target':'soc:coverage'}}
+        elif (item['tool']=='mcp__system_diagnostics__get_system_diagnostics'
+                and not {'since_kst','until_kst'} & set(item['arguments'])):
+            variants=[v['properties']['arguments'] for v in strict['properties']['calls']['items'].get('anyOf',[])
+                if v.get('properties',{}).get('tool',{}).get('const')==item['tool']]
+            if len(variants)==1:
+                variants=[v for v in variants[0].get('anyOf',[variants[0]])
+                    if Draft202012Validator(v).is_valid(item['arguments'])]
+            if len(variants)==1:
+                identity=copy.deepcopy(item)
+                for key in ('lookback_minutes','limit'):
+                    prop=variants[0].get('properties',{}).get(key,{})
+                    default=prop.get('default')
+                    if (key not in identity['arguments'] and type(default) is int
+                            and Draft202012Validator(prop).is_valid(default)):
+                        identity['arguments'][key]=default
         key = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
         if key not in seen: calls.append(item);seen.add(key)
     removed = len(result['calls']) - len(calls);result['calls'] = calls
@@ -2475,6 +2522,10 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
         limit = 1
     if pipeline_lookup_request(question):
         limit = 1
+    elif (current_diagnostic_lookup(question)
+            and set(schemas)=={'mcp__system_diagnostics__get_system_diagnostics'}):
+        targets=schemas['mcp__system_diagnostics__get_system_diagnostics'].get('properties',{}).get('target',{}).get('enum',[])
+        if targets:limit=min(limit,len(set(targets)))
     # Keep a complete plan within the existing 2048-token generation budget.
     # Further batches retain the request-wide model/tool caps and missing scope.
     limit = min(limit, 4)

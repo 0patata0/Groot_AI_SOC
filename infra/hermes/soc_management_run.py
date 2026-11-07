@@ -2579,8 +2579,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
 
 @functools.lru_cache(maxsize=1)
 def chat_lookup_harness():
-    path=Path('/opt/data/plugins/groot-query-completion/alignment.py')
-    if not path.exists():path=Path(__file__).with_name('query-completion')/'alignment.py'
+    path=Path(globals().get('__file__','/opt/data/management-code/run.py')).with_name('query-completion')/'alignment.py'
+    if not path.exists():path=Path('/opt/data/plugins/groot-query-completion/alignment.py')
     spec=importlib.util.spec_from_file_location('_management_chat_alignment',path)
     alignment=importlib.util.module_from_spec(spec);spec.loader.exec_module(alignment)
     return alignment.load_harness()
@@ -2897,6 +2897,9 @@ def management_read_request(request, agent, *, pending=False):
     if indexed is not None:return indexed
     pipeline=bool(chat and chat['tools']==['mcp__system_diagnostics__get_system_diagnostics']
         and chat_lookup_harness().pipeline_lookup_request(chat['request']))
+    diagnostic='mcp__system_diagnostics__get_system_diagnostics'
+    current=bool(chat and chat['tools'] in (None,[diagnostic]) and not pipeline
+        and chat_lookup_harness().current_diagnostic_lookup(chat['request']))
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2904,6 +2907,7 @@ def management_read_request(request, agent, *, pending=False):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
+        if current and name!=diagnostic:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2914,6 +2918,9 @@ def management_read_request(request, agent, *, pending=False):
                 raise RuntimeError('chat_pipeline_target_unregistered')
             selected={'type':'object','additionalProperties':False,'required':['target'],
                 'properties':{'target':{'type':'string','enum':[target]}}}
+        if current and selected is not None:
+            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
+            if selected is None:raise RuntimeError('chat_diagnostic_target_unregistered')
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)
@@ -2924,6 +2931,8 @@ def management_read_request(request, agent, *, pending=False):
     schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
         'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
             'type':'array','minItems':1,'maxItems':1 if pipeline else 4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
+    if current:
+        schema['properties']['calls']['maxItems']=min(4,len(catalog[diagnostic]['properties']['target']['enum']))
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)
@@ -2961,6 +2970,7 @@ def management_read_request(request, agent, *, pending=False):
     agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,
         'schema':copy.deepcopy(schema),'catalog':catalog}
     if chat:agent._capstone_management_selection['chat_read']=True
+    if current:agent._capstone_management_selection['current_diagnostic']=True
     return result
 
 
@@ -3367,7 +3377,9 @@ def management_selection_response(response, selection, agent):
         return obj
     value=json.loads(raw,object_pairs_hook=unique,
         parse_constant=lambda _value:(_ for _ in ()).throw(ValueError('nonfinite_json')))
-    Draft202012Validator(selection['schema']).validate(value)
+    if selection.get('current_diagnostic'):
+        value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
+    else:Draft202012Validator(selection['schema']).validate(value)
     if 'compact_citations' in selection:
         if value.get('more_evidence'):
             if selection.get('service_report'):

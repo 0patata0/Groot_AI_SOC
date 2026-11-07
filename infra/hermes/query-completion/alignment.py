@@ -428,7 +428,7 @@ def request_wrapper(original, query, harness):
                 used = used[1] if used[0] == turn else 0
                 remaining = min(32 if scope == {'mcp__system_diagnostics__get_system_diagnostics'} else 8, harness.CONTRACT.TOOL_CALLS - used)
                 if remaining > 0:
-                    schema = harness.selection_schema(schemas, remaining,reference)
+                    schema = harness.selection_schema(schemas, remaining,reference,question=request)
                     # The model selects exact read calls in a constrained object.
                     # Native dispatch still validates and executes those calls.
                     data.pop('tools', None); data.pop('tool_choice', None)

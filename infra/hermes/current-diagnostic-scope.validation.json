@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T11:29:27+09:00",
+  "versions": {
+    "query": "1.19.114",
+    "common": "1.5.61",
+    "routing": "1.1.6",
+    "diagnostics": "1.2.8"
+  },
+  "sources": {
+    "infra/hermes/query-completion/__init__.py": "617e5a21f51718226f566edb2df09bc27596c5cb2beb01f9c1445fee9642202a",
+    "infra/hermes/query-completion/alignment.py": "6da7e1357c0becc67757f41963c765347daf1ab44f77e41d39c2ba8e4992bba8",
+    "infra/hermes/query-completion/plugin.yaml": "dc46d6a01976120867e0a662359a3f662ec2499684aba0a38c49eb2cdf0b758b",
+    "infra/hermes/query-completion/test_alignment.py": "2a8386032e989cac099cfb88d6fc6632285a20c9d9587d360751b0630ad07d1f",
+    "infra/hermes/soc_management_run.py": "b49759e60479a0e233e08e308aaf4a07df47f67f075e53aedf63ada58966386e",
+    "infra/hermes/test_soc_management_chat_read.py": "eba6a19cdf0f269955fc362a6edbf4dc50450436fcb52a304f825d2d91554782",
+    "infra/ollama-trial/harness.py": "ba356c6270cc998a20d958c5a7be836057bc417c1fe558fc1872d9c4ab919594",
+    "infra/ollama-trial/test_current_diagnostic_selection.py": "38a044ad6cb65ffde726e1703486b64a6ee4a36b69867d52591320e7937ea42d"
+  },
+  "tests": {
+    "at_kst": "2026-11-07T11:20:01.102564+09:00",
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 477,
+        "unique": 477
+      },
+      "service": {
+        "rc": 0,
+        "count": 48,
+        "unique": 48
+      },
+      "claims": {
+        "rc": 0,
+        "count": 30,
+        "unique": 30
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 276,
+        "unique": 276
+      },
+      "query": {
+        "rc": 0,
+        "count": 392,
+        "unique": 392
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "unique": 79
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62
+      }
+    },
+    "passed": 1364,
+    "skip": 0
+  },
+  "actual_final_chat": {
+    "hermes": {
+      "seconds": 18.476,
+      "actual_read_calls": 1,
+      "arguments": {
+        "target": "b:management"
+      },
+      "result_sha256": "229f6a838271d6a4066edae0049a319df1d93e8bf0c346147f5a4fc35e9bfca2",
+      "properties": {
+        "ActiveEnterTimestampMonotonic": 0,
+        "ActiveState": "inactive",
+        "ExecMainCode": 1,
+        "ExecMainExitTimestampMonotonic": 1226156708065,
+        "ExecMainStartTimestampMonotonic": 1226156522077,
+        "ExecMainStatus": 0,
+        "InactiveEnterTimestampMonotonic": 1226156708330,
+        "LoadState": "loaded",
+        "NRestarts": 0,
+        "Result": "success",
+        "SubState": "dead",
+        "Type": "oneshot",
+        "UnitFileState": "static"
+      },
+      "observed_at_kst": "2026-11-07T11:22:51+09:00",
+      "markdown_tables": 2,
+      "protected_calls": 0,
+      "runtime_status": "completed"
+    },
+    "ollama": {
+      "seconds": 18.396,
+      "actual_read_calls": 1,
+      "arguments": {
+        "target": "b:management"
+      },
+      "result_sha256": "77a59fdafc25959cf0e74d34ad813269511a538c3ed4f67fc5ec28df0e82dde3",
+      "properties": {
+        "ActiveEnterTimestampMonotonic": 0,
+        "ActiveState": "activating",
+        "ExecMainCode": 0,
+        "ExecMainExitTimestampMonotonic": 0,
+        "ExecMainStartTimestampMonotonic": 1226424250088,
+        "ExecMainStatus": 0,
+        "InactiveEnterTimestampMonotonic": 1226409236609,
+        "LoadState": "loaded",
+        "NRestarts": 0,
+        "Result": "success",
+        "SubState": "start",
+        "Type": "oneshot",
+        "UnitFileState": "static"
+      },
+      "observed_at_kst": "2026-11-07T11:27:06+09:00",
+      "markdown_tables": 2,
+      "protected_calls": 0,
+      "runtime_status": "completed"
+    }
+  },
+  "first_native_failure": {
+    "query": "1.19.113",
+    "seconds": 22.339,
+    "actual_reads": 0,
+    "status": "partial",
+    "cause": "inline_gate_missing___file__",
+    "quality_success": false
+  },
+  "health": {
+    "confirmed_at_kst": "2026-11-07T11:22:01.722398+09:00",
+    "source_sha": 24,
+    "protected_sha": 8,
+    "sdk_receipt": 20,
+    "review_receipt": 5,
+    "bots_ws_worker": true,
+    "active_services": 4,
+    "queues": 0,
+    "b_failed": 0,
+    "rollback_confirmed": true
+  },
+  "backups": [
+    "/var/lib/capstone-service-grounding/20261107-scope113",
+    "/var/lib/capstone-service-grounding/20261107-scope114"
+  ],
+  "limitations": [
+    "one_reused_question_per_engine",
+    "shared_gpu_and_channel_context_uncontrolled",
+    "not_complex_quality_or_average_latency",
+    "new_os_and_attack_e2e_not_run"
+  ],
+  "git": {
+    "status": "publication_pending"
+  }
+}

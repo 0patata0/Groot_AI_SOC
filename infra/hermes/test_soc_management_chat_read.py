@@ -16,6 +16,18 @@ NAME='mcp__system_diagnostics__get_system_diagnostics'
 
 
 class ChatRead(unittest.TestCase):
+    def test_inline_gate_without_file_uses_installed_harness_path(self):
+        sentinel=object();module=SimpleNamespace(load_harness=lambda:sentinel)
+        spec=SimpleNamespace(loader=SimpleNamespace(exec_module=lambda m:None))
+        saved=w.__dict__.pop('__file__');w.chat_lookup_harness.cache_clear()
+        try:
+            with patch.object(w.importlib.util,'spec_from_file_location',return_value=spec) as load,\
+                 patch.object(w.importlib.util,'module_from_spec',return_value=module):
+                self.assertIs(w.chat_lookup_harness(),sentinel)
+                self.assertEqual(load.call_args.args[1],Path('/opt/data/plugins/groot-query-completion/alignment.py'))
+        finally:
+            w.__dict__['__file__']=saved;w.chat_lookup_harness.cache_clear()
+
     def setUp(self):
         self.context={'request':'지금 A B C systemd 상태 조회해줘',
             'background':'이전 답변은 현재 상태의 근거가 아니다.',
@@ -121,7 +133,7 @@ class ChatRead(unittest.TestCase):
                 w.management_read_request(r,a,pending=True)
 
     @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
-    def test_three_hosts_can_use_one_tool_but_duplicate_arguments_are_rejected(self):
+    def test_three_hosts_remain_required_and_current_duplicates_are_coalesced(self):
         from openai.types.chat import ChatCompletion
         a=agent();a.valid_tool_names={NAME};r=request();r['tools']=[self.tool]
         with patch.dict(w.os.environ,self.env,clear=True):
@@ -134,8 +146,68 @@ class ChatRead(unittest.TestCase):
                         json.dumps({'request_nonce':lease['nonce'],'calls':rows})}}])
             out,count=w.management_selection_response(response(calls),lease,a)
             self.assertEqual(count,3);self.assertEqual(len(out.choices[0].message.tool_calls),3)
-            with self.assertRaises(Exception):w.management_selection_response(response(calls+[calls[0]]),lease,a)
+            out,count=w.management_selection_response(response(calls+[calls[0]]),lease,a)
+            self.assertEqual(count,3)
             self.assertEqual(lease['catalog'][NAME],self.tool['function']['parameters'])
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_current_service_native_lease_excludes_unasked_hosts_and_keeps_retry_scope(self):
+        from jsonschema import Draft202012Validator
+        a=agent();a.valid_tool_names={NAME};r=request();tool=copy.deepcopy(self.tool)
+        props=tool['function']['parameters']['properties']
+        props['target']['enum']+=['b:management']
+        props['limit']={'type':'integer','minimum':1,'maximum':50,'default':20}
+        props['lookback_minutes']={'type':'integer','minimum':1,'maximum':1440,'default':15}
+        r['tools']=[tool];before=copy.deepcopy(r)
+        for names in ([NAME],None):
+            env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,tools=names,
+                request='B 서버 capstone-management.service의 지금 실행 상태와 시작 설정 알려줘.')))
+            with patch.dict(w.os.environ,env,clear=True):
+                for _ in range(2):
+                    out=w.management_read_request(r,a,pending=True);lease=a._capstone_management_selection
+                    schema=out['response_format']['json_schema']['schema']
+                    self.assertTrue(lease['current_diagnostic'])
+                    self.assertEqual(schema['properties']['calls']['maxItems'],1)
+                    self.assertEqual(lease['catalog'][NAME]['properties']['target']['enum'],['b:management'])
+                    for target in ('a:systemd','c:systemd'):
+                        self.assertFalse(Draft202012Validator(schema).is_valid({'request_nonce':lease['nonce'],
+                            'calls':[{'tool':NAME,'arguments':{'target':target}}]}))
+        self.assertEqual(r,before)
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_current_native_defaults_deduplicate_without_weakening_nonce_or_arguments(self):
+        from openai.types.chat import ChatCompletion
+        a=agent();a.valid_tool_names={NAME};r=request();tool=copy.deepcopy(self.tool)
+        props=tool['function']['parameters']['properties'];props['target']['enum']+=['b:management']
+        props['limit']={'type':'integer','minimum':1,'maximum':50,'default':20}
+        props['lookback_minutes']={'type':'integer','minimum':1,'maximum':1440,'default':15}
+        r['tools']=[tool]
+        env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,
+            request='B 서버 capstone-management.service 현재 상태?')))
+        with patch.dict(w.os.environ,env,clear=True):w.management_read_request(r,a,pending=True)
+        lease=a._capstone_management_selection
+        def response(rows,nonce=lease['nonce']):
+            return ChatCompletion(id='test',model=a.model,created=0,object='chat.completion',
+                choices=[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':
+                    json.dumps({'request_nonce':nonce,'calls':rows})}}])
+        first={'tool':NAME,'arguments':{'target':'b:management'}}
+        same={'tool':NAME,'arguments':{'target':'b:management','limit':20,'lookback_minutes':15}}
+        out,count=w.management_selection_response(response([first,same]),lease,a)
+        self.assertEqual(count,1)
+        self.assertEqual(json.loads(out.choices[0].message.tool_calls[0].function.arguments),first['arguments'])
+        for invalid in ({'tool':NAME,'arguments':{'target':'a:systemd'}},
+                        {'tool':NAME,'arguments':{'target':'b:management','limit':51}}):
+            with self.assertRaises(Exception):w.management_selection_response(response([first,same,invalid]),lease,a)
+        with self.assertRaises(Exception):w.management_selection_response(response([first],nonce='old'),lease,a)
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_temporal_service_request_does_not_receive_current_only_lease(self):
+        a=agent();a.valid_tool_names={NAME};r=request();r['tools']=[self.tool]
+        env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,
+            request='B 서버 capstone-management.service 지금 상태 두 번 비교해줘')))
+        with patch.dict(w.os.environ,env,clear=True):out=w.management_read_request(r,a,pending=True)
+        self.assertNotIn('current_diagnostic',a._capstone_management_selection)
+        self.assertEqual(out['response_format']['json_schema']['schema']['properties']['calls']['maxItems'],4)
 
     @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
     def test_registered_time_schema_projection_rejects_systemd_history_and_matches_native(self):

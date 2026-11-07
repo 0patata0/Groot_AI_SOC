@@ -26,6 +26,27 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_native_current_service_selection_uses_same_question_bound_single_target_cap(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        question='B 서버 capstone-management.service의 지금 실행 상태와 시작 설정 알려줘.'
+        name='mcp__system_diagnostics__get_system_diagnostics'
+        rows=[{'role':'system','content':'native'},{'role':'user','content':question}]
+        agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='a')
+        source={'messages':rows,'tools':[{'type':'function','function':{'name':name,
+            'description':'read diagnostics','parameters':{'type':'object','properties':{
+                'target':{'type':'string','enum':['a:systemd','b:management','c:systemd']}},
+                'required':['target'],'additionalProperties':False}}}]}
+        wrapped=alignment.request_wrapper(lambda *args,**kw:Request(copy.deepcopy(source)),PLUGIN,H)
+        result=wrapped(agent,original_user_message=question,turn_id='a',messages=rows)
+        schema=result.api_kwargs['response_format']['json_schema']['schema']
+        self.assertEqual(schema['properties']['calls']['maxItems'],1)
+        args=schema['properties']['calls']['items']['anyOf'][0]['properties']['arguments']
+        self.assertEqual(args['properties']['target']['enum'],['b:management'])
+
     def test_workflow_context_is_replaced_once_when_request_changes(self):
         @dataclass
         class Request:

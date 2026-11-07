@@ -2127,9 +2127,15 @@ def chat_read_schema(name, schema):
     rules=schema.get('allOf',[])
     expected=[{'not':{'required':['lookback_minutes','since_kst']}},
               {'not':{'required':['lookback_minutes','until_kst']}}]
-    if (len(rules)!=3 or rules[:2]!=expected or rules[2].get('if')!={'required':['since_kst']}
+    journal_conditions=[{'if':{'required':['view']},'then':{'required':['since_kst','until_kst']}},
+                        {'if':{'required':['journal_scope']},'then':{'required':['view']}}]
+    journal=(len(rules)==5 and rules[2:4]==journal_conditions
+             and schema.get('properties',{}).get('view',{}).get('enum')==['journal']
+             and schema.get('properties',{}).get('journal_scope',{}).get('enum')==['errors','all'])
+    if (not (len(rules)==3 or journal) or rules[:2]!=expected or rules[-1].get('if')!={'required':['since_kst']}
             or schema.get('dependentRequired')!={'since_kst':['until_kst'],'until_kst':['since_kst']}):return schema
-    condition=rules[2].get('then',{})
+    if not journal and {'view','journal_scope'} & set(schema.get('properties',{})):return schema
+    condition=rules[-1].get('then',{})
     history=condition.get('properties',{}).get('target',{}).get('enum')
     if (set(condition)-{'properties','type','required'} or condition.get('required',[])
             or condition.get('type','object')!='object'
@@ -2139,11 +2145,18 @@ def chat_read_schema(name, schema):
     recent=copy.deepcopy(schema);past=copy.deepcopy(schema)
     for value in (recent,past):
         value.pop('allOf');value.pop('dependentRequired')
-    for key in ('since_kst','until_kst'):recent['properties'].pop(key,None)
+    for key in ('since_kst','until_kst','view','journal_scope'):recent['properties'].pop(key,None)
     past['properties'].pop('lookback_minutes',None)
     past['properties']['target']['enum']=[x for x in history if x in past['properties']['target']['enum']]
     past['required']=list(dict.fromkeys(past.get('required',[])+['since_kst','until_kst']))
-    return {'anyOf':[recent,past]} if past['properties']['target']['enum'] else recent
+    if not past['properties']['target']['enum']:return recent
+    branches=[recent,past]
+    if journal:
+        excerpt=copy.deepcopy(past)
+        excerpt['required']=list(dict.fromkeys(excerpt['required']+['view']))
+        for key in ('view','journal_scope'):past['properties'].pop(key)
+        branches.append(excerpt)
+    return {'anyOf':branches}
 
 
 def chat_read_context():

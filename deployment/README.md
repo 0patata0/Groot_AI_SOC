@@ -1,10 +1,10 @@
 # 구축·운영 가이드
 
-11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.
+11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.
 
 11/7: SSH·실습 관리 주소, Wazuh 웹 관리 주소, 자동 차단 보호 주소를 별도로 입력한다. 관리자 SSH의 특정 횟수 경보만 예외 처리하고 다른 공격/인증 로그를 유지한다. [정책과 정기보고의 적용 전후 구분](../infra/validation/admin-ssh/README.md).
 
-현재 query1.19.75는 [관측 범위 검사](../infra/hermes/observation-scope.md)를 두 봇과 관리 게이트에 동기화했다. 프로세스 상태와 서비스 기능 정상, 로그 연속성 미검증과 실패를 구분한다. 고유1,112검사·B9파일/보호7SHA 확인. 기존 소스 복사·내장 게이트 경로를 사용하며 추가 패키지/포트/키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래74 기록은 당시 범위다.
+11/6 당시 query1.19.75는 [관측 범위 검사](../infra/hermes/observation-scope.md)를 두 봇과 관리 게이트에 동기화했다. 프로세스 상태와 서비스 기능 정상, 로그 연속성 미검증과 실패를 구분한다. 고유1,112검사·B9파일/보호7SHA 확인. 기존 소스 복사·내장 게이트 경로를 사용하며 추가 패키지/포트/키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래74 기록은 당시 범위다.
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 

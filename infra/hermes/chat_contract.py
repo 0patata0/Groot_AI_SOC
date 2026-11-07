@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.70'
+VERSION = 'soc-chat-contract:1.5.71'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -559,15 +559,21 @@ def service_history_plan(request, question, requested_at):
             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
                 or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
     options=[]
+    wants_journal=bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])(?:raw|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I))
+    journal_supported='journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
     for target in sorted(targets):
         if current:options.append({'tool':name,'arguments':{'target':target}})
         options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
                        for start,end in periods)
+        if wants_journal and journal_supported:
+            options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),
+                'until_kst':end.isoformat(),'view':'journal','limit':50}} for start,end in periods)
     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
     only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
-            'current_companions':related}
+            'current_companions':related,
+            'unavailable_capabilities':['journal_excerpt'] if wants_journal and not journal_supported else []}
 
 
 def service_history_state(plan, receipts, now=None):
@@ -578,21 +584,25 @@ def service_history_state(plan, receipts, now=None):
     """
     state={'pending':[],'incomplete':[]}
     if not plan:return state
+    state['incomplete'].extend(str(x)+':tool_capability_unavailable' for x in plan.get('unavailable_capabilities',[]))
     now=now or datetime.now(timezone(timedelta(hours=9)))
     for required in plan['requirements']:
         args=required['arguments'];target=args['target'];past='since_kst' in args
         runtime=target in plan.get('current_companions',[])
+        journal=args.get('view')=='journal'
         matches=[]
         for row in receipts:
             if not isinstance(row,dict):continue
             actual=row.get('arguments',{})
             if row.get('tool')!=required['tool'] or not isinstance(actual,dict) or actual.get('target')!=target:continue
-            if set(actual)-{'target','limit','lookback_minutes','since_kst','until_kst'}:continue
+            if set(actual)-{'target','limit','lookback_minutes','since_kst','until_kst','view','journal_scope'}:continue
+            if actual.get('view')!=args.get('view'):continue
+            if journal and actual.get('journal_scope','errors')!=args.get('journal_scope','errors'):continue
             if past:
                 if 'lookback_minutes' in actual or any(_diagnostic_instant(actual.get(k))!=_diagnostic_instant(args[k]) for k in ('since_kst','until_kst')):continue
             elif {'since_kst','until_kst'} & set(actual):continue
             matches.append(row)
-        label=target+(':history' if past else ':current')
+        label=target+(':journal' if journal else ':history' if past else ':current')
         if not matches:state['pending'].append(required);state['incomplete'].append(label+':not_read');continue
         row=matches[-1];data=row.get('data',{})
         if (row.get('is_error') is not False or not isinstance(data,dict) or type(data.get('schema')) is not int or data['schema']!=1
@@ -602,7 +612,12 @@ def service_history_state(plan, receipts, now=None):
             state['incomplete'].append(label+':unavailable');continue
         stamp=_diagnostic_instant(data.get('observed_at_kst'))
         if not stamp or not -5<=(now-stamp).total_seconds()<=180:state['incomplete'].append(label+':stale');continue
-        if past:
+        if journal:
+            valid=(data.get('kind')=='journal_excerpt' and data.get('status')=='observed'
+                   and data.get('journal_scope')==args.get('journal_scope','errors')
+                   and all(_diagnostic_instant(data.get('requested_'+k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))
+                   and bool(diagnostic_journal_fields(data).get('journal_valid')))
+        elif past:
             valid=(data.get('kind')=='journal_history' and 'properties' not in data
                    and all(_diagnostic_instant(data.get('requested_'+k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))
                    and isinstance(data.get('history_coverage'),dict) and type(data.get('has_more')) is bool)
@@ -873,9 +888,52 @@ def operator_diagnostic_options(request, context, receipts=()):
     return options
 
 
+def diagnostic_journal_fields(data):
+    """Keep authenticated excerpt receipts distinct from current state/indexes."""
+    out={'diagnostic_mode':'journal_excerpt','journal_valid':False}
+    rows=data.get('entries')
+    start,end=(_diagnostic_instant(data.get('requested_'+k)) for k in ('since_kst','until_kst'))
+    if (data.get('kind')!='journal_excerpt' or data.get('status')!='observed'
+            or data.get('live_query') is not True or data.get('mutation_performed') is not False
+            or data.get('redacted_excerpts_returned') is not True or data.get('raw_messages_returned') is not False
+            or data.get('journal_retention_verified') is not False or data.get('requested_window_total_count') is not None
+            or type(data.get('has_more')) is not bool or type(data.get('response_size_limited')) is not bool
+            or data.get('response_size_limited') and not data['has_more']
+            or not start or not end or start>=end
+            or data.get('journal_scope') not in ('all','errors') or not isinstance(rows,list) or len(rows)>50
+            or type(data.get('returned_entries')) is not int or data['returned_entries']!=len(rows)):return out
+    identities=set();codes=[]
+    for row in rows:
+        if not isinstance(row,dict):return out
+        at=_diagnostic_instant(row.get('at_kst'));identity=row.get('record_sha256')
+        if (not at or not start<=at<=end or not isinstance(identity,str)
+                or type(row.get('priority')) is not int or not 0<=row['priority']<=7
+                or not re.fullmatch('[0-9a-f]{64}',identity) or identity in identities):return out
+        identities.add(identity)
+        text,state,sha=row.get('message_excerpt'),row.get('message_state'),row.get('message_sha256')
+        if state in ('unchanged','redacted'):
+            if (not isinstance(text,str) or len(text.encode())>8192 or not isinstance(sha,str)
+                    or not re.fullmatch('[0-9a-f]{64}',sha)
+                    or row.get('excerpt_sha256')!=hashlib.sha256(text.encode()).hexdigest()
+                    or state=='unchanged' and sha!=row['excerpt_sha256']):return out
+            try:value=json.loads(text)
+            except ValueError:value=None
+            if data.get('target')=='b:management' and data.get('unit')=='capstone-management.service' and value=={'status':'failed','error':'controller_already_running'}:
+                codes.append({'code':'controller_already_running','observed_at_kst':row['at_kst'],'record_sha256':identity})
+        elif state in ('non_text_message','invalid_text_message','message_size_bound'):
+            if text is not None or row.get('excerpt_sha256') is not None:return out
+            if sha is not None and (not isinstance(sha,str) or not re.fullmatch('[0-9a-f]{64}',sha)):return out
+        else:return out
+    out.update(journal_valid=True,journal_entries=copy.deepcopy(rows),journal_scope=data['journal_scope'],
+               journal_has_more=data['has_more'],journal_returned_entries=len(rows),unit=data.get('unit'))
+    if codes:out['error_code_observations']=codes
+    return out
+
+
 def diagnostic_observation_fields(data):
-    """Preserve typed exit observations and their unit/time, never journal prose."""
+    """Preserve typed observations; journal prose is a separate validated view."""
     out={'diagnostic_mode':'journal_history' if data.get('kind')=='journal_history' else 'snapshot'}
+    if data.get('kind')=='journal_excerpt':return diagnostic_journal_fields(data)
     if data.get('kind')=='runtime':
         # Keep runtime snapshots distinct from unit/error samples, including
         # unavailable observations. Never invent a missing metric as zero.
@@ -972,6 +1030,21 @@ def diagnostic_evidence_rows(row, stamp):
     def count(value):return str(value) if type(value) is int and value>=0 else '미확인'
     historical=row.get('diagnostic_mode')=='journal_history'
     scope='관측 '+stamp(row.get('observed_at_kst'))
+    if row.get('diagnostic_mode')=='journal_excerpt':
+        if row.get('journal_valid') is not True:return [(target+' journal 원문 발췌','검증 불가','현재 상태·원문 부재·0건의 증거 아님')]
+        scope+='; 실제 journal 조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))
+        scope+='; 비밀 마스킹 적용·보존 전체/무오류 증명 아님'
+        if row.get('journal_has_more'):scope+='; 추가 표본/잘림 있음'
+        entries=row.get('journal_entries',[]);groups={}
+        for item in entries:
+            groups.setdefault((item['message_excerpt'],item['message_state']),[]).append(item['at_kst'])
+        answer=[(target+' journal 원문 발췌','반환 '+count(row.get('journal_returned_entries'))+'행; '+row['journal_scope']+' 표본',scope)]
+        for i,((text,state),times) in enumerate(list(groups.items())[:8],1):
+            excerpt=(text[:240]+(' …[표시 생략]' if len(text)>240 else '')) if text is not None else '본문 미반환: '+state
+            answer.append(('로그 발췌 '+str(i)+' / '+str(len(times))+'행',excerpt,
+                stamp(min(times,key=_diagnostic_instant))+' ~ '+stamp(max(times,key=_diagnostic_instant))+'; '+state))
+        if len(groups)>8:answer.append(('발췌 표시 한도',str(len(groups)-8)+'종 추가','전체 반환 내용·해시는 도구 영수증에 보존'))
+        return answer
     if type(row.get('age_seconds')) is int and row['age_seconds']>=0:
         scope+='; 수집본 나이 '+str(row['age_seconds'])+'초(실시간 직접 조회 아님)'
     ages=row.get('_display_repeat_ages')

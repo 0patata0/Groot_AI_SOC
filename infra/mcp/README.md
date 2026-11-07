@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-11/8 [제한된 journal 조회 후보](journal-excerpts.md): 기존 `get_system_diagnostics`의 `view=journal`로 등록 서비스·KST 구간의 마스킹된 메시지와 SHA를 반환한다. Mac104·Linux83검사와 B 격리 환경의 실제 비특권 읽기32행/오류원문8행을 확인했다. **운영 A/B/C 배포와 봇의 원문 표시·판단 연결은 아직 미완료**이며 아래 기존 운영 범위와 구분한다. 새 도구 이름·TCP 포트·일반 sudo/Docker 권한은 추가하지 않는다.
+11/8 [제한된 journal 원문 조회](journal-excerpts.md)를 A/B/C 운영에 적용했다. 기존 get_system_diagnostics의 view=journal로 고정 서비스·KST 기간의 마스킹된 메시지와 SHA를 읽고 두 봇에서 원문/이력/현재 상태를 구분한다. 진단MCP1.3.0·Linux1,544회귀검사·실제MCP11호출(성공9/거절2). 원문 조회 성공과 최종 판단 품질을 구분하며 [현재 결과](../../STATUS.md)를 따른다. 새 도구 이름/TCP/일반 sudo·Docker 권한0.
 
 현재 security-events1.3.2/query79/common1.5.35는 [시간·필터 보완](../hermes/chat-read-scope.md)을 반영한다. `search_wazuh_alerts(program_name="systemd")`는 `predecoder.program_name` 정확 검색이며 자유 DSL이 아니다. 적용 필터와 프로그램명을 반환하고7읽기·권한·진단1.2.2를 유지한다. 이전32조합은 등록/SDK 검증이었고, 최종 Native provider의 제약 손실은79에서 별도로 수정·40조합 검사했다. 고유1,287PASS; 복합 실제 채팅95.209초/품질 실패로60초 목표는 미완료다.
 
@@ -144,7 +144,7 @@ Hermes UID995의 SDK로6서버 initialize/list를 다시 확인했다. 서버가
 
 ## 2026-10-23 고정 시스템 진단 — A/B/C 배포·실제 SDK 검증 완료
 
-`system-diagnostics`의 읽기 도구1개 `get_system_diagnostics`를 추가했다. A/B/C의 허용된 systemd 대상25개에서 상태·`Type`·종료 코드·재시작 횟수와 최대4시간의 분류된 오류 표본을 읽는다. root collector의60초 주기·TTL180초 snapshot을 읽고 원문 journal·환경·명령·HTTP 본문은 반환하지 않는다. 미설치·중지·실패한 unit도 조회하며, 조회 실패/잘림/범위 한계를 정상이나 오류0으로 바꾸지 않는다. 기존 승인형 변경·LLM 관리 주체와 일반 sudo/Docker 금지 정책을 유지한다. [범위·전송·검증 계약](system-diagnostics.md).
+`system-diagnostics`의 읽기 도구1개 `get_system_diagnostics`를 추가했다. A/B/C의 허용된 systemd 대상25개에서 상태·`Type`·종료 코드·재시작 횟수와 최대4시간의 분류된 오류 표본을 읽는다. 기본 조회는 root collector의60초 주기·TTL180초 snapshot을 읽고 본문을 반환하지 않는다. 11/8 추가한 명시 view=journal은 별도 고정 reader의 제한된 마스킹 발췌를 반환한다. 미설치·중지·실패한 unit도 조회하며, 조회 실패/잘림/범위 한계를 정상이나 오류0으로 바꾸지 않는다. 기존 승인형 변경·LLM 관리 주체와 일반 sudo/Docker 금지 정책을 유지한다. [범위·전송·검증 계약](system-diagnostics.md).
 
 기존 B는21:21:05 KST에 동일 Hermes CID·컨테이너 설정을 보존한 채 여섯 번째 MCP 등록을 마쳤다. 실제 UID995 SDK에서 기존5개 MCP의 도구 이름 해시 보존, 새 도구의 A/B/C 읽기, 잘못된 인자와 쓰기 도구 거부, 관리/검증 모드의 읽기 허용을 확인했다. SDK의 빈 `_meta` 호환성과 journal grep의 정상 무매치 종료코드1을 고친 후 추가 컨테이너 재시작 없이 A/B의 관측0건과 C의 과거 분류 오류 보존을 다시 확인했다. 이0건은 제한된 수집 표본이며 전체 journal이나 서비스 정상의 보증이 아니다. 모델 요청·채팅 게시와 새 서버 전체 설치는 수행하지 않았다. [v3 역사·v4 후속·검증 한계](system-diagnostics-validation-20261023.json).
 

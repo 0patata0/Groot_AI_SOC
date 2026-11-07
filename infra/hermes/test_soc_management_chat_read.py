@@ -254,8 +254,12 @@ class ChatRead(unittest.TestCase):
                           {'until_kst':'2026-11-06T01:00:00+09:00'},
                           {'since_kst':'2026-11-06T00:00:00+09:00','until_kst':'2026-11-06T01:00:00+09:00'},
                           {'since_kst':'2026-11-06T00:00:00+09:00','until_kst':'2026-11-06T01:00:00+09:00','lookback_minutes':10}):
-                args=dict(target=target,**times)
-                self.assertEqual(native.is_valid(args),grammar.is_valid(args),args)
+                for journal in ({},{'view':'journal'},{'journal_scope':'all'},
+                                {'view':'journal','journal_scope':'all'},
+                                {'view':'journal','journal_scope':'errors'},
+                                {'view':'summary'},{'view':'journal','journal_scope':'unknown'}):
+                    args=dict(target=target,**times,**journal)
+                    self.assertEqual(native.is_valid(args),grammar.is_valid(args),args)
         unknown=copy.deepcopy(schema);unknown['allOf'].append({'required':['limit']})
         self.assertIs(w.chat_read_schema(NAME,unknown),unknown)
         self.assertIs(w.chat_read_schema('other',schema),schema)

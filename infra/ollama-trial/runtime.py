@@ -353,6 +353,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if not value['more_evidence']:
                         review=value['report'];indexes=review.pop('evidence_indexes')
                         review['evidence_tools']=[citations[i] for i in indexes]
+                        report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
                         return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
                     selected={n:readable[n] for n in value['read_tools']}
                     call_schema=harness.selection_schema({n:t.args_schema for n,t in selected.items()},budget.limit-budget.used)
@@ -528,7 +529,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 final = harness.write_report(final, progress)
             final = harness.EVIDENCE.kst_display(harness.footer_free(str(final)))
             report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(agent_role='ollama'), 'model_steps': steps, 'tool_calls': budget.limit}
-            report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') else 'completed', final_response=final,
+            unresolved_service=(report.get('service_judgment',{}).get('assessment')=='unresolved'
+                or report.get('service_judgment',{}).get('status') in ('needs_review','awaiting_approval','monitor'))
+            report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') or unresolved_service else 'completed', final_response=final,
                           conversation_seconds=time.perf_counter() - tick)
             if not report['protected_calls'] and report['calls'] and all(
                     harness.EVIDENCE.allowed(alias(c['server'],c['name']),'verify') for c in report['calls']):

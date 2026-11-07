@@ -7,7 +7,7 @@
 기존 학습 모델의 [실제 MCP 사용·원본 비교](finetuning/RUNTIME_COMPARISON_20261107.md)를 실행하고, 미조회 답변 실패와 공통 보완을 기록한다. 새 학습이나 운영 모델 전면 교체와 구분한다. [시험·채택 기준](finetuning/TRAINED_MODEL_TRIAL.md).
 
 현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입과13:22 KST 독립 GPU사전시험2단계를 완료했다. 당시 SSH 단절 독립 실행을 확인했으며 그 사전시험에서는 본학습을 자동 시작하지 않았다. [품질 보완 준비](finetuning/QUALITY_PREPARATION.md)는 균형 후보1,220건·중간 평가/최선 보존·별도 평가32건·비교 설정6개를 구성하고13:46 새 GPU사전시험을 완료했다. 6군 정확도 비교·운영 승격은 미완료다. 이후 사용자 승인으로20:54 균형 본학습 실행기를 등록했으며, 마지막20:55 관측은 유휴 자원 대기였다. 아침 재지시까지 현황 조회를 중단한다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
-현재 query1.19.121/common1.5.70·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](infra/hermes/short-read-evidence.md). 후속 공통63은 정상 동작의 직접 부정 문구를 정상 선언으로 읽던 검사 오류를 수정했다. 1,392검사 통과·운영 반영 완료이나 새 복합 질문 H50.595/O53.258초는 모두 품질 미완료다. [후속 검증·잔여](infra/hermes/diagnostic-disclaimers.md).
+현재 query1.19.122/common1.5.71·routing1.1.6/진단MCP1.3.0이다. 아래 단문 수치는 이전 검증 범위다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](infra/hermes/short-read-evidence.md). 후속 공통63은 정상 동작의 직접 부정 문구를 정상 선언으로 읽던 검사 오류를 수정했다. 1,392검사 통과·운영 반영 완료이나 새 복합 질문 H50.595/O53.258초는 모두 품질 미완료다. [후속 검증·잔여](infra/hermes/diagnostic-disclaimers.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 
@@ -19,9 +19,9 @@
 
 11/8 공통68/query121은 서비스 보고의 후속 조회를 실제 도구 입력 규격에 결속하고, 제안·기능 공백·실행을 구분합니다.1,439고유검사 통과·운영 확정했지만 새 채팅 Hermes90.544초/Ollama109.325초는 모두partial입니다. 반복 조사와 처리지연 오답이 남으며 전체 정확성·60초 목표 달성으로 표시하지 않습니다. [변경·실측·복구](infra/hermes/service-followup-schema.md).
 
-11/8 SDK 추가근거의 실제 MCP 실행·반복 거절에 이어 common70의 자연어 KST 기간 연결을 운영 반영했습니다.1,449고유검사·새 채팅 H80.744초/O41.842초에서 필수3읽기를 확인했습니다. 원문 journal 미반환·Hermes 불필요FW/수집범위 과장·Ollama의 미완료인데 completed 상태가 남아 조사 품질은 미완료입니다. 이번 시간 수정은 계획된 Hermes재시작2회이며 운영 원본35B·승인/FW를 유지했습니다. [현재 결과·실패·복구](infra/hermes/service-periods.md) · [이전 실행 수정](infra/ollama-trial/service-inquiry.md). 기존3모델15보고 비교도 학습 우위를 입증하지 못했습니다. [조건·결과](finetuning/SERVICE_REASONING_COMPARISON_20261108.md).
+11/8 SDK 추가근거의 실제 MCP 실행·반복 거절에 이어 common70의 자연어 KST 기간 연결을 운영 반영했습니다.1,449고유검사·새 채팅 H80.744초/O41.842초에서 필수3읽기를 확인했습니다. 당시 원문 journal 미반환·Hermes 불필요FW/수집범위 과장·Ollama의 미완료인데 completed 상태를 확인했고, 후속 원문 연결·상태 보완과 구분합니다. 이번 시간 수정은 계획된 Hermes재시작2회이며 운영 원본35B·승인/FW를 유지했습니다. [이전 시간 처리 결과·실패·복구](infra/hermes/service-periods.md) · [이전 실행 수정](infra/ollama-trial/service-inquiry.md). 기존3모델15보고 비교도 학습 우위를 입증하지 못했습니다. [조건·결과](finetuning/SERVICE_REASONING_COMPARISON_20261108.md).
 
-서비스 원문 조회는 기존 MCP에 `view=journal`을 추가하는 후보를 구현하고 B 비특권 계정에서 실제32행/오류원문8행을 확인했습니다. Mac104·Linux83검사·정확 인자 스키마12조건을 검증했으며, 운영 A/B/C 적용과 양봇의 원문 표시·판단은 후속입니다. [구현·실패 수정·한계](infra/mcp/journal-excerpts.md).
+서비스 원문 조회 `view=journal`을 A/B/C에 적용하고 두 봇의 원문·이력·현재 상태 구분과 SDK 미완료 상태를 보완했습니다. Linux1,544검사·실제MCP11호출(정상9/거절2)·B원문32행/오류8행SHA를 확인했습니다. 새 Hermes 채팅은 원문 표시까지 성공했으나140.678초/7읽기·최종판단 미완료이므로 전체 정확성·60초 목표 달성은 아닙니다. 최신 결과는 [STATUS](STATUS.md)를 따릅니다. [구현·실패 수정·한계](infra/mcp/journal-excerpts.md).
 
 11/8 복합 판단 후속은 필드 의미 설명·보고 지침 정리·반복 억제·추론 옵션의10출력(제어군 포함)을 대조했으나 모두 비채택했습니다. 추론 활성62.700초도 의미 오류가 남았고, 운영 설정은 유지합니다. [실제 설정·비채택 근거·다음 작업](infra/hermes/service-semantics-probes.md).
 
@@ -586,7 +586,7 @@ A 로그 정제 중단과 Suricata/WAF 원본 회전 상호 대기를 수정했�
 
 A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snapshot reader·단일 `get_system_diagnostics` MCP를 연결했다. 일반 sudo·Docker·임의 shell/journal 권한은 추가하지 않는다. 기존 B는 원본 해시·유휴/승인/lease 검사와 복구 백업을 거쳐 최소 이관했으며, 단일 `deploy.sh`의 새 서버 설치 경로도 같은 소스 계약을 사용한다. 운영 서버에는 초기 설치기 전체를 실행하지 않았다.
 
-설치된 MCP SDK2.0.0의 표준 `_meta` 호환성과 journal grep의 정상적인 일치 없음 처리를 보완했다. core33·진단 설치기18·controller37·SIEM40 회귀와 실제 UID995 SDK의6개 MCP initialize/list, 잘못된 인자·쓰기 도구 거절을 확인했다. 최종 A/B/C4개 대상 조회에서 A/B 오류 표본0과 C의 과거 `publication_failed` 분류를 확인했다. C terminal 오류103개 중 보존50개로 잘림이 있으므로 전체 로그 건수나 정확한 원인 분석으로 해석하지 않는다. 원문 MESSAGE·환경·명령·HTTP 본문은 반환하지 않는다.
+설치된 MCP SDK2.0.0의 표준 `_meta` 호환성과 journal grep의 정상적인 일치 없음 처리를 보완했다. core33·진단 설치기18·controller37·SIEM40 회귀와 실제 UID995 SDK의6개 MCP initialize/list, 잘못된 인자·쓰기 도구 거절을 확인했다. 최종 A/B/C4개 대상 조회에서 A/B 오류 표본0과 C의 과거 `publication_failed` 분류를 확인했다. C terminal 오류103개 중 보존50개로 잘림이 있으므로 전체 로그 건수나 정확한 원인 분석으로 해석하지 않는다. 당시 snapshot/정제 이력은 원문 MESSAGE·환경·명령·HTTP 본문을 반환하지 않았다. 11/8 별도 view=journal의 제한된 마스킹 발췌가 추가됐으며 최신 범위는 [원문 조회](infra/mcp/journal-excerpts.md)를 따른다.
 
 [실제 SDK·운영 증거](infra/mcp/system-diagnostics-validation-20261023.json) · [설치·후속 핀 증거](deployment/diagnostics-journal-fix-validation-20261023.json) · [추가 검증 계획](infra/추가검증_계획_2026-10-23.md). 새3VM 전체 설치·실제 취약점 공격/탐지/대응 E2E·재부팅·장시간 터미널 만료는 이번 완료 범위와 구분한다.
 

@@ -293,7 +293,7 @@ class ServiceHistory(unittest.TestCase):
         plan=c.service_history_plan(catalog(),f'{start} ~ {self.at} c:apache 오류 조회',self.at)
         self.assertEqual(plan['requirements'][0]['arguments'],{'target':'c:apache','since_kst':start,'until_kst':self.at})
 
-    def test_natural_kst_intervals_preserve_exact_date_clock_and_three_required_reads(self):
+    def test_natural_kst_intervals_preserve_exact_date_clock_and_requested_journal(self):
         at='2026-11-08T18:00:00+09:00'
         for time_text,start,end in (
             ('2026-11-06 16:20~16:40 KST','2026-11-06T16:20:00+09:00','2026-11-06T16:40:00+09:00'),
@@ -306,8 +306,9 @@ class ServiceHistory(unittest.TestCase):
             with self.subTest(time_text=time_text):
                 q=f'B의 capstone-management.service 오류 원문하고 지금 상태를 확인해줘. 오류 구간은 {time_text}야. 관제 처리도 밀렸는지 확인하고 설정 변경은 하지 마.'
                 plan=c.service_history_plan(catalog(),q,at);self.assertIsNotNone(plan)
-                reads=plan['requirements'];self.assertEqual(len(reads),3)
+                reads=plan['requirements'];self.assertEqual(len(reads),4)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end}},reads)
+                self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end,'view':'journal','limit':50}},reads)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management'}},reads)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management-pipeline'}},reads)
 
@@ -772,6 +773,106 @@ class ServiceReport(unittest.TestCase):
         Draft202012Validator(schema).validate({'request_nonce':nonce,'calls':[{'tool':NAME,'arguments':{'target':'b:management'}}],'report':None})
         with self.assertRaises(ValidationError):Draft202012Validator(schema).validate({'request_nonce':nonce,'calls':[{'tool':other,'arguments':{}}],'report':None})
 
+
+
+class JournalEvidence(unittest.TestCase):
+    def setUp(self):
+        history=load('journal_fixture_history',ROOT/'infra/mcp/diagnostic_history.py');history.core=d
+        journal=load('journal_fixture_excerpt',ROOT/'infra/mcp/diagnostic_journal.py');journal.core=d
+        for name,value in (('_history',history),('_journal',journal)):
+            context=patch.object(d,name,value);context.start();self.addCleanup(context.stop)
+        self.at='2026-11-08T03:00:00+09:00';self.now=datetime.fromisoformat(self.at)
+        self.q='B의 capstone-management.service 오류 원문하고 지금 상태를 확인해줘. 오류 구간은 2026-11-06 16:20~16:40 KST야. 설정 변경은 하지 마.'
+        self.plan=c.service_history_plan(catalog(),self.q,self.at)
+        self.args=self.plan['requirements'][2]['arguments']
+
+    def data(self, messages=None):
+        if messages is None:messages=['{"status":"failed","error":"controller_already_running"}']*2
+        def runner(*args):
+            rows=[{'_SYSTEMD_UNIT':'capstone-management.service','__REALTIME_TIMESTAMP':str(int(
+                datetime.fromisoformat('2026-11-06T16:24:00+09:00').timestamp()*1000000)+i),
+                '__CURSOR':'fixture'+str(i),'PRIORITY':'6','MESSAGE':msg} for i,msg in enumerate(messages)]
+            return 0,('\n'.join(json.dumps(x) for x in rows)+'\n').encode()
+        return d.journal_library().answer(self.args,'b',int(self.now.timestamp()),runner=runner)
+
+    def receipt(self,data=None):
+        return {**copy.deepcopy(self.plan['requirements'][2]),'is_error':False,'data':data or self.data()}
+
+    def test_raw_target_names_do_not_request_message_reads(self):
+        for target in ('a:raw-waf','a:raw-suricata'):
+            p=c.service_history_plan(catalog(),'오늘 '+target+' 오류 조회',self.at)
+            self.assertEqual(len(p['requirements']),1)
+            self.assertNotIn('view',p['requirements'][0]['arguments'])
+        for word in ('원문','raw','journal','journalctl'):
+            p=c.service_history_plan(catalog(),'오늘 b:management 오류 '+word+' 확인',self.at)
+            self.assertEqual(p['requirements'][-1]['arguments']['view'],'journal')
+        self.assertIsNone(c.service_history_plan(catalog(),'오늘 b:management 원문 말고 오류 이력',self.at))
+
+    def test_old_catalog_never_invents_journal_capability_or_completeness(self):
+        req=catalog();req['tools'][0]['function']['parameters']['properties'].pop('view')
+        p=c.service_history_plan(req,self.q,self.at)
+        self.assertEqual(len(p['requirements']),3)
+        self.assertEqual(p['unavailable_capabilities'],['journal_excerpt'])
+        self.assertIn('journal_excerpt:tool_capability_unavailable',c.service_history_state(p,[],self.now)['incomplete'])
+
+    def test_history_cannot_substitute_for_excerpt_or_vice_versa(self):
+        state=c.service_history_state(self.plan,[self.receipt()],self.now)
+        self.assertNotIn('b:management:journal:scope_mismatch',state['incomplete'])
+        self.assertNotIn(self.plan['requirements'][2],state['pending'])
+        self.assertIn(self.plan['requirements'][1],state['pending'])
+        wrong=self.receipt();wrong['data']['kind']='journal_history'
+        state=c.service_history_state(self.plan,[wrong],self.now)
+        self.assertIn('b:management:journal:scope_mismatch',state['incomplete'])
+
+    def test_wrong_unit_window_scope_staleness_and_error_cannot_complete(self):
+        for changes in ({'unit':'other.service'},{'target':'a:nginx'},
+                        {'requested_since_kst':'2026-11-06T16:21:00+09:00'},
+                        {'journal_scope':'all'},{'observed_at_kst':'2026-11-08T02:00:00+09:00'}):
+            row=self.receipt();row['data'].update(changes)
+            self.assertTrue(any(x.startswith('b:management:journal:') for x in c.service_history_state(self.plan,[row],self.now)['incomplete']))
+        row=self.receipt();row['is_error']=True
+        self.assertIn('b:management:journal:unavailable',c.service_history_state(self.plan,[row],self.now)['incomplete'])
+
+    def test_changed_excerpt_hash_duplicate_cursor_priority_and_count_rejected(self):
+        for change in ('excerpt','raw_hash','cursor','priority','count','bounds','response_limit'):
+            data=self.data()
+            if change=='excerpt':data['entries'][0]['message_excerpt']='invented'
+            elif change=='raw_hash':data['entries'][0]['message_sha256']='0'*64
+            elif change=='cursor':data['entries'][0]['record_sha256']=data['entries'][1]['record_sha256']
+            elif change=='priority':data['entries'][0]['priority']=True
+            elif change=='count':data['returned_entries']=True
+            elif change=='bounds':data['entries'][0]['at_kst']='2026-11-06T16:00:00+09:00'
+            else:data['response_size_limited']=True
+            with self.subTest(change=change):self.assertFalse(c.diagnostic_journal_fields(data)['journal_valid'])
+
+    def test_masked_and_withheld_messages_remain_explicit_unknowns(self):
+        data=self.data(['password=fixture-secret-value', 'x'*8193, [1,2,3]])
+        facts=c.diagnostic_observation_fields(data)
+        self.assertTrue(facts['journal_valid'])
+        self.assertEqual({r['message_state'] for r in facts['journal_entries']},{'redacted','message_size_bound','non_text_message'})
+        self.assertNotIn('fixture-secret-value',str(facts))
+        self.assertNotIn('error_code_observations',facts)
+        table=c.diagnostic_evidence_rows({'kind':'diagnostics','target':data['target'],**facts},str)
+        self.assertIn('본문 미반환',str(table));self.assertNotIn('0건',str(table))
+
+    def test_verified_excerpt_reaches_shared_facts_and_bounded_table_without_mutating_receipt(self):
+        from types import SimpleNamespace as NS
+        data=self.data();before=copy.deepcopy(data)
+        facts=w.observation_facts('get_system_diagnostics',NS(isError=False,content=[NS(text=json.dumps(data))]),self.args)
+        self.assertTrue(facts[0]['journal_valid'])
+        self.assertEqual(len(facts[0]['error_code_observations']),2)
+        table=w.literal_evidence_table(facts)
+        self.assertIn('반환 2행',table);self.assertIn('로그 발췌 1 / 2행',table)
+        self.assertIn('controller_already_running',table)
+        self.assertNotIn('ActiveState',table);self.assertEqual(data,before)
+
+    def test_many_groups_and_long_text_show_display_limits_not_evidence_loss(self):
+        data=self.data([('different message '+str(i)+' ')*30 for i in range(10)])
+        facts=c.diagnostic_journal_fields(data);self.assertTrue(facts['journal_valid'])
+        rows=c.diagnostic_evidence_rows({'target':'b:management',**facts},str)
+        self.assertEqual(len(rows),10)
+        self.assertIn('2종 추가',str(rows));self.assertIn('[표시 생략]',str(rows))
+        self.assertEqual(len(facts['journal_entries']),10)
 
 
 if __name__=='__main__':unittest.main()

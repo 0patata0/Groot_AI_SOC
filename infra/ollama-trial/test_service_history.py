@@ -22,7 +22,7 @@ mcp=load('sdk_service_mcp',ROOT/'infra/mcp/system-diagnostics-mcp.py');mcp._libr
 
 @unittest.skipUnless(importlib.util.find_spec('jsonschema'),'existing server jsonschema required')
 class ServiceRuntime(unittest.TestCase):
-    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None):
+    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None):
         order=[];prompts=[];calls=[]
         class Connector:
             async def list_tools(self):return [types.SimpleNamespace(**mcp.tools()[0])]
@@ -37,6 +37,15 @@ class ServiceRuntime(unittest.TestCase):
                 elif arguments['target']=='b:management-pipeline':
                     data.update(target='b:management-pipeline',kind='runtime',status='degraded',metrics={'review_required_cases':2},codes=['case_review_required'],lookback_scope='latest_snapshot_only_not_requested_history');data.pop('unit')
                 else:data.update(status='observed',properties={'ActiveState':'active','Result':'success'})
+                if arguments.get('view')=='journal':
+                    at=datetime.fromisoformat(arguments['since_kst'])+timedelta(microseconds=1)
+                    row={'_SYSTEMD_UNIT':'capstone-management.service','__REALTIME_TIMESTAMP':str(int(at.timestamp()*1000000)),
+                         '__CURSOR':'fixture1','PRIORITY':'6','MESSAGE':'{"status":"failed","error":"controller_already_running"}'}
+                    history=load('sdk_journal_fixture_history',ROOT/'infra/mcp/diagnostic_history.py');history.core=core
+                    journal=load('sdk_journal_fixture_excerpt',ROOT/'infra/mcp/diagnostic_journal.py');journal.core=core
+                    with patch.object(core,'_history',history):
+                        data=journal.answer(arguments,'b',now=int(datetime.now(timezone.utc).timestamp())+1,
+                            runner=lambda *args:(0,json.dumps(row).encode()+b'\n'))
                 if past and failed:data={'error':'history unavailable'}
                 return types.SimpleNamespace(isError=bool(past and failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
         class Client:
@@ -82,7 +91,7 @@ class ServiceRuntime(unittest.TestCase):
             m=types.ModuleType(name);m.__dict__.update(values);modules[name]=m
         with patch.dict(runtime.os.environ,{'CAPSTONE_SERVICE_REPORT_COMPACT':'1' if enabled else '0'}),patch.dict(sys.modules,modules),patch.object(runtime,'capabilities',return_value={'system-diagnostics':['get_system_diagnostics']}),patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools):
             result=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid','access_mode':'hermes-parity',
-                'mcpServers':{'system-diagnostics':{}}},{'question':'오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
+                'mcpServers':{'system-diagnostics':{}}},{'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
         return result,order,prompts,calls
 
     def test_model_selects_both_reads_before_judgment_with_real_evidence(self):
@@ -93,6 +102,8 @@ class ServiceRuntime(unittest.TestCase):
         self.assertNotIn('since_kst',calls[0]);self.assertIn('since_kst',calls[1])
         self.assertIn('journal_history',json.dumps(prompts[0]));self.assertIn('ActiveState',json.dumps(prompts[0]));self.assertNotIn('assess',order)
         self.assertNotIn('unqueried',result);self.assertEqual(result['protected_calls'],0)
+        self.assertEqual(result['status'],'partial')
+        self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
         receipts=runtime.harness.service_history_receipts(result['calls']);self.assertEqual(len(receipts),3)
         tampered=[dict(c,result_sha256='0'*64) for c in result['calls']]
         self.assertEqual(runtime.harness.service_history_receipts(tampered),[])
@@ -112,6 +123,33 @@ class ServiceRuntime(unittest.TestCase):
         self.assertEqual(len(body['untrusted_completed_reads']),3)
         self.assertIn('등록 target 스키마',body['available_read_descriptions']['mcp__system_diagnostics__get_system_diagnostics'])
         self.assertIn('b:management',body['available_read_descriptions']['mcp__system_diagnostics__get_system_diagnostics'])
+
+    def test_explicit_journal_reaches_model_and_table_without_losing_other_reads(self):
+        result,order,prompts,calls=self.run_case(selection={'indexes':[0,1,2,3]},
+            question='오늘 B 서버 capstone-management.service 오류 원문하고 지금 상태 확인해줘. 설정은 바꾸지 마.')
+        self.assertEqual(result['status'],'partial',result)
+        self.assertEqual(len(calls),4);self.assertEqual(result['protected_calls'],0)
+        self.assertEqual([x.get('view') for x in calls],[None,None,'journal',None])
+        self.assertEqual(calls[-1]['target'],'b:management-pipeline')
+        body=json.loads(prompts[0][1]['content'])
+        receipts=body['untrusted_completed_reads'];self.assertEqual(len(receipts),4)
+        self.assertEqual(receipts[2]['data']['kind'],'journal_excerpt')
+        self.assertIn('controller_already_running',result['final_response'])
+        self.assertIn('반환 1행',result['final_response'])
+        self.assertNotIn('assess',order)
+
+    def test_observation_success_does_not_resolve_open_incident(self):
+        for assessment,status,expected in (('unresolved','resolved','partial'),('benign','needs_review','partial'),
+                                          ('benign','monitor','partial'),('benign','awaiting_approval','partial'),
+                                          ('benign','resolved','completed')):
+            with self.subTest(assessment=assessment,status=status):
+                value={'more_evidence':False,'report':{'assessment':assessment,
+                    'basis':'반환된 현재 서비스 관측과 과거 오류 표본의 범위를 구분하여 확인했습니다.',
+                    'evidence_indexes':[0],'limitations':['반환 범위 밖은 확인하지 않았습니다.'],
+                    'next_steps':[],'status':status}}
+                result,order,prompts,calls=self.run_case(compact_report=value)
+                self.assertEqual(result['status'],expected,result)
+                self.assertEqual(result['service_judgment'],{'assessment':assessment,'status':status})
 
     def test_literal_claim_repair_keeps_compact_context_and_actual_receipts(self):
         good={'more_evidence':False,'report':{'assessment':'unresolved',

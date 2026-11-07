@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.72'
+VERSION = 'soc-chat-contract:1.5.73'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -1292,16 +1292,22 @@ def diagnostic_history_return_violations(text, facts):
 
 def diagnostic_pipeline_claim_violations(text, facts):
     """Review-state counts are not proof of current processing congestion."""
-    if not diagnostic_facts_only(facts):return []
     rows=[f for f in facts if f.get('kind')=='diagnostics' and f.get('target')=='b:management-pipeline']
+    if not rows:return []
+    only_diagnostics=diagnostic_facts_only(facts)
     metrics=rows[-1].get('pipeline_metrics',{}) if rows else {}
     empty=all(type(metrics.get(k)) is int and metrics[k]==0
               for k in ('pending_reports','running_cases','overdue_cases'))
     issues=set()
     for clause in re.split(r'\n|;|(?<=[.!?])\s+',text):
         if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
+        # An unrelated read must not disable checks of an explicitly named
+        # pipeline. In mixed investigations, unqualified processing claims may
+        # refer to a web service or sensor; do not borrow this queue's metrics.
+        named_pipeline=re.search(r'\bb:management-pipeline\b|\bSOC\b|관제|관리\s*(?:처리\s*)?파이프라인',clause,re.I)
+        if not only_diagnostics and not named_pipeline:continue
         if (not diagnostic_subjects(clause,rows)
-                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인|관제\s*(?:처리\s*)?대기열',clause,re.I)):continue
+                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인|관제\s*(?:처리\s*)?대기열|관리\s*(?:처리\s*)?파이프라인',clause,re.I)):continue
         if (type(metrics.get('review_required_cases')) is int
                 and (period:=re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치(?:\s*(?:건수|사건))?',clause))
                 and not _claim_is_unasserted(clause[period.end():])):

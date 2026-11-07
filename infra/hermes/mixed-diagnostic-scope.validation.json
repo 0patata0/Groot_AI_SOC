@@ -1,0 +1,243 @@
+{
+  "checked_at_kst": "2026-11-08T05:02:30.006127+09:00",
+  "state": "deployed_guard_fix_quality_incomplete",
+  "common": "1.5.73",
+  "query": "1.19.123",
+  "model": "qwen3.6:35b",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "340631d61ea75c417f7fd874983e48d484de53a14156e74aec7c49cf7d7b4628",
+    "infra/hermes/test_diagnostic_claim_scope.py": "fdf4d430ff2f44917e52b4c2fa673422ebdef4552fbf6e1644027541b7ba51e2"
+  },
+  "test_profiles": {
+    "native": {
+      "rc": 0,
+      "count": 482,
+      "skip": 0,
+      "unique_methods": 482
+    },
+    "service": {
+      "rc": 0,
+      "count": 87,
+      "skip": 0,
+      "unique_methods": 87
+    },
+    "claims": {
+      "rc": 0,
+      "count": 57,
+      "skip": 0,
+      "unique_methods": 57
+    },
+    "sdk": {
+      "rc": 0,
+      "count": 293,
+      "skip": 0,
+      "unique_methods": 293
+    },
+    "query": {
+      "rc": 0,
+      "count": 408,
+      "skip": 0,
+      "unique_methods": 408
+    },
+    "peer": {
+      "rc": 0,
+      "count": 79,
+      "skip": 0,
+      "unique_methods": 79
+    },
+    "installer": {
+      "rc": 0,
+      "count": 63,
+      "skip": 0,
+      "unique_methods": 63
+    },
+    "diagnostics": {
+      "rc": 0,
+      "count": 84,
+      "skip": 0,
+      "unique_methods": 84
+    }
+  },
+  "unique_pass": 1553,
+  "local_claim_tests": 57,
+  "actual_prior_answer_replay": {
+    "issues": [
+      "diagnostic_pipeline_congestion_unverified"
+    ],
+    "current_common": "1.5.73",
+    "actual_h74_final_answer_replay": true,
+    "new_model_generation": false,
+    "production_changed": false
+  },
+  "final_health": {
+    "at_kst": "2026-11-08T05:01:27.054575+09:00",
+    "query": "1.19.123",
+    "common": "1.5.73",
+    "manifest": 15,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_timer_inactive": true,
+    "hermes_planned_restart_this_revision": 1,
+    "jobs": {
+      "gz6zoeomdfyo5kj68wtmuezf6c": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ],
+      "nh8baje983f9frzz4wk9k5o6oh": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ]
+    },
+    "embedded_gate_matches": true,
+    "gate_bytes": 65370
+  },
+  "changed_files": 3,
+  "protected_files": 8,
+  "planned_hermes_restarts": 1,
+  "rollback_minutes": 15,
+  "backup_root": "/var/lib/capstone-service-grounding/20261108-mixedscope75",
+  "chat": [
+    {
+      "engine": "hermes",
+      "posted_to_final_seconds": 138.173,
+      "status": "partial",
+      "investigation_complete": false,
+      "actual_reads": 4,
+      "required_diagnostic_reads": 4,
+      "explicit_block_list_requested": true,
+      "block_list_read": false,
+      "protected_calls": 0,
+      "sha256_verified": [
+        "9fa272adc34ad6bdf7fb6625c8ee9cfbd51f04ca761305d4c9988663d91c8f52",
+        "9d5260752180a4215d0574c997954fec3f925027ad52d7c2f742c02af6c4dc73",
+        "708dba0e2d6991b414701996d25ad551f03c288f0b207657c9f55f5deb28176a",
+        "e3765b3b3730f0dfc579c8a2af8fafb0323b3a93324d0e26e634e67d96e99397"
+      ],
+      "journal_entries": 32,
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "reply_id": "9o7xh8k1h7n53bo3biepugxzqr",
+      "remaining_issues": [],
+      "mixed_fact_guard_exercised": false
+    },
+    {
+      "engine": "ollama",
+      "posted_to_final_seconds": 60.428,
+      "status": "partial",
+      "investigation_complete": false,
+      "actual_reads": 4,
+      "required_diagnostic_reads": 4,
+      "explicit_block_list_requested": true,
+      "block_list_read": false,
+      "protected_calls": 0,
+      "sha256_verified": [
+        "f6712df772f083de48b8e9d5992e87ca93323b4938fa80f566adae791147f5d6",
+        "c0471413d0976a98f9b5679cc15da628755d6f91e47943271ec812a68570506c",
+        "72a5410d596922cd66033230b3f78b0d75db42927a81325628bd82972cce517c",
+        "1a2a9851af04724ec4fc8a8fefd689da8dc52eb610cfb41471822877ce6892b7"
+      ],
+      "journal_entries": 32,
+      "markdown_tables": 0,
+      "code_fences": 0,
+      "reply_id": "nraencnhrpnupj7ce6ia97a7ew",
+      "remaining_issues": [
+        "unobserved_block_list_claim",
+        "unobserved_tool_result_claim"
+      ],
+      "mixed_fact_guard_exercised": false
+    }
+  ],
+  "native_guard_metadata": [
+    {
+      "event": "management_read_selection",
+      "keys": [
+        "accepted",
+        "actual_mcp_calls_by_adapter",
+        "additional_inquiry",
+        "compact_report",
+        "indexed_reads",
+        "input_message_bytes",
+        "literal_report_repair",
+        "model_json_sha256",
+        "native_dispatch",
+        "provider_seconds",
+        "reasoning_effort",
+        "repeated_read_rejected",
+        "report_projection",
+        "selected_reads",
+        "usage"
+      ],
+      "metadata": {
+        "accepted": true
+      }
+    },
+    {
+      "event": "management_literal_repair_profile",
+      "keys": [
+        "issues",
+        "max_tokens",
+        "protected_actions_allowed",
+        "reasoning_effort",
+        "tool_count"
+      ],
+      "metadata": {
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ]
+      }
+    }
+  ],
+  "cleanup_server": {
+    "path": "/tmp/capstone-mixed-scope-20261108-r1",
+    "files": 471,
+    "bytes": 7455964,
+    "removed": true
+  },
+  "cleanup_mac": {
+    "bytes": 4147360,
+    "sha256": "31f93896fc3b8e14289158394343c0cb302a4ec67365aab65506bf59f2804982",
+    "removed": true,
+    "path": "/private/tmp/capstone-mixed-scope-20261108-2bdkped1",
+    "new_packages": 0
+  },
+  "future_schema_size_only": {
+    "scope": "local schema size only; frozen catalog from 04:19; not production or model quality test",
+    "catalog_read_tools": 35,
+    "full_schema_bytes": 35360,
+    "diagnostic_proposal_schema_bytes": 7435,
+    "additional_inquiry_catalog_unchanged": true,
+    "production_changed": false,
+    "remaining_design": "Restricting a follow-up proposal must not be presented as tool unavailable; full actual inquiry must stay reachable. Compare actual generations and legitimate new tool needs before adoption."
+  },
+  "dgx_polled": false,
+  "attack_tests": 0,
+  "model_promoted": false,
+  "independent_evaluation": false,
+  "limitations": [
+    "new mixed request: both bots omitted block list, so new mixed guard not exercised by live chat",
+    "actual prior mixed erroneous answer replay rejected; isolated validation is not whole investigation success",
+    "Native original draft unavailable; existing sample_zero_presented_as_absence repair metadata only",
+    "SDK final fallback omitted diagnostic table and used bullets; output consistency incomplete",
+    "same past development incident; one sample each; cache/GPU not controlled",
+    "new OS install, manual rollback and all-client UI render not tested"
+  ]
+}

@@ -266,6 +266,42 @@ class DiagnosticClaims(unittest.TestCase):
                      '검토 상태 수만으로 처리 지연을 입증하지 않습니다.'):
             with self.subTest(text=text):self.assertEqual(self.issues(text),[])
 
+    def test_other_read_does_not_disable_explicit_pipeline_claim_validation(self):
+        for other in ({'kind':'blocks'}, {'kind':'events'}, {'kind':'web_access'}):
+            self.facts=[self.pipeline(),diagnostic('b:management'),other]
+            for text in ('현재 b:management-pipeline 처리 지연이 있습니다.',
+                         '현재 관제 처리 대기열은 285건입니다.',
+                         '관리 파이프라인이 정상화되었는지 확인하고, 대기 중인 285건의 사건 처리 지연에 따른 운영적 영향 검토가 필요합니다.'):
+                with self.subTest(other=other,text=text):
+                    self.assertTrue(set(self.issues(text)) & {
+                        'diagnostic_pipeline_count_mismatch','diagnostic_pipeline_congestion_unverified'})
+
+    def test_mixed_pipeline_scope_preserves_other_subject_and_uncertainty(self):
+        self.facts=[self.pipeline(),diagnostic('c:vector'),{'kind':'web_access'}]
+        for text in ('c:vector 처리 지연이 있습니다.', 'DVWA 요청 처리 지연이 있습니다.',
+                     '처리 대기열은 285건입니다.', '어제 관제 처리 지연이 있었습니다.',
+                     '현재 관제 병목 가능성은 추가 확인이 필요합니다.',
+                     '관제 처리 대기열은 0건이며 검토 상태 사건은 285건입니다.',
+                     '관리 파이프라인의 처리 지연을 단정하지 않습니다.'):
+            with self.subTest(text=text):
+                self.assertFalse(set(self.issues(text)) & {
+                    'diagnostic_pipeline_count_mismatch','diagnostic_pipeline_congestion_unverified'})
+
+    def test_mixed_pipeline_does_not_invent_zero_metrics(self):
+        self.facts=[self.pipeline(),{'kind':'blocks'}]
+        self.facts[0]['pipeline_metrics']['pending_reports']=2
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('현재 관제 처리 지연이 있습니다.'))
+        del self.facts[0]['pipeline_metrics']['pending_reports']
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('현재 관제 처리 지연이 있습니다.'))
+        self.facts=[diagnostic('c:vector'),{'kind':'blocks'}]
+        self.assertEqual(c.diagnostic_pipeline_claim_violations('현재 관제 처리 지연이 있습니다.',self.facts),[])
+
+    def test_mixed_review_trend_and_period_need_their_own_observations(self):
+        self.facts=[self.pipeline(),{'kind':'blocks'}]
+        self.assertIn('diagnostic_pipeline_trend_unverified',self.issues('관제 검토 사건이 증가했습니다.'))
+        self.assertIn('diagnostic_pipeline_period_unverified',self.issues('관제 검토 사건은 이틀 치입니다.'))
+        self.assertEqual(c.diagnostic_pipeline_claim_violations('웹 요청 처리량이 증가했습니다.',self.facts),[])
+
     def test_pipeline_other_uncertainty_does_not_excuse_positive_claim(self):
         self.facts=[self.pipeline()]
         for text in ('관제 검토 대기 증가로 저하 상태이며 원인은 미확인입니다.',
@@ -422,7 +458,7 @@ class DiagnosticClaims(unittest.TestCase):
         for text in ('현재 검토 상태 합계29건입니다.', '검토 대기29건이 이틀 치인지 여부는 미확인입니다.'):
             self.assertNotIn('diagnostic_pipeline_period_unverified',self.issues(text))
 
-    def test_congestion_guard_uses_latest_complete_target_and_keeps_other_evidence(self):
+    def test_congestion_guard_uses_latest_complete_target_without_blanket_mixed_exemption(self):
         zero={'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{
             'pending_reports':0,'running_cases':0,'overdue_cases':0}}
         for latest in ({'pending_reports':2,'running_cases':0,'overdue_cases':0},
@@ -430,7 +466,9 @@ class DiagnosticClaims(unittest.TestCase):
             self.facts=[zero,dict(zero,pipeline_metrics=latest)]
             self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
         self.facts=[zero,{'kind':'events'}]
-        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
+        # Merely having another tool result does not establish pipeline delay.
+        self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('웹 요청 처리 병목 상태입니다.'))
 
     def test_restart_counter_cannot_prove_manual_reload_history(self):
         self.assertIn('diagnostic_restart_counter_not_history',self.issues('NRestarts=0이므로 한 번도 restart 또는 reload되지 않았습니다.'))

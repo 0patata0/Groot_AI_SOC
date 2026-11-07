@@ -141,6 +141,9 @@
     }
   },
   "publication": {
-    "status": "pending"
+    "source_commit": "07a695f18b496bcde2b79e2b448aad023a8994ad",
+    "remote_main_verified": true,
+    "verified_at_kst": "2026-11-07T21:16:49.937214+09:00",
+    "receipt_followup_commit": true
   }
 }

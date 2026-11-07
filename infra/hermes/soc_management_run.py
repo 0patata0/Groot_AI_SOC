@@ -1413,7 +1413,7 @@ def calculated_json_violations(text, facts):
 
 
 def display_evidence(facts):
-    """Coalesce only unchanged containment observations; retain audit facts.
+    """Coalesce display-only repetitions; retain every original audit fact.
 
     A changed state/deadline, another request/IP or a missing observation clock
     stays separate. Generic timestamps already shown by these observations need
@@ -1422,7 +1422,7 @@ def display_evidence(facts):
     result, groups = [], {}
     clock_times = {v for row in facts if row.get('kind') == 'containment_clock'
                    for v in row.get('times', {}).values()}
-    for row in facts:
+    for row in diagnostic_contract().diagnostic_display_observations(facts):
         if row.get('kind') == 'times':
             remaining = [v for v in row.get('instants', []) if v not in clock_times]
             if remaining:

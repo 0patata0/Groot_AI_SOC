@@ -1977,7 +1977,7 @@ def diagnostic_request(question):
     if (plan and plan.get('kind') == 'agent_identity'
             and not re.search(r'진단|오류|장애|실패|systemd|\.service\b|수집기',text,re.I)): return None
     pipeline=bool(re.search(r'(?:관제|\bSOC\b).{0,12}(?:보고|조사|처리|대기열).{0,12}'
-        r'(?:밀(?:려|렸|리)|지연|대기|현황|상태|몇|확인|보여|조회)',text,re.I))
+        r'(?:밀(?:려|렸|리|린)|지연|대기|현황|상태|몇|확인|보여|조회)',text,re.I))
     if pipeline and PIPELINE_INVESTIGATION.search(text): return None
     health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|살아\s*있|돌아\s*가|돌고\s*있|작동\s*중|가동\s*중|켜져|안\s*(?:돼|되|돌)|\b(?:failure|failed|alive|running|healthy|up)\b|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
     if not pipeline and not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|WAF|ModSecurity|Suricata|IDS|수리카타|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None

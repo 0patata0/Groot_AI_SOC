@@ -43,6 +43,22 @@ class Grounding(unittest.TestCase):
                   '관제 보고 대기열과 침해 위험을 판단해줘'):
             with self.subTest(question=q):self.assertIsNone(harness.diagnostic_request(q))
 
+    def test_short_backlog_attributive_form_keeps_exact_current_scope(self):
+        for question in ('지금 관제 처리나 보고 전송에 밀린 게 있어? 검토가 필요한 사건 수도 따로 알려줘.',
+                         '관제 보고 밀린 건수 알려줘', '지금 SOC 처리에 밀린 일이 있어?'):
+            with self.subTest(question=question):
+                self.assertTrue(harness.pipeline_lookup_request(question))
+                self.assertTrue(harness.structured_read(question))
+                self.assertEqual(harness.tool_scope(question),{'mcp__system_diagnostics__get_system_diagnostics'})
+                self.assertEqual(harness.diagnostic_request(question)['requested'],['b:management-pipeline'])
+
+    def test_backlog_word_does_not_hide_history_actions_or_causal_inquiry(self):
+        for question in ('어제 관제 처리에 밀린 일이 있었어?', '관제 처리에 밀린 사건을 삭제해줘',
+                         '관제 보고에 밀린 일이 왜 생겼는지 분석해줘', '관제 보고 밀린 건수와 공격 위험 판단해줘'):
+            with self.subTest(question=question):
+                self.assertFalse(harness.pipeline_lookup_request(question))
+                self.assertIsNone(harness.diagnostic_request(question))
+
     def test_current_pipeline_lookup_shows_requested_metrics_without_detailed_keyword(self):
         data={'schema':1,'kind':'runtime','host':'b','target':'b:management-pipeline',
             'status':'degraded','codes':['case_review_required'],'mutation_performed':False,

@@ -21,6 +21,71 @@ NAME='mcp__system_diagnostics__get_system_diagnostics'
 def catalog():
     return {'tools':[{'function':{'name':NAME,'parameters':m.tools()[0]['inputSchema']}}]}
 
+
+class DiagnosticDisplayRepeats(unittest.TestCase):
+    def row(self, **changes):
+        return {'kind':'diagnostics','diagnostic_mode':'runtime',
+            'target':'b:management-pipeline','observed_at_kst':'2026-11-07T23:00:00+09:00',
+            'age_seconds':5,'runtime_status':'degraded','runtime_codes':['case_review_required'],
+            'pipeline_metrics':{'pending_reports':0,'running_cases':0,'overdue_cases':0,
+                'review_required_cases':17},**changes}
+
+    def test_identical_observation_is_one_display_group_with_every_retrieval_age(self):
+        facts=[self.row(age_seconds=5),self.row(age_seconds=24),self.row(age_seconds=12)]
+        before=copy.deepcopy(facts);result=c.diagnostic_display_observations(facts)
+        self.assertEqual(len(result),1);self.assertEqual(result[0]['age_seconds'],24)
+        self.assertEqual(result[0]['_display_repeat_ages'],[5,24,12])
+        self.assertEqual(facts,before)
+        self.assertEqual(c.diagnostic_display_observations(result),result)
+
+    def test_distinct_observation_times_are_not_a_repeat(self):
+        facts=[self.row(),self.row(observed_at_kst='2026-11-07T23:01:00+09:00')]
+        self.assertEqual(c.diagnostic_display_observations(facts),facts)
+
+    def test_changed_values_or_scope_at_the_same_time_remain_visible(self):
+        for changes in ({'pipeline_metrics':{'pending_reports':3}}, {'runtime_codes':['case_stalled']},
+                        {'runtime_limits':['inspection_limit_reached']}, {'runtime_status':'ok'},
+                        {'bundle_component':{'source':'other'}}, {'requested_since_kst':'2026-11-07T22:00:00+09:00'}):
+            with self.subTest(changes=changes):
+                facts=[self.row(),self.row(**changes)]
+                self.assertEqual(c.diagnostic_display_observations(facts),facts)
+
+    def test_unknown_observation_clock_or_age_cannot_hide_a_read(self):
+        for changes in ({'observed_at_kst':None},{'observed_at_kst':'2026-11-07T14:00:00Z'},
+                        {'age_seconds':None},{'age_seconds':True},{'age_seconds':-1}):
+            with self.subTest(changes=changes):
+                facts=[self.row(**changes),self.row(**changes)]
+                self.assertEqual(c.diagnostic_display_observations(facts),facts)
+
+    def test_unavailable_or_other_diagnostics_are_not_coalesced(self):
+        for changes in ({'runtime_status':'unavailable'}, {'target':'b:llm'},
+                        {'diagnostic_mode':'journal_history'}, {'diagnostic_mode':'snapshot'}):
+            facts=[self.row(**changes),self.row(**changes)]
+            self.assertEqual(c.diagnostic_display_observations(facts),facts)
+
+    def test_other_evidence_order_and_audit_objects_are_untouched(self):
+        other={'kind':'events','source':'suricata','returned_count':2}
+        facts=[self.row(),other,self.row(age_seconds=10)]
+        view=c.diagnostic_display_observations(facts)
+        self.assertIs(view[1],other);self.assertEqual(len(facts),3)
+        self.assertNotIn('_display_repeat_ages',facts[0])
+
+    def test_shared_table_explains_retrieval_without_double_counting_metrics(self):
+        facts=[self.row(),self.row(age_seconds=25)];before=copy.deepcopy(facts)
+        text=w.literal_evidence_table(facts)
+        self.assertEqual(text.count('| 검토 상태 사건 |'),1)
+        self.assertEqual(text.count('| 관제 처리·전송 대기 |'),1)
+        self.assertIn('동일 수집본 2회 조회(서로 다른 관측 아님)',text)
+        self.assertIn('조회별 나이 5, 25초',text)
+        self.assertIn('17건',text);self.assertEqual(facts,before)
+
+    def test_same_values_in_new_snapshot_are_shown_twice(self):
+        facts=[self.row(),self.row(observed_at_kst='2026-11-07T23:01:00+09:00')]
+        text=w.literal_evidence_table(facts)
+        self.assertEqual(text.count('| 검토 상태 사건 |'),2)
+        self.assertNotIn('동일 수집본',text)
+
+
 class ServiceHistory(unittest.TestCase):
     def pipeline(self, **changes):
         return {'schema':1,'kind':'runtime','target':'b:management-pipeline','host':'b',

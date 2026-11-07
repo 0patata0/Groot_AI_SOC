@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.66'
+VERSION = 'soc-chat-contract:1.5.67'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -806,6 +806,40 @@ def diagnostic_observation_fields(data):
     return out
 
 
+def diagnostic_display_observations(facts):
+    """Group exact repeats of one runtime observation, only for display.
+
+    A new observation time, changed value/scope or unknown retrieval age stays
+    separate. Original receipts/facts remain available to guards and auditing.
+    This neither caches a read nor turns repeated retrieval into a trend.
+    """
+    result, groups = [], {}
+    for row in facts:
+        if (row.get('kind') != 'diagnostics' or row.get('diagnostic_mode') != 'runtime'
+                or row.get('target') != 'b:management-pipeline'
+                or row.get('runtime_status') not in ('ok', 'degraded')
+                or not _diagnostic_instant(row.get('observed_at_kst'))
+                or type(row.get('age_seconds')) is not int or row['age_seconds'] < 0
+                or '_display_repeat_ages' in row):
+            result.append(row)
+            continue
+        try:
+            key = json.dumps({k:v for k,v in row.items() if k != 'age_seconds'},
+                             sort_keys=True, ensure_ascii=False, allow_nan=False)
+        except (ValueError, TypeError):
+            result.append(row)
+            continue
+        if key not in groups:
+            groups[key] = len(result)
+            result.append(row)
+            continue
+        index = groups[key]
+        old = result[index]
+        ages = old.get('_display_repeat_ages', [old['age_seconds']]) + [row['age_seconds']]
+        result[index] = {**old, 'age_seconds': max(ages), '_display_repeat_ages': ages}
+    return result
+
+
 def diagnostic_evidence_rows(row, stamp):
     """Bounded display of typed observations, never a service health verdict."""
     target=row.get('target','')
@@ -815,6 +849,11 @@ def diagnostic_evidence_rows(row, stamp):
     scope='관측 '+stamp(row.get('observed_at_kst'))
     if type(row.get('age_seconds')) is int and row['age_seconds']>=0:
         scope+='; 수집본 나이 '+str(row['age_seconds'])+'초(실시간 직접 조회 아님)'
+    ages=row.get('_display_repeat_ages')
+    if (isinstance(ages,list) and len(ages)>1
+            and all(type(age) is int and age>=0 for age in ages)):
+        scope+='; 동일 수집본 '+str(len(ages))+'회 조회(서로 다른 관측 아님)'
+        scope+='; 조회별 나이 '+', '.join(map(str,ages))+'초'
     if row.get('diagnostic_mode')=='runtime' and target=='b:management-pipeline':
         metrics=row.get('pipeline_metrics',{})
         status=row.get('runtime_status','미확인')

@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.80'
+VERSION = 'soc-chat-contract:1.5.81'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -31,11 +31,17 @@ SERVICE_STATE_GUIDANCE = (
     '과거 종료값은 해당 target·오류 시각과 함께, 현재 종료값은 수집 시각과 함께 보고합니다. '
     'observed_at_kst는 수집 시각이며 프로세스의 실제 종료·복구 발생 시각이 아닙니다. '
     'NRestarts만으로 수동 재시작·reload 이력이나 과거 active 상태의 유무를 추정하지 않습니다. '
-    'journal_history의 raw_messages_returned=false는 원문을 반환하지 않았다는 뜻이며 원문 미수집·부재의 증거가 아닙니다. '
+    'journal_history는 정제 오류 메타데이터이고 journal_excerpt는 실제 journal 메시지 발췌입니다. 둘은 같은 기간에도 서로 다른 근거 범위입니다. '
+    'raw_messages_returned=false는 제한 없는 원문 덤프를 반환하지 않는다는 뜻입니다. journal_excerpt의 message_excerpt가 없다는 뜻이 아닙니다. '
+    '발췌 행의 message_state=unchanged는 원문과 같은 메시지, redacted는 비밀값을 가린 메시지입니다. redacted_excerpts_returned=true만으로 모든 행이 마스킹됐다고 쓰지 않습니다. '
+    'message_state=message_size_bound/non_text_message/invalid_text_message와 message_excerpt=null은 해당 행의 본문 미제공입니다. 다른 행의 발췌까지 없다고 확대하지 않습니다. '
+    'journal_scope=errors는 고정 조건의 후보 검색이며 반환 행 전체를 실패 건수로 세지 않습니다. 실제 메시지의 status/error/reason과 그 시각을 읽습니다. '
     '오류 표본·색인 일치 수·전체 오류 건수를 구분하고 exit1만으로 세부 원인을 만들지 않습니다. '
     '반환 표본이 0건이면 그 표본의 수만 설명하며, 최근 오류가 없다거나 문제가 없다고 확대하지 않습니다. '
     '확인된 오류 코드는 직접 실패 이유의 근거이며, 누가 잠금을 가졌는지 같은 미확인 배경과 구분합니다. '
-    'controller_already_running은 배타 잠금 획득 실패입니다. 코드만으로 재시도·재시작 시행이나 그 성공/실패·소유자 종료·복구를 만들지 않습니다. '
+    'known_error_code 또는 status=failed/error의 controller_already_running은 배타 잠금 획득 실패 근거입니다. '
+    'status=deferred/reason의 같은 문자열은 다른 컨트롤러 실행으로 이번 실행을 미룬 기록이며 그 자체가 서비스 실패 기록은 아닙니다. 질문이 실패를 전제해도 확인한 기록과 구분합니다. '
+    '어느 쪽도 코드만으로 재시도·재시작 시행이나 그 성공/실패·잠금 소유자의 정상 진행·종료·복구를 증명하지 않습니다. '
     'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 실행·전송 대기 지표와 별도의 사건 검토 상태입니다. '
     '컨트롤러 실패가 지금도 처리에 영향을 주는지 질문하면 두 범위를 구분해 등록 도구로 확인합니다. '
     'review_required_cases는 검토 상태의 사건 수이며 처리·전송 대기 건수나 공격 확정·실행 실패 건수가 아닙니다. '
@@ -918,7 +924,7 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
             'diagnostic_pipeline_period_unverified':'현재 상태 합계를 오늘·어제 발생 건수로 바꿨습니다. 기간별 유입 건수를 확인한 근거가 없으면 현재 합계로만 설명하세요.',
             'diagnostic_pipeline_trend_unverified':'한 시점의 검토 상태 합계로 증가·감소 추세를 만들었습니다. 서로 다른 관측 시점의 비교값이 없으면 현재 합계만 설명하세요.',
             'diagnostic_pipeline_pending_unverified':'실제 처리·전송·기한 초과 지표가0인데 대기가 존재한다고 했습니다. 검토 상태의 사건 합계와 구분하세요.',
-            'diagnostic_history_return_denied':'해당 구간의 정제 오류 표본이 실제 반환됐는데 전체 조회·반환 실패라고 했습니다. 확보한 표본과 전체 수집 범위·원문 미반환을 분리하세요.',
+            'diagnostic_history_return_denied':'해당 구간의 정제 오류 표본이 실제 반환됐는데 전체 조회·반환 실패라고 했습니다. 확보한 표본과 전체 수집 범위를 구분하세요. 별도 journal_excerpt가 있으면 message_excerpt/message_state의 실제 발췌 제공 여부도 확인하세요.',
             'diagnostic_property_value_unverified':'속성을 확인한 대상·시점과 문장 범위가 맞지 않습니다. 현재 스냅샷의 속성은 현재 관측으로, 과거 오류 이력은 해당 과거 구간으로 따로 설명하세요.',
             'diagnostic_report_empty_field':'판단·한계·다음 조치에 빈 값이나 문장부호만 있는 항목이 있습니다. 실제 근거에 연결되는 문장으로 작성하세요. 칸을 채우려고 불필요한 작업을 만들지 마세요.',
             'diagnostic_error_code_total_unverified':'오류 색인 전체 수를 특정 코드의 발생 횟수로 옮겼습니다. 코드별로 반환된 표본과 색인 전체 일치 건수를 구분하세요. 해당 코드의 전체 횟수는 확인되지 않았습니다.',

@@ -1,13 +1,13 @@
 {
   "schema": "groot-balanced-main-registration-v1",
   "registered_at_kst": "2026-11-07T20:54:28.303677+09:00",
-  "last_verified_at_kst": "2026-11-07T20:55:27.080617+09:00",
+  "last_verified_at_kst": "2026-11-08T08:32:47.117034+09:00",
   "run_id": "capstone-dgx-20261107-balancedmain",
   "run_directory": "~/Capstone_Groot_training/dgx-20261107-balancedmain",
-  "status": "detached_controller_running",
-  "last_observed_stage": "waiting_for_idle_resources",
+  "status": "training_completed_soc_quality_unverified",
+  "last_observed_stage": "finished",
   "last_observed_idle_seconds": 58,
-  "optimizer_progress_observed": false,
+  "optimizer_progress_observed": true,
   "training_records": 1220,
   "max_epochs": 1,
   "planned_optimizer_steps": 610,
@@ -101,5 +101,102 @@
     "remote_main": "0e9db7aab96459e53457b52e82e918e7991f375c",
     "verified_at_kst": "2026-11-07T20:59:49.100788+09:00",
     "credential_source": "project local credential file, one Git subprocess environment; helpers and HTTP trace disabled"
+  },
+  "registration_observation": {
+    "last_verified_at_kst": "2026-11-07T20:55:27.080617+09:00",
+    "status": "detached_controller_running",
+    "last_observed_stage": "waiting_for_idle_resources",
+    "last_observed_idle_seconds": 58,
+    "optimizer_progress_observed": false
+  },
+  "completion_observation": {
+    "checked_at_kst": "2026-11-08T08:32:47.117034+09:00",
+    "status": "completed",
+    "completed_at_kst": "2026-11-08T02:57:06.960086+09:00",
+    "optimizer_steps": 610,
+    "max_steps": 610,
+    "epoch": 1.0,
+    "attempts": 4,
+    "shared_inference_yields": 3,
+    "resume_steps": [
+      168,
+      380,
+      588
+    ],
+    "eval_loss": 0.5471523404121399,
+    "best_step": 610,
+    "best_loss": 0.5471523404121399,
+    "run_directory": "~/Capstone_Groot_training/dgx-20261107-balancedmain-a4/workspace/main",
+    "adapter_bytes": 65061752,
+    "recorded_adapter_sha256": "5166b554636fc4ee90f19aaa462dcd4670038ce6b8b8ffd0cfc1bb463c09a158",
+    "weights_sha_recomputed_this_observation": false,
+    "service_active": false,
+    "main_pid": 0,
+    "evaluation_history": [
+      {
+        "epoch": 0.10491803278688525,
+        "eval_loss": 0.6160843372344971,
+        "eval_runtime": 394.9878,
+        "step": 64
+      },
+      {
+        "epoch": 0.2098360655737705,
+        "eval_loss": 0.6008883714675903,
+        "eval_runtime": 396.0752,
+        "step": 128
+      },
+      {
+        "epoch": 0.31475409836065577,
+        "eval_loss": 0.5944151878356934,
+        "eval_runtime": 396.0525,
+        "step": 192
+      },
+      {
+        "epoch": 0.419672131147541,
+        "eval_loss": 0.5786892175674438,
+        "eval_runtime": 397.2098,
+        "step": 256
+      },
+      {
+        "epoch": 0.5245901639344263,
+        "eval_loss": 0.5689172744750977,
+        "eval_runtime": 396.9541,
+        "step": 320
+      },
+      {
+        "epoch": 0.6295081967213115,
+        "eval_loss": 0.5550636053085327,
+        "eval_runtime": 394.4711,
+        "step": 384
+      },
+      {
+        "epoch": 0.7344262295081967,
+        "eval_loss": 0.554565966129303,
+        "eval_runtime": 395.4234,
+        "step": 448
+      },
+      {
+        "epoch": 0.839344262295082,
+        "eval_loss": 0.5485736131668091,
+        "eval_runtime": 395.6178,
+        "step": 512
+      },
+      {
+        "epoch": 0.9442622950819672,
+        "eval_loss": 0.5485174059867859,
+        "eval_runtime": 397.1181,
+        "step": 576
+      },
+      {
+        "epoch": 1.0,
+        "eval_loss": 0.5471523404121399,
+        "eval_runtime": 395.9851,
+        "step": 610
+      }
+    ],
+    "soc_accuracy_verified": false,
+    "thor_transferred": false,
+    "production_promoted": false,
+    "read_only": true
   }
 }

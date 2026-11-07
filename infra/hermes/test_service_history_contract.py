@@ -22,6 +22,74 @@ def catalog():
     return {'tools':[{'function':{'name':NAME,'parameters':m.tools()[0]['inputSchema']}}]}
 
 
+class ServiceLookupBoundary(unittest.TestCase):
+    at='2026-11-08T06:00:00+09:00'
+    def check(self,q):
+        return c.service_lookup_scope(c.service_history_plan(catalog(),q,self.at),q)
+
+    def test_registered_closed_lookup_accepts_short_and_explicit_periods(self):
+        for q in ('어제 b:management 오류 보여줘',
+                  '오늘 B capstone-management.service 오류와 지금 상태 확인해줘.',
+                  '2026-11-06 16:20~16:40 KST B capstone-management.service 오류 원문과 지금 관제 처리 대기 상태를 표로 정리해줘. 설정 변경은 하지 마.',
+                  '어제 c:apache 오류 내역을 표로 보여주세요.'):
+            with self.subTest(q=q):self.assertTrue(self.check(q))
+
+    def test_every_uncovered_clause_keeps_ordinary_investigation(self):
+        base='어제 b:management 오류 보여줘'
+        for suffix in (' 왜 그랬지?', ' 원인도 확인해줘', ' 영향도 확인해줘', ' 문제 있어?',
+                       ' 정상인지 판단해줘', ' 복구해줘', ' 설정을 변경해줘', ' CPU도 보여줘',
+                       ' 설정도 보여줘', ' 경보도 확인해줘', ' 모두 누락 없이 보여줘',
+                       ' 연속 실행인지 알려줘', ' 오늘과 비교해줘', ' 승인해줘',
+                       ' 그럼 어떻게 해야 하나?', ' 이 결과를 기준으로 차단해줘'):
+            with self.subTest(suffix=suffix):self.assertFalse(self.check(base+suffix))
+
+    def test_host_mismatch_and_unprovided_pipeline_do_not_complete(self):
+        for q in ('오늘 A capstone-management.service 오류 보여줘',
+                  '오늘 C 서버 capstone-management.service 오류 보여줘',
+                  '어제 c:apache 오류와 지금 관제 처리 대기 상태 보여줘',
+                  '어제 b:unknown 오류 보여줘'):
+            with self.subTest(q=q):self.assertFalse(self.check(q))
+
+    def test_prohibition_is_removed_only_as_an_entire_clause(self):
+        self.assertTrue(self.check('어제 b:management 오류 보여줘. 설정 변경은 하지 마.'))
+        for q in ('어제 b:management 오류 보여줘. 변경 내용도 보여줘.',
+                  '어제 b:management 오류 보여줘. 설정 변경은 하지 마. 설정도 보여줘.'):
+            self.assertFalse(self.check(q))
+
+    def test_context_requires_fresh_complete_exact_receipts(self):
+        f=ServiceHistory();f.setUp();q='오늘 B capstone-management.service 오류와 지금 상태 확인해줘.'
+        rows=f.rows();before=copy.deepcopy(rows)
+        def context(values):return c.service_report_context(catalog(),q,f.at,values,now=f.now)
+        self.assertTrue(context(rows)['lookup_only']);self.assertEqual(rows,before)
+        self.assertIsNone(context(rows[:-1]))
+        failed=copy.deepcopy(rows);failed[-1]['is_error']=True
+        self.assertIsNone(context(failed))
+        stale=copy.deepcopy(rows);stale[0]['data']['observed_at_kst']=(f.now-timedelta(seconds=181)).isoformat()
+        self.assertIsNone(context(stale))
+        extra=copy.deepcopy(rows);extra[0]['arguments']['limit']=20
+        self.assertNotIn('lookup_only',context(extra))
+
+    def test_lookup_render_has_no_incident_disposition(self):
+        report={'scope':'verified_service_lookup','assessment':'observed','status':'resolved'}
+        text=w.render_model_review(report,[])
+        self.assertNotIn('INCIDENT_DISPOSITION',text)
+        self.assertIn('사건 종결을 뜻하지',text)
+        self.assertIn('반환 자료는 도구의 보존·표본 한도',text)
+        self.assertNotIn('원문은 도구의',text)  # History metadata need not include raw journal.
+        self.assertEqual(w.management_status(text),'resolved')
+
+    def test_lookup_schema_rejects_verdict_and_any_generated_fact(self):
+        from jsonschema import Draft202012Validator
+        v=Draft202012Validator(c.service_report_schema([NAME],lookup_only=True))
+        good={'more_evidence':False,'report':{'scope':'verified_service_lookup','assessment':'observed','status':'resolved','evidence_indexes':[0]}}
+        self.assertTrue(v.is_valid(good))
+        for k,value in (('assessment','benign'),('status','needs_review'),('basis','정상입니다'),('evidence_indexes',[])):
+            bad=copy.deepcopy(good);bad['report'][k]=value
+            self.assertFalse(v.is_valid(bad))
+        ordinary=Draft202012Validator(c.service_report_schema([NAME]))
+        self.assertFalse(ordinary.is_valid(good))
+
+
 class CompletedReadIdentity(unittest.TestCase):
     def test_exact_match_preserves_type_scope_and_original_objects(self):
         done=[{'tool':NAME,'arguments':{'target':'b:management','limit':50}}]
@@ -646,6 +714,33 @@ class ServiceFollowUp(unittest.TestCase):
 
 
 class ServiceReport(unittest.TestCase):
+    def test_native_lookup_acknowledges_actual_reads_without_incident_closure(self):
+        from openai.types.chat import ChatCompletion
+        from types import SimpleNamespace
+        from jsonschema import ValidationError
+        self.f.question='오늘 B capstone-management.service 오류와 지금 상태 확인해줘.'
+        req,a,snap,wire,env=self.wire()
+        lease=a._capstone_management_selection
+        props=wire['response_format']['json_schema']['schema']['properties']
+        report={k:v['const'] for k,v in props['report']['properties'].items()}
+        self.assertEqual(report['scope'],'verified_service_lookup')
+        value={'request_nonce':lease['nonce'],'more_evidence':False,'report':report}
+        facts=[]
+        for row in self.rows:
+            facts.extend(w.observation_facts('get_system_diagnostics',SimpleNamespace(isError=False,
+                content=[SimpleNamespace(text=json.dumps(row['data']))]),row['arguments']))
+        lease['report_facts']=facts
+        def response(v):return ChatCompletion(id='lookup',created=1,model='qwen3.6:35b',object='chat.completion',choices=[{
+            'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(v)}}])
+        decoded,count=w.management_selection_response(response(value),lease,a)
+        text=decoded.choices[0].message.content
+        self.assertEqual(count,0);self.assertIsNone(decoded.choices[0].message.tool_calls)
+        self.assertEqual(w.management_status(text),'resolved')
+        self.assertNotIn('INCIDENT_DISPOSITION',text)
+        self.assertEqual(w.evidence_claim_violations(text,facts,{NAME}),[])
+        bad=copy.deepcopy(value);bad['report']['assessment']='benign'
+        with self.assertRaises(ValidationError):w.management_selection_response(response(bad),lease,a)
+
     def test_generation_matches_metadata_closure_veto_but_preserves_further_reads(self):
         from jsonschema import Draft202012Validator
         facts=[{'kind':'diagnostics','target':'b:management','error_code_observations':[{

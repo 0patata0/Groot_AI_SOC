@@ -345,7 +345,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     descriptions={name:harness.CONTRACT.service_tool_description(t.description,t.args_schema)
                                   for name,t in readable.items()}
                     schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
-                        facts=harness.facts_for(report['calls']),read_schemas={n:t.args_schema for n,t in readable.items()})
+                        facts=harness.facts_for(report['calls']),read_schemas={n:t.args_schema for n,t in readable.items()},
+                        lookup_only=service_context.get('lookup_only') is True)
                     messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True,
                         execution_rejections=report.get('service_inquiry_rejections'))
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(messages),90)
@@ -362,6 +363,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if not value['more_evidence']:
                         review=value['report'];indexes=review.pop('evidence_indexes')
                         review['evidence_tools']=[citations[i] for i in indexes]
+                        report['service_lookup_complete']=review.get('scope')=='verified_service_lookup'
                         report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
                         return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
                     selected={n:readable[n] for n in value['read_tools']}
@@ -419,7 +421,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
                 literal = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                            harness.service_report(current, report['calls']) or
-                           harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
+                           (harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) if not service_plan else None) or
                            harness.event_report(current, report['calls']))
                 issues = [] if literal else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
@@ -428,7 +430,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 repair_passes = 0
                 selection_failures = []
                 gap = harness.preparation_gap(current, report['calls'])
-                incident_gap = harness.incident_evidence_gap(current, report['calls'],reference,service_plan)
+                incident_gap = not report.get('service_lookup_complete') and harness.incident_evidence_gap(current, report['calls'],reference,service_plan)
                 preparation_used = False
                 while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or audit or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
@@ -510,7 +512,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                             harness.service_report(current, report['calls']) or
-                            harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
+                            (harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) if not service_plan else None) or
                             harness.event_report(current, report['calls']))
                 issues = (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))

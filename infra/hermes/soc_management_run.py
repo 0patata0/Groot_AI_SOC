@@ -1654,6 +1654,8 @@ def factual_review_report(facts):
 
 def render_model_review(report, facts):
     """Model owns judgment; receipts supply the table without model retyping."""
+    if report.get('scope')=='verified_service_lookup':
+        return diagnostic_contract().service_lookup_report(literal_evidence_table(facts))
     def line(value):
         if any(token in value for token in ('OUT-OF-BAND', 'TRUSTED_CONTROLLER',
                 'INCIDENT_DISPOSITION', 'MANAGEMENT_STATUS')):
@@ -3078,7 +3080,6 @@ def indexed_read_request(request, agent):
 
 
 def temporal_review_observations(facts):
-    """Receipt-only sample chronology, never attack/absence/risk classification."""
     result=[]
     for clock in facts:
         if not isinstance(clock,dict) or clock.get('kind')!='containment_clock':continue
@@ -3256,7 +3257,7 @@ def management_report_request(request, agent, snapshot):
             agent._capstone_review_feedback=None
             return result
         if service is not None:
-            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,read_schemas=catalog)
+            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,read_schemas=catalog,lookup_only=service.get('lookup_only') is True)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,
@@ -3656,7 +3657,6 @@ def main():
 
     @functools.wraps(builder)
     def restricted_builder(self, *args, **kwargs):
-        # The native loop can refresh tools after __init__ or session resume.
         self.tools = permitted_tools(self.tools, mode)
         self.valid_tool_names = {tool['function']['name'] for tool in self.tools}
         if len(args) > 1 and args[1] is not None:
@@ -3745,9 +3745,6 @@ def main():
                 'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules',
                 'mcp__system_diagnostics__get_system_diagnostics'} or tool_name in {
                 'mcp__security_events__' + name for name in EVENT_READ}):
-            # Native CLI previews stop at 5,000 characters, in the middle of JSON.
-            # Keep the bounded real result for host verification, without changing
-            # the model's MCP response or trusting assistant-generated evidence.
             output = str(kwargs.get('result') or '')
             error = bool(kwargs.get('is_error', False))
             size = len(output.encode('utf-8'))

@@ -72,6 +72,9 @@ class ServiceRuntime(unittest.TestCase):
             def __init__(self,**kw):pass
             def with_structured_output(self,*args,**kw):
                 async def select(messages):
+                    if args[0].get('properties',{}).get('report',{}).get('properties',{}).get('scope',{}).get('const')=='verified_service_lookup':
+                        order.append('compact');prompts.append(messages)
+                        return {'more_evidence':False,'report':{k:v['const'] for k,v in args[0]['properties']['report']['properties'].items()}}
                     if 'anyOf' in args[0]:
                         order.append('compact');prompts.append(messages)
                         return copy.deepcopy((compact_report[min(order.count('compact')-1,len(compact_report)-1)] if isinstance(compact_report,list) else compact_report) or self_report())
@@ -116,6 +119,26 @@ class ServiceRuntime(unittest.TestCase):
         receipts=runtime.harness.service_history_receipts(result['calls'])
         self.assertEqual(receipts[-1]['tool'],'mcp__resp__list_blocks')
         self.assertEqual(runtime.harness.missing_reads(question,result['calls']),[])
+
+    def test_factual_lookup_finishes_without_incident_verdict_or_redundant_inquiry(self):
+        question='오늘 B capstone-management.service 오류 원문과 지금 관제 처리 대기 상태를 표로 정리해줘. 현재 차단 목록도 보여줘. 설정 변경은 하지 마.'
+        result,order,prompts,calls=self.run_case(question=question,blocks=True,selection={'indexes':[0,1,2,3,4]})
+        self.assertEqual(result['status'],'completed',result)
+        self.assertTrue(result['service_lookup_complete'])
+        self.assertEqual(order,['select','read','read','read','read','block_read','compact'])
+        self.assertEqual(len(calls),5);self.assertEqual(result['protected_calls'],0)
+        self.assertIn('192.0.2.7',result['final_response'])
+        self.assertIn('controller_already_running',result['final_response'])
+        self.assertIn('사건 종결을 뜻하지',result['final_response'])
+        self.assertNotIn('INCIDENT_DISPOSITION',result['final_response'])
+
+    def test_cause_request_keeps_model_investigation(self):
+        result,order,prompts,calls=self.run_case(question='오늘 b:management 오류 원인이 뭔지 확인해줘. 지금 상태도 확인해줘.')
+        self.assertEqual(result['status'],'partial',result)
+        self.assertFalse(result.get('service_lookup_complete'))
+        self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
+        self.assertIn('**판단**',result['final_response'])
+        self.assertIn('배경 원인은 미확인',result['final_response'])
 
     def test_failed_companion_read_remains_partial_without_invented_empty_list(self):
         question='오늘 B 서버 capstone-management.service 오류와 지금 상태 확인해줘. 현재 차단 목록도 보여줘.'

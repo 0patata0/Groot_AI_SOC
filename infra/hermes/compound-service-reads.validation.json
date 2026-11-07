@@ -1,16 +1,16 @@
 {
-  "checked_at_kst": "2026-11-08T06:22:16.181948+09:00",
-  "state": "deployed_compact_scope_and_reasoning_fix_quality_incomplete",
-  "common": "1.5.76",
-  "query": "1.19.127",
-  "model": "qwen3.6:35b original, not promoted",
+  "checked_at_kst": "2026-11-08T06:52:00.398643+09:00",
+  "state": "bounded_factual_lookup_verified_not_full_incident_reasoning",
+  "common": "1.5.78",
+  "query": "1.19.128",
+  "model": "qwen3.6:35b",
   "source_sha256": {
-    "infra/hermes/chat_contract.py": "408b204af336d6d96dd4f3cbae44b773ce23cf80bfa60441d95af8073e6ddbeb",
-    "infra/hermes/soc_management_run.py": "278f96d096e1fc0a0c544fe0b1041a0279e0e54b2f1db92e23c9e21814d5bacf",
-    "infra/hermes/query-completion/__init__.py": "3bf9a1aa72a77fc787a689009f2637a0f0f54a9d4c3f735fba83085e989f3a95",
-    "infra/hermes/test_service_history_contract.py": "03d8fca0c7e026b667c03d7a5f089b3ecc407b457414b463746843c9f45ce952",
-    "infra/hermes/test_diagnostic_claim_scope.py": "fc6c6b500bed4cf6cb2c81f61e4e2fc6a71b71a40bd74cee740cef4b5a9d58fd",
-    "infra/ollama-trial/test_service_history.py": "2419f544c8074a546eab1cefa5fc166e386635cc9d933587c9bf330aeaf617d8"
+    "infra/hermes/chat_contract.py": "f9ebba9464a5e67aeeaa15205ad1e74809219b2c8f5b3b30ca7ee445050253de",
+    "infra/hermes/soc_management_run.py": "c3d3f1e7ed87ad845ae49c758f526eb05468f772fb575eb3e6130c1c97c12621",
+    "infra/hermes/query-completion/__init__.py": "7572b033c692fbbfc37ff3b80354b3d567f6dedab10f8d9df4a1c6be209515a8",
+    "infra/hermes/test_service_history_contract.py": "a07c082ffb73866e59034f5c152f3b9efe009206b88cfc411c6080bdd7ef34d7",
+    "infra/ollama-trial/runtime.py": "1081e501c509dea52745ad4c9721d59b65a0a249c880ea9e23449b48f7311889",
+    "infra/ollama-trial/test_service_history.py": "e35dc0acd608453f853d6a7e5ab730537d0d03ac16ba000095699cab606215d8"
   },
   "test_profiles": {
     "native": {
@@ -20,7 +20,7 @@
     },
     "service": {
       "rc": 0,
-      "count": 97,
+      "count": 105,
       "skip": 0
     },
     "claims": {
@@ -30,7 +30,7 @@
     },
     "sdk": {
       "rc": 0,
-      "count": 301,
+      "count": 303,
       "skip": 0
     },
     "query": {
@@ -54,11 +54,11 @@
       "skip": 0
     }
   },
-  "tests_passed": 1574,
+  "tests_passed": 1584,
   "final_health": {
-    "at_kst": "2026-11-08T06:22:16.181948+09:00",
-    "query": "1.19.127",
-    "common": "1.5.76",
+    "at_kst": "2026-11-08T06:52:00.398643+09:00",
+    "query": "1.19.128",
+    "common": "1.5.78",
     "manifest": 17,
     "protected": 8,
     "sdk_sources": 20,
@@ -77,566 +77,697 @@
     "b_failed_units": 0,
     "rollback_timer_inactive": true,
     "hermes_planned_restart_this_revision": 1,
-    "hermes_planned_restarts_this_unit": 2,
+    "hermes_planned_restarts_this_unit": 1,
     "jobs": {
-      "w9jjke1yd7ygmrc73xfr19jqty": [
-        [
-          "hermes",
-          "lead",
-          "done"
-        ]
-      ],
-      "sr41wmwktb8e7mp7fu58fjo8aa": [
-        [
-          "hermes",
-          "lead",
-          "done"
-        ]
-      ],
-      "b7e5hgdkdpfqfcyrpj4jqjpozw": [
+      "hedrctjrzf8ribbyoqiq98oece": [
         [
           "ollama",
           "lead",
           "done"
         ]
       ],
-      "3o6sjjh79fn99mzszmbra3ge3r": [
+      "hr5xyekof3drtdehknyja5cm9h": [
         [
           "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "nmf8io4qc784mnjdwfjbeqtkna": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "tx54tcpfii8r9be3dr4fxfztbc": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ],
+      "8augh7brctnd3gg8s5s1e51tor": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ],
+      "mrn3diwf5tbpbqszmbegccuyyw": [
+        [
+          "hermes",
           "lead",
           "done"
         ]
       ]
     },
     "embedded_gate_matches": true,
-    "gate_bytes": 65507
+    "gate_bytes": 65383
   },
   "chat": [
     {
       "run_label": "hermes",
       "engine": "hermes",
-      "source_id": "w9jjke1yd7ygmrc73xfr19jqty",
-      "job_id": "dcc7a7aa0675ea42b0b63e8a09d3b36d",
-      "reply_id": "9grjj9oxufnz9ked6xqgyimiec",
-      "posted_to_final_seconds": 111.258,
-      "status": "partial",
+      "source_id": "8augh7brctnd3gg8s5s1e51tor",
+      "job_id": "e6adc89baf81bfb754da53dabc6aa32f",
+      "reply_id": "q8iffzf36ig47cghkpb9sdwmee",
+      "posted_to_final_seconds": 37.668,
+      "status": "completed",
       "actual_reads": 5,
       "sha256_verified": [
-        "983d4b509967f3e9a6fac2faf75db62ab9879e7d35426725816405d2a16929a5",
-        "7ad23c87987f9b7c9859d35a983358ffb4da593fa1c8366e9b34ae9b7b477d2b",
-        "4b18277db201787a46833b4e344ca80bcd57bb7958d4cea39288c235a66940d9",
-        "c39e94c3ab4ea45d04b6c1e2fc97146b9940041599dbe9c56a7e6ca000d96b9c",
+        "0f6ed8ed027b76dad88e87cbfa20be8be056888eee37838c8f0ce38e610e7fa3",
+        "14ba09196458bb25970ff12f99b4dad3049333d07ef069c918764b5322eb33f3",
+        "189aec52cf11253340de0fc826b3ff36cbf1364b333484c1772c8be4efe6cd08",
+        "ce09209c641b251aef83fc064406a91df552ca46c29a6b4e4d705cb4e50a56d4",
         "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management"
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management",
+            "since_kst": "2026-11-06T16:20:00+09:00",
+            "until_kst": "2026-11-06T16:40:00+09:00"
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management",
+            "since_kst": "2026-11-06T16:20:00+09:00",
+            "until_kst": "2026-11-06T16:40:00+09:00",
+            "view": "journal",
+            "limit": 50
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management-pipeline"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
       ],
       "markdown_tables": 1,
       "code_fences": 0,
-      "protected_calls": 0,
-      "content_review": {
-        "verdict": "failed",
-        "reason": "Four medium-reasoning outputs hit length; final generic failure omitted collected observations."
-      },
-      "journal_entries": 32,
-      "block_list_count": 0,
-      "model_calls": null
+      "protected_calls": 0
     },
     {
-      "run_label": "hermes_retest",
+      "run_label": "ollama",
+      "engine": "ollama",
+      "source_id": "hr5xyekof3drtdehknyja5cm9h",
+      "job_id": "82d42e87dd3cd720fee6ef28f4288ed0",
+      "reply_id": "1yqxjtx7k7yebnh7phrft8a9kc",
+      "posted_to_final_seconds": 30.424,
+      "status": "completed",
+      "actual_reads": 5,
+      "sha256_verified": [
+        "6a7582968f5cea0598ea2eb37ddf179c044b31a2b33e8465352fdd34e1977e93",
+        "a7302f0a43d91f6a188f02d4de651095dc004a6372f3db27f3288fffa035c205",
+        "e582112bfaeed750fbaea4badae3c7258630dc7205caffb8f15a70f1605e22f3",
+        "f1210bdad977924f97e964c7293ad634df01ba3009005dfc911e94aa1fefc6da",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management"
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management",
+            "since_kst": "2026-11-06T16:20:00+09:00",
+            "until_kst": "2026-11-06T16:40:00+09:00"
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management",
+            "since_kst": "2026-11-06T16:20:00+09:00",
+            "until_kst": "2026-11-06T16:40:00+09:00",
+            "view": "journal",
+            "limit": 50
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:management-pipeline"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
+      ],
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "protected_calls": 0
+    },
+    {
+      "run_label": "hermes_short",
       "engine": "hermes",
-      "source_id": "sr41wmwktb8e7mp7fu58fjo8aa",
-      "job_id": "8d7b20fb86824543439b0fd2467bae60",
-      "reply_id": "eauc1g8wfpr37f13b4ehqqcscy",
-      "posted_to_final_seconds": 79.23,
-      "status": "partial",
-      "actual_reads": 5,
+      "source_id": "tx54tcpfii8r9be3dr4fxfztbc",
+      "job_id": "5499671a523f9fe4ed2c3ae644b5c3a0",
+      "reply_id": "bgrko3nhdpga9f5pzhgx44r8mc",
+      "posted_to_final_seconds": 25.04,
+      "status": "completed",
+      "actual_reads": 1,
       "sha256_verified": [
-        "d58f7969fec1aa13b02a74ad8d917548d8504a819360f4a83834e235a8edc204",
-        "d4d55cab342a3ecd7c7178fead4823a71283d9e23be325fa1460980919b497e7",
-        "d25ce54a73668ce1ee7ce287cea33ddadc1e312a0a5ae1016af28ac6f71a844e",
-        "a0f2a636bdf9d0952718b3e3c40db620839212b2d56ea8cff3f7fe91203be18a",
-        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        "ec2a6a60456a5c850436e6bb2044ffc6c7c2f3be2325cd172d486a0b4110c9e9"
       ],
-      "markdown_tables": 1,
-      "code_fences": 0,
-      "protected_calls": 0,
-      "content_review": {
-        "verdict": "incomplete",
-        "reason": "None reasoning effective; requested reads and table preserved. Model requested already-completed reads and did not complete judgment."
-      },
-      "journal_entries": 32,
-      "block_list_count": 0,
-      "model_calls": null
-    },
-    {
-      "run_label": "ollama_first",
-      "engine": "ollama",
-      "source_id": "3o6sjjh79fn99mzszmbra3ge3r",
-      "job_id": "a8df204f6080ff1eaf57a177c4737b45",
-      "reply_id": "7knpfm1eh3yefmhojbhknoyxwr",
-      "posted_to_final_seconds": 32.777,
-      "status": "partial",
-      "actual_reads": 5,
-      "sha256_verified": [
-        "fbc1fdf0f4472fce5f8f4c9fd45e60f267ddca3b4fe11be8533fc1c90327b62b",
-        "5bc8e484d29674ce0f8ff4afe3e233d96ba089ac11b56339891014562fac0189",
-        "73e68056b3f7a2945b518cf4d93f9d81ebdc81fded3f843382c204ff8365bbf1",
-        "326955b67d144f392349f19734d6adb95b1dd0c7fdc6806861a08bd2626ccee5",
-        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
-      ],
-      "markdown_tables": 1,
-      "code_fences": 0,
-      "protected_calls": 0,
-      "content_review": {
-        "verdict": "failed",
-        "reason": "Lock acquisition error reported as restart failure."
-      },
-      "journal_entries": 32,
-      "block_list_count": 0,
-      "model_calls": [
+      "read_arguments": [
         {
-          "seconds": 1.1447701181750745,
-          "usage": {
-            "input_tokens": 436,
-            "output_tokens": 15,
-            "total_tokens": 451
-          },
-          "ollama": {
-            "total_duration": 1136117796,
-            "load_duration": 4482701,
-            "prompt_eval_count": 436,
-            "prompt_eval_duration": 700394000,
-            "eval_count": 15,
-            "eval_duration": 399522000
-          }
-        },
-        {
-          "seconds": 21.11512823589146,
-          "usage": {
-            "input_tokens": 17941,
-            "output_tokens": 189,
-            "total_tokens": 18130
-          },
-          "ollama": {
-            "total_duration": 21103678379,
-            "load_duration": 10343345,
-            "prompt_eval_count": 17941,
-            "prompt_eval_duration": 16642506000,
-            "eval_count": 189,
-            "eval_duration": 4310402000
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:apache",
+            "since_kst": "2026-11-07T00:00:00+09:00",
+            "until_kst": "2026-11-07T23:59:59.999999+09:00"
           }
         }
-      ]
-    },
-    {
-      "run_label": "ollama_retest",
-      "engine": "ollama",
-      "source_id": "b7e5hgdkdpfqfcyrpj4jqjpozw",
-      "job_id": "549e16506130dddbcc86f955e79c0ff4",
-      "reply_id": "4xtyaejjmtdzbjoioxi1q3hz8c",
-      "posted_to_final_seconds": 33.696,
-      "status": "partial",
-      "actual_reads": 5,
-      "sha256_verified": [
-        "0dfcfff53a9f26b084e348aaea00c6967681ad9682a8a607269231b9dff0f75f",
-        "90c723ac574af6837b6b46b87fc61d86ecc55fcf8a7b1ae6decc7a2555973108",
-        "9a60fee55a9d7a4ce690304c851efda9ef0c2da7b70ac3d6a0507f5b6c716c8d",
-        "b4e4b0a8e2bc35716915ffc9a62dacfded1c6e8e78efea5caf2ef9d72f2ca19a",
-        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
       ],
       "markdown_tables": 1,
       "code_fences": 0,
-      "protected_calls": 0,
-      "content_review": {
-        "verdict": "qualified_read_report_not_full_investigation_success",
-        "reason": "Requested reads and source-specific table present; prior approval/restart/time errors absent. Consecutive-failure wording exceeds error-only sample; raw_messages false vs redacted excerpts needs clearer wording."
-      },
-      "journal_entries": 32,
-      "block_list_count": 0,
-      "model_calls": [
+      "protected_calls": 0
+    },
+    {
+      "run_label": "ollama_short",
+      "engine": "ollama",
+      "source_id": "nmf8io4qc784mnjdwfjbeqtkna",
+      "job_id": "2bcc08a3cb984d8d23bdefb871670e1d",
+      "reply_id": "3hyyp4bwz3nabcjhy77y6z181e",
+      "posted_to_final_seconds": 15.309,
+      "status": "completed",
+      "actual_reads": 1,
+      "sha256_verified": [
+        "6b7318e371e201ee592ebad8188c820b476012bb93e421c469774e650d34f25c"
+      ],
+      "read_arguments": [
         {
-          "seconds": 1.2898277728818357,
-          "usage": {
-            "input_tokens": 436,
-            "output_tokens": 25,
-            "total_tokens": 461
-          },
-          "ollama": {
-            "total_duration": 1280752658,
-            "load_duration": 4225060,
-            "prompt_eval_count": 436,
-            "prompt_eval_duration": 685771000,
-            "eval_count": 25,
-            "eval_duration": 559387000
-          }
-        },
-        {
-          "seconds": 21.686676295939833,
-          "usage": {
-            "input_tokens": 17941,
-            "output_tokens": 208,
-            "total_tokens": 18149
-          },
-          "ollama": {
-            "total_duration": 21678787973,
-            "load_duration": 13042112,
-            "prompt_eval_count": 17941,
-            "prompt_eval_duration": 16648510999,
-            "eval_count": 208,
-            "eval_duration": 4881146000
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:apache",
+            "since_kst": "2026-11-07T00:00:00+09:00",
+            "until_kst": "2026-11-07T23:59:59.999999+09:00"
           }
         }
-      ]
+      ],
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "protected_calls": 0
+    },
+    {
+      "run_label": "hermes_short_final",
+      "engine": "hermes",
+      "source_id": "mrn3diwf5tbpbqszmbegccuyyw",
+      "job_id": "1f5a111aefd1c7ba1fedd1d7a9bec8d1",
+      "reply_id": "ogh7cza7cbnx7r58yrr4tpdq1h",
+      "posted_to_final_seconds": 24.823,
+      "status": "completed",
+      "actual_reads": 1,
+      "sha256_verified": [
+        "6aad63a3f686421748ba3de7c05a9f1bbe52a15865b17da2334e91e8d5703c81"
+      ],
+      "read_arguments": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:apache",
+            "since_kst": "2026-11-07T00:00:00+09:00",
+            "until_kst": "2026-11-07T23:59:59.999999+09:00"
+          }
+        }
+      ],
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "protected_calls": 0
+    },
+    {
+      "run_label": "ollama_short_final",
+      "engine": "ollama",
+      "source_id": "hedrctjrzf8ribbyoqiq98oece",
+      "job_id": "9889bd45a40db0055fdda102f40c2e8b",
+      "reply_id": "8ypb9kgn8idqmepzb5hq886ssy",
+      "posted_to_final_seconds": 13.403,
+      "status": "completed",
+      "actual_reads": 1,
+      "sha256_verified": [
+        "90ef4911cdf5b8bd992293801b169494e0b4b215ebb356852fd0601a73b2a2bf"
+      ],
+      "read_arguments": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:apache",
+            "since_kst": "2026-11-07T00:00:00+09:00",
+            "until_kst": "2026-11-07T23:59:59.999999+09:00"
+          }
+        }
+      ],
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "protected_calls": 0
     }
   ],
-  "native_before": {
-    "events": [
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": true,
-          "selected_reads": 5,
-          "provider_seconds": 2.061959,
-          "native_dispatch": true,
-          "report_projection": false,
-          "repeated_read_rejected": false,
-          "indexed_reads": true,
-          "compact_report": false,
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "none",
-          "input_message_bytes": 1751,
-          "usage": {
-            "completion_tokens": 48,
-            "prompt_tokens": 495,
-            "total_tokens": 543,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 0
-            }
-          },
-          "actual_mcp_calls_by_adapter": 0,
-          "model_json_sha256": "0c254417659a1072ac4e7883a5424ecc48f7bc696d0b4e78960ec0580dd321d6"
+  "native_model_metadata": {
+    "lookup": {
+      "run_id": "d681a5298300817902f4b9764451e3e7",
+      "events": [
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "b:management"
+            ]
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "b:management"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 5,
+            "provider_seconds": 2.186254,
+            "native_dispatch": true,
+            "report_projection": false,
+            "repeated_read_rejected": false,
+            "indexed_reads": true,
+            "compact_report": false,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 1751,
+            "usage": {
+              "completion_tokens": 54,
+              "prompt_tokens": 494,
+              "total_tokens": 548,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "68c5f3ab737bff0d7207689678fff7c15e011a45f428012be9da7419333eba68"
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "b:management"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 0,
+            "provider_seconds": 20.998764,
+            "native_dispatch": false,
+            "report_projection": true,
+            "repeated_read_rejected": false,
+            "indexed_reads": false,
+            "compact_report": true,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 33157,
+            "usage": {
+              "completion_tokens": 101,
+              "prompt_tokens": 15818,
+              "total_tokens": 15919,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "37ecdf160892783a963071366f65e7f0179d1d6f7438383081382dcbb0cd1fa6"
+          }
         }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": false,
-          "error_class": "ValueError",
-          "provider_seconds": 36.284967,
-          "error_code": "management_selection_response_shape",
-          "response_finish": "length",
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "medium",
-          "actual_mcp_calls_by_adapter": 0
+      ],
+      "error_lines": []
+    },
+    "short": {
+      "run_id": "21e8d2c6f0f6720f37f69d7150288b9f",
+      "events": [
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 1,
+            "provider_seconds": 1.679022,
+            "native_dispatch": true,
+            "report_projection": false,
+            "repeated_read_rejected": false,
+            "indexed_reads": true,
+            "compact_report": false,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 1223,
+            "usage": {
+              "completion_tokens": 40,
+              "prompt_tokens": 336,
+              "total_tokens": 376,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "bfe021963b754e993fb64931ac8b210ff89f2f8e7a3cd11d004d2fcc8da56ecc"
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 0,
+            "provider_seconds": 9.674464,
+            "native_dispatch": false,
+            "report_projection": true,
+            "repeated_read_rejected": false,
+            "indexed_reads": false,
+            "compact_report": true,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 8084,
+            "usage": {
+              "completion_tokens": 114,
+              "prompt_tokens": 2960,
+              "total_tokens": 3074,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "bd5e1c6dbf4f3181f2795fbb8daaee8e1581d67304ef7fc01349923f75223752"
+          }
         }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": false,
-          "error_class": "ValueError",
-          "provider_seconds": 18.44641,
-          "error_code": "management_selection_response_shape",
-          "response_finish": "length",
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "medium",
-          "actual_mcp_calls_by_adapter": 0
+      ],
+      "error_lines": []
+    },
+    "short-final": {
+      "run_id": "2857db99fbbc609d6598e43d042050bc",
+      "events": [
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 1,
+            "provider_seconds": 1.708872,
+            "native_dispatch": true,
+            "report_projection": false,
+            "repeated_read_rejected": false,
+            "indexed_reads": true,
+            "compact_report": false,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 1223,
+            "usage": {
+              "completion_tokens": 38,
+              "prompt_tokens": 337,
+              "total_tokens": 375,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "0d9e03a475f4c4d89904208082fed6ba33f5e8cd09805022aa7c36e47bbbfe37"
+          }
+        },
+        {
+          "event": "management_service_reasoning",
+          "data": {
+            "reasoning_effort": "none",
+            "registered_targets": [
+              "c:apache"
+            ]
+          }
+        },
+        {
+          "event": "management_read_selection",
+          "data": {
+            "accepted": true,
+            "selected_reads": 0,
+            "provider_seconds": 8.430685,
+            "native_dispatch": false,
+            "report_projection": true,
+            "repeated_read_rejected": false,
+            "indexed_reads": false,
+            "compact_report": true,
+            "additional_inquiry": false,
+            "literal_report_repair": false,
+            "reasoning_effort": "none",
+            "input_message_bytes": 5519,
+            "usage": {
+              "completion_tokens": 121,
+              "prompt_tokens": 1688,
+              "total_tokens": 1809,
+              "completion_tokens_details": null,
+              "prompt_tokens_details": {
+                "audio_tokens": null,
+                "cached_tokens": 0
+              }
+            },
+            "actual_mcp_calls_by_adapter": 0,
+            "model_json_sha256": "d495a42945d357851efd92b895b628ac9386f2422cfa656550b1bb263a229b2c"
+          }
         }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": false,
-          "error_class": "ValueError",
-          "provider_seconds": 19.646773,
-          "error_code": "management_selection_response_shape",
-          "response_finish": "length",
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "medium",
-          "actual_mcp_calls_by_adapter": 0
-        }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": false,
-          "error_class": "ValueError",
-          "provider_seconds": 19.684732,
-          "error_code": "management_selection_response_shape",
-          "response_finish": "length",
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "medium",
-          "actual_mcp_calls_by_adapter": 0
-        }
-      }
-    ],
-    "error_lines": []
-  },
-  "native_after": {
-    "events": [
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": true,
-          "selected_reads": 5,
-          "provider_seconds": 2.133021,
-          "native_dispatch": true,
-          "report_projection": false,
-          "repeated_read_rejected": false,
-          "indexed_reads": true,
-          "compact_report": false,
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "none",
-          "input_message_bytes": 1751,
-          "usage": {
-            "completion_tokens": 52,
-            "prompt_tokens": 495,
-            "total_tokens": 547,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 0
-            }
-          },
-          "actual_mcp_calls_by_adapter": 0,
-          "model_json_sha256": "74b874b79214290fd59c31cc3c1d2eeb5dcae7cc533eaa7cc0831c4bfb00e272"
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": true,
-          "selected_reads": 0,
-          "provider_seconds": 20.456889,
-          "native_dispatch": false,
-          "report_projection": false,
-          "repeated_read_rejected": false,
-          "indexed_reads": false,
-          "compact_report": true,
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "none",
-          "input_message_bytes": 50638,
-          "usage": {
-            "completion_tokens": 63,
-            "prompt_tokens": 17926,
-            "total_tokens": 17989,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 0
-            }
-          },
-          "actual_mcp_calls_by_adapter": 0,
-          "model_json_sha256": "5447b9758e9c8a9a0df1ac5526e463e9970c71bfb51449c89ed7582f3d4494eb"
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": true,
-          "selected_reads": 0,
-          "provider_seconds": 18.657312,
-          "native_dispatch": false,
-          "report_projection": false,
-          "repeated_read_rejected": true,
-          "indexed_reads": false,
-          "compact_report": false,
-          "additional_inquiry": true,
-          "literal_report_repair": false,
-          "reasoning_effort": "none",
-          "input_message_bytes": 41616,
-          "usage": {
-            "completion_tokens": 196,
-            "prompt_tokens": 16338,
-            "total_tokens": 16534,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 0
-            }
-          },
-          "actual_mcp_calls_by_adapter": 0,
-          "model_json_sha256": "3bc39ecd0ed335f61009118b9c297b7fb2ed5c1ca94295b08218a72384568a05"
-        }
-      },
-      {
-        "event": "management_service_reasoning",
-        "data": {
-          "reasoning_effort": "none",
-          "registered_targets": [
-            "b:management"
-          ]
-        }
-      },
-      {
-        "event": "management_read_selection",
-        "data": {
-          "accepted": true,
-          "selected_reads": 0,
-          "provider_seconds": 23.857541,
-          "native_dispatch": false,
-          "report_projection": true,
-          "repeated_read_rejected": false,
-          "indexed_reads": false,
-          "compact_report": true,
-          "additional_inquiry": false,
-          "literal_report_repair": false,
-          "reasoning_effort": "none",
-          "input_message_bytes": 52066,
-          "usage": {
-            "completion_tokens": 194,
-            "prompt_tokens": 18259,
-            "total_tokens": 18453,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 0
-            }
-          },
-          "actual_mcp_calls_by_adapter": 0,
-          "model_json_sha256": "b0a9169fe442edb8e81e652414f671bd0d301590bbca1b9dcbcdc1db41f881c9"
-        }
-      }
-    ],
-    "error_lines": []
-  },
-  "receipt_replay": {
-    "original_job": "e26979150a15dc7b8e067a190c53e80f",
-    "at_kst": "2026-11-08T05:48:26.259852+09:00",
-    "replay_completed_at": "2026-11-08T05:49:35.094000+09:00",
-    "receipts": 5,
-    "lossless": true,
-    "context_bytes": 24706,
-    "prior_reply_rejections": [
-      "diagnostic_pipeline_approval_unverified"
-    ],
-    "live_new_generation": false,
-    "initial_replay_correction": "Used reply completion time, not request start; journal was collected after start."
-  },
-  "lock_replay": {
-    "original_job": "a8df204f6080ff1eaf57a177c4737b45",
-    "elapsed": 32.777,
-    "issues": [
-      "diagnostic_lock_metadata_not_restart_history"
-    ],
-    "live_new_generation": false,
-    "note": "partial output: audit receipts; no reusable cache"
+      ],
+      "error_lines": []
+    }
   },
   "cleanup": {
-    "mac": {
-      "runs": 3,
-      "bytes": 12480608,
-      "files": 3,
-      "removed": true
-    },
-    "server": {
-      "runs": 3,
-      "bytes": 22446214,
-      "files": 1413,
-      "removed": true
-    }
+    "mac": [
+      {
+        "file": "/private/tmp/capstone-lookup78-20261108-4uodcuv6/tests.py",
+        "sha256": "82c83212f642765faa5ad52d3ad4b4e7af68133fc8d090c412582ba261242ec5",
+        "bytes": 4165237,
+        "removed": true
+      },
+      {
+        "file": "/private/tmp/capstone-lookup78-20261108-yntj25tm/tests.py",
+        "sha256": "80063653c3078ab250817ba723cc3619e8a1c740ab869ed36be8082a796d7c85",
+        "bytes": 4165793,
+        "removed": true
+      },
+      {
+        "file": "/private/tmp/capstone-lookup78-20261108-nkdl7qtl/tests.py",
+        "sha256": "b3ca7f21e0457fd67c530b4077a63c9ca0d7d6792b75f26470f5bdd3f6bb653f",
+        "bytes": 4165977,
+        "removed": true
+      },
+      {
+        "file": "/private/tmp/capstone-lookup78-20261108-4umgefvp/tests.py",
+        "sha256": "2e04d8a1e515b66ae130211a45d4a9a54b2a779b2e2fec90b1b38c381cc175be",
+        "bytes": 4166221,
+        "removed": true
+      }
+    ],
+    "server": [
+      {
+        "path": "/tmp/capstone-lookup78-20261108-r1",
+        "files": 471,
+        "bytes": 7493980,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-lookup78-20261108-r2",
+        "files": 471,
+        "bytes": 7495856,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-lookup78-20261108-r3",
+        "files": 471,
+        "bytes": 7496040,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-lookup78-20261108-r4",
+        "files": 471,
+        "bytes": 7496229,
+        "removed": true
+      }
+    ]
   },
   "deployment": [
     {
-      "at_kst": "2026-11-08T06:04:40.355991+09:00",
-      "epoch": 1794085480.3560097,
-      "changes": 10,
+      "at_kst": "2026-11-08T06:40:13.565489+09:00",
+      "epoch": 1794087613.5655093,
+      "changes": 11,
       "db_same_while_stopped": true,
       "protected": 8
     },
     {
-      "at_kst": "2026-11-08T06:09:13.405919+09:00",
-      "epoch": 1794085753.4059377,
+      "at_kst": "2026-11-08T06:47:29.033820+09:00",
+      "epoch": 1794088049.033837,
       "changes": 3,
-      "db_same_while_stopped": true,
-      "protected": 8
-    },
-    {
-      "at_kst": "2026-11-08T06:17:43.564120+09:00",
-      "epoch": 1794086263.5641396,
-      "changes": 8,
       "db_same_while_stopped": true,
       "protected": 8
     }
   ],
   "recovery_roots": [
-    "/var/lib/capstone-service-grounding/20261108-provenance77",
-    "/var/lib/capstone-service-grounding/20261108-provenance77b",
-    "/var/lib/capstone-service-grounding/20261108-provenance77c"
+    "/var/lib/capstone-service-grounding/20261108-lookup78",
+    "/var/lib/capstone-service-grounding/20261108-lookup78b"
   ],
+  "previous_validation_commit": "cc6263b22a093cd6a29383ebe41b666a42cdc98d",
   "dgx_polled": false,
   "attack_tests": 0,
   "model_promoted": false,
   "independent_evaluation": false,
   "all_client_rendering_verified": false,
-  "previous_validation_commit": "0a400d153092b7b0b919c8c7a4bd5a9c41878ce2",
   "limitations": [
-    "Same development incident, new roots; GPU/cache uncontrolled; no average or causal speedup claim.",
-    "Ollama latest chat used query126/common76; final query127 change concerns native reasoning selection.",
-    "Error-only samples do not establish consecutive failures across all executions.",
-    "All four runtime reports are partial. Final Hermes preserves observations but does not finish judgment.",
-    "Job done means delivery ended, not investigation success.",
-    "No new OS installation, attack E2E, independent evaluation, DGX status query or model promotion."
+    "Named registered service, unambiguous past period and closed factual request only; unknown clauses retain investigation.",
+    "Lookup completion is not incident resolution, complete log coverage, recovery or absence of attack.",
+    "New roots, same development incident; shared GPU/cache uncontrolled. No mean latency or general speedup claim.",
+    "Complex causal judgment, Native failed-run evidence preservation and independent evaluation remain incomplete.",
+    "Common77 compound/initial short chats; common78 wording-only followup verified by final short chats and regression tests.",
+    "No new OS installation, attacks, DGX polling or model promotion."
+  ],
+  "posted_content_review": [
+    {
+      "run_label": "hermes",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 5,
+      "scope": "development_lookup_only"
+    },
+    {
+      "run_label": "ollama",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 5,
+      "scope": "development_lookup_only"
+    },
+    {
+      "run_label": "hermes_short",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 1,
+      "scope": "development_lookup_only"
+    },
+    {
+      "run_label": "ollama_short",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 1,
+      "scope": "development_lookup_only"
+    },
+    {
+      "run_label": "hermes_short_final",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 1,
+      "scope": "development_lookup_only"
+    },
+    {
+      "run_label": "ollama_short_final",
+      "posted_body_matches_actual_receipt_render": true,
+      "model_generated_fact_prose": false,
+      "incident_disposition_posted": false,
+      "reads": 1,
+      "scope": "development_lookup_only"
+    }
   ]
 }

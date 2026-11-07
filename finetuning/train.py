@@ -170,6 +170,20 @@ def encode_completion(row, tokenizer, max_length):
     if len(messages) < 2 or messages[-1].get("role") != "assistant":
         return None, "missing_assistant_target"
     kwargs = {"tokenize": False, "add_generation_prompt": False, "enable_thinking": False}
+    if "preserve_empty_thinking_history" in row:
+        # Qwen's template otherwise drops the empty thinking wrapper from an
+        # earlier assistant after a later user turn, breaking prefix alignment.
+        # This explicit corpus flag only permits empty reasoning, not hidden
+        # reasoning supervision or an arbitrary template keyword override.
+        if row["preserve_empty_thinking_history"] is not True:
+            return None, "invalid_empty_thinking_history_policy"
+        for message in messages:
+            if message.get("role") == "assistant" and (
+                message.get("reasoning_content") not in (None, "")
+                or any(tag in (message.get("content") or "") for tag in ("<think>", "</think>"))
+            ):
+                return None, "nonempty_reasoning_history_refused"
+        kwargs["preserve_thinking"] = True
     if row.get("tools"):
         kwargs["tools"] = row["tools"]
     prompt_text = tokenizer.apply_chat_template(messages[:-1], **kwargs)

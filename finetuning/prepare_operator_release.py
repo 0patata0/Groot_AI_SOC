@@ -136,23 +136,23 @@ def admit(directory, token_receipt):
         if record['reason'] is None and (type(record['tokens']) is not int or not 0 < record['tokens'] <= 4096):
             raise ValueError('Invalid admitted token length')
     tokens = {(r['split'],r['id']):r for r in result['records']}
-    admitted, held = [], []
+    admitted, held, admitted_tokens = [], [], []
     fallback = {r['provenance']['parent_dialogue']:r for r in rows(directory/'fallback.candidates.jsonl')}
     for row in rows(directory/'train.candidates.jsonl'):
         record = tokens[('train',row['id'])]
         if record['reason'] is None:
-            admitted.append(row);continue
+            admitted.append(row);admitted_tokens.append(record['tokens']);continue
         if record['reason'] != 'over_max_length':raise ValueError('Encoding alignment/schema failure: '+row['id'])
         held.append({'id':row['id'],'reason':record['reason']})
         candidate=fallback.get(row['id'])
         if candidate and tokens[('fallback',candidate['id'])]['reason'] is None:
             admitted.append(candidate)
+            admitted_tokens.append(tokens[('fallback',candidate['id'])]['tokens'])
     for split in ('validation','test'):
         if any(tokens[(split,r['id'])]['reason'] for r in rows(directory/(split+'.jsonl'))):
             raise ValueError('Frozen evaluation no longer fits')
     dump(directory/'train.jsonl',admitted)
     dump(directory/'held-token.jsonl',held)
-    admitted_tokens=[tokens[('fallback'if r['id'].endswith('-initial-call')else'train',r['id'])]['tokens']for r in admitted]
     report={'at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
             'status':'source_and_token_verified_waiting_final_review_and_gpu_smoke',
             'train_rows':len(admitted),'validation_rows':composition['validation_rows'],'test_rows':composition['test_rows'],

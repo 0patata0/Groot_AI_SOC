@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from prepare_data import check_schema, matches_schema, Reject
+from current_diagnostic_schema import project_for_call
 
 
 def supported(schema):
@@ -49,10 +50,11 @@ def audit_rows(rows, catalog):
             if entry['protected']: counts['protected_named_calls_requiring_policy_review'] += 1
             schema = copy.deepcopy(entry['parameters'])
             try:
-                if not supported(schema): raise Reject('unsupported_schema_constraint')
-                check_schema(schema, root=True)
                 arguments = fn.get('arguments')
                 if isinstance(arguments, str): arguments = json.loads(arguments)
+                schema = project_for_call(name, schema, arguments)
+                if not supported(schema): raise Reject('unsupported_schema_constraint')
+                check_schema(schema, root=True)
                 if not matches_schema(arguments, schema): raise Reject('arguments_schema_mismatch')
                 counts['schema_valid_calls'] += 1
             except (Reject, ValueError, TypeError):

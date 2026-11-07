@@ -10,14 +10,24 @@ from zoneinfo import ZoneInfo
 def main(base):
     from transformers import AutoTokenizer
     from train import encode_completion
-    from dialogue_encoding import encode_dialogue
+    from dialogue_encoding import encode_dialogue, label_values
     tokenizer=AutoTokenizer.from_pretrained(base,trust_remote_code=False,local_files_only=True)
     results=[];source_digest=hashlib.sha256()
     for line in sys.stdin.buffer:
         source_digest.update(line);item=json.loads(line);row=item['row']
         encoded,reason=encode_dialogue(row,tokenizer,4096,encode_completion)
+        supervised=0
+        if encoded:
+            width=len(encoded['input_ids'])+7
+            labels=label_values(encoded,tokenizer.pad_token_id,width)
+            expected={i for start,end in encoded['supervised_ranges'] for i in range(start,end)}
+            actual={i for i,label in enumerate(labels) if label!=-100}
+            if actual!=expected or any(labels[i]!=encoded['input_ids'][i] for i in expected):
+                raise ValueError('Assistant/input/padding mask mismatch')
+            supervised=len(expected)
         results.append({'id':row['id'],'split':item['split'],'reason':reason,
-                        'tokens':len(encoded['input_ids'])if encoded else None})
+                        'tokens':len(encoded['input_ids'])if encoded else None,
+                        'supervised_tokens':supervised,'mask_verified':bool(encoded)})
     artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest()for p in Path(base).iterdir()
                if p.is_file()and p.name in ('tokenizer.json','tokenizer_config.json','chat_template.jinja','config.json')}
     print(json.dumps({'at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),

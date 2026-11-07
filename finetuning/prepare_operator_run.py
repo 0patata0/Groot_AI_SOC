@@ -22,6 +22,22 @@ def data_manifest(directory):
     return outputs
 
 
+def select_smoke(full, token_counts):
+    """Cover worst input, actual tool trajectory, and opted-in history encoding."""
+    longest=max(full,key=lambda r:(token_counts[r['id']],r['id']))
+    multi=[r for r in full if sum(m['role']=='assistant'for m in r['messages'])>=3
+           and sum(m['role']=='tool'for m in r['messages'])>=2]
+    if not multi:raise ValueError('Require an actual multi-turn tool trajectory in GPU preparation')
+    longest_multi=max(multi,key=lambda r:(token_counts[r['id']],r['id']))
+    selected={r['id']:r for r in (longest,longest_multi)}
+    if len(selected)!=2:raise ValueError('Require distinct longest-input and longest-multi-turn examples')
+    history=[r for r in full if r.get('preserve_empty_thinking_history') is True]
+    if history:
+        sample=max(history,key=lambda r:(token_counts[r['id']],r['id']))
+        selected[sample['id']]=sample
+    return list(selected.values())
+
+
 def build(data, output, root, environment_parent, run_id, image, deadline, purpose='preflight_only', retry_policy=None, release_review=None):
     data, output = Path(data), Path(output)
     if purpose not in ('preflight_only','main_training'):raise ValueError('Unknown purpose')
@@ -47,13 +63,7 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
         if set(review['runtime_sources'])!=expected_names:raise ValueError('Release must cover every runtime source')
     full=rows(data/'train.jsonl')
     token_counts={r['id']:r['tokens']for r in receipt['records']if r['reason']is None}
-    longest=max(full,key=lambda r:(token_counts[r['id']],r['id']))
-    multi=[r for r in full if sum(m['role']=='assistant'for m in r['messages'])>=3
-           and sum(m['role']=='tool'for m in r['messages'])>=2]
-    if not multi:raise ValueError('Require an actual multi-turn tool trajectory in GPU preparation')
-    longest_multi=max(multi,key=lambda r:(token_counts[r['id']],r['id']))
-    selected={r['id']:r for r in (longest,longest_multi)}
-    if len(selected)!=2:raise ValueError('Require distinct longest-input and longest-multi-turn examples')
+    selected=select_smoke(full,token_counts)
     output.mkdir(parents=True)
     for name in ('source','data','data/smoke','profiles','installer/finetuning'):
         (output/name).mkdir(parents=True,exist_ok=True)
@@ -62,15 +72,16 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
     for split in ('train','validation','test'):
         shutil.copyfile(data/(split+'.jsonl'),output/'data'/(split+'.jsonl'))
         if split!='train':shutil.copyfile(data/(split+'.jsonl'),output/'data/smoke'/(split+'.jsonl'))
-    dump(output/'data/smoke/train.jsonl',list(selected.values()))
+    dump(output/'data/smoke/train.jsonl',selected)
     full_manifest=data_manifest(output/'data');smoke_manifest=data_manifest(output/'data/smoke')
     shutil.copytree(data/'licenses',output/'data/licenses')
     for name in ('admission.json','composition.json','token-review.json','mcp-contract.json'):
         shutil.copyfile(data/name,output/'data'/name)
     if purpose=='main_training':shutil.copyfile(release_path,output/'data/release.json')
-    selection={'selection':'longest admitted conversation plus longest complete trajectory with at least two tool calls and three assistant turns',
+    selection={'selection':'longest admitted conversation, longest complete multi-tool trajectory, and longest opted-in empty-thinking-history conversation when present',
                'records':[{'id':r['id'],'tokens':token_counts[r['id']],
-                           'assistant_turns':sum(m['role']=='assistant'for m in r['messages'])}for r in selected.values()],
+                           'assistant_turns':sum(m['role']=='assistant'for m in r['messages']),
+                           'preserve_empty_thinking_history':r.get('preserve_empty_thinking_history',False)}for r in selected],
                'train_sha256':full_manifest['train']['sha256'],'smoke_sha256':smoke_manifest['train']['sha256'],
                'main_training_rows':len(full),'planned_main_optimizer_steps':(len(full)+1)//2,
                'smoke_optimizer_steps':2,'smoke_gradient_accumulation':2,'main_training_started':False}

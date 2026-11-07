@@ -6,7 +6,7 @@
 
 기존 학습 모델의 [실제 MCP 사용·원본 비교](finetuning/RUNTIME_COMPARISON_20261107.md)를 실행하고, 미조회 답변 실패와 공통 보완을 기록한다. 새 학습이나 운영 모델 전면 교체와 구분한다. [시험·채택 기준](finetuning/TRAINED_MODEL_TRIAL.md).
 
-현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입과13:22 KST 독립 GPU사전시험2단계를 완료했다. SSH 단절 독립 실행을 확인했으며 본학습 자동 시작0이다. [품질 보완 준비](finetuning/QUALITY_PREPARATION.md)는 균형 후보1,220건·중간 평가/최선 보존·별도 평가32건·비교 설정6개를 구성하고13:46 새 GPU사전시험을 완료했다. 정확도 비교·본학습·운영 승격은 아직이다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
+현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입과13:22 KST 독립 GPU사전시험2단계를 완료했다. 당시 SSH 단절 독립 실행을 확인했으며 그 사전시험에서는 본학습을 자동 시작하지 않았다. [품질 보완 준비](finetuning/QUALITY_PREPARATION.md)는 균형 후보1,220건·중간 평가/최선 보존·별도 평가32건·비교 설정6개를 구성하고13:46 새 GPU사전시험을 완료했다. 6군 정확도 비교·운영 승격은 미완료다. 이후 사용자 승인으로20:54 균형 본학습 실행기를 등록했으며, 마지막20:55 관측은 유휴 자원 대기였다. 아침 재지시까지 현황 조회를 중단한다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
 현재 query1.19.118/common1.5.63·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](infra/hermes/short-read-evidence.md). 후속 공통63은 정상 동작의 직접 부정 문구를 정상 선언으로 읽던 검사 오류를 수정했다. 1,392검사 통과·운영 반영 완료이나 새 복합 질문 H50.595/O53.258초는 모두 품질 미완료다. [후속 검증·잔여](infra/hermes/diagnostic-disclaimers.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
@@ -14,6 +14,8 @@
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 
 반복 `systemd failure` 중 예약 조사 잠금 충돌은 정상 연기로 수정했다. 실제 오류·직접 재조사 실패는 유지한다. 수정 후 약27분 정상82회·잠금대기21회·새 실패0을 확인했다. [원인·운영 검증](infra/hermes/controller-contention.md). 복합 최종 보고30초는 아직 미달이다.
+
+논문은11/7 최신 모델3군 비교·실제 단문6채팅·복합 실패와 비채택 후보5회를 원고/초록에 반영하고 PDF43쪽을 출력·검수했습니다. 목차69개·본문/표776개 일치·이전본SHA보존이며 공식 제출본·독립평가는 미완료입니다. 논문 전체는 계속 로컬/Git제외입니다. [비채택 후보 근거](infra/hermes/history-integrity-review.md).
 
 발표자료는11/5 새 지시에 따라 호스팅 없는 다운로드 PDF 초안20쪽으로 작성했습니다. 발표·논문·메모·검증 원문은 로컬 전용으로 유지하며 저장소에는 포함하지 않습니다. 최종 제출본·독립 평가·전 업무 완료 여부는 [현재 현황](STATUS.md)을 따릅니다.
 

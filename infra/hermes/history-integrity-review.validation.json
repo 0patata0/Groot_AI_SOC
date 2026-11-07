@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-07",
+  "type": "recorded_evidence_model_replay_not_live_chat",
+  "decision": "not_adopted",
+  "operating_model": "qwen3.6:35b",
+  "runtime_versions": {
+    "common": "1.5.63",
+    "query": "1.19.118"
+  },
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "c511133b4b34d3c9b10b3fb10f6741d7ed34f689ed0ddc3b90b6f39eb33c4168",
+    "infra/hermes/soc_management_run.py": "4213d7700c037c58a33feb932a5bd62b0e235f353e73c47d2a63363d08eae255",
+    "infra/hermes/query-completion/__init__.py": "3d8941407b5d4740b2c46dd2b7dabfa100cbbf38bfd4b51b29757fd5d06f7a91"
+  },
+  "registered_read_tools": 35,
+  "new_mcp_result_queries": 0,
+  "protected_writes": 0,
+  "mattermost_posts": 0,
+  "deployment_changes": 0,
+  "dgx_training_status_polls_after_2055": 0,
+  "results": [
+    {
+      "case": "H63",
+      "variant": "control",
+      "messages_sha256": "ae69cba681dfd52bafe7bb6b04206d38c5a71b6fbc97cce70b289c0fcf361b1e",
+      "issues": [
+        "diagnostic_property_value_unverified"
+      ],
+      "seconds": 13.698637360008433,
+      "metrics": {
+        "usage": {
+          "input_tokens": 9077,
+          "output_tokens": 209,
+          "total_tokens": 9286
+        },
+        "ollama": {
+          "total_duration": 13651953477,
+          "load_duration": 5765475,
+          "prompt_eval_count": 9077,
+          "prompt_eval_duration": 8378204000,
+          "eval_count": 209,
+          "eval_duration": 5177134000
+        }
+      },
+      "manual_quality": "failed"
+    },
+    {
+      "case": "H63",
+      "variant": "trust_semantics",
+      "messages_sha256": "b7c6981ad1a50de3f7d4fe9b555d03a1750bfb87078e7e5dee1d2dc7da470dd0",
+      "issues": [
+        "diagnostic_pipeline_congestion_unverified",
+        "sample_zero_presented_as_absence"
+      ],
+      "seconds": 13.398790335049853,
+      "metrics": {
+        "usage": {
+          "input_tokens": 9181,
+          "output_tokens": 185,
+          "total_tokens": 9366
+        },
+        "ollama": {
+          "total_duration": 13380327479,
+          "load_duration": 5780307,
+          "prompt_eval_count": 9181,
+          "prompt_eval_duration": 8351142000,
+          "eval_count": 185,
+          "eval_duration": 4901580000
+        }
+      },
+      "manual_quality": "failed"
+    },
+    {
+      "case": "O63",
+      "variant": "control",
+      "messages_sha256": "6d27950024fabbe071d5e3ef76a992c8332216ad0c4d453e67f30bbd8823b82b",
+      "issues": [],
+      "seconds": 13.087104168022051,
+      "metrics": {
+        "usage": {
+          "input_tokens": 9076,
+          "output_tokens": 200,
+          "total_tokens": 9276
+        },
+        "ollama": {
+          "total_duration": 13067123161,
+          "load_duration": 6923728,
+          "prompt_eval_count": 9076,
+          "prompt_eval_duration": 8306332000,
+          "eval_count": 200,
+          "eval_duration": 4635280000
+        }
+      },
+      "manual_quality": "failed"
+    },
+    {
+      "case": "O63",
+      "variant": "trust_semantics",
+      "messages_sha256": "747898193317c15b87835664e12cc08bb25fe8557d5a26fbfb11649bc80ab4a9",
+      "issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "seconds": 13.08061834401451,
+      "metrics": {
+        "usage": {
+          "input_tokens": 9180,
+          "output_tokens": 184,
+          "total_tokens": 9364
+        },
+        "ollama": {
+          "total_duration": 13058404077,
+          "load_duration": 5303842,
+          "prompt_eval_count": 9180,
+          "prompt_eval_duration": 8401947000,
+          "eval_count": 184,
+          "eval_duration": 4540648000
+        }
+      },
+      "manual_quality": "failed"
+    },
+    {
+      "case": "H63",
+      "variant": "reasoning_4096",
+      "messages_sha256": "b1d70d75101fa07d104a3263de67d80a46581bf8cf74298a153d292fe7444511",
+      "issues": [
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "seconds": 65.2190629679244,
+      "metrics": {
+        "usage": {
+          "input_tokens": 9075,
+          "output_tokens": 3571,
+          "total_tokens": 12646
+        },
+        "ollama": {
+          "total_duration": 65168580910,
+          "load_duration": 5802593,
+          "prompt_eval_count": 9075,
+          "prompt_eval_duration": 2027467000,
+          "eval_count": 3571,
+          "eval_duration": 62972893000
+        }
+      },
+      "manual_quality": "failed"
+    }
+  ],
+  "limitations": [
+    "development cases, not independent evaluation",
+    "shared GPU/cache uncontrolled",
+    "manual review by Codex, not independent expert panel",
+    "model synthesis time, not chat round-trip",
+    "automatic validator pass is not semantic correctness"
+  ],
+  "private_receipts": {
+    "replay.json": "0ff8461681111e1103862de200b9ff728d382d542808a532dd034e0a5ab2e9c7",
+    "reasoning.json": "a90f479fe320a997276359897be3c048bf1dc6ad8c2bdbd47782eacd1547a18e"
+  }
+}

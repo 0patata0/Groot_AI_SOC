@@ -146,6 +146,9 @@
     "new_os_and_attack_e2e_not_run"
   ],
   "git": {
-    "status": "publication_pending"
+    "source_commit": "334577b336dcc18f3a31b7d1ad1f871ad0a51ba0",
+    "remote_main": "334577b336dcc18f3a31b7d1ad1f871ad0a51ba0",
+    "verified_at_kst": "2026-11-07T11:35:30.513733+09:00",
+    "credential_source": "project-local one-process token; cached helper and HTTP trace disabled"
   }
 }

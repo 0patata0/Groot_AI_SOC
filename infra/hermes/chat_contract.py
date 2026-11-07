@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.68'
+VERSION = 'soc-chat-contract:1.5.70'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -451,6 +451,55 @@ def _diagnostic_instant(value):
     except ValueError:return None
 
 
+def _service_natural_period(question, at):
+    """One explicit local clock interval; never infer a missing date or rollover.
+
+    The project clock is KST. Other zones, approximate/multiple windows and
+    incomplete bounds remain with the ordinary investigation. This resolves
+    time arguments only, never service identity, dispatch or incident judgment.
+    """
+    if re.search(r'UTC|GMT|[+-]\d{2}:?\d{2}|(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|(?:Asia|America|Europe|Africa|Australia)/|쯤|대략',question,re.I):return None
+    date=r'(?:\d{4}-\d{2}-\d{2}|\d{4}년\s*\d{1,2}월\s*\d{1,2}일|오늘|금일|어제)'
+    clock=r'(?:(?:오전|오후)\s*)?(?:\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?(?:\s*\d{1,2}초)?)'
+    pattern=(r'(?<![\dA-Za-z])(?P<date>'+date+r')\s*(?P<start>'+clock+r')\s*'
+        r'(?:~|～|–|—|-|부터)\s*(?:(?P<end_date>'+date+r')\s*)?(?P<end>'+clock+r')'
+        r'(?![\d:시분초])(?:\s*까지)?(?:\s*(?:KST(?![A-Za-z])|한국\s*시간))?')
+    matches=list(re.finditer(pattern,question,re.I))
+    if len(matches)!=1:return None
+    match=matches[0];rest=question[:match.start()]+question[match.end():]
+    # An unknown explicit zone next to the interval cannot silently become KST.
+    prefix_zone=re.search(r'\b([A-Z]{2,6})\s*$',question[:match.start()])
+    suffix_zone=re.match(r'\s*([A-Z]{2,6})\b',question[match.end():])
+    if any(z and z[1]!='KST' for z in (prefix_zone,suffix_zone)):return None
+    if (re.search(date+r'|\d{1,2}:\d{2}|\d\s*(?:시|분|시간)',rest)
+            or re.match(r'\s*(?:경|전후|이전|이후)',question[match.end():])):return None
+    def day(value):
+        if value in ('오늘','금일','어제'):
+            return at.replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=value=='어제')
+        parts=[int(n) for n in re.findall(r'\d+',value)]
+        return datetime(*parts,tzinfo=at.tzinfo)
+    def instant(value, date_value, inherited=''):
+        period=re.match(r'(오전|오후)',value)
+        meridiem=period[1] if period else inherited
+        if ':' in value:
+            hour,minute,second=([int(n) for n in re.findall(r'\d+',value)]+[0])[:3]
+        else:
+            hour=int(re.search(r'(\d+)시',value)[1])
+            minute_match=re.search(r'(\d+)분',value);second_match=re.search(r'(\d+)초',value)
+            minute=int(minute_match[1]) if minute_match else 0
+            second=int(second_match[1]) if second_match else 0
+        if meridiem:
+            if not 1<=hour<=12:raise ValueError('ambiguous_meridiem')
+            hour=hour%12+(12 if meridiem=='오후' else 0)
+        return day(date_value).replace(hour=hour,minute=minute,second=second)
+    try:
+        start=instant(match['start'],match['date'])
+        meridiem=re.match(r'(오전|오후)',match['start'])
+        end=instant(match['end'],match['end_date'] or match['date'],meridiem[1] if meridiem and not match['end_date'] else '')
+        return (start,end)
+    except ValueError:return None
+
+
 def service_history_plan(request, question, requested_at):
     """Required reads for explicitly named units and unambiguous past periods.
 
@@ -471,6 +520,8 @@ def service_history_plan(request, question, requested_at):
     periods=[];days=set()
     if len(bounds)==2:
         periods=[tuple(map(_diagnostic_instant,bounds))]
+    elif not bounds and (period:=_service_natural_period(question,at)) is not None:
+        periods=[period]
     elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',question):
         days=set(re.findall(r'오늘|금일|어제',question))
         midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)

@@ -293,6 +293,62 @@ class ServiceHistory(unittest.TestCase):
         plan=c.service_history_plan(catalog(),f'{start} ~ {self.at} c:apache 오류 조회',self.at)
         self.assertEqual(plan['requirements'][0]['arguments'],{'target':'c:apache','since_kst':start,'until_kst':self.at})
 
+    def test_natural_kst_intervals_preserve_exact_date_clock_and_three_required_reads(self):
+        at='2026-11-08T18:00:00+09:00'
+        for time_text,start,end in (
+            ('2026-11-06 16:20~16:40 KST','2026-11-06T16:20:00+09:00','2026-11-06T16:40:00+09:00'),
+            ('2026-11-06 16:20:10–16:40:25','2026-11-06T16:20:10+09:00','2026-11-06T16:40:25+09:00'),
+            ('2026년 11월 6일 오후 4시 20분부터 4시 40분까지','2026-11-06T16:20:00+09:00','2026-11-06T16:40:00+09:00'),
+            ('2026-11-06 오전 12:05~오후 12:10 KST','2026-11-06T00:05:00+09:00','2026-11-06T12:10:00+09:00'),
+            ('어제 16시 20분～16시 40분 한국 시간','2026-11-07T16:20:00+09:00','2026-11-07T16:40:00+09:00'),
+            ('오늘 오전 4시 30초부터 5시 15초까지','2026-11-08T04:00:30+09:00','2026-11-08T05:00:15+09:00'),
+        ):
+            with self.subTest(time_text=time_text):
+                q=f'B의 capstone-management.service 오류 원문하고 지금 상태를 확인해줘. 오류 구간은 {time_text}야. 관제 처리도 밀렸는지 확인하고 설정 변경은 하지 마.'
+                plan=c.service_history_plan(catalog(),q,at);self.assertIsNotNone(plan)
+                reads=plan['requirements'];self.assertEqual(len(reads),3)
+                self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end}},reads)
+                self.assertIn({'tool':NAME,'arguments':{'target':'b:management'}},reads)
+                self.assertIn({'tool':NAME,'arguments':{'target':'b:management-pipeline'}},reads)
+
+    def test_natural_interval_date_rollover_must_be_explicit(self):
+        at='2026-11-08T18:00:00+09:00'
+        q='2026-11-06 23:50 ~ 2026-11-07 00:10 KST b:management 오류 확인'
+        args=c.service_history_plan(catalog(),q,at)['requirements'][0]['arguments']
+        self.assertEqual(args['since_kst'],'2026-11-06T23:50:00+09:00')
+        self.assertEqual(args['until_kst'],'2026-11-07T00:10:00+09:00')
+        self.assertIsNone(c.service_history_plan(catalog(),'2026-11-06 23:50~00:10 b:management 오류',at))
+        q='어제 오후 3시~4시 c:apache 오류'
+        args=c.service_history_plan(catalog(),q,'2027-01-01T12:00:00+09:00')['requirements'][0]['arguments']
+        self.assertEqual(args['since_kst'],'2026-12-31T15:00:00+09:00')
+        self.assertEqual(args['until_kst'],'2026-12-31T16:00:00+09:00')
+
+    def test_natural_invalid_ambiguous_partial_multiple_and_other_zone_are_not_narrowed(self):
+        for window in (
+            '11월 6일 16:20~16:40 KST','16:20~16:40 KST','2026-11-06 16:20부터',
+            '2026-11-06 16:20~16:40 UTC','2026-11-06 16:20~16:40 +00:00',
+            '2026-11-06 16:20~16:40쯤','2026-11-06 16:20~16:40 이전',
+            '2026-11-06 25:00~25:30','2026-11-06 16:99~17:00','2026-11-06 16시 99초~17시',
+            '2026-11-06 오후 16시~17시','2026-11-31 16:20~16:40','2026-11-09 16:20~16:40',
+            '2026-09-01 16:20~16:40','2026-11-05 16:20~2026-11-07 16:40',
+            '2026-11-06 16:20~16:40 또는 17:20~17:40','2026-11-06 16:20~16:40, 2026-11-07 16:20~16:40',
+        ):
+            with self.subTest(window=window):
+                self.assertIsNone(c.service_history_plan(catalog(),window+' b:management 오류 확인','2026-11-08T18:00:00+09:00'))
+
+    def test_natural_period_retains_negative_and_unit_registration_boundaries(self):
+        for request in ('b:unknown 오류 조회','A 서버 capstone-management.service 오류 조회',
+                        'b:management 오류 조회하지 마','b:management 오류 예시 설명'):
+            self.assertIsNone(c.service_history_plan(catalog(),'2026-11-06 16:20~16:40 KST '+request,'2026-11-08T18:00:00+09:00'))
+
+    def test_natural_explicit_other_or_unknown_zone_never_defaults_to_kst(self):
+        for window in ('2026-11-06 16:20~16:40 PST','PST 2026-11-06 16:20~16:40',
+                       '2026-11-06 16:20~16:40 jst','2026-11-06 16:20~16:40 ABCD',
+                       'ABCD 2026-11-06 16:20~16:40','Asia/Tokyo 2026-11-06 16:20~16:40',
+                       '2026-11-06 16:20~16:40 -0400','2026-11-06 16:20~16:40 KSTX'):
+            with self.subTest(window=window):
+                self.assertIsNone(c.service_history_plan(catalog(),window+' b:management 오류 확인','2026-11-08T18:00:00+09:00'))
+
     def test_ambiguous_negative_unregistered_and_mixed_time_not_guessed(self):
         for q in ('오늘 vector.service 오류 확인','오늘 A 서버 capstone-management.service 실패와 현재 확인',
                   '오늘 b:management 오류 조회하지 마','오늘 b:management 오류 예시 설명',

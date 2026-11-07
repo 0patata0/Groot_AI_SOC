@@ -11,6 +11,8 @@
 
 11/8 Native review 실패 답변은 현재 실행에서 확인한 MCP 조회 근거를 표로 보존하고 판단 미완료를 유지하도록 보완했다. 1,591회 검사(고유1,563)·과거 실제 실패 재생·운영 적용을 확인했다. 새 원인/현재영향 질문은 O57.350/H65.821초·각4조회이나 의미 판단이 남아 양쪽 품질 미완료다. [범위·검증·복구](infra/hermes/native-failure-evidence.md).
 
+11/8 공통79는 문장 내 서비스/관제 주장 범위와 검토 건수의 오류 횟수 오탐을 보완했다.1,597회 검사·설치 재생을 통과했다. 새 날짜 채팅 O67.132/H89.955초는 하루 journal 조회 시간초과로 미완료이며, 재현6.028초가 운영 명령 제한4초를 넘는 원인을 확인했다. 시간제한·도구 오류 후 근거 보존은 후속 작업이다. [검증·한계](infra/hermes/metric-claim-scope.md).
+
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.

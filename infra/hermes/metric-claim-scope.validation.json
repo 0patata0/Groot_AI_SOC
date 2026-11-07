@@ -1,0 +1,362 @@
+{
+  "schema": 1,
+  "common": "1.5.79",
+  "query": "1.19.128",
+  "model": "qwen3.6:35b",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "a596cdc8f4e495cdb98b6688691c9118c66bf069b4408a11d42bc2b4b1acea22",
+    "infra/hermes/test_diagnostic_claim_scope.py": "9dba86440161b1d88071546b72552840ba792ea3761cfba5624d8dd217739bce"
+  },
+  "tests": {
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 482,
+        "unique": 467,
+        "skip": 0
+      },
+      "service": {
+        "rc": 0,
+        "count": 105,
+        "unique": 97,
+        "skip": 0
+      },
+      "claims": {
+        "rc": 0,
+        "count": 66,
+        "unique": 66,
+        "skip": 0
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 303,
+        "unique": 303,
+        "skip": 0
+      },
+      "query": {
+        "rc": 0,
+        "count": 408,
+        "unique": 403,
+        "skip": 0
+      },
+      "peer": {
+        "rc": 0,
+        "count": 86,
+        "unique": 86,
+        "skip": 0
+      },
+      "installer": {
+        "rc": 0,
+        "count": 63,
+        "unique": 63,
+        "skip": 0
+      },
+      "diagnostics": {
+        "rc": 0,
+        "count": 84,
+        "unique": 84,
+        "skip": 0
+      }
+    },
+    "test_executions": 1597,
+    "unique_test_identifiers": 1569
+  },
+  "candidate_adopted": false,
+  "candidate_generations": 6,
+  "missing_metric_model_generations": 0,
+  "candidate_results": [
+    {
+      "case": "actual_inactive_zero",
+      "variant": "control",
+      "seconds": 17.217161306878552,
+      "usage": {
+        "input_tokens": 17673,
+        "output_tokens": 27,
+        "total_tokens": 17700
+      },
+      "schema_valid": true,
+      "guard_issues": null
+    },
+    {
+      "case": "actual_inactive_zero",
+      "variant": "observation_first",
+      "seconds": 21.569036053027958,
+      "usage": {
+        "input_tokens": 17753,
+        "output_tokens": 165,
+        "total_tokens": 17918
+      },
+      "schema_valid": true,
+      "guard_issues": null
+    },
+    {
+      "case": "actual_activating_zero",
+      "variant": "control",
+      "seconds": 21.60275523085147,
+      "usage": {
+        "input_tokens": 17681,
+        "output_tokens": 201,
+        "total_tokens": 17882
+      },
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ]
+    },
+    {
+      "case": "actual_activating_zero",
+      "variant": "observation_first",
+      "seconds": 24.615140716079623,
+      "usage": {
+        "input_tokens": 17761,
+        "output_tokens": 272,
+        "total_tokens": 18033
+      },
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_error_code_total_unverified",
+        "diagnostic_lock_metadata_not_restart_history"
+      ]
+    },
+    {
+      "case": "synthetic_processing_pending",
+      "variant": "control",
+      "seconds": 20.934937596088275,
+      "usage": {
+        "input_tokens": 17681,
+        "output_tokens": 169,
+        "total_tokens": 17850
+      },
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ]
+    },
+    {
+      "case": "synthetic_processing_pending",
+      "variant": "observation_first",
+      "seconds": 24.74052873882465,
+      "usage": {
+        "input_tokens": 17761,
+        "output_tokens": 292,
+        "total_tokens": 18053
+      },
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ]
+    }
+  ],
+  "installed_draft_replay": {
+    "results": [
+      {
+        "name": "actual_activating_zero-control",
+        "old_issues": [
+          "diagnostic_lock_metadata_not_restart_history"
+        ],
+        "new_issues": [
+          "diagnostic_lock_metadata_not_restart_history",
+          "diagnostic_pipeline_congestion_unverified"
+        ]
+      },
+      {
+        "name": "actual_activating_zero-observation_first",
+        "old_issues": [
+          "diagnostic_error_code_total_unverified",
+          "diagnostic_lock_metadata_not_restart_history"
+        ],
+        "new_issues": [
+          "diagnostic_lock_metadata_not_restart_history"
+        ]
+      }
+    ],
+    "new_model_calls": 0,
+    "new_mcp_calls": 0,
+    "source_sha256": "a596cdc8f4e495cdb98b6688691c9118c66bf069b4408a11d42bc2b4b1acea22"
+  },
+  "chats": [
+    {
+      "engine": "ollama",
+      "chat_seconds": 67.132,
+      "worker_seconds": 66.38794255699031,
+      "calls": 8,
+      "error_calls": 1,
+      "result_sha256": [
+        "e6003415f8a57f9246d0de7af25da4b1db6f09283d5817c2c98264d967bebe03",
+        "d56eb64672a33b01af9b6324c446255a037501c3641f9ef696036938498de6b6",
+        "e240d489e47fce40488276b3a53bda7f0a3e1e18761a8f93c03f3ecde06d7778",
+        "ef86e8dd693c5ce384473cfc4ad12a666d2ed93a086f59c302336fe697504d5c",
+        "b101e3dcb509292ffc14ce055a5ed2348c8acf157f8d39e435afd87ff8f7e48d",
+        "b06fbea85162ef4187c71e85e88cac79c4d8ab5ff99ae8887eeb34da9f0e9af3",
+        "f4ca2aaa5bb185a867839d405200d70cfd3b3c468031926ed137887ca575844c",
+        "03bbced39021a2f63580377e4258314b5f882333b8fe7f4c68160ab4ec5ebaca"
+      ],
+      "arguments": [
+        {
+          "target": "b:management"
+        },
+        {
+          "target": "b:management",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T23:59:59.999999+09:00"
+        },
+        {
+          "target": "b:management",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T23:59:59.999999+09:00",
+          "view": "journal",
+          "limit": 50
+        },
+        {
+          "target": "b:management-pipeline"
+        },
+        {
+          "target": "b:management",
+          "limit": 20,
+          "lookback_minutes": 15
+        },
+        {
+          "target": "b:management",
+          "limit": 20,
+          "lookback_minutes": 240
+        },
+        {
+          "target": "b:management",
+          "limit": 20,
+          "lookback_minutes": 144
+        },
+        {
+          "target": "b:management",
+          "limit": 20,
+          "lookback_minutes": 72
+        }
+      ],
+      "tables": 1,
+      "protected_calls": 0,
+      "quality_complete": false,
+      "status": "partial",
+      "published_body_matches": true
+    },
+    {
+      "engine": "hermes",
+      "chat_seconds": 89.955,
+      "worker_seconds": 89.14548690593801,
+      "calls": 4,
+      "error_calls": 1,
+      "result_sha256": [
+        "298bcb93f524b628cd7296c20221526c8a6cd492e763c498bda3db36857a13bb",
+        "b08ba2f5b1d439c4c3ca5d6e8e4b5ea156cd766127727cca2f3cdfa95ab2daa4",
+        "d2484562d6367f7620123ae8440b8ea0b0d1bfff2d7c83c386aad57fcbb91c8e",
+        "627bee66284578c7150a0b3dcd93503a601834fbdfce4f43ef3b64f82eb7ee12"
+      ],
+      "arguments": [
+        {
+          "target": "b:management",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T23:59:59.999999+09:00"
+        },
+        {
+          "target": "b:management",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T23:59:59.999999+09:00",
+          "view": "journal",
+          "limit": 50
+        },
+        {
+          "target": "b:management-pipeline"
+        },
+        {
+          "target": "b:management"
+        }
+      ],
+      "tables": 1,
+      "protected_calls": 0,
+      "quality_complete": false,
+      "status": "partial",
+      "published_body_matches": true
+    }
+  ],
+  "final_health": {
+    "at_kst": "2026-11-08T07:36:59.612453+09:00",
+    "query": "1.19.128",
+    "common": "1.5.79",
+    "manifest": 18,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_timer_inactive": true,
+    "hermes_planned_restart_this_revision": 0,
+    "hermes_planned_restarts_this_unit": 0,
+    "jobs": {
+      "xhu5eoz8jprdbkzqkkno3fdb4e": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "aqg18tyxqjn5jff18sj5rbmxqr": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ]
+    },
+    "embedded_gate_matches": true,
+    "gate_bytes": 65383
+  },
+  "journal_timeout_probe": {
+    "summary": {
+      "status": "observed",
+      "returned_entries": 6,
+      "has_more": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false
+    },
+    "trials": [
+      {
+        "filter": "--priority=err",
+        "production_limit_seconds": 4,
+        "probe_limit_seconds": 12,
+        "code": 0,
+        "bytes": 0,
+        "rows": 0,
+        "seconds": 0.03872192418202758
+      },
+      {
+        "filter": "fixed_error_grep",
+        "production_limit_seconds": 4,
+        "probe_limit_seconds": 12,
+        "code": 0,
+        "bytes": 2892,
+        "rows": 6,
+        "seconds": 6.028382688993588
+      }
+    ],
+    "seconds": 6.087414513109252,
+    "production_changes": 0,
+    "raw_output_logged": false
+  },
+  "cleanup": {
+    "mac_bytes": 4174717,
+    "mac_directories": 1,
+    "server_files": 471,
+    "server_bytes": 7512296
+  },
+  "new_os_installation": false,
+  "independent_evaluation": false,
+  "full_quality_complete": false
+}

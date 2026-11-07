@@ -259,6 +259,64 @@ class DiagnosticClaims(unittest.TestCase):
         return {'kind':'diagnostics','target':'b:management-pipeline','observed_at_kst':STAMP,
             'pipeline_metrics':{'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':285}}
 
+    def test_pipeline_after_service_keeps_its_own_subject(self):
+        self.facts=[self.pipeline(),diagnostic('b:management'),{'kind':'events'}]
+        for text in (
+            'capstone-management.service는 실패했으며 현재 b:management-pipeline의 review_required_cases가 285건으로 관제 처리 지연이 확인됩니다.',
+            'b:management 오류 후 b:management-pipeline 처리 대기열은 285건입니다.',
+            'vector.service를 확인했고 현재 b:management-pipeline 전송 대기가 있습니다.',
+            'c:vector와 b:management-pipeline를 조회했고 현재 관제 병목 상태입니다.'):
+            with self.subTest(text=text):
+                self.assertTrue(set(self.issues(text)) & {'diagnostic_pipeline_congestion_unverified',
+                    'diagnostic_pipeline_count_mismatch','diagnostic_pipeline_pending_unverified'})
+
+    def test_later_different_subject_does_not_borrow_empty_pipeline(self):
+        self.facts=[self.pipeline(),diagnostic('c:vector'),{'kind':'events'}]
+        for text in (
+            'b:management-pipeline를 확인했으나 현재 c:vector 처리 지연이 있습니다.',
+            '관제 자료를 확인했고 vector.service 전송 대기가 있습니다.',
+            'b:management-pipeline 처리 대기는 0건이며 c:vector 처리 대기열은 285건입니다.'):
+            with self.subTest(text=text):
+                self.assertFalse(set(self.issues(text)) & {'diagnostic_pipeline_congestion_unverified',
+                    'diagnostic_pipeline_count_mismatch','diagnostic_pipeline_pending_unverified'})
+
+    def test_pipeline_claim_before_later_subject_still_checked(self):
+        self.facts=[self.pipeline(),diagnostic('c:vector'),{'kind':'events'}]
+        text='현재 b:management-pipeline 처리 지연이 있으며 c:vector는 별도로 확인합니다.'
+        self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+
+    def test_pipeline_time_scope_is_local_to_each_claim(self):
+        self.facts=[self.pipeline(),diagnostic('c:vector')]
+        self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(
+            '현재 관제 처리 지연이 있으며 어제 vector.service가 실패했습니다.'))
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(
+            '어제 관제 처리 지연이 있었으며 현재 vector.service가 실행 중입니다.'))
+        self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(
+            '어제 관제 처리 지연이 있었고 지금 b:management-pipeline 처리 지연이 있습니다.'))
+
+    def test_explicit_pipeline_preserves_unknown_positive_and_denial(self):
+        self.facts=[self.pipeline(),diagnostic('b:management')]
+        text='capstone-management.service 오류 후 현재 b:management-pipeline 처리 지연이 있습니다.'
+        for metrics in ({'pending_reports':2,'running_cases':0,'overdue_cases':0},{'pending_reports':0},{}):
+            with self.subTest(metrics=metrics):
+                self.facts[0]['pipeline_metrics']=metrics
+                self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+        self.facts[0]=self.pipeline()
+        for suffix in ('을 단정하지 않습니다.',' 여부는 미확인입니다.',' 가능성은 확인 필요합니다.'):
+            self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(
+                'capstone-management.service 오류 후 현재 b:management-pipeline 처리 지연'+suffix))
+
+    def test_review_metric_is_not_a_nearby_error_code_frequency(self):
+        self.facts=[self.code_samples(),self.pipeline()]
+        for text in (
+            'controller_already_running과 검토 건수 285건의 인과관계는 미확인입니다.',
+            'controller_already_running 이후 review_required_cases=285건입니다.',
+            'controller_already_running의 잠금 소유자·현재 상태와 검토 건수 285건의 인과관계는 미확인입니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('diagnostic_error_code_total_unverified',self.issues(text))
+        self.assertIn('diagnostic_error_code_sample_mismatch',self.issues(
+            'controller_already_running과 검토 건수 285건, controller_already_running 표본 20건입니다.'))
+
     def test_direct_pipeline_disclaimer_is_not_congestion(self):
         self.facts=[self.pipeline()]
         for text in ('degraded 상태는 검토 미완료 표지이며 성능 저하를 의미하지 않습니다.',

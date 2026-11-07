@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.78'
+VERSION = 'soc-chat-contract:1.5.79'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -1387,11 +1387,30 @@ def diagnostic_history_return_violations(text, facts):
     return sorted(issues)
 
 
+def _diagnostic_pipeline_subject(text, position, facts):
+    """Bind a claim to its nearest preceding subject, not all names in a line.
+
+    A service followed by a pipeline is two subjects. Conversely a later web
+    service must not borrow the earlier pipeline's empty processing metrics.
+    Without a named subject, preserve the existing diagnostics-only scope.
+    """
+    mentions=[]
+    for m in re.finditer(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*',text):
+        mentions.append((m.start(),m.group().rstrip('.')=='b:management-pipeline'))
+    for m in re.finditer(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',text):
+        mentions.append((m.start(),False))
+    for m in re.finditer(r'\bSOC\b|관제|관리\s*(?:처리\s*)?파이프라인|처리\s*파이프라인',text,re.I):
+        mentions.append((m.start(),True))
+    before=[m for m in mentions if m[0]<=position]
+    if before:return max(before,key=lambda m:m[0])[1]
+    if mentions:return False
+    return diagnostic_facts_only(facts)
+
+
 def diagnostic_pipeline_claim_violations(text, facts):
     """Review-state counts are not proof of current processing congestion."""
     rows=[f for f in facts if f.get('kind')=='diagnostics' and f.get('target')=='b:management-pipeline']
     if not rows:return []
-    only_diagnostics=diagnostic_facts_only(facts)
     metrics=rows[-1].get('pipeline_metrics',{}) if rows else {}
     empty=all(type(metrics.get(k)) is int and metrics[k]==0
               for k in ('pending_reports','running_cases','overdue_cases'))
@@ -1403,15 +1422,16 @@ def diagnostic_pipeline_claim_violations(text, facts):
                 if not _claim_is_unasserted(clause[claim.end():]):
                     issues.add('diagnostic_pipeline_approval_unverified')
         if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
-        # An unrelated read must not disable checks of an explicitly named
-        # pipeline. In mixed investigations, unqualified processing claims may
-        # refer to a web service or sensor; do not borrow this queue's metrics.
-        named_pipeline=re.search(r'\bb:management-pipeline\b|\bSOC\b|관제|관리\s*(?:처리\s*)?파이프라인',clause,re.I)
-        if not only_diagnostics and not named_pipeline:continue
-        if (not diagnostic_subjects(clause,rows)
-                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인|관제\s*(?:처리\s*)?대기열|관리\s*(?:처리\s*)?파이프라인',clause,re.I)):continue
+        def applies(position, current=False):
+            if not _diagnostic_pipeline_subject(clause,position,facts):return False
+            if not current:return True
+            before=clause[:position]
+            markers=[(m.start(),'past') for m in re.finditer(r'과거|어제|당시|지난',before)]
+            markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|오늘',before)]
+            return not markers or max(markers)[1]!='past'
         if (type(metrics.get('review_required_cases')) is int
                 and (period:=re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치(?:\s*(?:건수|사건))?',clause))
+                and applies(period.start())
                 and not _claim_is_unasserted(clause[period.end():])):
             issues.add('diagnostic_pipeline_period_unverified')
         if type(metrics.get('review_required_cases')) is int and re.search(r'검토',clause):
@@ -1419,20 +1439,17 @@ def diagnostic_pipeline_claim_violations(text, facts):
                 if _diagnostic_instant(f.get('observed_at_kst')) and type(f.get('pipeline_metrics',{}).get('review_required_cases')) is int}
             if len({x[0] for x in observations})<2:
                 for trend in re.finditer(r'(?:검토[^.!?;\n]{0,24}?)(증가|감소|늘어|줄어)',clause):
-                    if not _claim_is_unasserted(clause[trend.end():]):issues.add('diagnostic_pipeline_trend_unverified')
+                    if applies(trend.start()) and not _claim_is_unasserted(clause[trend.end():]):issues.add('diagnostic_pipeline_trend_unverified')
         if not empty:continue
-        markers=[(m.start(),'past') for m in re.finditer(r'과거|어제|당시|지난',clause)]
-        markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|오늘',clause)]
-        if markers and max(markers)[1]=='past':continue
-        if re.search(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|건|사건|항목))?'
+        for pending in re.finditer(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|건|사건|항목))?'
                 r'(?:은|는|이|가)?\s*(?:존재합니다|있습니다|남아\s*있습니다)',clause):
-            issues.add('diagnostic_pipeline_pending_unverified')
+            if applies(pending.start(),True):issues.add('diagnostic_pipeline_pending_unverified')
         for count in re.finditer(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|사건|상태))?'
                 r'(?:\s*\(review_required_cases\))?\s*(?:은|는|이|가|:|=)?\s*([0-9][0-9,]*)\s*건',clause):
-            if int(count[1].replace(',',''))>0 and not _claim_is_unasserted(clause[count.end():]):
+            if applies(count.start(),True) and int(count[1].replace(',',''))>0 and not _claim_is_unasserted(clause[count.end():]):
                 issues.add('diagnostic_pipeline_count_mismatch')
         for claim in re.finditer(r'병목|정체|과부하|적체|(?:성능\s*)?저하|처리\s*지연|지연\s*(?:중|상태|발생|확인)',clause):
-            if not _claim_is_unasserted(clause[claim.end():]):issues.add('diagnostic_pipeline_congestion_unverified')
+            if applies(claim.start(),True) and not _claim_is_unasserted(clause[claim.end():]):issues.add('diagnostic_pipeline_congestion_unverified')
     return sorted(issues)
 
 
@@ -1447,6 +1464,9 @@ def diagnostic_error_code_count_violations(text, facts):
         for code in codes:
             pattern=re.escape(code)+r'([^\n.!?;|0-9]{0,24})([0-9][0-9,]*)\s*(?:건|회)'
             for match in re.finditer(pattern,clause):
+                # A different metric named between the code and the number
+                # owns that number; proximity alone is not a code frequency.
+                if re.search(r'(?:review_required_cases|검토\s*(?:건수|상태|사건|대기))\s*(?:수|합계)?\s*(?:은|는|이|가|:|=)?\s*$',match[1]):continue
                 after=clause[match.end():].lstrip(' )')
                 if (_claim_is_unasserted(after) or re.match(r'(?:이라고|라고|으로)?\s*(?:단정|확정).{0,12}(?:않|못|없)',after)):continue
                 count=int(match[2].replace(',',''))

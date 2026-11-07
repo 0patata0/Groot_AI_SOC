@@ -182,9 +182,10 @@
     "new OS installation, attack/load, UI visual regression and independent evaluation not performed"
   ],
   "publication": {
-    "source_commit": null,
-    "remote_verified": false,
-    "note": "pending this unit"
+    "source_commit": "e9fcaa8060029461d77b961331cf4621a65f40e2",
+    "remote_verified": true,
+    "verified_at_kst": "2026-11-07T10:21:50.071874+09:00",
+    "note": "This publication receipt is a subsequent documentation commit; final receipt commit is recorded locally."
   },
   "cleanup": {
     "server_fixture": {

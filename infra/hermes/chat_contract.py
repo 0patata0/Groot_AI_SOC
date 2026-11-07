@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.59'
+VERSION = 'soc-chat-contract:1.5.60'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -25,6 +25,7 @@ SERVICE_STATE_GUIDANCE = (
     '서비스 상태는 Type/Result/ActiveState/SubState를 함께 읽습니다. Type=oneshot은 작업 후 종료할 수 있으므로 '
     'Result=success와 exit_status=0인 inactive/dead를 지속 장애·미복구·재시작 필요로 단정하지 않습니다. '
     '이는 프로세스 종료 관측이며 전체 기능 정상·침해 부재의 증거도 아닙니다. '
+    'ActiveState=inactive는 현재 실행 상태입니다. 자동 시작 설정인 enabled/disabled와 구분하고, UnitFileState를 조회하지 않았다면 비활성화 설정으로 번역하지 않습니다. '
     'oneshot의 정상 종료 조건을 장기 active/running 유지로 바꾸지 않습니다. '
     '현재 process_termination.exit_status와 과거 recent_errors의 process_exit.exit_code는 서로 다른 시점의 값이며 달라도 모순이 아닙니다. '
     '과거 종료값은 해당 target·오류 시각과 함께, 현재 종료값은 수집 시각과 함께 보고합니다. '
@@ -655,16 +656,25 @@ def service_report_messages(context, descriptions, citations, feedback=None):
     body={**context,'available_read_descriptions':descriptions,
           'current_successful_tools':dict(enumerate(citations))}
     if feedback:
-        policy+=(' 검증기가 이전 초안의 오류를 지적했습니다. 아래 이전 초안은 수정 대상이며 그대로 반복하지 마세요. '
-            'sample_zero_presented_as_absence는 제한된 표본을 전체 부재로 확대한 오류입니다. '
-            'diagnostic_snapshot_is_not_functional_health는 프로세스 속성을 전체 기능 정상으로 확대한 오류입니다. '
-            'diagnostic_restart_counter_not_history는 현재 속성/자동 재시작 횟수로 과거 재시작 부재를 단정한 오류입니다. 재시작 이력은 미확인으로 구분하세요. '
-            '해당 주장을 실제 관측 범위로 고쳐 다시 작성하세요. 새 판단에 추가 근거가 필요하면 실제 읽기를 선택하세요.')
+        issues=list(dict.fromkeys(x for x in feedback.get('issues',[])
+            if isinstance(x,str) and re.fullmatch(r'[a-z][a-z0-9_:.-]{0,127}',x)))[:32]
+        explanations={
+            'sample_zero_presented_as_absence':'제한된 표본을 전체 부재로 확대한 오류입니다. 표본 범위와 전체 구간의 미확인을 구분하세요.',
+            'diagnostic_snapshot_is_not_functional_health':'프로세스 속성을 전체 기능 정상으로 확대한 오류입니다. 실제 프로세스 관측과 기능 검증을 구분하세요.',
+            'diagnostic_restart_counter_not_history':'현재 속성/자동 재시작 횟수로 과거 재시작 부재를 단정한 오류입니다. 수동 재시작·reload 이력은 해당 실행 기록이 없으면 미확인입니다.',
+            'diagnostic_lock_metadata_not_restart_history':'controller_already_running의 직접 의미는 배타 잠금 획득 실패입니다. 이것을 재시도·재시작 시행 또는 그 성공/실패로 바꾼 주장을 제거하세요. 잠금 소유자와 실행 계기는 별도 근거가 없으면 미확인입니다.',
+            'diagnostic_enablement_unverified':'실행 상태 inactive와 자동 시작 설정 disabled를 혼동했습니다. UnitFileState 등 실제 설정 근거가 없으면 비활성화 설정을 주장하지 마세요.',
+            'diagnostic_oneshot_state_is_not_failure':'성공 종료한 oneshot의 inactive/dead로 지속 장애나 재실행 실패를 단정했습니다. 현재 실행 상태·종료 결과와 전체 기능 검증을 구분하세요.',
+            'diagnostic_pipeline_congestion_unverified':'검토 상태 수만으로 관제 과부하·병목을 단정했습니다. 처리·전송 대기와 기한 초과 지표를 실제 관측 범위에서 설명하세요.',
+            'diagnostic_pipeline_period_unverified':'현재 상태 합계를 오늘·어제 발생 건수로 바꿨습니다. 기간별 유입 건수를 확인한 근거가 없으면 현재 합계로만 설명하세요.',
+        }
+        policy+=(' 검증기가 이전 초안의 오류를 지적했습니다. 거절된 주장을 그대로 반복하지 마세요. '
+            +' '.join(code+': '+explanations[code] for code in issues if code in explanations)
+            +' 해당 주장을 실제 관측 범위로 고쳐 다시 작성하세요. 새 판단에 추가 근거가 필요하면 실제 읽기를 선택하세요.')
         # The full rejected draft (including its rendered evidence table) is
         # retained in runtime audit, not copied back as a competing answer.
         # Regenerate from the same complete receipts and bounded issue codes.
-        body['report_validation_issues']=[x for x in feedback.get('issues',[])
-            if isinstance(x,str) and re.fullmatch(r'[a-z][a-z0-9_:.-]{0,127}',x)][:32]
+        body['report_validation_issues']=issues
     return [{'role':'system','content':policy},
             {'role':'user','content':json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':'))}]
 
@@ -936,10 +946,15 @@ def diagnostic_lifecycle_claim_violations(text, facts):
                         and re.search(r'재시도|재시작|재기동|재실행|재가동|\brestart\b|\bretry\b',clause,re.I)
                         and re.search(r'실패|성공|수행|시행|완료|했|되었|됐|진행',clause)
                         and not re.search(r'미확인|여부|단정.{0,5}(?:않|못)|근거.{0,5}없|증명.{0,5}않|필요|예정|제안|권고|승인|아니|아님',clause)):
-                    issues.add('diagnostic_restart_counter_not_history')
+                    issues.add('diagnostic_lock_metadata_not_restart_history')
         rows=diagnostic_subjects(line,facts)
         if rows:
             for clause in re.split(r';|(?<=[.!?])\s+',line):
+                if (diagnostic_facts_only(facts)
+                        and re.search(r'UnitFileState\s*[:=]\s*(?:enabled|disabled)|(?:자동\s*시작|부팅\s*시|활성화\s*설정).{0,12}(?:비활성|disabled)|inactive.{0,18}비활성화',clause,re.I)
+                        and not any('UnitFileState' in f.get('properties',{}) for f in rows)
+                        and not re.search(r'미확인|단정.{0,5}(?:않|못)|아니|아님|아닙|뜻하지\s*않|의미하지\s*않|제안|예정|승인',clause)):
+                    issues.add('diagnostic_enablement_unverified')
                 for denial in re.finditer(r'(?:재시작|재기동|restart|reload)(?:은|는|이|가)?\s*(?:발생하지|있지|이루어지지)\s*않',clause,re.I):
                     before=clause[max(0,denial.start()-20):denial.start()]
                     after=clause[denial.end():denial.end()+35]

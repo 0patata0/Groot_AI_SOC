@@ -1,0 +1,187 @@
+{
+  "at_kst": "2026-11-07T09:47:11.360228+09:00",
+  "versions": {
+    "query": "1.19.109",
+    "common": "1.5.60",
+    "routing": "1.1.6",
+    "diagnostics": "1.2.8"
+  },
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "ad7f41130239ba38400fd1a24433a7f15d13888394fc92d24ae0c6a4b6a83df3",
+    "infra/hermes/test_diagnostic_claim_scope.py": "e3522797eafa5d2a792885c993e9633f552069c63ceb10f9d8b2cbc499cc834f",
+    "infra/hermes/test_service_history_contract.py": "cad34d7000a2b8bc602e4585ebdede127c74b6d415f19094f3078b44e3579bd7"
+  },
+  "tests": {
+    "profiles": {
+      "runtime": 33,
+      "time": 6,
+      "native": 473,
+      "service": 48,
+      "claims": 27,
+      "diagnostics": 67,
+      "sdk": 261,
+      "query": 391,
+      "peer": 72,
+      "installer": 20
+    },
+    "unique_pass": 1398,
+    "skip": 0,
+    "at_kst": "2026-11-07T09:37:29.300587+09:00",
+    "manifest_files": 461
+  },
+  "deployment": {
+    "at_kst": "2026-11-07T09:38:01.743191+09:00",
+    "backup": "/var/lib/capstone-resume/20261107-common60",
+    "changed": 3,
+    "manifest": 22,
+    "protected": 8,
+    "idle_before": {
+      "idle": true,
+      "active_leases": 0,
+      "heartbeat_age_seconds": 29.299
+    },
+    "queues_before": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "stopped_config_db_bytes_equal": true,
+    "independent_rollback": "active_15m"
+  },
+  "health": [
+    {
+      "at_kst": "2026-11-07T09:40:31.697672+09:00",
+      "manifest": 22,
+      "protected": 8,
+      "sdk_sources": 20,
+      "review_files": 5,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "schema": 1,
+          "engine": "hermes",
+          "pid": 162,
+          "process_start_ticks": 121988243,
+          "checked_at": 1794012015,
+          "websocket_connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "schema": 1,
+          "engine": "ollama",
+          "pid": 1365185,
+          "process_start_ticks": 121987983,
+          "checked_at": 1794012023,
+          "websocket_connected": true,
+          "worker_alive": true
+        }
+      },
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "failed": "",
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "ready": true
+    },
+    {
+      "confirmed": true,
+      "rollback_timer": "inactive",
+      "rollback_noop": true
+    }
+  ],
+  "chat": {
+    "at_kst": "2026-11-07T09:44:41.779441+09:00",
+    "chat": {
+      "hermes": {
+        "seconds": 53.209,
+        "status": "partial",
+        "protected_calls": 0,
+        "calls": 5,
+        "model_calls": 4,
+        "model_seconds": 38.659977999999995,
+        "full_raw_sha_verified": true,
+        "remaining_issues": [],
+        "quality_pass": false,
+        "table_syntax": true,
+        "code_fences": 0
+      },
+      "ollama": {
+        "seconds": 42.82,
+        "status": "partial",
+        "protected_calls": 0,
+        "calls": 4,
+        "model_calls": 4,
+        "model_seconds": 32.26809580880217,
+        "full_raw_sha_verified": false,
+        "remaining_issues": [
+          "diagnostic_lock_metadata_not_restart_history",
+          "diagnostic_pipeline_congestion_unverified"
+        ],
+        "quality_pass": false,
+        "table_syntax": true,
+        "code_fences": 0
+      }
+    },
+    "hermes_calls": [
+      {
+        "arguments": {
+          "target": "b:management",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T09:40:46.442467+09:00"
+        },
+        "result_sha256": "65c290eee15ac47b09727f9a3a88bec0baaa3a840f4766a400c68c125691def7"
+      },
+      {
+        "arguments": {
+          "target": "b:management-pipeline"
+        },
+        "result_sha256": "a43442955c6778890d0cc0a15d98330df1fb8aa58b92d49f0478b51b5a09e21e"
+      },
+      {
+        "arguments": {
+          "target": "b:management"
+        },
+        "result_sha256": "53ca9a4b1435375dda2d589bf684bf60f57e43dd4ef9b587f39b9f4171111d4c"
+      },
+      {
+        "arguments": {
+          "target": "b:management",
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T23:59:59.999999+09:00"
+        },
+        "result_sha256": "f54534b4391d6f84256107c3393307ccec1209fe8a26fc6111ebccacaa6e3d7d"
+      },
+      {
+        "arguments": {
+          "target": "b:management-pipeline"
+        },
+        "result_sha256": "e9311f177535907de0cbb88edbbf67c4343aef2c2d91b2c18c325d4f247a44d8"
+      }
+    ],
+    "limits": [
+      "one_new_root_each_recent_channel_context_retained",
+      "shared_gpu_cache_uncontrolled",
+      "both_quality_incomplete",
+      "ollama_partial_metadata_not_full_original_receipts",
+      "no_ui_rendering_audit"
+    ]
+  },
+  "publication": {
+    "status": "pending"
+  },
+  "limits": [
+    "both_compound_responses_failed_quality",
+    "no_attack_load_training_or_new_os_install",
+    "partial_sdk_audit_not_retained_by_chat_dispatcher",
+    "single_sample_each_no_latency_distribution"
+  ],
+  "cleanup": {
+    "temporary_fixture": "retained_for_active_followup",
+    "new_mac_packages": 0,
+    "operational_data_backups_preserved": true
+  }
+}

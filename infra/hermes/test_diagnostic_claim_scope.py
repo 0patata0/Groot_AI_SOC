@@ -164,11 +164,28 @@ class DiagnosticClaims(unittest.TestCase):
             {'code':'controller_already_running'}]})
         for text in ('어제 controller_already_running 오류로 재시작에 실패했습니다.',
                      'controller_already_running 발생 후 재시도를 수행했습니다.'):
-            self.assertIn('diagnostic_restart_counter_not_history',self.issues(text))
+            self.assertIn('diagnostic_lock_metadata_not_restart_history',self.issues(text))
+            self.assertNotIn('diagnostic_restart_counter_not_history',self.issues(text))
         for text in ('controller_already_running은 배타 잠금 획득 실패입니다.',
                      'controller_already_running만으로 재시작 실패 여부는 미확인입니다.',
                      'controller_already_running 이후 재시도 시행은 단정하지 않습니다.'):
-            self.assertNotIn('diagnostic_restart_counter_not_history',self.issues(text))
+            self.assertNotIn('diagnostic_lock_metadata_not_restart_history',self.issues(text))
+
+    def test_inactive_does_not_prove_disabled_configuration(self):
+        for text in ('현재 c:vector는 inactive이므로 비활성화된 설정입니다.',
+                     '현재 c:vector UnitFileState=disabled입니다.',
+                     '현재 c:vector는 자동 시작이 비활성화되어 있습니다.'):
+            with self.subTest(text=text):
+                self.assertIn('diagnostic_enablement_unverified',self.issues(text))
+        for text in ('현재 c:vector는 inactive/dead이며 자동 시작 설정은 미확인입니다.',
+                     'inactive는 자동 시작 비활성화를 뜻하지 않습니다.',
+                     '승인 후 자동 시작 비활성화를 검토합니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('diagnostic_enablement_unverified',self.issues(text))
+        self.facts[0]['properties']['UnitFileState']='disabled'
+        self.assertNotIn('diagnostic_enablement_unverified',self.issues('현재 c:vector UnitFileState=disabled입니다.'))
+        self.facts=[diagnostic(),{'kind':'events'}]
+        self.assertNotIn('diagnostic_enablement_unverified',self.issues('현재 c:vector UnitFileState=disabled입니다.'))
 
     def test_review_count_with_empty_processing_queues_does_not_prove_congestion(self):
         row={'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{

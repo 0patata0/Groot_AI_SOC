@@ -129,7 +129,9 @@
     "no_attack_load_training_or_new_os_install"
   ],
   "publication": {
-    "status": "pending"
+    "source_commit": "433a5fc727cb78225294834fe000a61b1d4cfa58",
+    "remote_main_verified_at_kst": "2026-11-07T09:32:17.961091+09:00",
+    "receipt": "This subsequent documentation commit records the verified source publication; its own receipt is local."
   },
   "cleanup": {
     "task_temp_and_test_fixture": "retained_for_same_active_followup_until_17KST",

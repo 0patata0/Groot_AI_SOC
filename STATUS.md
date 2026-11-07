@@ -17,7 +17,7 @@
 | 추가 학습 준비 | 기존8,719 보존·균형 후보1,220/룰 정답 토큰84.93%→40.25%, 도구41문답/65호출 유지. 중간평가·조기종료/재개·최선 보존, 별도 평가32·비교6설정 준비 |13:46 새35B GPU2/2·최선step1/현재58SHA·CPU재개동등성/loss3·로컬118/압축8통과. 모델 품질 비교·본학습·승격0. [보완 결과](finetuning/QUALITY_PREPARATION.md) |
 | IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](infra/hermes/ids-application-method.md) |
 | 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
-| Git·정리 | 시험Thor엔진/guard·Mac중계/임시포트 종료, primary PID715615/재시작0 유지. 서버시험56파일은 로컬SHA검증 보존 후 제거, 격리3,279파일·Mac자체임시107파일/73,704,545B 제거 확인 | 이번 공개 소스·결과/설치 문서 커밋·푸시 진행 중. 기존 Ansible/NAT/topology 변경·복구원본 유지 |
+| Git·정리 | 시험Thor엔진/guard·Mac중계/임시포트 종료, primary PID715615/재시작0 유지. 서버시험56파일은 로컬SHA검증 보존 후 제거, 격리3,279파일·Mac자체임시107파일/73,704,545B 제거 확인 | 공개26경로 `ea2963b` 푸시·16:13:47 KST 실원격main 일치. 이 게시 영수증은 후속 문서 커밋에 반영. 기존 Ansible/NAT/topology 변경·복구원본 유지 |
 
 [이번 모델 비교·범위](finetuning/RUNTIME_COMPARISON_20261107.md) · [공통 보완·복구](infra/hermes/short-read-evidence.md) · [이전 예외 조회](infra/mcp/threshold-policy-read.md) · [이전 적용 방식](infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
 

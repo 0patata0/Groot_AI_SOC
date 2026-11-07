@@ -176,5 +176,16 @@
     "browser/mobile UI visual test",
     "in-memory suppression table proof",
     "model training or promotion"
-  ]
+  ],
+  "publication": {
+    "source_commit": "43ef5b44ab4200a0decc0ad2f49e86c23db1900c",
+    "remote_match_at_kst": "2026-11-07T14:50:08.038601+09:00",
+    "receipt_document_commit": "followup; final HEAD in local session"
+  },
+  "cleanup": {
+    "remote_test_files_removed": 1868,
+    "local_temp_files_removed": 41,
+    "local_temp_bytes_removed": 42405354,
+    "verified": true
+  }
 }

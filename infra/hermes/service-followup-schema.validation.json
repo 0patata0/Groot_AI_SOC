@@ -1,0 +1,266 @@
+{
+  "checked_at_kst": "2026-11-08T01:46:21.010922+09:00",
+  "production_common": "1.5.68",
+  "production_query": "1.19.121",
+  "model": "qwen3.6:35b",
+  "model_promoted": false,
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "e8adbf47f84e5cb2f2375e485c4f32af5b0e21db6c4a8456e663c16a2b1250c8",
+    "infra/hermes/soc_management_run.py": "094401338125fda4bde71fdf4e583af68201d0da2d629ed5bf56471a7380834e",
+    "infra/hermes/query-completion/__init__.py": "c9b44c22ce820c86c91ba883d1b6d5c83767c085c3cd1724aeb19cd0673289e2",
+    "infra/hermes/test_service_history_contract.py": "fd33a7970f9064daafb6a6e48e273844b25f8879e22baf0b6b5a5638acdf3c5b",
+    "infra/ollama-trial/runtime.py": "0eabd73434a9cae268dfe6b18cf8c6ffdf8bfa5e4f18a4d3e6a5e143deba50cf",
+    "infra/ollama-trial/test_service_history.py": "2e8c390d6056c09dcc354fed98fb5f1f37f04f43028a9eec0a613c5deb1ea625"
+  },
+  "tests": {
+    "files": 469,
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 481,
+        "skip": 0,
+        "unique": 481
+      },
+      "service": {
+        "rc": 0,
+        "count": 70,
+        "skip": 0,
+        "unique": 70
+      },
+      "claims": {
+        "rc": 0,
+        "count": 53,
+        "skip": 0,
+        "unique": 53
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 286,
+        "skip": 0,
+        "unique": 286
+      },
+      "query": {
+        "rc": 0,
+        "count": 408,
+        "skip": 0,
+        "unique": 408
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "skip": 0,
+        "unique": 79
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "skip": 0,
+        "unique": 62
+      }
+    },
+    "unique": 1439,
+    "skip": 0
+  },
+  "deployment": {
+    "at_kst": "2026-11-08T01:33:31.452345+09:00",
+    "query": "1.19.121",
+    "common": "1.5.68",
+    "manifest": 15,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true
+  },
+  "applied": {
+    "at_kst": "2026-11-08T01:26:46.846648+09:00",
+    "epoch": 1794068806.8466687,
+    "changes": 12,
+    "db_same_while_stopped": true,
+    "protected": 8
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-08T01:45:53.474689+09:00",
+    "files": 3,
+    "bytes": 8823772,
+    "directories": 2,
+    "related_processes": 0,
+    "verified_removed": true,
+    "operating_backups_preserved": true
+  },
+  "server_cleanup": {
+    "verified_removed": [
+      {
+        "path": "/tmp/capstone-followup69-20261108",
+        "files": 469,
+        "bytes": 7367590
+      },
+      {
+        "path": "/tmp/capstone-followup69b-20261108",
+        "files": 469,
+        "bytes": 7370949
+      }
+    ],
+    "operating_backups_preserved": true
+  },
+  "frozen_replays": [
+    {
+      "case": "hermes66",
+      "seconds": 12.342908021993935,
+      "input_sha256": "c21faf3a745d30bc4258cae244c4adb916683350539a341bdad1776e547805e0",
+      "raw_read_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "actual_tool_calls": 0,
+      "source_kind": "actual_frozen_receipts",
+      "next_steps": [],
+      "manual_quality": "not_passed"
+    },
+    {
+      "case": "ollama66",
+      "seconds": 12.230784733081236,
+      "input_sha256": "1c49587819b3b160290ba6895f42fc0a49027d7df85160d67ce4d4ba690d01ea",
+      "raw_read_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "10007ae27a7a7a1703009926d8d73b023416fbda122615261716af055b6f43b5"
+      ],
+      "schema_valid": true,
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "actual_tool_calls": 0,
+      "source_kind": "actual_frozen_receipts",
+      "next_steps": [],
+      "manual_quality": "not_passed"
+    },
+    {
+      "case": "synthetic_backlog",
+      "seconds": 12.219761299202219,
+      "input_sha256": "3dda543dd82f71b956c5dae13a5ed182869f8946af3c6337e992dfa01afcb8fe",
+      "raw_read_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "713f11c6f19758d7623f30d9f87c0a96783d66ee431000d5cc4a54e44ec9166a"
+      ],
+      "schema_valid": true,
+      "guard_issues": [],
+      "actual_tool_calls": 0,
+      "source_kind": "explicit_counterfactual_fixture_not_live",
+      "next_steps": [],
+      "manual_quality": "not_passed"
+    }
+  ],
+  "live_chats": [
+    {
+      "engine": "hermes",
+      "seconds": 90.544,
+      "status": "partial",
+      "actual_reads": 7,
+      "protected_calls": 0,
+      "source_id": "fi6rar3bpinp9mo6m5eqy7y1do",
+      "reply_id": "zpp1686zy7dotxr6zjzxoxcnrw",
+      "source_sha256": [
+        "e8c91b5896ec9882df8876c6c60cb788860779f9060c848946f1cb5712bdc064",
+        "14b40d6b22cdbaedba2acd8d7597b2f05490d33af446a450a18ef78d90544650",
+        "409146918fe789fa524f66d226ca901e2e52abd65fa21dee65852c730c3ba6d8",
+        "ab3e32a3480a18f116fd0b063295ae09b5ca4bca42f0b2d898d65c543b8759df",
+        "5803c0a3e367601b4f8c3ee8e71f6b06d80ca8278730261d381a901ee43dd5bd",
+        "cbfad8f00f809643d10f33860e45986de2e33a03acbbee981ea87a4f78a87521",
+        "97e3be29637f70d8b221f4a962fe7aae23e148ed37faeee59cde385e5dd8c24c"
+      ],
+      "response_sha256": "6c6dc880d19435dc30f8a02ef4f8dba4ec2a394bca6e6dae4bb05684d64c73ef",
+      "one_markdown_table": true,
+      "ui_all_clients_tested": false,
+      "remaining_issues": [],
+      "full_investigation_passed": false,
+      "limitations": [
+        "7 reads with repeated same pipeline snapshot",
+        "limit=50 current lookup did not retrieve missing historical raw journal",
+        "no followup proposal is not completed investigation"
+      ]
+    },
+    {
+      "engine": "ollama",
+      "seconds": 109.325,
+      "status": "partial",
+      "actual_reads": 3,
+      "protected_calls": 0,
+      "source_id": "6hj1z3agzbrr9xjf4xfxxqm4yo",
+      "reply_id": "om51asc83b8gxxbfc7ewrbwgue",
+      "source_sha256": [
+        "30752617c1deb598aa8f1421bf65088f1ed69227371dd5c7c26f80d9d7d1d76f",
+        "07083d5a5c6ec707750c967e493a9308818d07c4dbf497620d09868381b88577",
+        "0d3856d8e2ec1f2064c494ef90e8922d8bd31af1b70e7b6a27bea427a5665013"
+      ],
+      "response_sha256": "1b32f95340966cb0be106d870c0f7ee7e4e15d05205578892a057c0bd37ccb6f",
+      "one_markdown_table": true,
+      "ui_all_clients_tested": false,
+      "remaining_issues": [
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "full_investigation_passed": false,
+      "limitations": [
+        "more_evidence selected three times; unstructured inquiry fallback retained",
+        "unsupported processing congestion rejected; report withheld",
+        "typed final followup not exercised in this chat"
+      ],
+      "model_calls": 7,
+      "model_seconds": 98.82771047460847,
+      "typed_projection_more_evidence_count": 3
+    }
+  ],
+  "independent_accuracy_benchmark": false,
+  "dgx_status_queries": 0,
+  "new_attacks": 0,
+  "new_packages": 0,
+  "final_check": [
+    {
+      "healthy": true,
+      "manifest": 15,
+      "protected": 8,
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "common": "1.5.68"
+    },
+    {
+      "at_kst": "2026-11-08T01:46:22.097965+09:00",
+      "rollback_timer": "inactive",
+      "jobs": [
+        {
+          "source_id": "fi6rar3bpinp9mo6m5eqy7y1do",
+          "engine": "hermes",
+          "phase": "lead",
+          "status": "done"
+        },
+        {
+          "source_id": "6hj1z3agzbrr9xjf4xfxxqm4yo",
+          "engine": "ollama",
+          "phase": "lead",
+          "status": "done"
+        }
+      ]
+    }
+  ]
+}

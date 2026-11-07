@@ -1666,7 +1666,7 @@ def render_model_review(report, facts):
     basis=line(report['basis'])
     text='**판단**\n'+basis+'\n\n'+literal_evidence_table(facts)
     text+='\n\n**미확인·한계**\n'+'\n'.join('- '+line(x) for x in report['limitations'])
-    text+='\n\n**다음 조치**\n'+'\n'.join('- '+line(x) for x in report['next_steps'])
+    text+='\n\n**다음 조치**\n'+'\n'.join('- '+line(x) for x in diagnostic_contract().service_follow_up_lines(report['next_steps']))
     disposition={k:report[k] for k in ('assessment','basis','evidence_tools')}
     return text+'\n\nINCIDENT_DISPOSITION: '+json.dumps(disposition,ensure_ascii=False)+'\nMANAGEMENT_STATUS: '+report['status']
 
@@ -3265,11 +3265,11 @@ def management_report_request(request, agent, snapshot):
             agent._capstone_review_feedback=None
             return result
         if service is not None:
-            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts)
+            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,read_schemas=catalog)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,
-                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback)
+                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback,structured_followups=True)
             result['max_tokens']=1024;result.pop('max_completion_tokens',None)
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':schema,
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),

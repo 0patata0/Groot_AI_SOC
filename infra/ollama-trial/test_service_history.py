@@ -90,7 +90,7 @@ class ServiceRuntime(unittest.TestCase):
         value={'more_evidence':False,'report':{'assessment':'unresolved',
             'basis':'현재 상태와 과거 오류 메타데이터를 각각 확인했으며 상세 실패 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['과거 기록은 부분 표본입니다.'],
-            'next_steps':['추가 오류 근거를 확인합니다.'],'status':'needs_review'}}
+            'next_steps':[{'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}],'status':'needs_review'}}
         result,order,prompts,calls=self.run_case(compact_report=value)
         self.assertNotEqual(result['status'],'failed',result)
         self.assertEqual(len(calls),3);self.assertEqual(result['protected_calls'],0)
@@ -106,7 +106,7 @@ class ServiceRuntime(unittest.TestCase):
         good={'more_evidence':False,'report':{'assessment':'unresolved',
             'basis':'과거 실패 원인은 현재 조회 범위만으로 확정할 수 없어 미확인으로 구분합니다.',
             'evidence_indexes':[0],'limitations':['과거 오류는 부분 표본입니다.'],
-            'next_steps':['추가 오류 근거를 확인합니다.'],'status':'needs_review'}}
+            'next_steps':[{'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}],'status':'needs_review'}}
         bad=copy.deepcopy(good);bad['report']['basis']='현재 b:management 서비스는 완전히 정상이며 모든 기능이 정상으로 복구되었습니다.'
         result,order,prompts,calls=self.run_case(compact_report=[bad,good])
         self.assertNotEqual(result['status'],'failed',result)
@@ -129,6 +129,29 @@ class ServiceRuntime(unittest.TestCase):
         self.assertNotEqual(result['status'],'failed',result)
         self.assertNotIn('compact',order);self.assertIn('assess',order)
         self.assertEqual(len(calls),3)
+
+    def test_invalid_followup_is_audited_without_dispatch_or_completed_answer(self):
+        bad={'more_evidence':False,'report':{'assessment':'unresolved',
+            'basis':'현재 관측과 과거 오류를 구분했으나 상세 원인은 미확인입니다.',
+            'evidence_indexes':[0],'limitations':['당시 잠금 소유자는 미확인입니다.'],
+            'next_steps':[{'kind':'read_proposal','tool':'mcp__system_diagnostics__get_system_diagnostics',
+                'arguments':{'target':'b:management','raw_messages_returned':True}}],'status':'needs_review'}}
+        result,order,prompts,calls=self.run_case(compact_report=bad)
+        self.assertNotEqual(result['status'],'completed');self.assertEqual(result['protected_calls'],0)
+        self.assertEqual(len(calls),3);self.assertNotIn('assess',order)
+        self.assertEqual(result['service_report_audit'][0]['response'],bad)
+        self.assertNotIn('raw_messages_returned',result.get('final_response',''))
+
+    def test_valid_followup_is_a_proposal_and_not_an_extra_mcp_call(self):
+        value={'more_evidence':False,'report':{'assessment':'unresolved',
+            'basis':'현재 관측과 과거 오류를 구분했으나 상세 원인은 미확인입니다.',
+            'evidence_indexes':[0],'limitations':['당시 잠금 소유자는 미확인입니다.'],
+            'next_steps':[{'kind':'read_proposal','tool':'mcp__system_diagnostics__get_system_diagnostics',
+                'arguments':{'target':'b:management','limit':50}}],'status':'needs_review'}}
+        result,order,prompts,calls=self.run_case(compact_report=value)
+        self.assertEqual(len(calls),3);self.assertEqual(result['protected_calls'],0)
+        self.assertIn('미실행·미예약',result['final_response'])
+        self.assertNotIn('assess',order)
 
     def test_invalid_or_incomplete_selection_dispatches_nothing(self):
         for plan in ({'indexes':[0]},{'indexes':[0,0]},{'indexes':[0,2]},{'indexes':[True,1]}):

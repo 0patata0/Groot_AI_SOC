@@ -444,6 +444,92 @@ class ServiceHistory(unittest.TestCase):
         with patch.dict(w.os.environ,dict(env,CAPSTONE_MANAGEMENT_MODE='apply'),clear=True):
             with self.assertRaisesRegex(RuntimeError,'chat_read_context_invalid'):w.operator_diagnostic_options(catalog())
 
+class ServiceFollowUp(unittest.TestCase):
+    def setUp(self):
+        from jsonschema import Draft202012Validator
+        self.schema=c.service_report_schema([NAME],read_schemas={NAME:catalog()['tools'][0]['function']['parameters']})
+        Draft202012Validator.check_schema(self.schema)
+        self.validator=Draft202012Validator(self.schema)
+        self.report={'assessment':'unresolved','basis':'과거 실패 표본과 현재 관측을 구분했고 추가 원인은 미확인입니다.',
+            'evidence_indexes':[0],'limitations':['당시 잠금 소유자와 실행 계기는 미확인입니다.'],
+            'next_steps':[],'status':'needs_review'}
+    def value(self,step):return {'more_evidence':False,'report':{**self.report,'next_steps':[step]}}
+    def read(self,**args):return {'kind':'read_proposal','tool':NAME,'arguments':{'target':'b:management',**args}}
+
+    def test_real_current_and_history_arguments_are_retained(self):
+        self.validator.validate(self.value(self.read()))
+        self.validator.validate(self.value(self.read(since_kst='2026-11-06T00:00:00+09:00',
+            until_kst='2026-11-06T23:59:59+09:00',limit=50)))
+
+    def test_output_field_cannot_become_a_query_option(self):
+        self.assertFalse(self.validator.is_valid(self.value(self.read(raw_messages_returned=True))))
+
+    def test_missing_required_wrong_target_and_limit_are_rejected(self):
+        for args in ({},{'target':'b:unregistered'},{'target':'b:management','limit':51},
+                     {'target':'b:management','limit':True}):
+            self.assertFalse(self.validator.is_valid(self.value({'kind':'read_proposal','tool':NAME,'arguments':args})))
+
+    def test_unknown_tool_and_protected_tool_cannot_enter_read_catalog(self):
+        for name in ('mcp__system_diagnostics__journalctl','mcp__resp__block_ip'):
+            self.assertFalse(self.validator.is_valid(self.value({**self.read(),'tool':name})))
+
+    def test_prose_and_claimed_execution_or_schedule_are_not_plans(self):
+        for step in ('raw_messages_returned=true로 원문을 조회합니다.',
+                     {**self.read(),'executed':True},{**self.read(),'schedule_at':'now'},
+                     {**self.read(),'purpose':'이 도구에서 잠금 소유자를 조회합니다.'}):
+            self.assertFalse(self.validator.is_valid(self.value(step)))
+
+    def test_capability_gap_is_distinct_from_executable_read(self):
+        step={'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}
+        self.validator.validate(self.value(step))
+        rendered=c.service_follow_up_lines([step])[0]
+        self.assertIn('기능 보완 필요',rendered);self.assertNotIn('조회 제안',rendered)
+        self.assertFalse(self.validator.is_valid(self.value({**step,'tool':NAME})))
+
+    def test_no_proposal_is_allowed_without_blank_heading_or_closure(self):
+        self.validator.validate({'more_evidence':False,'report':self.report})
+        report={**self.report,'evidence_tools':[NAME]}
+        text=w.render_model_review(report,[{'kind':'diagnostics','target':'b:management'}])
+        self.assertIn('추가 조치 제안 없음',text);self.assertIn('MANAGEMENT_STATUS: needs_review',text)
+        self.assertEqual(c.diagnostic_report_text_violations(text,[{'kind':'diagnostics'}]),[])
+
+    def test_registered_read_proposal_is_displayed_unexecuted(self):
+        report={**self.report,'evidence_tools':[NAME],'next_steps':[self.read()]}
+        text=w.render_model_review(report,[{'kind':'diagnostics','target':'b:management'}])
+        self.assertIn('미실행·미예약',text);self.assertIn('"target":"b:management"',text)
+        self.assertIn('MANAGEMENT_STATUS: needs_review',text)
+
+    def test_more_evidence_branch_still_requests_actual_inquiry(self):
+        self.validator.validate({'more_evidence':True,'report':None,'read_tools':[NAME]})
+
+    def test_local_refs_cannot_cross_tool_definitions(self):
+        from jsonschema import Draft202012Validator
+        other='mcp__fixture__read_other'
+        def spec(target):return {'type':'object','additionalProperties':False,'required':['target'],
+            'properties':{'target':{'$ref':'#/$defs/target'}},'$defs':{'target':{'enum':[target]}}}
+        inputs={NAME:spec('b:management'),other:spec('c:apache')};before=copy.deepcopy(inputs)
+        validator=Draft202012Validator(c.service_report_schema([NAME],read_schemas=inputs))
+        validator.validate(self.value(self.read()))
+        self.assertFalse(validator.is_valid(self.value(self.read(target='c:apache'))))
+        validator.validate(self.value({'kind':'read_proposal','tool':other,'arguments':{'target':'c:apache'}}))
+        self.assertEqual(inputs,before)
+
+    def test_external_or_unresolved_refs_fail_without_network_lookup(self):
+        for schema in ({'$ref':'https://example.invalid/schema'},{'$ref':'#/$defs/missing'},
+                       {'$id':'https://example.invalid/base','type':'object'}, {'$dynamicRef':'#anchor'}):
+            with self.assertRaisesRegex(ValueError,'service_follow_up_schema_scope'):
+                c.service_report_schema([NAME],read_schemas={NAME:schema})
+
+    def test_schema_literal_data_is_not_interpreted_as_ref_or_id(self):
+        from jsonschema import Draft202012Validator
+        literal={'$ref':'https://example.invalid/not-a-schema','$id':'user-value'}
+        spec={'type':'object','additionalProperties':False,'required':['$id','value'],
+            'properties':{'$id':{'type':'string'},'value':{'const':literal}}}
+        schema=c.service_report_schema([NAME],read_schemas={NAME:spec})
+        Draft202012Validator(schema).validate(self.value({'kind':'read_proposal','tool':NAME,
+            'arguments':{'$id':'literal-name','value':literal}}))
+
+
 class ServiceReport(unittest.TestCase):
     def test_generation_matches_metadata_closure_veto_but_preserves_further_reads(self):
         from jsonschema import Draft202012Validator
@@ -562,6 +648,23 @@ class ServiceReport(unittest.TestCase):
         req,a,snap,wire,env=self.wire();env['CAPSTONE_SERVICE_REPORT_COMPACT']='0'
         with patch.dict(w.os.environ,env,clear=True):
             self.assertIs(w.management_report_request(req,a,snap),req)
+
+    def test_native_followup_is_bound_to_input_schema_and_never_dispatches(self):
+        from openai.types.chat import ChatCompletion
+        from jsonschema import ValidationError
+        req,a,snap,wire,env=self.wire();lease=a._capstone_management_selection
+        value={'request_nonce':lease['nonce'],'more_evidence':False,'report':{
+            'assessment':'unresolved','basis':'과거 오류 표본과 현재 실행 관측을 구분했고 상세 원인은 미확인입니다.',
+            'evidence_indexes':[0],'limitations':['당시 잠금 소유자는 미확인입니다.'],
+            'next_steps':[{'kind':'read_proposal','tool':NAME,'arguments':{'target':'b:management','limit':50}}],
+            'status':'needs_review'}}
+        def response(v):return ChatCompletion(id='followup',created=1,model='qwen3.6:35b',object='chat.completion',choices=[{
+            'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(v)}}])
+        decoded,count=w.management_selection_response(response(value),lease,a)
+        self.assertEqual(count,0);self.assertIsNone(decoded.choices[0].message.tool_calls)
+        self.assertIn('미실행·미예약',decoded.choices[0].message.content)
+        bad=copy.deepcopy(value);bad['report']['next_steps'][0]['arguments']['raw_messages_returned']=True
+        with self.assertRaises(ValidationError):w.management_selection_response(response(bad),lease,a)
 
     def test_native_old_binding_and_stale_receipts_do_not_use_service_projection(self):
         req,a,snap,wire,env=self.wire();a._capstone_registered_read_conditions=('old',{})

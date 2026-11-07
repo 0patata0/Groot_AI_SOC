@@ -1,7 +1,7 @@
 {
   "schema": "groot-pcap-learning-review-v1",
-  "at_kst": "2026-11-07 12:20 KST",
-  "scope": "local curation; DGX cleaned candidates only; no training",
+  "at_kst": "2026-11-07T12:54:35.115278+09:00",
+  "scope": "local curation and source-bound SFT preparation; DGX cleaned data and CPU token checks; no GPU training",
   "source_kind": "University controlled malware captures with background and normal traffic, not three independently confirmed enterprise intrusions",
   "citation": {
     "authors": [
@@ -148,13 +148,13 @@
   "retained_observations": 351160,
   "independent_collection_scenarios": 3,
   "independent_soc_incidents": null,
-  "sft_conversations": 0,
+  "sft_conversations": 24,
   "training_eligible": false,
   "training_started": false,
-  "split": "unassigned",
+  "split": "derived SFT train only; raw flow candidate remains without automatic training admission",
   "leakage_group": "CTU-13-shared-campus-and-hosts",
   "training_input_allowlist": [],
-  "model_tokens_checked": false,
+  "model_tokens_checked": true,
   "prior_corpus_check": {
     "search": "CTU-13 case-insensitive name, selected filenames and source SHA in datasets/raw, datasets/processed, finetuning/data-* text",
     "matches": 0,
@@ -198,7 +198,8 @@
   "storage": {
     "fixed_original": "datasets/archives/original.tar.gz",
     "fixed_cleaned": "datasets/archives/cleaned.tar.gz",
-    "legacy_migration": "pending after DGX import as instructed"
+    "legacy_migration": "completed; two fixed archives fully restored and hashed; 11242 verified duplicate files removed",
+    "inventory": "../datasets/ARCHIVE_INVENTORY.json"
   },
   "not_imported": [
     {
@@ -213,5 +214,25 @@
       "source": "CAIDA DDoS2007",
       "reason": "public access exists but attack/response only without payload/normal baseline; dataset-specific AUA and separate DDoS review pending; no download"
     }
-  ]
+  ],
+  "initial_candidate_state": {
+    "at_kst": "2026-11-07 12:20 KST",
+    "scope": "local curation; DGX cleaned candidates only; no training",
+    "sft_conversations": 0,
+    "split": "unassigned",
+    "model_tokens_checked": false
+  },
+  "derived_training_preparation": {
+    "status": "data_ready_gpu_smoke_pending",
+    "train_rows": 8719,
+    "validation_rows": 176,
+    "test_rows": 176,
+    "token_and_mask_records_passed": 9082,
+    "max_tokens": 4067,
+    "new_conversations": 24,
+    "independent_leakage_groups": 1,
+    "project_authored_source_bound_not_expert_gold": true,
+    "destination": "~/Capstone_Groot_training/pcap-candidates-20261107/training-ready-r1",
+    "review": "PCAP_TRAINING_PREPARATION.md"
+  }
 }

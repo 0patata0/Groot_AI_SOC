@@ -57,6 +57,12 @@ class ArchiveTests(unittest.TestCase):
  def test_tamper(self):
   out,r=self.pack();out.write_bytes(out.read_bytes()+b'changed')
   with self.assertRaises(ValueError):A.verify_extract(out,r,self.d/'restore')
+ def test_selected_restore_requires_known_prefix(self):
+  out,r=self.pack()
+  with self.assertRaises(ValueError):A.verify_extract(out,r,self.d/'unknown',['missing'])
+  self.assertFalse((self.d/'unknown').exists())
+  result=A.verify_extract(out,r,self.d/'selected',['datasets/test'])
+  self.assertEqual(result['verified_files'],2)
  def test_unsafe_names(self):
   for name in ['/absolute','../escape','a/../b','a//b','./a','a\\b','']:
    with self.assertRaises(ValueError):A.safe_name(name)

@@ -23,8 +23,9 @@ def digest(path):
 
 
 def safe_name(name):
+    if not isinstance(name,str): raise ValueError('unsafe archive path')
     p = PurePosixPath(name)
-    if not isinstance(name,str) or not name or p.is_absolute() or '..' in p.parts or \
+    if not name or p.is_absolute() or '..' in p.parts or \
             str(p) != name or '\\' in name or '\x00' in name or name.endswith('/'):
         raise ValueError('unsafe archive path')
     return name
@@ -61,7 +62,7 @@ def build(output, files, kind):
             'uncompressed_bytes':sum(r['bytes'] for r in records),'files':len(records)}
 
 
-def verify_extract(archive, receipt, destination):
+def verify_extract(archive, receipt, destination, prefixes=None):
     archive=Path(archive);destination=Path(destination)
     if destination.exists() or destination.is_symlink(): raise ValueError('fresh extraction directory required')
     if digest(archive)!=receipt['sha256']: raise ValueError('archive hash mismatch')
@@ -86,8 +87,18 @@ def verify_extract(archive, receipt, destination):
             raise ValueError('manifest members mismatch')
         for m in members:
             if m.name!=MANIFEST and m.size!=records[m.name]['bytes']: raise ValueError('member size mismatch')
+        selected=set(names)
+        if prefixes is not None:
+            if not prefixes: raise ValueError('empty restoration selection')
+            selected={MANIFEST}
+            for prefix in prefixes:
+                safe_name(prefix)
+                matching={n for n in records if n==prefix or n.startswith(prefix+'/')}
+                if not matching: raise ValueError('unknown restoration prefix')
+                selected.update(matching)
         destination.mkdir(parents=True,exist_ok=False,mode=0o700)
         for m in members:
+            if m.name not in selected: continue
             target=destination/m.name;target.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
             # Destination is new and controlled. Do not use tar.extract/extractall.
             with tar.extractfile(m) as source, target.open('xb') as out:
@@ -95,5 +106,5 @@ def verify_extract(archive, receipt, destination):
             target.chmod(0o600)
             expected=receipt['manifest_sha256'] if m.name==MANIFEST else records[m.name]['sha256']
             if target.stat().st_size!=m.size or digest(target)!=expected: raise ValueError('restored member mismatch')
-    return {'verified_files':len(members),'archive_sha256':receipt['sha256'],
+    return {'verified_files':len(selected),'archive_sha256':receipt['sha256'],
             'training_eligible':False,'training_started':False}

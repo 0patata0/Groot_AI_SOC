@@ -1,6 +1,8 @@
+> 명시적 과거 기록: 2026-11-07 공통60 반영 전. [현재 현황](../STATUS.md) · [활성 계획](../PLAN.md). 본문은 당시 내용이며 보관 위치에 맞춰 상대 링크만 보정했습니다.
+
 # 인프라 현황 — 2026-11-07 09:31 KST
 
-전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](PLAN.md) · [직전 상태](archive/STATUS-before-resume-20261107.md).
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](../archive/STATUS-before-resume-20261107.md).
 
 ## 이번 작업과 검증 상태
 
@@ -15,19 +17,19 @@
 | 논문 선작성 | 이전본 보존·4.7 근거/해석/실행 분리,5.12.6 실채팅·실패/미완료 결과,5.13 정확성 선평가 방법·국영문초록 갱신.5.12.5 배치 순서 정정 | 기록된 common59 결과를 원장과 대조.109 새 시험은 아직 논문 수치에 편입하지 않음. 새PDF/전쪽 시각검수·제출확정·독립평가 미완료,논문Git제외 |
 
 
-[단일 현재 조회/실측/복구](infra/hermes/pipeline-single-read.md) · [날짜·주장 검사/실측/복구](infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](infra/mcp/runtime-clock.md) · [단문 경로](infra/hermes/pipeline-navigation.md) · [반복systemd 수정](infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
+[단일 현재 조회/실측/복구](../infra/hermes/pipeline-single-read.md) · [날짜·주장 검사/실측/복구](../infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](../infra/mcp/runtime-clock.md) · [단문 경로](../infra/hermes/pipeline-navigation.md) · [반복systemd 수정](../infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
 
 ## 그 밖의 운영 현황
 
 | 영역 | 마지막 확인 범위 | 남은 범위 |
 |---|---|---|
-| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](infra/mcp/fw-consolidation.md) · [웹](infra/validation/web-traffic/README.md) |
-| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](infra/mcp/containment-display.md) |
-| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](infra/validation/dns-noise/README.md) |
-| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](infra/mcp/web-history.md) |
-| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](infra/validation/web-e2e/README.md) |
-| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](infra/validation/rule-overlap/README.md) |
-| 논문·발표·설치 | 논문5.12.6/구현4.7·정확성평가방법과 이전본 보존. 호스팅 없는 발표 PDF20쪽/메모685초·전쪽 시각검수. 단일deploy.sh 설치 경로 정합 검사 | 이번 후속 실측/최신논문PDF·제출형식·리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](../infra/mcp/fw-consolidation.md) · [웹](../infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](../infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](../infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](../infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](../infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.12.6/구현4.7·정확성평가방법과 이전본 보존. 호스팅 없는 발표 PDF20쪽/메모685초·전쪽 시각검수. 단일deploy.sh 설치 경로 정합 검사 | 이번 후속 실측/최신논문PDF·제출형식·리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
 
 ## 다음 작업과 유지 조건
 

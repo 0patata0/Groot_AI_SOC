@@ -134,8 +134,15 @@
     "receipt": "This subsequent documentation commit records the verified source publication; its own receipt is local."
   },
   "cleanup": {
-    "task_temp_and_test_fixture": "retained_for_same_active_followup_until_17KST",
-    "packages_installed_on_mac": 0,
-    "operational_data_and_backups_preserved": true
+    "at_kst": "2026-11-07T09:52:55.101323+09:00",
+    "mac_temp_files_removed": 34,
+    "mac_temp_bytes_removed": 9382926,
+    "mac_temp_absent": true,
+    "server_fixture_files_removed": 461,
+    "server_fixture_bytes_removed": 7205122,
+    "server_fixture_absent": true,
+    "sha_verified": true,
+    "new_mac_packages": 0,
+    "operational_data_and_backups": "preserved"
   }
 }

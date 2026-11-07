@@ -171,7 +171,9 @@
     ]
   },
   "publication": {
-    "status": "pending"
+    "source_commit": "c5bb52b8a1a2db257bdeaffca027b1584d36f7a1",
+    "remote_main_verified_at_kst": "2026-11-07T09:48:21.777592+09:00",
+    "receipt": "subsequent documentation commit; own receipt kept locally"
   },
   "limits": [
     "both_compound_responses_failed_quality",
@@ -180,8 +182,122 @@
     "single_sample_each_no_latency_distribution"
   ],
   "cleanup": {
-    "temporary_fixture": "retained_for_active_followup",
+    "at_kst": "2026-11-07T09:52:55.101323+09:00",
+    "mac_temp_files_removed": 34,
+    "mac_temp_bytes_removed": 9382926,
+    "mac_temp_absent": true,
+    "server_fixture_files_removed": 461,
+    "server_fixture_bytes_removed": 7205122,
+    "server_fixture_absent": true,
+    "sha_verified": true,
     "new_mac_packages": 0,
-    "operational_data_backups_preserved": true
-  }
+    "operational_data_and_backups": "preserved"
+  },
+  "reasoning_replay": {
+    "at_kst": "2026-11-07T09:52:03.465249+09:00",
+    "kind": "recorded_evidence_replay_not_chat",
+    "same_recorded_read_count": 4,
+    "source_at_kst": "2026-11-07T09:43:14.968108+09:00",
+    "num_predict": 2048,
+    "same_model": "qwen3.6:35b",
+    "read_catalog_count": 35,
+    "off": {
+      "reasoning": false,
+      "model_seconds": 6.568433673819527,
+      "issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "metrics": {
+        "usage": {
+          "input_tokens": 9047,
+          "output_tokens": 191,
+          "total_tokens": 9238
+        },
+        "ollama": {
+          "total_duration": 6545360552,
+          "prompt_eval_count": 9047,
+          "prompt_eval_duration": 2009873000,
+          "eval_count": 191,
+          "eval_duration": 4361949000
+        }
+      }
+    },
+    "on": {
+      "reasoning": true,
+      "model_seconds": 37.440673654899,
+      "status": "failed",
+      "error_type": "OutputParserException",
+      "metrics": {
+        "usage": {
+          "input_tokens": 9045,
+          "output_tokens": 2048,
+          "total_tokens": 11093
+        },
+        "ollama": {
+          "total_duration": 37421241791,
+          "prompt_eval_count": 9045,
+          "prompt_eval_duration": 2011246000,
+          "eval_count": 2048,
+          "eval_duration": 35283346000
+        }
+      }
+    },
+    "on_first_attempt": "also_empty_json_parser_failure_no_per_model_metrics",
+    "adopted": false,
+    "live_inference_options_changed": false,
+    "limitations": [
+      "one_off_two_on_attempts",
+      "different_cache_state_not_latency_causal_estimate",
+      "output_budget_reached_on_measured_true_run",
+      "no_independent_quality_benchmark",
+      "no_model_internal_reasoning_stored"
+    ]
+  },
+  "health_final": [
+    {
+      "at_kst": "2026-11-07T09:50:55.962898+09:00",
+      "manifest": 22,
+      "protected": 8,
+      "sdk_sources": 20,
+      "review_files": 5,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "schema": 1,
+          "engine": "hermes",
+          "pid": 162,
+          "process_start_ticks": 121988243,
+          "checked_at": 1794012655,
+          "websocket_connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "schema": 1,
+          "engine": "ollama",
+          "pid": 1365185,
+          "process_start_ticks": 121987983,
+          "checked_at": 1794012643,
+          "websocket_connected": true,
+          "worker_alive": true
+        }
+      },
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "failed": "",
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "ready": true
+    },
+    {
+      "confirmed": true,
+      "rollback_timer": "inactive",
+      "rollback_noop": true
+    }
+  ]
 }

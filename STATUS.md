@@ -16,7 +16,7 @@
 | 추가 학습 준비 | 기존8,719 보존·균형 후보1,220/룰 정답 토큰84.93%→40.25%, 도구41문답/65호출 유지. 중간평가·조기종료/재개·최선 보존, 별도 평가32·비교6설정 준비 |13:46 새35B GPU2/2·최선step1/현재58SHA·CPU재개동등성/loss3·로컬118/압축8통과. 모델 품질 비교·본학습·승격0. [보완 결과](finetuning/QUALITY_PREPARATION.md) |
 | IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](infra/hermes/ids-application-method.md) |
 | 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
-| Git·정리 | 직전 품질 준비/문서45d3292 실원격main 일치. 이번 IDS115 소스·검증·문서는 게시 준비 중 | 원본/정제 각1압축 유지. 기존 Ansible/NAT/topology 변경 별도 보존·현재단위 공개 파일만 게시 |
+| Git·정리 | IDS115 공개16경로 7130086 푸시·14:16:00 KST 실원격main 일치. 이 게시 영수증은 후속 문서 커밋으로 반영 | 서버시험926파일/Mac작업임시25파일 정리. 기존 관리자 작업용 임시·Ansible/NAT/topology 보존 |
 
 [이번 변경·검증·복구](infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
 

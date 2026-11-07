@@ -164,5 +164,17 @@
     "Shared GPU/cache/channel background not controlled; no average latency claim.",
     "Markdown body checked; new browser/mobile rendering not tested.",
     "No actual rule change, approval, security-device restart, attack/load/PCAP, new OS install, or training."
-  ]
+  ],
+  "publication": {
+    "commit": "713008684015cfa41396b3214eef7c6168b4a9f8",
+    "remote_main": "713008684015cfa41396b3214eef7c6168b4a9f8",
+    "verified_at_kst": "2026-11-07T14:16:00.828259+09:00",
+    "credential_source": "project local credential file, one Git subprocess environment; helpers and HTTP trace disabled"
+  },
+  "cleanup": {
+    "container_test_files_removed": 926,
+    "local_task_files_removed": 25,
+    "local_task_bytes_removed": 21007126,
+    "existing_unrelated_files_preserved": true
+  }
 }

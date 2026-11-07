@@ -57,6 +57,13 @@ class RetryTests(unittest.TestCase):
         self.assertFalse((p/resume.COMPLETION_MARKER).exists())
         self.assertIsNone(dgx.newest_checkpoint(self.root,168))
 
+    def test_quality_stop_must_not_be_restarted_as_shared_inference_retry(self):
+        out,p=self.checkpoint(self.root)
+        with patch.object(resume,'verified_completion',return_value={
+                'quality_control':{'stop_requested':True}}):
+            with self.assertRaisesRegex(RuntimeError,'Quality stop'):
+                dgx.newest_checkpoint(self.root,168)
+
     def test_shared_interruption_retries_newest_complete_checkpoint(self):
         seen=[]
         def action(c):

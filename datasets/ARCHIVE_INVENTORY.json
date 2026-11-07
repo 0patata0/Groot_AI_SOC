@@ -1,5 +1,5 @@
 {
-  "at_kst": "2026-11-07T12:53:12.824101+09:00",
+  "at_kst": "2026-11-07T13:49:21.541425+09:00",
   "archives": {
     "original": {
       "kind": "original",
@@ -11,24 +11,40 @@
     },
     "cleaned": {
       "kind": "cleaned",
-      "bytes": 535951925,
-      "sha256": "c600dd1bed2b680e0e6c5c65aebcdd9c37d50d5f038b2b0460a63af62f103ae3",
-      "manifest_sha256": "3056240437d5092e09054e393667dc6b73a3a977592fc12be36cedf6c2b89719",
-      "uncompressed_bytes": 5064734785,
-      "files": 1959
+      "bytes": 538895416,
+      "sha256": "34964874a5a967c6fd9748347b52cee290de5f5602f00f9be924b0d6cecdee45",
+      "manifest_sha256": "dfe1c92e6a000647609a6eb0ba8bf14b8430567c70c01c07f812ec228fe14b28",
+      "uncompressed_bytes": 5088307254,
+      "files": 2065
     }
   },
-  "catalog_sha256": "1a5352e5d758587db8858431d3b8c065805d12f16bb7f0793b677982b7b9bf2f",
-  "plan_sha256": "7278fd47c989cb36ba8e7af97c87490a9221a1d9a7a0159eb2ddfb7a318f6c2c",
-  "full_restore_verified_files_including_manifests": 11281,
+  "catalog_sha256": "bbe71d61518692022671f66dc5f68febe8c2d091b1f746f54e7f690137e0c02e",
+  "plan_sha256": "0fb2ff1d37fd74961a92c139b6cc8ff37944d195d7e836e3bdcd26e57e05ef65",
+  "full_restore_verified_files_including_manifests": 11387,
   "removed_exact_dataset_files": 11242,
   "post_cleanup_absent": 11242,
   "selected_ready_versions_restored_files": 89,
   "remaining_non_dataset_files": [
     "finetuning/data-joint-expansion-20261101-r3/.DS_Store"
   ],
-  "training_started": false,
   "remote_training_inputs_changed": false,
   "weights_archived": false,
-  "git_data_excluded": true
+  "git_data_excluded": true,
+  "initial_migration_plan_sha256": "7278fd47c989cb36ba8e7af97c87490a9221a1d9a7a0159eb2ddfb7a318f6c2c",
+  "appended_reviewed_files": 106,
+  "initial_migration_restored_files_including_manifests": 11281,
+  "latest_cleaned_full_restore_files_including_manifest": 2066,
+  "original_changed_in_latest_append": false,
+  "local_temporary_cleanup_pending": false,
+  "gpu_preflight_steps": 2,
+  "latest_temporary_cleanup": {
+    "at_kst": "2026-11-07T13:51:40.100092+09:00",
+    "files_removed": 4394,
+    "bytes_removed": 11416668051,
+    "archives_reverified": true,
+    "new_106_members_reverified": true,
+    "remote_35b_artifacts_preserved": true,
+    "absent": true
+  },
+  "main_training_started": false
 }

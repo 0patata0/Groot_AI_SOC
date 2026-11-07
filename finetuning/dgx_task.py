@@ -111,12 +111,18 @@ def main(stage):
                     status['status']=progress['status']
                     status['step']=progress['step']
                     return
-                if progress['status'] != 'completed':
+                if progress['status'] not in ('completed', 'completed_early_stop'):
                     raise RuntimeError('Training stopped before the full plan completed: '+progress['status'])
                 metrics = json.loads((ROOT/stage/'eval_results.json').read_text())
                 import math
                 if not math.isfinite(metrics['eval_loss']):
                     raise RuntimeError('Nonfinite final validation loss')
+                if progress['status'] == 'completed_early_stop':
+                    selection = json.loads((ROOT/stage/'quality-selection.json').read_text())
+                    if not selection['stop_requested'] or not selection['files']:
+                        raise RuntimeError('Early stop lacks a retained validated adapter')
+                    status.update(status='completed_early_stop', step=progress['step'])
+                    return
         else:
             raise ValueError('Unknown stage')
         status['status'] = 'completed'

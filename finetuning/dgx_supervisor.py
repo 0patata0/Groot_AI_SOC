@@ -277,7 +277,7 @@ def run_once(c, *, smoke_only=False):
                         stop_container(c)
                         child.wait(timeout=20)
             receipt=json.loads((root/'workspace'/(stage+'-status.json')).read_text())
-            if stage=='main' and receipt['status'] in ('stopped_deadline','completed_training_validation_pending'):
+            if stage=='main' and receipt['status'] in ('stopped_deadline','completed_training_validation_pending','completed_early_stop'):
                 status['status']=receipt['status']
                 return
             if receipt['status'] != 'completed':
@@ -322,6 +322,8 @@ def newest_checkpoint(root, minimum):
     for checkpoint in output.glob('checkpoint-*'):
         try:receipt=verified_completion(output,checkpoint)
         except (OSError,ValueError,KeyError):continue
+        if receipt.get('quality_control',{}).get('stop_requested'):
+            raise RuntimeError('Quality stop checkpoint requires review, not an automatic training retry')
         if receipt['step']>minimum:candidates.append(receipt['step'])
     return max(candidates) if candidates else None
 

@@ -10,8 +10,8 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 from urllib import request
 from evaluate import function_calls
-from prepare_data import canonical,matches_schema
-from soc_dataset import checked_schema,validate_case
+from prepare_data import canonical,matches_schema,Reject
+from soc_dataset import checked_call_schema,validate_case
 from soc_evaluate import transport_tools
 
 def edited_content(content,edits):
@@ -29,7 +29,7 @@ def match_call(actual,expected,catalog,observations=()):
     entry=next((t for t in catalog['tools'] if t['name']==actual['name']),None)
     if actual.get('parse_error') or not entry or actual['name']!=expected['name']:return False
     args=actual['arguments']
-    if not matches_schema(args,checked_schema(entry['parameters'])):return False
+    if not valid_arguments(actual['name'],args,entry):return False
     # A reason is free prose, never a required memorized sentence. All scope,
     # IDs, exact edits and base hashes still have to match the reference.
     a={k:v for k,v in args.items() if k!='reason'};b={k:v for k,v in expected['arguments'].items() if k!='reason'}
@@ -42,8 +42,18 @@ def match_call(actual,expected,catalog,observations=()):
                 except ValueError:return False
     return a==b
 
+def valid_arguments(name,arguments,entry):
+    try:return matches_schema(arguments,checked_call_schema(name,entry['parameters'],arguments))
+    except (Reject,ValueError,TypeError,KeyError):return False
+
 def replay(case,catalog,generate,max_turns=8):
-    validate_case(case,catalog);messages=copy.deepcopy(case['messages'][:2]);steps=[];trace=[]
+    validate_case(case,catalog)
+    initial=case.get('prompt_messages_count',2)
+    if (type(initial)is not int or not 2<=initial<len(case['messages'])
+            or case['messages'][initial-1]['role']!='user'
+            or any(m.get('tool_calls')for m in case['messages'][:initial])):
+        raise ValueError('Only explicit pre-action conversation context is allowed')
+    messages=copy.deepcopy(case['messages'][:initial]);steps=[];trace=[]
     for i,m in enumerate(case['messages']):
         if m['role']=='assistant' and m.get('tool_calls'):
             if len(m['tool_calls'])!=1:raise ValueError('Fixture must use one serial observation per step')
@@ -59,7 +69,7 @@ def replay(case,catalog,generate,max_turns=8):
         for index,call in enumerate(calls):
             if done>=len(steps) or not match_call(call,steps[done][0],catalog,messages):
                 entry=lookup.get(call['name'])
-                valid=entry and not call.get('parse_error') and matches_schema(call['arguments'],checked_schema(entry['parameters']))
+                valid=entry and not call.get('parse_error') and valid_arguments(call['name'],call['arguments'],entry)
                 wanted=steps[done][0]['arguments'] if done<len(steps) else {}
                 actual_args=call['arguments'] if isinstance(call.get('arguments'),dict) else {}
                 wrong_target=any(k in wanted and k in actual_args and wanted[k]!=actual_args[k] for k in ('target','source_ip','request_id','proposal_id'))

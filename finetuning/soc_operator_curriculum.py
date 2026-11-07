@@ -46,6 +46,9 @@ def projections(root=ROOT):
 
 def runtime(diag,target,when,degraded=False):
     epoch=int(datetime.fromisoformat(when).timestamp());row={'kind':'suricata_runtime','status':'degraded' if degraded else 'ok','metrics':{'running':True,'rules_loaded':41,'rules_failed':0,'kernel_drops':12 if degraded else 0,'engine_stats_age_seconds':5,'engine_uptime_seconds':1200},'codes':['loss_counter_nonzero'] if degraded else [],'limits':['counters_are_since_engine_start','per_rule_detection_not_verified']}
+    # Match the current per-target observation contract. This is a controlled
+    # fixture timestamp, not a newly observed production measurement.
+    row['observed_at']=epoch
     return diag.runtime_result({'checked_at':epoch,'expires_at':epoch+180,'host':'a','runtime':{target:row}},target,epoch+1)
 
 class Dialogue:

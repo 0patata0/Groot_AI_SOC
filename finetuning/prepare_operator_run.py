@@ -77,6 +77,8 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
     shutil.copytree(data/'licenses',output/'data/licenses')
     for name in ('admission.json','composition.json','token-review.json','mcp-contract.json'):
         shutil.copyfile(data/name,output/'data'/name)
+    for name in ('balance-review.json','selection.jsonl'):
+        if (data/name).is_file():shutil.copyfile(data/name,output/'data'/name)
     if purpose=='main_training':shutil.copyfile(release_path,output/'data/release.json')
     selection={'selection':'longest admitted conversation, longest complete multi-tool trajectory, and longest opted-in empty-thinking-history conversation when present',
                'records':[{'id':r['id'],'tokens':token_counts[r['id']],
@@ -87,14 +89,15 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
                'smoke_optimizer_steps':2,'smoke_gradient_accumulation':2,'main_training_started':False}
     (output/'profiles/selection.json').write_text(json.dumps(selection,ensure_ascii=False,indent=2)+'\n')
     for stage in ('main','smoke'):
-        config=json.loads((SOURCE/'data-evidence-run-20261031-r1-final/profiles'/(stage+'.json')).read_text())
+        # A code-owned template remains available after dataset archives are closed.
+        config=json.loads((SOURCE/'config.qwen36-operator.json').read_text())
         config.update(hardware_profile='dgx-spark-sm121',data_dir='/data',output_dir='/workspace/'+stage,
-                      training_deadline_epoch=cutoff(deadline)-900,final_eval_only=True,
+                      training_deadline_epoch=cutoff(deadline)-900,final_eval_only=False,
                       save_steps=4 if stage=='main'else 2)
-        if stage=='main':config['eval_steps']=(len(full)+1)//2
-        else:
+        if stage=='smoke':
             config.update(smoke_longest_prefixes=False,max_train_samples=0,
-                          gradient_accumulation_steps=2,max_steps=2,max_eval_samples=8)
+                          gradient_accumulation_steps=2,max_steps=2,max_eval_samples=8,
+                          eval_steps=1,save_steps=1)
         path=output/'profiles'/(stage+'.json');path.write_text(json.dumps(config,indent=2)+'\n')
         local=training_config(path);local['data_dir']=str(output/('data/smoke'if stage=='smoke'else'data'))
         check_data(local)

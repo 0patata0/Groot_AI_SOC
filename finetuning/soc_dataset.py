@@ -14,6 +14,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from prepare_data import canonical, check_schema, matches_schema, normalize_record, prompt_hash
+from current_diagnostic_schema import project_for_call
 
 
 METADATA = {'title','description','default','examples','$schema','$id','deprecated','readOnly','writeOnly'}
@@ -49,6 +50,10 @@ def checked_schema(original):
     return schema
 
 
+def checked_call_schema(name, original, arguments):
+    return checked_schema(project_for_call(name, original, arguments))
+
+
 def validate_case(case,catalog):
     if case.get('split') not in ('train','validation','test'):raise ValueError('Explicit split required')
     if not case.get('scenario_group') or not case.get('id'):raise ValueError('Scenario identity required')
@@ -67,16 +72,22 @@ def validate_case(case,catalog):
     tools=[]
     for name in case.get('tool_names',[]):
         if name not in lookup:raise ValueError('Unregistered tool in case')
-        entry=lookup[name];checked_schema(entry['parameters'])
+        entry=lookup[name];checked_call_schema(name,entry['parameters'],{})
         tools.append({'type':'function','function':{'name':name,'description':entry.get('description','SOC '+name.split('__')[-1]),
             'parameters':copy.deepcopy(entry['parameters'])}})
     if len({t['function']['name'] for t in tools})!=len(tools):raise ValueError('Duplicate tools')
-    normalized=normalize_record({'id':case['id'],'messages':case['messages'],'tools':tools},'soc-reviewed')
+    # The generic record normalizer supports structural JSON schema only. Project
+    # the one known diagnostic guard for that pass, then validate every actual
+    # call against its original guard and return the untouched tool declaration.
+    structural_tools=copy.deepcopy(tools)
+    for tool in structural_tools:
+        fn=tool['function'];fn['parameters']=checked_call_schema(fn['name'],fn['parameters'],{})
+    normalized=normalize_record({'id':case['id'],'messages':case['messages'],'tools':structural_tools},'soc-reviewed')
     calls=[]
     for message in normalized['messages']:
         for call in message.get('tool_calls',[]):
             fn=call['function'];entry=lookup[fn['name']]
-            if not matches_schema(fn['arguments'],checked_schema(entry['parameters'])):
+            if not matches_schema(fn['arguments'],checked_call_schema(fn['name'],entry['parameters'],fn['arguments'])):
                 raise ValueError('MCP argument constraint violation')
             calls.append(fn)
             if entry['protected'] and not review.get('protected_policy_reviewed'):
@@ -92,6 +103,7 @@ def validate_case(case,catalog):
         if any(word in final for word in ('적용 완료','차단 완료','원복 완료')):
             raise ValueError('Invented completion before approval')
     normalized['id']=case['id'];normalized['source']=version
+    normalized['tools']=tools
     normalized['provenance']={'scenario_group':case['scenario_group'],'review':review,
         'source_uri':case.get('source_uri','project:reviewed-soc-cases'),'license':case.get('license','project-local')}
     if case.get('template_family'):normalized['provenance']['template_family']=case['template_family']

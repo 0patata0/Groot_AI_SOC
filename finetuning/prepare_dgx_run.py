@@ -10,7 +10,7 @@ from dgx_supervisor import read_config, cutoff
 SOURCE=Path(__file__).resolve().parent
 FILES=('train.py','model_profile.py','memory_budget.py','memory_telemetry.py',
        'bounded_loading.py','completion_loss.py','dialogue_encoding.py','training_lineage.py',
-       'guarded_process.py','download_model.py','dgx_task.py','dgx_supervisor.py',
+       'guarded_process.py','download_model.py','dgx_task.py','dgx_supervisor.py','training_quality.py',
        'requirements.qwen36-thor.txt','requirements.qwen36-dgx.txt','admit_guide_sft.py',
        'check_dgx_architecture.py','resume_training.py')
 

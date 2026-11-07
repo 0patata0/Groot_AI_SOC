@@ -122,6 +122,8 @@ def read_config(path):
     deterministic_training_enabled(config)
     if type(config.get('final_eval_only', False)) is not bool:
         raise ValueError('final_eval_only must be a boolean')
+    from training_quality import policy
+    policy(config)
     deadline_reached(config)  # Validate an optional timestamp before allocating weights.
     return config
 
@@ -507,14 +509,21 @@ def run_training(config, checks, hardware):
     if config.get("record_prefix_usage",False):
         from training_lineage import recorded_trainer
         trainer_type=recorded_trainer(trainer_type,output/"successful_microbatch_lineage.jsonl")
+    quality = None
+    if config.get('quality_control') is not None:
+        from training_quality import callback_class
+        quality = callback_class(TrainerCallback)(config, output)
+    # The quality manifest must be written before Progress marks a complete checkpoint.
     trainer = trainer_type(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
-                      processing_class=tokenizer, callbacks=[progress])
+                      processing_class=tokenizer, callbacks=([quality] if quality else [])+[progress])
     try:
         result = trainer.train(**({'resume_from_checkpoint':config['resume_from_checkpoint']} if resume else {}))
     except Exception as exc:
         memory_telemetry.record(output,torch.cuda,phase='training_failed',step=trainer.state.global_step,error_type=type(exc).__name__)
         raise
     finally:first_step_trace.stop()
+    stopped_by_quality = bool(quality and quality.tracker.state['stop_requested']
+        and trainer.state.global_step < trainer.state.max_steps and not deadline_reached(config))
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)
@@ -525,7 +534,9 @@ def run_training(config, checks, hardware):
         progress.record(trainer.state, 'validating')
         trainer.save_metrics("eval", final_eval_metrics(trainer))
         evaluated = True
-    status = ('stopped_deadline' if trainer.state.global_step < trainer.state.max_steps else
+    selection = quality.finish() if quality else None
+    status = ('completed_early_stop' if stopped_by_quality and evaluated else
+              'stopped_deadline' if trainer.state.global_step < trainer.state.max_steps else
               'completed' if evaluated else 'completed_training_validation_pending')
     progress.record(trainer.state, status)
     print(f"Saved adapter and tokenizer to {output / 'adapter'}. Requires the original base model. No upload performed.")

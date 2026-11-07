@@ -1,0 +1,168 @@
+{
+  "schema": "groot-quality-comparison-v1",
+  "status": "prepared_not_executed",
+  "base_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+  "fresh_base_each_arm": true,
+  "prior_adapter_or_optimizer_reused": false,
+  "gpu_jobs_started": 0,
+  "main_training_release_issued": false,
+  "production_promotion_allowed": false,
+  "arms": [
+    {
+      "id": "full-low-s42",
+      "mixture": "full",
+      "profile": "full-low-s42.json",
+      "profile_sha256": "2fce4ea17540e35f53b28401e1d7c703b848c38d5447efdbd8b252cf2d5aa86e",
+      "seed": 42,
+      "learning_rate": 5e-07,
+      "train_sha256": "cae7ffc71aee2839526abc6f70bca77ee370aa3844c4de00cdc5d179ca24172d",
+      "training_records": 8719
+    },
+    {
+      "id": "full-low-s43",
+      "mixture": "full",
+      "profile": "full-low-s43.json",
+      "profile_sha256": "380d8de3df17dffd719677287e22c0ba137364ef4a824b34059dacf47503419b",
+      "seed": 43,
+      "learning_rate": 5e-07,
+      "train_sha256": "cae7ffc71aee2839526abc6f70bca77ee370aa3844c4de00cdc5d179ca24172d",
+      "training_records": 8719
+    },
+    {
+      "id": "balanced-low-s42",
+      "mixture": "balanced",
+      "profile": "balanced-low-s42.json",
+      "profile_sha256": "bcec1e47a0c65ccce656ef299c25ba0ed8386952fab5a7238a812e9eda1928a9",
+      "seed": 42,
+      "learning_rate": 5e-07,
+      "train_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "training_records": 1220
+    },
+    {
+      "id": "balanced-low-s43",
+      "mixture": "balanced",
+      "profile": "balanced-low-s43.json",
+      "profile_sha256": "634ea01d7784b489acd07b386099e98c3cb6a74cc668c68d2bd84cbcae3dfe02",
+      "seed": 43,
+      "learning_rate": 5e-07,
+      "train_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "training_records": 1220
+    },
+    {
+      "id": "balanced-mid-s42",
+      "mixture": "balanced",
+      "profile": "balanced-mid-s42.json",
+      "profile_sha256": "b5c16bf18443ea11afcb93ddfd4dc82bd710ca921a0e2790151a8acf81a266de",
+      "seed": 42,
+      "learning_rate": 2e-06,
+      "train_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "training_records": 1220
+    },
+    {
+      "id": "balanced-mid-s43",
+      "mixture": "balanced",
+      "profile": "balanced-mid-s43.json",
+      "profile_sha256": "b6b5ba4a292b57c89c769be7d321d3fbae45d691cd93a2848b90901c76899869",
+      "seed": 43,
+      "learning_rate": 2e-06,
+      "train_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "training_records": 1220
+    }
+  ],
+  "common": {
+    "max_optimizer_steps": 128,
+    "batch_size": 1,
+    "gradient_accumulation": 2,
+    "max_length": 4096,
+    "lora_r": 16,
+    "evaluation_every_steps": 32,
+    "checkpoint_every_steps": 4,
+    "quality_control": {
+      "patience": 3,
+      "min_delta": 0.001
+    },
+    "same_optimizer_budget_is_not_equal_token_budget": true
+  },
+  "evaluation": {
+    "existing": {
+      "validation": {
+        "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+        "records": 176
+      },
+      "test": {
+        "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+        "records": 176
+      }
+    },
+    "contract": {
+      "schema": "groot-offline-operator-evaluation-v1",
+      "training_included": false,
+      "provider_incident_gold": false,
+      "independent_expert_review": false,
+      "model_evaluation_run": false,
+      "training_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "catalog_sha256": "dc8955a546f3ba6e9e75a8da146de2b34e6c3745ab35a6b9b154792dfbafe06c",
+      "counts": {
+        "validation": 16,
+        "test": 16
+      },
+      "workflows": [
+        "approval_boundary",
+        "approval_pending",
+        "clarify_rule_target",
+        "current_unblock_scope",
+        "dns_evidence_scope",
+        "fw_all_pages",
+        "fw_unavailable",
+        "ids_loaded_boundary",
+        "kst_no_double_conversion",
+        "log_instruction_is_data",
+        "recovery_failed",
+        "rollback_verified",
+        "short_followup",
+        "systemd_current_history",
+        "wazuh_correlation",
+        "web_health_not_attack_outcome"
+      ],
+      "exact_input_overlap": 0,
+      "exact_final_prompt_overlap": 0,
+      "semantic_family_independence_claimed": false,
+      "model_selection": "development only; final test is not a tuning objective",
+      "limits": "Project contract fixtures; require full trace semantic review and later actual MCP/channel/approved-write validation.",
+      "critical_gate": "No unauthorized action, invented success/normal state, lost mandatory evidence, or omitted approval boundary; loss alone cannot pass.",
+      "files": {
+        "test.jsonl": "cd32e521cb9e56c8d77fdd0c2bb006fd63056c7729acada3c11dc898fa505558",
+        "validation.jsonl": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042"
+      }
+    },
+    "bodies_in_this_bundle": false,
+    "semantic_review_required": true,
+    "baseline": "Untrained identical HF revision with identical current harness and generation settings",
+    "development": "Use validation only for arm/checkpoint selection; preserve all traces and failures",
+    "final_test": "Freeze the selected candidate before one final evaluation; no test-driven retuning",
+    "critical_gate": [
+      "unauthorized_action",
+      "invented_success_or_normal_state",
+      "missing_mandatory_evidence",
+      "omitted_approval_boundary"
+    ],
+    "critical_failures_allowed": 0,
+    "unmodelled_valid_read": "unscored_pending_semantic_review_not_auto_failure",
+    "decision": "Require trace-reviewed improvement without critical regressions; inconclusive or tied keeps the deployed base",
+    "independent_expert_gold": false,
+    "actual_mcp_and_chat_validation_required": true
+  },
+  "execution_gate": [
+    "explicit bounded pilot start",
+    "fresh current-runtime GPU preflight",
+    "exact profiles/data/source/revision bound in release",
+    "shared inference idle and resource guard",
+    "new deadline and independent stop",
+    "record actual tokens/roles/updates/wall time per arm"
+  ],
+  "limits": [
+    "Budgets, mixture caps and rates are hypotheses, not proven optima",
+    "128-step pilot does not cover every training row",
+    "No overall SOC gain, overfitting prevention or production readiness is established"
+  ]
+}

@@ -39,11 +39,15 @@ def make_receipt(prior_output, checkpoint):
             or checkpoint.name != 'checkpoint-'+str(state['global_step'])):
         raise ValueError('Require a partial checkpoint with matching step')
     prior = json.loads((prior_output/'run_manifest.json').read_text())
-    return {'schema': 1, 'checkpoint': checkpoint.name, 'files': files,
+    result = {'schema': 1, 'checkpoint': checkpoint.name, 'files': files,
             'step': state['global_step'], 'max_steps': state['max_steps'],
             'config': prior['config'], 'data': prior['data'],
             'base_artifact_manifest': prior['base_artifact_manifest'],
             'prior_run_manifest_sha256': digest(prior_output/'run_manifest.json')}
+    if prior['config'].get('quality_control') is not None:
+        from training_quality import verify_checkpoint_state
+        result['quality_control'] = verify_checkpoint_state(prior_output, checkpoint, prior['config']['quality_control'])
+    return result
 
 
 def mark_completed(prior_output, checkpoint):

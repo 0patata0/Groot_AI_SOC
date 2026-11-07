@@ -7,9 +7,22 @@ import copy
 from prepare_data import Reject
 
 NAME='mcp__system_diagnostics__get_system_diagnostics'
+EVENT_NAMES={'mcp__security_events__search_suricata_alerts',
+             'mcp__security_events__search_modsecurity_alerts',
+             'mcp__security_events__search_wazuh_alerts',
+             'mcp__security_events__search_web_access'}
 
 
 def project_for_call(name, schema, arguments):
+    if name in EVENT_NAMES and 'dependentRequired' in schema:
+        if (schema['dependentRequired']!={'since_kst':['until_kst']} or
+                schema.get('allOf')!=[{'not':{'required':['since_kst','lookback_minutes']}}]):
+            raise Reject('unrecognized_event_time_guard')
+        if not isinstance(arguments,dict):raise Reject('arguments_schema_mismatch')
+        if 'since_kst'in arguments and ('until_kst'not in arguments or 'lookback_minutes'in arguments):
+            raise Reject('arguments_schema_mismatch')
+        projected=copy.deepcopy(schema);projected.pop('allOf');projected.pop('dependentRequired')
+        return projected
     if name!=NAME or 'dependentRequired' not in schema:return schema
     expected={'since_kst':['until_kst'],'until_kst':['since_kst']}
     guards=schema.get('allOf')

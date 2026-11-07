@@ -31,7 +31,7 @@ def safe_name(name):
     return name
 
 
-def build(output, files, kind):
+def build(output, files, kind, preserved_records=None):
     output = Path(output)
     if kind not in ('original','cleaned'): raise ValueError('unregistered archive kind')
     if output.exists(): raise ValueError('refuse overwrite; stage and verify first')
@@ -43,8 +43,14 @@ def build(output, files, kind):
         path=Path(path)
         if path.is_symlink() or not path.is_file(): raise ValueError('regular files only')
         stat=path.stat()
-        records.append({'path':name,'bytes':stat.st_size,'sha256':digest(path),
-                        'original_mode':stat.st_mode & 0o777,'original_mtime_ns':stat.st_mtime_ns})
+        record={'path':name,'bytes':stat.st_size,'sha256':digest(path),
+                'original_mode':stat.st_mode & 0o777,'original_mtime_ns':stat.st_mtime_ns}
+        if preserved_records and name in preserved_records:
+            old=preserved_records[name]
+            if any(old[k]!=record[k] for k in ('path','bytes','sha256')):
+                raise ValueError('Preserved archive member changed')
+            record.update(original_mode=old['original_mode'],original_mtime_ns=old['original_mtime_ns'])
+        records.append(record)
     if sum(r['bytes'] for r in records)>MAX_TOTAL: raise ValueError('archive size budget exceeded')
     manifest={'schema':'groot-lossless-dataset-v1','kind':kind,'members':records,
               'training_eligible':False,'training_input_allowlist':[]}

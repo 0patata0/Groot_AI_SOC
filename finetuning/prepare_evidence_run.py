@@ -19,7 +19,7 @@ SPLIT_SHA = {'validation':'ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6d
              'test':'a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045'}
 SOURCE_FILES = ('train.py','model_profile.py','memory_budget.py','memory_telemetry.py',
                 'bounded_loading.py','completion_loss.py','dialogue_encoding.py',
-                'training_lineage.py','guarded_process.py','durable_training_task.py','resume_training.py')
+                'training_lineage.py','guarded_process.py','durable_training_task.py','resume_training.py','training_quality.py')
 
 
 def digest(raw): return hashlib.sha256(raw).hexdigest()

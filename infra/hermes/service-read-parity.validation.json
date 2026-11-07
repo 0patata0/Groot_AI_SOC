@@ -1,0 +1,219 @@
+{
+  "checked_at_kst": "2026-11-08T04:49:41.364909+09:00",
+  "state": "deployed_execution_control_investigation_quality_incomplete",
+  "common": "1.5.72",
+  "query": "1.19.123",
+  "model": "qwen3.6:35b",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "b16fc4a07ac4a664173e8518a5cb22aa4235f5b22886e56ca8dcf80077931a1d",
+    "infra/hermes/query-completion/__init__.py": "930bb697a613117d0c2f6ebbbc675e074113aa765f03858377b5bf15f9a0835b",
+    "infra/hermes/soc_management_run.py": "7ea4a4916617b3aba99191a9acc7b4b87cf1af2c2192996e13866e41c5e02569",
+    "infra/hermes/test_service_history_contract.py": "12e3752d02c3c5490ec5754425a03ab3e019fb8e125761db6c0e9b2a11f8b2aa",
+    "infra/hermes/test_soc_management_grounding.py": "34e08fbf2fc7940d02907aa888962789f7aa0c48fa8997bfac001e1dfa7089b3",
+    "infra/ollama-trial/runtime.py": "2f6e0cc9f4ab66d250f2c23bfd1771b27e539e943cea491af4cddb5c7aecc557"
+  },
+  "test_profiles": {
+    "native": {
+      "rc": 0,
+      "count": 482,
+      "skip": 0,
+      "unique_methods": 482
+    },
+    "service": {
+      "rc": 0,
+      "count": 87,
+      "skip": 0,
+      "unique_methods": 87
+    },
+    "claims": {
+      "rc": 0,
+      "count": 53,
+      "skip": 0,
+      "unique_methods": 53
+    },
+    "sdk": {
+      "rc": 0,
+      "count": 293,
+      "skip": 0,
+      "unique_methods": 293
+    },
+    "query": {
+      "rc": 0,
+      "count": 408,
+      "skip": 0,
+      "unique_methods": 408
+    },
+    "peer": {
+      "rc": 0,
+      "count": 79,
+      "skip": 0,
+      "unique_methods": 79
+    },
+    "installer": {
+      "rc": 0,
+      "count": 63,
+      "skip": 0,
+      "unique_methods": 63
+    },
+    "diagnostics": {
+      "rc": 0,
+      "count": 84,
+      "skip": 0,
+      "unique_methods": 84
+    }
+  },
+  "unique_pass": 1549,
+  "deployed_hosts": [
+    "B"
+  ],
+  "changed_files": 12,
+  "final_health": {
+    "at_kst": "2026-11-08T04:48:42.437636+09:00",
+    "query": "1.19.123",
+    "common": "1.5.72",
+    "manifest": 15,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_timer_inactive": true,
+    "hermes_planned_restart_this_revision": 1,
+    "jobs": {
+      "831bb173bjbtjkef8tazje4cbr": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ],
+      "xdyt77iymb8bimutsso9m77rke": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ]
+    },
+    "embedded_gate_matches": true,
+    "gate_bytes": 65370
+  },
+  "chat": [
+    {
+      "engine": "hermes",
+      "posted_to_final_seconds": 135.881,
+      "status": "partial",
+      "investigation_complete": false,
+      "actual_reads": 6,
+      "required_reads": 4,
+      "protected_calls": 0,
+      "read_sha256": [
+        "5cf7fdc7779d027263ecbe836c51383b504674426671b239042cad0466da8d4f",
+        "f68ae929aae67f9c9ca30b741b86158764ce5b80225e92805bed5bb458df002d",
+        "dc0a8e423b0b406706b7b5df0bfaf5ec30e1203261c71dc62f6e099e88cb62da",
+        "5d4572b6849230f529be286902f049e1c5dc0c2bdca1280b83a32840eff31060",
+        "20edb826b0bf2dd184d972bf709c1fa806776aaa6322986892b9abd4014915c9",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "journal_entries": 32,
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "reply_id": "craiaiu96brednmsapzneuj3uy",
+      "model_selections": 6,
+      "model_seconds": 121.228544,
+      "repeated_batch_rejections": 0,
+      "unnecessary_reads": [
+        "same current target with changed lookback_minutes=48 and limit=50",
+        "resp.list_blocks"
+      ],
+      "published_errors": [
+        "review-state count interpreted as processing delay",
+        "20-minute incident window described as 15 minutes",
+        "journal excerpt availability misdescribed"
+      ],
+      "audit_model_drafts_available": false
+    },
+    {
+      "engine": "ollama",
+      "posted_to_final_seconds": 66.992,
+      "status": "partial",
+      "investigation_complete": false,
+      "actual_reads": 4,
+      "required_reads": 4,
+      "protected_calls": 0,
+      "read_sha256": [
+        "d30f519a58e283c03632416547e9fd84dad4472b1ea9613b08ddb5f496994e35",
+        "5508596291ba5382aff2b755ff6296353bdf4e4fca225525cd8f9ec78da52aba",
+        "febbaf9fa273db3fea70b544f78563b07b2090a27fadee04cfdc17e6e9fc74ec",
+        "fb806bc8381b5991a8e524948be077859a50dc967074d8761d78b6f1223dfa91"
+      ],
+      "journal_entries": 32,
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "reply_id": "6mrm5crrg3d9pxsi46bqnjkqza",
+      "model_calls": 5,
+      "model_seconds": 56.2099091662094,
+      "repeated_inquiry_plans": 2,
+      "final_model_judgment": false
+    }
+  ],
+  "same_journal_entries": true,
+  "mixed_facts_reproduction": {
+    "fact_kinds": [
+      "diagnostics",
+      "times",
+      "diagnostics",
+      "times",
+      "diagnostics",
+      "times",
+      "diagnostics",
+      "times",
+      "diagnostics",
+      "times",
+      "blocks"
+    ],
+    "mixed_pipeline_issues": [],
+    "diagnostics_only_pipeline_issues": [
+      "diagnostic_pipeline_congestion_unverified"
+    ],
+    "whole_report_issues": [],
+    "all_read_sha_match": true
+  },
+  "cleanup_server": {
+    "path": "/tmp/capstone-service-parity-20261108-r1",
+    "files": 471,
+    "bytes": 7452353,
+    "removed": true
+  },
+  "cleanup_mac": {
+    "path": "/private/tmp/capstone-service-parity-20261108-03wiwzs5/tests.py",
+    "bytes": 4145751,
+    "sha256": "afb18f923a5e444c3653c7b4189d35043a5ecc856670d73e43796ecd47ec5c38",
+    "finished_test_receipt_sha256": "894a9018c6d7d560c7ca3742f4f01039343036e392b6f51c15d919d0fa909f51",
+    "removed": true,
+    "new_packages": 0
+  },
+  "backup_root": "/var/lib/capstone-service-grounding/20261108-readparity74",
+  "rollback_minutes": 15,
+  "dgx_polled": false,
+  "attack_tests": 0,
+  "model_promoted": false,
+  "limitations": [
+    "same historical development incident, paraphrased questions; not independent holdout",
+    "one sample per bot; shared GPU/cache uncontrolled; no causal latency improvement claim",
+    "Native exact-repeat rejection not exercised by this actual chat; isolated tests only",
+    "Native mixed-tools fact-validation gap remains; SDK final decision missing",
+    "Markdown payload checked, not every Mattermost client rendered",
+    "new OS install and actual manual rollback not performed"
+  ]
+}

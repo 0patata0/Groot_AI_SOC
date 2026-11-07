@@ -1,6 +1,6 @@
 # 제한된 서비스 journal 조회
 
-2026-11-08. 기존 `get_system_diagnostics`의 `view="journal"`을 A/B/C 운영에 적용했다. 진단 MCP1.3.0·common1.5.71/query1.19.122이며 원본35B를 유지한다. 아래 초기 격리 시험과 후속 운영 검증은 별도 범위다. [검증 원장](journal-excerpts.validation.json) · [현재 상태](../../STATUS.md).
+2026-11-08. 기존 `get_system_diagnostics`의 `view="journal"`을 A/B/C 운영에 적용했다. 초기 운영 연결 당시 진단 MCP1.3.0·common1.5.71/query1.19.122였으며 현재 버전은 STATUS를 따른다. 원본35B를 유지한다. 아래 초기 격리 시험과 후속 운영 검증은 별도 범위다. [검증 원장](journal-excerpts.validation.json) · [현재 상태](../../STATUS.md).
 
 정제 이력에는 본문이 없어 모델이 오류 원문을 요청해도 실제 근거를 가져오지 못했다. 이 기능은 실제 journal의 메시지를 읽되 비밀 값과 비정상 형식을 처리한 `message_excerpt`를 제공한다. 기존 메타데이터를 원문처럼 재작성하지 않는다.
 

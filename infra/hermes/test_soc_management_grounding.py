@@ -380,6 +380,23 @@ class Grounding(unittest.TestCase):
         self.assertEqual(next_request['reasoning_effort'],'none');self.assertFalse(next_request['extra_body']['think'])
         self.assertEqual(self.call(self.agent,**self.kw),'original')
 
+    def test_service_repeat_gets_bounded_report_repair_without_forcing_same_read(self):
+        self.completed.append('get_system_diagnostics')
+        self.agent._capstone_service_repeat_turn='turn-a'
+        self.kw['assistant_message'].content='추가 조회 묶음은 동일 조회를 포함해 전체 미실행입니다.'
+        self.agent._capstone_inquiry_retries=('turn-a',(3,))
+        self.kw['codex_ack_continuations']=1
+        result=self.call(self.agent,**self.kw)
+        self.assertEqual(result.action,'continue');self.assertEqual(result.codex_ack_continuations,2)
+        self.assertIsNone(self.agent._capstone_service_repeat_turn)
+        self.assertIn('service_completed_read_repeat',self.agent._capstone_review_feedback['issues'])
+        self.assertEqual(self.agent._capstone_factual_turn,'turn-a')
+        # No fake dispatch or completion is appended by a rejected plan.
+        self.assertEqual(self.completed,['get_system_diagnostics'])
+        self.agent._capstone_service_repeat_turn='turn-a'
+        self.kw['codex_ack_continuations']=2
+        self.assertEqual(self.call(self.agent,**self.kw),'original')
+
     def test_actual_read_or_native_pending_tool_does_not_force_more_calls(self):
         self.completed.append('search_suricata_alerts')
         self.kw['assistant_message'].content='반환 표본을 확인했습니다.\nMANAGEMENT_STATUS: monitor'

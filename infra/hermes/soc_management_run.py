@@ -832,12 +832,7 @@ def incident_binding_violations(text, facts):
 
 
 def event_field_violations(text, facts):
-    """Check explicit field/namespace claims, not attack or benign judgments.
-
-    Only known correlator IDs absent from the observed sensor namespace are
-    rejected. Numeric collisions are ambiguous, not proof of a wrong claim.
-    This is a bounded check of common explicit claims, not full prose validation.
-    """
+    'Check explicit field/namespace claims, not attack or benign judgments.'
     events = [f for f in facts if f.get('kind') == 'events']
     if not events or not isinstance(text, str):
         return []
@@ -974,12 +969,7 @@ def incident_impact_missing(decision,requirements,receipts,linked_response=False
 
 
 def disposition_citation_violations(text, successful_reads):
-    """Check model citations against completed native calls, for every disposition.
-
-    An unresolved assessment is not permission to invent evidence. Missing
-    citations cause a model-selected read/rewrite, never a fabricated receipt.
-    The controller independently validates the complete disposition schema.
-    """
+    'Check model citations against completed native calls, for every disposition.'
     if successful_reads is None:
         return []
     issues = []
@@ -1815,11 +1805,7 @@ def completed_citation_request(request, successful_reads):
 
 
 def completed_web_review_request(request, agent, successful_reads, *, requirements_complete=False, component_reads=()):
-    """Lower thinking only for a completed-evidence, read-only web review.
-
-    This changes model computation, not the disposition or missing-evidence
-    checks. Protected actions, incomplete reads and other routes stay unchanged.
-    """
+    'Require actual completed sensor reads before compact web review.'
     required = {'mcp__security_events__get_web_service_target',
         'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_web_access'}
     if (requirements_complete is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
@@ -1840,12 +1826,7 @@ def completed_web_review_request(request, agent, successful_reads, *, requiremen
 
 
 def arm_literal_repair(agent, turn, issues):
-    """One verified read-only formatting/evidence correction, never risk reasoning.
-
-    The initial assessment keeps its existing reasoning profile. Unknown issues,
-    missing observations and protected changes do not enter this fast phase.
-    Tools, messages and the final evidence/closure checks remain unchanged.
-    """
+    'One verified read-only formatting/evidence correction, never risk reasoning.'
     build = getattr(agent, '_build_api_kwargs', None)
     if (os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or not callable(build)
             or not issues or not set(issues) <= LITERAL_REPAIR_ISSUES):
@@ -2049,11 +2030,7 @@ def read_ledger_view(rows):
 
 
 def review_execution_view(agent, rows):
-    """Keep native wrap-up and dispatch failures when compacting API history.
-
-    No log/prose can activate these controls. This is navigation, not evidence
-    completeness, a disposition, a retry prohibition or a new time limit.
-    """
+    'Expose native wrap-up and actual dispatch errors; never evidence or approval.'
     ledger=read_ledger_view(rows);failures={}
     for i,row in enumerate(ledger['rows'] if ledger else []):
         key=(row['tool'],json.dumps(row['arguments'],sort_keys=True))
@@ -2104,11 +2081,7 @@ def required_sensor_input_rejection(name, arguments, requirements, receipts):
 
 
 def chat_read_schema(name, schema):
-    """Expand exact registered time conditions for provider grammars.
-
-    Original registry validation still runs before dispatch. Only this exact
-    known conditional shape is projected; unknown schemas remain unchanged.
-    """
+    'Project verified registry conditions into equivalent model grammar branches.'
     if name in {'mcp__security_events__'+n for n in
             ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}:
         if (schema.get('type')!='object' or schema.get('additionalProperties') is not False
@@ -2454,6 +2427,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         if inquiry:
             agent._capstone_more_evidence_turn=None
             issues.append('model_requested_additional_evidence')
+        if isinstance(turn,str) and getattr(agent,'_capstone_service_repeat_turn',None)==turn:
+            agent._capstone_service_repeat_turn=None
+            issues.append('service_completed_read_repeat')
         if completed_calls and management_status(content) is None:
             issues.append('missing_or_invalid_management_status')
         verify=os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
@@ -2600,7 +2576,7 @@ def chat_lookup_harness():
 
 
 def literal_chat_lookup(context, ledger, receipts, harness):
-    """Render complete plain reads; never invent a risk/incident decision."""
+    'Render complete plain reads without risk or incident decisions.'
     if not context or not context['tools'] or not ledger or len(ledger)>32 or len(receipts)!=len(ledger):return None
     question=context['request']
     comparison=getattr(harness,'systemd_comparison_request',lambda _:False)(question)
@@ -2885,12 +2861,7 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
 
 
 def management_read_request(request, agent, *, pending=False):
-    """Encode a pending, catalog-bound read choice; native still dispatches it.
-
-    Only the controller's verify process and current authenticated requirements
-    may enter this phase. No text/log parser can arm it, add a tool or execute a
-    change. The next ordinary assessment retains its original model profile.
-    """
+    'Encode a pending, catalog-bound read choice; native still dispatches it.'
     agent._capstone_management_selection = None
     if (pending is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
             or getattr(agent, 'provider', None) != 'custom'
@@ -3150,7 +3121,7 @@ def compact_controller_context():
 
 
 def management_report_request(request, agent, snapshot):
-    """Current-run read-or-report schema; never suppress additional inquiry."""
+    'Bind current-run reads and reports; allow new evidence.'
     inquiry=(isinstance(snapshot,dict) and isinstance(snapshot.get('turn'),str) and bool(snapshot['turn'])
         and getattr(agent,'_capstone_full_review_turn',None)==snapshot['turn'])
     service_chat=bool(os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and isinstance(snapshot,dict)
@@ -3274,7 +3245,8 @@ def management_report_request(request, agent, snapshot):
             result['max_tokens']=1024;result.pop('max_completion_tokens',None)
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':copy.deepcopy(schema),
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
-                'receipt_count':len(receipts),'additional_inquiry':True}
+                'receipt_count':len(receipts),'additional_inquiry':True,
+                'completed_service_reads':[{'tool':r['tool'],'arguments':r['arguments']} for r in service['untrusted_completed_reads']]}
             agent._capstone_review_feedback=None
             return result
         if service is not None:
@@ -3282,7 +3254,9 @@ def management_report_request(request, agent, snapshot):
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,
-                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback,structured_followups=True)
+                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback,structured_followups=True,execution_rejections=(
+                    getattr(agent,'_capstone_service_rejections',(None,[]))[1]
+                    if getattr(agent,'_capstone_service_rejections',(None,[]))[0]==snapshot['turn'] else None))
             result['max_tokens']=1024;result.pop('max_completion_tokens',None)
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':schema,
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
@@ -3438,6 +3412,19 @@ def management_selection_response(response, selection, agent):
                 or tool_input_rejection(name,arguments,selection['catalog'][name])):
             raise ValueError('management_selection_read_not_authorized')
         seen.add(key)
+    repeated=(diagnostic_contract().service_repeated_calls(value['calls'],selection['completed_service_reads'])
+        if selection.get('completed_service_reads') else [])
+    if repeated:
+        rejection={'code':'already_completed_read','calls':repeated,'dispatched':False}
+        prior=getattr(agent,'_capstone_service_rejections',(None,[]))
+        rows=prior[1] if prior[0]==agent._current_turn_id else []
+        agent._capstone_service_rejections=(agent._current_turn_id,(rows+[rejection])[-2:])
+        agent._capstone_full_review_turn=agent._capstone_more_evidence_turn=None
+        agent._capstone_service_repeat_turn=agent._current_turn_id
+        selection['repeated_read_rejected']=True
+        result=copy.deepcopy(response)
+        result.choices[0].message.content='추가 조회 묶음은 이미 성공한 동일 조회를 포함해 실행하지 않았습니다. 확보한 근거로 판단을 이어가야 합니다.'
+        return result,0
     result=copy.deepcopy(response)
     result.choices[0].message.tool_calls=[ChatCompletionMessageToolCall(
         id='call_soc_read_'+uuid.uuid4().hex,type='function',function={
@@ -3503,7 +3490,8 @@ def management_selection_call_wrapper(original):
             return verdict
         sys.stderr.write('management_read_selection '+json.dumps({'accepted':True,'selected_reads':count,
             'provider_seconds':round(time.monotonic()-started,6),'native_dispatch':count>0,
-            'report_projection':count==0 and 'report_facts' in selection and getattr(agent,'_capstone_more_evidence_turn',None)!=selection['turn'],
+            'report_projection':count==0 and 'report_facts' in selection and not selection.get('repeated_read_rejected') and getattr(agent,'_capstone_more_evidence_turn',None)!=selection['turn'],
+            'repeated_read_rejected':bool(selection.get('repeated_read_rejected')),
             'indexed_reads':'indexed_options' in selection,'compact_report':'compact_citations' in selection,
             'additional_inquiry':bool(selection.get('additional_inquiry')),
             'literal_report_repair':bool(selection.get('literal_report_repair')),

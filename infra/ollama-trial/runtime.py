@@ -331,14 +331,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                   for name,t in readable.items()}
                     schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
                         facts=harness.facts_for(report['calls']),read_schemas={n:t.args_schema for n,t in readable.items()})
-                    messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True)
-                    if report.get('service_inquiry_rejections'):
-                        body=json.loads(messages[1]['content'])
-                        body['execution_rejections']=report['service_inquiry_rejections'][-2:]
-                        messages[1]['content']=canonical(body)
-                        messages[0]['content']+=(' 같은 답변 안에서 이미 성공한 동일 읽기는 재실행하지 않습니다. '
-                            '거절된 계획은 실행되지 않았으므로 새 근거가 아닙니다. 누락 근거를 실제 제공하는 다른 읽기/인자를 선택하거나 '
-                            '이미 확인한 사실과 현재 도구가 제공하지 않는 근거를 구분해 보고하세요. 정상이나 해결됨으로 대신하지 마세요.')
+                    messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True,
+                        execution_rejections=report.get('service_inquiry_rejections'))
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(messages),90)
                     # Preserve generated JSON, including invalid choices, before
                     # schema validation or rendering. Never store reasoning.
@@ -373,10 +367,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     # The read-only service phase has no intervening writes.
                     # Reject the whole batch if it repeats a successful call;
                     # failed reads and changed input/page/limit remain eligible.
-                    done={(alias(c['server'],c['name']),canonical(c['arguments'])) for c in report['calls']
+                    done=[{'tool':alias(c['server'],c['name']),'arguments':c['arguments']} for c in report['calls']
                           if not c.get('is_error') and isinstance(c.get('result'),str)
-                          and c.get('result_sha256')==hashlib.sha256(c['result'].encode()).hexdigest()}
-                    repeated=[c for c in plan['calls'] if (c['tool'],canonical(c['arguments'])) in done]
+                          and c.get('result_sha256')==hashlib.sha256(c['result'].encode()).hexdigest()]
+                    repeated=harness.CONTRACT.service_repeated_calls(plan['calls'],done)
                     if repeated:
                         rejection={'code':'already_completed_read','calls':repeated,'dispatched':False}
                         history=report.setdefault('service_inquiry_rejections',[])

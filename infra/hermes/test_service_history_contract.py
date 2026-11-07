@@ -22,6 +22,20 @@ def catalog():
     return {'tools':[{'function':{'name':NAME,'parameters':m.tools()[0]['inputSchema']}}]}
 
 
+class CompletedReadIdentity(unittest.TestCase):
+    def test_exact_match_preserves_type_scope_and_original_objects(self):
+        done=[{'tool':NAME,'arguments':{'target':'b:management','limit':50}}]
+        same={'tool':NAME,'arguments':{'limit':50,'target':'b:management'}}
+        different=[{'tool':NAME,'arguments':{'target':'b:management','limit':20}},
+                   {'tool':NAME,'arguments':{'target':'a:vector','limit':50}},
+                   {'tool':NAME,'arguments':{'target':'b:management','limit':50,'view':'journal'}},
+                   {'tool':'other','arguments':same['arguments']}]
+        before=copy.deepcopy([done,same,different]);result=c.service_repeated_calls([same]+different,done)
+        self.assertEqual(result,[same]);self.assertEqual([done,same,different],before)
+        result[0]['arguments']['limit']=1;self.assertEqual(same['arguments']['limit'],50)
+        self.assertEqual(c.service_repeated_calls([same],[]),[])
+
+
 class DiagnosticDisplayRepeats(unittest.TestCase):
     def row(self, **changes):
         return {'kind':'diagnostics','diagnostic_mode':'runtime',
@@ -752,10 +766,62 @@ class ServiceReport(unittest.TestCase):
         lease=a._capstone_management_selection
         response=ChatCompletion(id='actual-read-selection',created=1,model='qwen3.6:35b',object='chat.completion',choices=[{
             'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps({
-                'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'target':'b:management'}}],'report':None})}}])
+                'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'target':'b:management','limit':50}}],'report':None})}}])
         decoded,count=w.management_selection_response(response,lease,a)
         self.assertEqual(count,1)
         self.assertEqual(decoded.choices[0].message.tool_calls[0].function.name,NAME)
+    def inquiry_fixture(self):
+        from openai.types.chat import ChatCompletion
+        def response(value):
+            return ChatCompletion(id='repeat-test',created=1,model='qwen3.6:35b',object='chat.completion',choices=[{
+                'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(value)}}])
+        req,a,snap,wire,env=self.wire();lease=a._capstone_management_selection
+        w.management_selection_response(response({'request_nonce':lease['nonce'],'more_evidence':True,
+            'report':None,'read_tools':[NAME]}),lease,a)
+        with patch.dict(w.os.environ,env,clear=True):w.management_report_request(req,a,snap)
+        return req,a,snap,env,response
+
+    def test_native_duplicate_batch_is_not_dispatched_and_feedback_keeps_receipts(self):
+        req,a,snap,env,response=self.inquiry_fixture();lease=a._capstone_management_selection
+        same={'tool':NAME,'arguments':{'target':'b:management'}}
+        new={'tool':NAME,'arguments':{'target':'b:management','limit':50}}
+        value={'request_nonce':lease['nonce'],'calls':[new,same],'report':None};before=copy.deepcopy(value)
+        decoded,count=w.management_selection_response(response(value),lease,a)
+        self.assertEqual(count,0);self.assertIsNone(decoded.choices[0].message.tool_calls)
+        self.assertTrue(lease['repeated_read_rejected']);self.assertEqual(value,before)
+        self.assertIsNone(a._capstone_full_review_turn);self.assertIsNone(a._capstone_more_evidence_turn)
+        self.assertEqual(a._capstone_service_repeat_turn,'current')
+        self.assertEqual(a._capstone_service_rejections[1],[{'code':'already_completed_read','calls':[same],'dispatched':False}])
+        with patch.dict(w.os.environ,env,clear=True):wire=w.management_report_request(req,a,snap)
+        body=json.loads(wire['messages'][1]['content'])
+        self.assertTrue(a._capstone_management_selection['service_report'])
+        self.assertEqual(body['untrusted_completed_reads'],snap['service_context']['untrusted_completed_reads'])
+        self.assertEqual(body['execution_rejections'],a._capstone_service_rejections[1])
+        self.assertIn('전체 미실행',wire['messages'][0]['content'])
+        a._capstone_service_rejections=('other-turn',[{'code':'untrusted_old'}])
+        with patch.dict(w.os.environ,env,clear=True):wire=w.management_report_request(req,a,snap)
+        self.assertNotIn('execution_rejections',json.loads(wire['messages'][1]['content']))
+
+    def test_new_scope_and_non_service_lease_can_still_select_actual_reads(self):
+        for arguments,remove in [({'target':'b:management','limit':50},False),({'target':'a:vector'},False),
+                                 ({'target':'b:management'},True)]:
+            with self.subTest(arguments=arguments,non_service=remove):
+                req,a,snap,env,response=self.inquiry_fixture();lease=a._capstone_management_selection
+                if remove:lease.pop('completed_service_reads')
+                decoded,count=w.management_selection_response(response({'request_nonce':lease['nonce'],
+                    'calls':[{'tool':NAME,'arguments':arguments}],'report':None}),lease,a)
+                self.assertEqual(count,1);self.assertEqual(json.loads(decoded.choices[0].message.tool_calls[0].function.arguments),arguments)
+                self.assertFalse(lease.get('repeated_read_rejected',False))
+
+    def test_invalid_new_or_repeated_input_is_still_rejected_before_deduplication(self):
+        from jsonschema import ValidationError
+        req,a,snap,env,response=self.inquiry_fixture();lease=a._capstone_management_selection
+        for args in ({'target':'b:management','shell':'id'},{'target':'b:management','limit':51}):
+            with self.subTest(args=args),self.assertRaises(ValidationError):
+                w.management_selection_response(response({'request_nonce':lease['nonce'],
+                    'calls':[{'tool':NAME,'arguments':args}],'report':None}),lease,a)
+        self.assertFalse(hasattr(a,'_capstone_service_rejections'))
+
     def test_additional_inquiry_exposes_only_model_selected_argument_schemas(self):
         from openai.types.chat import ChatCompletion
         from jsonschema import Draft202012Validator,ValidationError

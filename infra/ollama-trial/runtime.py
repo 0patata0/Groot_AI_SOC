@@ -315,22 +315,33 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 report['required_service_reads']={'selected':selection['indexes'],'count':len(options)}
                 question=harness.incident_observation_prompt(current,report['calls'])+harness.read_background(question,current)
             async def service_synthesis(feedback=None):
+                nonlocal selection_active
                 if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')!='1':return None
-                service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
-                    report['at_kst'],harness.service_history_receipts(report['calls']),
-                    background=service_background) if service_plan and
-                    len(report['calls'])==len(harness.service_history_receipts(report['calls'])) else None)
-                if service_context is not None:
+                # A request for more evidence must reach real read dispatch,
+                # rather than replaying the original question through agent.run.
+                for _ in range(steps):
+                    service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
+                        report['at_kst'],harness.service_history_receipts(report['calls']),
+                        background=service_background) if service_plan and
+                        len(report['calls'])==len(harness.service_history_receipts(report['calls'])) else None)
+                    if service_context is None:return None
                     citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
-                    descriptions={t.name:harness.CONTRACT.service_tool_description(t.description,t.args_schema) for t in agent.adapter.tools
-                                  if harness.EVIDENCE.allowed(t.name,'verify')}
+                    readable={t.name:t for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')}
+                    descriptions={name:harness.CONTRACT.service_tool_description(t.description,t.args_schema)
+                                  for name,t in readable.items()}
                     schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
-                        facts=harness.facts_for(report['calls']),read_schemas={t.name:t.args_schema for t in agent.adapter.tools
-                            if t.name in descriptions})
-                    value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(
-                        harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True)),90)
-                    # Private generated JSON, not internal reasoning or reusable
-                    # evidence. Retain even a schema-invalid proposed follow-up.
+                        facts=harness.facts_for(report['calls']),read_schemas={n:t.args_schema for n,t in readable.items()})
+                    messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True)
+                    if report.get('service_inquiry_rejections'):
+                        body=json.loads(messages[1]['content'])
+                        body['execution_rejections']=report['service_inquiry_rejections'][-2:]
+                        messages[1]['content']=canonical(body)
+                        messages[0]['content']+=(' 같은 답변 안에서 이미 성공한 동일 읽기는 재실행하지 않습니다. '
+                            '거절된 계획은 실행되지 않았으므로 새 근거가 아닙니다. 누락 근거를 실제 제공하는 다른 읽기/인자를 선택하거나 '
+                            '이미 확인한 사실과 현재 도구가 제공하지 않는 근거를 구분해 보고하세요. 정상이나 해결됨으로 대신하지 마세요.')
+                    value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(messages),90)
+                    # Preserve generated JSON, including invalid choices, before
+                    # schema validation or rendering. Never store reasoning.
                     report.setdefault('service_report_audit', []).append({
                         'response': json.loads(json.dumps(value, ensure_ascii=False)),
                         'repair': feedback is not None,
@@ -343,7 +354,45 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         review=value['report'];indexes=review.pop('evidence_indexes')
                         review['evidence_tools']=[citations[i] for i in indexes]
                         return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
-                return None
+                    selected={n:readable[n] for n in value['read_tools']}
+                    call_schema=harness.selection_schema({n:t.args_schema for n,t in selected.items()},budget.limit-budget.used)
+                    nonce=os.urandom(16).hex()
+                    call_schema['properties'].update(request_nonce={'const':nonce},report={'type':'null'})
+                    call_schema['required']+=['request_nonce','report']
+                    plan=await asyncio.wait_for(llm.with_structured_output(call_schema,method='json_schema').ainvoke(
+                        harness.CONTRACT.service_inquiry_messages(service_context,
+                            {n:descriptions[n] for n in selected},citations,call_schema,
+                            {'model_calls_used':meter.used,'model_calls_limit':steps,
+                             'tool_calls_used':budget.used,'tool_calls_limit':budget.limit})),90)
+                    report['service_report_audit'].append({'phase':'inquiry','response':json.loads(json.dumps(plan,ensure_ascii=False)),
+                        'read_result_sha256':[c.get('result_sha256') for c in report['calls']]})
+                    report['service_report_audit']=report['service_report_audit'][-12:]
+                    plan,removed=harness.validated_selection(plan,call_schema)
+                    if removed:report['deduplicated_read_calls']=report.get('deduplicated_read_calls',0)+removed
+                    # The read-only service phase has no intervening writes.
+                    # Reject the whole batch if it repeats a successful call;
+                    # failed reads and changed input/page/limit remain eligible.
+                    done={(alias(c['server'],c['name']),canonical(c['arguments'])) for c in report['calls']
+                          if not c.get('is_error') and isinstance(c.get('result'),str)
+                          and c.get('result_sha256')==hashlib.sha256(c['result'].encode()).hexdigest()}
+                    repeated=[c for c in plan['calls'] if (c['tool'],canonical(c['arguments'])) in done]
+                    if repeated:
+                        rejection={'code':'already_completed_read','calls':repeated,'dispatched':False}
+                        history=report.setdefault('service_inquiry_rejections',[])
+                        if rejection in history:
+                            report['stop_reason']='repeated_service_inquiry_without_new_evidence'
+                            raise RuntimeError(report['stop_reason'])
+                        history.append(rejection)
+                        continue
+                    before=len(report['calls']);selection_active=True
+                    try:
+                        for choice in plan['calls']:
+                            await selected[choice['tool']].ainvoke(choice['arguments'])
+                    finally:selection_active=False
+                    require(len(report['calls'])>before,'service_inquiry_no_completed_read')
+                    report['service_inquiry_count']=report.get('service_inquiry_count',0)+1
+                    feedback=None  # New actual receipts require a fresh judgment.
+                raise RuntimeError('service_inquiry_budget_exhausted')
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:

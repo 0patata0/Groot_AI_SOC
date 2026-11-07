@@ -1,0 +1,246 @@
+{
+  "schema": 1,
+  "scope": "frozen_single_pass_report_generation_not_full_investigation",
+  "started_at_kst": "2026-11-08T01:58:46.326008+09:00",
+  "finished_at_kst": "2026-11-08T02:05:58.178398+09:00",
+  "model_digests": {
+    "soc-qwen36:35b-operator-q4km-20261103": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+    "qwen3.6:35b": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "soc-qwen36:35b-base-q4km-20261027": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad"
+  },
+  "options": {
+    "temperature": 0,
+    "top_p": 0.95,
+    "num_predict": 2048,
+    "num_ctx": 262144
+  },
+  "think": false,
+  "common": "1.5.68",
+  "query": "1.19.121",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "e8adbf47f84e5cb2f2375e485c4f32af5b0e21db6c4a8456e663c16a2b1250c8",
+    "infra/hermes/soc_management_run.py": "094401338125fda4bde71fdf4e583af68201d0da2d629ed5bf56471a7380834e",
+    "infra/ollama-trial/harness.py": "806425662664ce9954329ecab6fda905449f2032c2237217d8dd2feee7a49b34",
+    "infra/ollama-trial/runtime.py": "0eabd73434a9cae268dfe6b18cf8c6ffdf8bfa5e4f18a4d3e6a5e143deba50cf"
+  },
+  "new_mcp_calls": 0,
+  "chat_posts": 0,
+  "protected_calls": 0,
+  "production_model_changed": false,
+  "dgx_polled": false,
+  "rows": [
+    {
+      "arm": 0,
+      "case": "hermes66",
+      "input_sha256": "baf44ee8d3d295f0ef42aa654ecf7ba7a283371d90bd3662388b466fec013b0d",
+      "seconds": 46.13407839182764,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "e04c25172d717a263f4cc0717ee9ac9acd283bf86dbb4a88de48dbc4749f5156",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 0,
+      "case": "ollama66",
+      "input_sha256": "cbb01e3d2d16c1169e7af21597b1e1938c56e3fd7fe17e5f016ee826e9e4f051",
+      "seconds": 7.8300324021838605,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "848febb213e9c780c80de944b6924610b98e9becf2ce980753b914887be339d4",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 0,
+      "case": "synthetic_backlog",
+      "input_sha256": "afb2c6eaabad9d122f74ffaa768af9f1052585711cb8f4d76f7acc2409d72e35",
+      "seconds": 7.7105619283393025,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "6d97b9c47ac033d3dd5942285b02a14dea1d674db4d78aada08f96e4b9988923",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 0,
+      "case": "hermes69",
+      "input_sha256": "39d46d15aef355e71170a970f6c912d45ef17bd28abacfe8f603d9233612dd1d",
+      "seconds": 9.012437435798347,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "4ae02110bf5be4594a796e434f6c0d72d27fa5c3af55cf341dcdf1e12cee2d28",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 0,
+      "case": "ollama69",
+      "input_sha256": "2fd84acf269cf60fb194d94ad704281859cc1abba5fe2762a7f830e96919a296",
+      "seconds": 7.663982386235148,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "14befa72310217bb00dd14d7db58ba6c56101620a446ba20ee4b844d005dacf7",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 1,
+      "case": "hermes66",
+      "input_sha256": "baf44ee8d3d295f0ef42aa654ecf7ba7a283371d90bd3662388b466fec013b0d",
+      "seconds": 55.25046209990978,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [
+        "diagnostic_pipeline_congestion_unverified",
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "output_file_sha256": "4f1656b0360c91da71ab55c814489abbe5676e080ba2bef80f86109b1b556324",
+      "manual_outcome": "unsupported_claim",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 1,
+      "case": "ollama66",
+      "input_sha256": "cbb01e3d2d16c1169e7af21597b1e1938c56e3fd7fe17e5f016ee826e9e4f051",
+      "seconds": 11.962751106824726,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "output_file_sha256": "b3d4b3e5c04fc8f4394627a8ca9b951b905bde5e2c53d48feeb16a47c7697861",
+      "manual_outcome": "unsupported_claim",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 1,
+      "case": "synthetic_backlog",
+      "input_sha256": "afb2c6eaabad9d122f74ffaa768af9f1052585711cb8f4d76f7acc2409d72e35",
+      "seconds": 12.0904108020477,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [],
+      "output_file_sha256": "fcac825ae99951a8bfb3596810c3023b3798691a91b2b74022fa231def031b81",
+      "manual_outcome": "bounded_observation_consistent_synthetic_only",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 1,
+      "case": "hermes69",
+      "input_sha256": "39d46d15aef355e71170a970f6c912d45ef17bd28abacfe8f603d9233612dd1d",
+      "seconds": 9.845846206881106,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "13717ad4a922fe15bc186170a0b72df6b5a2b05f9a3ea67ceea49984177fb07e",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 1,
+      "case": "ollama69",
+      "input_sha256": "2fd84acf269cf60fb194d94ad704281859cc1abba5fe2762a7f830e96919a296",
+      "seconds": 9.245335830841213,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "d51f05b74d09581985810ac9ee9b1f85e5902653121dac9c9c905327b7682749",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 2,
+      "case": "hermes66",
+      "input_sha256": "baf44ee8d3d295f0ef42aa654ecf7ba7a283371d90bd3662388b466fec013b0d",
+      "seconds": 51.320544690825045,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "output_file_sha256": "c41df4b37efd2343bdc662ab2af2fdacd6896239af7438d0848c4a5f5e45c1d8",
+      "manual_outcome": "unsupported_claim",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 2,
+      "case": "ollama66",
+      "input_sha256": "cbb01e3d2d16c1169e7af21597b1e1938c56e3fd7fe17e5f016ee826e9e4f051",
+      "seconds": 10.821247499901801,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "output_file_sha256": "da5885f647644119439a3b419ab4fa6c94efe24e64815fe527b29244ec327a10",
+      "manual_outcome": "unsupported_claim",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 2,
+      "case": "synthetic_backlog",
+      "input_sha256": "afb2c6eaabad9d122f74ffaa768af9f1052585711cb8f4d76f7acc2409d72e35",
+      "seconds": 10.615492545068264,
+      "schema_valid": true,
+      "more_evidence": false,
+      "guard_issues": [],
+      "output_file_sha256": "4490c543bae253bc3c46ff1fcfaafffd3670de2a092e2e028a38d655140d2ada",
+      "manual_outcome": "bounded_observation_consistent_synthetic_only",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 2,
+      "case": "hermes69",
+      "input_sha256": "39d46d15aef355e71170a970f6c912d45ef17bd28abacfe8f603d9233612dd1d",
+      "seconds": 9.166082465089858,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "dfaeea6bd4a6883903b9fd66ded431f250e10869174c22a5700b75c0259caf3b",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    },
+    {
+      "arm": 2,
+      "case": "ollama69",
+      "input_sha256": "2fd84acf269cf60fb194d94ad704281859cc1abba5fe2762a7f830e96919a296",
+      "seconds": 8.205400869250298,
+      "schema_valid": true,
+      "more_evidence": true,
+      "output_file_sha256": "c2cd719124e9f2b8a7ee2ff1f86b7b1db18a986651dc590f874b9de893e2d54a",
+      "manual_outcome": "additional_read_not_executed",
+      "full_investigation_pass": false
+    }
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-08T02:11:35.364413+09:00",
+    "units": {
+      "ollama": {
+        "MainPID": "715615",
+        "Result": "success",
+        "NRestarts": "0",
+        "ActiveState": "active"
+      },
+      "capstone-service-model-engine-20261108": {
+        "MainPID": "0",
+        "Result": "success",
+        "NRestarts": "0",
+        "ActiveState": "inactive"
+      },
+      "capstone-service-model-eval-20261108": {
+        "MainPID": "0",
+        "Result": "success",
+        "NRestarts": "0",
+        "ActiveState": "inactive"
+      },
+      "capstone-service-model-guard-20261108": {
+        "MainPID": "0",
+        "Result": "success",
+        "NRestarts": "0",
+        "ActiveState": "inactive"
+      }
+    },
+    "verified_removed_files": 23,
+    "removed_bytes": 641352,
+    "model_store_preserved": true
+  }
+}

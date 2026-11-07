@@ -1,0 +1,245 @@
+{
+  "checked_at_kst": "2026-11-08T02:25:18.783931+09:00",
+  "common": "1.5.68",
+  "query": "1.19.121",
+  "model": "qwen3.6:35b",
+  "source_sha256": {
+    "infra/ollama-trial/runtime.py": "443e6655261ddbff50a814bbe45b5a69db5cf076264cf28885134456057e71dd",
+    "infra/ollama-trial/test_service_history.py": "45cb25bea1fc3618dbd074208849c3d5d971b9bb51aae3625da0e7153fbfa186"
+  },
+  "tests": {
+    "files": 469,
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 481,
+        "unique": 481,
+        "skip": 0
+      },
+      "service": {
+        "rc": 0,
+        "count": 70,
+        "unique": 70,
+        "skip": 0
+      },
+      "claims": {
+        "rc": 0,
+        "count": 53,
+        "unique": 53,
+        "skip": 0
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 291,
+        "unique": 291,
+        "skip": 0,
+        "revision": "r2"
+      },
+      "query": {
+        "rc": 0,
+        "count": 408,
+        "unique": 408,
+        "skip": 0
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "unique": 79,
+        "skip": 0
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62,
+        "skip": 0
+      }
+    },
+    "unique": 1444,
+    "skip": 0,
+    "validation_scope": "Initial 7-profile suite; SDK-only source revision then 291 SDK tests rerun. Other profiles reference unchanged covered sources."
+  },
+  "direct_trials": [
+    {
+      "candidate": "live-result.json",
+      "status": "partial",
+      "seconds": 112.65061244508252,
+      "model_calls": 12,
+      "actual_reads": 11,
+      "extra_read_rounds": 5,
+      "stop_reason": null,
+      "protected_calls": 0,
+      "result_sha256": "354c0c7a0f6176b43d73c33b7ea42dc7f0f1ffe06252737d3639575f4cc85eff",
+      "investigation_complete": false
+    },
+    {
+      "candidate": "live-result-r2.json",
+      "status": "partial",
+      "seconds": 38.73096661712043,
+      "model_calls": 5,
+      "actual_reads": 3,
+      "extra_read_rounds": 0,
+      "stop_reason": "repeated_service_inquiry_without_new_evidence",
+      "protected_calls": 0,
+      "result_sha256": "97ddc98103a0b86debcc90ffd60b55f980b310ed182930b4c36b2960bb186278",
+      "investigation_complete": false
+    }
+  ],
+  "actual_chat": [
+    {
+      "case": "natural_time",
+      "source_id": "x6xsc3hfpjgj7q1wkuicqq4tuo",
+      "reply_id": "985k6yraijdo58sruxnzu4fure",
+      "chat_seconds": 78.365,
+      "status": "partial",
+      "actual_reads": 0,
+      "model_calls": 3,
+      "protected_calls": 0,
+      "read_sha256": [],
+      "inquiry_drafts": 0,
+      "markdown_tables": 0,
+      "fenced_code": false,
+      "investigation_complete": false,
+      "evidence_sha_verified": true
+    },
+    {
+      "case": "iso_time",
+      "source_id": "nasxqj3asigdib9irdwujp6zsh",
+      "reply_id": "tbjyqw58btr8bnwjgz9sdszasy",
+      "chat_seconds": 41.642,
+      "status": "partial",
+      "actual_reads": 3,
+      "model_calls": 5,
+      "protected_calls": 0,
+      "read_sha256": [
+        "02a221d150e77723fd0a580eeeca638307de2e1557c6c49a77916b21c69ec6a7",
+        "cfdd0c3d0075fe478995e4a69c5bb0c0448aa18de4dd86d3949426dd5c2a8db2",
+        "9740b2afe4e2437e47cfbd3fbd927a27bdc0cc236b588d8d3ba874ea02e36244"
+      ],
+      "inquiry_drafts": 2,
+      "markdown_tables": 1,
+      "fenced_code": false,
+      "investigation_complete": false,
+      "evidence_sha_verified": true
+    }
+  ],
+  "deployment": {
+    "at_kst": "2026-11-08T02:19:32.842282+09:00",
+    "query": "1.19.121",
+    "common": "1.5.68",
+    "manifest": 15,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true,
+    "hermes_unchanged": true
+  },
+  "final_health": {
+    "at_kst": "2026-11-08T02:25:18.783931+09:00",
+    "query": "1.19.121",
+    "common": "1.5.68",
+    "manifest": 15,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true,
+    "hermes_unchanged": true
+  },
+  "jobs": {
+    "x6xsc3hfpjgj7q1wkuicqq4tuo": [
+      [
+        "ollama",
+        "lead",
+        "done"
+      ]
+    ],
+    "nasxqj3asigdib9irdwujp6zsh": [
+      [
+        "ollama",
+        "lead",
+        "done"
+      ]
+    ]
+  },
+  "cleanup": {
+    "b_trials": {
+      "at_kst": "2026-11-08T02:20:34.723180+09:00",
+      "verified_removed": [
+        {
+          "root": "/var/lib/capstone-service-inquiry-trial/20261108",
+          "files": 7,
+          "bytes": 98932,
+          "unit": {
+            "MainPID": "0",
+            "Result": "success",
+            "ActiveState": "inactive"
+          }
+        },
+        {
+          "root": "/var/lib/capstone-service-inquiry-trial/20261108-r2",
+          "files": 7,
+          "bytes": 74320,
+          "unit": {
+            "MainPID": "0",
+            "Result": "success",
+            "ActiveState": "inactive"
+          }
+        }
+      ],
+      "operating_files_preserved": true
+    },
+    "b_fixture": {
+      "files": 469,
+      "bytes": 7381215,
+      "operating_files_preserved": true
+    },
+    "mac": {
+      "at_kst": "2026-11-08T02:21:07.520534+09:00",
+      "path_absent": true,
+      "files": 2,
+      "bytes": 4292433,
+      "preceding_process_check_exit": 0,
+      "matching_processes": 0,
+      "local_evidence_and_user_files_preserved": true
+    }
+  },
+  "unresolved": [
+    "compact_natural_kst_time_range_does_not_bind_required_reads",
+    "complex_cause_and_impact_semantics",
+    "raw_journal_capability_not_provided",
+    "read_alias_and_default_argument_equivalence_not_deduplicated"
+  ],
+  "not_tested": [
+    "actual_attacks",
+    "protected_writes",
+    "new_server_full_install",
+    "all_client_table_rendering",
+    "independent_model_accuracy"
+  ],
+  "dgx_status_polled": false,
+  "hermes_restarted": false,
+  "model_promoted": false
+}

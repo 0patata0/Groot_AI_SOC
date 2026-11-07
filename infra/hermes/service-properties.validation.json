@@ -183,7 +183,13 @@
   "new_packages": 0,
   "new_os_install_tested": false,
   "independent_evaluation": false,
-  "publication": "pending",
+  "publication": {
+    "source_commit": "e612d48c0332562da4b47f97590f02db11805879",
+    "source_remote_main": "e612d48c0332562da4b47f97590f02db11805879",
+    "verified_at_kst": "2026-11-07T10:52:16.913650+09:00",
+    "credential_source": "project local credential file, per-process only",
+    "followup": "receipt documentation commit; final commit id recorded locally"
+  },
   "intermediate_chat": [
     {
       "engine": "ollama",

@@ -13,7 +13,7 @@
 | 최종 실제 채팅 | H20.711초/3읽기·O18.107초/1읽기·양2표. 실제 원문SHA·인자·KST·실행/시작 설정 일치 | 각1회·공유GPU/채널문맥 비통제. H의 A/C 추가 조회2회 잔여. 필드 표시 성공이며 일반 복합 정답률/평균 지연 아님 |
 | 운영·검사 | 1,270고유PASS/skip0. B11/6/6파일 단계 반영·23SHA/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·독립원복 확정 | Hermes 계획 재시작3회. DB·승인·추적 교체0. 새OS·공격/부하·UI전수 미시험 |
 | 논문 선작성 | 공식 근거·업무 요구·설계/구현·평가 방법/분모·실측과 실패·5.13.3 감사·5.13.4 필드 보존/단문 실패·이전본 보존 | 새PDF/시각검수·제출확정·미사용176 독립평가 잔여, 논문Git제외 |
-| Git·정리 | 이번 공개 수정은 커밋·푸시 준비 중. 이전b417278 원격 일치 | 서버1,844파일·Mac43파일/45.6MB 정리 확인. 기존 Ansible/NAT/토폴로지·운영자료/복구본 보존 |
+| Git·정리 | 공개18경로 소스e612d48 커밋·프로젝트 자격 직접 푸시·실원격main 일치. 게시 영수증은 후속 문서 커밋 | 서버1,844파일·Mac43파일/45.6MB 정리 확인. 기존 Ansible/NAT/토폴로지·운영자료/복구본 보존 |
 
 [이번 변경·검증·복구](infra/hermes/service-properties.md) · [직전 감사·복합 품질](infra/hermes/service-read-audit.md) · [정정 안내](infra/hermes/service-repair-feedback.md) · [현재 대기열](infra/hermes/pipeline-single-read.md) · [수집시각](infra/mcp/runtime-clock.md) · [반복systemd 수정](infra/hermes/controller-contention.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료 상태를 유지한다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
 

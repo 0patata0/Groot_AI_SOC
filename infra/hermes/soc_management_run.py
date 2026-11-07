@@ -1748,7 +1748,7 @@ def management_reasoning(request, agent, *, required_read_phase=False):
             names={t.get('function',{}).get('name') for t in request.get('tools',[])}
             catalog={'tools':[{'function':{'name':n,'parameters':s}} for n,s in bound[1].items() if n in names]}
     service=diagnostic_contract().service_history_plan(catalog,chat['request'],chat['requested_at_kst']) if chat else None
-    service_lookup=bool(service and service.get('only_service'))
+    service_lookup=bool(service and service.get('compact_scope') and not service.get('unavailable_capabilities'))
     if service_lookup:print('management_service_reasoning '+json.dumps({'reasoning_effort':'none','registered_targets':sorted(service['units'])}),file=sys.stderr)
     if lookup or service_lookup:
         result.pop('max_completion_tokens',None);result['max_tokens']=2048
@@ -3675,7 +3675,7 @@ def main():
         native_read_catalog[:]=copy.deepcopy(scope_catalog)
         self._capstone_registered_read_conditions=(getattr(self,'_current_turn_id',None),{
             t['function']['name']:copy.deepcopy(t['function']['parameters']) for t in scope_catalog
-            if t['function']['name']=='mcp__system_diagnostics__get_system_diagnostics' or
+            if t['function']['name'] in ('mcp__system_diagnostics__get_system_diagnostics','mcp__resp__list_blocks') or
                 t['function']['name'] in {'mcp__security_events__'+n for n in
                     ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}})
         base=management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self)

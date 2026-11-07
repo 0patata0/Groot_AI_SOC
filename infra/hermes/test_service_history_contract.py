@@ -433,6 +433,33 @@ class ServiceHistory(unittest.TestCase):
     def test_mixed_attack_request_keeps_security_evidence_requirement(self):
         self.assertFalse(c.service_history_plan(catalog(),self.question+' 공격 영향도 확인',self.at)['only_service'])
 
+    def test_companion_inventory_compact_context_keeps_every_original_receipt(self):
+        request=catalog();request['tools'].append({'function':{'name':'mcp__resp__list_blocks',
+            'parameters':{'type':'object','properties':{}}}})
+        question=self.question+' 현재 임시차단 목록도 보여줘.'
+        rows=self.rows()+[{'tool':'mcp__resp__list_blocks','arguments':{},'is_error':False,'data':{'blocks':['192.0.2.9']}}]
+        before=copy.deepcopy(rows)
+        context=c.service_report_context(request,question,self.at,rows,now=self.now)
+        self.assertIsNotNone(context);self.assertEqual(context['question'],question)
+        self.assertEqual(context['untrusted_completed_reads'],rows)
+        self.assertNotIn('observed_at_kst',context['untrusted_completed_reads'][-1]['data'])
+        context['untrusted_completed_reads'][-1]['data']['blocks'].clear()
+        self.assertEqual(rows,before)
+        for bad in ({'is_error':True},{'arguments':{'target':'other'}},{'data':{'blocks':[], 'observed_at_kst':self.at}},
+                    {'tool':'mcp__other__list_blocks'}):
+            with self.subTest(bad=bad):
+                altered=copy.deepcopy(rows);altered[-1].update(bad)
+                self.assertIsNone(c.service_report_context(request,question,self.at,altered,now=self.now))
+
+    def test_compact_companion_scope_does_not_drop_other_security_or_write_requests(self):
+        base='오늘 b:management 오류와 지금 상태 확인. 현재 차단 목록 보여줘.'
+        for extra in (' WAF 룰도 보여줘.', ' 공격 영향도 판단해줘.', ' 차단 유지 승인도 확인해줘.',
+                      ' 웹 접속 이력도 보여줘.', ' 현재 차단 목록이 아니라 과거 차단 사유를 조사해줘.',
+                      ' vector.service 재시작해줘.'):
+            with self.subTest(extra=extra):
+                plan=c.service_history_plan(catalog(),base+extra,self.at)
+                self.assertTrue(plan is None or not plan['compact_scope'])
+
     def test_no_read_and_partial_read_remain_pending(self):
         state=c.service_history_state(self.plan,[],self.now)
         self.assertEqual(state['pending'],self.plan['requirements']);self.assertEqual(len(state['incomplete']),3)
@@ -494,6 +521,23 @@ class ServiceHistory(unittest.TestCase):
             self.assertEqual(w.management_reasoning(dict(native,model='qwen3.6:35b'),agent)['reasoning_effort'],'medium')
             agent._capstone_registered_read_conditions=('current',{NAME:full})
             self.assertEqual(w.management_reasoning({'tools':[],'model':'qwen3.6:35b'},agent)['reasoning_effort'],'medium')
+
+    def test_companion_inventory_has_same_reasoning_profile_as_bounded_service_read(self):
+        from types import SimpleNamespace
+        name='mcp__resp__list_blocks';req=catalog()
+        req['tools'].append({'function':{'name':name,'parameters':{'type':'object','properties':{}}}})
+        agent=SimpleNamespace(provider='custom',model='qwen3.6:35b',base_url='http://10.200.10.10:11435/v1')
+        for suffix,effort in ((' 현재 차단 목록도 보여줘.','none'),
+                              (' 현재 차단 목록도 보여줘. 공격 영향도 판단해줘.','medium'),
+                              (' 현재 차단 목록도 보여줘. 재시작 승인 요청해줘.','medium')):
+            context={'request':self.question+suffix,'background':'','tools':[NAME,name],'requested_at_kst':self.at}
+            with patch.dict(w.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_OPERATOR_REVIEW':'1',
+                    'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_CHAT_READ_JSON':json.dumps(context)},clear=True):
+                result=w.management_reasoning(dict(req,model='qwen3.6:35b'),agent)
+                self.assertEqual(result['reasoning_effort'],effort)
+                if effort=='none':
+                    self.assertEqual(result['max_tokens'],2048)
+                    self.assertEqual(w.management_reasoning(dict(catalog(),model='qwen3.6:35b'),agent)['reasoning_effort'],'medium')
 
     def test_immutable_inline_gate_without_file_loads_fixed_contract(self):
         original=w.__file__;w.diagnostic_contract.cache_clear()

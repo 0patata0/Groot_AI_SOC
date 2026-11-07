@@ -470,6 +470,33 @@ class DiagnosticClaims(unittest.TestCase):
         self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
         self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('웹 요청 처리 병목 상태입니다.'))
 
+    def test_review_metric_is_not_approval_queue_even_with_other_tool_evidence(self):
+        self.facts=[self.pipeline(),{'kind':'blocks','count':0}]
+        for text in ('| 검토 필요 케이스 | 285건 | 관리자의 카드 승인/거부 대기 |',
+                     'review_required_cases는 관리자 승인 대기입니다.',
+                     '검토 상태 285건이 승인 대기이며 확인이 필요합니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_pipeline_approval_unverified',self.issues(text))
+        for text in ('검토 상태는 승인 대기가 아닙니다.', '검토 상태가 승인 대기인지 여부는 미확인입니다.',
+                     '검토 상태285건입니다. 변경 요청 abc는 관리자 승인 대기입니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_pipeline_approval_unverified',self.issues(text))
+        self.assertIn('diagnostic_pipeline_count_mismatch',self.issues('현재 SOC 처리 대기 상태(review_required_cases)가285건입니다.'))
+
+    def test_block_inventory_does_not_prove_failed_service_incident_recovered(self):
+        self.facts=[diagnostic(),historical(),{'kind':'blocks','count':0}]
+        report={'basis':'과거 종료값 3; 현재 마지막 종료값 0으로 종료했습니다.',
+            'assessment':'remediated','evidence_tools':['mcp__system_diagnostics__get_system_diagnostics','mcp__resp__list_blocks'],
+            'limitations':['전체 영향은 별도 검증이 필요합니다.'],'next_steps':[],'status':'resolved'}
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(g.render_model_review(report,self.facts)))
+
+    def test_current_block_inventory_cannot_disable_lock_code_meaning_check(self):
+        self.facts=[{'kind':'diagnostics','target':'b:management','unit':'capstone-management.service',
+            'error_code_observations':[{'code':'controller_already_running'}]}, {'kind':'blocks','count':0}]
+        self.assertIn('diagnostic_lock_metadata_not_restart_history',self.issues(
+            'capstone-management.service는 controller_already_running 오류로 재시작에 실패했습니다.'))
+        for text in ('controller_already_running은 배타 잠금 획득 실패이며 재시작 여부는 미확인입니다.',
+                     'controller_already_running 원문을 확인했으며 재시작을 제안합니다.'):
+            self.assertNotIn('diagnostic_lock_metadata_not_restart_history',self.issues(text))
+
     def test_restart_counter_cannot_prove_manual_reload_history(self):
         self.assertIn('diagnostic_restart_counter_not_history',self.issues('NRestarts=0이므로 한 번도 restart 또는 reload되지 않았습니다.'))
         self.assertEqual(self.issues('NRestarts=0만으로 수동 재시작 이력을 판단할 수 없습니다.'),[])

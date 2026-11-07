@@ -66,7 +66,7 @@ class ServiceRuntime(unittest.TestCase):
         def self_report():
             return {'more_evidence':False,'report':{'assessment':'unresolved',
                 'basis':'현재 서비스 관측과 과거 오류 메타데이터를 구분했으며 배경 원인은 미확인입니다.',
-                'evidence_indexes':[0],'limitations':['과거 오류는 부분 표본입니다.'],
+                'evidence_indexes':list(range(2 if blocks else 1)),'limitations':['과거 오류는 부분 표본입니다.'],
                 'next_steps':[],'status':'needs_review'}}
         class LLM:
             def __init__(self,**kw):pass
@@ -110,7 +110,8 @@ class ServiceRuntime(unittest.TestCase):
         self.assertNotEqual(result['status'],'failed',result)
         self.assertEqual(order[:6],['select','read','read','read','read','block_read'])
         self.assertEqual(len(calls),5);self.assertEqual(calls[-1],{})
-        self.assertEqual(result['protected_calls'],0);self.assertNotIn('compact',order)
+        self.assertEqual(result['protected_calls'],0);self.assertIn('compact',order)
+        self.assertNotIn('agent',order)
         self.assertIn('192.0.2.7',str(prompts));self.assertIn('journal_excerpt',str(prompts))
         receipts=runtime.harness.service_history_receipts(result['calls'])
         self.assertEqual(receipts[-1]['tool'],'mcp__resp__list_blocks')

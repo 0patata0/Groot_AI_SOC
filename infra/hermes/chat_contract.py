@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.74'
+VERSION = 'soc-chat-contract:1.5.76'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -39,6 +39,9 @@ SERVICE_STATE_GUIDANCE = (
     'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 실행·전송 대기 지표와 별도의 사건 검토 상태입니다. '
     '컨트롤러 실패가 지금도 처리에 영향을 주는지 질문하면 두 범위를 구분해 등록 도구로 확인합니다. '
     'review_required_cases는 검토 상태의 사건 수이며 처리·전송 대기 건수나 공격 확정·실행 실패 건수가 아닙니다. '
+    '이는 needs_review/outcome_unknown/review_ready 상태의 합계이며 관리자 승인 카드 대기 수가 아닙니다. 승인 대기는 별도 승인 기록으로 확인합니다. '
+    '과거 서비스 오류와 현재 검토 상태 합계의 동시 관측만으로 인과관계나 적체 원인을 만들지 않습니다. '
+    '관측 시각은 그 시각을 반환한 도구·대상에만 연결합니다. list_blocks의 blocks 목록에는 관측 시각이 없으므로 다른 진단 시각을 붙이지 않습니다. '
     '전송·기한초과 대기가 0이어도 검토 완료·과거 실패 해결·전체 정상으로 확대하지 않습니다. '
     '검토 상태 건수만으로 처리 병목·실시간 지연을 단정하지 않습니다. oneshot의 inactive/dead와 성공 종료는 재실행 실패의 증거가 아닙니다. '
     'case_review_required만 붙은 degraded는 검토 미완료 표지이며 성능 저하 측정값이 아닙니다. review_required_cases는 현재 상태 합계이지 오늘·어제·이틀 치 발생 건수가 아닙니다. '
@@ -588,8 +591,17 @@ def service_history_plan(request, question, requested_at):
                 and registered[0].get('properties')=={} and not registered[0].get('required')):
             options.append({'tool':block_name,'arguments':{}})
         else:unavailable.append('current_block_list')
-    only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
+    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
+    only_service=not re.search(outside,question,re.I)
+    # Preserve the full question and every receipt. Only a separately matched
+    # inventory clause is removed for scope classification, never for inquiry.
+    residual=question
+    if read_contract().companion_block_request(question):
+        residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
+                          if read_contract().block_list_plan(part.strip()) is None)
+    compact_scope=not re.search(outside,read_contract().without_prohibitions(residual),re.I)
     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+            'compact_scope':compact_scope,
             'current_companions':related,
             'unavailable_capabilities':unavailable}
 
@@ -657,12 +669,14 @@ def service_history_state(plan, receipts, now=None):
 def service_report_context(request, question, requested_at, receipts, *, now=None, background=''):
     """Lossless, current completed reads only; no verdict, dispatch or truncation."""
     plan=service_history_plan(request,question,requested_at)
-    if (not plan or not plan['only_service'] or not receipts or len(receipts)>32
+    if (not plan or not plan['compact_scope'] or not receipts or len(receipts)>32
             or service_history_state(plan,receipts,now)['incomplete']):return None
     name='mcp__system_diagnostics__get_system_diagnostics'
-    if any(r.get('tool')!=name or r.get('is_error') is not False
-           or not isinstance(r.get('data'),dict) or r['data'].get('mutation_performed') is not False
-           for r in receipts):return None
+    for row in receipts:
+        if row.get('is_error') is not False or not isinstance(row.get('data'),dict):return None
+        if row.get('tool')=='mcp__resp__list_blocks':
+            if row.get('arguments')!={} or read_contract().block_addresses(row['data']) is None:return None
+        elif row.get('tool')!=name or row['data'].get('mutation_performed') is not False:return None
     value={'question':question,'requested_at_kst':requested_at,'background':background,
            'untrusted_completed_reads':copy.deepcopy(receipts)}
     if len(json.dumps(value,ensure_ascii=False,allow_nan=False).encode())>131072:return None
@@ -676,7 +690,8 @@ def diagnostic_facts_only(facts):
 
 def diagnostic_metadata_failure(facts):
     """The existing closure veto, shared by generation and output validation."""
-    return diagnostic_facts_only(facts) and any(
+    # A current block inventory adds no evidence of service recovery.
+    return bool(facts) and all(f.get('kind') in ('diagnostics','times','time_calculation','blocks') for f in facts) and any(
         f.get('error_code_observations') or f.get('error_exit_observations') for f in facts)
 
 
@@ -853,6 +868,7 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
             'diagnostic_error_code_total_unverified':'오류 색인 전체 수를 특정 코드의 발생 횟수로 옮겼습니다. 코드별로 반환된 표본과 색인 전체 일치 건수를 구분하세요. 해당 코드의 전체 횟수는 확인되지 않았습니다.',
             'diagnostic_error_code_sample_mismatch':'명시한 코드의 반환 표본 수가 실제 코드별 표본과 다릅니다. 다른 오류 유형이나 전체 색인 수를 해당 코드 표본 수로 사용하지 마세요.',
             'diagnostic_pipeline_count_mismatch':'검토 상태 사건 수를 처리·전송 대기 또는 기한 초과 건수로 바꿨습니다. 이름이 다른 지표의 숫자를 옮겨 쓰지 마세요.',
+            'diagnostic_pipeline_approval_unverified':'검토 상태 합계를 관리자 승인 대기 수로 바꿨습니다. 검토 상태와 승인 카드의 대기는 다른 지표입니다.',
         }
         policy+=(' 검증기가 이전 초안의 오류를 지적했습니다. 거절된 주장을 그대로 반복하지 마세요. '
             +' '.join(code+': '+explanations[code] for code in issues if code in explanations)
@@ -1225,7 +1241,7 @@ def diagnostic_property_claim_violations(text, facts):
 
 def diagnostic_lifecycle_claim_violations(text, facts):
     issues=set()
-    lock_metadata=diagnostic_facts_only(facts) and any(
+    lock_metadata=all(f.get('kind') in ('diagnostics','times','time_calculation','blocks') for f in facts) and any(
         x.get('code')=='controller_already_running' for f in facts for x in f.get('error_code_observations',[]))
     for line in text.splitlines():
         if lock_metadata:
@@ -1325,6 +1341,11 @@ def diagnostic_pipeline_claim_violations(text, facts):
               for k in ('pending_reports','running_cases','overdue_cases'))
     issues=set()
     for clause in re.split(r'\n|;|(?<=[.!?])\s+',text):
+        review_named=re.search(r'review_required_cases|검토\s*(?:필요|상태|대기)',clause,re.I)
+        if review_named and type(metrics.get('review_required_cases')) is int:
+            for claim in re.finditer(r'승인(?:\s*[/·]\s*거부)?\s*(?:카드\s*)?대기',clause):
+                if not _claim_is_unasserted(clause[claim.end():]):
+                    issues.add('diagnostic_pipeline_approval_unverified')
         if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
         # An unrelated read must not disable checks of an explicitly named
         # pipeline. In mixed investigations, unqualified processing claims may
@@ -1350,8 +1371,8 @@ def diagnostic_pipeline_claim_violations(text, facts):
         if re.search(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|건|사건|항목))?'
                 r'(?:은|는|이|가)?\s*(?:존재합니다|있습니다|남아\s*있습니다)',clause):
             issues.add('diagnostic_pipeline_pending_unverified')
-        for count in re.finditer(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|사건))?'
-                r'\s*(?:은|는|이|가|:|=)?\s*([0-9][0-9,]*)\s*건',clause):
+        for count in re.finditer(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|사건|상태))?'
+                r'(?:\s*\(review_required_cases\))?\s*(?:은|는|이|가|:|=)?\s*([0-9][0-9,]*)\s*건',clause):
             if int(count[1].replace(',',''))>0 and not _claim_is_unasserted(clause[count.end():]):
                 issues.add('diagnostic_pipeline_count_mismatch')
         for claim in re.finditer(r'병목|정체|과부하|적체|(?:성능\s*)?저하|처리\s*지연|지연\s*(?:중|상태|발생|확인)',clause):

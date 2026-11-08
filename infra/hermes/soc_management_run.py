@@ -30,6 +30,16 @@ EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search
                         'get_web_service_target', 'search_web_access', 'collect_incident_evidence'})
 BUNDLE_TOOL = 'mcp__security_events__collect_incident_evidence'
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
+VERIFIED_RUNTIME_MODELS = frozenset({'qwen3.6:35b',
+    'soc-qwen36:35b-balanced-q4km-20261108'})
+
+
+def verified_runtime_model(agent, wire_model):
+    """Exact operator-selected model identity; no prefix or body override."""
+    return (isinstance(wire_model, str) and wire_model in VERIFIED_RUNTIME_MODELS
+            and wire_model == getattr(agent, 'model', None))
+
+
 MAX_EVENT_AUDIT_BYTES = 128 * 1024
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
                          '정상 또는 조사 완료로 판단하지 않았으며 추가 검토가 필요합니다.\n'
@@ -1725,10 +1735,10 @@ def readonly_incident_review():
 def management_reasoning(request, agent, *, required_read_phase=False):
     """Use the verified Ollama compatibility control in this process only."""
     extra = dict(request.get('extra_body') or {})
-    if (getattr(agent, 'provider', None) != 'custom' or getattr(agent, 'model', None) != 'qwen3.6:35b'
+    if (getattr(agent, 'provider', None) != 'custom'
             or str(getattr(agent, 'base_url', '')).rstrip('/') not in {
                 'http://211.170.162.111:11434/v1', 'http://10.200.10.10:11435/v1'}
-            or extra.get('model', request.get('model')) != 'qwen3.6:35b'):
+            or not verified_runtime_model(agent, extra.get('model', request.get('model')))):
         return request
     result = dict(request)
     for key in ('think', 'reasoning_effort', 'reasoning'):
@@ -2876,10 +2886,9 @@ def management_read_request(request, agent, *, pending=False):
     agent._capstone_management_selection = None
     if (pending is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
             or getattr(agent, 'provider', None) != 'custom'
-            or getattr(agent, 'model', None) != 'qwen3.6:35b'
             or getattr(agent, 'api_mode', 'chat_completions') != 'chat_completions'
             or str(getattr(agent, 'base_url', '')).rstrip('/') != 'http://10.200.10.10:11435/v1'
-            or request.get('model') != 'qwen3.6:35b' or request.get('tool_choice') != 'required'
+            or not verified_runtime_model(agent, request.get('model')) or request.get('tool_choice') != 'required'
             or not isinstance(getattr(agent, '_current_turn_id', None), str)
             or not agent._current_turn_id or getattr(agent, '_interrupt_requested', False)):
         return request
@@ -3141,10 +3150,10 @@ def management_report_request(request, agent, snapshot):
             or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
             or (os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')!='1' and not service_chat)
             or not (readonly_incident_review() or service_chat)
-            or getattr(agent,'provider',None)!='custom' or getattr(agent,'model',None)!='qwen3.6:35b'
+            or getattr(agent,'provider',None)!='custom'
             or getattr(agent,'api_mode','chat_completions')!='chat_completions'
             or str(getattr(agent,'base_url','')).rstrip('/')!='http://10.200.10.10:11435/v1'
-            or request.get('model')!='qwen3.6:35b' or getattr(agent,'_interrupt_requested',False)
+            or not verified_runtime_model(agent, request.get('model')) or getattr(agent,'_interrupt_requested',False)
             or request.get('tool_choice') not in ((None,'auto','required') if inquiry else (None,'auto'))
             or not isinstance(request.get('messages'),list)):
         return request
@@ -3370,8 +3379,7 @@ def management_selection_response(response, selection, agent):
     from openai.types.chat import ChatCompletionMessageToolCall
     if (selection.get('turn') != getattr(agent,'_current_turn_id',None)
             or getattr(agent,'_interrupt_requested',False)
-            or getattr(agent,'model',None)!='qwen3.6:35b'
-            or getattr(response,'model',None)!='qwen3.6:35b'
+            or not verified_runtime_model(agent, getattr(response,'model',None))
             or len(response.choices)!=1 or response.choices[0].finish_reason!='stop'):
         raise ValueError('management_selection_response_shape')
     message=response.choices[0].message
@@ -3472,7 +3480,7 @@ def management_selection_call_wrapper(original):
         request=kw.get('api_kwargs')
         active=(os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify' and isinstance(selection,dict)
             and selection.get('turn')==kw.get('turn_id')==getattr(agent,'_current_turn_id',None)
-            and isinstance(request,dict) and request.get('model')=='qwen3.6:35b'
+            and isinstance(request,dict) and verified_runtime_model(agent, request.get('model'))
             and request.get('response_format',{}).get('json_schema',{}).get('schema')==selection['schema']
             and not set(request.get('extra_body') or {}).intersection({'tools','tool_choice','response_format','model','messages'})
             and not request.get('tools') and not getattr(agent,'_interrupt_requested',False))

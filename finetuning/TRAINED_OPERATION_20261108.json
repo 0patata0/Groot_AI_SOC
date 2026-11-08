@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "checked_at_kst": "2026-11-08T11:49:16.734859+09:00",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "base_preserved": true,
+  "applied": {
+    "at_kst": "2026-11-08T11:43:50.627478+09:00",
+    "epoch": 1794105830.6274965,
+    "changes": 12,
+    "db_same_while_stopped": true,
+    "protected": 6
+  },
+  "confirmation": {
+    "at_kst": "2026-11-08T11:46:59.357611+09:00",
+    "query": "1.19.130",
+    "common": "1.5.82",
+    "manifest": 32,
+    "protected": 6,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true,
+    "hermes_planned_restart": 1
+  },
+  "model_probe": {
+    "at_kst": "2026-11-08T11:47:33.990181+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "probe": {
+      "backend_sha256": "294473c1a464a09f6a0b9fcb5ffaa58946f52d05806df9088020210cd9d1268b",
+      "checked_at": 1794106002,
+      "completed_at": 1794106002,
+      "elapsed_ms": 297,
+      "reason": "response_ok",
+      "run_id": "6cd0aced10a7bbcbffe6ed4082f44d2b",
+      "schema": 1,
+      "scope": "bounded_inference_only_no_tool_or_security_judgement",
+      "success": true
+    }
+  },
+  "test_count": 1632,
+  "unique_tests": 1604,
+  "skip": 0,
+  "core_sha256": "3427bdca6bc2067d5e89863320374588ef0b70daa94004a50fa77700b64d8be0",
+  "query_version": "1.19.130",
+  "chats": [
+    {
+      "engine": "ollama",
+      "status": "completed",
+      "chat_seconds": 34.2,
+      "mcp_calls": 1,
+      "protected_calls": 0,
+      "reply_id": "h3qihecjftrt7yougspm6carmo",
+      "result": "empty_block_list_observed",
+      "final_response_complete": true
+    },
+    {
+      "engine": "hermes",
+      "status": "partial",
+      "chat_seconds": 55.561,
+      "mcp_calls": 1,
+      "protected_calls": 0,
+      "reply_id": "p14z5q6nefra3gz5rmtsp517ty",
+      "result": "empty_block_list_observed",
+      "final_response_complete": false
+    }
+  ],
+  "general_accuracy_improvement_proven": false,
+  "independent_test176_completed": false,
+  "privilege_change": false,
+  "new_full_os_authority": "pending_implementation"
+}

@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.129"
+VERSION = "groot-query-completion:1.19.130"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = 'ef4bbdb969e96db56021c5d9915f5499641261b4f147f6326c2129e38708d1db'
+EVIDENCE_SOURCE_SHA256 = '3427bdca6bc2067d5e89863320374588ef0b70daa94004a50fa77700b64d8be0'
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -312,8 +312,7 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
             agent._capstone_query_completion_names_restore = restore_names
         base_url = getattr(agent, "base_url", None)
         if (getattr(agent, "provider", None) == "custom"
-                and getattr(agent, "model", None) == "qwen3.6:35b"
-                and extra.get("model", result.get("model")) == "qwen3.6:35b"
+                and EVIDENCE.verified_runtime_model(agent, extra.get("model", result.get("model")))
                 and isinstance(base_url, str)
                 and base_url.rstrip("/") in {"http://211.170.162.111:11434/v1",
                                               "http://10.200.10.10:11435/v1"}):

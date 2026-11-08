@@ -1,7 +1,7 @@
 {
   "schema": "groot-balanced-main-registration-v1",
   "registered_at_kst": "2026-11-07T20:54:28.303677+09:00",
-  "last_verified_at_kst": "2026-11-08T09:29:41.907628+09:00",
+  "last_verified_at_kst": "2026-11-08T09:47:27.474626+09:00",
   "run_id": "capstone-dgx-20261107-balancedmain",
   "run_directory": "~/Capstone_Groot_training/dgx-20261107-balancedmain",
   "status": "training_completed_soc_quality_unverified",
@@ -312,16 +312,56 @@
       "thor_transferred": false,
       "production_promoted": false,
       "error": "missing verified base projector conversion-status.json; training and merge completed"
+    },
+    {
+      "at_kst": "2026-11-08T09:29:41.907628+09:00",
+      "status": "running",
+      "stage": "convert",
+      "root": "~/Capstone_Groot_training/dgx-balanced-export-20261108-r2",
+      "unit": "capstone-dgx-balanced-export-20261108-r2",
+      "main_pid": 3039388,
+      "container_pid": 3039443,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "control_sha256": "57291a6e7e48e3f7bacc008b88a0481b758ca669df5344da494e41f70bf01ba5",
+      "cpu_limit": 2,
+      "memory_gib": 24,
+      "network": "none",
+      "gpu_enabled": false,
+      "runtime_limit_seconds": 7200,
+      "source_notices": 18,
+      "merged_tensors_verified": 1045,
+      "unchanged_tensors": 855,
+      "changed_modules": 190,
+      "preserved_mtp_tensors": 19,
+      "existing_dgx_ollama_pid": 2510711,
+      "existing_dgx_ollama_restarts": 0,
+      "thor_transferred": false,
+      "production_promoted": false,
+      "conversion_only_retry": true,
+      "prior_failed_artifacts_preserved": true,
+      "runtime_projector_preflight_passed": true,
+      "source_sha256": {
+        "deploy.sh": "91b535600a1847df9de78d07fb2711bece7c09491c88fe5de41ebf44ebaa58a3",
+        "finetuning/candidate_model.py": "ff995f5b2e3c3f3b0147ee825fa58ecdfeaf99a8090fb98b8318733c3aad23df",
+        "finetuning/merge_streaming.py": "6477ee8bac20c4642399f778b32b9a166428fe4b06136e36d0eaca98891444d3",
+        "finetuning/merge_adapter.py": "d1157eb6ac4d58f0ee95b9abdaae2c2290ded3114ce8985849ad5af0fa0c5045",
+        "finetuning/model_profile.py": "bf4941122f11cc87cf49297481abf46ddce874db9bfdbb3d2c4c6d18d6ed553b",
+        "finetuning/bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+        "finetuning/download_model.py": "3642c4b7ced0c49d5dfe07c6025985bc1b8f35d130530fe0afd733da2c1b28ad",
+        "finetuning/convert_soc.py": "1e8349d21cd1d0d394a3881b8c986be12e3d4e64362adf143052cce054685865",
+        "finetuning/convert_reference.py": "c756a96da0fbfbf42157777a47da4a60af1b0ca47c35396fd396463bbb298e00",
+        "finetuning/register_soc.py": "e8e168bc3c1bedd822377adfeeb0525434f6945afc7cdca789030a547c2ca3b5"
+      }
     }
   ],
   "export_observation": {
-    "at_kst": "2026-11-08T09:29:41.907628+09:00",
-    "status": "running",
-    "stage": "convert",
+    "at_kst": "2026-11-08T09:47:27.474626+09:00",
+    "status": "completed",
+    "stage": "finished",
     "root": "~/Capstone_Groot_training/dgx-balanced-export-20261108-r2",
     "unit": "capstone-dgx-balanced-export-20261108-r2",
-    "main_pid": 3039388,
-    "container_pid": 3039443,
+    "main_pid": 0,
+    "container_pid": 0,
     "model": "soc-qwen36:35b-balanced-q4km-20261108",
     "control_sha256": "57291a6e7e48e3f7bacc008b88a0481b758ca669df5344da494e41f70bf01ba5",
     "cpu_limit": 2,
@@ -336,7 +376,7 @@
     "preserved_mtp_tensors": 19,
     "existing_dgx_ollama_pid": 2510711,
     "existing_dgx_ollama_restarts": 0,
-    "thor_transferred": false,
+    "thor_transferred": true,
     "production_promoted": false,
     "conversion_only_retry": true,
     "prior_failed_artifacts_preserved": true,
@@ -352,7 +392,31 @@
       "finetuning/convert_soc.py": "1e8349d21cd1d0d394a3881b8c986be12e3d4e64362adf143052cce054685865",
       "finetuning/convert_reference.py": "c756a96da0fbfbf42157777a47da4a60af1b0ca47c35396fd396463bbb298e00",
       "finetuning/register_soc.py": "e8e168bc3c1bedd822377adfeeb0525434f6945afc7cdca789030a547c2ca3b5"
-    }
+    },
+    "completed_at_kst": "2026-11-08T09:46:22.470667+09:00",
+    "text_tensor_count": 753,
+    "projector_tensor_count": 334,
+    "preserved_nextn_predict_layers": 1,
+    "artifacts": [
+      {
+        "path": "qwen36-soc-bf16.gguf",
+        "bytes": 71066994528,
+        "sha256": "33ec9cd9cad439fb46ee946271e45c2558b9f050601318e0ca44985989dd050e"
+      },
+      {
+        "path": "qwen36-soc-q4_k_m.gguf",
+        "bytes": 21713462816,
+        "sha256": "0cc75a1b4b54c798ffeb253b48bab72cad7bcfa25444510944da852e02bbf48f"
+      },
+      {
+        "path": "mmproj-qwen36-soc-f16.gguf",
+        "bytes": 899283200,
+        "sha256": "daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+      }
+    ],
+    "full_transfer_artifacts_sha_reverified": true,
+    "metadata_files": 34,
+    "thor_transfer_status": "completed"
   },
   "conversion_regression_tests": {
     "executed": 27,
@@ -382,5 +446,58 @@
     "restore_record": "/var/lib/capstone-model-storage/20261108-balanced/receipt.json",
     "restore_script": "/var/lib/capstone-model-storage/20261108-balanced/restore-independent-copy.py",
     "restoration_executed": false
+  },
+  "thor_transfer_observation": {
+    "status": "completed",
+    "started_at_kst": "2026-11-08T09:48:07.815572+09:00",
+    "weight_expected": {
+      "path": "qwen36-soc-q4_k_m.gguf",
+      "bytes": 21713462816,
+      "sha256": "0cc75a1b4b54c798ffeb253b48bab72cad7bcfa25444510944da852e02bbf48f"
+    },
+    "basis_sha256": "810199c2ce42d7db26e6fdd77ffbc1347df1e8ac7cb927377940879c26f34f63",
+    "metadata_files": 34,
+    "automatic_promotion": false,
+    "mac_weight_files": 0,
+    "credentials_saved": false,
+    "completed_at_kst": "2026-11-08T09:50:31.203699+09:00",
+    "full_sha_verified": "0cc75a1b4b54c798ffeb253b48bab72cad7bcfa25444510944da852e02bbf48f",
+    "blob_hardlinked": true,
+    "old_blob_unchanged": true,
+    "free_bytes": 25040162816,
+    "temporary_credentials_removed": true,
+    "model_registration_performed": false,
+    "root": "~/Capstone_Groot_training/balanced-candidate-20261108-r1"
+  },
+  "thor_registration_observation": {
+    "status": "completed",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "variant": "dgx-guide",
+    "started_at_kst": "2026-11-08T09:59:11.731026+09:00",
+    "training_source_attribution_sha256": "6419536a3c55455ab26a67a8a09ac38fb9f36848442ef4cdc68c056861bb1c32",
+    "files": {
+      "qwen36-soc-q4_k_m.gguf": "sha256:0cc75a1b4b54c798ffeb253b48bab72cad7bcfa25444510944da852e02bbf48f",
+      "mmproj-qwen36-soc-f16.gguf": "sha256:daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+    },
+    "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "completed_at_kst": "2026-11-08T09:59:35.110029+09:00",
+    "digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion",
+      "vision"
+    ],
+    "runtime_options_match_original": true,
+    "chat_template_matches_hf": true,
+    "chat_template_matches_original": false,
+    "hf_template_sha256": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+    "conversion_manifest_sha256": "f33a7146e6d09838e2cdca81f7ccfb2185558e7bcc8a9225d9ccf460467c0745",
+    "existing_models_unchanged": true,
+    "verified_at_kst": "2026-11-08T10:00:48.231335+09:00",
+    "primary_pid": 715615,
+    "primary_restarts": 0,
+    "operating_bot_model": "qwen3.6:35b",
+    "production_promoted": false
   }
 }

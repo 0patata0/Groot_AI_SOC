@@ -1,6 +1,6 @@
 # 균형 자료 본학습 독립 실행 — 2026-11-07 KST
 
-사용자가 균형 후보1,220건을 선택해11/7 20:54 독립 실행기를 등록했다. **11/8 08:32:47 KST 사용자 요청에 따른 실제 조회에서02:57:06 KST 본학습 완료·610/610step·epoch1.0을 확인했다.** 공유 추론에 세 번 양보한 뒤168/380/588step에서 자동 재개했으며 네 번째 실행에서 완료됐다. 현재 MainPID0·inactive이며08:30 종료 타이머는 완료 기록을 유지했다. 09:16 가중치·재개 계보 검증을 마쳤고09:17 별도 CPU 내보내기를 시작했다.09:20 병합 검증 완료 후 projector 입력 누락으로 변환이 중단됐다. 누락 보완·27검사·실제 사전검사 뒤09:29 새r2에서 변환만 재개했으며, Thor 반입·관제 문답 비교·운영 승격은 아직 미실행이다. [실행/완료 원장](BALANCED_MAIN_20261107.json) · [준비 검증](QUALITY_PREPARATION.md).
+사용자가 균형 후보1,220건을 선택해11/7 20:54 독립 실행기를 등록했다. **11/8 08:32:47 KST 사용자 요청에 따른 실제 조회에서02:57:06 KST 본학습 완료·610/610step·epoch1.0을 확인했다.** 공유 추론에 세 번 양보한 뒤168/380/588step에서 자동 재개했으며 네 번째 실행에서 완료됐다. 현재 MainPID0·inactive이며08:30 종료 타이머는 완료 기록을 유지했다. 09:16 가중치·재개 계보 검증을 마쳤고09:17 별도 CPU 내보내기를 시작했다.09:20 병합 검증 완료 후 projector 입력 누락으로 변환이 중단됐다. 누락 보완·27검사·실제 사전검사 뒤r2변환을09:46 완료했다.09:47 text/projector 전체 SHA 재대조 후 Thor 직접 반입을09:50 완료했으며, 09:59 별도 후보 등록까지 완료했다. 관제 문답 비교·운영 승격은 아직 미실행이다. [실행/완료 원장](BALANCED_MAIN_20261107.json) · [준비 검증](QUALITY_PREPARATION.md).
 
 | 항목 | 확정 설정 |
 |---|---|
@@ -62,3 +62,18 @@ Thor는 기존 원본35B를 유지한다. 기존 미학습Q4 export와canonical 
 09:25 최초변환은 base projector의 `conversion-status.json` 미준비로 실패했다. 학습/병합 실패가 아니며 기존 실패 상태·BF16 중간 산출물은r1에 보존했다. `convert_soc.py`는 이제 검증된 base projector의 상태·variant·고정 converter revision·단일artifact·길이/SHA·symlink 여부를 **새 출력 생성과 text변환 전에** 검사하고 사용 직전에 재검사한다. 누락/변경/중복/외부링크 회귀를 포함한27검사PASS/skip0이다. 단일deploy.sh·기존pack/source반입 경로를 그대로 사용한다.
 
 후속 root `~/Capstone_Groot_training/dgx-balanced-export-20261108-r2`에는 기존 검증병합/18고지/receipt를 보존형hardlink·작은복사로 재사용하고 검증projector를 준비했다. 최초 preflight wrapper는 Docker의bash entrypoint 호출법을 잘못 사용해 변환 시작 전에 실패했으며, 호출·새 디렉터리 소유권을 바로잡은 뒤 동일 CPU 컨테이너의 실제 사전검사를 통과했다. 09:29:33 변환전용systemd를 시작했고09:29:41 PID3039388/컨테이너3039443·2CPU/24GiB/networknone·기존OllamaPID2510711/재시작0을 확인했다. 최대2시간·종료시자체컨테이너정리·학습/병합재실행0·운영승격0이다. 최종 GGUF 해시/Thor 반입/추론 품질은 아직 미확인이다.
+
+### 09:47 변환 완료·전송 전 검증
+
+09:46:22 KST r2 변환이 완료됐고 systemd MainPID0/Result=success, 기존 DGX Ollama PID2510711/재시작0을 확인했다. 09:47:27 전송 전 text/projector 전체 SHA를 다시 계산해 변환 영수증과 일치시켰다. text753/projector334텐서·qwen35moe·MTP nextn_predict_layers1·CPU 전용·학습 프로필/adapter/변환/출처18고지의 연결을 검증했다. 최초 실패 기록은 위 이력에 유지한다.
+
+| 산출물 | 바이트 | SHA256 |
+|---|---:|---|
+| Q4_K_M |21,713,462,816|`0cc75a1b4b54c798ffeb253b48bab72cad7bcfa25444510944da852e02bbf48f`|
+| 비전 projector |899,283,200|`daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1`|
+
+Thor에는 DGX에서 직접 정식 고정 호스트 키 SSH/rsync로 전송하며 Mac은 제어와 작은 검증 기록만 보관한다. 새 후보 디렉터리에서 전체 SHA·34개 설정/출처·기존 blob 불변·20GiB 잔여 공간을 확인한 후 별도 등록한다. 전송 시작은 등록·GPU 적재·품질 성공을 뜻하지 않는다. 현재 운영 모델 변경0이다.
+
+09:50:31 KST Thor 반입 완료. 받은21,713,462,816B 전체 SHA·34메타데이터 SHA·기존base blob 불변을 재확인했다. 같은 내용20,920,083,968B를 서버의 기존blob에서 활용해 실제 새 데이터793,378,848B를 전송했으며 원본을 수정하지 않았다. 새Q4와canonical blob은같은inode로 등록시중복공간을 피했고 기존projector를 재사용했다. 잔여25,040,162,816B(20GiB 이상), 임시askpass/known_hosts/기준링크 제거.09:58 주Ollama PID715615/재시작0·두전송PID종료를 재확인했다.09:59 별도 새이름 등록을 시작했으며 아직 GPU적재/관제품질 평가와 운영승격은 미완료다.
+
+09:59:35 단일 deploy.sh의 register 단계 완료,10:00 재조회로 MainPID0/Result=success·기존 모든 모델digest 불변·주PID715615/재시작0을 확인했다. 후보digest는 `7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3`이며, text/projector blob·학습영수증/출처 고지·원본 runtime options·고정 HF template를 대조했다. HF 채팅 template는 운영 원본 template와 다르므로 같은HF 미학습군을 비교에 포함한다. GPU적재·응답 품질·운영봇 선택은 아직 실행하지 않았다.

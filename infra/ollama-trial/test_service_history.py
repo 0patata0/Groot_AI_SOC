@@ -65,6 +65,7 @@ class ServiceRuntime(unittest.TestCase):
             async def ainvoke(self,args):return await self.coroutine(**args)
         def self_report():
             return {'more_evidence':False,'report':{'assessment':'unresolved',
+                'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
                 'basis':'현재 서비스 관측과 과거 오류 메타데이터를 구분했으며 배경 원인은 미확인입니다.',
                 'evidence_indexes':list(range(2 if blocks else 1)),'limitations':['과거 오류는 부분 표본입니다.'],
                 'next_steps':[],'status':'needs_review'}}
@@ -164,6 +165,7 @@ class ServiceRuntime(unittest.TestCase):
 
     def test_compact_model_report_keeps_real_reads_and_avoids_agent_replay(self):
         value={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'현재 상태와 과거 오류 메타데이터를 각각 확인했으며 상세 실패 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['과거 기록은 부분 표본입니다.'],
             'next_steps':[{'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}],'status':'needs_review'}}
@@ -195,18 +197,22 @@ class ServiceRuntime(unittest.TestCase):
     def test_observation_success_does_not_resolve_open_incident(self):
         for assessment,status,expected in (('unresolved','resolved','partial'),('benign','needs_review','partial'),
                                           ('benign','monitor','partial'),('benign','awaiting_approval','partial'),
-                                          ('benign','resolved','completed')):
+                                          ('benign','resolved','partial')):
             with self.subTest(assessment=assessment,status=status):
                 value={'more_evidence':False,'report':{'assessment':assessment,
+                    'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
                     'basis':'반환된 현재 서비스 관측과 과거 오류 표본의 범위를 구분하여 확인했습니다.',
                     'evidence_indexes':[0],'limitations':['반환 범위 밖은 확인하지 않았습니다.'],
                     'next_steps':[],'status':status}}
                 result,order,prompts,calls=self.run_case(compact_report=value)
                 self.assertEqual(result['status'],expected,result)
-                self.assertEqual(result['service_judgment'],{'assessment':assessment,'status':status})
+                self.assertNotIn('service_judgment',result)
+                self.assertEqual(result['error_type'],'ValidationError')
+                self.assertEqual(result['protected_calls'],0)
 
     def test_literal_claim_repair_keeps_compact_context_and_actual_receipts(self):
         good={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'과거 실패 원인은 현재 조회 범위만으로 확정할 수 없어 미확인으로 구분합니다.',
             'evidence_indexes':[0],'limitations':['과거 오류는 부분 표본입니다.'],
             'next_steps':[{'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}],'status':'needs_review'}}
@@ -230,6 +236,7 @@ class ServiceRuntime(unittest.TestCase):
     def test_more_evidence_dispatches_selected_read_then_returns_to_structured_report(self):
         more={'more_evidence':True,'report':None,'read_tools':['mcp__system_diagnostics__get_system_diagnostics']}
         good={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'현재 관측과 추가 반환 표본은 확인했지만 과거의 배경 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['반환 기록은 전체 기능 검증이 아닙니다.'],
             'next_steps':[],'status':'needs_review'}}
@@ -265,6 +272,7 @@ class ServiceRuntime(unittest.TestCase):
     def test_repeated_successful_read_rejects_whole_batch_and_allows_grounded_report(self):
         more={'more_evidence':True,'report':None,'read_tools':['mcp__system_diagnostics__get_system_diagnostics']}
         good={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'현재 상태와 과거 오류 표본은 확인했으나 원문 기록은 제공되지 않아 배경 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['원문 기록은 현재 도구에서 반환되지 않습니다.'],
             'next_steps':[{'kind':'capability_gap','needed_evidence':'지정 구간의 원문 오류 기록'}],'status':'needs_review'}}
@@ -296,6 +304,7 @@ class ServiceRuntime(unittest.TestCase):
 
     def test_invalid_followup_is_audited_without_dispatch_or_completed_answer(self):
         bad={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'현재 관측과 과거 오류를 구분했으나 상세 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['당시 잠금 소유자는 미확인입니다.'],
             'next_steps':[{'kind':'read_proposal','tool':'mcp__system_diagnostics__get_system_diagnostics',
@@ -308,6 +317,7 @@ class ServiceRuntime(unittest.TestCase):
 
     def test_valid_followup_is_a_proposal_and_not_an_extra_mcp_call(self):
         value={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
             'basis':'현재 관측과 과거 오류를 구분했으나 상세 원인은 미확인입니다.',
             'evidence_indexes':[0],'limitations':['당시 잠금 소유자는 미확인입니다.'],
             'next_steps':[{'kind':'read_proposal','tool':'mcp__system_diagnostics__get_system_diagnostics',

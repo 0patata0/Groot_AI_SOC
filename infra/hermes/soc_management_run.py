@@ -1662,7 +1662,10 @@ def render_model_review(report, facts):
             raise ValueError('report_control_echo')
         return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', ' ').replace('\r', ' ')
     basis=line(report['basis'])
-    text='**판단**\n'+basis+'\n\n'+literal_evidence_table(facts)
+    text='**판단**\n'+basis
+    if 'current_observation' in report:
+        text+='\n\n**현재 처리 상태**\n'+line(report['current_observation'])
+    text+='\n\n'+literal_evidence_table(facts)
     text+='\n\n**미확인·한계**\n'+'\n'.join('- '+line(x) for x in report['limitations'])
     text+='\n\n**다음 조치**\n'+'\n'.join('- '+line(x) for x in diagnostic_contract().service_follow_up_lines(report['next_steps']))
     disposition={k:report[k] for k in ('assessment','basis','evidence_tools')}

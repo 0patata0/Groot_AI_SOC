@@ -1,5 +1,7 @@
 # 초기 설치의 승인형 SOC 관리 확장
 
+2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).
+
 현재 query1.19.81/common1.5.37·security-events1.3.2는 [무손실 경보 입력](../infra/hermes/event-input-view.md)로 경보의 반복 필드만 줄이고 원문·JSON값/타입/행순서·근거·승인 경계를 보존한다. 고유1,221회귀PASS·skip0, B16파일/보호8SHA·양봇 연결/worker·3서비스를 확인했다. 이전50행 모델 입력26,666→5,504B이나 응답시간 개선율은 아니다. 새 실제채팅126.313초/진행0.117초·MCP4조회2.677초이며 판단 정정 실패로 partial/근거 표만 반환했다. 정확한 최종60초는 미완료다. 기존 deploy.sh 복사·SHA·관리 게이트·설정 예제/오프라인 목록을 유지하며 새 패키지·포트·키0, 새 OS 전체 설치 미실행이다. 아래 날짜/버전별 기록은 당시 범위다.
 
 현재 query1.19.79/common1.5.35·security-events1.3.2는 [채팅 조회 범위·입력 규격](../infra/hermes/chat-read-scope.md)을 보완했다. Native 최종 요청의 시간 제약을 복원하고, 근거 없는 초기 ID/IP 필터를 제한하며 ‘오늘’을 KST 당일로 연결한다. Wazuh는 `program_name=systemd` 정확 검색을 지원한다. 고유1,287회귀PASS·skip0, 운영15파일/보호8SHA와 실제 MCP 조회를 확인했다. 복합 실제 채팅은95.209초이고 대상 누락·호스트 오인·건강 과장으로 품질 실패다. 사용자가 조정한60초 안팎의 목표도 아직 미달이다. 단일deploy.sh·기존 source_bundle 복사 경로를 사용하며 추가 패키지/포트/키/권한은 없다. 새 OS 전체 설치는 미실행이며 아래 버전별 기록은 당시 범위다.

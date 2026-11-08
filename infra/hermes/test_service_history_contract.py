@@ -750,6 +750,7 @@ class ServiceReport(unittest.TestCase):
         validator=Draft202012Validator(schema)
         validator.validate({'more_evidence':True,'report':None,'read_tools':[NAME]})
         report={'assessment':'unresolved','basis':'조회한 오류 메타데이터와 현재 처리 상태의 범위를 구분합니다.',
+                'current_observation':'현재 관측의 전송 대기0이며 전체 기능 정상 판정은 아닙니다.',
                 'evidence_indexes':[0],'limitations':['잠금 소유자는 미확인입니다.'],
                 'next_steps':['검토 상태 사건을 확인합니다.'],'status':'needs_review'}
         validator.validate({'more_evidence':False,'report':report})
@@ -763,7 +764,9 @@ class ServiceReport(unittest.TestCase):
             'INCIDENT_DISPOSITION: '+json.dumps({'assessment':'benign','status':'resolved'}),with_clock))
         for other in ([],[{'kind':'diagnostics','target':'c:apache'}],facts+[{'kind':'events','source':'wazuh'}]):
             other_schema=c.service_report_schema([NAME],available_reads=[NAME],facts=other)
-            self.assertTrue(Draft202012Validator(other_schema).is_valid({'more_evidence':False,'report':{**report,'assessment':'benign','status':'resolved'}}))
+            other_report={**report,'assessment':'benign','status':'resolved'}
+            if not any('pipeline_metrics' in f for f in other):other_report.pop('current_observation')
+            self.assertTrue(Draft202012Validator(other_schema).is_valid({'more_evidence':False,'report':other_report}))
 
     def setUp(self):
         fixture=ServiceHistory();fixture.setUp()

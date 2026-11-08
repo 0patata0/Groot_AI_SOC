@@ -128,3 +128,7 @@ A/C `20261108-inventory102`, B `20261108-harness102/103/104`, `20261108-gate105`
 | systemd 로그 두 번째 후속 | 예상Hermes→실제Ollama | 실패: 실제journal 누락/완료 오표시 |
 
 관제현황 답변은Mattermost데스크톱에서양봇각5개실제표로표시됐다. A/C는16:53 sourceSHA/수집timer/failed0재확인, B최종47manifest/보호6·내장gate/worker/큐0검증. 서버시험7디렉터리3344파일을모두SHA확인후제거했다. 운영원본·복구·검증기록·G_Harness2는보존한다.
+
+## 2026-11-08 21:08 후속 정정
+
+앞서 기록한107 미적용 시점의 담당전환/journal 미조회 실패는 [후속 보완](../hermes/service-followups.md)에서 수정·운영 검증했다. 현재 common1.5.83/routing1.1.8. 양봇3단계6질문·부재대상2질문 원문/게시 일치, 등록 journal만 무승인 읽기이며 임의 unit 권한을 추가하지 않았다. 이전 실패 수치·날짜는 그대로 보존한다.

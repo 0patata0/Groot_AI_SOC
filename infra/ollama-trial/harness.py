@@ -2127,6 +2127,7 @@ def diagnostic_history_request(question):
     if not re.search(r'systemd|\.service\b|서비스|서버|호스트|Vector|벡터|Docker|도커|Hermes|헤르메스|Ollama|올라마|인덱서|Indexer|Mattermost|매터모스트|파이프라인|수집기', text, re.I):
         return False
     if re.search(r'룰|규칙|rules?', text, re.I): return False
+    if CONTRACT.service_log_request(text): return True
     if re.search(r'비교|대조|연속|재조회|두\s*번|세\s*번|여러\s*번|\d+\s*(?:번|회)|\d{4}[-/.]\d',text): return True
     if re.search(r'경보|반복|이력|과거|당시|어제|그제|지난|원인|왜|조사|장애인지', text):
         return True

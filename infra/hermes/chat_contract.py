@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.82'
+VERSION = 'soc-chat-contract:1.5.83'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -518,6 +518,14 @@ def _service_natural_period(question, at):
     except ValueError:return None
 
 
+def service_log_request(question):
+    """Message-log intent, excluding words embedded in target/unit names."""
+    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|[는은도만을를가의에](?=$|[\s,.!?？]))|'
+                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
+    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
+                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
+
+
 def service_history_plan(request, question, requested_at):
     """Required reads for explicitly named units and unambiguous past periods.
 
@@ -528,10 +536,12 @@ def service_history_plan(request, question, requested_at):
     """
     name='mcp__system_diagnostics__get_system_diagnostics'
     if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-    if re.search(r'```|번역|예시|가정|정규식|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
+    if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
     if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
-    if not re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I):return None
+    wants_journal=service_log_request(question)
+    wants_history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+    if not wants_history and not wants_journal:return None
     at=_diagnostic_instant(requested_at)
     if at is None:return None
     bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',question)
@@ -545,6 +555,9 @@ def service_history_plan(request, question, requested_at):
         midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)
         if '어제' in days:periods.append((midnight-timedelta(days=1),midnight-timedelta(microseconds=1)))
         if days & {'오늘','금일'}:periods.append((midnight,at))
+        # An unspecified log lookup has a visible bounded default. Explicit
+        # ambiguous/unsupported periods above never fall back to this window.
+        if not days and wants_journal:periods.append((at-timedelta(minutes=15),at))
     else:return None
     if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
             or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
@@ -569,6 +582,7 @@ def service_history_plan(request, question, requested_at):
         targets.add(matches[0])
     if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
     current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+    if wants_journal and not wants_history and not re.search(r'상태|state|status',question,re.I):current=False
     # A named today's operating state also asks for a current observation;
     # the separate today's history is still required, never replaced by it.
     current=current or bool(re.search(r'(?:오늘|금일)(?:은|의)?\s*(?:(?:관제|처리|서비스|운영)\s*)?상태',question))
@@ -577,15 +591,20 @@ def service_history_plan(request, question, requested_at):
             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
                 or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
     options=[]
-    wants_journal=bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])(?:raw|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I))
     journal_supported='journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
     for target in sorted(targets):
         if current:options.append({'tool':name,'arguments':{'target':target}})
-        options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
-                       for start,end in periods)
+        if wants_history:
+            options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
+                           for start,end in periods)
         if wants_journal and journal_supported:
             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),
-                'until_kst':end.isoformat(),'view':'journal','limit':50}} for start,end in periods)
+                'until_kst':end.isoformat(),'view':'journal','limit':50,
+                **({} if wants_history else {'journal_scope':'all'})}} for start,end in periods)
+        elif wants_journal and not wants_history and not current:
+            # Old catalogs can still report the available target, but the
+            # unavailable journal capability below always vetoes completion.
+            options.append({'tool':name,'arguments':{'target':target}})
     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
     unavailable=['journal_excerpt'] if wants_journal and not journal_supported else []
@@ -598,14 +617,18 @@ def service_history_plan(request, question, requested_at):
             options.append({'tool':block_name,'arguments':{}})
         else:unavailable.append('current_block_list')
     outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-    only_service=not re.search(outside,question,re.I)
+    def without_targets(text):
+        for label in sorted(set(targets)|{mapping[t] for t in targets},key=len,reverse=True):
+            text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',' ',text)
+        return text
+    only_service=not re.search(outside,without_targets(question),re.I)
     # Preserve the full question and every receipt. Only a separately matched
     # inventory clause is removed for scope classification, never for inquiry.
     residual=question
     if read_contract().companion_block_request(question):
         residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
                           if read_contract().block_list_plan(part.strip()) is None)
-    compact_scope=not re.search(outside,read_contract().without_prohibitions(residual),re.I)
+    compact_scope=not re.search(outside,without_targets(read_contract().without_prohibitions(residual)),re.I)
     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
             'compact_scope':compact_scope,
             'current_companions':related,
@@ -697,7 +720,7 @@ def service_lookup_scope(plan, question):
     text=re.sub(r'(?<![A-Za-z0-9_:])[ABC](?:\s*(?:서버|호스트))?(?=\s|의|$)',' ',text,flags=re.I)
     text=re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?',' ',text)
     token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|'
-           r'원문|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
+           r'원문|로그|logs?|journal(?:ctl)?|raw|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
            r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
            r'부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|도|만|에|[\s,.!?。~–—-]')
     return re.fullmatch(r'(?:'+token+r')+',text) is not None

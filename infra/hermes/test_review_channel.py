@@ -1017,6 +1017,36 @@ assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
         follow = self.follow('표로 보여줄래')
         self.assertEqual(follow['engine'], 'ollama')
 
+    def test_consecutive_service_followups_keep_explicit_owner_without_direct_authority(self):
+        h=self.actual_harness()
+        for i,text in enumerate(('@hermes B 서버 capstone-management.service 상태 보여줘',
+                                 '메모리는?', '로그도', '상태는?')):
+            post=dict(self.post,id=str(i+1)*26,create_at=1100+i*1000,message=text)
+            self.d.add(post)
+            row=dict(self.d.db.execute('SELECT * FROM jobs WHERE source_id=?',(post['id'],)).fetchone())
+            self.assertEqual(row['engine'],'hermes')
+            self.assertEqual(bool(row['direct']),i==0)
+            self.assertIn('capstone-management.service',row['question'])
+            with self.d.db:
+                self.d.db.execute("UPDATE jobs SET status='done',result=? WHERE id=?",
+                    (json.dumps({'status':'completed','final_response':'표본입니다.'}),row['id']))
+            if i==1:
+                self.d.db.close();self.d=m.Dispatcher(self.config,self.apis,self.database,h)
+        # An explicit new topic loses the old owner. No mention is synthesized.
+        self.d.add(dict(self.post,id='z'*26,create_at=6000,message='WAF 룰 보여줘'))
+        row=self.d.db.execute('SELECT engine,direct FROM jobs WHERE source_id=?',('z'*26,)).fetchone()
+        self.assertEqual(tuple(row),('ollama',0))
+
+    def test_owner_lineage_rejects_expired_cross_thread_or_multiple_leads(self):
+        self.actual_harness();self.post['message']='@hermes WAF 룰 조회'
+        self.d.add(self.post);self.finish()
+        for fields in ({'create_at':1000000},{'user_id':'v'*26},{'channel_id':'x'*26},{'root_id':'t'*26}):
+            post=dict(self.post,create_at=2200);post.update(fields)
+            self.assertIsNone(self.d.explicit_followup_owner(self.post['id'],post))
+        with self.d.db:
+            self.d.db.execute("UPDATE jobs SET status='cancelled' WHERE source_id=?",(self.post['id'],))
+        self.assertIsNone(self.d.explicit_followup_owner(self.post['id'],dict(self.post,create_at=2200)))
+
     def test_change_gets_ollama_peer_and_preserves_disagreement(self):
         self.post['message'] = 'WAF 규칙 수정안을 작성해줘'
         self.d.add(self.post); self.finish('completed', '제안 제출. 승인 대기입니다.')

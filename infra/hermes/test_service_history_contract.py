@@ -1016,6 +1016,46 @@ class JournalEvidence(unittest.TestCase):
             self.assertEqual(p['requirements'][-1]['arguments']['view'],'journal')
         self.assertIsNone(c.service_history_plan(catalog(),'오늘 b:management 원문 말고 오류 이력',self.at))
 
+    def test_short_log_lookup_reads_messages_for_registered_units_on_each_host(self):
+        for target,unit in d.TARGETS.items():
+            if not isinstance(unit,str):continue
+            q=target[0].upper()+' 서버 '+unit+' 로그 보여줘'
+            # Multiple targets can legitimately share a unit; use the exact
+            # registered target when the unit alone would be ambiguous.
+            if sum(v==unit and k[0]==target[0] for k,v in d.TARGETS.items())>1:q=target+' 로그 보여줘'
+            with self.subTest(target=target):
+                plan=c.service_history_plan(catalog(),q,self.at)
+                self.assertIsNotNone(plan)
+                self.assertTrue(c.service_lookup_scope(plan,q))
+                self.assertEqual(plan['requirements'],[{'tool':NAME,'arguments':{
+                    'target':target,'since_kst':'2026-11-08T02:45:00+09:00',
+                    'until_kst':self.at,'view':'journal','limit':50,'journal_scope':'all'}}])
+                self.assertEqual(c.service_history_state(plan,[],self.now)['pending'],plan['requirements'])
+
+    def test_log_request_does_not_complete_from_current_status_or_history(self):
+        plan=c.service_history_plan(catalog(),'B 서버 capstone-management.service 로그 보여줘',self.at)
+        for args in ({'target':'b:management'},
+                     {'target':'b:management','since_kst':'2026-11-08T02:45:00+09:00','until_kst':self.at}):
+            row={'tool':NAME,'arguments':args,'is_error':False,'data':self.data()}
+            self.assertEqual(c.service_history_state(plan,[row],self.now)['pending'],plan['requirements'])
+            self.assertIsNone(c.service_report_context(catalog(),'B 서버 capstone-management.service 로그 보여줘',self.at,[row],now=self.now))
+
+    def test_short_logs_respect_explicit_dates_negation_host_and_old_catalog(self):
+        self.assertFalse(c.service_log_request('Wazuh remoted와 Groot_C 로그수집기 통계 조회해줘'))
+        plan=c.service_history_plan(catalog(),'어제 b:management 로그 보여줘',self.at)
+        self.assertEqual(plan['requirements'][0]['arguments']['since_kst'],'2026-11-07T00:00:00+09:00')
+        for q in ('b:management 로그 조회하지 마','b:management 로그 사용법 설명',
+                  'B 서버 capstone-management.service 설정 원문 보여줘',
+                  'B 서버 capstone-management.service 설정 파일 raw 보여줘',
+                  'A 서버 capstone-management.service 로그 보여줘',
+                  'b:unknown 로그 보여줘','b:management 지난달 로그 보여줘',
+                  '내일 b:management 로그 보여줘','b:management 3시부터 로그 보여줘'):
+            self.assertIsNone(c.service_history_plan(catalog(),q,self.at),q)
+        req=catalog();req['tools'][0]['function']['parameters']['properties'].pop('view')
+        plan=c.service_history_plan(req,'b:management 로그 보여줘',self.at)
+        self.assertTrue(plan['requirements'])
+        self.assertIn('journal_excerpt:tool_capability_unavailable',c.service_history_state(plan,[],self.now)['incomplete'])
+
     def test_old_catalog_never_invents_journal_capability_or_completeness(self):
         req=catalog();req['tools'][0]['function']['parameters']['properties'].pop('view')
         p=c.service_history_plan(req,self.q,self.at)

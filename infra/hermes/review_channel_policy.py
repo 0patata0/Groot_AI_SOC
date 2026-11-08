@@ -11,7 +11,7 @@ exec(compile(_format_path.read_bytes(),str(_format_path),'exec'),_format.__dict_
 normalize_tables = _format.normalize_tables
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
-VERSION = 'soc-review-routing:1.1.7'
+VERSION = 'soc-review-routing:1.1.8'
 
 
 def direct_targets(question):

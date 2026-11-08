@@ -195,6 +195,36 @@ class Dispatcher:
         self.db.execute('DELETE FROM request_evidence WHERE job_id NOT IN ('
             'SELECT e.job_id FROM request_evidence e JOIN jobs j ON j.id=e.job_id ORDER BY j.created DESC LIMIT 200)')
 
+    def explicit_followup_owner(self, previous, post):
+        """Carry a human's single-bot choice through bounded read followups.
+
+        Only routing is inherited. The job's direct bit, approval and evidence
+        remain specific to this new message. Persisted parent links survive a
+        dispatcher restart; automatic owners and cross-review peers do not.
+        """
+        seen, owner = set(), None
+        while previous and previous not in seen and len(seen) < 100:
+            seen.add(previous)
+            row = self.db.execute('SELECT r.post,c.parent_source_id FROM requests r '
+                'LEFT JOIN request_context c ON c.source_id=r.id WHERE r.id=?', (previous,)).fetchone()
+            if not row: return None
+            old = json.loads(row['post'])
+            if (old['user_id'] != post['user_id'] or old['channel_id'] != post['channel_id']
+                    or old.get('root_id', '') != post.get('root_id', '')
+                    or not 0 < post['create_at'] - old['create_at'] <= 15*60*1000
+                    or old.get('delete_at')): return None
+            leads = self.db.execute("SELECT engine,direct,status FROM jobs WHERE source_id=? AND phase='lead'",
+                                    (previous,)).fetchall()
+            if len(leads) != 1 or leads[0]['status'] != 'done': return None
+            engine = leads[0]['engine']
+            if owner is not None and owner != engine: return None
+            owner = engine
+            direct = policy.direct_targets(old['message'])
+            if direct:
+                return owner if direct == [owner] and leads[0]['direct'] else None
+            previous = row['parent_source_id']
+        return None
+
     def add(self, post):
         if not policy.eligible(post, self.c) or self.db.execute('SELECT 1 FROM requests WHERE id=?', (post['id'],)).fetchone():
             return
@@ -224,15 +254,17 @@ class Dispatcher:
             engines = direct if len(direct) == 1 else ['hermes']
             plan['cross_review'] = True
         if previous and not direct and not policy.mutual_verification(post['message']):
-            owners = self.db.execute("SELECT DISTINCT engine,direct FROM jobs WHERE source_id=? AND phase='lead' AND status='done'", (previous,)).fetchall()
-            if len(owners) == 1 and owners[0]['direct']:
-                engines = [owners[0]['engine']]
+            owner = self.explicit_followup_owner(previous, post)
+            if owner:
+                engines = [owner]
         # Main-channel followups use bounded history from this same human only.
         prior = self.db.execute("SELECT r.post,j.result,j.engine,j.phase FROM requests r JOIN jobs j ON j.source_id=r.id WHERE j.status='done' ORDER BY r.created DESC,j.created DESC LIMIT 12").fetchall()
         context = []
         for row in reversed(prior):
             old = json.loads(row['post'])
-            if old['user_id'] == post['user_id'] and old['create_at'] < post['create_at']:
+            if (old['user_id'] == post['user_id'] and old['channel_id'] == post['channel_id']
+                    and old.get('root_id', '') == post.get('root_id', '')
+                    and 0 < post['create_at'] - old['create_at'] <= 15*60*1000):
                 context.append({'question': old['message'][:1000], 'engine': row['engine'], 'phase': row['phase'],
                                 'answer': json.loads(row['result'])['final_response'][:1400]})
         question = current

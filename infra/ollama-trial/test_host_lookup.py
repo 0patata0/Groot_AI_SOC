@@ -30,6 +30,62 @@ def seal(call, data):
 
 
 class HostLookup(unittest.TestCase):
+    def test_explicit_os_or_container_never_becomes_wazuh_agent_identity(self):
+        for question in ('B 서버 capstone-management.service 상태 보여줘',
+                         'A 서버 capstone-vector.service 상태 보여줘',
+                         'C 서버 apache2.service 상태 보여줘',
+                         'B 서버 hermes 컨테이너 상태 보여줘'):
+            with self.subTest(question=question):
+                self.assertIsNone(h.read_plan(question))
+        self.assertEqual(h.read_plan('B 서버 상태 보여줘')['kind'], 'agent_identity')
+
+    def test_docker_resources_without_name_are_stats_not_host_memory(self):
+        for q in ('도커 컨테이너 자원 보여줄래','도커 자원 보여줘','컨테이너 자원 보여줘',
+                  '컨테이너별 CPU 메모리 보여줘','Docker stats 보여줘','B 서버 Docker 사용량 보여줘',
+                  '도커 RAM 보여줘','컨테이너 메모리 사용률 보여줘','컨테이너 리소스 보여줘',
+                  '도커 메모리 현황 보여줘'):
+            with self.subTest(q=q):
+                request=h.host_inventory_request(q)
+                self.assertEqual(request,[dict(host='b' if q.startswith('B 서버') else 'all',view='container_stats',state='all',limit=100,offset=0)])
+                self.assertIsNone(h.scope_notice(q));self.assertEqual(h.tool_scope(q),{NAME})
+                self.assertTrue(h.refine_read_schemas(q,{NAME:m.INVENTORY_TOOL['inputSchema']},[]))
+        req=h.host_inventory_request(h.resolve_short_read('다음 페이지',['도커 자원 보여줘']))[0]
+        self.assertEqual((req['view'],req['offset']),('container_stats',100))
+
+    def test_short_inventory_aliases_and_object_state_preserve_subject(self):
+        cases={'도커 목록 보여줘':['containers'],'도커 컨테이너 상태 보여줘':['containers'],
+               'docker 컨테이너 목록':['containers'],'B 서버 ssh.service 상태 보여줘':['service_details'],
+               '실행 중인 프로세스 보여줘':['processes'],'CPU 사용률 보여줘':['resources'],
+               '남은 디스크 공간 보여줘':['storage'],'열려있는 포트 보여줘':['ports'],
+               '네트워크 경로 보여줘':['network'],'라우팅 테이블 보여줘':['network'],
+               'DNS 설정 보여줘':['network'],'스왑 사용량 보여줘':['resources'],
+               '디스크 용량 보여줘':['storage'],'메모리 여유 공간 보여줘':['resources']}
+        for q,views in cases.items():
+            with self.subTest(q=q):
+                req=h.host_inventory_request(q);self.assertEqual([r['view'] for r in req],views)
+                self.assertEqual(h.tool_scope(q),{NAME});self.assertTrue(h.refine_read_schemas(q,{NAME:m.INVENTORY_TOOL['inputSchema']},[]))
+        self.assertEqual(h.host_inventory_request('B 서버 ssh.service 상태 보여줘')[0]['unit'],'ssh.service')
+        self.assertIsNone(h.host_inventory_request('도커 상태 보여줘'))
+        self.assertEqual(h.tool_scope('도커 상태 보여줘'),{'mcp__system_diagnostics__get_system_diagnostics'})
+
+    def test_unknown_conditions_and_mutations_are_not_short_read_completed(self):
+        for q in ('도커 CPU 90% 이상 보여줘','도커 메모리 줄여줘','도커 어제 자원 보여줘',
+                  '도커 자원 및 서버 메모리 보여줘','도커 환경변수 보여줘','컨테이너 상세 보여줘',
+                  '서비스 실패 원인 알려줘','남은 디스크 공간 삭제해줘','라우팅 테이블 변경해줘',
+                  'CPU 90% 이상인 프로세스 보여줘','도커 목록 조회하지 마'):
+            with self.subTest(q=q): self.assertIsNone(h.host_inventory_request(q))
+
+    def test_missing_log_detail_subject_asks_once_and_inherits_only_name(self):
+        for q in ('도커 로그 보여줘','컨테이너 상세 보여줘','B 서버 도커 컨테이너 로그 보여줄래'):
+            with self.subTest(q=q):
+                self.assertIn('어느 컨테이너',h.scope_notice(q))
+                resolved=h.resolve_short_read('hermes',[q]);req=h.host_inventory_request(resolved)[0]
+                self.assertEqual(req['container'],'hermes');self.assertEqual(req['host'],'b' if q.startswith('B 서버') else 'all')
+                self.assertIsNone(h.scope_notice(resolved))
+        for q in ('도커 로그 삭제해줘','도커 로그 조회하지 마','도커 오류 원인 알려줘'):
+            self.assertIsNone(h.scope_notice(q))
+        self.assertEqual(h.resolve_short_read('재시작해줘',['도커 로그 보여줘']),'재시작해줘')
+
     def test_capacity_units_use_exact_source_and_at_most_two_decimals(self):
         for value,unit,want in [('107374182400','bytes','107.37 GB (107,374,182,400 bytes)'),
                                 ('1000000000000','B','1 TB (1,000,000,000,000 B)'),

@@ -48,7 +48,8 @@ def request(value):
     core.need(type(limit) is int and 1 <= limit <= 100 and type(offset) is int and 0 <= offset <= MAX_ROWS,
               'inventory_page')
     container = value.get('container')
-    core.need((view.startswith('container_') and isinstance(container, str)
+    core.need((view == 'container_stats' and 'container' not in value) or
+              (view.startswith('container_') and isinstance(container, str)
                and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}', container))
               or (not view.startswith('container_') and container is None), 'inventory_container')
     unit = value.get('unit')
@@ -212,11 +213,13 @@ def docker_view(view, runner, docker):
         with ThreadPoolExecutor(max_workers=4) as pool: rows = [r for group in pool.map(one, listed) for r in group]
     elif view == 'container_stats':
         raw = command(runner, [docker, 'stats', '--no-stream', '--all', '--format', '{{json .}}'])
-        rows = []
+        rows = []; seen = set()
         for item in (json.loads(line) for line in raw.splitlines()):
-            core.need(item['Name'] in names.values(), 'container_stats_catalog')
+            core.need(item['Name'] in names.values() and item['Name'] not in seen, 'container_stats_catalog')
+            seen.add(item['Name'])
             for key in ('CPUPerc', 'MemUsage', 'MemPerc', 'NetIO', 'BlockIO', 'PIDs'):
                 rows.append(dict(name=safe(item['Name']), field=key, value=safe(item[key])))
+        core.need(seen == set(names.values()), 'container_stats_missing_objects')
     else:
         data = json.loads(command(runner, [docker, 'inspect', '--type', 'container', '--', *names]))
         core.need(isinstance(data, list) and len(data) == len(names) and {row['Id'] for row in data} == set(names), 'container_inspect_catalog')
@@ -308,7 +311,7 @@ def answer(value, expected_host, now=None, snapshot=None):
     fresh = 0 <= now - source['observed_at'] <= core.TTL
     observed = fresh and source['status'] == 'observed'
     rows = source['rows'] if observed else []
-    if view.startswith('container_'):
+    if view.startswith('container_') and 'container' in value:
         rows = [row for row in rows if row['name'] == value['container']]
         catalog = snapshot['views']['containers']
         catalog_known = catalog['status'] == 'observed' and 0 <= now - catalog['observed_at'] <= core.TTL
@@ -332,6 +335,7 @@ def answer(value, expected_host, now=None, snapshot=None):
               'total': len(rows) if observed else None, 'rows': rows[offset:offset + limit],
               'has_more': offset + limit < len(rows) if observed else None,
               'next_offset': offset + limit if observed and offset + limit < len(rows) else None}
-    if view.startswith('container_'): result.update(container=value['container'], object_present=present if observed else None)
+    if view.startswith('container_') and 'container' in value:
+        result.update(container=value['container'], object_present=present if observed else None)
     if view == 'service_details': result.update(unit=value['unit'], object_present=bool(rows) if observed else None)
     return result

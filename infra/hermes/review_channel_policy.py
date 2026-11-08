@@ -11,7 +11,7 @@ exec(compile(_format_path.read_bytes(),str(_format_path),'exec'),_format.__dict_
 normalize_tables = _format.normalize_tables
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
-VERSION = 'soc-review-routing:1.1.6'
+VERSION = 'soc-review-routing:1.1.7'
 
 
 def direct_targets(question):
@@ -93,17 +93,7 @@ def resolve_followup(question, previous, harness):
     resolved = resolver(current, [previous]) if resolver else current
     if resolved != current:
         return resolved
-    scope = getattr(harness, 'rule_scope_request', lambda _: None)
-    prior, present = scope(previous), scope(current)
-    # A bounded natural-language detail/format request can omit "rules".
-    if (prior and len(prior['devices']) == 1 and not present and len(current) <= 120
-            and re.fullmatch(r'(?:좀\s*더\s*|더\s*|방금\s*|그거\s*|그걸\s*|상세조회한거\s*)?'
-                             r'(?:자세[하게히]*|상세[히하게]*|표로|테이블로|원문으로)'
-                             r'\s*(?:정리해서\s*)?(?:보여(?:줘|주세요|줄래|줄래요)|'
-                             r'보고\s*싶(?:은데|어|어요)|알려(?:줘|주세요)|해(?:줘|주세요))?[?.!]*', current)):
-        origin = '커스텀 ' if prior.get('custom_only') else '기본 ' if prior.get('basic_only') else ''
-        detail = '상세 ' if re.search(r'자세|상세|원문', current) else ''
-        return prior['devices'][0] + ' 룰 ' + origin + detail + '조회. ' + current
+
     return current
 
 

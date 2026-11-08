@@ -56,7 +56,9 @@ INVENTORY_TOOL = {
         'running is process state, NOT functional health. failed is only supported for services. '
         'ports lists listeners, NOT firewall permissions or externally reachable ports. '
         'No process arguments, environment, container commands, shell, arbitrary path or mutation. '
-        'container_details, container_stats and container_logs require an exact container name; host all searches that name on A/B/C. '
+        'container_details and container_logs require an exact container name; host all searches that name on A/B/C. '
+        'container_stats allows omission of container to read stats for all containers, including stopped ones; '
+        'each metric is one row, so limit/offset count metric rows, not containers. Supplying container restricts to that exact name. '
         'Details project only fixed inspect fields (health/restarts/ports/networks/mounts/resource limits). '
         'Logs are masked, bounded stdout+stderr samples: recent15 minutes, tail20 per stream, updated every60s. '
         'A log sample is not the full retained history or proof of no errors; unsupported drivers are unavailable. '
@@ -497,7 +499,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.0'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.1'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

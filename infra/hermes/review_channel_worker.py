@@ -31,6 +31,9 @@ def lookup_read_scope(harness, current, phase):
     """
     if phase != 'lead' or not getattr(harness, 'structured_read', lambda _: False)(current):
         return None
+    if getattr(harness,'soc_overview_request',lambda _:False)(current):
+        scope=harness.tool_scope(current)
+        return frozenset(scope) if all(harness.EVIDENCE.allowed(n,'verify') for n in scope) else None
     events = getattr(harness,'event_lookup_scope',lambda _:None)(current)
     if events and all(harness.EVIDENCE.allowed(name,'verify') for name in events): return events
     if getattr(harness, 'host_inventory_request', lambda _: None)(current):
@@ -572,9 +575,8 @@ def main():
     current = request.get('current_question', request['question'])
     notice = harness.scope_notice(current)
     if notice:
-        scope = harness.rule_scope_request(current)
         print(json.dumps({'status': 'partial', 'final_response': notice,
-            'scope_resolution': 'clarification_required' if scope['ambiguous'] else 'unsupported_scope',
+            'scope_resolution': 'clarification_required',
             'structured_scope_complete': False, 'protected_calls': 0, 'calls': [],
             'unqueried': harness.missing_reads(current, [])}, ensure_ascii=False))
         return
@@ -706,11 +708,11 @@ def main():
                 scope_complete=False
             status = 'completed' if result['completed'] and not failed_evidence and result['state'] in ('completed', 'waiting_approval') else 'partial'
             if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope or
-                    harness.event_lookup_scope(current) or harness.host_inventory_request(current)) and not scope_complete and not any(c['is_write'] for c in calls):
+                    harness.event_lookup_scope(current) or harness.host_inventory_request(current) or harness.soc_overview_request(current)) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
             if result['completed'] and scope_complete and (response_read or diagnostic_targets or
-                    (lookup_scope and (harness.event_lookup_scope(current) or harness.host_inventory_request(current))
+                    (lookup_scope and (harness.event_lookup_scope(current) or harness.host_inventory_request(current) or harness.soc_overview_request(current))
                      and request['phase']=='lead') or (plan and
                     (plan['kind']=='agent_identity' or plan['kind']=='web_access' and request['phase']=='lead'))):
                 status = 'completed'  # Completion of these read fields, not incident closure.

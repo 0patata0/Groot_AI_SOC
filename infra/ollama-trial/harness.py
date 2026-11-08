@@ -72,13 +72,44 @@ def resolve_short_read(question, prior_questions=()):
     previous = prior_questions[-1]
     if not isinstance(previous,str) or len(previous)>1800: return question
     if READ.wants_write(normalized(question)) or READ.wants_write(normalized(previous)):return question
+    # Resolve consecutive same-subject ellipses without skipping a topic turn.
+    if len(prior_questions)>1:
+        previous=resolve_short_read(previous,prior_questions[-12:-1])
+    follow=re.fullmatch(r'\s*(?:그(?:거|것|중)|해당\s*(?:서비스|컨테이너))?\s*'
+        r'(메모리|CPU|자원|리소스|사용량|로그|journal|상태|상세히|자세히|상세)'
+        r'(?:는|은|도)?\s*(?:보여줘|보여줄래|알려줘|조회해줘)?[?？.! ]*',normalized(question),re.I)
+    if follow:
+        prior_text=normalized(previous)
+        units=list(dict.fromkeys(re.findall(r'(?<![A-Za-z0-9_.@-])[A-Za-z0-9_.@-]+\.service\b',prior_text)))
+        hosts=list(dict.fromkeys(re.findall(r'(?<![A-Za-z0-9])([ABC])\s*서버',prior_text,re.I)))
+        if len(units)==1 and len(hosts)<=1 and not re.search(r'컨테이너|container',prior_text,re.I):
+            prefix=(hosts[0].upper()+' 서버 ') if hosts else ''
+            field=follow[1]
+            if re.fullmatch(r'메모리|CPU|자원|리소스|사용량',field,re.I):field='상세 '+field
+            return prefix+units[0]+' '+field+' 보여줘'
+        # Registered diagnostic aliases retain the actual host and service
+        # family too; no hard-coded alias is substituted for an unknown unit.
+        prior_diag=diagnostic_request(previous)
+        if prior_diag and not prior_diag.get('all') and len(prior_diag.get('requested',[]))==1:
+            return prior_diag['requested'][0]+' '+follow[1]+' 보여줘'
+    pending = container_target_required(previous)
+    supplied = normalized(question).strip(' \t\n?？.!').replace('헤르메스','hermes')
+    if pending and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}',supplied):
+        prefix = '' if pending['host']=='all' else pending['host'].upper()+' 서버 '
+        return prefix+supplied+' 컨테이너 '+pending['kind']+' 보여줘'
     host_prior = host_inventory_request(previous)
     if host_prior:
         text = normalized(question)
         first = host_prior[0]
-        if first.get('container') and re.fullmatch(r'\s*(?:로그|자원|상세)(?:도)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text):
+        if follow and any(r['view'].startswith('container') for r in host_prior):
             prefix = '' if first['host'] == 'all' else first['host'].upper() + ' 서버 '
-            return prefix + first['container'] + ' 컨테이너 ' + text
+            return prefix+(first.get('container','')+' 컨테이너 '+follow[1]+' 보여줘').strip()
+        if follow and all(r['view'] in ('resources','storage','network') for r in host_prior):
+            # Host-level questions keep their host; process/unit/container
+            # metrics must never be replaced by this host-level path.
+            prefix = '' if first['host']=='all' else first['host'].upper()+' 서버 '
+            if re.fullmatch(r'메모리|CPU|자원|리소스|사용량',follow[1],re.I):
+                return prefix+follow[1]+' 보여줘'
         page = display_page_request(text)
         count = re.fullmatch(r'\s*([1-9][0-9]?)\s*(?:개|건)(?:만)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text)
         failed = re.fullmatch(r'\s*(?:오류|실패)(?:난|한)?\s*(?:것|서비스)(?:만)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text)
@@ -95,12 +126,7 @@ def resolve_short_read(question, prior_questions=()):
             prefix += (first.get('container') or first.get('unit') or '') + ' '
             state = '실패한 ' if failed else '실행중인 ' if first['state'] == 'running' else ''
             return prefix + state + ' '.join(label[v] for v in views) + ' ' + str(int(count[1]) if count else first['limit']) + '개 ' + str(number) + '페이지 보여줘'
-    # Fold only consecutive short read/format turns, never skip a new topic.
-    previous_scope=rule_scope_request(previous)
-    if len(prior_questions)>1 and (rule_table_request(previous) or
-            CONTRACT.bare_firewall_view(normalized(previous)) or
-            previous_scope and previous_scope['ambiguous']):
-        previous=resolve_short_read(previous,prior_questions[-12:-1])
+    # The shared history fold above also covers rule/format turns.
     current = rule_scope_request(question)
     prior = rule_scope_request(previous)
     if not prior and not READ.wants_write(normalized(previous)):
@@ -110,6 +136,13 @@ def resolve_short_read(question, prior_questions=()):
         elif re.search(r'상태|조회|확인|보여|알려|오류|문제|어때',label):
             prior = rule_scope_request(previous+' 룰 조회')
     if not prior: return question
+    if (len(prior['devices'])==1 and not current and len(question)<=120
+            and re.fullmatch(r'(?:좀\s*더\s*|더\s*|방금\s*|그거\s*|그걸\s*|상세조회한거\s*)?'
+                r'(?:자세[하게히]*|상세[히하게]*|표로|테이블로|원문으로)\s*(?:정리해서\s*)?'
+                r'(?:보여(?:줘|주세요|줄래|줄래요)|보고\s*싶(?:은데|어|어요)|알려(?:줘|주세요)|해(?:줘|주세요))?[?.!]*',question)):
+        # Shared with every adapter: retain ID/origin/correlation/hook below,
+        # not a channel-specific rewrite that drops detailed conditions.
+        question='룰 '+('상세 ' if re.search(r'자세|상세|원문',question) else '')+'표로 보여줘'
     text=normalized(question)
     fw_prefix='FW '
     if prior['devices']==['FW']:
@@ -187,8 +220,24 @@ def rule_scope_request(question):
     return CONTRACT.rule_scope_request('룰 조회' if display_page_request(question) is not None else text)
 
 
+def container_target_required(question):
+    """Only an unqualified Docker log/detail request requires an object name."""
+    if host_read_prohibited(question):return None
+    text=normalized(question)
+    if READ.wants_write(text):return None
+    hosts=re.findall(r'(?<![a-z0-9])([abc])\s*서버',text,re.I)
+    if len(set(h.lower() for h in hosts))>1:return None
+    rest=re.sub(r'(?<![a-z0-9])[abc]\s*서버','',text,flags=re.I)
+    rest=re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|조회(?:해줘|해주세요)?|확인(?:해줘|해주세요)?|지금|현재|좀','',rest)
+    m=re.fullmatch(r'\s*(?:(?:도커|Docker|컨테이너|containers?)\s*)+(로그|상세|자세히|헬스|health)\s*[?.!]*',rest,re.I)
+    return dict(host=hosts[0].lower() if hosts else 'all',kind='로그' if m[1]=='로그' else '상세') if m else None
+
+
 def scope_notice(question):
     """Scope/capability explanation only; never an observation or tool result."""
+    missing=container_target_required(question)
+    if missing:
+        return '어느 컨테이너의 '+missing['kind']+'를 볼까요? 컨테이너 이름을 알려주세요. 아직 조회하지 않았습니다.'
     request = rule_scope_request(question)
     if not request:
         return None
@@ -621,7 +670,13 @@ def read_plan(question):
     for value in literals:
         if value not in text:
             text += '\n' + value
-    return READ.plan(text, EVIDENCE._AWARE_TIME)
+    plan = READ.plan(text, EVIDENCE._AWARE_TIME)
+    # A host qualifier identifies where an explicit OS/Docker object lives;
+    # it does not turn that object's status into Wazuh agent identity.
+    if (plan and plan.get('kind') == 'agent_identity'
+            and re.search(r'\.service\b|\bsystemd\b|컨테이너|\bcontainer\b', text, re.I)):
+        return None
+    return plan
 
 
 def rule_detail_request(question):
@@ -822,7 +877,100 @@ def inventory_question(question):
     return None if combined_rule_request(question) else _inventory_question(question)
 
 
+SOC_OVERVIEW_CALLS = {
+    'mcp__system_diagnostics__get_system_diagnostics': {'target':'soc:coverage'},
+    'mcp__security_events__search_wazuh_alerts': {'lookback_minutes':60,'limit':5},
+    'mcp__resp__list_blocks': {},
+}
+
+
+def soc_overview_request(question):
+    """Current SOC overview only. Unknown filters/history/causes stay model-led."""
+    if not isinstance(question,str) or re.search(r'조회\s*하지|도구\s*없이',question):return False
+    text=normalized(question)
+    if READ.wants_write(text) or EVIDENCE.incident_investigation_request(text):return False
+    return bool(re.fullmatch(r'\s*(?:(?:지금|현재|전체|전반적인|우리)\s*)*'
+        r'(?:보안\s*)?(?:관제|SOC)(?:\s*운영)?\s*(?:현황|상황|상태)(?:을|를|은|는)?\s*'
+        r'(?:(?:좀|간단히|표로|한눈에)\s*)*(?:알려\s*(?:줘|줄래|주세요)|보여\s*(?:줘|줄래|주세요)|'
+        r'조회\s*(?:해줘|해주세요)?|확인\s*(?:해줘|해주세요)?|어때)?[?？.! ]*',text,re.I))
+
+
+def soc_overview_state(calls, targets=()):
+    """No earlier assistant text: only this turn's intact, fresh MCP receipts."""
+    latest={'mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name',''):c for c in calls}
+    call=latest.get('mcp__system_diagnostics__get_system_diagnostics',{})
+    data=payload(call);now=datetime.now(EVIDENCE.KST)
+    valid=(isinstance(data,dict) and call.get('arguments')=={'target':'soc:coverage'}
+        and data.get('schema')==1 and data.get('kind')=='coverage' and data.get('target')=='soc:coverage'
+        and data.get('mutation_performed') is False and isinstance(data.get('targets'),dict)
+        and set(data.get('hosts',{}))==set('abc'))
+    if valid:
+        rows=data['targets'];expected={t for t in targets if re.match(r'^[abc]:',t)}
+        valid=bool(rows) and (not expected or set(rows)==expected) and data.get('total_targets')==len(rows)
+        for target,row in rows.items():
+            if not isinstance(row,dict) or not re.fullmatch(r'[abc]:[a-z0-9-]+',target):valid=False;break
+            status=row.get('status');stamp=EVIDENCE.parse_instant(row.get('observed_at_kst'))
+            if status not in ('ok','degraded','unavailable','not_installed'):valid=False;break
+            if status!='unavailable' and not (stamp and -5<=(now-stamp).total_seconds()<=180):valid=False;break
+        counts={s:sum(r.get('status')==s for r in rows.values()) for s in ('ok','degraded','unavailable','not_installed')}
+        valid=valid and data.get('counts')==counts
+    coverage=data if valid else None
+    pipeline=(coverage or {}).get('targets',{}).get('b:management-pipeline',{})
+    metrics=CONTRACT.diagnostic_observation_fields(pipeline).get('pipeline_metrics',{})
+    blocks=READ.block_list_state(calls)
+    event_missing=event_lookup_missing('최근 경보 5개 보여줘',calls)
+    return coverage,metrics,blocks,event_missing
+
+
+def soc_overview_missing(calls, targets=()):
+    coverage,metrics,blocks,events=soc_overview_state(calls,targets)
+    missing=[]
+    if coverage is None:missing.append('관제 수집·서비스 상태: 현재 전체 조회 근거 미확인')
+    else:missing.extend(t+': 현재 상태 미확인' for t,r in coverage['targets'].items() if r['status']=='unavailable')
+    for key in ('pending_reports','running_cases','overdue_cases','review_required_cases'):
+        if key not in metrics:missing.append('관제 처리 지표 '+key+': 미확인')
+    if blocks is None:missing.append('현재 동적 IP 차단 목록: 미확인')
+    missing.extend(events or [])
+    return missing
+
+
+def soc_overview_report(question, calls, targets=()):
+    if not soc_overview_request(question):return None
+    coverage,metrics,blocks,events=soc_overview_state(calls,targets)
+    missing=soc_overview_missing(calls,targets)
+    lines=['**관제 현황**','',
+        '현재 수집·처리 상태, 동적 IP 차단과 최근 60분 Wazuh 경보 표본을 조회했습니다.' if not missing else
+        '관제 현황을 부분 조회했습니다. 미확인은 정상이나 0건이 아닙니다.','',
+        *READ.table(['항목','조회 결과','범위'],[
+            ['보고 전송 대기',metrics.get('pending_reports','미확인'),'현재 대기열'],
+            ['조사 실행 중',metrics.get('running_cases','미확인'),'현재 작업'],
+            ['처리 기한 초과',metrics.get('overdue_cases','미확인'),'현재 사건'],
+            ['검토 필요',metrics.get('review_required_cases','미확인'),'needs_review/outcome_unknown/review_ready'],
+            ['동적 IP 차단',len(blocks) if blocks is not None else '미확인','A agent_block 집합 · WAF 요청 차단과 별개']])]
+    if coverage:
+        rows=coverage['targets'];host_rows=[]
+        for host in 'abc':
+            selected=[r for t,r in rows.items() if t.startswith(host+':')]
+            count=[sum(r['status']==s for r in selected) for s in ('ok','degraded','unavailable','not_installed')]
+            stamps=sorted({r['observed_at_kst'] for r in selected if r.get('observed_at_kst')})
+            host_rows.append([host.upper(),*count,' / '.join(stamps)])
+        lines+=['','**수집·서비스 점검**','',*READ.table(['호스트','통과','이상 징후','미확인','미설치','수집 시각(KST)'],host_rows)]
+        attention=[(t,r) for t,r in rows.items() if r['status'] in ('degraded','unavailable')]
+        if attention:
+            labels={'degraded':'이상 징후','unavailable':'미확인'}
+            lines+=['','**확인이 필요한 항목**','',*READ.table(['대상','상태','반환 근거'],[
+                [t,labels[r['status']],', '.join(r.get('codes',[])) or
+                 ' / '.join(str(r.get('properties',{}).get(k,'미확인')) for k in ('ActiveState','SubState','Result'))]
+                for t,r in attention])]
+    if blocks:lines+=['','차단 IP: '+', '.join(blocks[:20])+(' · 나머지는 차단 목록 상세 조회' if len(blocks)>20 else '')]
+    if not events:lines+=['',event_report('최근 경보 5개 보여줘',calls)]
+    if missing:lines+=['','**미확인 범위**','',*READ.table(['확인 항목'],[[m] for m in missing])]
+    lines+=['','상태 수집은 약60초 주기입니다. 경보 표본은 전체 발생 건수·공격 성공 건수가 아니며, 점검 통과도 보안 사고 부재를 뜻하지 않습니다.']
+    return '\n'.join(lines)
+
+
 def structured_read(question):
+    if soc_overview_request(question): return True
     if host_inventory_request(question): return True
     if systemd_comparison_request(question): return True
     if event_lookup_scope(question): return True
@@ -923,7 +1071,7 @@ def event_lookup_missing(question, calls):
 
 def lookup_report(question, calls, diagnostic_targets=(), *, include_diagnostics=True):
     """One renderer order for SDK, Native and shared-channel reads."""
-    return (host_inventory_report(question, calls) or read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
+    return (soc_overview_report(question, calls, diagnostic_targets) or host_inventory_report(question, calls) or read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
             or (diagnostic_report(question, calls, diagnostic_targets) if include_diagnostics else None)
             or event_report(question, calls))
 
@@ -1729,7 +1877,7 @@ def read_background(question,current):
     Only the separately supplied current request authorizes a read. Background
     prose is a search reference, not an observed result or an approval.
     """
-    if question==current:return ''
+    if question==current or soc_overview_request(current):return ''
     question=card_query_context(question,current)
     reference=card_reference(question,current)
     anchor=('\n카드 생성 시각 기준의 정확한 조회 조건: '+json.dumps(reference,ensure_ascii=False)+
@@ -1938,6 +2086,10 @@ def workflow_names(question):
 def guidance(question, *, include_workflows=True):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    if soc_overview_request(question):
+        result += ('\n현재 관제 현황은 새 종합 조회입니다. soc:coverage, 최근60분 Wazuh 경보5개 표본, '
+                   '현재 list_blocks를 모두 조회하세요. 이전 대화의 Docker 자원·수치를 재사용하지 마세요. '
+                   '경보 표본을 전체 건수나 공격 성공 수로 바꾸지 마세요.')
     if diagnostic_history_request(question) or diagnostic_request(question):
         result += '\n' + CONTRACT.SERVICE_STATE_GUIDANCE
     if systemd_comparison_request(question):
@@ -2093,9 +2245,18 @@ PIPELINE_INVESTIGATION = re.compile(
 
 
 HOST_INVENTORY_TOOL = 'mcp__system_diagnostics__get_host_inventory'
+DIAGNOSTIC_UNIT_ALIASES = (('capstone-vector.service','vector','a'),
+                           ('capstone-management.service','management','b'),
+                           ('wazuh-agent.service','wazuh-agent',None))
+
+
+def host_read_prohibited(question):
+    return bool(re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이|보여주지',
+                          SHARED._unquoted_text(question)))
 
 
 def detailed_host_request(question):
+    if host_read_prohibited(question):return None
     text = normalized(question)
     if READ.wants_write(text): return None
     text = text.replace('헤르메스', 'hermes')
@@ -2111,26 +2272,29 @@ def detailed_host_request(question):
     rest = re.sub(r'[0-9]+\s*(?:개|건|페이지)', '', rest)
     subject = {}
     if units and not docker:
-        if len(units) != 1 or not re.search(r'상세|자세|종료\s*코드|재시작\s*횟수|자동\s*시작', rest): return None
+        if len(units) != 1 or not re.search(r'상태|상세|자세|종료\s*코드|재시작\s*횟수|자동\s*시작', rest): return None
+        if units[0] in {unit for unit,_,_ in DIAGNOSTIC_UNIT_ALIASES} and not re.search(r'상세|자세|종료\s*코드|재시작\s*횟수',rest):
+            return None  # Preserve richer registered diagnostic semantics and host mapping.
         subject = {'unit': units[0]}; views = ['service_details']; rest = rest.replace(units[0], '')
     elif docker:
         rest = re.sub(r'컨테이너|도커|Docker|containers?', '', rest, flags=re.I)
-        names = re.findall(r'(?<![A-Za-z0-9_.-])[A-Za-z0-9][A-Za-z0-9_.-]*', re.sub(r'\b(?:CPU|RAM|stats|health)\b', '', rest, flags=re.I))
-        if len(names) != 1: return None
-        subject = {'container': names[0]}; rest = rest.replace(names[0], '')
+        names = re.findall(r'(?<![A-Za-z0-9_.-])[A-Za-z0-9][A-Za-z0-9_.-]*', re.sub(r'\b(?:CPU|RAM|memory|stats|health)\b', '', rest, flags=re.I))
+        if len(names) > 1: return None
+        if names: subject = {'container': names[0]}; rest = rest.replace(names[0], '')
         views = []
         if re.search(r'로그', rest): views.append('container_logs')
-        if re.search(r'자원|CPU|메모리|stats', rest, re.I): views.append('container_stats')
+        if re.search(r'자원|리소스|CPU|메모리|RAM|memory|사용량|사용률|stats', rest, re.I): views.append('container_stats')
         if re.search(r'상세|자세|상태|헬스|health|재시작\s*횟수|포트|네트워크|볼륨|마운트|설정', rest, re.I): views.append('container_details')
         if not views: views = ['container_details']
+        if not names and views != ['container_stats']: return None
     else: return None
-    limit = int(counts[0]) if counts else (100 if all(v.endswith('_details') for v in views) else 20)
+    limit = int(counts[0]) if counts else (100 if not subject or all(v.endswith('_details') for v in views) else 20)
     page = int(pages[0]) if pages else 1
     if not 1 <= limit <= 100 or not 1 <= page <= 205 or (page - 1) * limit > 4096: return None
     rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|확인(?:해줘|해주세요)?|조회(?:해줘|해주세요)?|'
                   r'정리(?:해서|해줘)?|상세히|상세|자세히|자세하게|상태|헬스체크|헬스|health|재시작\s*횟수|종료\s*코드|'
-                  r'자동\s*시작|시작\s*설정|설정|포트|네트워크|볼륨|마운트|자원|CPU|메모리|사용량|stats|로그|'
-                  r'systemd|서비스|지금|현재|호스트별|서버별|목록|표로|테이블로|좀|하고|및|는|은|를|을|도|의', '', rest, flags=re.I)
+                  r'자동\s*시작|시작\s*설정|설정|포트|네트워크|볼륨|마운트|자원|리소스|CPU|메모리|RAM|memory|사용량|사용률|현황|stats|로그|'
+                  r'systemd|서비스|지금|현재|호스트별|서버별|목록|표로|테이블로|좀|하고|랑|및|는|은|를|을|도|의|별', '', rest, flags=re.I)
     if re.sub(r'[\s,./·?!~]+', '', rest): return None
     return [dict(host=host, view=view, state='all', limit=limit, offset=(page-1)*limit, **subject) for view in views]
 
@@ -2141,15 +2305,22 @@ def host_inventory_request(question):
     Unknown restrictions remain in general inquiry. This plans scope only;
     model selection and actual MCP receipts are still required.
     """
+    if host_read_prohibited(question):return None
     text = normalized(question)
     if READ.wants_write(text): return None
     detail = detailed_host_request(question)
     if detail: return detail
+    if (re.search(r'도커|docker',text,re.I) and re.search(r'상태',text)
+            and not re.search(r'컨테이너|containers?|목록',text,re.I)):
+        return None  # Bare Docker status remains the existing daemon diagnostic.
+    # Never substitute host RAM/CPU or a container list for Docker resource/detail requests.
+    if re.search(r'컨테이너|도커|docker|container', text, re.I) and re.search(
+            r'자원|리소스|CPU|메모리|RAM|memory|사용량|사용률|stats|로그|상세|자세', text, re.I): return None
     if re.search(r'\bsystemd\b', text, re.I) and not re.search(r'서비스', text): return None
-    groups = [('services', r'서비스|systemd'), ('containers', r'컨테이너|containers?'),
-              ('ports', r'수신\s*포트|열린\s*포트|리스닝\s*포트|포트|listening\s*ports?'),
-              ('resources', r'CPU|메모리|스왑|자원|memory|RAM|swap|load'),
-              ('processes', r'프로세스|processes'), ('network', r'네트워크|인터페이스|라우팅|DNS\s*설정'),
+    groups = [('services', r'서비스|systemd'), ('containers', r'컨테이너|도커|docker|containers?'),
+              ('ports', r'수신\s*포트|열린\s*포트|열려\s*있는\s*포트|리스닝\s*포트|포트|listening\s*ports?'),
+              ('resources', r'CPU|메모리|스왑|자원|리소스|memory|RAM|swap|load'),
+              ('processes', r'프로세스|processes'), ('network', r'네트워크|인터페이스|라우팅(?:\s*테이블)?|DNS\s*설정'),
               ('storage', r'파일시스템|마운트|디스크|disk')]
     views = [key for key, pattern in groups if re.search(pattern, text, re.I)]
     if not views: return None
@@ -2167,13 +2338,16 @@ def host_inventory_request(question):
     failed = bool(re.search(r'실패|오류', text))
     if running and failed: return None
     state = 'failed' if failed else 'running' if running else 'all'
+    if running and views == ['processes']: state = 'all'  # ps snapshot, not runnable-only task filtering.
     if state != 'all' and set(views) - {'services', 'containers'}: return None
     if failed and views != ['services']: return None
     rest = re.sub(r'(?<![a-z0-9])[abc]\s*서버|[0-9]+\s*(?:개|건|페이지)', '', text, flags=re.I)
     for _, pattern in groups: rest = re.sub(pattern, '', rest, flags=re.I)
+    if set(views) <= {'storage','resources'}: rest = re.sub(r'남은|공간|(?<![가-힣])용량', '', rest)
+    if views == ['network']: rest = re.sub(r'경로', '', rest)
     rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|확인(?:해줘|해주세요)?|'
                   r'조회(?:해줘|해주세요)?|정리(?:해서|해줘)?|실행\s*중인?|가동\s*중인?|돌아가는|돌고\s*있(?:는|어)?|떠\s*있(?:는|어)?|running|'
-                  r'실패한|실패|오류난|오류|지금|현재|호스트별|서버별|서버|사용량|현황|상태|목록|표로|테이블로|상세히|상세|설정|간단히|'
+                  r'실패한|실패|오류난|오류|지금|현재|호스트별|서버별|서버|사용량|사용률|현황|상태|목록|표로|테이블로|상세히|상세|설정|간단히|'
                   r'얼마나|남았어|여유|뭐|좀|하고|랑|및|는|은|를|을|도|만|의', '', rest, flags=re.I)
     if re.sub(r'[\s,./·?!~]+', '', rest): return None
     # Unqualified services includes Docker applications, with separate evidence.
@@ -2369,9 +2543,7 @@ def diagnostic_request(question):
         wanted.extend(h + ':systemd' for h in (list(dict.fromkeys(hosts)) or list('abc')))
     # Known unit aliases retain their actual host; unknown units are not mapped
     # to unrelated services. General systemd questions can discover failures.
-    for unit, name, default in [('capstone-vector.service', 'vector', 'a'),
-                                ('capstone-management.service', 'management', 'b'),
-                                ('wazuh-agent.service', 'wazuh-agent', None)]:
+    for unit, name, default in DIAGNOSTIC_UNIT_ALIASES:
         for match in re.finditer(r'(?<![A-Za-z0-9@_.:-])'+re.escape(unit)+r'(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',text):
             preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
             selected=(preceding[-1] if preceding else host) or default
@@ -2444,6 +2616,7 @@ def diagnostic_observations(calls):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if soc_overview_request(question): return set(SOC_OVERVIEW_CALLS)
     if host_inventory_request(question): return {HOST_INVENTORY_TOOL}
     if systemd_comparison_request(question): return set(SYSTEMD_COMPARE_TOOLS)
     events = event_lookup_scope(question)
@@ -2520,6 +2693,7 @@ def missing_reads(question, calls, diagnostic_targets=()):
 
 def _missing_reads(question, calls, diagnostic_targets=()):
     calls=evidence_reads(calls)
+    if soc_overview_request(question): return soc_overview_missing(calls, diagnostic_targets)
     host = host_inventory_observations(question, calls)
     if host:
         return [r['view']+': 호스트 인벤토리 근거 미확인' for r in host[0] if not host[1].get(r['view']) or
@@ -2594,6 +2768,17 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    if soc_overview_request(question):
+        from jsonschema import Draft202012Validator
+        narrowed={}
+        for name,args in SOC_OVERVIEW_CALLS.items():
+            if any('mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name','')==name for c in calls):continue
+            schema=result.get(name)
+            if not schema or not Draft202012Validator(schema).is_valid(args):continue
+            props=schema.get('properties',{})
+            narrowed[name]={'type':'object','additionalProperties':False,'required':list(args),
+                'properties':{k:{**props[k],'enum':[v]} for k,v in args.items()}}
+        return narrowed
     host = host_inventory_request(question)
     if host:
         schema = result.get(HOST_INVENTORY_TOOL)
@@ -3048,6 +3233,10 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
                   for family in reference['families'] if 'mcp__security_events__search_'+family+'_alerts' in schemas)
         if count:limit=min(limit,count)
     minimum = 1
+    if soc_overview_request(question):
+        minimum=len(schemas)
+        if not 1 <= minimum <= limit:raise ValueError('soc_overview_selection_budget')
+        limit=minimum
     if host_inventory_request(question) and set(schemas) == {HOST_INVENTORY_TOOL}:
         minimum = len(schemas[HOST_INVENTORY_TOOL].get('properties', {}).get('view', {}).get('enum', []))
         if not 1 <= minimum <= limit: raise ValueError('host_inventory_selection_budget')

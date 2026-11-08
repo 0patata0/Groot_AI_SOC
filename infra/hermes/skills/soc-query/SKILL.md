@@ -20,7 +20,8 @@ SOC_WORKFLOW_QUERY_V1
 | 서버·서비스·journal | `get_system_diagnostics`의 등록 대상·view. 서비스 상태와 과거 원문·전체 기능 정상은 구분 |
 | 실행 서비스·컨테이너 목록 | `get_host_inventory`: 일반 서비스 요청은 loaded systemd와 Docker를 구분해 함께 조회. 명시 호스트를 유지하고 생략 시 A/B/C 범위를 밝힘 |
 | 수신 포트·자원·프로세스 | 같은 도구의 ports/resources/processes. 포트 수신≠FW 허용, load≠CPU%, 프로세스 CPU%는 수명 기준. 프로세스 인자·환경은 제공하지 않음 |
-| Docker 상세·자원·로그 | 정확한 container 이름과 container_details/stats/logs. 상태/health/재시작/포트/네트워크/볼륨/제한을 조회. Env/Cmd/Labels·전체 inspect는 반환하지 않음. 로그는 최근15분 제한 마스킹 표본이며 stdout/stderr 포함 |
+| Docker 자원·CPU·메모리·사용량 | container_stats. 이름 생략 시 해당 호스트의 모든 컨테이너(중지 상태 포함)를 조회하고 호스트 생략 시 A/B/C를 명시. 이름이 있으면 그 이름만 조회. 자원 요청을 컨테이너 목록+호스트 메모리로 대체하지 않음. 페이지 한도는 컨테이너 수가 아닌 지표 행 수 |
+| Docker 상세·로그 | 정확한 container 이름과 container_details/logs. 이름 없으면 한 번 확인하고 후속 이름을 이어받음. 상태/health/재시작/포트/네트워크/볼륨/제한을 조회. Env/Cmd/Labels·전체 inspect는 반환하지 않음. 로그는 최근15분 제한 마스킹 표본이며 stdout/stderr 포함 |
 | OS 서비스 상세·네트워크·저장소 | service_details에 실제 .service 이름. loaded unit의 실행/종료/재시작/자동시작/자원 필드. network는 인터페이스·주 라우팅·DNS 설정, storage는 로컬 파일시스템 용량 |
 
 호스트 인벤토리는 60초 주기 스냅샷이며 수집 시각·조건 일치 건수·표시 건수·페이지를 함께 표시한다. 실행 중≠기능 정상, 오래된 자료·실패≠0건이다. limit/offset은 각 호스트·분류별 적용이며 새 페이지는 새 스냅샷일 수 있다. 서비스 전체 설치 목록 대신 loaded unit을 조회했다면 범위를 숨기지 않는다. 상세 원인/추세/임의 필터를 이 단순 목록으로 충족했다고 답하지 않는다.
@@ -35,3 +36,12 @@ SOC_WORKFLOW_QUERY_V1
 4. **보고하고 종료한다.** 필요한 근거가 갖춰진 단순 조회는 `soc-output`으로 바로 표를 반환하고 끝낸다. 같은 결과를 다시 설명하기 위한 모델·MCP 호출이나 교차검토를 추가하지 않는다. 상세 요청 때만 필요한 설명을 덧붙인다. 표본 조회 완료는 사건 종결·무공격·무장애 판단이 아니다.
 
 같은 결과의 재정리·다음 페이지는 동일 대화의 검증된 영수증과 관측 시각을 사용한다. 새 조회가 없으면 밝히며 실패·변조·잘린 결과나 오래된 결과를 최신 근거로 재사용하지 않는다. 명시한 교차검토는 원질문과 독립 영수증을 대조하며 두 봇의 동의 자체는 근거가 아니다.
+
+### 현재 관제 현황과 후속 질문
+
+- `지금 관제 현황 알려줘` 같은 현재 종합 조회는 `get_system_diagnostics(target=soc:coverage)`, `search_wazuh_alerts(lookback_minutes=60, limit=5)`, `list_blocks()`의 실제 근거를 모두 사용한다. 서비스·수집, 처리/검토 대기, 동적 IP 차단, 경보 표본을 구분한 표로 표시한다. 경보 표본 수는 전체 사건·공격 성공 수가 아니며 WAF 요청 차단과 FW 동적 IP 차단도 다르다.
+- 새로 명시한 주제는 이전 주제보다 우선한다. Docker 조회 뒤 관제 현황 요청은 새 조회이고, `메모리는?`는 같은 Docker 대상의 후속 조회다. 대상 없는 `상세히 보여줘`는 단일 대상이 있으면 이어받고 여러 컨테이너면 이름을 한 번 확인한다.
+- 이어받는 것은 동일 사용자·확인된 대화 범위의 대상과 조건뿐이다. 이전 봇 수치·정상 주장·승인을 새 관측처럼 사용하지 않는다. 기존 검증 결과 재정리만 요청된 경우에는 원관측 시각과 새 조회가 없음을 밝힌다.
+
+- 같은 후속 질문 규칙을 systemd unit·Docker 객체·호스트 자원·FW/WAF/IDS/Wazuh 조회에 공통 적용한다. 대상 종류를 바꾸지 않으며, `ssh.service`, `apache2.service`, 임의의 실제 loaded unit도 이름을 유지한다. journal의 실제 지원 범위는 등록된 고정 target·기간·마스킹 정책이며 대상 유지 기능을 임의 unit journal 권한 확장으로 설명하지 않는다.
+- Adapter마다 조회 조건을 다시 추정하지 않는다. Native와 SDK는 공통 scope/인자 검증을 재사용하고, FW hook·origin·rule ID·Wazuh 상관 필터 등 장비별 조건은 그대로 보존한다.

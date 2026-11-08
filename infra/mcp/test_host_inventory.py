@@ -31,6 +31,29 @@ def snap():
 
 
 class Inventory(unittest.TestCase):
+    def test_stats_only_may_omit_name_and_retains_all_objects_and_pagination(self):
+        h.request(dict(host='all',view='container_stats'))
+        s=snap();s['views']['container_stats']['rows']=[dict(name=n,field='PIDs',value='1') for n in ('app','other')]
+        args=dict(host='a',view='container_stats',limit=1)
+        r=h.answer(args,'a',NOW,s)
+        self.assertEqual(r['total'],2);self.assertTrue(r['has_more']);self.assertNotIn('container',r)
+        self.assertNotIn('object_present',r)
+        self.assertEqual(h.answer(dict(args,offset=1),'a',NOW,s)['rows'][0]['name'],'other')
+        self.assertEqual(h.answer(dict(args,container='app'),'a',NOW,s)['total'],1)
+        s['views']['container_stats']['observed_at']=NOW-181
+        self.assertEqual(h.answer(args,'a',NOW,s)['status'],'unavailable')
+        for bad in (None,'*','--all','../x'):
+            with self.subTest(bad=bad),self.assertRaises(ValueError):h.request(dict(args,container=bad))
+
+    def test_stats_collector_refuses_missing_duplicate_or_foreign_objects(self):
+        catalog='\n'.join(json.dumps(dict(ID=c*64,Names=n,Image='test',State='running',Status='Up')) for c,n in [('a','app'),('b','other')]).encode()
+        def data(name):return dict(Name=name,CPUPerc='0%',MemUsage='1MiB / 1GiB',MemPerc='1%',NetIO='1B / 1B',BlockIO='0B / 0B',PIDs='1')
+        for names,valid in [(('app','other'),True),(('app',),False),(('app','app'),False),(('app','foreign'),False)]:
+            def run(argv,*args):return (0,catalog) if 'ps' in argv else (0,'\n'.join(json.dumps(data(n)) for n in names).encode())
+            if valid:self.assertEqual(len(h.docker_view('container_stats',run,'/usr/bin/docker')),12)
+            else:
+                with self.subTest(names=names),self.assertRaises(ValueError):h.docker_view('container_stats',run,'/usr/bin/docker')
+
     def test_resolved_dns_is_data_only_and_not_required_to_be_root_owned_code(self):
         with tempfile.NamedTemporaryFile() as file:
             file.write(b'nameserver 127.0.0.53\nsearch internal.example\n');file.flush();file.seek(0)

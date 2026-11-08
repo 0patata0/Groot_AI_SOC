@@ -2911,6 +2911,9 @@ def management_read_request(request, agent, *, pending=False):
     security_scope=chat_lookup_harness().tool_scope(chat['request']) if security else None
     events=chat_lookup_harness().event_lookup_scope(chat['request']) if chat and chat['tools'] else None
     host_inventory=chat_lookup_harness().host_inventory_request(chat['request']) if chat and chat['tools'] else None
+    overview=bool(chat and chat['tools'] and chat_lookup_harness().soc_overview_request(chat['request']))
+    shared_scope=chat_lookup_harness().tool_scope(chat['request']) if (
+        current or ids_policy or security or events or host_inventory or overview) else None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2918,11 +2921,7 @@ def management_read_request(request, agent, *, pending=False):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
-        if current and name!=diagnostic:continue
-        if ids_policy and name!=ids_tool:continue
-        if security_scope is not None and name not in security_scope:continue
-        if events and name not in events:continue
-        if host_inventory and name != 'mcp__system_diagnostics__get_host_inventory': continue
+        if shared_scope is not None and name not in shared_scope:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2933,21 +2932,13 @@ def management_read_request(request, agent, *, pending=False):
                 raise RuntimeError('chat_pipeline_target_unregistered')
             selected={'type':'object','additionalProperties':False,'required':['target'],
                 'properties':{'target':{'type':'string','enum':[target]}}}
-        if current and selected is not None:
+        if shared_scope is not None and selected is not None:
             selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
-            if selected is None:raise RuntimeError('chat_diagnostic_target_unregistered')
-        if ids_policy and selected is not None:
-            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
-            if selected is None:raise RuntimeError('chat_ids_policy_target_unregistered')
-        if security and selected is not None:
-            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
-            if selected is None:raise RuntimeError('chat_inventory_scope_unregistered')
-        if events and selected is not None:
-            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
-            if selected is None:raise RuntimeError('chat_event_scope_unregistered')
-        if host_inventory and selected is not None:
-            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
-            if selected is None:raise RuntimeError('chat_host_inventory_scope_unregistered')
+            if selected is None:
+                code=('chat_diagnostic_target_unregistered' if current else 'chat_ids_policy_target_unregistered' if ids_policy
+                      else 'chat_inventory_scope_unregistered' if security else 'chat_event_scope_unregistered' if events
+                      else 'chat_host_inventory_scope_unregistered' if host_inventory else 'chat_overview_scope_unregistered')
+                raise RuntimeError(code)
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)
@@ -2963,6 +2954,9 @@ def management_read_request(request, agent, *, pending=False):
     if host_inventory:
         count=len(host_inventory)
         schema['properties']['calls'].update(minItems=count,maxItems=count)
+    if overview:
+        shared=chat_lookup_harness().selection_schema(catalog,4,question=chat['request'])
+        schema['properties']['calls']=shared['properties']['calls']
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)

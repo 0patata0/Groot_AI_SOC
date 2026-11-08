@@ -16,6 +16,30 @@ NAME='mcp__system_diagnostics__get_system_diagnostics'
 
 
 class ChatRead(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('jsonschema'),'server jsonschema required')
+    def test_soc_overview_native_uses_same_exact_three_reads_and_rejects_substitution(self):
+        from jsonschema import Draft202012Validator
+        harness=w.chat_lookup_harness();q='지금 관제 현황 알려줘'
+        tools=[]
+        for name,args in harness.SOC_OVERVIEW_CALLS.items():
+            props={k:{'type':'string' if isinstance(v,str) else 'integer'} for k,v in args.items()}
+            if 'target' in props:props['target']['enum']=['soc:coverage','b:management','a:systemd']
+            if 'limit' in props:props.update(program_name={'type':'string'},source_ip={'type':'string'})
+            tools.append({'type':'function','function':{'name':name,'parameters':{'type':'object',
+                'properties':props,'required':['target'] if 'target' in props else [],'additionalProperties':False}}})
+        a=agent();a.valid_tool_names={t['function']['name'] for t in tools};r=request();r['tools']=tools
+        ctx=dict(self.context,request=q,tools=sorted(a.valid_tool_names))
+        env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(ctx))
+        with patch.dict(w.os.environ,env,clear=True):out=w.management_read_request(r,a,pending=True)
+        lease=a._capstone_management_selection;schema=out['response_format']['json_schema']['schema']
+        selection={'request_nonce':lease['nonce'],'calls':[{'tool':n,'arguments':args} for n,args in harness.SOC_OVERVIEW_CALLS.items()]}
+        self.assertTrue(Draft202012Validator(schema).is_valid(selection))
+        bad=copy.deepcopy(selection);bad['calls'][0]['arguments']['target']='b:management'
+        self.assertFalse(Draft202012Validator(schema).is_valid(bad))
+        bad=copy.deepcopy(selection);bad['calls'][1]['arguments']['program_name']='capstone-mgmt-log'
+        self.assertFalse(Draft202012Validator(schema).is_valid(bad))
+        self.assertFalse(Draft202012Validator(schema).is_valid(dict(selection,calls=selection['calls'][:2])))
+
     def test_inline_gate_without_file_uses_installed_harness_path(self):
         sentinel=object();module=SimpleNamespace(load_harness=lambda:sentinel)
         spec=SimpleNamespace(loader=SimpleNamespace(exec_module=lambda m:None))

@@ -81,7 +81,12 @@ class ShortContext(unittest.TestCase):
     def test_management_alias_does_not_accept_other_unit_or_write_request(self):
         for unit in ('fake-capstone-management.service','capstone-management.service.extra','capstone-management.service-backup'):
             q='B 서버 '+unit+' 상태?'
-            self.assertNotIn('b:management',h.diagnostic_request(q)['requested'])
+            inventory=h.host_inventory_request(q)
+            if inventory:
+                self.assertEqual(inventory[0]['unit'],unit)
+                self.assertEqual(inventory[0]['view'],'service_details')
+                self.assertIsNone(h.diagnostic_request(q))
+            else:self.assertNotIn('b:management',h.diagnostic_request(q)['requested'])
         for q in ('capstone-management.service 시작 설정 바꿔줘', 'B 서버 capstone-management.service 재시작해줘'):
             self.assertIsNone(h.diagnostic_request(q))
 

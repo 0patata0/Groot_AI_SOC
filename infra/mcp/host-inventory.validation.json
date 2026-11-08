@@ -1,310 +1,1001 @@
 {
-  "date_kst": "2026-11-08",
-  "status": "implemented_deployed_and_bounded_live_validation_passed",
-  "versions": {
-    "query": "1.19.133",
-    "common": "1.5.82",
-    "diagnostics": "1.4.0"
-  },
-  "framework": {
-    "repository": "https://github.com/google-research/harness2",
-    "commit": "6868817518876de8fd170c6a8354daca273b6191",
-    "census": {
-      "base": {
-        "always_on_chars": 16836,
-        "n_files": 29,
-        "skills": 5,
-        "sub_agents": 0,
-        "scripts": 20,
-        "plugins": 0
+  "initial_host_inventory_validation": {
+    "date_kst": "2026-11-08",
+    "status": "implemented_deployed_and_bounded_live_validation_passed",
+    "versions": {
+      "query": "1.19.133",
+      "common": "1.5.82",
+      "diagnostics": "1.4.0"
+    },
+    "framework": {
+      "repository": "https://github.com/google-research/harness2",
+      "commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "census": {
+        "base": {
+          "always_on_chars": 16836,
+          "n_files": 29,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 20,
+          "plugins": 0
+        },
+        "candidate": {
+          "always_on_chars": 16836,
+          "n_files": 30,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 21,
+          "plugins": 0
+        }
       },
-      "candidate": {
-        "always_on_chars": 16836,
-        "n_files": 30,
-        "skills": 5,
-        "sub_agents": 0,
-        "scripts": 21,
-        "plugins": 0
+      "diff": {
+        "added": [
+          "scripts/host_inventory.py"
+        ],
+        "removed": [],
+        "modified": [
+          "scripts/channel_worker.py",
+          "scripts/diagnostic_installer.py",
+          "scripts/evidence_gate.py",
+          "scripts/management_controller.py",
+          "scripts/native_query.py",
+          "scripts/read-system-diagnostics.py",
+          "scripts/sdk_authority.py",
+          "scripts/sdk_harness.py",
+          "scripts/system-diagnostics-mcp.py",
+          "scripts/system_diagnostics.py",
+          "skills/soc-output/SKILL.md",
+          "skills/soc-query/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "model_calls": 0,
+      "subagents": 0
+    },
+    "regression_profiles": {
+      "native": 487,
+      "sdk": 337,
+      "query": 408,
+      "peer": 89,
+      "event_lookup": 15,
+      "installer": 63,
+      "workflow": 4,
+      "output": 7,
+      "host_inventory": 13,
+      "diagnostics": 88,
+      "runtime_health": 33
+    },
+    "regression_executions": 1544,
+    "regression_skip": 0,
+    "count_note": "profile executions include repeated tests; affected profiles rerun after their latest changes",
+    "actual_mcp": {
+      "uid": 999,
+      "read_calls": 11,
+      "invalid_arguments_rejected": 2,
+      "seconds": 5.693,
+      "views": 11,
+      "all_observed": true,
+      "protected_calls": 0
+    },
+    "catalog": {
+      "before": 44,
+      "after": 45,
+      "read": 36,
+      "protected": 9,
+      "existing_schema_sha_unchanged": true,
+      "new_tool": "system-diagnostics.get_host_inventory"
+    },
+    "actual_chat": [
+      {
+        "case": "hermes-services-r3",
+        "question": "지금 실행중인 서비스 보여줘",
+        "elapsed": 22.522,
+        "source_id": "8g8c48s1y7gpjb4wwsu5i74c3w",
+        "reply_id": "iuak7wj7p7yg3817676dw7r6iy",
+        "calls": 2,
+        "rows": 70,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "ollama-services-r3",
+        "question": "지금 실행중인 서비스 보여줘",
+        "elapsed": 21.721,
+        "source_id": "emtizeb8j7yjmb7tbqiud33cqo",
+        "reply_id": "fbuxjqgg1jrptgii48f8it6j5y",
+        "calls": 2,
+        "rows": 70,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "hermes-unit-detail",
+        "question": "B 서버 ssh.service 상세 보여줘",
+        "elapsed": 18.496,
+        "source_id": "u5aky66967diir1grn5unnud4h",
+        "reply_id": "j3qifh7o4b8w8qxhywgfsze8se",
+        "calls": 1,
+        "rows": 20,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "ollama-network",
+        "question": "A 서버 네트워크 상태 보여줘",
+        "elapsed": 54.588,
+        "source_id": "cg5nf5p9tbnz5qrqxemg9iszfa",
+        "reply_id": "ocw4jteb6jya9chedogu38skpe",
+        "calls": 1,
+        "rows": 16,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "hermes-resources",
+        "question": "서버 메모리 얼마나 남았어",
+        "elapsed": 19.796,
+        "source_id": "46j4f7h3ztd3t868oexcc9a3jy",
+        "reply_id": "nzz9umame7ge8n8ktjzga7685h",
+        "calls": 1,
+        "rows": 42,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "ollama-storage",
+        "question": "B 서버 디스크 상태 보여줘",
+        "elapsed": 19.792,
+        "source_id": "e4opnwuthtnwjjcmoubxuuhdio",
+        "reply_id": "bj9mu8c8a7f39d9hbdi9a1t78r",
+        "calls": 1,
+        "rows": 14,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "hermes-docker-log",
+        "question": "B 서버 hermes 컨테이너 로그 보여줘",
+        "elapsed": 19.415,
+        "source_id": "83kfoufbb7ni9q43c7xjbo1qnc",
+        "reply_id": "1zzkcjb61b8smfos4e3ru36wew",
+        "calls": 1,
+        "rows": 20,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "hermes-memory-final",
+        "question": "메모리랑 스왑 보여줘",
+        "elapsed": 19.965,
+        "source_id": "ux5nncpmh3rsfepa6ghe4fq57o",
+        "reply_id": "n3je74nj1p8ajyrdgwtiuqrf8a",
+        "calls": 1,
+        "rows": 42,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "ollama-disk-final",
+        "question": "B 서버 디스크 상태 보여줘",
+        "elapsed": 20.325,
+        "source_id": "dt59zmuunj8fppf9dsh5scamno",
+        "reply_id": "t7bmbso19jgtbjq74ss3itcm9y",
+        "calls": 1,
+        "rows": 11,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      },
+      {
+        "case": "ollama-docker-stats-final",
+        "question": "B 서버 hermes 컨테이너 자원 보여줘",
+        "elapsed": 20.216,
+        "source_id": "djz1jjpijbyzxj9735mg5h8wyo",
+        "reply_id": "jy8qqxig5pn49pxm7d3fbjahcw",
+        "calls": 1,
+        "rows": 6,
+        "rendered_from_verified_receipts": true,
+        "protected_calls": 0
+      }
+    ],
+    "ui": {
+      "at_kst": "2026-11-08T15:19:00+09:00",
+      "method": "Mattermost native accessibility tree, actual table elements",
+      "hermes": {
+        "source_id": "8g8c48s1y7gpjb4wwsu5i74c3w",
+        "tables": 7,
+        "host_sections": [
+          "A",
+          "B",
+          "C"
+        ],
+        "systemd_ssh_row": true,
+        "missing_evidence": false
+      },
+      "ollama": {
+        "source_id": "emtizeb8j7yjmb7tbqiud33cqo",
+        "tables": 7,
+        "host_sections": [
+          "A",
+          "B",
+          "C"
+        ],
+        "systemd_ssh_row": true,
+        "missing_evidence": false
       }
     },
-    "diff": {
-      "added": [
-        "scripts/host_inventory.py"
-      ],
-      "removed": [],
-      "modified": [
-        "scripts/channel_worker.py",
-        "scripts/diagnostic_installer.py",
-        "scripts/evidence_gate.py",
-        "scripts/management_controller.py",
-        "scripts/native_query.py",
-        "scripts/read-system-diagnostics.py",
-        "scripts/sdk_authority.py",
-        "scripts/sdk_harness.py",
-        "scripts/system-diagnostics-mcp.py",
-        "scripts/system_diagnostics.py",
-        "skills/soc-output/SKILL.md",
-        "skills/soc-query/SKILL.md"
-      ],
-      "always_on_char_delta": 0
-    },
-    "model_calls": 0,
-    "subagents": 0
-  },
-  "regression_profiles": {
-    "native": 487,
-    "sdk": 337,
-    "query": 408,
-    "peer": 89,
-    "event_lookup": 15,
-    "installer": 63,
-    "workflow": 4,
-    "output": 7,
-    "host_inventory": 13,
-    "diagnostics": 88,
-    "runtime_health": 33
-  },
-  "regression_executions": 1544,
-  "regression_skip": 0,
-  "count_note": "profile executions include repeated tests; affected profiles rerun after their latest changes",
-  "actual_mcp": {
-    "uid": 999,
-    "read_calls": 11,
-    "invalid_arguments_rejected": 2,
-    "seconds": 5.693,
-    "views": 11,
-    "all_observed": true,
-    "protected_calls": 0
-  },
-  "catalog": {
-    "before": 44,
-    "after": 45,
-    "read": 36,
-    "protected": 9,
-    "existing_schema_sha_unchanged": true,
-    "new_tool": "system-diagnostics.get_host_inventory"
-  },
-  "actual_chat": [
-    {
-      "case": "hermes-services-r3",
-      "question": "지금 실행중인 서비스 보여줘",
-      "elapsed": 22.522,
-      "source_id": "8g8c48s1y7gpjb4wwsu5i74c3w",
-      "reply_id": "iuak7wj7p7yg3817676dw7r6iy",
-      "calls": 2,
-      "rows": 70,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "ollama-services-r3",
-      "question": "지금 실행중인 서비스 보여줘",
-      "elapsed": 21.721,
-      "source_id": "emtizeb8j7yjmb7tbqiud33cqo",
-      "reply_id": "fbuxjqgg1jrptgii48f8it6j5y",
-      "calls": 2,
-      "rows": 70,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "hermes-unit-detail",
-      "question": "B 서버 ssh.service 상세 보여줘",
-      "elapsed": 18.496,
-      "source_id": "u5aky66967diir1grn5unnud4h",
-      "reply_id": "j3qifh7o4b8w8qxhywgfsze8se",
-      "calls": 1,
-      "rows": 20,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "ollama-network",
-      "question": "A 서버 네트워크 상태 보여줘",
-      "elapsed": 54.588,
-      "source_id": "cg5nf5p9tbnz5qrqxemg9iszfa",
-      "reply_id": "ocw4jteb6jya9chedogu38skpe",
-      "calls": 1,
-      "rows": 16,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "hermes-resources",
-      "question": "서버 메모리 얼마나 남았어",
-      "elapsed": 19.796,
-      "source_id": "46j4f7h3ztd3t868oexcc9a3jy",
-      "reply_id": "nzz9umame7ge8n8ktjzga7685h",
-      "calls": 1,
-      "rows": 42,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "ollama-storage",
-      "question": "B 서버 디스크 상태 보여줘",
-      "elapsed": 19.792,
-      "source_id": "e4opnwuthtnwjjcmoubxuuhdio",
-      "reply_id": "bj9mu8c8a7f39d9hbdi9a1t78r",
-      "calls": 1,
-      "rows": 14,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "hermes-docker-log",
-      "question": "B 서버 hermes 컨테이너 로그 보여줘",
-      "elapsed": 19.415,
-      "source_id": "83kfoufbb7ni9q43c7xjbo1qnc",
-      "reply_id": "1zzkcjb61b8smfos4e3ru36wew",
-      "calls": 1,
-      "rows": 20,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "hermes-memory-final",
-      "question": "메모리랑 스왑 보여줘",
-      "elapsed": 19.965,
-      "source_id": "ux5nncpmh3rsfepa6ghe4fq57o",
-      "reply_id": "n3je74nj1p8ajyrdgwtiuqrf8a",
-      "calls": 1,
-      "rows": 42,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "ollama-disk-final",
-      "question": "B 서버 디스크 상태 보여줘",
-      "elapsed": 20.325,
-      "source_id": "dt59zmuunj8fppf9dsh5scamno",
-      "reply_id": "t7bmbso19jgtbjq74ss3itcm9y",
-      "calls": 1,
-      "rows": 11,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    },
-    {
-      "case": "ollama-docker-stats-final",
-      "question": "B 서버 hermes 컨테이너 자원 보여줘",
-      "elapsed": 20.216,
-      "source_id": "djz1jjpijbyzxj9735mg5h8wyo",
-      "reply_id": "jy8qqxig5pn49pxm7d3fbjahcw",
-      "calls": 1,
-      "rows": 6,
-      "rendered_from_verified_receipts": true,
-      "protected_calls": 0
-    }
-  ],
-  "ui": {
-    "at_kst": "2026-11-08T15:19:00+09:00",
-    "method": "Mattermost native accessibility tree, actual table elements",
-    "hermes": {
-      "source_id": "8g8c48s1y7gpjb4wwsu5i74c3w",
-      "tables": 7,
-      "host_sections": [
-        "A",
-        "B",
-        "C"
-      ],
-      "systemd_ssh_row": true,
-      "missing_evidence": false
-    },
-    "ollama": {
-      "source_id": "emtizeb8j7yjmb7tbqiud33cqo",
-      "tables": 7,
-      "host_sections": [
-        "A",
-        "B",
-        "C"
-      ],
-      "systemd_ssh_row": true,
-      "missing_evidence": false
-    }
-  },
-  "failures_retained": [
-    "original service request 64.823s, no successful MCP",
-    "native lookup allowlist omitted new tool, ControllerError",
-    "native CLI 5000-character receipt truncation hid successful systemd rows",
-    "native completed metadata despite missing verified scope",
-    "one Docker catalog collection unavailable: partial, next snapshot recovered",
-    "intermittent management SSH banner timeout; no direct-path bypass"
-  ],
-  "limitations": [
-    "60-second snapshot, TTL180 seconds; running does not verify functional health",
-    "loaded services are not all installed unit files",
-    "logs: bounded redacted recent15m sample, not all OS journal",
-    "read-only expansion is not temporary arbitrary OS write authority",
-    "shared GPU not controlled; single trials do not establish average latency or general accuracy",
-    "no new-host full installation or attack E2E in this unit"
-  ],
-  "ui_capacity": {
-    "method": "Mattermost native accessibility tree; observed before context compaction",
-    "hermes_memory": {
-      "source_id": "ux5nncpmh3rsfepa6ghe4fq57o",
-      "tables": 4,
-      "SwapFree": true,
-      "raw_KiB_and_GB": true,
-      "host_sections": [
-        "A",
-        "B",
-        "C"
-      ]
-    },
-    "ollama_storage": {
-      "source_id": "dt59zmuunj8fppf9dsh5scamno",
-      "tables": 2,
-      "raw_bytes_and_GB": true
-    },
-    "docker_stats": "actual receipt and posted Markdown verified; separate native UI inspection not performed"
-  },
-  "final_live_confirmation": {
-    "at_kst": "2026-11-08T15:31:35.804930+09:00",
-    "query": "1.19.133",
-    "common": "1.5.82",
-    "manifest": 46,
-    "protected": 6,
-    "sdk_sources": 20,
-    "review_sources": 5,
-    "bots_ws_worker": true,
-    "services": [
-      "active",
-      "active",
-      "active",
-      "active"
+    "failures_retained": [
+      "original service request 64.823s, no successful MCP",
+      "native lookup allowlist omitted new tool, ControllerError",
+      "native CLI 5000-character receipt truncation hid successful systemd rows",
+      "native completed metadata despite missing verified scope",
+      "one Docker catalog collection unavailable: partial, next snapshot recovered",
+      "intermittent management SSH banner timeout; no direct-path bypass"
     ],
-    "queues": {
-      "/var/lib/capstone-review-chat/queue.sqlite": 0,
-      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    "limitations": [
+      "60-second snapshot, TTL180 seconds; running does not verify functional health",
+      "loaded services are not all installed unit files",
+      "logs: bounded redacted recent15m sample, not all OS journal",
+      "read-only expansion is not temporary arbitrary OS write authority",
+      "shared GPU not controlled; single trials do not establish average latency or general accuracy",
+      "no new-host full installation or attack E2E in this unit"
+    ],
+    "ui_capacity": {
+      "method": "Mattermost native accessibility tree; observed before context compaction",
+      "hermes_memory": {
+        "source_id": "ux5nncpmh3rsfepa6ghe4fq57o",
+        "tables": 4,
+        "SwapFree": true,
+        "raw_KiB_and_GB": true,
+        "host_sections": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      "ollama_storage": {
+        "source_id": "dt59zmuunj8fppf9dsh5scamno",
+        "tables": 2,
+        "raw_bytes_and_GB": true
+      },
+      "docker_stats": "actual receipt and posted Markdown verified; separate native UI inspection not performed"
     },
-    "b_failed_units": 0,
-    "rollback_confirmed_noop": true,
-    "hermes_planned_restart": 1
-  },
-  "cleanup": {
-    "framework": {
+    "final_live_confirmation": {
+      "at_kst": "2026-11-08T15:31:35.804930+09:00",
+      "query": "1.19.133",
+      "common": "1.5.82",
+      "manifest": 46,
+      "protected": 6,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "bots_ws_worker": true,
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "b_failed_units": 0,
+      "rollback_confirmed_noop": true,
+      "hermes_planned_restart": 1
+    },
+    "cleanup": {
+      "framework": {
+        "repository": "https://github.com/google-research/harness2.git",
+        "commit": "6868817518876de8fd170c6a8354daca273b6191",
+        "files": 656,
+        "bytes": 43654051
+      },
+      "mac_packages_installed": 0,
+      "server_test_directories_removed": 5,
+      "server_test_files_removed": 2385,
+      "server_rollback_backups_preserved": true,
+      "temporary_mac_scripts_removed": 78,
+      "verified_removed_at_cleanup_time": true
+    },
+    "framework_retention": {
+      "at_kst": "2026-11-08T15:38:26.005680+09:00",
       "repository": "https://github.com/google-research/harness2.git",
       "commit": "6868817518876de8fd170c6a8354daca273b6191",
-      "files": 656,
-      "bytes": 43654051
-    },
-    "mac_packages_installed": 0,
-    "server_test_directories_removed": 5,
-    "server_test_files_removed": 2385,
-    "server_rollback_backups_preserved": true,
-    "temporary_mac_scripts_removed": 78,
-    "verified_removed_at_cleanup_time": true
+      "restored_after_cleanup": true,
+      "retained_until_explicit_deletion": true,
+      "git_ignored": true,
+      "worktree_clean": true,
+      "core_import_verified": true,
+      "new_package_installs": 0,
+      "temporary_execution_scripts_restored": false
+    }
   },
-  "framework_retention": {
-    "at_kst": "2026-11-08T15:38:26.005680+09:00",
-    "repository": "https://github.com/google-research/harness2.git",
-    "commit": "6868817518876de8fd170c6a8354daca273b6191",
-    "restored_after_cleanup": true,
-    "retained_until_explicit_deletion": true,
-    "git_ignored": true,
-    "worktree_clean": true,
-    "core_import_verified": true,
-    "new_package_installs": 0,
-    "temporary_execution_scripts_restored": false
+  "latest_common_context_validation": {
+    "date_kst": "2026-11-08",
+    "status": "deployed_bounded_tests_with_known_followup_log_failure",
+    "versions": {
+      "query": "1.19.136",
+      "common": "1.5.82",
+      "routing": "1.1.7",
+      "diagnostics": "1.4.1"
+    },
+    "framework": {
+      "at_kst": "2026-11-08T16:45:27.929015+09:00",
+      "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "base_commit": "74c6a1c8609ae3d7affab44294917c7c097adbcf",
+      "census": {
+        "base": {
+          "always_on_chars": 16802,
+          "n_files": 27,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        },
+        "candidate": {
+          "always_on_chars": 16802,
+          "n_files": 27,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        }
+      },
+      "diff": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/sdk_harness.py"
+        ],
+        "always_on_char_delta": 0
+      },
+      "model_calls": 0,
+      "automatic_adoption": false,
+      "subagents": 0,
+      "framework_retained": true
+    },
+    "regression": {
+      "profiles": 11,
+      "executions": 1559,
+      "skipped": 0,
+      "all_passed": true,
+      "contains_overlapping_profiles": true
+    },
+    "catalog": {
+      "tools": 45,
+      "schema_equal_to_inventory97": true,
+      "mutations": 0,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "seconds": 8.967425867915154
+    },
+    "live_confirmation": {
+      "at_kst": "2026-11-08T16:54:14.449282+09:00",
+      "query": "1.19.136",
+      "common": "1.5.82",
+      "manifest": 47,
+      "protected": 6,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "bots_ws_worker": true,
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "b_failed_units": 0,
+      "rollback_confirmed_noop": true,
+      "hermes_planned_restart": 1
+    },
+    "failures_preserved": [
+      "Ollama independent SOC question reused Docker topic with no read",
+      "Hermes SOC overview selected wrong targets and filter: 99.830 seconds partial",
+      "incremental deployment receipt metadata retained old hashes; metadata-only repair",
+      "embedded immutable controller gate not synchronized; safe refusal before model; exact bytes constant repaired",
+      "explicit B OS service misread as Wazuh agent identity: 86.533 seconds partial; common identity precedence fixed"
+    ],
+    "authorization": {
+      "protected_operations_changed": false,
+      "model_changed": false,
+      "new_packages": false,
+      "new_ports": false,
+      "general_os_privilege_added": false
+    },
+    "limits": [
+      "registered journal targets only",
+      "read completion is not incident resolution",
+      "shared inference was not controlled",
+      "no independent quality evaluation",
+      "no attack E2E or fresh OS installation in this unit"
+    ],
+    "source_sha256": {
+      "infra/hermes/query-completion/__init__.py": "0cfea4a8e400efc2f5b678aaeecf8cf248a197b6f0636be7535d78c68077d8bc",
+      "infra/hermes/review_channel_policy.py": "2ecb078de266872d6c01a73937ca62f329747022856b0e6b71d3c2a61ba0e675",
+      "infra/hermes/review_channel_worker.py": "bba9a951405324c88ca82bc7a4c55b2ec50da3f63e85bfbfb83fe31f6167accb",
+      "infra/hermes/skills/soc-query/SKILL.md": "a8d824c41d688e7f9a7fa5a9406fddff9d36f9d2d41c1a966f5b33cc10c67f7e",
+      "infra/hermes/soc_management_run.py": "ffb09dd7880b8df7e3740d9970ef4f5d23f0071718c5ee0073e847cc51aa2025",
+      "infra/mcp/host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+      "infra/mcp/system-diagnostics-mcp.py": "a7f9bb2062e54d2070160e905798d1f2d823350194b17e69e6c8291531b5656d",
+      "infra/ollama-trial/harness.py": "dacc3d94a2a5dd9e53f9ca49374ce9e22352a58e9c4d8b4806e1f4acfaffef4c",
+      "infra/ollama-trial/runtime.py": "d0a1a90d8a6b7dc649ec934c6f21b1df34e1fdd61b475df3648500947fc2fe6d"
+    },
+    "framework_104": {
+      "at_kst": "2026-11-08T16:25:09.377766+09:00",
+      "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "base_commit": "74c6a1c8609ae3d7affab44294917c7c097adbcf",
+      "census": {
+        "base": {
+          "always_on_chars": 16802,
+          "n_files": 27,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        },
+        "candidate": {
+          "always_on_chars": 16802,
+          "n_files": 27,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        }
+      },
+      "diff": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/channel_policy.py",
+          "scripts/evidence_gate.py",
+          "scripts/native_query.py",
+          "scripts/sdk_harness.py",
+          "skills/soc-query/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "model_calls": 0,
+      "automatic_adoption": false,
+      "subagents": 0,
+      "framework_retained": true
+    },
+    "remaining_failures": [
+      {
+        "expected_engine": "hermes",
+        "actual_engine": "ollama",
+        "source_id": "a5m9ai38gidzjpa6qjxpexiejc",
+        "resolved_question": "B 서버 capstone-management.service 로그 보여줘",
+        "report_status": "completed",
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics"
+          }
+        ],
+        "semantic_pass": false,
+        "issues": [
+          "second untagged followup loses original directly selected bot because first followup direct=false",
+          "journal log request received current diagnostic summary without actual view=journal read"
+        ]
+      }
+    ],
+    "scenario_summary": {
+      "scenarios": 19,
+      "successful_read_scenarios": 17,
+      "expected_clarification": 1,
+      "failed_log_followup": 1,
+      "successful_read_receipts": 21,
+      "revision_scopes": "8 cases on gate105, 11 on harness106; one failed on106",
+      "fresh_successful_query_seconds": [
+        16.644,
+        28.134
+      ]
+    },
+    "successful_scenarios": [
+      {
+        "case": "hermes-network",
+        "question": "라우팅 테이블 보여줘",
+        "source_id": "tsoir6exy7yrbkwd6hai5o3zgc",
+        "seconds": 20.199,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "all",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "network"
+            }
+          }
+        ]
+      },
+      {
+        "case": "hermes-overview",
+        "question": "관제 현황 알려줄래",
+        "source_id": "ok79mrwg8ibqjef9jn3owh1gir",
+        "seconds": 21.415,
+        "status": "completed",
+        "clarification": false,
+        "reads": 3,
+        "raw_sha_validated": 3,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "limit": 5,
+              "lookback_minutes": 60
+            }
+          },
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "soc:coverage"
+            }
+          }
+        ]
+      },
+      {
+        "case": "hermes-ports",
+        "question": "열려있는 포트 보여줘",
+        "source_id": "bewy16h9epnbjjcw7s9rz37cph",
+        "seconds": 20.261,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "all",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "ports"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-answer",
+        "question": "hermes 컨테이너 로그 보여줘",
+        "source_id": "ouajqjuuqtgimppx7bkicwqrfa",
+        "seconds": 18.687,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "container": "hermes",
+              "host": "all",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "container_logs"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-ask",
+        "question": null,
+        "source_id": "nse69n896pfntggp4r9wxiggnh",
+        "seconds": 1.259,
+        "status": "partial",
+        "clarification": true,
+        "reads": 0,
+        "raw_sha_validated": 0,
+        "renderer_body_equal": false,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": []
+      },
+      {
+        "case": "ollama-cpu",
+        "question": "CPU 사용률 보여줘",
+        "source_id": "7m3h1ebjupfxzdck44tkwz5nwc",
+        "seconds": 21.235,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "all",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "resources"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-disk",
+        "question": "남은 디스크 공간 보여줘",
+        "source_id": "6ud588zh8bnn9kam5hqarwknwe",
+        "seconds": 21.731,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "all",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "storage"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-overview",
+        "question": "지금 관제 현황 알려줘",
+        "source_id": "14bthowkxfgguk7o3bb7ux37sa",
+        "seconds": 21.679,
+        "status": "completed",
+        "clarification": false,
+        "reads": 3,
+        "raw_sha_validated": 3,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "soc:coverage"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "limit": 5,
+              "lookback_minutes": 60
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ]
+      },
+      {
+        "case": "hermes-alert",
+        "question": "최근 경보 5개 보여줘",
+        "source_id": "ykpy8ztsyp85p8ecxeksi4op7c",
+        "seconds": 18.0,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "security-events",
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "limit": 5,
+              "lookback_minutes": 60
+            }
+          }
+        ]
+      },
+      {
+        "case": "hermes-memory",
+        "question": "B 서버 capstone-management.service 상세 메모리 보여줘",
+        "source_id": "fgqetshbzjbx8dw8usf4uxwexy",
+        "seconds": 16.644,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "b",
+              "limit": 100,
+              "offset": 0,
+              "state": "all",
+              "unit": "capstone-management.service",
+              "view": "service_details"
+            }
+          }
+        ]
+      },
+      {
+        "case": "hermes-unit",
+        "question": "B 서버 capstone-management.service 상태 보여줘",
+        "source_id": "w9d11smi9tr6fe5e8rjz5odp5o",
+        "seconds": 20.21,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:management"
+            }
+          }
+        ]
+      },
+      {
+        "case": "hermes-wazuh",
+        "question": "Wazuh 상관 룰 보여줘",
+        "source_id": "rjf8wpys3pfxj89gfzb8x3d4yo",
+        "seconds": 21.553,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "rule-b",
+            "name": "get_security_rules",
+            "arguments": {
+              "correlation_only": true,
+              "limit": 20,
+              "offset": 0,
+              "origin": "all",
+              "target": "b:wazuh",
+              "view": "details"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-container",
+        "question": "B 서버 hermes 컨테이너 상세 보여줘",
+        "source_id": "y5okf39fojbitgn68uhn4bxdzh",
+        "seconds": 18.918,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "container": "hermes",
+              "host": "b",
+              "limit": 100,
+              "offset": 0,
+              "state": "all",
+              "view": "container_details"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-fw",
+        "question": "fw 룰 보여줘",
+        "source_id": "phfueoi55fg43jdjx5shn7h4kh",
+        "seconds": 18.555,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "resp",
+            "name": "get_firewall_rules",
+            "arguments": {
+              "limit": 200,
+              "offset": 0
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-ids",
+        "question": "IDS 룰 보여줘",
+        "source_id": "s9qbcrfyu3re9qkgjnhu6yggwr",
+        "seconds": 28.134,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "rule-a",
+            "name": "get_security_rules",
+            "arguments": {
+              "correlation_only": false,
+              "limit": 20,
+              "offset": 0,
+              "origin": "all",
+              "target": "a:suricata",
+              "view": "summary"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-logs",
+        "question": "B 서버 hermes 컨테이너 로그 보여줘",
+        "source_id": "u8a687s3s7bdzgfs3cjaz6iyxh",
+        "seconds": 18.288,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "container": "hermes",
+              "host": "b",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "container_logs"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-memory",
+        "question": "B 서버 hermes 컨테이너 메모리 보여줘",
+        "source_id": "6cas956tmi8o3qn79jedqxw9we",
+        "seconds": 18.256,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "container": "hermes",
+              "host": "b",
+              "limit": 20,
+              "offset": 0,
+              "state": "all",
+              "view": "container_stats"
+            }
+          }
+        ]
+      },
+      {
+        "case": "ollama-waf",
+        "question": "WAF 룰 보여줘",
+        "source_id": "wowo6s9zpb89immeyadjn4xfhe",
+        "seconds": 22.1,
+        "status": "completed",
+        "clarification": false,
+        "reads": 1,
+        "raw_sha_validated": 1,
+        "renderer_body_equal": true,
+        "posted_body_equal": true,
+        "protected_calls": 0,
+        "arguments": [
+          {
+            "server": "rule-a",
+            "name": "get_security_rules",
+            "arguments": {
+              "correlation_only": false,
+              "limit": 20,
+              "offset": 0,
+              "origin": "all",
+              "target": "a:waf",
+              "view": "summary"
+            }
+          }
+        ]
+      }
+    ],
+    "ui_overview": {
+      "at_kst": "2026-11-08T16:40:00+09:00",
+      "method": "Mattermost desktop AX table roles",
+      "posts": [
+        {
+          "source_id": "14bthowkxfgguk7o3bb7ux37sa",
+          "tables": 5,
+          "overview_present": true,
+          "missing_evidence_text": false
+        },
+        {
+          "source_id": "ok79mrwg8ibqjef9jn3owh1gir",
+          "tables": 5,
+          "overview_present": true,
+          "missing_evidence_text": false
+        }
+      ]
+    },
+    "server_test_cleanup": {
+      "directories": 7,
+      "files": 3344,
+      "sha_validated_before_removal": true
+    },
+    "mac_cleanup": {
+      "files": 219,
+      "bytes": 21885401,
+      "packages_installed": 0,
+      "framework_retained": true,
+      "baseline_diffs_and_evidence_retained": true
+    }
   }
 }

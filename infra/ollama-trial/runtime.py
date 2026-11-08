@@ -94,9 +94,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
     report['access_mode'] = mode
     notice = harness.scope_notice(current)
     if notice and not request.get('discover_only'):
-        scope = harness.rule_scope_request(current)
         report.update(status='partial', final_response=notice,
-                      scope_resolution='clarification_required' if scope['ambiguous'] else 'unsupported_scope',
+                      scope_resolution='clarification_required',
                       unqueried=harness.missing_reads(current, []),
                       conversation_seconds=time.perf_counter() - started)
         return report

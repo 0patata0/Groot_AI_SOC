@@ -49,6 +49,7 @@ class Profiles(unittest.TestCase):
             d.install_common(settings(), 'service')
         self.assertIn(str(d.CODE / 'diagnostic_history.py'), written)
         self.assertIn(str(d.CODE / 'diagnostic_journal.py'), written)
+        self.assertIn(str(d.CODE / 'host_inventory.py'), written)
         self.assertIn(['/usr/bin/systemctl','enable','--now',d.JOURNAL_SERVICE], calls)
         backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
         self.assertLess(calls.index(backfill), calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
@@ -92,6 +93,7 @@ class Profiles(unittest.TestCase):
             self.assertIn('ReadWritePaths=/var/lib/capstone-diagnostics\n', service)
             self.assertIn('NoNewPrivileges=yes', service)
             self.assertIn('ProtectSystem=strict', service)
+            self.assertIn('RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\n', service)
             self.assertIn('TimeoutStartSec=85', service)
             self.assertIn('TimeoutStopSec=5', service)
             self.assertIn('OnUnitActiveSec=60s', timer)

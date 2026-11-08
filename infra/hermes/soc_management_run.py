@@ -29,7 +29,7 @@ WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
 EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks',
                         'get_web_service_target', 'search_web_access', 'collect_incident_evidence'})
 BUNDLE_TOOL = 'mcp__security_events__collect_incident_evidence'
-DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
+DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time', 'get_host_inventory'})
 VERIFIED_RUNTIME_MODELS = frozenset({'qwen3.6:35b',
     'soc-qwen36:35b-balanced-q4km-20261108'})
 
@@ -2910,6 +2910,7 @@ def management_read_request(request, agent, *, pending=False):
     security=chat_lookup_harness().security_inventory_request(chat['request']) if chat and chat['tools'] else None
     security_scope=chat_lookup_harness().tool_scope(chat['request']) if security else None
     events=chat_lookup_harness().event_lookup_scope(chat['request']) if chat and chat['tools'] else None
+    host_inventory=chat_lookup_harness().host_inventory_request(chat['request']) if chat and chat['tools'] else None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2921,6 +2922,7 @@ def management_read_request(request, agent, *, pending=False):
         if ids_policy and name!=ids_tool:continue
         if security_scope is not None and name not in security_scope:continue
         if events and name not in events:continue
+        if host_inventory and name != 'mcp__system_diagnostics__get_host_inventory': continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2943,6 +2945,9 @@ def management_read_request(request, agent, *, pending=False):
         if events and selected is not None:
             selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
             if selected is None:raise RuntimeError('chat_event_scope_unregistered')
+        if host_inventory and selected is not None:
+            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
+            if selected is None:raise RuntimeError('chat_host_inventory_scope_unregistered')
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)
@@ -2955,6 +2960,9 @@ def management_read_request(request, agent, *, pending=False):
             'type':'array','minItems':1,'maxItems':1 if pipeline or ids_policy else 4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
     if current:
         schema['properties']['calls']['maxItems']=min(4,len(catalog[diagnostic]['properties']['target']['enum']))
+    if host_inventory:
+        count=len(host_inventory)
+        schema['properties']['calls'].update(minItems=count,maxItems=count)
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)
@@ -3759,7 +3767,8 @@ def main():
                 successful_read_names.add(tool_name)
         if event_type == 'tool.completed' and (tool_name in {'mcp__resp__get_firewall_rules',
                 'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules',
-                'mcp__system_diagnostics__get_system_diagnostics'} or tool_name in {
+                'mcp__system_diagnostics__get_system_diagnostics',
+                'mcp__system_diagnostics__get_host_inventory'} or tool_name in {
                 'mcp__security_events__' + name for name in EVENT_READ}):
             output = str(kwargs.get('result') or '')
             error = bool(kwargs.get('is_error', False))

@@ -258,6 +258,21 @@ class ControllerTests(unittest.TestCase):
             with self.subTest(change=change),self.assertRaisesRegex(m.ControllerError,'scope_invalid'):
                 m.prompt_for('base',dict(case,**change),context)
 
+    def test_host_inventory_reaches_native_lookup_prompt_and_gate(self):
+        case, context = self.lookup_case()
+        name = 'mcp__system_diagnostics__get_host_inventory'
+        case.update(chat_request='지금 실행중인 서비스 보여줘',
+                    chat_lookup_tools=[name], chat_lookup_guidance='systemd와 Docker를 실제 조회한다.')
+        prompt = m.prompt_for('base', case, context)
+        self.assertIn(name, prompt)
+        self.assertIn('TRUSTED_CHAT_LOOKUP_CONTRACT', prompt)
+        self.assertIn(name, m.DIAGNOSTIC_TOOLS)
+        self.assertTrue(runner.allowed(name, 'verify'))
+        for invalid in (name+'_shell', 'mcp__system_diagnostics__exec',
+                        'mcp__system_diagnostics__restart_service'):
+            with self.subTest(name=invalid), self.assertRaisesRegex(m.ControllerError, 'scope_invalid'):
+                m.prompt_for('base', dict(case, chat_lookup_tools=[invalid]), context)
+
     def test_prompt_routes_rule_service_and_containment_status_without_execution(self):
         self.events(self.incident())
         case=self.store.next_case();context=self.store.context(case['id'])

@@ -506,6 +506,47 @@ class Tests(unittest.TestCase):
                          '오늘 systemd 실패 경보가 반복됐는데 지금도 장애인지 조회해서 알려줘. 설정은 바꾸지 마.'):
             self.assertEqual(w.diagnostic_read_targets(h,question),[])
 
+    def test_host_inventory_truncated_native_trace_cannot_claim_completed(self):
+        from contextlib import nullcontext
+        import copy
+        import hashlib
+        h=self.actual_harness();question='지금 실행중인 서비스 보여줘';calls=[]
+        for args in h.host_inventory_request(question):
+            fields=(dict(unit='ssh.service',load='loaded',active='active',sub='running')
+                    if args['view']=='services' else dict(id='a'*64,name='hermes',image='fixture',state='running',status='Up'))
+            raw=json.dumps(dict(kind='host_inventory',request=args,hosts=[dict(args,host=host,status='observed',
+                observed_at_kst='2026-11-08T15:11:00+09:00',age_seconds=1,total=1,rows=[fields],
+                has_more=False,next_offset=None,reason=None) for host in 'abc']))
+            calls.append(dict(server='system-diagnostics',name='get_host_inventory',arguments=args,is_error=False,
+                result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest()))
+        for truncated in (False,True):
+            evidence=copy.deepcopy(calls)
+            if truncated:
+                evidence[0].update(result='{"result": "broken...',result_sha256=hashlib.sha256(b'{"result": "broken...').hexdigest())
+            class DB:
+                def execute(self,sql,args=()):
+                    if 'tool_calls' in sql:return [dict(name='mcp__system_diagnostics__get_host_inventory',completed=1,is_error=0,is_write=0)]*2
+                    return SimpleNamespace(fetchone=lambda:None if 'SELECT 1' in sql else dict(id='c'*32,mode='verify',run_count=0,session_id=None))
+                def commit(self):pass
+            store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
+                new_case=lambda *a:'c'*32,context=lambda _:[],close=lambda:None)
+            controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
+                run_hermes=lambda *a:dict(completed=True,state='completed',text='model claims complete',run_id='d'*32),
+                prompt_for=lambda *a:'prompt',incomplete_report=lambda _:'incomplete')
+            request=dict(id='a'*32,phase='lead',readonly=True,question=question);output=io.StringIO()
+            with mock.patch.dict(sys.modules,{'harness':h,'soc_management_controller':controller}), \
+                 mock.patch.object(sys,'argv',['worker','hermes']), \
+                 mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+                 mock.patch.object(sys,'stdout',output),mock.patch.object(w.os,'geteuid',return_value=0), \
+                 mock.patch.object(w,'read_trace_calls',return_value=evidence):
+                w.main()
+            report=json.loads(output.getvalue())
+            self.assertEqual(report['status'],'partial' if truncated else 'completed')
+            self.assertEqual(report['structured_scope_complete'],not truncated)
+            self.assertEqual(report['evidence'] is None,truncated)
+            self.assertIn('hermes',report['final_response'])
+            self.assertEqual('ssh.service' in report['final_response'],not truncated)
+
     def test_native_receipt_unwraps_bound_result_and_refuses_missing_input(self):
         with tempfile.TemporaryDirectory() as directory:
             rid = '1' * 32; root = Path(directory)

@@ -65,6 +65,21 @@ TARGETS['soc:coverage'] = None
 _runtime = None
 _history = None
 _journal = None
+_inventory = None
+
+
+def inventory_library():
+    global _inventory
+    if _inventory is None:
+        path = Path(__file__).with_name('host_inventory.py')
+        source = root_file(path, 131072)
+        module = types.ModuleType('fixed_host_inventory')
+        module.__file__ = str(path)
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+        module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
+            'need', 'DiagnosticError', 'ROLE_HOST', 'TTL', 'root_file', 'parsed', 'encode', 'trusted_parents', 'journal_library')})
+        _inventory = module
+    return _inventory
 
 
 def journal_library():
@@ -197,12 +212,17 @@ def root_file(path, maximum, mode=None, gid=None):
         return data
 
 
-def bounded_command(argv, maximum, seconds, input_data=None):
-    """No shell or inherited credentials. Never retain or return stderr."""
+def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False):
+    """No shell/inherited credentials. Stderr only for fixed Docker log reads."""
+    if docker_logs:
+        need(len(argv) == 9 and argv[0] in ('/usr/bin/docker', '/usr/local/bin/docker')
+             and argv[1:8] == ['logs', '--since', '15m', '--tail', '20', '--timestamps', '--']
+             and re.fullmatch(r'[a-f0-9]{64}', argv[8]) and input_data is None,
+             'docker_log_command_invalid')
     checked_journal = argv[:4] == ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json']
     checked_grep = checked_journal and argv[-2:] == ['--priority=warning..info', '--grep=' + ERROR_PATTERN]
     process = subprocess.Popen(argv, stdin=subprocess.PIPE if input_data is not None else subprocess.DEVNULL,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE if checked_journal else subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT if docker_logs else subprocess.PIPE if checked_journal else subprocess.DEVNULL,
         env=ENV, close_fds=True, start_new_session=True)
     result = bytearray()
     stderr_bytes = 0
@@ -551,6 +571,10 @@ def main():
         history = {}
         value = collect(args.role, history_output=history)
         publish(value)
+        runtime = runtime_library()
+        docker = (runtime.docker_binary(runtime.load_config(args.role))
+                  if Path('/etc/capstone-diagnostics/runtime.json').exists() else '/usr/bin/docker')
+        inventory_library().publish(inventory_library().collect(args.role, bounded_command, docker))
         if history:
             history_library().publish(**history)
     else:

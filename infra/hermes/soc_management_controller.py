@@ -45,7 +45,7 @@ WRITE_TOOLS = frozenset("mcp__%s__%s" % (server, name)
                        for name in ("propose_rule_edit", "propose_rule_change", "propose_service_action", "temporarily_contain_ip"))
 WRITE_TOOLS |= {"mcp__resp__block_ip", "mcp__resp__unblock_ip"}
 CALCULATION_TOOLS = frozenset({"mcp__system_diagnostics__calculate_time"})
-DIAGNOSTIC_TOOLS = CALCULATION_TOOLS | {"mcp__system_diagnostics__get_system_diagnostics"}
+DIAGNOSTIC_TOOLS = CALCULATION_TOOLS | {"mcp__system_diagnostics__get_system_diagnostics", "mcp__system_diagnostics__get_host_inventory"}
 ID = re.compile(r"[0-9a-f]{16,64}\Z")
 SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 SESSION = re.compile(r"[A-Za-z0-9_.:-]{1,128}\Z")
@@ -1301,7 +1301,7 @@ def chat_lookup_prompt(case, evidence):
     read_name = (r"mcp__(?:wazuh_ro__(?:get_wazuh_|search_wazuh_)[a-z_]+|"
                  r"rule_[ab]__(?:get_security_rules|get_rule_change_target|get_service_action_target|"
                  r"get_rule_change_status|get_operation_status)|resp__(?:get_firewall_rules|list_blocks)|"
-                 r"system_diagnostics__get_system_diagnostics|security_events__(?:get_web_service_target|search_web_access|search_"
+                 r"system_diagnostics__(?:get_system_diagnostics|get_host_inventory)|security_events__(?:get_web_service_target|search_web_access|search_"
                  r"(?:wazuh|suricata|modsecurity)_alerts))")
     if (not isinstance(question, str) or not 1 <= len(question) <= 3000
             or not isinstance(guidance, str) or not 1 <= len(guidance) <= 16384

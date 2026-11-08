@@ -28,7 +28,7 @@ PROFILES = {'rule-a': ('rule-a',), 'rule-b': ('rule-b',),
 SOURCES = ('runtime.py', 'read_pool.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
 PARITY_PROFILES = {**PROFILES, 'resp': ('resp-a',),
                    'rule-write-a': ('rule-write-a',), 'rule-write-b': ('rule-write-b',)}
-READONLY_TOOL_COUNT = 35
+READONLY_TOOL_COUNT = 36
 PROTECTED_TOOL_COUNT = 9
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C', 'TZ': 'Asia/Seoul',
        'PYTHONDONTWRITEBYTECODE': '1', 'PIP_NO_CACHE_DIR': '1',

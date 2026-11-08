@@ -1,5 +1,7 @@
 # 초기 설치·통합 패키지 준비 상태
 
+2026-11-08: 현재 단일deploy.sh에는 host_inventory.py·진단MCP1.4.0·공통 조회/출력 스킬·비특권 읽기 검증(36개)이 연결됐습니다. 고정 root collector만 AF_NETLINK를 추가로 허용하며 신규 패키지/공개 포트/키는 없습니다. 운영 증분 검증과 새 OS 전체 설치는 구분합니다. [범위·검증](../infra/mcp/host-inventory.md).
+
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.
 
 11/7 관리자 정책: 단일deploy.sh에서SSH/실습관리·Wazuh웹·차단보호CIDR을별도로입력하고명시빈값을존중한다. 관리SSH22의SID2001219만예외생성·초기입력/정책74검사,정기보고정책전후분리30검사/운영dry확인을마쳤다. 초기보고변경이력은빈목록·추가패키지/포트0·새OS전체설치0. [검증·실제적용범위](../infra/validation/admin-ssh/README.md).

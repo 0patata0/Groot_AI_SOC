@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+2026-11-08: OS·Docker 상세 조회 반입 소스는 host_inventory.py, system_diagnostics.py, read-system-diagnostics.py, system-diagnostics-mcp.py와 공통 하네스·스킬입니다. 기존 source_bundle에 포함하며 추가deb/wheel/image·설정입력·키·공개포트는 없습니다. 기존 systemd/Docker/procps/iproute2/coreutils를 사용하고 수집unit의 AF_NETLINK 허용을 설치기에 반영했습니다. [운영 검증·범위](../infra/mcp/host-inventory.md).
+
 2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).
 
 11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.

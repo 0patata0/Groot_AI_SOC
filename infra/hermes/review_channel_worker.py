@@ -33,6 +33,9 @@ def lookup_read_scope(harness, current, phase):
         return None
     events = getattr(harness,'event_lookup_scope',lambda _:None)(current)
     if events and all(harness.EVIDENCE.allowed(name,'verify') for name in events): return events
+    if getattr(harness, 'host_inventory_request', lambda _: None)(current):
+        name = 'mcp__system_diagnostics__get_host_inventory'
+        return frozenset({name}) if harness.EVIDENCE.allowed(name, 'verify') else None
     if getattr(harness,'systemd_comparison_request',lambda _:False)(current):
         return frozenset(harness.SYSTEMD_COMPARE_TOOLS)
     if getattr(harness,'pipeline_lookup_request',lambda _:False)(current):
@@ -703,11 +706,12 @@ def main():
                 scope_complete=False
             status = 'completed' if result['completed'] and not failed_evidence and result['state'] in ('completed', 'waiting_approval') else 'partial'
             if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope or
-                    harness.event_lookup_scope(current)) and not scope_complete and not any(c['is_write'] for c in calls):
+                    harness.event_lookup_scope(current) or harness.host_inventory_request(current)) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
             if result['completed'] and scope_complete and (response_read or diagnostic_targets or
-                    (lookup_scope and harness.event_lookup_scope(current) and request['phase']=='lead') or (plan and
+                    (lookup_scope and (harness.event_lookup_scope(current) or harness.host_inventory_request(current))
+                     and request['phase']=='lead') or (plan and
                     (plan['kind']=='agent_identity' or plan['kind']=='web_access' and request['phase']=='lead'))):
                 status = 'completed'  # Completion of these read fields, not incident closure.
             evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)

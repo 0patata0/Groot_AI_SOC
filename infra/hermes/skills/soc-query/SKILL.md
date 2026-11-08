@@ -18,6 +18,14 @@ SOC_WORKFLOW_QUERY_V1
 | 장비 경보·로그 | 해당 `search_*_alerts`의 반환 표본. 탐지 목록은 실제 IDS drop·FW 차단 집행 증거가 아님 |
 | 장비명 없는 최근 경보·이벤트 | Wazuh에 수집된 통합 경보를 조회하고 그 범위를 표에 명시. ‘로그’만 요청하면 대화 맥락으로 대상을 확인 |
 | 서버·서비스·journal | `get_system_diagnostics`의 등록 대상·view. 서비스 상태와 과거 원문·전체 기능 정상은 구분 |
+| 실행 서비스·컨테이너 목록 | `get_host_inventory`: 일반 서비스 요청은 loaded systemd와 Docker를 구분해 함께 조회. 명시 호스트를 유지하고 생략 시 A/B/C 범위를 밝힘 |
+| 수신 포트·자원·프로세스 | 같은 도구의 ports/resources/processes. 포트 수신≠FW 허용, load≠CPU%, 프로세스 CPU%는 수명 기준. 프로세스 인자·환경은 제공하지 않음 |
+| Docker 상세·자원·로그 | 정확한 container 이름과 container_details/stats/logs. 상태/health/재시작/포트/네트워크/볼륨/제한을 조회. Env/Cmd/Labels·전체 inspect는 반환하지 않음. 로그는 최근15분 제한 마스킹 표본이며 stdout/stderr 포함 |
+| OS 서비스 상세·네트워크·저장소 | service_details에 실제 .service 이름. loaded unit의 실행/종료/재시작/자동시작/자원 필드. network는 인터페이스·주 라우팅·DNS 설정, storage는 로컬 파일시스템 용량 |
+
+호스트 인벤토리는 60초 주기 스냅샷이며 수집 시각·조건 일치 건수·표시 건수·페이지를 함께 표시한다. 실행 중≠기능 정상, 오래된 자료·실패≠0건이다. limit/offset은 각 호스트·분류별 적용이며 새 페이지는 새 스냅샷일 수 있다. 서비스 전체 설치 목록 대신 loaded unit을 조회했다면 범위를 숨기지 않는다. 상세 원인/추세/임의 필터를 이 단순 목록으로 충족했다고 답하지 않는다.
+
+출력은 `soc-output`의 호스트별 구획을 따른다. 요약 표 다음에 A/B/C 각 호스트의 상세 표를 따로 두며, 각 호스트 안의 systemd·Docker도 구분한다.
 
 기간 없는 ‘최근’ 경보는 제공된 최근60분 `lookback_minutes`를 선택하며 절대시각을 암산하지 않는다. 오늘/금일은 KST 자정~요청 시각의 `since_kst`·`until_kst`이고 lookback과 혼용하지 않는다. 지정 기간은 최신 요약으로 대체하지 않는다. 제공된 KST를 재변환하지 않는다.
 

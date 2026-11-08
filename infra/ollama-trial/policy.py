@@ -8,7 +8,7 @@ READ_TOOLS = {
     'rule-a': RULE_READS, 'rule-b': RULE_READS,
     'security-events': {'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks',
                         'get_web_service_target', 'search_web_access', 'collect_incident_evidence'},
-    'system-diagnostics': {'get_system_diagnostics', 'calculate_time'},
+    'system-diagnostics': {'get_system_diagnostics', 'calculate_time', 'get_host_inventory'},
     'resp': {'list_blocks', 'get_firewall_rules'},
     'wazuh-ro': {'get_wazuh_agents', 'get_wazuh_cluster_nodes',
                 'get_wazuh_critical_vulnerabilities', 'get_wazuh_manager_error_logs',

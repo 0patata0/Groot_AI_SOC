@@ -7,6 +7,7 @@ import copy
 import hashlib
 import html
 from datetime import datetime, timezone, timedelta
+from decimal import Decimal, localcontext, ROUND_HALF_UP
 import ipaddress
 import importlib.util
 import json
@@ -71,6 +72,29 @@ def resolve_short_read(question, prior_questions=()):
     previous = prior_questions[-1]
     if not isinstance(previous,str) or len(previous)>1800: return question
     if READ.wants_write(normalized(question)) or READ.wants_write(normalized(previous)):return question
+    host_prior = host_inventory_request(previous)
+    if host_prior:
+        text = normalized(question)
+        first = host_prior[0]
+        if first.get('container') and re.fullmatch(r'\s*(?:로그|자원|상세)(?:도)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text):
+            prefix = '' if first['host'] == 'all' else first['host'].upper() + ' 서버 '
+            return prefix + first['container'] + ' 컨테이너 ' + text
+        page = display_page_request(text)
+        count = re.fullmatch(r'\s*([1-9][0-9]?)\s*(?:개|건)(?:만)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text)
+        failed = re.fullmatch(r'\s*(?:오류|실패)(?:난|한)?\s*(?:것|서비스)(?:만)?\s*(?:보여줘|보여줄래|조회해줘)?[?.! ]*', text)
+        if page is not None or count or (failed and 'services' in [x['view'] for x in host_prior]):
+            first = host_prior[0]; number = first['offset'] // first['limit'] + 1
+            if count and first['host'] == 'all': return question  # Total versus per-host count needs scope.
+            number = number + 1 if page == 'next' else max(1, number - 1) if page == 'previous' else page or 1
+            label = {'services':'systemd 서비스','containers':'컨테이너','ports':'수신 포트',
+                     'resources':'자원 사용량','processes':'프로세스','network':'네트워크','storage':'파일시스템',
+                     'service_details':'서비스 상세','container_details':'컨테이너 상세',
+                     'container_stats':'컨테이너 자원','container_logs':'컨테이너 로그'}
+            views = ['services'] if failed else [x['view'] for x in host_prior]
+            prefix = '호스트별 ' if first['host'] == 'all' else first['host'].upper() + ' 서버 '
+            prefix += (first.get('container') or first.get('unit') or '') + ' '
+            state = '실패한 ' if failed else '실행중인 ' if first['state'] == 'running' else ''
+            return prefix + state + ' '.join(label[v] for v in views) + ' ' + str(int(count[1]) if count else first['limit']) + '개 ' + str(number) + '페이지 보여줘'
     # Fold only consecutive short read/format turns, never skip a new topic.
     previous_scope=rule_scope_request(previous)
     if len(prior_questions)>1 and (rule_table_request(previous) or
@@ -799,6 +823,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
+    if host_inventory_request(question): return True
     if systemd_comparison_request(question): return True
     if event_lookup_scope(question): return True
     if diagnostic_history_request(question): return False
@@ -898,7 +923,7 @@ def event_lookup_missing(question, calls):
 
 def lookup_report(question, calls, diagnostic_targets=(), *, include_diagnostics=True):
     """One renderer order for SDK, Native and shared-channel reads."""
-    return (read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
+    return (host_inventory_report(question, calls) or read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
             or (diagnostic_report(question, calls, diagnostic_targets) if include_diagnostics else None)
             or event_report(question, calls))
 
@@ -2067,9 +2092,256 @@ PIPELINE_INVESTIGATION = re.compile(
     r'\d+\s*(?:분|시간|일|시)|\d{4}-\d{2}-\d{2}')
 
 
+HOST_INVENTORY_TOOL = 'mcp__system_diagnostics__get_host_inventory'
+
+
+def detailed_host_request(question):
+    text = normalized(question)
+    if READ.wants_write(text): return None
+    text = text.replace('헤르메스', 'hermes')
+    hosts = re.findall(r'(?<![a-z0-9])([abc])\s*서버', text, re.I)
+    if len(set(x.lower() for x in hosts)) > 1: return None
+    host = hosts[0].lower() if hosts else 'all'
+    rest = re.sub(r'(?<![a-z0-9])[abc]\s*서버', '', text, flags=re.I)
+    units = re.findall(r'(?<![A-Za-z0-9_.@-])[A-Za-z0-9_.@-]+\.service\b', rest)
+    docker = bool(re.search(r'컨테이너|도커|Docker|container', rest, re.I))
+    counts = re.findall(r'([0-9]+)\s*(?:개|건)', rest); pages = re.findall(r'([0-9]+)\s*페이지', rest)
+    if len(counts) > 1 or len(pages) > 1: return None
+    if counts and host == 'all' and not re.search(r'호스트별|서버별', text): return None
+    rest = re.sub(r'[0-9]+\s*(?:개|건|페이지)', '', rest)
+    subject = {}
+    if units and not docker:
+        if len(units) != 1 or not re.search(r'상세|자세|종료\s*코드|재시작\s*횟수|자동\s*시작', rest): return None
+        subject = {'unit': units[0]}; views = ['service_details']; rest = rest.replace(units[0], '')
+    elif docker:
+        rest = re.sub(r'컨테이너|도커|Docker|containers?', '', rest, flags=re.I)
+        names = re.findall(r'(?<![A-Za-z0-9_.-])[A-Za-z0-9][A-Za-z0-9_.-]*', re.sub(r'\b(?:CPU|RAM|stats|health)\b', '', rest, flags=re.I))
+        if len(names) != 1: return None
+        subject = {'container': names[0]}; rest = rest.replace(names[0], '')
+        views = []
+        if re.search(r'로그', rest): views.append('container_logs')
+        if re.search(r'자원|CPU|메모리|stats', rest, re.I): views.append('container_stats')
+        if re.search(r'상세|자세|상태|헬스|health|재시작\s*횟수|포트|네트워크|볼륨|마운트|설정', rest, re.I): views.append('container_details')
+        if not views: views = ['container_details']
+    else: return None
+    limit = int(counts[0]) if counts else (100 if all(v.endswith('_details') for v in views) else 20)
+    page = int(pages[0]) if pages else 1
+    if not 1 <= limit <= 100 or not 1 <= page <= 205 or (page - 1) * limit > 4096: return None
+    rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|확인(?:해줘|해주세요)?|조회(?:해줘|해주세요)?|'
+                  r'정리(?:해서|해줘)?|상세히|상세|자세히|자세하게|상태|헬스체크|헬스|health|재시작\s*횟수|종료\s*코드|'
+                  r'자동\s*시작|시작\s*설정|설정|포트|네트워크|볼륨|마운트|자원|CPU|메모리|사용량|stats|로그|'
+                  r'systemd|서비스|지금|현재|호스트별|서버별|목록|표로|테이블로|좀|하고|및|는|은|를|을|도|의', '', rest, flags=re.I)
+    if re.sub(r'[\s,./·?!~]+', '', rest): return None
+    return [dict(host=host, view=view, state='all', limit=limit, offset=(page-1)*limit, **subject) for view in views]
+
+
+def host_inventory_request(question):
+    """Conservative noun/operation grammar for current bounded host listings.
+
+    Unknown restrictions remain in general inquiry. This plans scope only;
+    model selection and actual MCP receipts are still required.
+    """
+    text = normalized(question)
+    if READ.wants_write(text): return None
+    detail = detailed_host_request(question)
+    if detail: return detail
+    if re.search(r'\bsystemd\b', text, re.I) and not re.search(r'서비스', text): return None
+    groups = [('services', r'서비스|systemd'), ('containers', r'컨테이너|containers?'),
+              ('ports', r'수신\s*포트|열린\s*포트|리스닝\s*포트|포트|listening\s*ports?'),
+              ('resources', r'CPU|메모리|스왑|자원|memory|RAM|swap|load'),
+              ('processes', r'프로세스|processes'), ('network', r'네트워크|인터페이스|라우팅|DNS\s*설정'),
+              ('storage', r'파일시스템|마운트|디스크|disk')]
+    views = [key for key, pattern in groups if re.search(pattern, text, re.I)]
+    if not views: return None
+    hosts = re.findall(r'(?<![a-z0-9])([abc])\s*서버', text, re.I)
+    if len(set(x.lower() for x in hosts)) > 1: return None
+    host = hosts[0].lower() if hosts else 'all'
+    counts = re.findall(r'([0-9]+)\s*(?:개|건)', text)
+    pages = re.findall(r'([0-9]+)\s*페이지', text)
+    if len(counts) > 1 or len(pages) > 1: return None
+    if counts and host == 'all' and not re.search(r'호스트별|서버별', text): return None
+    limit = int(counts[0]) if counts else 20
+    page = int(pages[0]) if pages else 1
+    if not 1 <= limit <= 100 or not 1 <= page <= 205 or (page - 1) * limit > 4096: return None
+    running = bool(re.search(r'실행\s*중|가동\s*중|돌아가는|돌고\s*있|떠\s*있|running', text, re.I))
+    failed = bool(re.search(r'실패|오류', text))
+    if running and failed: return None
+    state = 'failed' if failed else 'running' if running else 'all'
+    if state != 'all' and set(views) - {'services', 'containers'}: return None
+    if failed and views != ['services']: return None
+    rest = re.sub(r'(?<![a-z0-9])[abc]\s*서버|[0-9]+\s*(?:개|건|페이지)', '', text, flags=re.I)
+    for _, pattern in groups: rest = re.sub(pattern, '', rest, flags=re.I)
+    rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|확인(?:해줘|해주세요)?|'
+                  r'조회(?:해줘|해주세요)?|정리(?:해서|해줘)?|실행\s*중인?|가동\s*중인?|돌아가는|돌고\s*있(?:는|어)?|떠\s*있(?:는|어)?|running|'
+                  r'실패한|실패|오류난|오류|지금|현재|호스트별|서버별|서버|사용량|현황|상태|목록|표로|테이블로|상세히|상세|설정|간단히|'
+                  r'얼마나|남았어|여유|뭐|좀|하고|랑|및|는|은|를|을|도|만|의', '', rest, flags=re.I)
+    if re.sub(r'[\s,./·?!~]+', '', rest): return None
+    # Unqualified services includes Docker applications, with separate evidence.
+    if 'services' in views and not re.search('systemd', text, re.I) and not failed and 'containers' not in views:
+        views.append('containers')
+    return [{'host': host, 'view': view, 'state': state, 'limit': limit, 'offset': (page - 1) * limit} for view in views]
+
+
+def host_inventory_observations(question, calls):
+    requests = host_inventory_request(question)
+    if not requests: return None
+    latest = {}
+    for call in evidence_reads(calls):
+        if call.get('server') != 'system-diagnostics' or call.get('name') != 'get_host_inventory': continue
+        args = call.get('arguments', {})
+        if args not in requests: continue
+        view = args['view']; data = payload(call)
+        latest[view] = None
+        if not isinstance(data, dict) or data.get('kind') != 'host_inventory' or data.get('request') != args: continue
+        hosts = list('abc') if args['host'] == 'all' else [args['host']]
+        rows = data.get('hosts')
+        if not isinstance(rows, list) or len(rows) != len(hosts): continue
+        valid = True
+        for host, row in zip(hosts, rows):
+            if (not isinstance(row, dict) or row.get('host') != host
+                    or any(row.get(k) != args[k] for k in args if k != 'host')):
+                valid = False; break
+            if row.get('status') == 'unavailable':
+                if row.get('total') is not None or row.get('rows') != [] or not isinstance(row.get('reason'), str): valid = False
+                continue
+            if (row.get('status') != 'observed'
+                    or type(row.get('age_seconds')) is not int or not 0 <= row['age_seconds'] <= 180
+                    or not EVIDENCE.parse_instant(row.get('observed_at_kst'))
+                    or type(row.get('total')) is not int or row['total'] < 0
+                    or not isinstance(row.get('rows'), list)
+                    or len(row['rows']) != min(args['limit'], max(0, row['total'] - args['offset']))
+                    or type(row.get('has_more')) is not bool
+                    or row['has_more'] != (args['offset'] + args['limit'] < row['total'])):
+                valid = False; break
+            keys = {'services': {'unit','load','active','sub'}, 'containers': {'id','name','image','state','status'},
+                    'ports': {'protocol','state','local','peer'}, 'resources': {'metric','value','unit'},
+                    'processes': {'pid','name','cpu_percent','memory_percent'},
+                    'service_details': {'unit','field','value'}, 'container_details': {'name','field','value'},
+                    'container_stats': {'name','field','value'}, 'container_logs': {'name','at_kst','message','message_state','message_sha256'},
+                    'network': {'category','name','value'},
+                    'storage': {'filesystem','type','total_bytes','used_bytes','available_bytes','usage_percent','mount'}}[view]
+            if any(not isinstance(x, dict) or set(x) != keys or any(not isinstance(v, str) for v in x.values()) for x in row['rows']):
+                valid = False; break
+        if valid: latest[view] = data
+    return requests, latest
+
+
+def capacity_text(value, unit, *, approximate=False):
+    """Display verified capacity fields only; preserve original value and unit."""
+    factors = {'bytes':1, 'B':1, 'kB':1000, 'KB':1000, 'MB':10**6, 'GB':10**9, 'TB':10**12,
+               'KiB':1024, 'MiB':1024**2, 'GiB':1024**3, 'TiB':1024**4}
+    if unit not in factors or not isinstance(value,str) or not re.fullmatch(r'[0-9]{1,24}(?:\.[0-9]{1,9})?',value):
+        return None
+    with localcontext() as context:
+        context.prec=50
+        amount=Decimal(value)*factors[unit]
+        label,scale=next(((label,scale) for label,scale in
+            (('TB',10**12),('GB',10**9),('MB',10**6),('kB',1000),('B',1)) if amount>=scale),('B',1))
+        shown=format((amount/scale).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP),'f').rstrip('0').rstrip('.')
+        original=format(int(value),',') if value.isdigit() else value
+        return ('약 ' if approximate else '')+shown+' '+label+' ('+original+' '+unit+')'
+
+
+def inventory_capacity_cell(view, entry, field):
+    if view=='storage' and field in ('total_bytes','used_bytes','available_bytes'):
+        return capacity_text(entry[field],'bytes')
+    if view=='resources' and field=='value' and entry['unit'] in ('bytes','KiB'):
+        return capacity_text(entry[field],entry['unit'])
+    if view=='service_details' and field=='value' and entry['field'] in ('MemoryCurrent','MemoryMax'):
+        return capacity_text(entry[field],'bytes')
+    if view=='container_details' and field=='value' and entry['field']=='memory_limit_bytes':
+        return capacity_text(entry[field],'bytes')
+    if view=='container_stats' and field=='value' and entry['field'] in ('MemUsage','NetIO','BlockIO'):
+        parts=entry[field].split(' / ')
+        if len(parts)!=2:return None
+        converted=[]
+        for part in parts:
+            match=re.fullmatch(r'([0-9]{1,24}(?:\.[0-9]{1,9})?)\s*(B|kB|KB|MB|GB|TB|KiB|MiB|GiB|TiB)',part)
+            if not match:return None
+            converted.append(capacity_text(*match.groups(),approximate=True))
+        return ' / '.join(converted)
+    return None
+
+
+def host_inventory_report(question, calls):
+    state = host_inventory_observations(question, calls)
+    if not state: return None
+    requests, latest = state
+    if not latest: return None
+    def cell(value): return ('미확인' if value is None else str(value)).replace('|', '\\|').replace('\n', ' ').replace('\r', ' ').replace('`', "'")[:300]
+    labels = {'services': ('systemd 서비스', ('unit','load','active','sub'), ('서비스','적재','활성','실행 상태')),
+              'containers': ('Docker 컨테이너', ('name','image','state','status'), ('이름','이미지','상태','상세 상태')),
+              'ports': ('수신 포트', ('protocol','state','local','peer'), ('프로토콜','상태','수신 주소','상대 주소')),
+              'resources': ('자원 사용량', ('metric','value','unit'), ('항목','값','원단위')),
+              'processes': ('프로세스', ('pid','name','cpu_percent','memory_percent'), ('PID','이름','CPU %','메모리 %')),
+              'service_details': ('서비스 상세', ('unit','field','value'), ('서비스','항목','값')),
+              'container_details': ('Docker 상세', ('name','field','value'), ('컨테이너','항목','값')),
+              'container_stats': ('Docker 자원', ('name','field','value'), ('컨테이너','항목','값')),
+              'container_logs': ('Docker 최근 로그 표본', ('name','at_kst','message','message_state'), ('컨테이너','시각(KST)','내용','마스킹/제한')),
+              'network': ('네트워크 설정', ('category','name','value'), ('분류','이름','값')),
+              'storage': ('파일시스템', ('filesystem','type','total_bytes','used_bytes','available_bytes','usage_percent','mount'),
+                          ('장치','형식','전체','사용','가용','사용률','마운트'))}
+    capacity_shown=False
+    def shown_entry(view,entry,field):
+        nonlocal capacity_shown
+        display=inventory_capacity_cell(view,entry,field)
+        if display is not None:capacity_shown=True
+        return cell(display if display is not None else entry[field])
+    out = ['**호스트 조회**', '', '범위: A/B/C 운영 호스트' if requests[0]['host'] == 'all' else '범위: '+requests[0]['host'].upper()+' 서버',
+           '60초 주기 수집 스냅샷입니다. 실행 상태는 기능 정상 판정이 아닙니다.']
+    out += ['', '**조회 요약**', '', '| 호스트 | 구분 | 조회 시각(KST) | 조건 일치 | 표시 | 다음 |',
+            '|---|---|---|---:|---:|---|']
+    for req in requests:
+        title, fields, heads = labels[req['view']]; data = latest.get(req['view'])
+        if data is None:
+            for host in ('abc' if req['host']=='all' else [req['host']]):
+                out += ['| '+host.upper()+' | '+title+' | 미확인 | 미확인 | 미확인 | 조회 근거 부족 |']
+            continue
+        for row in data['hosts']:
+            if row['status'] != 'observed':
+                out += ['| '+row['host'].upper()+' | '+title+' | 미확인 | 미확인 | 미확인 | '+cell(row['reason'])+' |']; continue
+            if row.get('object_present') is False:
+                out += ['| '+row['host'].upper()+' | '+title+' | '+cell(row['observed_at_kst'])+' | 해당 이름 없음 | 0 | 없음 |']; continue
+            out += ['| '+' | '.join(map(cell, (row['host'].upper(),title,row['observed_at_kst'],row['total'],len(row['rows']),
+                str(req['offset']//req['limit']+2)+'페이지' if row['has_more'] else '없음')))+' |']
+    for host in ('abc' if requests[0]['host']=='all' else [requests[0]['host']]):
+        out += ['', '**'+host.upper()+' 서버**']
+        for req in requests:
+            title, fields, heads = labels[req['view']]; data = latest.get(req['view'])
+            row = next((r for r in data['hosts'] if r['host']==host), None) if data else None
+            out += ['', '**'+title+'**', '']
+            if row is None or row['status']!='observed' or not row['rows']:
+                reason = ('조회 근거 미확인' if row is None else
+                          cell(row['reason']) if row['status']!='observed' else
+                          '해당 이름 없음' if row.get('object_present') is False else
+                          '해당 페이지 0건' if row['total'] else '조회 조건에 일치하는 항목 0건')
+                out += ['| 조회 결과 | 범위·상태 |', '|---|---|',
+                        '| '+title+' | '+reason+' |']
+                continue
+            out += ['| '+' | '.join(heads)+' |', '|'+'---|'*len(heads)]
+            for entry in row['rows']: out += ['| '+' | '.join(shown_entry(req['view'],entry,k) for k in fields)+' |']
+    if any(x['view'] == 'container_logs' for x in requests):
+        out += ['', '로그는 최근15분 stdout/stderr의 제한된 마스킹 표본입니다. 전체 로그·전체 오류 건수는 미확인입니다. 긴 본문은 표에서 일부 생략될 수 있습니다.']
+    if any(x['view'] == 'service_details' for x in requests):
+        out += ['', 'ExecMainCode는 종료 종류(1=exited), ExecMainStatus는 종료값입니다. 종료 정보만으로 현재 장애를 단정하지 않습니다.']
+    if any(x['view']=='services' for x in requests):
+        out += ['', '서비스는 로드된 systemd 단위입니다. 미로드 설치 서비스 전체 목록은 아닙니다.']
+    if any(x['view']=='ports' for x in requests):
+        out += ['', '수신 소켓은 FW 허용이나 외부 접근 성공의 증거가 아닙니다.']
+    if any(x['view']=='resources' for x in requests):
+        out += ['', 'CPU 사용률은 짧은 실측 구간 값이며 load는 실행 대기 작업 수입니다.']
+    if any(x['view']=='processes' for x in requests):
+        out += ['', '프로세스 CPU %는 프로세스 수명 기준 값입니다.']
+    if capacity_shown:
+        out += ['', '용량은 10진 단위(GB=10⁹ bytes, TB=10¹² bytes), 소수점 최대 두 자리입니다. 괄호는 반환 원값·단위이며 Docker가 반올림한 통계의 환산값은 약으로 표시합니다.']
+    out += ['', '표시 한도는 호스트·분류별 '+str(requests[0]['limit'])+'건입니다. 다음 페이지는 새 스냅샷을 조회하므로 목록이 바뀔 수 있습니다.']
+    return '\n'.join(out)
+
+
 def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
+    if host_inventory_request(question): return None
     if diagnostic_history_request(question): return None
     # One snapshot cannot satisfy a comparison, explicit date or resampling.
     if re.search(r'비교|대조|연속|재조회|두\s*번|세\s*번|여러\s*번|\d+\s*(?:번|회)|\d{4}[-/.]\d',text): return None
@@ -2172,6 +2444,7 @@ def diagnostic_observations(calls):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if host_inventory_request(question): return {HOST_INVENTORY_TOOL}
     if systemd_comparison_request(question): return set(SYSTEMD_COMPARE_TOOLS)
     events = event_lookup_scope(question)
     if events: return set(events)
@@ -2247,6 +2520,10 @@ def missing_reads(question, calls, diagnostic_targets=()):
 
 def _missing_reads(question, calls, diagnostic_targets=()):
     calls=evidence_reads(calls)
+    host = host_inventory_observations(question, calls)
+    if host:
+        return [r['view']+': 호스트 인벤토리 근거 미확인' for r in host[0] if not host[1].get(r['view']) or
+                any(row['status'] != 'observed' for row in host[1][r['view']]['hosts'])]
     events = event_lookup_missing(question,calls)
     if events is not None: return events
     if systemd_comparison_request(question):
@@ -2317,6 +2594,20 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    host = host_inventory_request(question)
+    if host:
+        schema = result.get(HOST_INVENTORY_TOOL)
+        if not schema: return {}
+        props = schema.get('properties', {})
+        if set(schema.get('required', [])) - set(host[0]): return {}
+        remaining = [r for r in host if not any(c.get('server') == 'system-diagnostics' and c.get('name') == 'get_host_inventory'
+                     and c.get('arguments') == r for c in calls)]
+        if not remaining: return {}
+        from jsonschema import Draft202012Validator
+        if any(not Draft202012Validator(schema).is_valid(r) for r in remaining): return {}
+        narrowed = {'type': 'object', 'additionalProperties': False, 'required': list(host[0]), 'properties': {}}
+        for key in host[0]: narrowed['properties'][key] = {**props[key], 'enum': list(dict.fromkeys(r[key] for r in remaining))}
+        return {HOST_INVENTORY_TOOL: narrowed}
     event_scope = event_lookup_scope(question)
     if event_scope:
         requested_limit = _event_lookup_request(question)[1]
@@ -2756,8 +3047,13 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
         count=sum(max(1,len(reference.get('host_rule_ids',[])) if family=='wazuh' else len(reference.get('source_ips',[])))
                   for family in reference['families'] if 'mcp__security_events__search_'+family+'_alerts' in schemas)
         if count:limit=min(limit,count)
+    minimum = 1
+    if host_inventory_request(question) and set(schemas) == {HOST_INVENTORY_TOOL}:
+        minimum = len(schemas[HOST_INVENTORY_TOOL].get('properties', {}).get('view', {}).get('enum', []))
+        if not 1 <= minimum <= limit: raise ValueError('host_inventory_selection_budget')
+        limit = minimum
     return {'title': 'ReadToolSelection', 'type': 'object', 'additionalProperties': False,
-        'properties': {'calls': {'type': 'array', 'minItems': 1, 'maxItems': limit, 'uniqueItems': True, 'items': {'anyOf': [
+        'properties': {'calls': {'type': 'array', 'minItems': minimum, 'maxItems': limit, 'uniqueItems': True, 'items': {'anyOf': [
             {'type': 'object', 'additionalProperties': False, 'required': ['tool', 'arguments'],
              'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': EVIDENCE.chat_read_schema(name,schema)}}
             for name, schema in schemas.items()]}}}, 'required': ['calls']}

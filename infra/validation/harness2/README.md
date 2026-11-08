@@ -3,13 +3,13 @@
 사용자 지속 지시에 따라 **이후 모든 하네스 정리에도 공식 Harness²를 사용한다.**
 구조·편집 범위·변경 목록을 먼저 점검하고, 후보 동결→회귀→운영 대조·배포→새 실제 채팅 순서로 검증한다.
 
-Harness²는 프로젝트 코드의 검토를 보완하는 임시 도구다. 운영 변경, 승인 판단,
+Harness²는 프로젝트 코드의 검토를 보완하는 로컬 도구다. 운영 변경, 승인 판단,
 모델 교체를 자동 결정하지 않는다. 실제 추론은 기존 **B 에이전트 → Thor** 경로를
 사용한다. 이 점검 도구에서 Thor API를 직접 호출하지 않는다.
 
 공식 [google-research/harness2](https://github.com/google-research/harness2)의
 `6868817518876de8fd170c6a8354daca273b6191` / 0.1.0 / Apache-2.0을
-Git 제외 `G_Harness2/`에 임시 설치했다. 설치 확인용 결정론적 예제는 2과제 성공이다.
+Git 제외 `G_Harness2/`에 보존한다. **11/8 후속 지시: 작업 후 자동 삭제하지 않고, 사용자가 명시적으로 삭제를 요청할 때만 제거한다.** 15:35 정리 직후 이 지시를 받아 같은 공식 커밋으로 복원했다. 별도 작업용 실행 스크립트와 서버 시험 복사본은 정리했다. 설치 확인용 결정론적 예제는 과거 2과제 성공이다.
 이는 SOC 에이전트 성능 결과가 아니다.
 
 [정리 범위·순서와 단절 후 인계](COMPONENTS.md)
@@ -49,7 +49,7 @@ Git 제외 `G_Harness2/`에 임시 설치했다. 설치 확인용 결정론적 �
 `audit.py`는 고정한 Git 커밋과 로컬 스냅샷을 인자로 받는다. 실행 예:
 
 ```sh
-G_Harness2/.venv/bin/python -B infra/validation/harness2/audit.py \
+PYTHONPATH=G_Harness2 python3 -B infra/validation/harness2/audit.py \
   --repo /path/to/project --base-ref FULL_GIT_COMMIT \
   --source-manifest /path/to/test-manifest.json \
   --snapshot /path/to/snapshot-public-fields.json \
@@ -91,8 +91,7 @@ G_Harness2/.venv/bin/python -B infra/validation/harness2/audit.py \
 건수는 미확인으로 표시하고 반환된 3건만 대조했다. 실제 감사 이벤트가 `Enabled`인데
 설정값 `On`을 기대해 partial로 남긴 중간 결과(H31.346초)도 실패 원문과 함께 보존했다.
 
-임시 프레임워크·전용 환경·캐시는 제거했으므로 위 실행 예는 같은 공식 커밋을 임시
-재설치한 경우에만 사용할 수 있다. 공개 검사기와 프로젝트 소스는 보존한다.
+13:18에는 임시 프레임워크·전용 환경·캐시를 제거했다. 이후 재준비했고 최신 보관 지시는 상단을 따른다. 현재 공식 core는 기존 Python에서 import를 확인했으며 전용 가상환경·추가 패키지는 설치하지 않았다. 공개 검사기와 프로젝트 소스는 보존한다.
 기존 사용자 환경·서버 복구본·운영 DB·채팅·승인 원장은 삭제하지 않았다.
 
 ## 후속 정리 기준 — 2026-11-08 14시
@@ -101,6 +100,6 @@ G_Harness2/.venv/bin/python -B infra/validation/harness2/audit.py \
 
 기준본은 앞선 배포의 **미커밋 운영 스냅샷**이다. `audit.py`의 Git 기준본 제약을 속이지 않고 별도 로컬 감사 실행기에 동결본·SHA를 명시해 같은 공식 `tree.validate`/`diff_summary`로 검토했다. 감사용 workflow 색인은 실제 선택기를 설명하는 메타데이터이며 운영 프롬프트로 배포하지 않는다. 모델 기반 후보 생성·선택·서브에이전트·자동 채택은0이다.
 
-회귀8프로필1,394회 통과와 실제 새채팅 18.429~20.494초/각1조회/정확한10·10·7행은 [별도 결과](../../hermes/event-listing-parity.md)에 남긴다. 구조 검사 통과만으로 성능·권한 안전성·독립 정확도 완료를 선언하지 않는다. 이후 하네스 정리도 이 순서를 유지하고, 결과/patch/SHA를 보존한 뒤 임시 프레임워크를 제거한다.
+회귀8프로필1,394회 통과와 실제 새채팅 18.429~20.494초/각1조회/정확한10·10·7행은 [별도 결과](../../hermes/event-listing-parity.md)에 남긴다. 구조 검사 통과만으로 성능·권한 안전성·독립 정확도 완료를 선언하지 않는다. 이후 하네스 정리도 이 순서를 유지하고 결과/patch/SHA를 보존한다. 프레임워크 삭제는 상단의 최신 사용자 지시를 따른다.
 
 후속 임시 설치도 14:17 KST에 제거 확인했다. Mac 644파일과 B의 격리474파일을 정리하고 보고·변경 patch·원문 SHA·실채팅 검증은 로컬 증거에 보존했다. 운영 복구본은 유지한다.

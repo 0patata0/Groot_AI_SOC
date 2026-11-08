@@ -34,6 +34,16 @@ def main():
     raw_request = incoming()
     if raw_request:
         value = d.parsed(raw_request)
+        if isinstance(value, dict) and set(value) == {'inventory'}:
+            request = value['inventory']
+            inventory = d.inventory_library()
+            host, _, _, _, _ = inventory.request(request)
+            snapshot = d.read_snapshot()
+            result = inventory.answer(request, snapshot['host'])
+            raw = d.encode(result); d.need(len(raw) <= 65536, 'inventory_result_bound')
+            syslog.syslog(syslog.LOG_NOTICE, json.dumps({'event': 'system_diagnostics_inventory_read', 'host': host}))
+            sys.stdout.buffer.write(raw); sys.stdout.buffer.flush()
+            return
         journal = isinstance(value, dict) and bool(set(value) & {'view','journal_scope'})
         if journal:
             reader = d.journal_library()

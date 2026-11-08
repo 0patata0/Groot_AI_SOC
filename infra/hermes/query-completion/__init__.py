@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.131"
+VERSION = "groot-query-completion:1.19.133"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = '1ac01a2c80568c2d3a298fcd1fabb187b908e3dd668d47d15bf76a592c70bfc1'
+EVIDENCE_SOURCE_SHA256 = '6e9ff05eb97300ec70b2e121e736bc64d97a2c3cd7bcc45659976dc210931c43'
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -111,6 +111,7 @@ _READ_TOOL_NAMES = frozenset(
     "mcp__security_events__get_wazuh_sca_checks",
     "mcp__resp__list_blocks", "mcp__resp__get_firewall_rules",
     "mcp__system_diagnostics__get_system_diagnostics",
+    "mcp__system_diagnostics__get_host_inventory",
     "mcp__system_diagnostics__calculate_time",
     *(f"mcp__wazuh_ro__{name}" for name in (
         "get_wazuh_agent_ports", "get_wazuh_agent_processes", "get_wazuh_agents",

@@ -594,6 +594,24 @@ class ManagementWrapper(unittest.TestCase):
                 self.assertEqual(event['output'],raw);self.assertEqual(controller.tool_payload(event['output']),payload)
             else:self.assertTrue(event['is_error']);self.assertIsNone(controller.tool_payload(event['output']))
 
+    def test_host_inventory_receipt_preserves_all_hosts_over_native_5000_limit(self):
+        name='mcp__system_diagnostics__get_host_inventory'
+        payload={'schema':1,'kind':'host_inventory','hosts':[
+            {'host':host,'rows':[{'unit':host+'-service-'+str(i)+'.service',
+             'active':'active','sub':'running','load':'loaded'} for i in range(100)]} for host in 'abc']}
+        raw=json.dumps({'result':json.dumps(payload)})
+        self.assertGreater(len(raw),5000)
+        for value,error in ((raw,False),('가'*(wrapper.MAX_EVENT_AUDIT_BYTES//3+1),False),
+                            (json.dumps({'error':'unavailable'}),True)):
+            def check(h):h.Emitter().on_tool_progress('tool.completed',name,result=value,
+                is_error=error,tool_call_id='host-read',duration=.2)
+            h=Harness();h.run(check,'verify');event=json.loads(h.stdout.getvalue())
+            self.assertEqual(event['tool_call_id'],'host-read')
+            if value==raw:
+                self.assertEqual(event['output'],raw)
+                self.assertEqual(controller.tool_payload(event['output']),payload)
+            else:self.assertTrue(event['is_error']);self.assertIsNone(controller.tool_payload(event['output']))
+
     def test_event_audit_utf8_limit_and_native_errors_fail_closed(self):
         for result, error in (('가' * (wrapper.MAX_EVENT_AUDIT_BYTES // 3 + 1), False),
                               (json.dumps({'error': 'denied'}), True)):

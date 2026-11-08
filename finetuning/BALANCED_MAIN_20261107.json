@@ -499,5 +499,19 @@
     "primary_restarts": 0,
     "operating_bot_model": "qwen3.6:35b",
     "production_promoted": false
+  },
+  "development_comparison_observation": {
+    "observed_at_kst": "2026-11-08T10:08:32.957247+09:00",
+    "completed_at_kst": "2026-11-08T10:07:57.894222+09:00",
+    "all_models_gpu_loaded": true,
+    "candidate_vram_bytes": 23652603001,
+    "private_evaluation_stopped": true,
+    "primary_restarts": 0,
+    "actual_mcp_dispatch": 0,
+    "channel_posts": 0,
+    "test176_consumed": false,
+    "production_promoted": false,
+    "operating_model": "qwen3.6:35b",
+    "record": "BALANCED_COMPARISON_20261108.json"
   }
 }

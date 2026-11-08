@@ -1,0 +1,172 @@
+{
+  "schema": "groot-balanced-development-comparison-v1",
+  "observed_at_kst": "2026-11-08T10:08:32.957247+09:00",
+  "completed_at_kst": "2026-11-08T10:07:57.894222+09:00",
+  "common": "soc-chat-contract:1.5.81",
+  "models": {
+    "qwen3.6:35b": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "soc-qwen36:35b-base-q4km-20261027": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+    "soc-qwen36:35b-balanced-q4km-20261108": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3"
+  },
+  "scope": "동결 실제 개발 근거1개+합성 반례2개, 동일 하네스·스키마의 첫 보고/추가조회 선택 단계",
+  "source_sha256": {
+    "runtime.py": "1081e501c509dea52745ad4c9721d59b65a0a249c880ea9e23449b48f7311889",
+    "chat_contract.py": "d5e0082e7f17903b1a7b08ae6a7b426128848f8256b9bba8ee8e063158c71169",
+    "harness.py": "12c0bb5165e279b4e725ce0067dcd9910506325a287ae7f5140912bfdbf6b145",
+    "grounding.py": "c3d3f1e7ed87ad845ae49c758f526eb05468f772fb575eb3e6130c1c97c12621"
+  },
+  "options": {
+    "temperature": 0,
+    "top_p": 0.95,
+    "num_predict": 2048,
+    "num_ctx": 262144
+  },
+  "reasoning": false,
+  "all_models_gpu_loaded": true,
+  "candidate_vram_bytes": 23652603001,
+  "private_evaluation_stopped": true,
+  "primary_pid": 715615,
+  "primary_restarts": 0,
+  "actual_mcp_dispatch": 0,
+  "channel_posts": 0,
+  "test176_consumed": false,
+  "production_promoted": false,
+  "operating_model": "qwen3.6:35b",
+  "limitations": [
+    "각 조건1회·실제1/합성2인 개발 비교이며 일반 정확도/승률로 환산하지 않음",
+    "추가조회·수정 피드백·최종 채팅까지의 전체 루프 미실행",
+    "공유 GPU/캐시/모델 순서 비통제. 출력 길이도 달라 시간 우위 판정 불가",
+    "기존 단일 진단 검사에서 누락된 actual 사례를 렌더링 후 근거검사는 거절. 혼합/미제공 사례에는 수동 검수상 문제 잔여"
+  ],
+  "results": [
+    {
+      "model": "qwen3.6:35b",
+      "case": "actual_deferred_zero",
+      "input_sha256": "f308a7b2c51c88fc7ee51c3be4a2b18a3ab0f1a1b5cc3cbd0d6ab8c2421c195a",
+      "result_file_sha256": "3f8e73560702f3f9c3c0db30f7e6b4ee5e1cc2b15b0807b7f1f8713de335a17f",
+      "content_sha256": "f2a6669475dcd0e520068f6cce62ce8a0739990d183e375bf79b7f2c1fa2133f",
+      "seconds": 51.270743244327605,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "qwen3.6:35b",
+      "case": "mixed_status",
+      "input_sha256": "4e55dc4373eef24adb532ff8faf79fa8b6bbe0fa163cd627d007c82243c55cc8",
+      "result_file_sha256": "6487d53160cef8df0691e8bf4470c57b246cb71b9d15b0924e0a9c4b8168e4cc",
+      "content_sha256": "f2a6669475dcd0e520068f6cce62ce8a0739990d183e375bf79b7f2c1fa2133f",
+      "seconds": 8.867486730217934,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "qwen3.6:35b",
+      "case": "withheld_only",
+      "input_sha256": "5b0df1b34eff50ccfc10ba68dbd0a6b8f144a669e0338c5029f659f4b056c4d5",
+      "result_file_sha256": "c78e3f753a970a69263e55a2f10ab4714e0c5d549ba9bdada20c441a87c564d1",
+      "content_sha256": "f2a6669475dcd0e520068f6cce62ce8a0739990d183e375bf79b7f2c1fa2133f",
+      "seconds": 8.440276292618364,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "soc-qwen36:35b-base-q4km-20261027",
+      "case": "actual_deferred_zero",
+      "input_sha256": "f308a7b2c51c88fc7ee51c3be4a2b18a3ab0f1a1b5cc3cbd0d6ab8c2421c195a",
+      "result_file_sha256": "6993655a6963ed4ed1c4e952d9caadb961c514af79f68c995dc47071610303f9",
+      "content_sha256": "9ba5902c2c9a3d646b98d3a59b9de3e63264755f3b52d3ccf734fbecbdcc56a8",
+      "seconds": 46.03514623316005,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "soc-qwen36:35b-base-q4km-20261027",
+      "case": "mixed_status",
+      "input_sha256": "4e55dc4373eef24adb532ff8faf79fa8b6bbe0fa163cd627d007c82243c55cc8",
+      "result_file_sha256": "7f930db469f4d495658cc833514e67248c528435f736c38cad706b4e6b36b42d",
+      "content_sha256": "9ba5902c2c9a3d646b98d3a59b9de3e63264755f3b52d3ccf734fbecbdcc56a8",
+      "seconds": 7.637667703907937,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "soc-qwen36:35b-base-q4km-20261027",
+      "case": "withheld_only",
+      "input_sha256": "5b0df1b34eff50ccfc10ba68dbd0a6b8f144a669e0338c5029f659f4b056c4d5",
+      "result_file_sha256": "470c0bd10312cc7635d29ac3357a28fb6a77ef0d375b60f9337dc97e383b1376",
+      "content_sha256": "9ba5902c2c9a3d646b98d3a59b9de3e63264755f3b52d3ccf734fbecbdcc56a8",
+      "seconds": 7.268328811973333,
+      "schema_valid": true,
+      "more_evidence": true,
+      "report_assessment": null,
+      "report_status": null,
+      "rendered_claim_violations": null,
+      "manual_review": "추가 읽기를 선택한 첫 단계. 도구 인자 선택·추가 조회·최종 답변은 미실행으로 정오 판정 유보."
+    },
+    {
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "case": "actual_deferred_zero",
+      "input_sha256": "f308a7b2c51c88fc7ee51c3be4a2b18a3ab0f1a1b5cc3cbd0d6ab8c2421c195a",
+      "result_file_sha256": "9e2ec6d5041e2dc9c52d5d859d69e5411e8ba024c6ad0002258076aba4429cdd",
+      "content_sha256": "9a706220b13566a99ada72905e2b4b7ecb53c7559f9db2b1cde3051988a2e910",
+      "seconds": 49.33359225234017,
+      "schema_valid": true,
+      "more_evidence": false,
+      "report_assessment": "benign",
+      "report_status": "resolved",
+      "rendered_claim_violations": [
+        "diagnostic_exit_status_mismatch",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "manual_review": "제한된 오류 후보 표본을 전체 journal/실패 부재로 확대하고 benign/resolved로 단정. 원문과 정제 이력의 범위·현재 처리 관측을 분리해야 함."
+    },
+    {
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "case": "mixed_status",
+      "input_sha256": "4e55dc4373eef24adb532ff8faf79fa8b6bbe0fa163cd627d007c82243c55cc8",
+      "result_file_sha256": "a65ecbfcfe8069c9b16b99d1f24c5bd9dc003149f54a022360bda0c9f0c6d7a0",
+      "content_sha256": "c832ceaed3382775789371a8eabbe1d0c064fbb10247dffd28b99046880612d5",
+      "seconds": 10.274293697904795,
+      "schema_valid": true,
+      "more_evidence": false,
+      "report_assessment": "unresolved",
+      "report_status": "needs_review",
+      "rendered_claim_violations": [],
+      "manual_review": "unresolved/needs_review로 유보했으나 현재 실제 처리 대기 지표 0을 답하지 않음. 검토287과 처리 대기 구분의 설명 누락."
+    },
+    {
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "case": "withheld_only",
+      "input_sha256": "5b0df1b34eff50ccfc10ba68dbd0a6b8f144a669e0338c5029f659f4b056c4d5",
+      "result_file_sha256": "19530fafe400565bf2e0f13cfda76862e42ac2d5451e99f3270041bf81dab0df",
+      "content_sha256": "4c5426c0c37a360e379178e813b220a4f2e5570f90ab301f7f345bd210c54427",
+      "seconds": 10.767154865898192,
+      "schema_valid": true,
+      "more_evidence": false,
+      "report_assessment": "benign",
+      "report_status": "needs_review",
+      "rendered_claim_violations": [],
+      "manual_review": "원문 미제공으로 원인 불명이라면서 benign 판정. 확인하지 않은 재시작 이력 부재를 주장하고 현재 처리 지표 답변 누락."
+    }
+  ]
+}

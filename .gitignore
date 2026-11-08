@@ -81,3 +81,5 @@ model*.hdf5
 /infra/hermes/benchmarks/results/**/results.jsonl
 /infra/hermes/benchmarks/results/**/candidate-*.conf
 /topology/*_rule_mcp.png
+# Temporary Harness2 framework, environments, dependencies and runs (remove after review).
+/G_Harness2/

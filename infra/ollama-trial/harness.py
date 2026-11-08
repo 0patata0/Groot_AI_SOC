@@ -800,9 +800,81 @@ def inventory_question(question):
 
 def structured_read(question):
     if systemd_comparison_request(question): return True
+    if event_lookup_scope(question): return True
     if diagnostic_history_request(question): return False
     return bool(security_inventory_request(question) or firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
+
+
+def event_lookup_scope(question):
+    """A bounded log listing, shared by selectors and the channel worker.
+
+    Unknown filters, mixed tasks and risk/causal questions retain model inquiry.
+    This selects read capabilities only; it never declares an event harmless.
+    """
+    text = normalized(question)
+    if READ.wants_write(text) or EVIDENCE.incident_investigation_request(text): return None
+    if not re.search(r'로그|경보|이벤트', text): return None
+    devices = {label for pattern, label in (
+        (r'WAF|ModSecurity', 'modsecurity'), (r'IDS|IPS|Suricata|수리카타', 'suricata'),
+        (r'Wazuh|와주', 'wazuh')) if re.search(pattern, text, re.I)}
+    if not devices: return None
+    rest = re.sub(r'WAF|ModSecurity|IDS|IPS|Suricata|수리카타|Wazuh|와주', '', text, flags=re.I)
+    rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|정리(?:해서|해줘)?|'
+                  r'조회(?:해줘|해주세요)?|오늘|금일|최근|지금|현재|차단|보안|로그|경보|이벤트|'
+                  r'목록|표로|테이블로|간단히|상세히|좀|하고|및|각각|장비별로|는|은|를|을|도|만|의', '', rest)
+    if re.sub(r'[\s,./·?!~]+', '', rest): return None
+    return frozenset('mcp__security_events__search_'+d+'_alerts' for d in devices)
+
+
+def event_lookup_missing(question, calls):
+    """Validate actual receipts before completing a plain listing, not a case."""
+    scope = event_lookup_scope(question)
+    if not scope: return None
+    now = datetime.now(EVIDENCE.KST)
+    latest = {'mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name',''):c for c in calls}
+    missing = []
+    for name in sorted(scope):
+        call = latest.get(name, {}); data = payload(call) if call else None
+        args = call.get('arguments', {})
+        valid = isinstance(data, dict) and isinstance(args, dict) and not call.get('is_write')
+        if valid:
+            rows = data.get('alerts'); start = EVIDENCE.parse_instant(data.get('requested_since_kst'))
+            end = EVIDENCE.parse_instant(data.get('requested_until_kst'))
+            expected = name.split('__search_')[1].removesuffix('_alerts')
+            valid = (data.get('source') == expected and data.get('applied_filters') == {}
+                     and not set(args)-{'since_kst','until_kst','lookback_minutes','limit'}
+                     and isinstance(rows,list) and type(data.get('returned_count')) is int
+                     and data['returned_count'] == len(rows) and type(data.get('limit')) is int
+                     and 1 <= data['limit'] <= 50 and 0 <= len(rows) <= data['limit'] and data.get('scan_capped') is False
+                     and start and end and 0 < (end-start).total_seconds() <= 86400
+                     and 0 <= (now-end).total_seconds() <= 600)
+            if valid:
+                if 'since_kst' in args:
+                    valid = (EVIDENCE.parse_instant(args['since_kst']) == start
+                             and EVIDENCE.parse_instant(args.get('until_kst')) == end
+                             and 'lookback_minutes' not in args and data.get('window_mode') == 'explicit_bounds')
+                else:
+                    minutes = args.get('lookback_minutes',60)
+                    valid = (type(minutes) is int and 1 <= minutes <= 1440
+                             and abs((end-start).total_seconds()-minutes*60) < 1
+                             and ('until_kst' not in args or EVIDENCE.parse_instant(args['until_kst']) == end))
+                if re.search(r'오늘|금일', normalized(question)):
+                    valid = valid and start == now.replace(hour=0,minute=0,second=0,microsecond=0)
+                for row in rows:
+                    stamp = EVIDENCE.parse_instant(row.get('timestamp')) if isinstance(row,dict) else None
+                    valid = valid and bool(stamp and start <= stamp <= end)
+                    if expected == 'modsecurity' and '차단' in normalized(question):
+                        valid = valid and str(row.get('http_status')) == '403' and row.get('engine') == 'Enabled'
+        if not valid: missing.append(name+': 요청 구간·조건·반환 표본 미확인')
+    return missing
+
+
+def lookup_report(question, calls, diagnostic_targets=(), *, include_diagnostics=True):
+    """One renderer order for SDK, Native and shared-channel reads."""
+    return (read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
+            or (diagnostic_report(question, calls, diagnostic_targets) if include_diagnostics else None)
+            or event_report(question, calls))
 
 
 def linked_rows(calls):
@@ -1444,6 +1516,8 @@ def action_fallback(question, calls):
         ('resp', 'block_ip'), ('resp', 'unblock_ip'), ('rule-write-a', 'temporarily_contain_ip'))]
     lines = ['답변의 상태·실행 설명에 확인되지 않은 근거가 있어 확인 범위만 표시합니다.',
              '이 답변은 변경 적용이나 현재 보안 상태가 정상이라는 판정이 아닙니다.']
+    if event_lookup_scope(question) and not attempts and not any(c.get('is_write') for c in calls):
+        return '\n'.join(lines) + '\n\n' + event_report(question,calls)
     reads = sorted({c.get('name', '') for c in calls if payload(c) and
                     c.get('name', '').startswith(('get_', 'list_', 'search_', 'calculate_'))})
     lines.append('- 이번 요청에서 성공한 조회·계산: ' + (', '.join(reads) if reads else '없음/미조회'))
@@ -1823,6 +1897,11 @@ def guidance(question, *, include_workflows=True):
     if include_workflows:
         workflows=workflow_names(question)
         if workflows:result+='\n'+CONTRACT.workflow_policy(workflows)
+    if event_lookup_scope(question):
+        result += ('\n이번 요청은 로그 표본 조회이며 사건 판단·변경 요청이 아닙니다. 명시한 장비의 경보 검색을 실제 선택하세요. '
+                   '오늘/금일은 요청의 KST 날짜 00:00부터 현재까지 since_kst와 until_kst로 조회합니다. '
+                   '두 시각과 lookback_minutes를 함께 넣지 마세요. 명시되지 않은 IP·룰 필터는 추가하지 마세요. '
+                   '반환 표본만 표로 표시하며 전체 건수·공격 성공·현재 차단 상태를 추정하지 않습니다.')
     if EVIDENCE.incident_investigation_request(text):
         result += '\n사건의 실제 경보부터 조회한 뒤 위험·대응 필요성을 판단하세요. 현재 규칙 파일 목록만으로 조사를 대신하지 마세요.'
         result += ('\n실제 센서 사건의 최종 판단은 공개 보고 뒤에 INCIDENT_DISPOSITION: {"assessment":"benign 또는 remediated 또는 unresolved 중 하나","basis":"실제 근거와 한계를 설명하는 20~2000자","evidence_tools":["실제로 성공한 mcp__서버__도구"]} 한 줄로 기록하세요. '
@@ -2073,6 +2152,8 @@ def diagnostic_observations(calls):
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
     if systemd_comparison_request(question): return set(SYSTEMD_COMPARE_TOOLS)
+    events = event_lookup_scope(question)
+    if events: return set(events)
     if diagnostic_history_request(question):
         return None  # Keep event/history tools available for mixed inquiries.
     if EVIDENCE.incident_investigation_request(normalized(question)):
@@ -2145,6 +2226,8 @@ def missing_reads(question, calls, diagnostic_targets=()):
 
 def _missing_reads(question, calls, diagnostic_targets=()):
     calls=evidence_reads(calls)
+    events = event_lookup_missing(question,calls)
+    if events is not None: return events
     if systemd_comparison_request(question):
         state=systemd_comparison_state(question,calls)
         return state['missing'] if state else ['systemd 비교 근거 미확인']
@@ -2213,6 +2296,26 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    event_scope = event_lookup_scope(question)
+    if event_scope:
+        result = {name:schema for name,schema in result.items() if name in event_scope}
+        for name,schema in list(result.items()):
+            if any(c.get('server') == 'security-events' and
+                   c.get('name') == name.split('__')[-1] for c in calls):
+                result.pop(name)  # A failed/partial read is reported, never blindly repeated.
+                continue
+            props = schema.get('properties',{})
+            if set(schema.get('required',[]))-{'since_kst','until_kst','lookback_minutes','limit'}:
+                result.pop(name); continue
+            schema['properties'] = {k:v for k,v in props.items() if k in
+                ('since_kst','until_kst','lookback_minutes','limit')}
+            schema['additionalProperties'] = False
+            if re.search(r'오늘|금일',normalized(question)):
+                if not all(k in props for k in ('since_kst','until_kst')):
+                    result.pop(name); continue
+                schema['properties'].pop('lookback_minutes',None)
+                schema['required'] = list(dict.fromkeys([*schema.get('required',[]),'since_kst','until_kst']))
+        return result
     if ids_policy_question(question) and any(c.get('server')=='rule-a' and c.get('name')=='get_service_action_target'
             and c.get('arguments',{}).get('target')=='a:suricata' for c in calls):
         return {}  # Unavailable/partial policy is not repaired by a blind repeat.
@@ -2895,39 +2998,88 @@ def event_report(question, calls):
         name = 'mcp__' + call['server'].replace('-', '_') + '__' + call['name']
         if name in scope:
             latest[name] = payload(call)
-    if not latest:
+    if not latest and not event_lookup_scope(question):
         return None
-    rows = ['**요약**', '실제 조회 구간의 반환 표본입니다. security-events는 until_kst와 lookback_minutes로 과거 구간을 조회하며, Wazuh 요약은 최신 표본입니다. 반환 표본 수는 요청 구간 전체 건수가 아닙니다.', '', '**확인 내역**']
+    rows = ['실제 조회에서 반환된 표본입니다. 반환 표본 수와 요청 구간 전체 건수는 구분합니다.']
+    missing = event_lookup_missing(question,calls)
+    if missing:
+        rows.extend(['',*READ.table(['조회 상태','미확인 범위'],[
+            ['부분 조회·미완료',item] for item in missing])])
     labels = {'mcp__security_events__search_modsecurity_alerts': 'WAF',
               'mcp__security_events__search_suricata_alerts': 'IDS',
+              'mcp__security_events__search_wazuh_alerts': 'Wazuh',
               'mcp__wazuh_ro__get_wazuh_alert_summary': 'Wazuh'}
     for name in sorted(scope):
         data = latest.get(name)
-        rows.extend(['', '**' + labels[name] + '**'])
+        rows.extend(['', '**' + labels.get(name,name) + '**', ''])
         if not data:
-            rows.append('- 조회 미완료/실패: 0건으로 판단하지 않습니다.'); continue
+            rows.extend(READ.table(['조회 상태','확인 범위'],[['조회 미완료/실패','0건으로 판단하지 않습니다.']])); continue
         if name.endswith('get_wazuh_alert_summary'):
             raw = data.get('result')
             if not isinstance(raw, str):
-                rows.append('- 반환 형식 미확인.'); continue
+                rows.extend(READ.table(['조회 상태','확인 범위'],[['반환 형식 미확인','0건으로 판단하지 않습니다.']])); continue
             records = re.findall(r'(?m)^Alert ID: [^\n]+\n(?:(?!Alert ID:)[\s\S])*?(?=^Alert ID:|\Z)', raw)
             stamps = [v for v in re.findall(r'(?m)^Time: ([^\n]+)', raw) if EVIDENCE.parse_instant(v)]
             if not records or len(stamps) != len(records):
-                rows.append('- 원본 표본 형식을 집계하지 못했습니다. 0건이라는 뜻은 아닙니다.'); continue
+                rows.extend(READ.table(['조회 상태','확인 범위'],[['원본 표본 형식 미확인','0건으로 판단하지 않습니다.']])); continue
             ordered = sorted(stamps, key=EVIDENCE.parse_instant)
-            rows.append(f'- 최신 반환 표본 {len(records)}건; 실제 표본 시각 {EVIDENCE.kst_time(ordered[0])} ~ {EVIDENCE.kst_time(ordered[-1])}. 절대 구간/전체 건수 조회 아님.')
-            for record in records[:5]:
-                rows.append('- ' + cell(EVIDENCE.kst_display(record.strip())))
+            rows.extend(READ.table(['조회 범위','반환 상태'],[[
+                EVIDENCE.kst_time(ordered[0])+' ~ '+EVIDENCE.kst_time(ordered[-1]),
+                f'Wazuh 요약은 최신 표본 · 반환 표본 {len(records)}건 · 절대 구간/전체 건수 조회 아님']]))
+            rendered=[]
+            for record in records:
+                fields={};remaining=[]
+                for line in record.splitlines():
+                    match=re.fullmatch(r'([^:\n]+): (.*)',line)
+                    if match and match[1] not in fields:fields[match[1]]=match[2]
+                    elif line.strip():remaining.append(line)
+                used={'Time','Alert ID','Agent','Level','Description','Rule ID','Source IP'}
+                extra='; '.join([k+': '+v for k,v in fields.items() if k not in used]+remaining)
+                rendered.append([EVIDENCE.kst_time(fields.get('Time')),fields.get('Agent'),fields.get('Source IP'),
+                    fields.get('Rule ID'),fields.get('Description'),fields.get('Level'),fields.get('Alert ID'),extra or '미반환'])
+            rows.extend(['',*READ.table(['시각(KST)','수집 자산','관측 출발지','Wazuh 룰 ID','경보 내용','레벨','경보 ID','추가 반환 필드'],rendered)])
         else:
-            if data.get('source') not in ('suricata', 'modsecurity') or not isinstance(data.get('alerts'), list):
-                rows.append('- 반환 형식 미확인.'); continue
-            rows.append(f"- 실제 요청 구간 {cell(data.get('requested_since_kst'))} ~ {cell(data.get('requested_until_kst'))}; 반환 표본 {cell(data.get('returned_count'))}건. 구간 전체 건수 미확인.")
-            for alert in data['alerts'][:5]:
-                if data['source'] == 'suricata':
-                    rows.append('- ' + cell(f"{alert.get('timestamp')} · SID {alert.get('signature_id')} · {alert.get('signature')} · {alert.get('source_ip')} → {alert.get('destination_ip')}:{alert.get('destination_port')} ({alert.get('protocol')})"))
+            source=data.get('source');alerts=data.get('alerts')
+            expected={'mcp__security_events__search_modsecurity_alerts':'modsecurity',
+                      'mcp__security_events__search_suricata_alerts':'suricata',
+                      'mcp__security_events__search_wazuh_alerts':'wazuh'}.get(name)
+            if source!=expected or not isinstance(alerts,list) or any(not isinstance(a,dict) for a in alerts):
+                rows.extend(READ.table(['조회 상태','확인 범위'],[['반환 형식 미확인','0건으로 판단하지 않습니다.']])); continue
+            rows.extend(READ.table(['요청 구간(KST)','반환 상태'],[[
+                str(data.get('requested_since_kst','미확인'))+' ~ '+str(data.get('requested_until_kst','미확인')),
+                f"반환 표본 {data.get('returned_count','미확인')}건 · 표시 {len(alerts)}건 · 구간 전체 건수 미확인"]]))
+            count=data.get('returned_count')
+            if type(count) is not int or count!=len(alerts):
+                rows.extend(['',*READ.table(['조회 상태','확인 범위'],[['반환 건수 불일치·미확인','실제 반환 행만 표시하며 완전한 조회로 판단하지 않습니다.']])])
+            if not alerts:
+                state='반환 표본 없음' if type(count) is int and count==0 else '반환 행 없음·건수 미확인'
+                rows.extend(['',*READ.table(['조회 상태','확인 범위'],[[state,'전체 경보·공격 부재의 증거가 아님']])]);continue
+            rendered=[]
+            for alert in alerts:
+                stamp=EVIDENCE.kst_display(str(alert.get('timestamp') or '시각 미확인'))
+                if source=='suricata':
+                    headers=['시각(KST)','관측 출발지','대상','프로토콜','SID·규칙 설명','수집 자산']
+                    rendered.append([stamp,alert.get('source_ip'),
+                        str(alert.get('destination_ip') or '미확인')+':'+str(alert.get('destination_port') or '미확인'),
+                        alert.get('protocol'),str(alert.get('signature_id') or '미확인')+' · '+str(alert.get('signature') or '설명 미반환'),alert.get('agent')])
+                elif source=='modsecurity':
+                    headers=['시각(KST)','관측 출발지','요청','WAF 룰 ID·규칙 설명','HTTP','엔진']
+                    matches=alert.get('waf_rule_matches',[])
+                    pairs=[str(m.get('rule_id') or 'ID 미확인')+' · '+str(m.get('description') or '설명 미반환') for m in matches if isinstance(m,dict)] if isinstance(matches,list) else []
+                    known={str(m.get('rule_id')) for m in matches if isinstance(m,dict)} if isinstance(matches,list) else set()
+                    ids=alert.get('waf_rule_ids',[])
+                    if isinstance(ids,list):pairs.extend(str(v)+' · 설명 미반환' for v in ids if str(v) not in known)
+                    request=str(alert.get('method') or '메서드 미확인')+' '+str(alert.get('request_path') or '경로 미반환')
+                    if alert.get('request_path_incomplete'):request+=' (경로 일부만 반환)'
+                    if alert.get('waf_rule_matches_incomplete'):pairs.append('규칙 설명 일부만 반환·누락 가능')
+                    rendered.append([stamp,alert.get('source_ip'),request,'; '.join(pairs) or '룰 근거 미반환',alert.get('http_status'),alert.get('engine')])
                 else:
-                    rows.append('- ' + cell(f"{alert.get('timestamp')} · WAF IDs {alert.get('waf_rule_ids')} · {alert.get('source_ip')} · {alert.get('method')} · HTTP {alert.get('http_status')} · engine {alert.get('engine')}"))
-    rows.extend(['', '**조치 및 다음 단계**', '- 조회만 수행했습니다. 반환0건은 전체 경보/공격 부재나 정상의 증거가 아니며, 행위자와 원인은 별도 조사 대상입니다.'])
+                    headers=['시각(KST)','수집 자산','관측 출발지','Wazuh 룰 ID','경보 내용','레벨']
+                    rendered.append([stamp,alert.get('agent'),alert.get('source_ip'),alert.get('wazuh_rule_id'),alert.get('wazuh_rule_description'),alert.get('wazuh_level')])
+            rows.extend(['',*READ.table(headers,rendered)])
+            if source=='modsecurity':rows.extend(['','규칙 매칭·HTTP 상태의 관측이며 침해 성공·실패 또는 FW의 IP 차단 상태를 뜻하지 않습니다.'])
+    rows.extend(['','조회만 수행했습니다. 반환0건은 전체 경보·공격 부재의 증거가 아닙니다.'])
+    if detailed_output(question):rows.extend(['','security-events는 until_kst와 lookback_minutes로 과거 구간을 조회하며, Wazuh 요약은 최신 표본입니다. 표에는 반환된 개별 로그를 모두 표시합니다. 규칙 설명은 센서가 반환한 명칭이며 행위자·원인·공격 성공 여부는 별도 근거가 필요합니다.'])
     return '\n'.join(rows)
 
 

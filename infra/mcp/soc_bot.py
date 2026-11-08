@@ -272,7 +272,9 @@ def policy_change_report(minutes):
             if value.get('timed_out') or value.get('_shards',{}).get('failed',0):raise ValueError('partial_policy_query')
             buckets=value['aggregations']['periods']['buckets'];counts=[buckets[k]['doc_count']for k in ('before','after')]
             if any(type(n)is not int or n<0 for n in counts):raise ValueError('invalid_policy_count')
+            if not any(counts):continue
             rows.append([change['name'],_alert_time_kst(when),*counts])
+        if not rows:return ''
         return ('**정책 적용 전·후 경보 구분** (이번 보고 구간의 정확한 SID·출발지·목적지·포트)\n\n'+
                 report_table(['확정된 변경','적용 시각(KST)','적용 전 기록','적용 후 새 경보'],rows)+
                 '\n\n적용 전 경보는 아래 전체 집계에도 포함된 과거 기록입니다. 삭제하거나 새 경보로 세지 않습니다. '
@@ -371,12 +373,13 @@ def build_report(minutes):
     text += '\n\n**기록된 조치** (색인 로그이며 현재 차단/복구 상태와 구분)\n\n'+action_report(minutes)
     if rows:
         text += '\n\n**최근 경보 표본** ('+str(len(rows[:5]))+'개 표시, 전체 상세 아님)\n\n'+report_table(
-            ['시각(KST)','Wazuh ID/레벨','수집 자산','출처 IP'],
-            [[r.get('ts'),str(r.get('id'))+'/'+str(r.get('level')),r.get('agent','미확인'),r.get('srcip') or '미확인'] for r in rows[:5]])
+            ['시각(KST)','Wazuh ID/레벨','경보 내용','수집 자산','로그에 기록된 출발지'],
+            [[r.get('ts'),str(r.get('id'))+'/'+str(r.get('level')),r.get('desc') or '설명 미반환',r.get('agent','미확인'),r.get('srcip') or '미확인'] for r in rows[:5]])
     fields = [{'short':True,'title':'발행자 수행','value':'조회·집계·보고; 보안 변경 없음'},
               {'short':True,'title':'판단·조치 주체','value':'LLM 관리 에이전트 · 카드 승인자는 관리자'}]
     if agg['src']:
-        text += '\n\n**관측 출처 IP(상위)**\n\n'+report_table(['주소','색인 집계 건수'],agg['src'])
+        text += '\n\n**로그에 기록된 출발지(상위)**\n\n'+report_table(['관측 주소','색인 집계 건수'],agg['src'])
+        text += '\n\n프록시·NAT 경유 로그의 관측 주소는 실제 요청자와 다를 수 있습니다. 이 집계만으로 공격 주체를 확정하지 않습니다.'
     text += '\n\n미확인: 공격 여부·영향·현재 조치 결과·사건 종결은 이 집계만으로 확정하지 않습니다.'
     return {'username':'soc-report','attachments':[{'color':'#439fe0','title':'SOC 경보 조회 자료',
             'text':text,'fields':fields,'footer':'capstone SOC telemetry','ts':int(time.time())}]}

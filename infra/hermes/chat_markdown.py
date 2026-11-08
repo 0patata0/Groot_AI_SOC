@@ -107,7 +107,7 @@ def labeled_report_tables(text):
     """
     if not isinstance(text,str):raise TypeError('Markdown text must be a string')
     lines=text.splitlines(keepends=True)
-    if _table_spans(lines) or re.search(r'(?m)^ {0,3}<[A-Za-z!/]',text):return text
+    if re.search(r'(?m)^ {0,3}<[A-Za-z!/]',text):return text
     def rows(block):
         result=[];parent=None;used=False
         for line in block:

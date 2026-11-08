@@ -421,7 +421,7 @@ class Tests(unittest.TestCase):
             controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
                 run_hermes=lambda *a:result,prompt_for=lambda *a:'prompt')
             harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},
-                guidance=lambda _:'read only',read_plan=lambda _:None,read_report=lambda *a:'verified or incomplete facts',
+                guidance=lambda _:'read only',read_plan=lambda _:None,lookup_report=lambda *a,**kw:'verified or incomplete facts',
                 missing_reads=lambda *a:[] if verified else ['FW incomplete'])
             request={'id':'a'*32,'phase':'lead','question':'FW 룰'};output=io.StringIO()
             with mock.patch.dict(sys.modules,{'harness':harness,'soc_management_controller':controller}), \

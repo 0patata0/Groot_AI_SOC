@@ -50,8 +50,13 @@ class LabelledReportTests(unittest.TestCase):
             self.assertEqual(labeled_report_tables(text),text)
 
     def test_existing_tables_and_ordered_lists_are_preserved(self):
-        for text in (TABLE+'\n\n- A: one\n- B: two','1. A: one\n2. B: two'):
-            self.assertEqual(labeled_report_tables(text),text)
+        text=TABLE+'\n\n- A: one\n- B: two'
+        out=labeled_report_tables(text)
+        self.assertTrue(out.startswith(TABLE+'\n\n'))
+        self.assertIn('| A | one |\n| B | two |',out)
+        self.assertEqual(labeled_report_tables(out),out)
+        text='1. A: one\n2. B: two'
+        self.assertEqual(labeled_report_tables(text),text)
 
     def test_crlf_and_missing_final_newline(self):
         text='- A: one\r\n- B: two'

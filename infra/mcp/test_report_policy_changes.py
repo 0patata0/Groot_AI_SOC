@@ -21,6 +21,11 @@ class PolicyReportTests(unittest.TestCase):
  def test_new_alerts_are_never_hidden(self):
   with patch.object(bot,'Path',return_value=fakepath()),patch.object(bot,'idx_search',return_value=response(4,2)):
    self.assertIn('| 4 | 2 |',bot.policy_change_report(60))
+ def test_zero_zero_comparison_is_omitted_but_matching_history_stays_visible(self):
+  with patch.object(bot,'Path',return_value=fakepath()),patch.object(bot,'idx_search',return_value=response(0,0)):
+   self.assertEqual(bot.policy_change_report(60),'')
+  with patch.object(bot,'Path',return_value=fakepath()),patch.object(bot,'idx_search',return_value=response(0,2)):
+   self.assertIn('| 0 | 2 |',bot.policy_change_report(60))
  def test_failed_or_partial_query_not_zero(self):
   for value in ({'timed_out':True},{'_shards':{'failed':1}},response(4,-1),response(4,False),{}):
    with self.subTest(value=value),patch.object(bot,'Path',return_value=fakepath()),patch.object(bot,'idx_search',return_value=value):
@@ -44,4 +49,12 @@ class PolicyReportTests(unittest.TestCase):
   with patch.object(bot,'agg_alerts',return_value=(agg,None)),patch.object(bot,'recent_alerts',return_value=([],None)),patch.object(bot,'action_report',return_value='history'),patch.object(bot,'policy_change_report',return_value='POLICY_NOTE'):
    text=bot.build_report(60)['attachments'][0]['text']
   self.assertIn('**4건**',text);self.assertIn('POLICY_NOTE',text);self.assertIn('ET SCAN Potential SSH Scan',text)
+ def test_recent_alert_table_has_description_and_observed_source_not_attacker(self):
+  agg={'total':1,'rules':[],'src':[('192.0.2.1',1)],'agent':[]}
+  rows=[{'ts':'2026-11-08 12:00 KST','id':'31533','level':10,'desc':'POST | frequency','agent':'web','srcip':'192.0.2.1'}]
+  with patch.object(bot,'agg_alerts',return_value=(agg,None)),patch.object(bot,'recent_alerts',return_value=(rows,None)),patch.object(bot,'action_report',return_value='history'),patch.object(bot,'policy_change_report',return_value=''):
+   text=bot.build_report(60)['attachments'][0]['text']
+  self.assertIn('Wazuh ID/레벨 | 경보 내용',text);self.assertIn('POST \\| frequency',text)
+  self.assertIn('프록시·NAT',text);self.assertIn('실제 요청자와 다를 수',text)
+  self.assertNotIn('공격자 IP',text)
 if __name__=='__main__':unittest.main()

@@ -31,6 +31,8 @@ def lookup_read_scope(harness, current, phase):
     """
     if phase != 'lead' or not getattr(harness, 'structured_read', lambda _: False)(current):
         return None
+    events = getattr(harness,'event_lookup_scope',lambda _:None)(current)
+    if events and all(harness.EVIDENCE.allowed(name,'verify') for name in events): return events
     if getattr(harness,'systemd_comparison_request',lambda _:False)(current):
         return frozenset(harness.SYSTEMD_COMPARE_TOOLS)
     if getattr(harness,'pipeline_lookup_request',lambda _:False)(current):
@@ -680,9 +682,8 @@ def main():
                 import harness
                 receipts = read_trace_calls(store, result['run_id'])
                 current = request.get('current_question', request['question'])
-                literal = (harness.read_report(current, receipts) or harness.inventory(current, receipts)
-                           or harness.service_report(current, receipts)
-                           or (harness.diagnostic_report(current, receipts, diagnostic_targets) if diagnostic_targets else None))
+                literal = harness.lookup_report(current, receipts, diagnostic_targets,
+                                                include_diagnostics=bool(diagnostic_targets))
                 if diagnostic_targets and not literal:
                     text = '요청한 서비스의 실제 진단 근거를 확인하지 못했습니다. 정상이라는 뜻은 아닙니다.'
                 if literal:
@@ -701,10 +702,12 @@ def main():
                 text=incomplete
                 scope_complete=False
             status = 'completed' if result['completed'] and not failed_evidence and result['state'] in ('completed', 'waiting_approval') else 'partial'
-            if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope) and not scope_complete and not any(c['is_write'] for c in calls):
+            if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope or
+                    harness.event_lookup_scope(current)) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
-            if result['completed'] and scope_complete and (response_read or diagnostic_targets or (plan and
+            if result['completed'] and scope_complete and (response_read or diagnostic_targets or
+                    (lookup_scope and harness.event_lookup_scope(current) and request['phase']=='lead') or (plan and
                     (plan['kind']=='agent_identity' or plan['kind']=='web_access' and request['phase']=='lead'))):
                 status = 'completed'  # Completion of these read fields, not incident closure.
             evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)

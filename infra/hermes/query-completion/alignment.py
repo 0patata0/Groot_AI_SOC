@@ -440,7 +440,7 @@ def request_wrapper(original, query, harness):
                         + json.dumps(schema, ensure_ascii=False)})
                     agent._capstone_read_selection = (turn, schema, used)
             else:
-                rendered = (harness.read_report(request, calls) or harness.inventory(request, calls) or harness.service_report(request, calls) or harness.diagnostic_report(request, calls, targets))
+                rendered = harness.lookup_report(request, calls, targets)
                 if rendered:
                     agent._capstone_query_completion_local_format = (turn, rendered)
         if scope == {"mcp__rule_a__get_service_action_target"}:
@@ -704,8 +704,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                          "_pending_verification_response", "_pending_verification_response_previewed")
                 return native.FinalResponseVerdict(action="continue", final_response=None,
                     codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
-            rendered = (harness.read_report(request, calls) or harness.inventory(request, calls) or harness.service_report(request, calls)
-                        or harness.diagnostic_report(request, calls, targets) or harness.event_report(request, calls))
+            rendered = harness.lookup_report(request, calls, targets)
             if rendered:
                 text = rendered
             elif harness.violations(request, text, calls):

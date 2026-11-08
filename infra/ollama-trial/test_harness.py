@@ -275,17 +275,83 @@ class Grounding(unittest.TestCase):
         raw = json.dumps({'result': 'Alert ID: 1.2\nTime: 2026-10-24T21:45:00+0000\nAgent: fixture\nLevel: 3\nDescription: sample\n'})
         calls = [{'server': 'wazuh-ro', 'name': 'get_wazuh_alert_summary', 'arguments': {'limit': 5},
                   'result': raw, 'result_sha256': hashlib.sha256(raw.encode()).hexdigest()}]
-        text = harness.event_report('WAF IDS Wazuh 보안 로그 조회', calls)
+        text = harness.event_report('WAF IDS Wazuh 보안 로그 요약', calls)
         self.assertIn('반환 표본 1건', text)
         self.assertIn('2026-10-25T06:45:00+09:00', text)
         self.assertEqual(text.count('조회 미완료/실패'), 2)
-        self.assertIn('until_kst와 lookback_minutes로 과거 구간을 조회', text)
+        self.assertIn('| 시각(KST) |', text)
         self.assertIn('Wazuh 요약은 최신 표본', text)
         self.assertNotIn('이 도구들은 고정 절대', text)
         calls[0]['result'] = json.loads(raw)['result']
         calls[0]['result_sha256'] = hashlib.sha256(calls[0]['result'].encode()).hexdigest()
-        self.assertIn('반환 표본 1건', harness.event_report('WAF IDS Wazuh 보안 로그 조회', calls))
+        self.assertIn('반환 표본 1건', harness.event_report('WAF IDS Wazuh 보안 로그 요약', calls))
         self.assertIn('2026-10-25T06:45:00+09:00', harness.model_view('wazuh-ro', 'get_wazuh_alert_summary', calls[0]['result']))
+
+    def test_waf_event_table_keeps_all_returned_rows_ids_and_descriptions(self):
+        alerts=[{'timestamp':'2026-11-08T11:14:21+09:00','source_ip':'192.0.2.8',
+                 'method':'GET','request_path':'/fixture/'+str(i),'http_status':'403','engine':'Enabled',
+                 'waf_rule_ids':['942160','949110'],
+                 'waf_rule_matches':[{'rule_id':'942160','description':'SQL | sample <rule>'}]} for i in range(7)]
+        data={'source':'modsecurity','alerts':alerts,'returned_count':7,
+              'requested_since_kst':'2026-11-08T11:00:00+09:00','requested_until_kst':'2026-11-08T12:00:00+09:00'}
+        raw=json.dumps(data)
+        call={'server':'security-events','name':'search_modsecurity_alerts','arguments':{},
+              'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        text=harness.event_report('waf 차단로그 보여줄래',[call])
+        self.assertIn('| 시각(KST) | 관측 출발지 | 요청 | WAF 룰 ID·규칙 설명 | HTTP | 엔진 |',text)
+        for i in range(7):self.assertIn('/fixture/'+str(i),text)
+        self.assertIn('SQL \\| sample &lt;rule&gt;',text)
+        self.assertIn('949110 · 설명 미반환',text)
+        self.assertIn('반환 표본 7건 · 표시 7건',text)
+        self.assertNotIn('- 2026',text)
+        self.assertNotIn('until_kst와 lookback_minutes',text)
+        self.assertEqual(data,json.loads(raw))
+
+    def test_ids_events_are_rows_with_sensor_id_and_name(self):
+        raw=json.dumps({'source':'suricata','returned_count':1,'alerts':[{
+            'timestamp':'2026-11-08T03:00:00Z','source_ip':'192.0.2.8','destination_ip':'192.0.2.10',
+            'destination_port':80,'signature_id':'1000002','signature':'fixture name','protocol':'TCP'}]})
+        call={'server':'security-events','name':'search_suricata_alerts','result':raw,
+              'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        text=harness.event_report('IDS 경보 보여줘',[call])
+        self.assertIn('| 2026-11-08T12:00:00+09:00 (KST) |',text)
+        self.assertIn('1000002 · fixture name',text)
+        self.assertIn('192.0.2.10:80',text)
+
+    def test_empty_events_are_status_rows_not_fabricated_logs_or_all_clear(self):
+        raw=json.dumps({'source':'modsecurity','returned_count':0,'alerts':[]})
+        call={'server':'security-events','name':'search_modsecurity_alerts','result':raw,
+              'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        text=harness.event_report('WAF 로그 조회',[call])
+        self.assertIn('| 반환 표본 없음 |',text)
+        self.assertNotIn('| 시각(KST) | 관측 출발지 | 요청 |',text)
+        self.assertIn('전체 경보·공격 부재의 증거가 아님',text)
+
+    def test_event_table_keeps_partial_labels_and_inconsistent_count_visible(self):
+        data={'source':'modsecurity','returned_count':2,'alerts':[{'waf_rule_ids':['123'],
+              'waf_rule_matches_incomplete':True,'request_path':'/fixture','request_path_incomplete':True}]}
+        raw=json.dumps(data)
+        call={'server':'security-events','name':'search_modsecurity_alerts','result':raw,
+              'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        text=harness.event_report('WAF 로그 조회',[call])
+        for marker in ('규칙 설명 일부만 반환','경로 일부만 반환','반환 건수 불일치·미확인','표시 1건'):
+            self.assertIn(marker,text)
+        for count in (True,None,-1,2):
+            raw=json.dumps({'source':'modsecurity','returned_count':count,'alerts':[]})
+            call.update(result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+            text=harness.event_report('WAF 로그 조회',[call])
+            self.assertIn('반환 행 없음·건수 미확인',text)
+            self.assertNotIn('| 반환 표본 없음 |',text)
+
+    def test_legacy_event_duplicate_and_continuation_are_not_silently_overwritten(self):
+        raw=json.dumps({'result':'Alert ID: 1.2\nTime: 2026-11-08T03:00:00Z\nAgent: fixture\n'
+             'Description: first label\nDescription: second label\ncontinued evidence\nLevel: 3\n'})
+        call={'server':'wazuh-ro','name':'get_wazuh_alert_summary','result':raw,
+              'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        text=harness.event_report('Wazuh 보안 로그 요약',[call])
+        for marker in ('first label','Description: second label','continued evidence'):
+            self.assertIn(marker,text)
+        self.assertIn('| 시각(KST) |',text)
 
     def test_ids_report_preserves_running_without_claiming_sid_load(self):
         raw = json.dumps({'target': 'a:suricata', 'observation': {'running': True, 'health': 'not_reported'},

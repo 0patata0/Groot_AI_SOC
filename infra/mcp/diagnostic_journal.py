@@ -32,6 +32,98 @@ FIELDS = '__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,P
 SECRET_KEY = r'(?:pass(?:word|wd)?|pwd|token|secret|api[_-]?key|access[_-]?key|private[_-]?key|authorization|cookie|set-cookie|credential|session[_-]?id)'
 
 
+# Public, fixed reason tokens emitted by raw-operations/coordinator.sh.
+# Secret-bearing assignments/headers are masked before this allowlist is used.
+# These are diagnostic text, never proof of recovery or an execution instruction.
+PUBLIC_REASON_CODES = frozenset((
+    'alias_generation_conflict',
+    'alias_not_regular',
+    'another_engine_owns_vector_pause',
+    'capacity_hold',
+    'container_source_pin_changed',
+    'container_source_unavailable',
+    'coordinator_busy',
+    'current_writer_path_binding_invalid',
+    'existing_native_cursor_unsafe',
+    'fixed_A_root_required',
+    'generation_allocation_uncertain',
+    'generation_counter_limit',
+    'generation_identity_changed',
+    'generation_permissions_changed',
+    'host_source_pin_changed',
+    'interrupted_link_cleanup_uncertain',
+    'interrupted_link_parent_changed',
+    'invalid_engine',
+    'invalid_reader',
+    'link_publication_conflict',
+    'link_publication_uncertain',
+    'managed_directory_permissions',
+    'native_writer_config_test_failed',
+    'new_generation_cursor_unsafe',
+    'new_generation_prefix_ambiguous',
+    'new_reader_checkpoint_pending',
+    'new_vector_checkpoint_invalid',
+    'next_generation_cold_prefix_unsafe',
+    'next_prefix_not_distinguishable',
+    'next_prefix_not_yet_distinguishable',
+    'old_checkpoint_entry_not_advanced',
+    'old_generation_still_changing',
+    'old_vector_eof_unavailable',
+    'old_writer_not_closed',
+    'old_writer_reopen_pending',
+    'output_rotation_pending',
+    'pending_writer_path_binding_invalid',
+    'raw_parent_changed',
+    'read_only_guard',
+    'reader_restart_guard_failed',
+    'sealed_generation_changed',
+    'sealed_line_guard_failed',
+    'sealed_size_budget',
+    'shared_lock_invalid',
+    'state_changed_during_guard',
+    'state_commit_uncertain_inspect_required',
+    'state_unavailable',
+    'stop_intent_changed',
+    'stop_intent_clear_uncertain',
+    'stop_intent_history_invalid',
+    'stop_intent_invalid',
+    'stop_intent_metadata_invalid',
+    'stop_intent_not_canonical',
+    'stop_intent_phase_conflict',
+    'stop_intent_previous_boot',
+    'stop_intent_publish_conflict',
+    'stop_intent_publish_uncertain',
+    'stop_intent_staging_limit',
+    'stop_intent_state_conflict',
+    'stop_intent_sync_failed',
+    'uncommitted_generation_exists',
+    'uncommitted_path_configuration',
+    'unexpected_raw_hardlink',
+    'unrecognized_interrupted_link',
+    'unsafe_runtime_directory',
+    'unsafe_runtime_source',
+    'vector_current_cursor_unavailable',
+    'vector_invocation_changed_before_stop',
+    'vector_not_active',
+    'vector_old_eof_pending',
+    'vector_pause_not_owned_or_clean',
+    'vector_stop_failed',
+    'vector_stop_not_clean',
+    'wazuh_old_eof_pending',
+    'writer_alias_conflict',
+    'writer_alias_invalid',
+    'writer_changed_before_signal',
+    'writer_container_changed',
+    'writer_file_permissions_changed',
+    'writer_identity_unavailable',
+    'writer_not_on_pending_generation',
+    'writer_path_config_changed',
+    'writer_path_config_invalid',
+    'writer_path_not_pending',
+    'writer_reopen_uncertain',
+))
+
+
 def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
@@ -73,9 +165,14 @@ def redact(message):
     # Opaque credential-looking strings (JWT/base64/hex/random tokens).
     def opaque(match):
         word = match[0]
-        known = set(core.ERROR_CODES) | set(core.STRUCTURED_ERROR_CODES) | set(core.SOURCE_NAMES)
+        known = set(core.ERROR_CODES) | set(core.STRUCTURED_ERROR_CODES) | set(core.SOURCE_NAMES) | PUBLIC_REASON_CODES
         known.update(unit for unit in core.TARGETS.values() if isinstance(unit, str))
         if word in known:return word
+        status = re.fullmatch(r'status=([0-9]{1,3})/([A-Z][A-Z0-9_]{0,63})', word)
+        if status and int(status[1]) <= 255:
+            label = status[2]
+            shown = opaque(re.match(r'.+', label)) if len(label) >= 24 else label
+            return 'status=' + status[1] + '/' + shown
         counts = {c:word.count(c) for c in set(word)}
         entropy = -sum(n / len(word) * math.log2(n / len(word)) for n in counts.values())
         return '[REDACTED OPAQUE]' if entropy >= 3.5 or re.fullmatch(r'[0-9a-fA-F]{24,}', word) else word

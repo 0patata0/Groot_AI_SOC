@@ -885,5 +885,161 @@
       "embedded_gate_matches": true,
       "gate_bytes": 65383
     }
+  },
+  "journal_redaction_update": {
+    "checked_at_kst": "2026-11-08 23:21 KST",
+    "scope": "registered journal public diagnostic tokens; not compound investigation success",
+    "source_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+    "public_reason_tokens": 85,
+    "secret_assignment_masking_precedes_allowlist": true,
+    "mcp_schema_unchanged": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_changed": false,
+    "harness2": {
+      "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "scope": "journal redaction prerequisite only; compound108 remains unadopted",
+      "census": {
+        "base": {
+          "always_on_chars": 16848,
+          "n_files": 26,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        },
+        "candidate": {
+          "always_on_chars": 16848,
+          "n_files": 26,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 19,
+          "plugins": 0
+        }
+      },
+      "diff": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/diagnostic_journal.py"
+        ],
+        "always_on_char_delta": 0
+      },
+      "base_sha256": "ddf0cc0c0a62180683aef1b5c796b193a8628ba1d278a6269f28e3c25fd48bd4",
+      "candidate_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+      "live_observed": {
+        "a": "2026-11-08T23:10:30.905347+09:00",
+        "b": "2026-11-08T23:10:31.435644+09:00",
+        "c": "2026-11-08T23:10:31.427057+09:00"
+      },
+      "model_calls": 0,
+      "automatic_adoption": false
+    },
+    "tests": {
+      "local_related": 102,
+      "linux_related_profiles": 11,
+      "linux_executions": 1284,
+      "skip": 0,
+      "includes_overlapping_tests": true
+    },
+    "hosts": {
+      "a": {
+        "confirmed_at_kst": "2026-11-08T23:18:26.558182+09:00",
+        "changed_paths": [
+          "/opt/capstone-diagnostics/diagnostic_journal.py"
+        ],
+        "rollback_noop": true,
+        "rollback_timer_stopped": true
+      },
+      "b": {
+        "confirmed_at_kst": "2026-11-08T23:18:34.953166+09:00",
+        "changed_paths": [
+          "/opt/capstone-diagnostics/diagnostic_journal.py"
+        ],
+        "rollback_noop": true,
+        "rollback_timer_stopped": true
+      },
+      "c": {
+        "confirmed_at_kst": "2026-11-08T23:18:42.318710+09:00",
+        "changed_paths": [
+          "/opt/capstone-diagnostics/diagnostic_journal.py"
+        ],
+        "rollback_noop": true,
+        "rollback_timer_stopped": true
+      }
+    },
+    "mcp_reads": {
+      "a:vector": {
+        "returned_rows": 20,
+        "has_more": false
+      },
+      "b:management": {
+        "returned_rows": 50,
+        "has_more": true
+      },
+      "c:apache": {
+        "returned_rows": 0,
+        "has_more": false
+      }
+    },
+    "fresh_chats": {
+      "ollama": {
+        "status": "passed_explicit_log_lookup",
+        "elapsed_seconds": 20.035,
+        "source_id": "n4dqtbsotfg55dam15ouhb91qr",
+        "reply_id": "idtyz7pjp3nsp8ukh58e6az1gh",
+        "actual_read_count": 1,
+        "protected_calls": 0,
+        "published_matches_renderer": true,
+        "public_codes_present": true,
+        "markdown_table": true,
+        "code_fences": 0,
+        "message_sha256": "83fbbfe91f5648779170ec86280afd6a77a457c294913319e68b1450848e1da6",
+        "browser_render_rechecked": false,
+        "exact_arguments_verified": true,
+        "actual_result_sha256": "f1dd207bc04791832582946a9c1f72602ebe92e4630ba97a3f0f021e3f0fa080",
+        "source_message_sha_verified": true,
+        "returned_rows": 20
+      },
+      "hermes": {
+        "status": "passed_explicit_log_lookup",
+        "elapsed_seconds": 29.196,
+        "source_id": "5gexxcfmjbnoxqx9chymq386gc",
+        "reply_id": "mfjuaybpf3n9deybi6rtpe875e",
+        "actual_read_count": 1,
+        "protected_calls": 0,
+        "published_matches_renderer": true,
+        "public_codes_present": true,
+        "markdown_table": true,
+        "code_fences": 0,
+        "message_sha256": "04100c0aa5ce6b7ab4e79358f5dc2e79f9f6c52824ac5bdb28dbfc1e8a23fcf9",
+        "browser_render_rechecked": false,
+        "exact_arguments_verified": true,
+        "actual_result_sha256": "af6fb693e88b978b6ff92c51dda8f52166ea6ca6e1a14e9ccb3747a08fdf2c2d",
+        "source_message_sha_verified": true,
+        "returned_rows": 20
+      }
+    },
+    "protected_calls": 0,
+    "bot_restarts": 0,
+    "reader_restarts": 3,
+    "recovery_directory": "/var/lib/capstone-diagnostics/journal-redaction-20261108",
+    "server_cleanup": {
+      "removed_files": 449,
+      "bytes": 7403906,
+      "removed": true
+    },
+    "not_verified": [
+      "compound cause and current impact judgment",
+      "general latency improvement",
+      "browser rendering",
+      "manual rollback exercise",
+      "new OS full install"
+    ],
+    "local_cleanup": {
+      "removed": true,
+      "removed_files": 15,
+      "bytes": 4265226,
+      "framework_preserved": true
+    }
   }
 }

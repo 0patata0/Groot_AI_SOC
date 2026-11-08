@@ -3,6 +3,8 @@ from collections import deque
 import copy
 import hashlib
 import json
+import re
+from pathlib import Path
 import socket
 import struct
 import subprocess
@@ -120,6 +122,39 @@ class Journal(unittest.TestCase):
                 result,_=self.read([row(message)]);entry=result['entries'][0]
                 self.assertNotIn(secret,json.dumps(result));self.assertEqual(entry['message_state'],'redacted')
                 self.assertEqual(entry['message_sha256'],hashlib.sha256(message.encode()).hexdigest())
+
+    def test_public_reason_allowlist_matches_canonical_emitter_without_guessing(self):
+        source=(Path(__file__).resolve().parents[1]/'normalization/vector/raw-operations/coordinator.sh').read_text()
+        emitted=set(re.findall(r'\bro_refuse ([A-Za-z][A-Za-z0-9_]*)',source)
+                    +re.findall(r'\bro_json (?:deferred|ready) ([A-Za-z][A-Za-z0-9_]*)',source))
+        self.assertEqual(j.PUBLIC_REASON_CODES,emitted)
+        for code in emitted:
+            message=json.dumps({'status':'deferred','reason':code})
+            excerpt,state,sha=j.redact(message)
+            self.assertEqual(excerpt,message,code);self.assertEqual(state,'unchanged')
+            self.assertEqual(sha,hashlib.sha256(message.encode()).hexdigest())
+
+    def test_public_reason_in_secret_field_is_still_secret_and_near_match_is_not_exempt(self):
+        code='existing_native_cursor_unsafe'
+        for message in ['password='+code,'{"token":"'+code+'"}',
+                        'Authorization: '+code,'request_body={"reason":"'+code+'"}']:
+            with self.subTest(message=message):
+                excerpt,state,_=j.redact(message)
+                self.assertNotIn(code,excerpt);self.assertEqual(state,'redacted')
+        for value in [code+'Z7q9',code.upper(),'unregistered_diagnostic_6Byv73mPq1Lz0rT8']:
+            excerpt,state,_=j.redact('reason='+value)
+            self.assertNotIn(value,excerpt);self.assertEqual(state,'redacted')
+
+    def test_exit_status_keeps_numeric_and_short_symbol_but_not_opaque_tail(self):
+        message='worker.service: Control process exited, code=exited, status=2/INVALIDARGUMENT'
+        excerpt,state,sha=j.redact(message)
+        self.assertEqual(excerpt,message);self.assertEqual(state,'unchanged')
+        self.assertEqual(sha,hashlib.sha256(message.encode()).hexdigest())
+        hidden='ABCDEFGHIJKLMNOPQRSTUVWXYZA123456789'
+        excerpt,state,_=j.redact('status=2/'+hidden)
+        self.assertEqual(excerpt,'status=2/[REDACTED OPAQUE]');self.assertEqual(state,'redacted')
+        excerpt,state,_=j.redact('password="status=2/INVALIDARGUMENT"')
+        self.assertNotIn('INVALIDARGUMENT',excerpt);self.assertEqual(state,'redacted')
 
     def test_escaped_quote_binary_oversize_control_and_prompt_injection_are_data(self):
         for message in ['password="abc\\\"def ghi"', ['binary',0], 'x'*8193, 'token='+('x'*8190)]:

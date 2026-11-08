@@ -4,7 +4,7 @@
 
 2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).
 
-11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.
+11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **당시에는 운영 A/B/C 배포·봇 연결·새 OS 전체 설치가 미완료**다.
 
 2026-11-07 query118/common62: 기존 source bundle에 단문 조회 계약·SDK 하네스·Native gate와 worker·query 플러그인을 포함한다. grounding 네 복사본과 embedded gate·SHA 핀·SDK/review 영수증을 함께 검증한다. 새 패키지/이미지/포트/설정키0, 루트 `deploy.sh`와 기존 설치 복사 경로 유지. 설치62검사 포함 총1,390검사PASS/새OS전체설치미시험. [변경·복구](../infra/hermes/short-read-evidence.md).
 
@@ -717,3 +717,5 @@ query1.19.112/common1.5.61: 기존 소스 묶음의 공통 gate·chat_contract·
 query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 없는 Native gate fallback을 기존 gate/alignment/query/harness 소스에 반영한다. 같은 SIEM/SDK 복사·root 렌더·영수증 경로이며 새 패키지·포트·키0. [검증·복구](../infra/hermes/current-diagnostic-scope.md).
 
 11/7 관리자 SSH/보고 이력 보완은 기존 Python·Suricata·soc_bot.py 설치 경로와 생성 JSON을 사용한다. 추가 deb/wheel/이미지 반입 항목은 없으며 초기 보고 이력은 빈 목록이다. [검증 범위](../infra/validation/admin-ssh/README.md).
+
+11/8 23:18 후속: 등록 journal reader는 A/B/C 운영 및 양봇 연결 확인을 마쳤다. 공개 진단 코드 과도 마스킹을 canonical `infra/mcp/diagnostic_journal.py`에서 보완했으며 기존 `deploy.sh` 복사 경로를 사용한다. 신규 패키지·이미지·TCP 포트0, 반입 목록 추가0. 새 OS 전체 설치는 미시험이다. [현재 검증](../infra/mcp/journal-excerpts.md).

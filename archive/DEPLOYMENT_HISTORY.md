@@ -1578,3 +1578,7 @@ raw 수집 경로에서 앞서 `publish_pending` / `reader_restart_guard_failed`
 
 
 </details>
+
+## 2026-11-08 23:18 KST — 공개 진단 코드 표시
+
+A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0a62180683aef1b5c796b193a8628ba1d278a6269f28e3c25fd48bd4`에서 `8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc`로 변경했다. 기존 비밀 마스킹 우선순위를 유지하고 공개 사유85종 및 숫자 종료값/짧은 상태명을 보존한다. reader 재시작3회·봇/수집기 재시작0, 독립15분 원복 준비→A23:18:26/B23:18:35/C23:18:42 확정·noop·타이머 해제. 복구본은 각 서버 `/var/lib/capstone-diagnostics/journal-redaction-20261108`; 과거 설치 영수증은 덮어쓰지 않고 증분 원장 추가. 원본은 위 SHA와 직전 Git `0ceb3686bfe334548af7e908becd5058a75a67dd`에서 복구 가능하다. [실제 MCP·채팅·한계](../infra/mcp/journal-excerpts.md). 복합108 하네스 후보는 운영 미적용이다.

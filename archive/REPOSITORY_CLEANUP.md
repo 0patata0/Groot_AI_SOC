@@ -4,7 +4,7 @@
 
 | 범위 | 처리 |
 |---|---|
-| STATUS·PLAN | 원문을 [현황 이력](STATUS-history-20261101.md)·[계획 이력](PLAN-history-20261101.md)으로 이동, 상대 링크만 재배치 |
+| STATUS·PLAN | 원문을 [현황 이력](STATUS_HISTORY.md#source-87368a0abd79b357)·[계획 이력](PLAN_HISTORY.md#source-b32ddb5c903faea1)으로 이동, 상대 링크만 재배치 |
 | 검증 JSON2개 | 샘플759개를 원본 보관본으로 분리. `_storage`에 원 SHA·삭제된 JSON pointer·건수·표본 SHA를 기록. 다른 값은 그대로 |
 | 벤치 결과 | 결과JSONL3개·생성 후보6개 추적 제거. 점수·입력·정답·원래 manifest 유지 |
 | 토폴로지 | Swift로 재생성 가능한 `topology/*_rule_mcp.png` 3개 제거. 입력PNG3개·소스·참조 중인 대표 그림2개 유지 |

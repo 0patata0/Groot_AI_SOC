@@ -1,6 +1,6 @@
 # 짧은 조회·실제 근거·FW 페이지 처리
 
-2026-11-03 공통 `soc-chat-contract:1.5.15`를 Hermes·Ollama 운영 경로에 반영했다. 원본35B를 유지하며 새 학습이나 권한 확대는 하지 않았다. [현황](../../STATUS.md) · [검증 원장](short-read-validation-20261103.json) · [보완 전 현황](../../archive/STATUS-20261103-before-short-read.md).
+2026-11-03 공통 `soc-chat-contract:1.5.15`를 Hermes·Ollama 운영 경로에 반영했다. 원본35B를 유지하며 새 학습이나 권한 확대는 하지 않았다. [현황](../../STATUS.md) · [검증 원장](short-read-validation-20261103.json) · [보완 전 현황](../../archive/STATUS_HISTORY.md#source-df352eea5f615cda).
 
 | 요청·문제 | 동작 |
 |---|---|

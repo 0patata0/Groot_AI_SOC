@@ -1,6 +1,6 @@
 # GROOT Lab Console
 
-현재 정책은 **2026-11-04 운영 반영** 기준이다. [상태·남은 과제](../../../STATUS.md) · [검증·배포·원복](../../validation/web-policy/README.md) · [갱신 전 이력](../../../archive/README-offline-labs-20261104-before-enforce.md).
+현재 정책은 **2026-11-04 운영 반영** 기준이다. [상태·남은 과제](../../../STATUS.md) · [검증·배포·원복](../../validation/web-policy/README.md) · [갱신 전 이력](../../../archive/DEPLOYMENT_HISTORY.md#source-429cb0b9c8ff56ec).
 
 [콘솔](https://log4shell.grootlab.duckdns.org/log4shell/)은 HTTP3개(Log4Shell·Apache2.4.49/2.4.50)와 터미널3개(Redis·Samba·sudo), 총6항목을 제공한다. DVWA는 기존 독립 주소를 유지한다. 목록·상태·실행 중인 웹은 공개 열람할 수 있고, **실행·중지·터미널 제어는 관리자 접속 주소와 인증이 모두 필요하다. 인증돼도 WAF 차단은 계속 적용된다.** 이전 차단 예외 모드/쿠키는 폐기했다.
 

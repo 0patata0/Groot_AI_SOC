@@ -1,6 +1,6 @@
 # 환경 값 입력과 단일 셸 실행
 
-> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/deployment-configuration-guide-before-ncsc-20261104.md).
+> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-5f5f782f6b670953).
 
 새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
 

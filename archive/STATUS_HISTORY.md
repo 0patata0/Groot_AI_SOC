@@ -1,10 +1,6408 @@
+# 현황 이력
+
+이 문서는 과거 기록입니다. 현재 상태는 [STATUS](../STATUS.md), 실행 계획은 [PLAN](../PLAN.md)을 따릅니다. 같은 내용을 반복한 부분은 하나의 본문으로 연결했습니다. 서로 다른 날짜·판단·실패·정정은 합쳐 단정하지 않습니다. [정리·복원 안내](README.md).
+
+| 원문 마지막 Git 기록(KST) | 보존한 문서 |
+|---|---|
+| 2026-11-08T11:07:45+09:00 | [STATUS-before-evidence-guardrails-20261108.md](#source-fa8974b97371746e) |
+| 2026-11-08T04:17:35+09:00 | [STATUS-before-journal-rollout-20261108.md](#source-56d0c711ab2eddc4) |
+| 2026-11-07T23:22:30+09:00 | [STATUS-before-report-guards-20261107.md](#source-f13eab275822f266) |
+| 2026-11-07T16:13:44+09:00 | [STATUS-before-trained-trial-20261107.md](#source-f4faba4634d4a845) |
+| 2026-11-07T14:49:48+09:00 | [STATUS-before-threshold-read-20261107.md](#source-4469cd7a492e918d) |
+| 2026-11-07T14:15:58+09:00 | [STATUS-before-ids-method-20261107.md](#source-2d645dfe728c28f4) |
+| 2026-11-07T11:35:09+09:00 | [STATUS-before-current-scope-20261107.md](#source-03db4ffc7fe5ff4e) |
+| 2026-11-07T10:52:03+09:00 | [STATUS-before-service-properties-20261107.md](#source-11c0fa69e377889c) |
+| 2026-11-07T10:21:47+09:00 | [STATUS-before-service-audit-20261107.md](#source-13885056bb40d264) |
+| 2026-11-07T09:53:43+09:00 | [STATUS-before-feedback-20261107.md](#source-2fe80c609495c562) |
+| 2026-11-07T09:32:11+09:00 | [STATUS-before-resume-20261107.md](#source-e5bd26f83fd0ff5e) |
+| 2026-11-07T04:58:55+09:00 | [STATUS-before-calendar-20261107.md](#source-f9e96c6210e55d5a) |
+| 2026-11-07T04:29:30+09:00 | [STATUS-before-runtime-clock-20261107.md](#source-6315596a4cf4e319) |
+| 2026-11-07T04:11:07+09:00 | [STATUS-before-pipeline-20261107.md](#source-8e4786f63f6ceded) |
+| 2026-11-07T03:00:24+09:00 | [STATUS-before-service-report-20261107.md](#source-ef8860920cc8c49f) |
+| 2026-11-07T00:42:48+09:00 | [STATUS-before-service-semantics-20261107.md](#source-af8d2c2f27331fdf) |
+| 2026-11-06T23:59:16+09:00 | [STATUS-before-service-history-20261106.md](#source-1233d8b203cd8eb8) |
+| 2026-11-06T23:04:38+09:00 | [STATUS-before-diagnostic-navigation-20261106.md](#source-f0feb692e888e61d) |
+| 2026-11-06T22:40:01+09:00 | [STATUS-before-systemd-comparison-20261106.md](#source-a6347e4a2e1e65bd) |
+| 2026-11-06T21:42:22+09:00 | [STATUS-before-event-view-20261106.md](#source-0cd09f27eb93c1d9) |
+| 2026-11-06T21:16:06+09:00 | [STATUS-before-chat-report-20261106.md](#source-8c103bea13856efc) |
+| 2026-11-06T20:33:58+09:00 | [STATUS-before-chat-scope-20261106.md](#source-9a18aa4d0dbec5b4) |
+| 2026-11-06T18:51:46+09:00 | [STATUS-before-chat-latency-20261106.md](#source-2e3dff554929067d) |
+| 2026-11-06T17:30:21+09:00 | [STATUS-before-review-execution-20261106.md](#source-361550c8afc0e994) |
+| 2026-11-06T16:43:36+09:00 | [STATUS-before-controller-contention-20261106.md](#source-b016ec30d558b604) |
+| 2026-11-06T16:17:47+09:00 | [STATUS-before-observation-scope-20261106.md](#source-ebfa7513628adfd3) |
+| 2026-11-06T15:53:38+09:00 | [STATUS-before-status-scope-20261106.md](#source-636e864e6d556704) |
+| 2026-11-06T15:08:36+09:00 | [STATUS-before-bundle-integration-20261106.md](#source-3a995fd08a9ea9a6) |
+| 2026-11-06T14:12:46+09:00 | [STATUS-before-incident-bundle-20261106.md](#source-7da751b04634e30c) |
+| 2026-11-06T13:41:06+09:00 | [STATUS-before-health-claims-20261106.md](#source-17c2cec7702ab8ff) |
+| 2026-11-06T12:59:26+09:00 | [STATUS-before-report-input-audit-20261106.md](#source-655dd5ebf759089c) |
+| 2026-11-06T12:28:48+09:00 | [STATUS-before-read-ledger-20261106.md](#source-241c17b126f0f67d) |
+| 2026-11-06T11:39:31+09:00 | [STATUS-before-request-scope-20261106.md](#source-4c9b48cff99b2302) |
+| 2026-11-06T10:57:09+09:00 | [STATUS-before-journal-history-20261106.md](#source-a8a0f12ef0526826) |
+| 2026-11-06T10:18:18+09:00 | [STATUS-before-review-startup-20261106.md](#source-9dfb993f2737d8a4) |
+| 2026-11-06T09:55:30+09:00 | [STATUS-before-review-payload-20261106.md](#source-66c76947289ed40f) |
+| 2026-11-06T09:13:26+09:00 | [STATUS-before-auto-review-20261106.md](#source-2c2e913c2257a2b7) |
+| 2026-11-06T03:06:08+09:00 | [STATUS-before-review-input-20261106.md](#source-0ca2531003046a01) |
+| 2026-11-06T02:01:20+09:00 | [STATUS-before-report-feedback-20261106.md](#source-39ab133ee97aa859) |
+| 2026-11-06T01:16:05+09:00 | [STATUS-before-review-scope-20261106.md](#source-ef4b3ab1f7472a16) |
+| 2026-11-05T23:29:33+09:00 | [STATUS-before-case-latency-20261105.md](#source-973ac9b921fc9e44) |
+| 2026-11-05T21:15:20+09:00 | [STATUS-before-web-traffic-20261105.md](#source-2eed133035d046a5) |
+| 2026-11-05T19:38:30+09:00 | [STATUS-before-fw-ipv4-20261105.md](#source-a9e919ef9bcccb6a) |
+| 2026-11-05T18:23:27+09:00 | [STATUS-before-dns-systemd-fw-20261105.md](#source-c3d845577da14b6b) |
+| 2026-11-05T15:44:06+09:00 | [STATUS-before-native-read-20261105.md](#source-1b9c31a3c5f672e1) |
+| 2026-11-05T15:07:46+09:00 | [STATUS-before-ids-impact-20261105.md](#source-a46b84acb3860404) |
+| 2026-11-05T13:45:57+09:00 | [STATUS-before-shared-status-20261105.md](#source-d9c898c7ced5c0f5) |
+| 2026-11-05T13:10:05+09:00 | [STATUS-before-additional-pcap-20261105.md](#source-a124a369d785496c) |
+| 2026-11-05T12:12:24+09:00 | [STATUS-before-web-history-20261105.md](#source-8a970f82c2248b8e) |
+| 2026-11-05T11:41:54+09:00 | [STATUS-before-impact-navigation-20261105.md](#source-c1f4d4fa768ddb0f) |
+| 2026-11-05T10:43:33+09:00 | [STATUS-before-required-scope-20261105.md](#source-1d85f846d75131ad) |
+| 2026-11-05T10:18:13+09:00 | [STATUS-before-dns-report-20261105.md](#source-c174690bb173e547) |
+| 2026-11-05T09:16:28+09:00 | [STATUS-before-workflow-skills-20261105.md](#source-53fb9b60b63424fb) |
+| 2026-11-05T01:26:44+09:00 | [STATUS-before-mcp-input-20261105.md](#source-a08bb8743d75fdcc) |
+| 2026-11-05T00:54:21+09:00 | [STATUS-before-incident-parity-20261105.md](#source-2b029d3bd8b6e503) |
+| 2026-11-04T23:56:05+09:00 | [STATUS-before-web-evidence-20261104.md](#source-564ef9348753a096) |
+| 2026-11-04T22:11:41+09:00 | [STATUS-before-incident-impact-20261104.md](#source-0b6995be4d8a9630) |
+| 2026-11-04T21:14:01+09:00 | [STATUS-before-gate-binding-20261104.md](#source-bc99faa0a43f26a3) |
+| 2026-11-04T20:31:34+09:00 | [STATUS-before-incident-review-20261104.md](#source-1f7786777ac7d035) |
+| 2026-11-04T19:18:25+09:00 | [STATUS-before-read-accuracy-ncsc-20261104.md](#source-faecf5f020d4ac68) |
+| 2026-11-04T18:18:19+09:00 | [STATUS-20261104-before-lookup-latency.md](#source-d4a41b57cd7fdfc2) |
+| 2026-11-04T17:29:05+09:00 | [STATUS-20261104-before-harness-cleanup.md](#source-beb1aeb23ac205e0) |
+| 2026-11-04T15:22:26+09:00 | [STATUS-20261104-before-web-e2e.md](#source-c9fdf9653d1fbfa3) |
+| 2026-11-04T14:34:43+09:00 | [STATUS-20261104-before-table-chunks.md](#source-2410faadaea24e78) |
+| 2026-11-04T13:59:19+09:00 | [STATUS-20261104-before-fw-chat.md](#source-691e354edbc8a0de) |
+| 2026-11-04T13:13:28+09:00 | [STATUS-20261104-before-fw-scope.md](#source-c9a27591468c12b0) |
+| 2026-11-04T12:49:17+09:00 | [STATUS-20261104-before-rule-audit.md](#source-7630b3f41e1fc905) |
+| 2026-11-04T12:00:02+09:00 | [STATUS-20261104-before-web-policy.md](#source-a66b68f9d792afa0) |
+| 2026-11-04T10:31:14+09:00 | [STATUS-20261103-before-management-access.md](#source-d70688ad386660bb) |
+| 2026-11-03T22:37:16+09:00 | [STATUS-20261103-before-operation-time.md](#source-fd1d5f234b14e0a3) |
+| 2026-11-03T21:21:23+09:00 | [STATUS-20261103-before-incident-context.md](#source-6561bd16a0c95484) |
+| 2026-11-03T20:23:34+09:00 | [STATUS-20261103-before-shared-containment.md](#source-44b2fd9c4f0995fb) |
+| 2026-11-03T19:40:17+09:00 | [STATUS-20261103-before-http404.md](#source-84055af98a0c21f3) |
+| 2026-11-03T18:23:22+09:00 | [STATUS-20261103-before-pcap.md](#source-37e640b7fc9dca78) |
+| 2026-11-03T14:05:56+09:00 | [STATUS-20261103-before-short-read.md](#source-df352eea5f615cda) |
+| 2026-11-03T12:50:26+09:00 | [STATUS-20261103-paused-peer-repair.md](#source-17d77ef915100c82) |
+| 2026-11-03T12:50:26+09:00 | [STATUS-20261103-before-peer-repair.md](#source-1fc9e4b108b56fd4) |
+| 2026-11-03T08:43:08+09:00 | [STATUS-20261103-before-role-routing.md](#source-48afa543da3870d5) |
+| 2026-11-03T07:21:49+09:00 | [STATUS-20261103-before-diagnostic-harness.md](#source-6b51787b69b033e7) |
+| 2026-11-03T05:20:41+09:00 | [STATUS-20261103-before-operator-candidate.md](#source-90c4d26dcf79ca0b) |
+| 2026-11-02T19:15:12+09:00 | [STATUS-20261102-before-waf-evidence.md](#source-abd0a2a95c94e7a9) |
+| 2026-11-02T16:01:27+09:00 | [STATUS-20261102-before-native-containment.md](#source-92b7392da582315c) |
+| 2026-11-02T14:15:53+09:00 | [STATUS-history-20261101.md](#source-87368a0abd79b357) |
+
+<a id="source-fa8974b97371746e"></a>
+
+## STATUS-before-evidence-guardrails-20261108.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-08T11:07:45+09:00</summary>
+
+<a id="source-fa8974b97371746e-h0"></a>
+<a id="record-b751760520f83f73806e187daea9d207f662d087349a884a20f59138a1c9d43b"></a>
+
+# 인프라 현황 — 2026-11-08 10:19 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. 정확성이 속도보다 우선이다. 11/9까지 파인튜닝 모델의 Thor 적재·실제 운용 검증을 목표로 하되, 검증하지 않은 모델을 일정 때문에 승격하지 않는다. [활성 계획](../PLAN.md) · [직전 상세 상태와 실패](STATUS_HISTORY.md#source-56d0c711ab2eddc4).
+
+
+
+<a id="source-fa8974b97371746e-h1"></a>
+<a id="record-df6c2602bd85749c48628633cd3e26f787025bc58d3de3b7118ab8d5d786b14c"></a>
+
+## 현재 구현·운영·검증
+
+| 항목 | 확인된 상태 | 남은 범위 |
+|---|---|---|
+| 운영 버전 | query1.19.128/common1.5.81/routing1.1.6·진단MCP1.3.2. 원본 qwen3.6:35b | 학습본 운영 승격0 |
+| 서비스 원문 조회 | A/B/C의 고정 journal reader 운영 적용. 기존 get_system_diagnostics의 view=journal·마스킹/해시/고정 unit·기간·한도/로컬 socket. 비특권 실제MCP11호출 중 정상9·잘못된 인자2거절 | 반환0행·제한 표본은 무장애/완전한 보존 증거 아님. [범위·실측](../infra/mcp/journal-excerpts.md) |
+| 원문 실측 | B 과거32행·오류원문8행 SHA 일치0.449초. A/C 강제 reader0행1.209/0.754초. 현재·정제 이력도 실제 조회 성공 | 단일 도구 시간이며 채팅 지연/일반 판단 정확도가 아님 |
+| 공통 하네스 | 명확한 서비스·기간·전체 조회 범위와 최신 성공 근거를 확인한 경우 조회 완료 규격. 모델이 실제 읽기를 선택·완료 응답, 표는 원문 기반. SDK 원인 판단의 현재 표 덮어쓰기 수정 | 원인·위험·변경·모르는 요구는 일반 조사 유지. 조회 완료≠사건 종결. [범위](../infra/hermes/compound-service-reads.md) |
+| 회귀검사 | Linux8프로필1,607회 실행PASS/skip0·고유1,579. Native482/서비스105/주장70/SDK303/query408/peer88/설치63/진단88 | 중복 실행28 포함. 새 OS 전체 설치·일반 정확도 증명 아님 |
+| 운영 확정 | B08:26 24manifest/보호10·SDK20/review5·양WSworker·4서비스·두큐0/failed0. core65,383B/핀·실제명령 일치 | 이번공통2복사본/MCP/SDKreceipt4파일·계획Hermes재시작1. jsem83복구·독립원복확정. A/C 직전reader검증 유지 |
+| 새 복합 채팅 | H37.668/O30.424초·각5읽기·원문32행/현재/차단0·표1·조회완료. 최종 단문 H24.823/O13.403초·각1읽기 | 6대화14읽기 SHA대조·보호0. 같은 개발 사례/공유GPU 비통제. 일반 복합 판단·평균60초 증명 아님 |
+| Native 실패 근거 | review 실행 실패와 CLI완료+도구오류 모두 현재 run의 결속된 조회를 표로 보존·partial/비재사용. 설치소스로 실제 도구실패4영수증/성공3표 복원 | 새 실시간 실패 유도0. 자동SOC/direct gateway 전체 실패 경로 별도. [범위·복구](../infra/mcp/journal-query-budget.md) |
+| 원문 검색 시간 보완 | 고정명령12초·전체20초/socket24초/원격36초. 실제 비특권MCP 하루조회6.036초/6행·이전32행known8SHA일치·A/C성공·임의경로거절 | 6행은 deferred로 확정장애6건 아님. 전체건수/보존은 미확인. [원인·검증](../infra/mcp/journal-query-budget.md) |
+| 공통 의미 안내 | common81/MCP1.3.2: 정제 이력/실제발췌·행별unchanged/마스킹/미반환·deferred/failed를 구분. 35읽기schema동일·6생성대조 | 일반 정확도 개선 미입증. 이전 common80의 기능정상단정 거절 유지. [원문 의미·검증](../infra/mcp/journal-excerpts.md) |
+| 새 원인/현재영향 채팅 | O45.776초/H53.808초·각필수4읽기·8SHA/정확구간/게시표각1대조·보호0 | O deferred 해석 반영이나 단일관측으로 증가 없음 주장; H CLI부터 판단 없이 근거표만. 둘품질미완료·각1회/일반60초 미입증 |
+| 이전 단문 성능 | 현재 대기열 새4질문 H17.344/16.630초·O16.362/16.911초, 각1읽기·지표/원문 일치 | 각 조건1회·공유GPU 비통제. 복합 성능으로 확대하지 않음. [이전 검증](../infra/hermes/diagnostic-claim-boundaries.md) |
+| 기존 학습본 대조 | 실제 SDK/MCP 개발회귀3군각30/30은 공통 하네스 개선. 동결5사례×3군 복합 비교에서 학습본5건 모두 추가조회 요구 | 학습 우위·일반 정확도·운영 적격 미입증. [비교](../finetuning/SERVICE_REASONING_COMPARISON_20261108.md) |
+| DGX 본학습·내보내기 | 02:57 완료1,220대화/610step·59입력/세adapter SHA/확정1,220계보 일치.09:46 Q4변환·09:47 전체SHA,09:50 Thor 직접반입/34설정·출처SHA·09:59 별도후보 등록 완료 | 기존digest/옵션/HF서식 일치·운영 원본35B 유지. 10:07 전체GPU/3군×3개발사례 비교 완료·질문 누락/정상 단정 잔여. 독립176평가/운영승격 미실행. [원장·범위](../finetuning/BALANCED_MAIN_20261107.md) |
+| 새 학습본 개발 비교 | 같은 common81/동결3사례×3모델, 전체GPU/9출력/schema9통과. 원본·HF 각3추가조회, 학습본3보고 | 학습본 정상/종결 단정·현재지표 누락 잔여. 렌더 후 근거검사 실제사례 거절/나머지 수동검수. 별도 시험 종료·운영승격0. [비교·한계](../finetuning/BALANCED_COMPARISON_20261108.md) |
+| 논문·발표 | 논문 PDF46쪽·목차71/본문·표822블록·경계이탈0·전체 시각검수. 균형학습 완료/재개계보와 원문조회 후 품질실패를 분리 반영. 직전43쪽/6파일 SHA보존 | 새 학습본 품질 비교·독립176평가·공식 제출형식·최종 발표/리허설 미완료. 발표PDF20쪽 유지 |
+
+
+
+<a id="source-fa8974b97371746e-h2"></a>
+<a id="record-0569d94245e7e6f397c27e011472ab306860d0bbbf96974ab0df2a98384ae244"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](../infra/mcp/fw-consolidation.md) · [웹](../infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](../infra/mcp/containment-display.md) |
+| VPN 출발지 확인 | 11/8 03:05~03:17의 .76→A80 경보5건 원문 대조: Windows UA·DVWA 경로4/SQLi문자열1. Mac VPN local-ip는03:10에 .79이며 보존로그 .76일치0 | 제 Mac의 직접시험 근거 없음. 사용자가 팀원에게 시험을 요청한 사실 확인. .76 단말할당/침해 성공 미확인; 경보 삭제·예외·공격 재개0. A/B/C 조회도231경유 재확인 |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](../infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](../infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](../infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.11.3/5.12.10/5.13.7·최신PDF46쪽·직전6파일SHA보존. 기존 발표PDF20쪽/메모685초 유지. 단일deploy.sh 설치 경로 정합 검사 | 제출형식·발표 최신실측/리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+<a id="source-fa8974b97371746e-h3"></a>
+<a id="record-c2be08855172a3f2a1378cd70d4fd996b5dce84d2a0e23dfc3c182e9348fb9ff"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단과 지연 | 지표 오역·단일관측의 증가/유지/증가 없음·판단 누락을 보완. 원문 안내 수정/빠른 partial만으로 완료를 주장하지 않음. 동일 오답/무관 조회·긴 표를 줄이고 정확한 원인·현재영향·후속을 새 채팅에서 검증. 정확한60초 안팎/추가30초 목표 |
+|2| 새 학습 결과 | 완료한 변환·Thor 반입/별도 등록 뒤 동일하네스3군 비교·독립평가·제한 운용 후 채택 판단. 기존 학습본과 새 결과를 혼동하지 않음 |
+|3| 관제·보호 변경 E2E | 서비스 가동 의도·관리 경로·정확 승인·쓰기/복구·SDK 동등성·룰 최신화와 중복 대조. 공격 시험은 재지시 전 중단 유지 |
+|4| 논문·운용 근거·발표 | 독립176평가·수집/알림/백업 복구·무손실 한계, 논문·발표의 최신 실측/출처·시각 검수와 리허설 |
+
+- LLM이 조사·판단·변경안·승인 요청·사후 확인을 주도한다. 일반 sudo/Docker/셸/설치 권한 위임0. 지정 IDS 선차단 예외만 유지한다.
+- 최초 임시차단600초·유지 승인60분·해제/원기한 후60초 재차단 대기·새 근거 조건. 모델 장애를 고정 정상/차단 판정으로 바꾸지 않는다.
+- 운영 조회·점검·변경은 Mac→관리자231→A→B/C. Mac VPN에서 직접 관리/공격 송신하지 않는다. Kali 직결 예외는 유지하되 공격·부하·PCAP재생은 중단 상태다. 사용자 재개 지시에 따라 오늘17:00 KST까지 진행하고 조기 종료 지시가 오면 마감한다. DGX 학습·CPU 변환·Thor 반입을 완료했으며 운영 모델 교체0이다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 데이터는 원본1+정제본1 무손실 압축. 가중치/자격/대화/검증 원문/업무분담/논문·발표/Git제외 유지.
+- 단일 deploy.sh 설치 경로를 동기화했다. 운영 서버를 초기 설치기로 덮지 않으며 새 OS 전체 설치·공격 E2E·서비스 상태·정적 검사 범위를 구분한다.
+
+모든 공격 차단·보안 구멍0·전체 관제 업무 완료·기관 준수 인증은 미입증이다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 고려사항이다.
+
+
+
+<a id="source-fa8974b97371746e-h4"></a>
+<a id="record-8f979d3f0bd98c8b677480c7671891068489630e2d27ffa8504695c0eb92baf6"></a>
+
+## 이번 작업 단위의 Git 상태
+
+직전 가중치/계보·변환 사전검사 단위는 최종 `1199e9ae443ee1196fea3829eff55f8cb37717a7`로09:31:55 실원격main 일치를 확인했다. 이번 변환 완료·Thor 반입/별도 후보 등록과 논문46쪽 검수의 공개6문서는 `b05ab9e4fc772b0262f95973b08bccb116388828`로 2026-11-08T10:02:15.947397+09:00 실원격main 일치를 확인했다. 이 게시 영수증은 후속 현황 커밋으로 반영한다.10:01 시작한 별도 loopback3모델×3사례 개발 비교는10:07 완료했으나 품질 합격은 아니다. 논문·대화·검증 원문·가중치는 Git 제외다. 기존 Ansible/NAT/topology 변경은 보존하고 새 패키지/Mac 가중치 다운로드0·운영 원본35B/공격시험 중단을 유지한다.
+
+11/8 VPN 출발지 원문 대조와 공격/관리 경로 재확인의 공개5문서는 `6f4fb0e1da079d853f52b8bd30c85c7c6f58cd57`로 2026-11-08T10:14:23.573562+09:00 실원격main 일치를 확인했다. 게시 영수증·팀원시험 요청 사실은 후속 현황 커밋에 반영한다. 원문·VPN 로그·일회성 토큰은 게시하지 않는다.
+
+10:15 VPN 경로 문서의 최종 `c2e4f86f5c72ad17e0f237164c389b8f45147966` 실원격main 일치를 확인했다. 이번 GPU 적재·개발 비교와 판정 한계의 공개8파일은 `41f2587749eb11e491916f2c1f37006412dd91c3`로 2026-11-08T10:20:59.748299+09:00 실원격main 일치를 확인했다. JSON/링크/비밀패턴/diff 검사와9출력 근거 검수를 마쳤으며, 이 게시 영수증을 후속 현황 커밋으로 반영한다. 운영 설정/보안 정책 변경0이며 WAF의 실제 차단 여부는 아직 추가 로그 대조가 필요하다.
+
+
+</details>
+
+<a id="source-56d0c711ab2eddc4"></a>
+
+## STATUS-before-journal-rollout-20261108.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-08T04:17:35+09:00</summary>
+
+<a id="source-56d0c711ab2eddc4-h0"></a>
+<a id="record-ba20fd49b6cedb7bbb82219515bad35f1afff969a497fda8aca3ddbfecdbfa1b"></a>
+
+> 과거 기록: 2026-11-08 03:45 KST까지의 상태. 현재는 [STATUS](../STATUS.md)와 [PLAN](../PLAN.md)을 따른다.
+
+# 인프라 현황 — 2026-11-08 03:45 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 파인튜닝 모델 Thor 적재·실제 운용 테스트 완료를 목표로 한다. 일정만으로 모델을 승격하지 않는다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-f13eab275822f266).
+
+
+
+<a id="source-56d0c711ab2eddc4-h1"></a>
+<a id="record-b09923c42001a529aed05b53683dfd101061878e9cc21c621975ff368be1251e"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.121/common1.5.70/routing1.1.6·진단MCP1.2.8 + SDK 추가조회 실행/동일 계획 거절 | 운영 원본35B·옵션·권한·승인·FW/TTL 유지 |
+| SDK 추가조회 실행 | 추가 근거 선택→인자 검증→실제 MCP→새 판단 연결. 최초 후보112.651초/11읽기 반복을 거절 처리로38.731초/3읽기로 제한. SDK291재검사·합산1,444고유/skip0 | 둘 다partial. 운영 같은질문 채팅41.642초/3읽기도partial, 빠른 중단을 조사 성공으로 세지 않음. 실패/다른 인자 읽기는 유지. [범위·검증](../infra/ollama-trial/service-inquiry.md) |
+| 자연어 시간 구간 보완 | common70·7프로필1,449고유PASS/skip0. 같은 자연어 시간 질문의 필수3읽기 양봇 복원·7원문SHA 대조. H80.744초/4읽기·O41.842초/3읽기 | H 불필요FW·수집범위 과장, O 미완료 근거인데 completed 상태·후속 없음. 전체 조사는 양쪽 미완료. 이전78.365초/조회0 실패와 구분. [수정·검증](../infra/hermes/service-periods.md) |
+| 기존3모델 복합 대조 | 동결5사례×3군=15보고 생성. 학습본5모두추가조회, 원본/동일HF 각3보고 중2근거없는주장·1합성반례 제한부합 | 학습본 후속조사 미실행·우위/운영적격 미입증. DGX새학습결과 아님. [조건·결과](../finetuning/SERVICE_REASONING_COMPARISON_20261108.md) |
+| 후속 조회 규격 | common68/query121·1,439고유PASS/skip0. 실제35읽기 카탈로그와 인자 규격에 결속하고 제안/기능 공백/실행을 구분 | 원인·영향 의미 오류 해결 아님. 동결3재생도 전체 품질 미통과. [동작·한계](../infra/hermes/service-followup-schema.md) |
+| 새 복합 실제 채팅 | H90.544초/7읽기·O109.325초/3읽기, 둘 다partial·보호0·10원문SHA 확인 | H같은관측반복/불필요현재조회, O추가근거분기3회 뒤 일반보고의 처리지연오답 거절. 두 채팅만으로 모든 후속 제안 경로 검증을 주장하지 않음 |
+| 현재 배포 확정 | 11/8 02:38:54 KST common70 확정·공통2복사본/SDK영수증3변경·15manifest/보호8·SDK20/review5.03:26:22 양WS/worker·4서비스·두큐0/Bfailed0·타이머inactive 재확인 | common69 중간 반영 후 시간대 경계 보완70. 이번 단위 계획 Hermes재시작 총2회·query/SDK runtime/원본35B/승인/FW 유지. 공격·보호쓰기·새OS설치 미시험 |
+| 단문 조회·중복 표 | common67/query120·1,424고유PASS/skip0. 같은 질문 H98.940→17.344초/O59.036→16.362초, 새 표현 H16.630/O16.911초. 수정 후4건 모두 실제1읽기·보호0·표시 지표/원문SHA 일치 | 단문 현재 대기열 범위의 결과. 평균/p95·독립 평가 아님. 11/7 23:53 소스14/보호8·양WS/worker·4서비스·큐0/Bfailed0·독립원복확정. [범위·실패](../infra/hermes/diagnostic-claim-boundaries.md) |
+| 복합 판단 잔여 | 이전66 실제 H68.867초4읽기/O51.221초3읽기는 양쪽 품질 실패 | 검토 수/처리 대기 혼동·과거와 현재 영향·근거 없는 후속 조치 잔여. 표시 보완을 복합 정확성 해결로 세지 않음 |
+| 복합 판단 후보 대조 | 동결 원문·대기 있음 반례의10출력(제어군 포함)을 대조. 필드 의미 설명·간결한 지침·presence_penalty0·추론 활성 모두 비채택 | 스키마10통과/자동검사5통과에도 의미 또는 실행 불가능한 후속 작업 잔여. 추론 후보62.700초도 실패. 운영 변경0. [조건·근거](../infra/hermes/service-semantics-probes.md) |
+| 기존 학습본 실제 사용 | Thor 별도 엔진·B 실제 MCP에 학습/운영원본/동일HF 3군 연결. 수정 전 최종답18/24·19/24·18/24, 고정판단10/10·7/10·8/10 | 개발 문항/수동 대조. 일반 정확도·학습 우위·운영 승격 아님 |
+| 공통 보완 후 | 단문FW·첫N개상관룰·임시차단/허위근거 방어. SDK3군각30/30·총90건/108실읽기·보호0 | 같은 문제 유형 개발 회귀. 최종guard8실패/90정상 재생·후속Native 수정은 동결90실행과 분리 |
+| 실제 실패와 수정 | Native 가짜snapshot로상관조회실패→다른FW답70.380초. 동일 스키마 제한/미확인표로 보완. 배포 복사누락의 source pin 오류도 4복사본/embedded/영수증 동기화 | 실패 기록 보존. 모델 추가학습으로 해결한 것으로 세지 않음 |
+| 앞선 단문 실제 채팅 | FW H16.866/O11.486초, 상관5개 H20.621/O14.628초, 차단 H18.417/O10.337초. 모두각1실읽기/쓰기0·대상/원문/답/표본문 일치 | 원본모델·각1회·공유GPU 비통제. 후속Hermes상관20.453초/1읽기 재확인. UI/모바일 전수·반복 평균·복합 전체 성능 아님 |
+| 앞선 단문 운영·검사 |7프로필1,390고유PASS/skip0. B29소스/보호8·SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·16:02주반영/16:11상태판정후속원복확정 | Hermes계획재시작3회·source pin 오류중 worker재시도12회 기록. 보호DB/원본복구본 유지·새OS/공격/보호쓰기 미시험 |
+| 논문·출력 | 최신3군 비교·단문6채팅/복합 실패·후속5재생을 원고/국·영 초록에 반영. PDF43쪽·현재두그림·MCP44도구 부록 | 목차69목적지·본문/표776개 일치·전체페이지/주요표 시각검수·경계이탈0. 로컬전용. 독립평가·공식 제출형식/최종본 미완료 |
+| 관리자 SSH·정기보고 | A231/32 SID2001219 예외 유지·정기보고 전후구분. 기존 MCP에 threshold 실제 읽기 추가, 양봇 단문 새 조회 확인 | 모든 장비/관리경로·새 패킷 정책효과·수동/soc 재시작은 별도. [정책](../infra/validation/admin-ssh/README.md) · [조회](../infra/mcp/threshold-policy-read.md) |
+| 균형 본학습 독립 실행 | 사용자 선택1,220건·최대610step/1epoch.20:54 DGX PID1 실행기 등록·59SHA·독립08:30KST 종료·공유추론 양보/체크포인트재개·중간/최종loss 검증 |20:55 마지막유휴확인58초, optimizer 시작 미관측. 아침 재지시까지 현황조회 중단·서버자동진행 유지. 과거동일소스GPU2step재사용·추가27검사PASS. [실행](../finetuning/BALANCED_MAIN_20261107.md) · [준비](../finetuning/QUALITY_PREPARATION.md) |
+| IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](../infra/hermes/ids-application-method.md) |
+| 서비스 원문 조회 후보 | 기존MCP view=journal·고정unit/기간/마스킹/해시·Unix socket 읽기 구현. Mac104·Linux83·schema12조건, 실제비특권B32행/오류원문8행0.452초·all한도/임의경로거절 확인 | **운영 미배포**. 최초파일한도실패→1024/전모드stderr거절 보완. A/C전송·양봇원문표시/후속판단·새OS설치 후속. [후보·실측](../infra/mcp/journal-excerpts.md) |
+| Git·정리 | journal 임시15파일210,796B·임시service/socket 제거.03:45 운영15manifest/보호8·양봇/4서비스·두큐0/Bfailed0 재확인 | masked시험결과3개/root원장 보존. Mac패키지/다운로드0. Git 상태는 아래. 기존 Ansible/NAT/topology 변경 보존 |
+
+[모델 비교](../finetuning/RUNTIME_COMPARISON_20261107.md) · [단문 보완](../infra/hermes/short-read-evidence.md) · [현재 공통70/query121](../infra/hermes/service-periods.md) · [후속조회 규격68](../infra/hermes/service-followup-schema.md) · [이전 단문67/query120](../infra/hermes/diagnostic-claim-boundaries.md) · [이전 상태와 실패](STATUS_HISTORY.md#source-f13eab275822f266). common65/66은 각각1,408/1,414검사·운영 확정했다. 별도 보고 입력/구조 후보14출력은 수동 품질 또는 스키마 실패로 전부 비채택했다. 조회·검토·처리 상태를 혼동하는 모델 의미 오류는 미완료이며 정규식 추가만으로 해결했다고 하지 않는다. 후속 같은 모델의 주장 검증2회(각10개)도 검토/처리 수 혼동을 둘 다 통과시켜 비채택했다. 모델 합성18.850/17.522초이며 운영 지연에 추가하지 않았다. 추가 범위 분할 합성은 과거 직접 원인6.607초가 제한 범위에서 맞았지만 현재 영향8.394초가 오답이어서 결합 후보를 비채택했다.
+
+
+
+<a id="source-56d0c711ab2eddc4-h2"></a>
+<a id="record-fdb5f75d95cb0ba5f634edb221986e7deb044bdc639c64d657ea844aa776958b"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](../infra/mcp/fw-consolidation.md) · [웹](../infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](../infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](../infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](../infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](../infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.11.1~2/5.12.8~9/5.13.6·최신PDF43쪽·이전6파일SHA보존. 기존 발표PDF20쪽/메모685초 유지. 단일deploy.sh 설치 경로 정합 검사 | 제출형식·발표 최신실측/리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+<a id="source-56d0c711ab2eddc4-h3"></a>
+<a id="record-4bc9dd4230c9507e40e48f10e493c36843d1e232eca87c765202c6d16947a174"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|0| 학습본 활용·균형 본학습 | 기존3군비교는 우위미입증으로원본유지. 균형1,220독립실행등록·아침재지시까지사람측폴링중단. 결과검증/미사용평가/제한채팅 판단은 이후. [실행](../finetuning/BALANCED_MAIN_20261107.md) · [기존결과](../finetuning/RUNTIME_COMPARISON_20261107.md) |
+|1| 일반 복합 판단 정확성·60초 안팎 | SDK 실제 추가조회/동일 성공읽기 반복 거절·자연어 KST 기간 연결은 반영했다. 원문 journal 후보의 A/B/C 증분 배포·하네스/채팅 연결, 미완료/성공 상태 구분, 불필요 조회·미수행 후속과 원인/현재 영향 판단이 남는다. 빠른 미완료 종료를 조사 성공으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 균형1,220건 본학습 파이프라인20:54등록·공유추론유지·08:30KST상한·아침재지시까지현황조회중단.6군 비교파일럿은별도미실행.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 16:10 종료 후20:37 목표active로재개. 사용자20시대 후속지시로균형본학습독립실행을등록했다. 아침재지시까지학습현황조회만중단하고다른작업을계속한다.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+
+<a id="source-56d0c711ab2eddc4-h4"></a>
+<a id="record-53bf7950fc6e493c4b6a1d18e1d08be7a2958e610a402b07bcd2e22657a59085"></a>
+
+## 이번 작업 단위의 Git 상태
+
+직전 common70 시간 처리 단위 최종 `60aaf6c064c190ea130a0bd51b0f01bb050bff7f`은11/8 03:29:04 KST 실원격 main과 일치했다. 이번 journal 조회 후보·검사·초기 설치/문서·현황 공개17경로는 `e9471a1e03780b89da8e307cc17e2cd469852e7e`로 2026-11-08T03:47:26.367125+09:00에 푸시·실원격 main 일치를 확인했다. 이 게시 영수증과 MCP 안내 링크는 후속 문서 커밋으로 반영한다. 마지막 ID·관련 경로 상태는 로컬 기록에 남긴다. 구현·격리 검증과 운영 배포/봇 사용 완료를 구분한다. 별도 Ansible/NAT/topology 변경은 보존하고 자격·대화·로컬 검증·업무분담·논문·가중치는 Git 제외다.
+
+
+</details>
+
+<a id="source-f13eab275822f266"></a>
+
+## STATUS-before-report-guards-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T23:22:30+09:00</summary>
+
+<a id="source-f13eab275822f266-h0"></a>
+<a id="record-4315733493f10e70f502ee7416da0b87b8b933dd3e7e1932ba3aa2b915e43208"></a>
+
+> 과거 기록: common64 게시 시점. 현재 상태는 [STATUS](../STATUS.md)를 따른다.
+
+# 인프라 현황 — 2026-11-07 22:29 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-f4faba4634d4a845).
+
+
+
+<a id="source-f13eab275822f266-h1"></a>
+<a id="record-e4ccffabafb8b49c78826be2ea7e103aa628b23393755b45997965789bcc0349"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.118/common1.5.64/routing1.1.6·진단MCP1.2.8 | 운영 원본35B·옵션·권한·승인·FW/TTL 유지 |
+| 진단 주장 검증 보완 | common64·1,402고유PASS/skip0. 단일시점 추세·대기0/존재·반환 이력 실패 주장·현재/과거 결속·직접부정 검사를 보완. 실제 H30.967/O50.526초·각3실읽기/보호0 | 양쪽 모두partial·품질 미완료. H영향 결론/빈조치·O재시도/병목 반복오해 잔여. 22:11소스14/보호8·양WS/4서비스/큐0/failed0·독립원복확정. [범위·결과](infra/hermes/diagnostic-claim-boundaries.md) |
+| 기존 학습본 실제 사용 | Thor 별도 엔진·B 실제 MCP에 학습/운영원본/동일HF 3군 연결. 수정 전 최종답18/24·19/24·18/24, 고정판단10/10·7/10·8/10 | 개발 문항/수동 대조. 일반 정확도·학습 우위·운영 승격 아님 |
+| 공통 보완 후 | 단문FW·첫N개상관룰·임시차단/허위근거 방어. SDK3군각30/30·총90건/108실읽기·보호0 | 같은 문제 유형 개발 회귀. 최종guard8실패/90정상 재생·후속Native 수정은 동결90실행과 분리 |
+| 실제 실패와 수정 | Native 가짜snapshot로상관조회실패→다른FW답70.380초. 동일 스키마 제한/미확인표로 보완. 배포 복사누락의 source pin 오류도 4복사본/embedded/영수증 동기화 | 실패 기록 보존. 모델 추가학습으로 해결한 것으로 세지 않음 |
+| 앞선 단문 실제 채팅 | FW H16.866/O11.486초, 상관5개 H20.621/O14.628초, 차단 H18.417/O10.337초. 모두각1실읽기/쓰기0·대상/원문/답/표본문 일치 | 원본모델·각1회·공유GPU 비통제. 후속Hermes상관20.453초/1읽기 재확인. UI/모바일 전수·반복 평균·복합 전체 성능 아님 |
+| 앞선 단문 운영·검사 |7프로필1,390고유PASS/skip0. B29소스/보호8·SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·16:02주반영/16:11상태판정후속원복확정 | Hermes계획재시작3회·source pin 오류중 worker재시도12회 기록. 보호DB/원본복구본 유지·새OS/공격/보호쓰기 미시험 |
+| 논문·출력 | 최신3군 비교·단문6채팅/복합 실패·후속5재생을 원고/국·영 초록에 반영. PDF43쪽·현재두그림·MCP44도구 부록 | 목차69목적지·본문/표776개 일치·전체페이지/주요표 시각검수·경계이탈0. 로컬전용. 독립평가·공식 제출형식/최종본 미완료 |
+| 관리자 SSH·정기보고 | A231/32 SID2001219 예외 유지·정기보고 전후구분. 기존 MCP에 threshold 실제 읽기 추가, 양봇 단문 새 조회 확인 | 모든 장비/관리경로·새 패킷 정책효과·수동/soc 재시작은 별도. [정책](infra/validation/admin-ssh/README.md) · [조회](infra/mcp/threshold-policy-read.md) |
+| 균형 본학습 독립 실행 | 사용자 선택1,220건·최대610step/1epoch.20:54 DGX PID1 실행기 등록·59SHA·독립08:30KST 종료·공유추론 양보/체크포인트재개·중간/최종loss 검증 |20:55 마지막유휴확인58초, optimizer 시작 미관측. 아침 재지시까지 현황조회 중단·서버자동진행 유지. 과거동일소스GPU2step재사용·추가27검사PASS. [실행](finetuning/BALANCED_MAIN_20261107.md) · [준비](finetuning/QUALITY_PREPARATION.md) |
+| IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](infra/hermes/ids-application-method.md) |
+| 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
+| Git·정리 | 시험Thor엔진/guard·Mac중계/임시포트 종료, primary PID715615/재시작0 유지. 서버시험56파일은 로컬SHA검증 보존 후 제거, 격리3,279파일·Mac자체임시107파일/73,704,545B 제거 확인 | 이전 최종 `4808cc1`·16:14 실원격 일치. 이번 독립학습 공개7문서 `0e9db7a`·20:59:49 KST 푸시/실원격main 일치. 영수증 후속 `c598a71`·21:00:24 실원격 일치. 이번 common63 공개8경로 `07a695f`·21:16:49 KST 푸시/실원격main 일치. 영수증 후속 `ca6e3c0`·21:17:29 실원격일치. 서버시험469파일/Mac자체2파일10,085,539B SHA 정리·기존 Ansible/NAT/topology 변경·복구원본 유지 |
+
+[이번 모델 비교·범위](finetuning/RUNTIME_COMPARISON_20261107.md) · [공통 보완·복구](infra/hermes/short-read-evidence.md) · [이전 예외 조회](infra/mcp/threshold-policy-read.md) · [이전 적용 방식](infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다.20시대 수정 전 H31.835/O53.158초·수정 후 H50.595/O53.258초, 각4실읽기/보호0·모두partial로품질미완료다. common63 직접부정 한계설명 오탐 수정·대기지표 안내는1,392고유검사/skip0·공통2소스+SDK영수증 운영반영·21:11독립원복확정. 소스14/보호8·양WS/4서비스·두큐0/Bfailed0. H의 실제조회 성공을 수집실패로 과장하는 문구와 O의 잠금/검토건수 해석이 남는다. 모델분리보고후보는미채택이다. 후속 보존원문 재생4회(신뢰 설명 대조)는13.081~13.699초, 추론on4096은65.219초였으나5회 모두 수동 품질 실패로 비채택했다. 자동 검사 통과1회도 근거 없는 인과/추세가 남았다. 운영 추가변경0·학습조회0. [후속 재생](infra/hermes/history-integrity-review.md). [후속 검증](infra/hermes/diagnostic-disclaimers.md). 과거 실패·원문·승인·운영DB·복구본을 보존한다.
+
+
+
+<a id="source-f13eab275822f266-h2"></a>
+<a id="record-82bdb75e4c9936ef0e5e5da7537d5210049fdfb77a34ffd4f6830e85c8c78bde"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](infra/mcp/fw-consolidation.md) · [웹](infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.11.1~2/5.12.8~9/5.13.6·최신PDF43쪽·이전6파일SHA보존. 기존 발표PDF20쪽/메모685초 유지. 단일deploy.sh 설치 경로 정합 검사 | 제출형식·발표 최신실측/리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+<a id="source-f13eab275822f266-h3"></a>
+<a id="record-ce5d56ed2b0a936ca59c95e03f3723b1ebaca61628e401b5bd37050a9b10b164"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|0| 학습본 활용·균형 본학습 | 기존3군비교는 우위미입증으로원본유지. 균형1,220독립실행등록·아침재지시까지사람측폴링중단. 결과검증/미사용평가/제한채팅 판단은 이후. [실행](finetuning/BALANCED_MAIN_20261107.md) · [기존결과](finetuning/RUNTIME_COMPARISON_20261107.md) |
+|1| 일반 복합 판단 정확성·60초 안팎 | 감사 보존으로 거절된 초안/최종 답변·실제 원문을 함께 대조할 수 있다. 필드 설명·도구 상세 단계 분리·추론on4096 후보는 여전히 오답/스키마 실패로 비채택. 속성 보존은 반영했다. 현재 단문 대상 축소·기본값 동등 중복 제거는 반영했다. common64는 이력 반환·현재/과거·대기/추세 주장 검사를 추가했고 자동통과2오답을 거절했다. 새3읽기 실제 채팅도 둘 다 품질미완료다. 다음은 반복 정정에도 남는 잠금/검토 수 오해, 관제 영향 결론 누락, 빈 조치·불필요한 재시작 제안을 보완한다. 완료 표시를 정답으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 균형1,220건 본학습 파이프라인20:54등록·공유추론유지·08:30KST상한·아침재지시까지현황조회중단.6군 비교파일럿은별도미실행.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 16:10 종료 후20:37 목표active로재개. 사용자20시대 후속지시로균형본학습독립실행을등록했다. 아침재지시까지학습현황조회만중단하고다른작업을계속한다.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+
+<a id="source-f13eab275822f266-h4"></a>
+<a id="record-297b9e0151afd30d703108a053bb80e64530ca018a96ab17dccdb16f57dcc9ec"></a>
+
+## 이번 작업 단위의 Git 상태
+
+직전 문서5경로 최종 `c99e7d3ae6e25476f6856162d363cb60015dfd22`는21:50:38 KST 실원격main과 일치했다. 이번 common64 소스2·검증 원장2·현황3경로는 검증·운영 확정과 서버1,407파일/Mac7파일29,983,285B 정리를 마쳤다. 공개7경로 소스 `13804da89f242980e7d7ca426b6a4bff36fea8f7`는2026-11-07T22:30:21.863445+09:00에 푸시·실원격main 일치를 확인했다. 프로젝트 자격파일 토큰을 해당 Git 프로세스 환경에만 전달하고 helper/HTTP trace를 껐다. 이 게시 확인은 후속 현황 커밋으로 남기며 마지막 커밋·원격 일치·작업 트리는 로컬 기록에 확정한다. 초기 후보 회귀·22:03원복·최종 재검증과 양봇 품질 미완료를 보존한다. 기존 Ansible/NAT/topology 변경은 별도로 유지하며 자격·원문·대화·업무분담·논문은 Git 제외다.
+
+
+</details>
+
+<a id="source-f4faba4634d4a845"></a>
+
+## STATUS-before-trained-trial-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T16:13:44+09:00</summary>
+
+<a id="source-f4faba4634d4a845-h0"></a>
+<a id="record-4581dac25fc1b30d3e7b05e39371fddce9c5259312a9dba8e882b64ce8f5b1c8"></a>
+
+# 인프라 현황 — 2026-11-07 14:46 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-4469cd7a492e918d).
+
+
+
+<a id="source-f4faba4634d4a845-h1"></a>
+<a id="record-7c75733389a685a3527e91452261bc7e5a58b1df93f9611d38eb7063b3327f4c"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.116/common1.5.61/routing1.1.6·진단MCP1.2.8 | 원본35B·옵션·권한·승인·FW/TTL 변경0 |
+| 현재 조회 범위 | 등록된 요청 대상·미조회 대상만 선택, 실제 스키마 기본값이 같은 호출만 중복 제거 | 과거·비교·재관측·다른 기간/상한은 유지 |
+| 실제 실패와 수정 | IDS 예외 파일 직접 읽기 추가. Hermes 최초 WAF 추가조회는 native 대상 제한 누락→공통 schema로 a:suricata만 선택 | 초기 답변·실패 원문 보존. 모델 학습이 아닌 도구/하네스 수정 |
+| 실제 채팅 | IDS 예외 일반/단문×양봇4건: H24.548/22.997초·O16.542/17.331초·각IDS1읽기/쓰기0·정책/원문SHA·SID/방향/주소/KST/표 일치 | 공유GPU/캐시/배경 비통제 개발 회귀. UI전수·평균·독립 정확도 아님 |
+| 운영·검사 |10프로필1,585고유PASS/skip0. A3소스/보호7·B29소스/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/A·Bfailed0·14:46원복확정 | Hermes 계획재시작2회·정지DB동일·IDS룰/컨테이너변경0·새OS/공격/UI미시험 |
+| 논문 MCP 목록 | 양경로8논리서버44등록도구 일치. 부록A 개별 역할·읽기35/보호요청8/임시차단1·허용 모드 기록 | 등록과 실제 사용/승인 E2E 구분. 최신PDF/시각검수·독립평가 미완료 |
+| 관리자 SSH·정기보고 | A231/32 SID2001219 예외 유지·정기보고 전후구분. 기존 MCP에 threshold 실제 읽기 추가, 양봇 단문 새 조회 확인 | 모든 장비/관리경로·새 패킷 정책효과·수동/soc 재시작은 별도. [정책](../infra/validation/admin-ssh/README.md) · [조회](../infra/mcp/threshold-policy-read.md) |
+| 추가 학습 준비 | 기존8,719 보존·균형 후보1,220/룰 정답 토큰84.93%→40.25%, 도구41문답/65호출 유지. 중간평가·조기종료/재개·최선 보존, 별도 평가32·비교6설정 준비 |13:46 새35B GPU2/2·최선step1/현재58SHA·CPU재개동등성/loss3·로컬118/압축8통과. 모델 품질 비교·본학습·승격0. [보완 결과](../finetuning/QUALITY_PREPARATION.md) |
+| IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](../infra/hermes/ids-application-method.md) |
+| 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
+| Git·정리 | 이번 공개24경로 `43ef5b4` 푸시·14:50:08 KST 실원격main 일치. 이 게시 영수증은 후속 문서 커밋으로 반영 | 서버시험1,868파일·Mac이번임시41파일/42,405,354B 제거 확인. 복구원본·기존 관리자용 임시·Ansible/NAT/topology 보존 |
+
+[이번 예외 조회·검증·복구](../infra/mcp/threshold-policy-read.md) · [이전 적용 방식](../infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](../infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](../infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
+
+
+
+<a id="source-03db4ffc7fe5ff4e-h2"></a>
+<a id="source-11c0fa69e377889c-h2"></a>
+<a id="source-13885056bb40d264-h2"></a>
+<a id="source-2d645dfe728c28f4-h2"></a>
+<a id="source-2fe80c609495c562-h2"></a>
+<a id="source-4469cd7a492e918d-h2"></a>
+<a id="source-f4faba4634d4a845-h2"></a>
+<a id="record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](../infra/mcp/fw-consolidation.md) · [웹](../infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](../infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](../infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](../infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](../infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.12.6/구현4.7·정확성평가방법과 이전본 보존. 호스팅 없는 발표 PDF20쪽/메모685초·전쪽 시각검수. 단일deploy.sh 설치 경로 정합 검사 | 이번 후속 실측/최신논문PDF·제출형식·리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+<a id="source-f4faba4634d4a845-h3"></a>
+<a id="record-0d4fd8052c53cd8cb4d7d54ea100e293c58b8cddae22a8096a2bbffc7737f70b"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|0| 기존 학습본 실제 시험 준비 | Thor 등록 후보 operator-20261103 확인. 원본 유지·동일 하네스/도구 읽기 시험→정확도/누락/지연 비교→통과 범위만 제한 채팅 사용. 오늘 새 자료 본학습과 구분. [계획](../finetuning/TRAINED_MODEL_TRIAL.md) |
+|1| 일반 복합 판단 정확성·60초 안팎 | 감사 보존으로 거절된 초안/최종 답변·실제 원문을 함께 대조할 수 있다. 필드 설명·도구 상세 단계 분리·추론on4096 후보는 여전히 오답/스키마 실패로 비채택. 속성 보존은 반영했다. 현재 단문 대상 축소·기본값 동등 중복 제거는 반영했다. 다음은 복합 질문의 모델 주장과 실제 필드 의미 연결, 근거 없는 후속 조치를 보완한다. 완료 표시를 정답으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 품질 보완 사전시험13:46완료·비교 파일럿/본학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-4469cd7a492e918d"></a>
+
+## STATUS-before-threshold-read-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T14:49:48+09:00</summary>
+
+<a id="source-4469cd7a492e918d-h0"></a>
+<a id="record-c81b2c3dc7822734e2db42a1c76b035327af34ab237800a513949de301ddc03b"></a>
+
+# 인프라 현황 — 2026-11-07 14:13 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-2d645dfe728c28f4).
+
+
+
+<a id="source-4469cd7a492e918d-h1"></a>
+<a id="record-d34024dc2ddcbeecd91c3eccce426ef8a3cbb0a92913e765556dcdb71359e326"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.115/common1.5.61/routing1.1.6·진단MCP1.2.8 | 원본35B·옵션·권한·승인·FW/TTL 변경0 |
+| 현재 조회 범위 | 등록된 요청 대상·미조회 대상만 선택, 실제 스키마 기본값이 같은 호출만 중복 제거 | 과거·비교·재관측·다른 기간/상한은 유지 |
+| 실제 실패와 수정 | IDS 무중단 질문의 룰 목록 오분류 수정. 첫 SDK 후보의 대상 ID 설명문 충돌로 조회0/partial 발생→ID 유지·회귀 추가 | 실패 원문 보존. 하네스 오류이며 학습으로 해결했다고 표시하지 않음 |
+| 실제 채팅 | IDS 적용 방식 2표현×양봇4건: H22.349/21.769초·O21.697/17.089초·각실제1읽기/쓰기0·원문SHA/인자/영향/KST/표 일치 | 개발 회귀·공유GPU/캐시/채널 배경 비통제. 독립 평가·평균·복합 전체 정확도 아님 |
+| 운영·검사 |7프로필1,373고유PASS/skip0·26SHA/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·14:13 독립원복 확정 | 계획 Hermes 재시작2회·운영DB 교체0·보안장비 변경/재시작0. 새OS/공격/부하/UI전수 미시험 |
+| 논문 MCP 목록 | 양경로8논리서버44등록도구 일치. 부록A 개별 역할·읽기35/보호요청8/임시차단1·허용 모드 기록 | 등록과 실제 사용/승인 E2E 구분. 최신PDF/시각검수·독립평가 미완료 |
+| 관리자 SSH·정기보고 | A231/32 SID2001219 예외·52,497룰/실패0.11:59카드는적용전4건;13:00실제12h전52/후0. 보고전후구분B반영·30검사·원복확정 | 초기입력74검사. 수동/soc프로세스는미재시작. 장비전체·MCP예외가시성·양봇인지잔여. [근거](../infra/validation/admin-ssh/README.md) |
+| 추가 학습 준비 | 기존8,719 보존·균형 후보1,220/룰 정답 토큰84.93%→40.25%, 도구41문답/65호출 유지. 중간평가·조기종료/재개·최선 보존, 별도 평가32·비교6설정 준비 |13:46 새35B GPU2/2·최선step1/현재58SHA·CPU재개동등성/loss3·로컬118/압축8통과. 모델 품질 비교·본학습·승격0. [보완 결과](../finetuning/QUALITY_PREPARATION.md) |
+| IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](../infra/hermes/ids-application-method.md) |
+| 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
+| Git·정리 | IDS115 공개16경로 7130086 푸시·14:16:00 KST 실원격main 일치. 이 게시 영수증은 후속 문서 커밋으로 반영 | 서버시험926파일/Mac작업임시25파일 정리. 기존 관리자 작업용 임시·Ansible/NAT/topology 보존 |
+
+[이번 변경·검증·복구](../infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](../infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](../infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+<a id="source-2d645dfe728c28f4-h3"></a>
+<a id="source-4469cd7a492e918d-h3"></a>
+<a id="record-e188bde7bb9df10817b19b632f4eda8345c16c777bdb9e7088fef679e9c46d67"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 감사 보존으로 거절된 초안/최종 답변·실제 원문을 함께 대조할 수 있다. 필드 설명·도구 상세 단계 분리·추론on4096 후보는 여전히 오답/스키마 실패로 비채택. 속성 보존은 반영했다. 현재 단문 대상 축소·기본값 동등 중복 제거는 반영했다. 다음은 복합 질문의 모델 주장과 실제 필드 의미 연결, 근거 없는 후속 조치를 보완한다. 완료 표시를 정답으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 품질 보완 사전시험13:46완료·비교 파일럿/본학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-2d645dfe728c28f4"></a>
+
+## STATUS-before-ids-method-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T14:15:58+09:00</summary>
+
+<a id="source-2d645dfe728c28f4-h0"></a>
+<a id="record-fffaa4e7fb51a7d9504338727949fb19ba7e9a05eab1222adb93a9b3343e6d2e"></a>
+
+> 과거 기록: 2026-11-07 IDS 적용 방식 수정 직전 STATUS.md. 내용은 당시 상태이며, 보관 위치에 맞춰 상대 링크만 조정했다. 현재 상태는 [STATUS](../STATUS.md)를 따른다.
+
+# 인프라 현황 — 2026-11-07 13:52 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-03db4ffc7fe5ff4e).
+
+
+
+<a id="source-2d645dfe728c28f4-h1"></a>
+<a id="record-d3caa072cc93b9b2b0eba95c3d3f4c225de32367e2cadcbf3e779844b4179831"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.114/common1.5.61/routing1.1.6·진단MCP1.2.8 | 원본35B·옵션·권한·승인·FW/TTL 변경0 |
+| 현재 조회 범위 | 등록된 요청 대상·미조회 대상만 선택, 실제 스키마 기본값이 같은 호출만 중복 제거 | 과거·비교·재관측·다른 기간/상한은 유지 |
+| 실제 실패와 수정 | query113 Native inline에서 __file__ 없음:22.339초/0읽기/partial. 설치경로 fallback·실행경계 검사로114 수정 | 실패 원문 보존, 빠른 오답을 성능으로 세지 않음 |
+| 실제 채팅 | H18.476초/O18.396초·각b:management1회·보호쓰기0·원문SHA/인자/속성/KST/2표 일치 | 각1회 동일 회귀 질문·공유GPU/캐시/채널문맥 비통제. 복합 정확도·평균 아님 |
+| 운영·검사 |7프로필1,364고유PASS/skip0·24SHA/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·독립원복 확정 | 계획 재시작2회·운영DB 교체0. 새OS/공격/부하/UI전수 미시험 |
+| 논문 MCP 목록 | 양경로8논리서버44등록도구 일치. 부록A 개별 역할·읽기35/보호요청8/임시차단1·허용 모드 기록 | 등록과 실제 사용/승인 E2E 구분. 최신PDF/시각검수·독립평가 미완료 |
+| 관리자 SSH·정기보고 | A231/32 SID2001219 예외·52,497룰/실패0.11:59카드는적용전4건;13:00실제12h전52/후0. 보고전후구분B반영·30검사·원복확정 | 초기입력74검사. 수동/soc프로세스는미재시작. 장비전체·MCP예외가시성·양봇인지잔여. [근거](../infra/validation/admin-ssh/README.md) |
+| 추가 학습 준비 | 기존8,719 보존·균형 후보1,220/룰 정답 토큰84.93%→40.25%, 도구41문답/65호출 유지. 중간평가·조기종료/재개·최선 보존, 별도 평가32·비교6설정 준비 |13:46 새35B GPU2/2·최선step1/현재58SHA·CPU재개동등성/loss3·로컬118/압축8통과. 모델 품질 비교·본학습·승격0. [보완 결과](../finetuning/QUALITY_PREPARATION.md) |
+| IDS 적용 방식 질문 | 실제 양봇 H23.865초/O22.940초 모두 무중단 여부 대신 룰 목록 출력·보호쓰기0 | 실제 MCP는 승인형 restart 경로/88검사. 단문 의미 분류 실패의 로컬 하네스 수정은 아직 미배포 |
+| 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
+| Git·정리 | 품질 준비37공개경로 b86aeff 푸시·13:53 실원격main 일치. 이 게시 영수증은 후속 문서 커밋으로 반영 | 통합원본1/정제본1·새106파일 전수복원/기존보존. Mac임시4,394파일/11.42GB·DGX CPU시험 임시2경로 정리 확인. 미배포 하네스·기존 Ansible/NAT/topology 변경은 별도 보존 |
+
+[이번 변경·검증·복구](../infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](../infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+
+[이미 보존한 동일 내용으로 이동](#record-e188bde7bb9df10817b19b632f4eda8345c16c777bdb9e7088fef679e9c46d67)
+
+</details>
+
+<a id="source-03db4ffc7fe5ff4e"></a>
+
+## STATUS-before-current-scope-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T11:35:09+09:00</summary>
+
+<a id="source-03db4ffc7fe5ff4e-h0"></a>
+<a id="record-b24670654a4f900903fbce79c6c058082ab5372e3be000299a8b11d53f40fafb"></a>
+
+# 인프라 현황 — 2026-11-07 10:52 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-11c0fa69e377889c).
+
+
+
+<a id="source-03db4ffc7fe5ff4e-h1"></a>
+<a id="record-f76c9e64fd0b7d18d97e6385b4e07206553d3f8cbbfc1133f6ad05fb85916261"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.112/common1.5.61/routing1.1.6·진단MCP1.2.8 | 원본35B·옵션·권한·승인·FW/TTL 변경0 |
+| 속성 누락 수정 | MCP LoadState/UnitFileState를 공통 사실·표·대상/시점별 값 검사까지 보존 | 실제 원문은 이전에도 모델 입력에 존재. 하네스 보완이며 추가 학습 성과 아님 |
+| 단문·혼합 표시 | management unit 이름 연결·등록 대상 대조·시작 설정 표, 다른 runtime 읽기가 서비스 표를 바꾸는 분기 수정 | 미등록/다른 호스트/쓰기 경계 유지. 모든 서비스·자연어 전수 지원 검증 아님 |
+| 발견한 실제 실패 | O첫6.419초/0읽기, 수정뒤O20.262초/2호출·1대상·동일SHA, H19.541초/2읽기/설정값 표시 누락 | 최초O·중간H는 품질 실패. 중복·불필요한 추가 읽기는 별도 잔여 |
+| 최종 실제 채팅 | H20.711초/3읽기·O18.107초/1읽기·양2표. 실제 원문SHA·인자·KST·실행/시작 설정 일치 | 각1회·공유GPU/채널문맥 비통제. H의 A/C 추가 조회2회 잔여. 필드 표시 성공이며 일반 복합 정답률/평균 지연 아님 |
+| 운영·검사 | 1,270고유PASS/skip0. B11/6/6파일 단계 반영·23SHA/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·독립원복 확정 | Hermes 계획 재시작3회. DB·승인·추적 교체0. 새OS·공격/부하·UI전수 미시험 |
+| 논문 선작성 | 공식 근거·업무 요구·설계/구현·평가 방법/분모·실측과 실패·5.13.3 감사·5.13.4 필드 보존/단문 실패·이전본 보존 | 새PDF/시각검수·제출확정·미사용176 독립평가 잔여, 논문Git제외 |
+| Git·정리 | 공개18경로 소스e612d48 커밋·프로젝트 자격 직접 푸시·실원격main 일치. 게시 영수증은 후속 문서 커밋 | 서버1,844파일·Mac43파일/45.6MB 정리 확인. 기존 Ansible/NAT/토폴로지·운영자료/복구본 보존 |
+
+[이번 변경·검증·복구](../infra/hermes/service-properties.md) · [직전 감사·복합 품질](../infra/hermes/service-read-audit.md) · [정정 안내](../infra/hermes/service-repair-feedback.md) · [현재 대기열](../infra/hermes/pipeline-single-read.md) · [수집시각](../infra/mcp/runtime-clock.md) · [반복systemd 수정](../infra/hermes/controller-contention.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료 상태를 유지한다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+<a id="source-03db4ffc7fe5ff4e-h3"></a>
+<a id="record-6c57196fc50eee46a8c3ceeefe5fe2037e923fac6f7475017ce7744ae31da8f6"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 감사 보존으로 거절된 초안/최종 답변·실제 원문을 함께 대조할 수 있다. 필드 설명·도구 상세 단계 분리·추론on4096 후보는 여전히 오답/스키마 실패로 비채택. 속성 보존은 반영했다. 다음은 모델 주장과 실제 필드의 의미 연결, 근거 없는 후속 조치·기본값 유무에 따른 중복 읽기와 불필요한 추가 조회를 보완한다. 완료 표시를 정답으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-11c0fa69e377889c"></a>
+
+## STATUS-before-service-properties-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T10:52:03+09:00</summary>
+
+<a id="source-11c0fa69e377889c-h0"></a>
+<a id="record-896fe210340225126a7312269cfbffbfeb4fda3e80f5afbe2ce893cd0e837560"></a>
+
+> 과거 기록: 2026-11-07 서비스 속성 보존·단문 조회 보완 이전 상태입니다. 현재 상태는 [STATUS](../STATUS.md)를 따릅니다.
+
+# 인프라 현황 — 2026-11-07 10:22 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-13885056bb40d264).
+
+
+
+<a id="source-11c0fa69e377889c-h1"></a>
+<a id="record-9b0d918c66e3d9e78a91d5698f4f82db2b3ee65d10ca2796ac0b3d0c5d32fbd4"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.109/common1.5.60/routing1.1.6·진단MCP1.2.8. SDK 현재 대기열을 실제 등록 target·시간 인자 없음·1조회 선택으로 제한 | 원본35B·권한·승인·FW/TTL·추론 옵션 변경0. 과거·원인·위험·변경 범위 유지 |
+| 최종 단문 채팅 | 새 질문 H16.476초/O17.272초·각1실제MCP/1모델·지표표 완료 | 원문SHA/정확target/KST/수치/게시표 구문 일치. 각1회·최근 채널문맥/공유GPU캐시 유지, 평균/p95·전후 인과 개선율 아님 |
+| 최종 복합 채팅 | 같은 회귀 질문 새 게시물 H30.914초/partial·O51.107초/completed, 실제 읽기 각각4개 | 실행기 완료≠정답. O 검토/처리대기 혼동·후속 범위, H 이미 읽은 항목 반복 제안·대상/도구 이름 혼동·도구 부재 단정 잔여. 정확성 성공 집계0 |
+| 서비스 판단 감사 | O4원문SHA·JSON초안3개 분리 보존, H기존 추적 참조 및4원문SHA 독립 대조 | O거절 초안은 공개 답변/후속 근거와 분리. Native 감사 행 자체에는 원문이 없으며 실제 기존 trace로 연결 |
+| 하트비트 수집 | 정상 PID의 새 신호를 오래된 시작시각+5초로 거절하던 원인 재현. 수정 전6회 중2회→후6회 중0회·채팅 지표 확보 | 실제 미래·만료·PID 불일치 검사는 유지. 검토285건은 실제 검토 상태이며 공격/실행실패285건이나 성능 측정값 아님 |
+| 운영 검증 | 감사 보완1,405고유PASS/skip0. 10:18:58 최종 확인. B runtime·공유 dispatcher/영수증 반영 및 후속 보완,23SHA/보호8/SDK20/review5·양WS/worker·4서비스·두큐0/Bfailed0·독립원복 확정 | Hermes 컨테이너/DB 교체0. 새OS·공격/부하·UI전수 미시험 |
+| Git·정리 | 감사 보완 소스e9fcaa8 커밋·프로젝트 자격 직접 푸시·실원격main 일치. 게시 영수증은 후속 문서 커밋 | 서버fixture461/Mac자체임시24 SHA·부재 확인 후 제거. 기존 Ansible/NAT/토폴로지·운영 자료/복구본 보존 |
+| 논문 선작성 | 공식NIST 근거·관제 요구사항·설계/구현·정확성 평가 방법·실측/실패와5.13.3 감사 분리 보존을 추가. 이전본 보존 | 본실험/기관 인증 아님. 새PDF·시각검수·독립평가·제출확정 미완료. 논문Git제외 |
+
+
+[서비스 감사·실채팅·복구](../infra/hermes/service-read-audit.md) · [정정 안내/품질 실패/복구](../infra/hermes/service-repair-feedback.md) · [단일 현재 조회/실측/복구](../infra/hermes/pipeline-single-read.md) · [날짜·주장 검사/실측/복구](../infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](../infra/mcp/runtime-clock.md) · [단문 경로](../infra/hermes/pipeline-navigation.md) · [반복systemd 수정](../infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+<a id="source-11c0fa69e377889c-h3"></a>
+<a id="record-df4a44f5063b00e09df9da1a607d5cce5e3c84a757cab1d544f91f76ff8d25e0"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 감사 보존으로 거절된 초안/최종 답변·실제 원문을 함께 대조할 수 있다. 필드 설명·도구 상세 단계 분리·추론on4096 후보는 여전히 오답/스키마 실패로 비채택. 다음은 주장과 실제 필드의 연결, 근거 없는 후속 조치·이미 한 읽기 반복을 보완한다. 완료 표시를 정답으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-13885056bb40d264"></a>
+
+## STATUS-before-service-audit-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T10:21:47+09:00</summary>
+
+<a id="source-13885056bb40d264-h0"></a>
+<a id="record-c887ce2d2865e6911ccd4c1d841b24110b297c956e84cb5668ccd2d63072d804"></a>
+
+> 과거 기록: 서비스 감사 보완 전 상태이며 현재 상태는 [STATUS](../STATUS.md)를 따른다.
+
+# 인프라 현황 — 2026-11-07 09:53 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-e5bd26f83fd0ff5e).
+
+
+
+<a id="source-13885056bb40d264-h1"></a>
+<a id="record-b502fb3f3b65ee8a426a29efcfeb2527cbf394dd398c37e0868c47f65021af36"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.109/common1.5.60/routing1.1.6·진단MCP1.2.8. SDK 현재 대기열을 실제 등록 target·시간 인자 없음·1조회 선택으로 제한 | 원본35B·권한·승인·FW/TTL·추론 옵션 변경0. 과거·원인·위험·변경 범위 유지 |
+| 최종 단문 채팅 | 새 질문 H16.476초/O17.272초·각1실제MCP/1모델·지표표 완료 | 원문SHA/정확target/KST/수치/게시표 구문 일치. 각1회·최근 채널문맥/공유GPU캐시 유지, 평균/p95·전후 인과 개선율 아님 |
+| 최종 복합 채팅 | common60 H53.209초/O42.820초·각필수4읽기/H추가1. 두 응답 모두partial·정확성 실패 | H 과거/현재 무관 단정·activated 표현/한국어 처리, O 잠금→재시작·검토→병목 오해 잔여. 일반 정확60초 미달성 |
+| 하트비트 수집 | 정상 PID의 새 신호를 오래된 시작시각+5초로 거절하던 원인 재현. 수정 전6회 중2회→후6회 중0회·채팅 지표 확보 | 실제 미래·만료·PID 불일치 검사는 유지. 검토285건은 실제 검토 상태이며 공격/실행실패285건이나 성능 측정값 아님 |
+| 운영 검증 |1,398고유PASS/skip0.09:50:55 최종건강확인.09:38:01 B공통계약2+영수증3파일/22SHA·보호8·정지중설정/DB동일.09:40:31 양WS/worker·4서비스·두큐0/failed0·독립원복확정 | 최초WS 재연결/시험 큐1로 확정 보류 이력 보존. A/C 변경0. 장기/새OS·공격/부하·UI전수 미시험 |
+| Git·정리 |공통60 소스c5bb52b·09:48:21 실원격main 동일. 보관 상대링크 보정·비교 결과·게시 영수증은 후속 문서 커밋 | 서버fixture461/Mac자체임시34 전체SHA·부재확인 후 제거. Mac새패키지0·운영자료/복구본/기존Ansible/NAT/토폴로지 보존 |
+| 논문 선작성 | 기존4.7/5.12.6/5.13에 더해2.7 NIST공식지침·3.6 업무 요구사항·5.13.1 분모/5.13.2 재현 절차, 출처[12][13]·이전본 보존 | 본실험 수행/기관 인증 아님. 새PDF·전쪽 시각검수·독립평가·제출확정 미완료. 논문Git제외 |
+
+
+[정정 안내/품질 실패/복구](../infra/hermes/service-repair-feedback.md) · [단일 현재 조회/실측/복구](../infra/hermes/pipeline-single-read.md) · [날짜·주장 검사/실측/복구](../infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](../infra/mcp/runtime-clock.md) · [단문 경로](../infra/hermes/pipeline-navigation.md) · [반복systemd 수정](../infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+<a id="source-13885056bb40d264-h3"></a>
+<a id="record-8894ded3a498537a790b188915524cc1bb80ee698b895f1a49dede104f0ea5a9"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | common60 정정 안내는 실제 오류에 맞췄으나 양봇 품질은 미완료다. 동일 보존 근거의 추론off6.568초는 오답, on37.441초는2048토큰 도달/최종JSON 부재였다. 현재 옵션에서 개선 미확인으로 운영추론 유지. 필드 의미·판단 입력 구성과 실패 초안 감사 보존을 점검한다. 근거 생략·고정 결론으로 대신하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-2fe80c609495c562"></a>
+
+## STATUS-before-feedback-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T09:53:43+09:00</summary>
+
+<a id="source-2fe80c609495c562-h0"></a>
+<a id="record-355efefc6b4aa85f73657af49c3b2a3b6e018c6d993c25db05dc77e4467134b3"></a>
+
+> 명시적 과거 기록: 2026-11-07 공통60 반영 전. [현재 현황](../STATUS.md) · [활성 계획](../PLAN.md). 본문은 당시 내용이며 보관 위치에 맞춰 상대 링크만 보정했습니다.
+
+# 인프라 현황 — 2026-11-07 09:31 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. **정확성 우선**이며 근거 누락·허위 상태·미수행 조치가 있는 빠른 답변은 실패다.11/10(화) 본격 논문 작성 전인11/9(월)까지 핵심 운용·검증 마감을 목표로 한다. 정확성을 유지하는60초 안팎/추가30초를 검증한다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-e5bd26f83fd0ff5e).
+
+
+
+<a id="source-2fe80c609495c562-h1"></a>
+<a id="record-90042a2ceedc464542e39ab1ef77b5ad50c03b259a89b797d9e5df30a1f597d5"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.109/common1.5.59/routing1.1.6·진단MCP1.2.8. SDK 현재 대기열을 실제 등록 target·시간 인자 없음·1조회 선택으로 제한 | 원본35B·권한·승인·FW/TTL·추론 옵션 변경0. 과거·원인·위험·변경 범위 유지 |
+| 최종 단문 채팅 | 새 질문 H16.476초/O17.272초·각1실제MCP/1모델·지표표 완료 | 원문SHA/정확target/KST/수치/게시표 구문 일치. 각1회·최근 채널문맥/공유GPU캐시 유지, 평균/p95·전후 인과 개선율 아님 |
+| 최종 복합 채팅 | H50.913초/O40.091초·각4필수읽기, 어제/오늘/현재unit/pipeline 확보. H 모델3회35.166초/O4회30.144초 | 양봇 partial. H 복구·기능 정상 미확인/후속 조치 모호, O 잘못된 재시작 주장 거절 후 근거표만 게시. 판단 완료까지60초 달성으로 세지 않음 |
+| 하트비트 수집 | 정상 PID의 새 신호를 오래된 시작시각+5초로 거절하던 원인 재현. 수정 전6회 중2회→후6회 중0회·채팅 지표 확보 | 실제 미래·만료·PID 불일치 검사는 유지. 검토285건은 실제 검토 상태이며 공격/실행실패285건이나 성능 측정값 아님 |
+| 운영 검증 |1,395고유PASS/skip0.09:25:03 B7파일 적용/22SHA·보호8·정지중설정/DB동일.09:26:13 양WS/worker·4서비스·두큐0/failed0·SDK20/review5receipt·15분독립원복확정 | C/A 이번 소스변경0.09:17 B최초드리프트0. 장기/새OS·공격/부하·UI전수 미시험 |
+| Git·정리 | 109소스·설치경로/현황·회귀 공개14파일433a5fc 게시·09:32:17 실원격main 일치. 이 확인 기록은 후속 문서 커밋으로 게시 | 서버fixture/Mac자체임시는 같은 활성 작업의 복합 보고 검증에 사용 후17:00마감 전 정리. Mac새패키지0. 기존 Ansible/NAT/토폴로지 변경 보존 |
+| 논문 선작성 | 이전본 보존·4.7 근거/해석/실행 분리,5.12.6 실채팅·실패/미완료 결과,5.13 정확성 선평가 방법·국영문초록 갱신.5.12.5 배치 순서 정정 | 기록된 common59 결과를 원장과 대조.109 새 시험은 아직 논문 수치에 편입하지 않음. 새PDF/전쪽 시각검수·제출확정·독립평가 미완료,논문Git제외 |
+
+
+[단일 현재 조회/실측/복구](../infra/hermes/pipeline-single-read.md) · [날짜·주장 검사/실측/복구](../infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](../infra/mcp/runtime-clock.md) · [단문 경로](../infra/hermes/pipeline-navigation.md) · [반복systemd 수정](../infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-5c8b9730d4efbebac767989263165a7cc669666bd4a32dad1346f21f558f44ad)
+
+<a id="source-2fe80c609495c562-h3"></a>
+<a id="record-4cef3968537fe86e331c3be68d3fb7252b360b5e0fec5366f9eb8d856e0ee8ff"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 최종59에서 달력 양구간과 현재unit/pipeline4읽기는 완료했다. 실제 H50.913/O40.091초는 판단 미완료 보고다. 다음은 잠금 실패와 재시작 행위 구분, inactive와 서비스 enablement 구분, 근거에 맞는 구체 후속 조치와 반복 모델 비용이다. O 단문 동일 수집본 중복은109의 실제 단일 호출로 보완했다. 필요 근거를 생략하거나 빠른 오답을 성공으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 11/7 09:15 KST 재개했다. 오늘17:00 KST 마감/16:40 신규변경 중단 후 검증·기록·게시·정리.11/9 핵심 운용·검증 마감 우선,11/10 논문 작성용 근거로 성공/실패/미확인·측정조건을 구분한다. 서버 상시 서비스는 유지한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-e5bd26f83fd0ff5e"></a>
+
+## STATUS-before-resume-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T09:32:11+09:00</summary>
+
+<a id="source-e5bd26f83fd0ff5e-h0"></a>
+<a id="record-4a84855bc347ef8287066ed8f35ab2ffa085dc2bf9c2fac72938f5fee3b2d8f5"></a>
+
+# 인프라 현황 — 2026-11-07 04:59 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-f9e96c6210e55d5a).
+
+
+
+<a id="source-e5bd26f83fd0ff5e-h1"></a>
+<a id="record-7d12ce044800b8000e50ad2275d443957df3790b26fa375acc201eb362c0e596"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.108/common1.5.59/routing1.1.6·진단MCP1.2.8. 단문 범위 통일, 대상별 수집시각, KST 어제·오늘 분리, 근거 없는 상태 해석 검사 보완 | 원본35B·권한·승인·FW/TTL 변경0. 일반 복합 판단의 정확한60초 목표 미완료 |
+| 최종 단문 채팅 | 새 질문 H19.851초/O20.120초·각 모델1회, 실제 MCP H1회/O2회·지표표 완료 | 원문SHA/KST/수치/게시표 구문 일치. O 동일 수집본 중복1회 잔여. 새 root이나 최근 문맥 유지, 평균/p95·완전 빈 세션 아님 |
+| 최종 복합 채팅 | H50.913초/O40.091초·각4필수읽기, 어제/오늘/현재unit/pipeline 확보. H 모델3회35.166초/O4회30.144초 | 양봇 partial. H 복구·기능 정상 미확인/후속 조치 모호, O 잘못된 재시작 주장 거절 후 근거표만 게시. 판단 완료까지60초 달성으로 세지 않음 |
+| 하트비트 수집 | 정상 PID의 새 신호를 오래된 시작시각+5초로 거절하던 원인 재현. 수정 전6회 중2회→후6회 중0회·채팅 지표 확보 | 실제 미래·만료·PID 불일치 검사는 유지. 검토285건은 실제 검토 상태이며 공격/실행실패285건이나 성능 측정값 아님 |
+| 운영 검증 |1,390고유PASS/skip0. B04:55:43 22SHA/보호8/SDK20·양WS/worker·3서비스·큐0/failed0·독립원복 확정. 배포 중 설정/DB 동일. A04:50:48 감시 A/B/C 수신·전송성공/알림대기0·failed0 | A reader→B→A final 호환 배포 후 B 공통59 확정. C 이번변경0. 장기/새OS 전체설치·공격/부하·UI전수 미시험 |
+| Git·정리 | 단문 b0d4497/영수증4136f63, 수집시각 b5e534d, 달력·주장 검사14파일 0b34ad2 커밋·푸시/실원격main 일치 확인. 이 문서는 게시 확인 후 작성한 후속 영수증 | 서버 자체fixture460파일/7,194,126B 제거·부재 확인. 자체Mac임시162파일/18,540,314B 제거·부재/잔여프로세스0 확인. 기존 Ansible/NAT/토폴로지 변경 보존 |
+
+[날짜·주장 검사/실측/복구](infra/hermes/calendar-service-review.md) · [수집시각·검증·복구](infra/mcp/runtime-clock.md) · [단문 경로](infra/hermes/pipeline-navigation.md) · [반복systemd 수정](infra/hermes/controller-contention.md). 현재 이후 복구는 최신 공통 변경부터 역순 검토하고 A/B 수집기 호환 순서를 따른다. 과거 실패 후보/원문/승인/운영DB와 복구본을 보존한다.
+
+
+
+<a id="source-0cd09f27eb93c1d9-h2"></a>
+<a id="source-2e3dff554929067d-h2"></a>
+<a id="source-39ab133ee97aa859-h2"></a>
+<a id="source-3a995fd08a9ea9a6-h2"></a>
+<a id="source-6315596a4cf4e319-h2"></a>
+<a id="source-8c103bea13856efc-h2"></a>
+<a id="source-8e4786f63f6ceded-h2"></a>
+<a id="source-9a18aa4d0dbec5b4-h2"></a>
+<a id="source-a6347e4a2e1e65bd-h2"></a>
+<a id="source-e5bd26f83fd0ff5e-h2"></a>
+<a id="source-f0feb692e888e61d-h2"></a>
+<a id="source-f9e96c6210e55d5a-h2"></a>
+<a id="record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](infra/mcp/fw-consolidation.md) · [웹](infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.12.5와 이전본 보존. 호스팅 없는 발표 PDF20쪽/메모685초·전쪽 시각검수. 단일deploy.sh 설치 경로 정합 검사 | 이번 후속 실측/최신논문PDF·제출형식·리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+<a id="source-e5bd26f83fd0ff5e-h3"></a>
+<a id="record-fc5dada3aed188ea9aeff9eb1f8c6aa2a55828aca79029ea5096bc86c0d5d66c"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 최종59에서 달력 양구간과 현재unit/pipeline4읽기는 완료했다. 실제 H50.913/O40.091초는 판단 미완료 보고다. 다음은 잠금 실패와 재시작 행위 구분, inactive와 서비스 enablement 구분, 근거에 맞는 구체 후속 조치와 반복 모델 비용이다. O 단문 동일 수집본 중복1회도 줄일 대상이다. 필요 근거를 생략하거나 빠른 오답을 성공으로 세지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 이번 단위는11/7 05:20 KST 마감 전에 배포·검증·기록·게시·임시 정리를 완료한다. 추가 변경/시험은 종료하고 사용자 재개 지시까지 대기한다. 서버 상시 서비스는 계속 운영한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-f9e96c6210e55d5a"></a>
+
+## STATUS-before-calendar-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T04:58:55+09:00</summary>
+
+<a id="source-f9e96c6210e55d5a-h0"></a>
+<a id="record-8facfa8ed62772763eb94fa27f570465faf65b9f3f8f36430f806b292983390f"></a>
+
+> 과거 기록 — 2026-11-07 날짜 비교 후속 적용 전 STATUS. 현재 상태는 루트 STATUS.md 참조.
+
+# 인프라 현황 — 2026-11-07 04:29 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-6315596a4cf4e319).
+
+
+
+<a id="source-f9e96c6210e55d5a-h1"></a>
+<a id="record-4b6dd26ccd803f8aa387d4bed8da9bf0402d3282be2dde0fc04bc373f0326d3f"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.108/common1.5.56/routing1.1.6·진단MCP1.2.8. 단문 대상·재시도 범위 통일과 대상별 수집시각 수정 | 모델·권한·승인·FW/TTL 변경0. 일반 원인·복합 조사60초 미완료 |
+| 실제 단문 채팅 | 다른 새 질문 H17.099초/O17.192초, 각1실제MCP·모델1회·지표표 완료 | 원문SHA/KST/수치 대조. 새 root이나 채널 최근 문맥 유지, 평균/p95·완전 빈 세션 아님 |
+| 하트비트 수집 | 정상 PID의 새 신호를 오래된 시작시각+5초로 거절하던 원인 재현. 수정 전6회 중2회→후6회 중0회·채팅 지표 확보 | 실제 미래·만료·PID 불일치 검사는 유지. 검토285건은 실제 상태이며 공격285건이나 실행실패285건 아님 |
+| 운영 검증 |1,380고유PASS/skip0·B22SHA/보호8/SDK20/review receipt·정지중설정/DB동일. A2소스 동기화, A 감시기 A/B/C 수신·알림대기0·전송성공, A/Bfailed0. B 양WS/worker·4서비스·큐0 | A reader→B→A final 순차 적용/독립원복 확정. C 이번변경0·장기/전체설치·공격/부하·UI전수 미시험 |
+| 복합 조사 | 관련 현재 지표·서비스 이력 연결·시간인자 규격/사실 검증 유지 |104 H66.578초/partial,103 O25.044초/runtimecompleted지만 의미 오류. 정확한60초 목표 미달 |
+| Git·정리 | 직전 단문 소스b0d4497·게시영수증4136f63 원격 일치 확인. 이번 수집시각 소스/문서 게시 마감 중 | 시험fixture/자체Mac임시 정리 예정. 기존 Ansible/NAT/토폴로지 별도 변경 보존 |
+
+[수집시각·검증·복구](infra/mcp/runtime-clock.md) · [단문 경로](infra/hermes/pipeline-navigation.md) · [이전 서비스 보고](infra/hermes/service-report.md) · [반복systemd 수정](infra/hermes/controller-contention.md). A/B 수집기 복구 순서는 수집시각 안내를 따른다.95 이후→94 복구 시 새 오류코드 수집기/보완 진단DB 유지 조건도 유효하다. 과거 실패/복구/원문 기록은 보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-6315596a4cf4e319-h3"></a>
+<a id="source-f9e96c6210e55d5a-h3"></a>
+<a id="record-5fe85979680fabc2eedeb15d7ae417653aa769d14e79bd8695d90cb5599e02fb"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 완료한 필수 읽기·호스트 결속을 유지하며 시점·속성값 검증과 실제 원인 코드·보고 정정을 보완한100의 실제 최종 판단은 양봇 partial이었고104 Hermes도66.578초/partial이었다. 기존 b:management-pipeline 연결과 단문 대상·재시도 구분은108에 반영했다. 다음은 일반 원인 조사에서 반복 선택·근거 없는 인과/조치 주장·보고 언어를 보완하고 다른 질문을 검증하는 것이다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 이번 작업은11/7 05:20 KST까지 마감한다.05:00 이후 신규 변경을 시작하지 않고 검증·문서·커밋/푸시·정리에 집중한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-6315596a4cf4e319"></a>
+
+## STATUS-before-runtime-clock-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T04:29:30+09:00</summary>
+
+<a id="source-6315596a4cf4e319-h0"></a>
+<a id="record-24a7e7797fbe4213d012ddd4adef061bd4f633563d860fa49bcc23bb341ecb71"></a>
+
+# 인프라 현황 — 2026-11-07 04:06 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-8e4786f63f6ceded).
+
+
+
+<a id="source-6315596a4cf4e319-h1"></a>
+<a id="record-d725c19c66ca0c0d5bd8950dfac1b4247ad9bbba3c9caed7906e44827fdb58f5"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.108/common1.5.56·진단MCP1.2.7·routing1.1.6. 서비스 이력/현재 처리 지표 연결·공통표·단문 범위 통일 | 모델·권한·승인·FW/TTL 변경0. 일반 원인·복합 조사60초 목표는 미완료 |
+| 단문 응답 | 108 새 동일문장 **Hermes17.272초/Ollama17.074초**, 각1실제조회·모델1회·지표표 완료.105 Hermes78.866초의 ‘조사’ 항목명 오분류 수정 | 107 재시도의 범위 유실도108에서 보완. 일부 채팅 지표는 미확인으로 유지. 각1회·평균/p95 아님 |
+| 원인 조사 | 등록 관련 현재 조회를 첫 묶음에 포함. 잘못된 time reference ID·수치 누락/소수점·근거 없는 정상종결 후보 규격 보완 |104 Hermes66.578초/partial,103 Ollama25.044초/runtimecompleted이나 재시도·후속행동 의미 오류. 빠른 오답을 성공에서 제외 |
+| 이전 진단 누락 보완 | B 정확 controller 실패코드219행 추가·기존664행 동일/삭제0·비root MCP확인 | 원본journal/DB백업 보존. 전체 이력 무손실·A/C 이번배포를 의미하지 않음 |
+| 근거·표 | 전송/실행/기한초과/검토 상태/채팅 대기 분리. 부족한 값은 미확인 유지. 검토285건은 공격285건 아님 |정상 PID 신호를 오래된 수집 시작시각+5초와 비교해 거절하는 오류를 실제6회 중2회 재현. 수집시각 보완 착수·아직 미배포. UI전수 미검증 |
+| 검증·운영 |1,345고유PASS/skip0·21SHA/보호8/SDK20·review receipt·정지중설정/DB동일.04:04 양WS/worker·3서비스active·Bfailed0·큐0·독립원복확정 | 새OS 전체설치·공격/부하·다중사용자/평균/p95 미시험 |
+| Git·정리 | 108 소스·문서24파일 `b0d4497` 푸시·실원격main 일치 확인. 게시 영수증 갱신 중 | 서버fixture/자체Mac임시 정리 전. 기존 Ansible/NAT/토폴로지 별도 변경 보존 |
+
+[현재 대기열 조회 연결](infra/hermes/pipeline-navigation.md) · [이전 서비스 보고](infra/hermes/service-report.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 복구본 `/var/lib/capstone-service-report/20261107-gate94`~100을 보존한다.95 이후→94 복구에는 새 오류코드 수집기와 보완한 진단DB를 유지한다. 보고 단계만 추론을 켠 비공개52.979초 시험은2,048토큰을 소진하고 최종 JSON을 완성하지 못해 비채택했다. 운영 추론 설정 변경은 없다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+
+[이미 보존한 동일 내용으로 이동](#record-5fe85979680fabc2eedeb15d7ae417653aa769d14e79bd8695d90cb5599e02fb)
+
+</details>
+
+<a id="source-8e4786f63f6ceded"></a>
+
+## STATUS-before-pipeline-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T04:11:07+09:00</summary>
+
+<a id="source-8e4786f63f6ceded-h0"></a>
+<a id="record-fc18e29b89436207346ee014bbbefbb948cea243665e120d2d86cd88040f4bf7"></a>
+
+# 인프라 현황 — 2026-11-07 02:59 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-ef8860920cc8c49f).
+
+
+
+<a id="source-8e4786f63f6ceded-h1"></a>
+<a id="record-ca893ffad31ee50f05c1d2780b1cb7c67df14c2748835abd7bb76bbdaa6a2f00"></a>
+
+## 이번 작업과 검증 상태
+
+| 항목 | 확인 결과 | 한계·남은 작업 |
+|---|---|---|
+| 현재 반영 | query1.19.100/common1.5.52·review routing1.1.5·진단MCP1.2.4. 완료한 실제 읽기 뒤 보고 입력/정정 비용 축소·조회 대상 제약 안내 | 모델/권한/승인/FW/TTL 변경0.최종100 실제 새 채팅: Hermes84.943초/Ollama39.992초. 둘 다 최종 판단 미완료 |
+| 진단 원인 누락 | B controller의 정확 JSON 실패 코드219건을 새로 색인. 고정 unit/JSON/failed만 분류 | deferred·임의 JSON/다른unit은 오류로 승격하지 않음. A/C 운영 배포는 이번 범위 아님 |
+| 이력 보존 | 고정24h backfill219행 추가, 기존664행 동일·삭제0/DB quick_check·비root MCP조회 확인 | 원본journal/DB백업 보존. 전체 journal 무손실·전체 오류 건수의 증명 아님 |
+| 정확성 | 과거 실패 메타데이터/프로세스 속성만으로 정상·복구 종결하는 구조화 주장도 검사. oneshot 종료·현재/과거 속성·재시작 부재·상태쌍 검증.96 SDK/97 Hermes 실제 오답을 새 검사에서 거절 | 좁은 주장 검사 통과만으로 전체 의미 정확성을 보장하지 않음. 근거 없는 인과관계/다음 조치 단정과 같은 수집본 반복조회 잔여 |
+| 표시·비용 | 실제 오류코드/현재상태/시각·표본 범위 공통표, 반복시각·이전 오답 재주입 감소. review 제어줄은 공개출력에서 제거/감사원장 보존 | 전체 장비·UI 전수 검증 아님. 전체 영수증·필수 읽기·해시·신선도 검증 유지 |
+| 이전 후보 실측 | Hermes96 61.320초는 근거와 한계를 설명했지만 최종 기능상태 미확인. Hermes97 61.922초/Ollama96 22.892초·97 23.835초는 의미 오류 | 오답을 빠른 성공으로 세지 않음. 교차검토는 별도이며100의 후속 검토 root149.312/254.858초 |
+| 검증·운영 | 고유1,322PASS/skip0·21SHA/보호8/SDK20sources·정지중DB/설정 동일·독립 복구본·02:59 양봇WS/worker·3서비스active/Bfailed0·큐0 | gate64,726B/상한65,536. 새OS 전체설치·공격/부하·다중사용자 평균/p95 미시험 |
+| Git·정리 | 공개24파일 소스 `ebcb8b7` 커밋·푸시/실원격main 일치(03:00 KST). 이 게시 영수증은 후속 커밋으로 반영 | 서버 시험459파일·Mac 임시132파일/42,557,983B 제거·부재 확인. 기존 Ansible/NAT/토폴로지 별도 변경 보존 |
+
+[수정·실측·복구](infra/hermes/service-report.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 복구본 `/var/lib/capstone-service-report/20261107-gate94`~100을 보존한다.95 이후→94 복구에는 새 오류코드 수집기와 보완한 진단DB를 유지한다. 보고 단계만 추론을 켠 비공개52.979초 시험은2,048토큰을 소진하고 최종 JSON을 완성하지 못해 비채택했다. 운영 추론 설정 변경은 없다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-8e4786f63f6ceded-h3"></a>
+<a id="record-3b4d082cd8770c4e514051ff04b1101a206fd4ba90cfd3ca59fd2689af1922ee"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 완료한 필수 읽기·호스트 결속을 유지하며 시점·속성값 검증과 실제 원인 코드·보고 정정을 보완한100의 실제 최종 판단은 양봇 partial이었다. 기존 b:management-pipeline의 대상 발견·unit/처리상태 구분을 먼저 보완하고 반복 모델 호출과 다른 질문을 검증한다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 이번 작업은11/7 05:20 KST까지 마감한다.05:00 이후 신규 변경을 시작하지 않고 검증·문서·커밋/푸시·정리에 집중한다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-ef8860920cc8c49f"></a>
+
+## STATUS-before-service-report-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T03:00:24+09:00</summary>
+
+<a id="source-ef8860920cc8c49f-h0"></a>
+<a id="record-65c16ab032ca27ee817bf66b8f83c4f18745ae6cae20b68becf4b6de3e25bc45"></a>
+
+<!-- 과거 기록: query89/common44 시점. 현재 상태는 ../STATUS.md 참고. -->
+
+# 인프라 현황 — 2026-11-07 00:40 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-af8d2c2f27331fdf).
+
+
+
+<a id="source-ef8860920cc8c49f-h1"></a>
+<a id="record-ce4c2e677f15775c56a9ab1b35f8a061b310faeef42d693268592735d95db850"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 확인 결과 | 남은 문제·검증 한계 |
+|---|---|---|
+| 현재 반영 | query89/common44. 과거/현재 종료값·실제 서비스 속성 대조, 질문별 지침 연결, peer 진단 검사 | 모델/권한/승인/FW/TTL 변경0. 진단MCP1.2.3·security-events1.3.2 유지 |
+| 실제 채팅(query88) | Hermes64.370초·Ollama47.133초 | 둘 다 의미 정확성 실패. SDK completed 표시도 성공으로 세지 않음. 정확한60초 미완료 |
+| 잘못된 상태 주장 | SDK가 실제 activating/start를 inactive/dead로 설명 | 최종89 운영에 실제 영수증 재현하여 거절 확인.89 새채팅 시간 미측정 |
+| 교차검토 | Ollama83.749초/상태 해석 거절, Hermes215.168초/미완료 | 첫 응답과 별도 worker 시간. 합의/정확성 성공으로 표시하지 않음 |
+| 필수 근거 | Native현재·11/6이력2읽기/SHA/target/unit/기간/완료당시신선도/쓰기0 독립확인 | 과거20표본/has_more·상세원인미확인. 프로세스 상태≠기능 정상/사건 종결 |
+| 검증·운영 | 고유1,232PASS/skip0·18SHA/보호8/SDK20sources·정지중DB/설정 보존·양WS/worker·3서비스active·Bfailed0·원복확정 | 새OS 전체설치·실제공격/부하·UI전수·평균/p95 미시험. gate64,110B/상한65,536 유지 |
+| 정리·Git | 자체 서버 시험본459파일 제거/부재확인, 운영DB/원문/trace/채팅/복구 보존 | Mac 자체 임시33파일 12,836,128B 제거/부재확인. 공개20파일 `4554c1c` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 기록 |
+
+[수정·실측·복구](../infra/hermes/diagnostic-navigation.md) · [수치 원장](../infra/hermes/diagnostic-navigation.validation.json) · [단순 비교](../infra/hermes/systemd-comparison.md) · [반복 systemd 수정](../infra/hermes/controller-contention.md). 복구본 `/var/lib/capstone-service-semantics/20261107-gate89` 및 이전87/88/86 보존. 종료값 검증 오탐이 이전partial에 기여한 정정도 기록했다.
+
+
+
+<a id="source-0ca2531003046a01-h2"></a>
+<a id="source-1233d8b203cd8eb8-h2"></a>
+<a id="source-17c2cec7702ab8ff-h2"></a>
+<a id="source-241c17b126f0f67d-h2"></a>
+<a id="source-2c2e913c2257a2b7-h2"></a>
+<a id="source-361550c8afc0e994-h2"></a>
+<a id="source-4c9b48cff99b2302-h2"></a>
+<a id="source-636e864e6d556704-h2"></a>
+<a id="source-655dd5ebf759089c-h2"></a>
+<a id="source-66c76947289ed40f-h2"></a>
+<a id="source-7da751b04634e30c-h2"></a>
+<a id="source-9dfb993f2737d8a4-h2"></a>
+<a id="source-a8a0f12ef0526826-h2"></a>
+<a id="source-af8d2c2f27331fdf-h2"></a>
+<a id="source-b016ec30d558b604-h2"></a>
+<a id="source-ebfa7513628adfd3-h2"></a>
+<a id="source-ef4b3ab1f7472a16-h2"></a>
+<a id="source-ef8860920cc8c49f-h2"></a>
+<a id="record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107"></a>
+
+## 그 밖의 운영 현황
+
+| 영역 | 마지막 확인 범위 | 남은 범위 |
+|---|---|---|
+| FW·웹 경로 | NAT/IPv4 확정, HTTP Wazuh→HTTPS308·웹50r/s/동시50·429 보호, 차단 사유/FW IP·조건 표 반영.21:22 A/B/C failed unit0·IPv6수신0·A4테이블17체인102규칙 | capstone_fw 추가통합은 사용자 취소. 전체 DDoS/egress/모든 관리 경로·장기 재부팅 검증 별도. [FW](../infra/mcp/fw-consolidation.md) · [웹](../infra/validation/web-traffic/README.md) |
+| Mattermost 표·단문 | 재개 후 실제 카드1표/양봇 각4표·코드블록0. 새 FW질문 Hermes12.097초/Ollama13.958초 각1회·102규칙 일치 | 공개 HTTPS/모바일/모든 과거 글·활성 차단 표·평균 지연 전수 미검증. [표·사유](../infra/mcp/containment-display.md) |
+| DNS·저장·호스트 | 지정230→168.126.63.1:53 및 정보성SID2만 예외, 원문16→native100115/level0 확인. 도메인/악성DNS 광역 면제0 | WAF 원문offset/수집 시점·세대/장기 연속성·전체 복구 검증 잔여. [DNS](../infra/validation/dns-noise/README.md) |
+| 웹 근거·필수 읽기 | 실제 등록 대상/agent와 호스트·백엔드 읽기 연결. 과거 DVWA1행 MCP 복구/정제14,143행·구간/서비스 우선 검색, 정확 사건 시각/인자 검증 | 최근/보관 표본은 전체 무손실이나 침해 부재 증명이 아님. 일부 과거구간0행·파싱 제외9·연속성 미확인. [이력 조회](../infra/mcp/web-history.md) |
+| 공개 웹·대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM MCP→600초FW/카드→만료/302복구 | 실제 Log4 앱503/등록 HTTP3개 중지·다른 공격/유지/해제/재차단·사건 종결 미완료. [단일 E2E](../infra/validation/web-e2e/README.md) |
+| PCAP·룰 중복 | 새7PCAP/정답PDF2 양Kali 동일SHA,232의100,006패킷·97정상/3공격HTTP와600초 차단/만료 확인. 추가압축5종은 보관/설명만 | 공격시험 중단 유지. IDS7쌍 격리14조건/Wazuh8쌍 확인은 운영룰 통합 완료가 아님. [PCAP](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) · [룰](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·설치 | 논문5.12.5와 이전본 보존. 호스팅 없는 발표 PDF20쪽/메모685초·전쪽 시각검수. 단일deploy.sh 설치 경로 정합 검사 | 이번 후속 실측/최신논문PDF·제출형식·리허설·미사용176 독립평가·새3VM 전체 설치 잔여. [설치](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+<a id="source-ef8860920cc8c49f-h3"></a>
+<a id="record-bb8db93e0e1e79216809ed83ccf1e342599e55df59c9347d2abc0cdf6849e088"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 완료한 필수 읽기·호스트 결속을 유지하며 시점·속성값 검증을 유지하며 실제 근거/지침의 중복 입력과 보고 정정 비용을 줄이는 후보를 다른 사건·새 채팅에서 검증한다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-af8d2c2f27331fdf"></a>
+
+## STATUS-before-service-semantics-20261107.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-07T00:42:48+09:00</summary>
+
+<a id="source-af8d2c2f27331fdf-h0"></a>
+<a id="record-186b32b2c8c5ff7b49ed0196fc83289c2dfc06605feeffb18781a2db9d8aa937"></a>
+
+# 인프라 현황 — 2026-11-06 23:58 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 정확한 최종 답변60초 안팎이 우선이며30초는 추가 목표다. 단순 비교는 달성 사례가 있으나 일반 원인 조사60초는 미완료다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-1233d8b203cd8eb8).
+
+
+
+<a id="source-af8d2c2f27331fdf-h1"></a>
+<a id="record-52a49ec48d478dcc4d484b6a0ff510adc2d4f2a2ff4de774e945c6027c8c43e2"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 확인 결과 | 범위·남은 문제 |
+|---|---|---|
+| 단순 이력/현재 비교 | 직전 Hermes25.532초·Ollama22.266초, 각4읽기 | 원인·위험 판단과 구분. 각1회이며 평균/p95 아님 |
+| 서비스 원인 질문 | 최신 Hermes74.516초·Ollama66.520초 | 둘 다partial. oneshot/NRestarts/종료값·수집 시각 해석과 보고 정정 잔여. 정확한60초 미달 |
+| 필수 근거 | 실제 등록25서비스/명시 기간의 현재·과거 읽기 결속. Native두읽기·SHA/기간/신선도·쓰기0 독립확인 | SDK 실패 영구요약은 호출/시간/해시만 보존되어 전체 사후감사와 구분 |
+| 반영 | query86/common41: 필수 읽기·진단 감사5000자잘림 수정·제한 조회 추론 none | 공격/위험/대응/승인/복구/재시작은 추론 최적화 제외. 모델/권한/승인/FW 유지 |
+| 검증·운영 | 고유1143PASS/skip0, B18SHA/보호8·양WS/worker·3서비스active·Bfailed0 | DB/설정 보존·SDK20sourceSHA·독립15분원복 확정. 새OS전체설치/실제공격/UI전수 미실행 |
+| 정리·Git | 서버 자체시험457파일7,057,881B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시35파일 5,426,876B 제거/부재확인. 공개20파일 `a63e4a2` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 관리 |
+
+[수정·실측·복구](../infra/hermes/diagnostic-navigation.md) · [수치 원장](../infra/hermes/diagnostic-navigation.validation.json) · [단순 비교](../infra/hermes/systemd-comparison.md) · [반복 systemd 수정](../infra/hermes/controller-contention.md). 진단MCP1.2.3·security-events1.3.2·게이트65,200B·원본35B/학습/FW/TTL/권한/승인정책 유지. 실제응답은 게시→최종게시수정, 교차검토는별도(Ollama86.069초·partial). 시험중inline경로오류·provider schema로인한추론미적용과수정근거도보존했다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-af8d2c2f27331fdf-h3"></a>
+<a id="record-44a8a98d0a3690864a0cccf21a41192ed246b4dfe6101a45873ceea115b3495b"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 완료한 필수 읽기·호스트 결속을 유지하며 서비스 속성·종료값·관측 시각 해석과 보고 정정 비용을 보완해 다른 사건·새 채팅에서 검증한다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-1233d8b203cd8eb8"></a>
+
+## STATUS-before-service-history-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T23:59:16+09:00</summary>
+
+<a id="source-1233d8b203cd8eb8-h0"></a>
+<a id="record-c534eef25ceeb8d9e41a7ac17c869a1ec4c8453a108ed2144a10c138e134639e"></a>
+
+# 인프라 현황 — 2026-11-06 23:00 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 우선 목표는 정확한 최종 답변60초 안팎, 추가 목표30초다. 단순 이력/현재 비교는 아래 실측에서 달성했고 일반 원인·위험 조사는 아직 미달이다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-f0feb692e888e61d).
+
+
+
+<a id="source-1233d8b203cd8eb8-h1"></a>
+<a id="record-8f739e4fc8d43f9f5c87b89b3040a23aedde188064a1b082d82b9bd5c718228b"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 확인 결과 | 범위·남은 문제 |
+|---|---|---|
+| 단순 이력/현재 비교 | 직전 실제 Hermes25.532초·Ollama16.746초, 각4조회·2표 | 각1회, 원인·위험 판단과 구분. 최신 common39 Ollama22.266초·4읽기·2표·쓰기0/근거 일치 확인 |
+| 원인 조사 재시험 | Hermes98.498→142.936초, 두 번 모두 품질 실패 | 현재 서비스 대상은 회복, 과거 진단 누락·무관 검색2회·보고 정정 잔여. 일반60초 미달 |
+| 교차검토 | 직전/후속 Ollama worker73.546/72.623초·모두partial | 해당 사례의 근거 대조 미완료, 합의·원인 해결로 세지 않음 |
+| 반영 | common1.5.39·진단1.2.3: 현재/과거 설명과 실제25서비스 target 안내 정정 | 도구 실행/권한/검증/결과 불변. 안내 정정이며 속도 향상 입증 아님 |
+| 검증·운영 | 관련716PASS·skip0, B17파일SHA/보호8·양봇WS/worker·3서비스active·Bfailed0 | 4파일 변경·SDK20sourceSHA·독립15분원복확정. 기존단일deploy.sh 연결, 새OS 전체 설치 미실행 |
+| 정리·Git | 서버 자체시험456파일7,026,948B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시16파일 4,107,310B 제거/부재확인. 공개13파일 `776a475` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 관리 |
+
+[안내 정정·실측·복구](../infra/hermes/diagnostic-navigation.md) · [수치 원장](../infra/hermes/diagnostic-navigation.validation.json) · [직전 비교](../infra/hermes/systemd-comparison.md) · [반복 systemd 수정](../infra/hermes/controller-contention.md). query82·security-events1.3.2·게이트65,345B·모델/학습/FW/TTL/권한/승인정책은 유지한다. 실제 응답 지연은 게시 시각→최종 게시 수정 시각이며, 뒤따른 교차검토 시간은 별도다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-1233d8b203cd8eb8-h3"></a>
+<a id="record-917dd142021ed7fb07a71c5b1e6a3dc9c04d674650adf4f57d4986dff0cd7df2"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 등록 서비스의 현재/과거 필수 읽기·호스트 결속·무관 조회와 보고 정정 비용을 보완해 다른 사건·새 채팅에서 검증한다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-f0feb692e888e61d"></a>
+
+## STATUS-before-diagnostic-navigation-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T23:04:38+09:00</summary>
+
+<a id="source-f0feb692e888e61d-h0"></a>
+<a id="record-e1388bdf5c723f0ae199a58cf3918e6bb52da5217d62898b4c2455cc3846a7e6"></a>
+
+# 인프라 현황 — 2026-11-06 22:36 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 우선 목표는 정확한 최종 답변60초 안팎, 추가 목표30초다. 단순 이력/현재 비교는 아래 실측에서 달성했고 일반 원인·위험 조사는 아직 미달이다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-a6347e4a2e1e65bd).
+
+
+
+<a id="source-f0feb692e888e61d-h1"></a>
+<a id="record-a8c0d17d86d396e6b95ae5aada348d828190ffce436e09e1f153fea31033e218"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 실제 Hermes 채팅 |25.532초·진행0.907초·MCP4조회 합1.544초 |같은 오늘 systemd 경보/현재 비교. 과거 표본10건+ABC 현재 모두 확인, completed·2표·쓰기0. 이전126.313초는 판단 오류로 partial |
+| 실제 Ollama 채팅 |16.746초·진행0.375초·MCP4조회 합1.451초 |다른 표현의 새 질문, completed·범위 누락0·2표·쓰기0. 원인·영향 판단 완료를 뜻하지 않음 |
+| 개선 |query82/common38: 실제 읽기 원장/SHA·기간/필터·ABC·신선도 검증 후 공통 사실 표 |추가 모델 재서술/정정만 생략. 태그 경계 보완·생략 기본limit·좁힌 schema의 빈 enum 수정. 원인/위험/복구/특정·추가 대상/시간/필터는 일반 조사 유지 |
+| 검사·설치 연결 |고유1,230PASS·skip0:482/244/391/43/70 |기존deploy.sh 복사·SHA·게이트65345B<65536. 새 의존성/포트/키0, 새 OS 전체 설치 미실행 |
+| 운영·복구 |관리자231경유 B16파일/보호8SHA·양봇WS/worker·3서비스active·Bfailed0 |최종82c 복구본 보존, 독립15분원복확정/timer비활성/no-op. 중간재연결ready false는 다시 관측해 확인, 추가 재시작으로 숨기지 않음 |
+| 실패·실측 한계 |구조화 생성3후보200.378/83.237/66.147초 모두 품질실패·미채택. 초기채팅Hermes79.947초 partial, Ollama7.399초 HTTP400 |각수정후새채팅으로검증. 단1회/공유GPU/질문표현차이이며평균·p95·SLA아님. 신규API표본문확인/데스크톱AX본문미노출로UI전수미검증 |
+| 정리·Git |서버 자체시험3,648파일56,167,515B와private실행8파일제거·부재확인 |DB/trace/prompt/terminal/채팅/복구보존. Mac자체임시52파일 정리/부재확인. 공개20파일 `9a5eb37` 커밋·푸시/실원격main일치. 이 게시 영수증은 후속 커밋으로 관리 |
+
+[동작·실측·실패 후보·복구](infra/hermes/systemd-comparison.md) · [수치 원장](infra/hermes/systemd-comparison.validation.json) · [이전 무손실 입력](infra/hermes/event-input-view.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 모델/추론서버·학습·FW/TTL·MCP권한·승인정책 변경0. 단순 비교 성공으로 복합 원인/위험 조사60초나 전체 관제 완료를 선언하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-f0feb692e888e61d-h3"></a>
+<a id="record-3898c175e1bee50d1b13af87d9dd7e188f99a6d0d29c5dfb49ff96a231310610"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 일반 복합 판단 정확성·60초 안팎 | 단순 오늘 systemd 이력/현재 비교는 Hermes25.532/Ollama16.746초에 완료했다. 원인·위험 판단은 필수 근거·호스트 결속·후속 조사와 보고 정정 비용을 보완해 다른 사건·새 채팅에서 검증한다. 제한된 비교1회 성공을 전체 복합 조사나 평균/p95 성과로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-a6347e4a2e1e65bd"></a>
+
+## STATUS-before-systemd-comparison-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T22:40:01+09:00</summary>
+
+<a id="source-a6347e4a2e1e65bd-h0"></a>
+<a id="record-9d7eef8e21c963cb6e1b1e34bdf96eb47a59250c50d040d5b75643cc5792406c"></a>
+
+# 인프라 현황 — 2026-11-06 21:40 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 복합 응답의 우선 목표는 **정확한 최종 답변60초 안팎**, 추가 목표30초다. 아직 미달이다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-0cd09f27eb93c1d9).
+
+
+
+<a id="source-a6347e4a2e1e65bd-h1"></a>
+<a id="record-a345bf2f85d40770cf581ccc4adc17d305043f96e4c13e1f7d87345a5d0f26a3"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 무손실 경보 입력 | query81/common37: Wazuh/IDS/WAF 반복 필드를 모델 요청에서 한 번만 표시. Native·SDK 공유 | 원문/감사·전체 JSON값/타입/행순서·미확인 범위 보존. 실제 이전50행26,666→5,504B(79.4%). 응답시간79.4% 개선이라는 뜻 아님 |
+| 회귀·설치 연결 | Native482/SDK235/query391/설치43/review70=고유1,221PASS·skip0 | 기존deploy.sh 소스 복사·SHA·관리 게이트65266B. 새 의존성/포트/키/오프라인 바이너리0, 새 OS 전체 설치 미실행 |
+| 운영 반영·복구 | 관리자231경유 B21:35 반영/21:36 확정,16파일/보호8SHA·변경13 | 양봇 연결/worker·실제3서비스active·B failed0. 독립15분원복 타이머 해제·확정no-op·복구본 보존 |
+| 실제 채팅 재시험 | 같은 질문 새 대화126.313초/진행0.117초, 첫선택13.884초/MCP4조회2.677초 | 원본35B·기존 추론강도. 호스트 오인·복구 주장 정정 실패→partial/needs_review·근거 표만 반환. 정확성·60초 미달 |
+| 직전 비교 |143.304초도 품질 실패; 이전50행/이번10행 | 각1회·공유GPU·입력 표본 차이. 시간 차이를 순수 성능 개선율로 계산하지 않음. 단순 조회10~21초와 구분 |
+| Git·정리 | 공개17파일 `2257a6c` 커밋·푸시/실원격main 일치. 이 게시 영수증은 후속 커밋으로 관리 | 서버 시험912파일14,255,765B 제거. DB/trace/prompt/terminal/복구 보존. Mac 자체20파일12787746B 제거·부재 확인; 원본/복구 보존·게시 확인 |
+
+[이번 동작·실측·한계](infra/hermes/event-input-view.md) · [보고 검사80/복합 범위36](infra/hermes/chat-report-guard.md) · [단순 조회](infra/hermes/chat-read-latency.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 모델·추론강도·학습·FW/TTL·MCP권한·승인 정책은 변경하지 않았다. 비공개 조회71.763초도 정확성 실패이며 실제 채팅 성공으로 세지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-a6347e4a2e1e65bd-h3"></a>
+<a id="record-c771741359b27c6891714301cb7ed0342271d1c8da1a4ef532d1b1b760e24924"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 정확성·60초 안팎 | 현재81/37에서 입력 반복을 줄였으나 실제126.313초·판단 오류로 미달. 단순 이력/현재 비교의 추가 생성 생략을 검토하고, 원인/위험 판단은 실제 근거·필수 범위·호스트 결속과 보고 정정 비용을 보완한다. 두 범위를 구분해 새 채팅에서 검증한다. 단순 조회10~21초를 복합 조사 성공으로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-0cd09f27eb93c1d9"></a>
+
+## STATUS-before-event-view-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T21:42:22+09:00</summary>
+
+<a id="source-0cd09f27eb93c1d9-h0"></a>
+<a id="record-146fff0447992d82c6c7add87948c376bd559872a3d26cdc8372e8a19971d634"></a>
+
+# 인프라 현황 — 2026-11-06 21:15 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 복합 응답의 우선 목표는 사용자 지시에 따라 **60초 안팎**, 추가 목표30초다. 정확한 최종 답변 기준으로 아직 미달이다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-8c103bea13856efc).
+
+
+
+<a id="source-0cd09f27eb93c1d9-h1"></a>
+<a id="record-c2f893f9cc807afa9ddba3c44ae8fc724f4b91ae383cb67e970b24f4d1b39a39"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 보고 검사 수정 | query80: 자체 표/모델의 연결된 부정문 오검출 제거; 현재 snapshot만으로 정상·복구/재시작·단위 없는 전체 건수 주장 검사 | 불필요 재작성 원인을 제거했다. 모든 자연어·판단 오류 검출은 아님 |
+| 복합 요청 분류 | common36: ‘오늘 오류·현재 상태 비교’, 과거/반복 실패·원인 질문을 현재 진단만으로 축소하지 않음 | 현재 단순 상태/FW·규칙 조회 경로 유지. 실제 재시험에서 Wazuh+ABC4조회 확인; 최종 모델 판단 검증 별도 |
+| 회귀·설치 연결 | Native476/SDK235/query391/설치43/review70 = 이번 고유1,215PASS·skip0 | 이전 변경 없는 MCP82는 별도. deploy.sh 기존 소스 복사 경로, 새 OS 전체 설치 미실행 |
+| 운영 배포·복구 | 관리자231 경유 B:80→common36, 최종16파일/보호8SHA.21:09 확정·rollback no-op·타이머 해제 | 양봇 연결/worker·4서비스·B failed0. review5/SDK20 설치 영수증 SHA 일치. 실제 수동 원복/공격 E2E와 구분 |
+| 실제 채팅 | 분류 수정 전63.050초/진행0.455초, 과거 경보 누락으로 실패 | 수정 후 같은 질문 새 대화143.304초/진행0.092초. Wazuh+ABC4조회/MCP1.459초. 모델 호스트·복구 추정/정정 실패로 근거 표만 반환(partial), 품질·60초 미달 |
+| 보고 속도 후보 | 비공개171.418/48.903/45.339/210.105초 모두 비채택 | 짧은 후보도 내용 오류로 실패. low 후보는 length/이어쓰기·예산 종료. 운영 모델·추론 프로필 변경0 |
+| Git·정리 | 공개20파일 `f468ce6` 커밋·푸시/실원격main 일치. 이 게시 영수증은 후속 커밋으로 관리 | 서버 시험2,273파일35,946,985B 제거. DB/trace/복구 보존. Mac 자체35파일9533149B 제거·부재 확인 |
+
+[보고 검사·실측·한계](infra/hermes/chat-report-guard.md) · [이전 범위79](infra/hermes/chat-read-scope.md) · [단순 조회10~21초](infra/hermes/chat-read-latency.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 학습·FW/TTL·MCP 권한·승인 정책은 변경하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-0cd09f27eb93c1d9-h3"></a>
+<a id="record-8b8efe067e0183fecae4595aadd856348ae1fc2791127101b804cd5b486ba944"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 정확성·60초 안팎 | 실제63.050초는 과거 경보 누락으로 실패. 공통36에서 조회 범위를 수정했으나 모델 주장 정정으로60초 초과. 정확한 근거·판단을 유지하며 입력/출력 비용과 재작성·관측 범위 결속을 보완하고 실제 새 대화로 검증한다. 단순 조회10~21초를 복합 조사 성공으로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-8c103bea13856efc"></a>
+
+## STATUS-before-chat-report-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T21:16:06+09:00</summary>
+
+<a id="source-8c103bea13856efc-h0"></a>
+<a id="record-6ebc5458608649ad6591255dace86cd903b68d9a118d1f850ad5adf387bbccbb"></a>
+
+# 인프라 현황 — 2026-11-06 20:34 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 복합 응답의 우선 목표는 사용자 지시에 따라 **60초 안팎**, 추가 목표30초다. 둘 다 정확한 최종 답변 기준으로 미달이다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-9a18aa4d0dbec5b4).
+
+
+
+<a id="source-8c103bea13856efc-h1"></a>
+<a id="record-b0e12f72ff689de351980d42683a236b97f2175273516fb3ab918dce4f4c90f8"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 시간·첫 검색 보완 | query79/common35: 최종 Native 시간 제약 복원, 초기 임의 ID/IP 필터 제한, ‘오늘’ KST 구간 결속 | 같은 turn·등록 권한·좁혀진 대상 유지. 더 구체적인 기간/목적지·다중 IP는 기존 해석 유지 |
+| systemd 경보 검색 | security-events1.3.2의 Wazuh `program_name=systemd` 정확 필터 | 실제 등록7읽기/호출 성공. 새 권한/패키지/포트 없음. 제한 표본·전체 건수 미확인 유지 |
+| 회귀·설치 연결 | Native469/SDK233/query391/MCP82/설치43/review69 = 고유1,287 PASS·skip0 | 최종 Native40시간조합 포함. 기존 deploy.sh/source_bundle 사용, 새 OS 전체 설치 미실행 |
+| 운영 배포·복구 | 관리자231 경유 B15파일, 보호8SHA 유지.20:13 배포·20:18 확정/no-op·원복 타이머 해제 | 20:32 양봇 연결/worker·4서비스/B failed0·자체 probe0. 실제 수동 원복·공격 E2E와 구분 |
+| 실제 복합 채팅 | 게시→최종95.209초, 진행 표시0.820초; MCP2회 약1.1초 | 오늘 구간/40704검색 성공. B/C 현재 상태 누락·B의 수집 경보를 A로 오인·unit0에서 정상/복구 추정. **품질 실패·60초 미달** |
+| 후보 비교 | 비공개178.971/54.225/89.053/214.215/84.191초 모두 비채택 |54초도 잘못된 IP 필터와 과장 판단으로 실패. 별도1건은 gate 크기 제한으로 모델 시작 전 거절.84초 후보의 마지막 부정 문장 오검출도 다음 수정 대상. 공개 채팅 시간 아님 |
+| systemd 실패 구분 | 이전 예약 잠금 충돌 수정 유지. 이번 r4 시험 wrapper가20:00에 크기 제한으로 종료 | 운영 관리 서비스 재발로 세지 않음. 시험 실패 기록 보존·해당 unit reset-failed 후 B failed0 확인 |
+| Git·정리 | 이번79 공개22파일 `77ef655` 커밋·푸시/실원격main 일치 확인. 게시 영수증은 후속 커밋으로 관리 | 서버 자체918파일·Mac61파일 제거/부재 확인. 운영 복구본/DB/trace 보존 |
+
+[조회 범위·실측·한계](infra/hermes/chat-read-scope.md) · [이전 단순 조회10~21초](infra/hermes/chat-read-latency.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 등록32조합 검증을 최종 Native provider 검증으로 확대했던 해석은 후속 문서에서 정정했다. 모델·추론 프로필·FW/TTL·승인 정책·학습은 변경하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-8c103bea13856efc-h3"></a>
+<a id="record-afad71a79ac651364fb6e61349268fc125e9eec50596ff68c6e529dea5a3c04b"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 정확성·60초 안팎 | 실제 채팅95.209초는 목표와 품질 모두 실패. MCP 약1.1초 대비 최종 모델 답변 약67초. 필수 대상·수집 주체/대상 결속·unit0/복구 주장 검사와 입력/출력 비용을 개선하고 새 대화의 왕복으로 검증한다. 단순 조회의10~21초를 복합 조사 성공으로 대체하지 않는다. |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-9a18aa4d0dbec5b4"></a>
+
+## STATUS-before-chat-scope-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T20:33:58+09:00</summary>
+
+<a id="source-9a18aa4d0dbec5b4-h0"></a>
+<a id="record-f3aa2206acca70b33fbf53a889b918ab3dda6f2ab1fc8167ce326b427cd22d71"></a>
+
+# 인프라 현황 — 2026-11-06 19:35 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-2e3dff554929067d).
+
+
+
+<a id="source-9a18aa4d0dbec5b4-h1"></a>
+<a id="record-08812447616b5c89c6e15d0a961507a2f71cdd8b2749f72e8d501a1b2f406590"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 실제 채팅 조회 최적화 |query78/common34: 첫 실제 도구 선택·동일 도구 여러 대상·현재/과거 시간 규격·짧은 현재 룰 질문 분류 보완 |LLM이 실제 MCP를 선택/호출한 뒤 대상 누락·영수증/인자/SHA 검사를 통과한 순수 조회만 공통 표로 완성. 사건 판단/쓰기/peer/실패/누락은 일반 조사 유지 |
+| Hermes 실제 채팅 비교 |ABC systemd 상태49.923→20.877초; “지금 fw 룰 뭐야?”140.738→17.139초 |각1회·새 Native세션/실제MCP·모델 단계3→1회. 전용 채널 새 FW는 Hermes11.899/Ollama10.993초. 평균/p95·공유 부하 보장 아님 |
+| 운영버전 회귀·초기 설치 경로 |이번 Native459/SDK232/query391/MCP81/설치43/review69 = 고유1,275 PASS·최종skip0 |새 시간 규격32조합·입력 거절/권한·기존 종료/승인 검사. 설치 도구수 검증을 실제35읽기+9보호와 연결. 새 OS 전체 설치 미실행 |
+| 운영 반영·복구 |query78/MCP1.3.1·관리자231 경유 B13파일·보호8SHA 유지 |19:27 반영·양봇 연결/실제44도구/4로그 조회 성공, Native gate63,208B. 15분 독립 원복 준비·검증 후 확정. 설정/모델/승인/FW/TTL 유지 |
+| 복합 조사 후속 |현행 사적 새 실행77.570초·후보126.666/214.335초 모두 품질/속도 실패, 운영 비채택 |오늘→최근구간 축소·대상 누락/건강 과장·출력 잘림 확인. 당시 시간 schema/runtime24조합 중9불일치는78/1.3.1에서 수정. 공개 채팅 속도로 세지 않음 |
+| 반복 systemd 실패 |실제 잠금 충돌만 예약 정상 연기로 처리한 수정 유지 |19:10 B 정상518/대기53·새실패0·failed0. A/C 마지막18:44failed0과 구분. 과거 경보 삭제 안함 |
+| 시간 입력 규격 |Wazuh/IDS/WAF/웹의 시작+종료와 상대 구간을 구분·모델 선택 규격도 동일하게 반영 |실제 등록 schema 32조합 일치·4종 실제 조회 성공. 잘못된 조합을 JSON 선택/실행 전 검사에서 거절하며 동적 시각·보관 기간은 실행 검사 유지 |
+| Git·정리 |이번78/MCP1.3.1 공개17파일 `b35297c` 푸시·원격main 일치 확인. 게시 영수증은 후속 커밋으로 관리 |현재 수정과 이전 게시 완료를 구분. 서버 시험452+worker1/Mac자체19파일 제거 확인. 서버 복구본·DB·실행 근거 보존 |
+
+후속 “개별 규칙도 표로”는1.529초였으며 기존 관측 재정리라고 표시했다. 새 조회 속도로 세지 않는다. 직전 조회 개선 단위의 실제 질문은11건이고, 이번 복합 후속은 비공개3실행/채팅게시0이다. 후보 경계6검사는 각각 통과했으나 전체 회귀를 반복한 것은 아니다.
+
+[시간 규격 수정](infra/mcp/event-time-contract.md) · [조회 원인·실측·복구](infra/hermes/chat-read-latency.md) · [복합 후속·규격 불일치](infra/hermes/chat-investigation-latency.md) · [반복 실패 수정](infra/hermes/controller-contention.md) · [이전76/75 비교](STATUS_HISTORY.md#source-2e3dff554929067d). ‘30초 내 근거 표+후속 최종 보고’는 미확정이며 복합 최종 보고 목표를 낮추지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-9a18aa4d0dbec5b4-h3"></a>
+<a id="record-6eb12e9dcbd4c751916b8e37058f82b066a0bfb6f5b2fe5442fce9df3ed2095f"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 시간 인자의 구조 불일치는 수정했다. 오늘/과거 구간·근거 없는 규칙 ID 필터·대상 누락 및 현재 unit0의 과장 보고를 검증한다. 연결한 읽기 묶음과 무손실 표시의 실제 지연·센서별 사건 당시/이후 구분·후속 계획을 확대 검증한다. 78 새 비공개88.849초/MCP4오류0도 최근1시간/근거 없는60140·과장 표현으로 품질 실패다. 현재 원장·참조 ID·전체 인용 결속·추가 조사 경로를 유지하고30초/정확성을 함께 검증한다. 반복 실패·남은 시간 안내의 compact 입력 전달과 발급된 snapshot 참조를 먼저 확인한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-2e3dff554929067d"></a>
+
+## STATUS-before-chat-latency-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T18:51:46+09:00</summary>
+
+<a id="source-2e3dff554929067d-h0"></a>
+<a id="record-06f3c3d276aa1275afae8c3df42cafe364114cbda48601365a16e1d2ea65ec83"></a>
+
+# 인프라 현황 — 2026-11-06 17:39 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-361550c8afc0e994).
+
+
+
+<a id="source-2e3dff554929067d-h1"></a>
+<a id="record-dc3ef72aa6d396a205a3933dc36db7a11725d316a29f8fb1f4dfbee60dba3bb4"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 실행 안내 누락 | query76에서 Native 마무리 안내와 같은 인자 반복 실패를 compact 입력에 보존 | 도구 문구로 활성화 불가. 도구 목록·필수 근거·LLM 판단·승인·종결검사 그대로 |
+| 회귀·설치 | Native458/SDK231/query391/설치42 = 고유1,122 PASS·skip0 | 신규9조건 포함, 실제 Native 안내 함수 연결 확인. 모델 정확성·새 OS 전체 설치를 뜻하지 않음 |
+| 운영 반영 | B9파일/보호7SHA·4서비스·양봇WS/worker·3큐·7등록 읽기 확인 | 관리자231 경유·15분 독립 복구 확정/no-op. 수동원복 미실행, 모델/키/FW/TTL 변경0 |
+| 반복 systemd 실패 | 실제 잠금 충돌만 예약 실행의 정상 연기로 처리한 수정 유지 | 수정 후 약59분 정상197/대기26·새 실패0, A/B/C failed0. Wazuh 해당 경보 최신 반환은 수정 전16:32:07; 수정 이후 별도 검색0. 장기 관측 잔여 |
+| 속도·품질 | 정확한 복합 최종 보고30초 미달 | 76 새 세션87.727초·MCP4/오류0이나 정상/표본부재 확대를 반복하여 최종 판단 거절. 근거 표만 보존·성공 보고 아님 |
+| Git·정리 | query76 최종02f6ac4, 반복 실패 후속 검증14398cf 푸시/원격main 일치. 게시 영수증은 후속 커밋에 보존 | 운영 복구본·DB·trace 보존, 서버 worker1개·시험경로 제거, Mac 작업 임시 정리 완료 |
+
+[실행 안내 보존](infra/hermes/review-execution-control.md) · [반복 실패 수정](infra/hermes/controller-contention.md) · [관측 범위 검사75](infra/hermes/observation-scope.md) · [기존 비교와 실패](infra/hermes/startup-profile.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-2e3dff554929067d-h3"></a>
+<a id="source-361550c8afc0e994-h3"></a>
+<a id="record-0bda447ced16b59990c8a3800f19319eb9c5b7b070aa5157c8255e471b47c86b"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 연결한 읽기 묶음과 무손실 표시의 실제 지연·센서별 사건 당시/이후 구분·후속 계획을 확대 검증한다. 현재 원장·참조 ID·전체 인용 결속·추가 조사 경로를 유지하고30초/정확성을 함께 검증한다. 반복 실패·남은 시간 안내의 compact 입력 전달과 발급된 snapshot 참조를 먼저 확인한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-361550c8afc0e994"></a>
+
+## STATUS-before-review-execution-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T17:30:21+09:00</summary>
+
+<a id="source-361550c8afc0e994-h0"></a>
+<a id="record-d610106fbf2874cdbfea6fdc6226bd5797150b512c6e32602c245ff928af0140"></a>
+
+# 인프라 현황 — 2026-11-06 17:08 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-b016ec30d558b604).
+
+
+
+<a id="source-361550c8afc0e994-h1"></a>
+<a id="record-17759dcc975ade72615812a0fd393e1bf868fae879004dd68138521e189b8a2d"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 반복 systemd 실패 | controller 잠금 충돌을 예약 실행의 정상 연기로 수정 | 최근3시간54회 원인 일치. 실제 충돌 exit0/커서·사건 불변, 약27분 자동82회·대기21회·새 실패0. A/B/C 현재 failed0. 장기 무재발은 미확인 |
+| 회귀·설치 | 신규6·기존365·설치42=고유413 PASS | 기존 관리검사74는 로컬 jsonschema 부재로 skip. B 신규6 재실행 PASS. 새 OS 설치 미실행 |
+| 운영 반영 | B controller1파일, 기존 query75/게이트64,855B 유지 | 관리자231 경유·15분 독립 복구 확정/no-op. 양봇WS/worker 정상, 수동원복 미실행 |
+| 관측 범위 검사 | query75의 진단/웹 상태·미검증/실패 구분 유지 | 앞선1,112검사 결과 보존. 자연어 전수 의미 검증은 아님 |
+| 속도 계측 | 비공개 실제 조사55.908/46.727초, 제목 생성용 별도 모델 호출 발견 | 계측기를 넣은 실행이며 채팅 전송 제외·독립 평가 아님. cProfile 누적시간은 스레드 중첩으로 wall time과 불일치하여 병목 합산에 사용하지 않음 |
+| 초기 연결 비교 | 전체8서버8.390초 vs 읽기6서버8.077초 | 모델 없는 기동·종료1쌍. 조회35도구 전체 schemaSHA 일치·약0.3초 차이, 운영 채택0 |
+| 30초 목표 | 정확한 복합 최종 보고30초 미달 | 현재 차단 안내만 바꾼 비공개 후보214.517초 시간초과·비채택. 잘못된 정상/종결 뒤 재조사·동일 snapshot 오류 반복을 확인. 새 독립 사건·실제 채팅 검증 잔여 |
+| Git·정리 | 실패수정14ecd5b 및 후속 검증24f1b53 푸시·원격main 일치. 게시 영수증은 후속 커밋으로 보존 | 기존 정리에 이어 Mac 임시15파일·서버 시험 worker1개 제거. 운영 증거·복구본 보존 |
+
+[반복 실패 수정](../infra/hermes/controller-contention.md) · [수치 원장](../infra/hermes/controller-contention.validation.json) · [기존 관측 범위 검사](../infra/hermes/observation-scope.md) · [기동·제목 호출 비교](../infra/hermes/startup-profile.md) · [앞선16비교](../infra/hermes/incident-review-probes.md) · [조회 묶음](../infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+
+[이미 보존한 동일 내용으로 이동](#record-0bda447ced16b59990c8a3800f19319eb9c5b7b070aa5157c8255e471b47c86b)
+
+</details>
+
+<a id="source-b016ec30d558b604"></a>
+
+## STATUS-before-controller-contention-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T16:43:36+09:00</summary>
+
+<a id="source-b016ec30d558b604-h0"></a>
+<a id="record-b5f396007bb24410d98ca25416f9c06816b30ec5ec6bb0750e2fc7666ce26195"></a>
+
+# 인프라 현황 — 2026-11-06 16:11 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-ebfa7513628adfd3).
+
+
+
+<a id="source-b016ec30d558b604-h1"></a>
+<a id="record-20c7b4171f6b474bc38e470b0797fbfa5f344b8eb5e63275d43e44db86fe5c32"></a>
+
+## 이번 완료와 남은 범위
+
+| 항목 | 결과 | 검증 범위·한계 |
+|---|---|---|
+| 관측 범위 검사 | query75: Vector/웹 정상 주장 대상을 구분하고, 진단 active→기능 정상 및 연속성 미검증→검증 실패 확대를 거절 | Native449·SDK231·query391·설치41=고유1,112 PASS. 자연어 전수 의미 검증은 아님 |
+| 운영 반영 | B9파일·보호7SHA,4서비스·양봇WS/worker·3큐 유휴, 게이트64,855B 확인 | 관리자231 경유. 기존74 백업·15분 원복 확정/no-op. 실제 수동 원복·새 OS 설치 미실행 |
+| 속도 후보 | 오답 초안 제외는2사례 중1개 검사 통과, 추론 켜기는56.669초·출력 미완성 | 둘 다 비채택. 기존 모델·추론·프롬프트·권한·승인·TTL 유지 |
+| 지연 재분해 | 과거43초 중 Native 초기화 전7.137초/결과 후2.584초 확인 | 모델28.431초·MCP3.027초와 별도. 새75/채팅 지연이나 제거 가능한 시간으로 단정하지 않음 |
+| 30초 목표 | 이전 실제43초 통과 사례와69초 최종 거절 기록 유지 | 새 전체 조사·독립 평가·실제 채팅 측정·안정적 정확성 미완료 |
+| Git·정리 | 운영 복구본·증거 보존, 패키지 설치0 | Mac 자체 임시20파일 정리·부재 및 컨테이너 시험경로0 확인. 소스·문서32b940d 푸시/원격main 일치. 게시 확인 문구·원장은 후속 반영 |
+
+[이번 수정·비교·복구](../infra/hermes/observation-scope.md) · [수치 원장](../infra/hermes/observation-scope.validation.json) · [앞선16비교](../infra/hermes/incident-review-probes.md) · [조회 묶음](../infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-636e864e6d556704-h3"></a>
+<a id="source-b016ec30d558b604-h3"></a>
+<a id="source-ebfa7513628adfd3-h3"></a>
+<a id="record-d54de86f192e7eae33f1b78e83300c316385741d5d4970d63e8ea1b8d7bf7042"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 연결한 읽기 묶음과 무손실 표시의 실제 지연·센서별 사건 당시/이후 구분·후속 계획을 확대 검증한다. 현재 원장·참조 ID·전체 인용 결속·추가 조사 경로를 유지하고30초/정확성을 함께 검증한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-ebfa7513628adfd3"></a>
+
+## STATUS-before-observation-scope-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T16:17:47+09:00</summary>
+
+<a id="source-ebfa7513628adfd3-h0"></a>
+<a id="record-79887e2ed5058b4b2925510da3ae034305a426231ffaf0943559d3b9e34f2356"></a>
+
+# 인프라 현황 — 2026-11-06 15:44 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-636e864e6d556704).
+
+
+
+<a id="source-ebfa7513628adfd3-h1"></a>
+<a id="record-f7f1145fbf1113c25fcd8eb903cb6095abc8cba4f5f3bef2ec5435735ccc732a"></a>
+
+## 이번 확인 결과와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 재조회·정정 비교 | 두 개발 사건의 동일 영수증으로16실행·모델18회. 조회 범위/목적·공통 앞부분·내부 조회 원장·정정 입력 비교 | 안정적 품질·전체 지연 개선을 입증하지 못해 후보 비채택 |
+| 입력 캐시 | 원안 IDS6.120초는26,999입력 중25,434토큰 재사용. 공통 앞부분7,355토큰도 재사용 확인 | 빠른 과거 자료 재생은 새 사건30초 보고가 아님.6.120초 출력도 품질 실패 |
+| 의미 오류 | 이미 읽은 목록/웹 구간 재선택, 근거 없는 정상·연속성 실패·SNI 계획, 오답 초안 반복 확인 | Vector/웹 검사 대상 혼동과 실제 잘못된 주장을 구분해 보완 필요 |
+| 현행 운영 | query74/common1.5.33·security-events1.3.0/진단1.2.2 유지.15:44:10에17파일/보호7SHA·4서비스·양봇WS/worker·3큐 유휴 확인 | 배포·모델·승인·TTL·FW·키 변경0. 이전1,215검사는 현행 배포 검사이며 이번 재생의 품질 점수가 아님 |
+| 현재 실측 기준 | 직전 실제 복합 사건43초는 근거/인용 통과, 다른69초는 최종 판단 거절 | 채팅 전달 제외·각1회. 신규 전체 조사·독립 평가·정확한30초 미완료 |
+| Git·정리 | Mac 자체 임시25파일 정리·부재 확인, 새 서버 파일 반입/패키지 설치0·기존 복구본 유지 | 비교 문서8f514d7 커밋·푸시,15:53:44 원격main 일치. 이 게시 확인 문구/원장은 후속 반영 |
+
+[이번 비교·실측·한계](../infra/hermes/incident-review-probes.md) · [수치 원장](../infra/hermes/incident-review-probes.validation.json) · [현행 읽기 묶음](../infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’의 허용 여부를 질문했으며, 답변 전에는 현재 최종 보고 목표를 변경하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+
+[이미 보존한 동일 내용으로 이동](#record-d54de86f192e7eae33f1b78e83300c316385741d5d4970d63e8ea1b8d7bf7042)
+
+</details>
+
+<a id="source-636e864e6d556704"></a>
+
+## STATUS-before-status-scope-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T15:53:38+09:00</summary>
+
+<a id="source-636e864e6d556704-h0"></a>
+<a id="record-bb4fdc534f8f0e98649118d191b23080d8dd3487ef5fa0c3d28e5d912449090d"></a>
+
+# 인프라 현황 — 2026-11-06 15:07 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-3a995fd08a9ea9a6).
+
+
+
+<a id="source-636e864e6d556704-h1"></a>
+<a id="record-bfc8adc977aadb0791c1b5ad38cf106daa6c154328a80394812980c7200e149c"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 읽기 묶음 연결 | Native/SDK/root 검증기에 실제 호출·내부 조회·인자/시각/응답SHA를 결속 | 운영 연결 완료. 위험 판단·추가 조사는 LLM이 수행 |
+| 실제 복합 보고 | 첫73 사건42.973초·모델2회·wire2/내부8조회, 오류/쓰기0 | 채팅 게시 미포함. 다른73 IDS는166.999초·추가 조회/후속 계획 미흡 |
+| 입력 보완 |74에서 내부 웹 로그에도 기존 무손실 표 적용; 같은 IDS 반환46,112→27,984B | 원본/검증 근거 보존.74 IDS68.880초지만 최종 판단 거절·사실표 fallback으로 품질 실패 |
+| SDK 실제 읽기 | 기존 계정·풀에서 wire1/내부8조회2.591초·근거16·오류0 | 모델/최종 보고/채팅 시간 제외 |
+| 검사·운영 | 고유1,215PASS. query74/common1.5.33·security-events1.3.0/진단1.2.2,17파일/보호7SHA·4서비스·양봇WS/worker 확인 | 새OS 전체설치·공격 E2E·전 업무 품질 아님 |
+| Git·복구·정리 | r1/r2 정확 백업·독립 원복 준비 및 상태 확인 후 확정 | 서버 작업용453파일·Mac 49파일 제거/부재 확인. 소스·문서31파일 e2549f9 푸시/원격main 일치(15:08:46 KST). 게시 영수증은 후속 문서 커밋에 포함 |
+
+[이번 동작·실측·한계](../infra/hermes/incident-bundle.md) · [수치 원장](../infra/hermes/incident-bundle.validation.json).30초 진행 알림을 최종 완료로 대신하지 않는다. 입력/생성 규격3후보는 추가 조회를 선택해 운영 비채택이다. Vector 표현의 웹 상태 검사 혼동, 근거 없는SNI/정책ID 계획, 센서별 과거/후속 구간 혼동·수동 지시 대기와 A 과거journal 공백은 잔여다.68.880초의 실패 출력을 최종 보고 성공으로 세지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+
+[이미 보존한 동일 내용으로 이동](#record-d54de86f192e7eae33f1b78e83300c316385741d5d4970d63e8ea1b8d7bf7042)
+
+</details>
+
+<a id="source-3a995fd08a9ea9a6"></a>
+
+## STATUS-before-bundle-integration-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T15:08:36+09:00</summary>
+
+<a id="source-3a995fd08a9ea9a6-h0"></a>
+<a id="record-b77cbce249c7543370ac70e44a3e7a957c7a8568063144bd8b1d11ea866210a3"></a>
+
+# 인프라 현황 — 2026-11-06 14:10 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-7da751b04634e30c).
+
+
+
+<a id="source-3a995fd08a9ea9a6-h1"></a>
+<a id="record-273c3ca26546ff02c2f7e5d315dd25ff1e082b95316d1829eb7ec414fed9005f"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 관련 읽기 묶음 | 기존 security-events MCP 후보로 센서·고정 진단·실제 WAF 경로에 맞는 등록 웹/agent 읽기 수집 | 구현 완료. LLM 판단·승인·추가 조사와 구분 |
+| 실제 서버 읽기 | 비공개 stdio1회당7~8 하위 조회,3.04~3.44초·조회 오류/쓰기0 | 모델·채팅 시간 제외. 개별 handler8조회3.293초로 수집 속도 우위는 미입증 |
+| 근거·경계 | 인자/시각/응답/SHA·부분 실패 보존. 구간/대상/결과·wire 크기 상한, 병렬 진단 rate limit 유지 | 잘림/오류를 정상 판정으로 대체하지 않음 |
+| 검사 | B139·설치 계약30 = 고유169PASS/서버skip0 | 실제 새OS 설치·모델 정확성·공격 E2E 아님 |
+| 운영 | query1.19.72·security-events1.2.2·진단1.2.1 유지. 후보1.3.0/1.2.2 미반영·새 기능 기본 비활성.14:10 운영29SHA/4서비스/양봇WS·worker/큐0 확인 | Native/SDK/controller 근거 연결과 새 최종 보고 측정 필요 |
+| Git·정리 | 공개19경로 반영·검사 완료. 서버 자체임시38파일/Mac17파일 감사 후 정리. 소스/문서607c430 커밋·푸시/원격main 일치. 게시 영수증은 별도 후속 커밋 | 이전7edb3e5 및 이번 소스 게시와 후속 문서 변경을 구분 |
+
+[이번 구현·실측·한계](infra/mcp/incident-evidence.md) · [수치 원장](infra/mcp/incident-evidence.validation.json). 다음은 실제 wire1회와 내부 읽기N개를 구분하면서 두 봇과 root 사건 검증기에 연결하고, 모델의 중간 선택 횟수·최종 보고 시간과 의미 정확성을 함께 검증한다.30초 진행 알림을 최종 완료로 대신하지 않는다.
+
+직전 [보고 검사 보완](infra/hermes/health-claim-check.md)은 운영 확정이다.70/71 후보53.091~128.994초는 의미 품질 실패였고,71의 보고 안내를72에서 원복했다.72의 새 전체 모델/채팅 실측과 A 과거journal 수집 공백은 여전히 남는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-3a995fd08a9ea9a6-h3"></a>
+<a id="record-0699297690a6b6ecac240b077c8c5378a9520b8472188c3992d3c49495d095f5"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 구현한 읽기 묶음의 Native/SDK/controller 근거 연결·모델 왕복 감소와 센서별 사건 당시/이후 구분을 검증한다. 현재 원장·참조 ID·전체 인용 결속·추가 조사 경로를 유지하고30초/정확성을 함께 검증한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-7da751b04634e30c"></a>
+
+## STATUS-before-incident-bundle-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T14:12:46+09:00</summary>
+
+<a id="source-7da751b04634e30c-h0"></a>
+<a id="record-75717ddb9b7e9f9acd0cef5662f381a66b26aea18178323e89a6e680fb42490d"></a>
+
+# 인프라 현황 — 2026-11-06 13:39 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-17c2cec7702ab8ff).
+
+
+
+<a id="source-7da751b04634e30c-h1"></a>
+<a id="record-4ce1c40d7277336090fedaca3ee733cbfa12a14d5a8a29ae3c9c7aea7cf69feb"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 재작성 오검출 | `비정상`을 `정상` 단정으로 오인하던 검사 수정. 부정 서술/별도 긍정 단정 구분 | 실제 캡처 답변 전후 확인. 전체 보고 품질/일정 초 단축 보장은 아님 |
+| 근거 없는 정상화 | 한정어 없는 `서비스 정상화 확인`도 검사 | 일부 표현 검사이며 복구 과장·센서 시각 혼합·불완전 문장 전체 해결은 미완료 |
+| 실제 새 세션3회 |70:68.442초/9읽기, 다른 IDS53.091초/8읽기;71:128.994초/13읽기. 모두 조회 오류/쓰기0 | 모두 의미 품질 실패.71은 범위 확장·반복 조회·복구 과장/미완성 문장도 잔여 |
+| 최종72 반영 | 기존 보고 안내를 복구하고 검증한 검사 수정만 유지. 공통1.5.32/MCP1.2.1·원본35B |72 전체 모델/채팅 시간 재측정 미실행.70/71 수치를72 실측으로 표시하지 않음 |
+| 검사 |관리426·SDK219·Native391·설치41·표19·출력7:고유1103PASS |서버57skip를 실제 Native63검사로 보완/중복6제외. 새OS전체 설치·모델 정확성·공격 시험과 구분 |
+| 운영·복구 |query1.19.72·B10파일/보호7SHA·서비스4·양봇 WS/worker·root gate65,155B 결속 확인/원복 타이머 확정 |새 패키지·포트·키·권한·모델·FW·TTL·A/C변경0. 변경 전 복구본 보존 |
+| Git·정리 |서버 자체임시1332파일·Mac 자체임시44파일 감사 후 제거/부재 확인. 공개17경로 ba21329 커밋·푸시/원격main 일치. 게시 영수증은 별도 후속 커밋 |직전0577808/183dd39 게시 완료와 구분. 기존 타 작업은 제외 |
+
+[이번 수정·실측·복구](../infra/hermes/health-claim-check.md) · [수치 원장](../infra/hermes/health-claim-check.validation.json) · [앞선 입력 후보](../infra/hermes/report-input-audit.md). 모델 반복 판단/작성37~111초가 주요 지연이었다. 독립된 조회를 읽기 전용 MCP 묶음으로 제공해 왕복 횟수를 줄이는 방안을 다음으로 검증한다. LLM의 판단과 추가 조사·승인 경계는 유지하며,30초 진행 알림을30초 최종 완료로 대신하지 않는다. A 과거journal 수집 공백도 잔여다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-7da751b04634e30c-h3"></a>
+<a id="record-7f6ed2785de763062045c7618c9376fe231a5a64584c503d7987710aa4c6fffa"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 독립 조회 묶음의 MCP 제공·모델 왕복 감소와 센서별 사건 당시/이후 구분을 검증한다. 현재 원장·참조 ID·전체 인용 결속·추가 조사 경로를 유지하고30초/정확성을 함께 검증한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-17c2cec7702ab8ff"></a>
+
+## STATUS-before-health-claims-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T13:41:06+09:00</summary>
+
+<a id="source-17c2cec7702ab8ff-h0"></a>
+<a id="record-780b93f8365ab142229b95fc1500f7f61cd0ebb439af69a84367e9a2972dc1a1"></a>
+
+# 인프라 현황 — 2026-11-06 12:58 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **복합 최종 보고30초와 안정적 정확성은 아직 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-655dd5ebf759089c).
+
+
+
+<a id="source-17c2cec7702ab8ff-h1"></a>
+<a id="record-e7fc87e041b9d50a16162855d74907c09db90a57a9d97b64c21dd822aabf94c3"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 최신 실제 전체 조사 |query1.19.69:64.580초/9읽기·오류0·쓰기0, 모델49.648초 |이전 단위 실측. 중복조회23→9로 줄었지만 기조회 대상 재조회 제안 잔여.30초/내용 정확성 미완료 |
+| 입력 계측 |재구성76,367B 중 도구 목록34,858B·근거22,748B·정책4,930B |현재 등록34규격+과거9영수증. 원 네트워크 캡처나 최신 조사 아님 |
+| 비공개 모델 비교7회 |규격 후속 제공16.560~21.855초도 추가조사 선택. 단일 포장 축약27.670초도 중복 조회. low64.334초는 본문 없이 상한 종료 |최종보고 개선 입증0·후보 채택0.6개형식통과를 품질 성공으로 집계하지 않음 |
+| 실제 후속 읽기1회 |웹 구간1.338초/보존18행·전체 요청수미확인 |쓰기/공격/채팅게시0. 다른경로200과공격403을 성공/정상으로 합치지 않음 |
+| 추론 서버 |Ollama0.40.2·원본35B Q4_K_M·보고된모델/VRAM크기동일23.66GB·상태왕복2.816ms |GPU 활용률/공유 부하는 별도. CPU/네트워크가 주원인이라는 증거 없음 |
+| 운영 확인 |12:56:27 query1.19.69/common1.5.32·10파일/보호7SHA·4서비스/양WSworker·3큐 유휴 |코드/모델/설정/권한/승인·TTL/재시작0.1098회귀는 이전 배포 결과이며 이번 재실행0 |
+| Git·정리 |진단 문서7경로0577808 커밋·푸시/원격main일치; 게시 영수증은 별도 후속 커밋 |Mac 자체임시25파일 감사 후 삭제·부재 확인. 서버 임시반입0. 이전 소스e832f29·최종088f829 게시 완료와 구분 |
+
+[이번 비교·비채택 사유](../infra/hermes/report-input-audit.md) · [수치 원장](../infra/hermes/report-input-audit.validation.json) · [현행 구현·복구](../infra/hermes/read-ledger.md). 다음은 불필요 재조회와 필요한 후속 수집을 구분하는 보완이다.30초 중간 알림을30초 최종 완료로 대신하지 않는다. A 과거journal 수집 공백도 잔여다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-17c2cec7702ab8ff-h3"></a>
+<a id="record-48fb19a81862db436e1273dec4e391817bcb1d4e7349be723b4218286c424f35"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 동일 인자/이미 포함된 행의 재조회와 필요한 후속 근거 수집을 보완한다. 현재 원장·참조 ID·전체 인용 결속을 유지하고30초/정확성을 함께 검증한다. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-655dd5ebf759089c"></a>
+
+## STATUS-before-report-input-audit-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T12:59:26+09:00</summary>
+
+<a id="source-655dd5ebf759089c-h0"></a>
+<a id="record-a6c759c12b2fc432f64fbd37d3a4e2264705e194da1f2237dcefd14e28138e84"></a>
+
+# 인프라 현황 — 2026-11-06 12:29 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **복합 최종 보고30초 목표와 안정적인 내용 정확성은 미완료**다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-241c17b126f0f67d).
+
+
+
+<a id="source-655dd5ebf759089c-h1"></a>
+<a id="record-e9d041d58218127ed7cfd466dfd3f31e54c66752e58c76363e6dde24a883b143"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 중복 조회·ID | 실제 완료 인자 원장·root 최초/후속 참조/명시 ID를 모델 선택에 연결 | 같은 사건23조회1오류→9조회0오류. 등록 권한·추가 근거 조회·LLM 판단 유지 |
+| 내용·형식 검사 | 연속성 미검증≠수집 장애, 관측된 후속 표본의 부정 검사, 필수 전체 인용 번호 고정 | 제한된 모순 검사. 모든 표현/현재 공격 지속·해소 판단의 정확성 보장이 아님 |
+| 실제 시간 |66:49.596초,67:49.005초,다른 사건67:77.403초,68:76.667초,69:64.580초 |66/67 의미 오류,68 형식 실패. 최종69: 조회·인용 오류0/현재 위험 미확인 유지, 이미 수행한 웹 대상 재조회 제안은 잔여. 새 세션/실제MCP/쓰기0; 평균·독립평가·채팅왕복 아님 |
+| 병목 | 최종 모델49.648초/5회·도구 결과합3.267초 | 보고 입력 약2.2만~2.7만 토큰 및 모델 정정 비용.30초 미달 |
+| 운영·회귀 |query1.19.69/common1.5.32/MCP1.2.1·B10파일/보호7SHA·4서비스/2WSworker |고유1098검사PASS·설치41포함. 새OS 전체설치·공격·채팅게시/모델/권한 확대0 |
+| 복구·Git·정리 |4배포 독립15분 원복 확정/no-op,65~68 복구본/DB/trace 보존 |서버 임시source1772파일/실행script5개·Mac 임시34파일 정리/부재 확인. 공개19경로 소스e832f29커밋·푸시/원격main일치. 게시 영수증 문서 변경은 소스와 별도 커밋으로 관리. 기존topology/Ansible/NAT 변경 보존 |
+
+[구현·실측·복구](../infra/hermes/read-ledger.md) · [수치 원장](../infra/hermes/read-ledger.validation.json).30초 중간 알림을30초 최종 조사 완료로 바꾸지 않는다. 자동 검사를 통과한 보고와 사람의 내용 검수를 구분한다. A 과거 journal 수집 공백도 미완료다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-655dd5ebf759089c-h3"></a>
+<a id="record-79370853e949072d6efe474baf0c3051899ff057a48f54268d15da3dbdbdf37b"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 현재 원장·참조 ID·전체 인용 결속을 유지하고 보고 입력량/모델 판단·과거 표본의 현재화·해소/긴급 대응 판단·A 수집 공백을 보완해 전체30초/정확성을 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-241c17b126f0f67d"></a>
+
+## STATUS-before-read-ledger-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T12:28:48+09:00</summary>
+
+<a id="source-241c17b126f0f67d-h0"></a>
+<a id="record-a72650c68c11e101af6d0ef00401419adc1e7f6d5bc7b221bd9ec417fae5219d"></a>
+
+# 인프라 현황 — 2026-11-06 11:37 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **복합 최종 보고30초 목표는 미달이며 이번에도 유효한 최종 보고를 얻지 못했다.** [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-4c9b48cff99b2302).
+
+
+
+<a id="source-241c17b126f0f67d-h1"></a>
+<a id="record-0e14c3736f4fc476c6dddd17a8265f42c5b41baf0515c75951438da6704a41ed"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 요청 서비스 조회 | 등록 원본 MCP 규격으로 명시 단위의 현재/사건 정확 KST 조회를 모델 선택 묶음에 포함 | 실제 c:apache2조회 최초 묶음에서 성공. 별칭·불명확한 요청은 일반 모델 경로. 큰 다중 구간 실제시험 별도 |
+| ID·규격 검증 | 알려진 작업 ID의 종류/서버 결속, API schema 단순화와 scalar 형식 손실 보완 |65 형식거절0, 잘못된 known-ID getter 실제 실행0. 근거 없는 unknown-ID 선택1오류는 남음 |
+| 실제 재시험 |63:69.800초/진단 누락,64:214.437초/시간초과,65:170.878초/23조회·1오류·쓰기0 | 각각1회·같은 개발 사건/새세션·실제 Native MCP. 모두 최종 보고 품질 실패. 속도 향상으로 집계하지 않음 |
+| 병목 |65 모델 선택12회 합146.476초·도구 결과11.421초 | 첫 필수9조회 이후 겹치는 웹/이력 조회·불필요한 범위 확대. 모델/공유GPU·추가조회 선택은 통제하지 않음 |
+| 운영·검증 |query1.19.65/common1.5.32/MCP1.2.1·B10파일/보호7SHA·4서비스/2WSworker 확인 | 고유1077검사PASS. 설치41포함. 새OS 전체설치·공격·채팅 게시/왕복 평균·모델/권한 확대0 |
+| 복구·Git·정리 | 각 배포15분 독립 원복 확정/no-op·3단계 복구본/DB/trace 보존 | 서버 임시 source2210파일/실행스크립트3개 및 Mac 자체 임시22파일 정리·부재 확인. 공개17경로4349f46 커밋·푸시/원격main일치. 게시 영수증은 후속 문서 커밋에 포함. 기존 사용자/topology/Ansible/NAT 변경 보존 |
+
+[요청 범위·실제 실패·복구](../infra/hermes/request-scope.md) · [수치 원장](../infra/hermes/request-scope.validation.json).30초 중간 보고를30초 최종 조사 완료로 바꾸지 않는다. A 과거 journal 일부 수집 공백은 [이전 작업](../infra/mcp/journal-history.md)의 미완료 항목이며 이번에 해결했다고 표시하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-241c17b126f0f67d-h3"></a>
+<a id="record-f323e5834fbb5f166b05c6285c06bad98b14b82ef6a9a8feb44b903bfca7b160"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 필수 현재/과거 조회를 유지하고 실제 조회 범위/새 근거의 명시·근거 없는 작업 ID 선택·중복 조사와 A 수집 공백을 보완해 전체30초/정확성을 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-4c9b48cff99b2302"></a>
+
+## STATUS-before-request-scope-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T11:39:31+09:00</summary>
+
+<a id="source-4c9b48cff99b2302-h0"></a>
+<a id="record-64bb0c9a457af758795c05009bd44c192d2bbc180ca267f2a26440cee8248ae8"></a>
+
+# 인프라 현황 — 2026-11-06 10:56 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **최종 보고30초 내외는 아직 미달**이다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-a8a0f12ef0526826).
+
+
+
+<a id="source-4c9b48cff99b2302-h1"></a>
+<a id="record-78d5a17a16adb782a5269f7ac7b6cbadd7160bd7bbe4a155cd10f56bed7fef7e"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 과거 서비스 오류 MCP | 기존 도구에 KST 양끝 구간·정제 오류 색인 추가. A3/B4/C3파일 운영 확정 | 기존 현재 조회 유지·원문/셸/sudo 추가0. A 구간 공백/stale·현재 journal unavailable. 원본/신규 동일 실패 재현 |
+| 실제 봇 MCP | UID995 SDK:과거3·현재3조회/인자5거절. B 과거3메타데이터0.013초·C0건0.594초 | 각각1표본/모델·채팅 시간 제외.0건은 정상 증거가 아님 |
+| 복합 재시험 | 같은 개발 사건/요청·새세션·실제 모델/Native MCP:88.149초,17시도/실제15성공/실행전거절2/쓰기0 | 모델 선택12회 합계68.856초·도구 결과6.442초. 실패보고. c:apache 대신 c:sudo-status, operation ID를 잘못된 getter로2회 선택. 최종30초·정확성 미달 |
+| 검증·설치 | 고유123로컬검사·각 호스트 격리60검사·실제 SDK11호출,단일deploy.sh 소스/초기 수집 연계 | 새OS 전체 설치/공격/채팅 게시/장기 보존 시험0 |
+| 유지·복구 | query1.19.62/common1.5.32·원본35B·권한/승인/TTL 유지.10:48 유휴 확인 후 두 봇 MCPcache 갱신·WS/worker/4서비스 확인 | 각 서버15분독립원복 확정/no-op·복구본 보존. 수동 전체 원복 시험 별도 |
+| Git·정리 | 소스/설치/운영/현황·원장 갱신,기존topology5stage·Ansible2·NAT3보존 | 서버 자체 반입29개·Mac 임시18개 감사 후 삭제/부재 확인. 새패키지0·공개21경로3078c88 커밋·푸시/원격main일치. 게시 영수증은 후속 문서 커밋에 포함 |
+
+[이력 조회 계약·실제 공백](../infra/mcp/journal-history.md) · [검증 원장](../infra/mcp/journal-history.validation.json). 과거 조회를 가능하게 만든 것이지 최종 보고 지연을 해결한 것은 아니다. 이전 약214초 시간초과보다 이번 실패보고가 일찍 끝났다는 사실을 성공한 성능 향상으로 표시하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-4c9b48cff99b2302-h3"></a>
+<a id="record-343781424e8dc81e524a21ddb6a47e9a3f16aeda2febebe76924208ea00f3bbd"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 과거 오류 조회를 유지하면서 요청 대상/작업 ID 선택·반복 조회를 보완하고 A의 수집 공백을 줄여 전체30초/정확성을 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-a8a0f12ef0526826"></a>
+
+## STATUS-before-journal-history-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T10:57:09+09:00</summary>
+
+<a id="source-a8a0f12ef0526826-h0"></a>
+<a id="record-35f0e1b9d2154c61ec48ce37ca5c54cf34eecd731bd7a3dab46b3ccb916ba724"></a>
+
+# 인프라 현황 — 2026-11-06 10:17 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 사용자 목표인 **최종 보고30초 내외는 아직 미달**이다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-9dfb993f2737d8a4).
+
+
+
+<a id="source-a8a0f12ef0526826-h1"></a>
+<a id="record-35053cc18bb3b7bcca4fd2b6a246f29ff9ff98061bc2acb52c0fae06b80e967e"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 확인 결과 | 상태·한계 |
+|---|---|---|
+| 초기 준비 분해 | 실제 컨테이너3회5.775~6.084초. MCP 모듈1.43~1.49초·run_agent2.64~2.70초·MCP discovery1.31~1.56초 | 모델 호출/채팅 완료 시간 아님 |
+| 초기화 후보 | 일반 도구 발견을 생략한 별도 프로세스의 import 약0.8초 감소. MCP34규격3회 동일 | 전체4.818~6.468초 변동·운영 비채택 |
+| 선택 방식 재생 | 실제 과거7/9영수증으로 모델API5회. 기존 선택20.196/20.703초; 후보24.632/23.181/10.993초 | 빠른 후보도 조회 누락·웹 정상/해결 단정. 기존 근거 검사에서 거절·운영 비채택. 전체 조사/독립평가 아님 |
+| 운영 상태 |10:15 KST query1.19.62/common1.5.32·9파일/보호7SHA·4서비스·양봇WS/worker·큐유휴·root60,963B 확인 | 소스/설정/모델/권한/승인TTL/서비스 재시작 변경0 |
+| 검증·설치 구분 | 이번은 실제 시작경로·전체읽기규격·기존 근거검사 진단. 앞선1,065회귀/설치41은 이전 배포의 근거 | 신규 회귀/전체 Native 조사/채팅 게시/공격/새OS설치0. 설치 구성 변경0 |
+| 다음 결정 |30초 내 근거1차 보고+조사 계속 또는 최종 조사30초 중 선호 확인 대기 | 답변 없이 조사 제한시간 단축·부분시간을 최종30초로 대체하지 않음 |
+| 기록·Git | 현황/계획/README·측정 원장/과거 상태 보존 | Mac 자체 임시20파일/499,970B 감사 보존 후 삭제·부재 확인. 새 패키지0·이번 공개6문서 43be3b9 커밋·푸시/원격main 확인. 게시 영수증은 후속 문서 커밋에 포함. 기존topology5stage·Ansible2·NAT3 보존 |
+
+[이번 진단과 비채택 근거](../infra/hermes/review-startup.md) · [검증 원장](../infra/hermes/review-startup.validation.json). 이전 전체 실측은43.634초(품질 실패),70.021초(추가 조회·품질 실패),복합 약214초 시간초과다. 캐시가 적용된 마지막 호출6.294초를 전체 답변 시간으로 표시하지 않는다. [이전 입력 개선·배포](../infra/hermes/review-payload.md).
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-a8a0f12ef0526826-h3"></a>
+<a id="record-7edc4cc2b82b43ca52d9b8a2c1fc800dda52f0ba230d00d902a56a46674e00bf"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 초기 준비·선택 단계 진단을 바탕으로 전체30초/1차 보고 구분을 확정하고, 추가 조회 반복·근거 있는 판단의 대안을 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-9dfb993f2737d8a4"></a>
+
+## STATUS-before-review-startup-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T10:18:18+09:00</summary>
+
+<a id="source-9dfb993f2737d8a4-h0"></a>
+<a id="record-4ef563627fb3efc43e96cdcbaf49f8594427129c222d00b8719463d83f693ffb"></a>
+
+# 인프라 현황 — 2026-11-06 09:53 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 사용자 우선 목표는 **보고30초 내외**이며 아직 미달이다. [활성 계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-66c76947289ed40f).
+
+
+
+<a id="source-9dfb993f2737d8a4-h1"></a>
+<a id="record-b5c6d93c4c32d69dbd3320db3f9f0ba4dc5e091347ef79ee3aa7b3be5f666d19"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 완료·관측 | 미완료·한계 |
+|---|---|---|
+| 운영 배포 | query1.19.62/common1.5.32. B root/controller·양봇 공유 코드·pin/receipt9파일, 보호7SHA·4서비스·양봇WS/worker 확인. root 인자60,963B | 모델/FW·권한/승인/TTL 변경0. 신규 전체 설치/공격시험0 |
+| 반복 입력 | 전체 등록 규격·설명을 고정 접두부에 배치. 웹0~1행의 파일 정보도 모든 값/순서/타입을 보존한 열 표현 | 첫 요청의 큰 입력 비용은 남음. 캐시 재사용은 공유 실행 상태에 따라 달라짐 |
+| 실제 부분 개선 | 후보58 마지막 보고6.294초/35,618입력 중33,464토큰 캐시 재사용 | 전체는70.021초/10조회. 과거 탐지의 현재 지속 표현·불필요 전체FW 조회·후속계획 품질 실패. 사용자 답변6초/30초 달성으로 표시하지 않음 |
+| 기준·실패 보존 | 기준57은43.634초/7조회이나 백엔드 정상 단정으로 품질 실패. 복합59/60은214.455/214.427초 시간초과 | 속도만으로 성공 집계0. 같은 개발 사건 검사본·실제MCP이며 채팅 전송/평균/독립 평가 아님 |
+| 판단·요청 보완 | 실제 백엔드 정상 단정 검사, 근거 뒤 정확한 현재 요청 재표시.61 추론확대 후보는 길이 한도/시간초과로 철회,62에서 기존 추론 설정 유지 | 요청 문구만으로 반복 조회 해결되지 않음. 현재 실행코드는60과 같으며 버전62의 전체 모델 반복은 별도; 후보 실패는 원장에 보존 |
+| 회귀·설치 | 고유1,065PASS. 관리388중57skip은Native63(중복6)에서 충족·SDK219/Native391/설치41/표19/출력7 | 최종 미충족skip0. 모델 품질·실제 공격 E2E·새OS 설치와 구분 |
+| 정리·Git | 서버 반입소스2,195/검사로그40/측정스크립트5 정리·복구5/검사증거5 보존. 공개 소스·설치 문서·현황 동기화 | Mac 자체 임시57파일/21,534,980B 감사 후 삭제·부재 확인. 공개17파일 7aad521 커밋·푸시/원격main 일치. 게시 영수증은 후속 문서 커밋에 포함. 기존topology5stage·Ansible2·NAT3 보존 |
+
+[실측·실패·복구](../infra/hermes/review-payload.md) · [검증 원장](../infra/hermes/review-payload.validation.json). 기준 한 표본에서 모델 선택29.491초, 실제MCP 합계2.319초, Native 초기 준비7.270초였다. 부분 캐시 개선을 전체30초 달성이나 정확성 완료로 대체하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-9dfb993f2737d8a4-h3"></a>
+<a id="record-f528623c546045ee16e988099301dc0f86563784160be1b8dc30bb02db556a5c"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 첫 큰 입력·약7초 Native 준비·추가 조회 반복·짧고 근거 있는 판단의 대안을 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-66c76947289ed40f"></a>
+
+## STATUS-before-review-payload-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T09:55:30+09:00</summary>
+
+<a id="source-66c76947289ed40f-h0"></a>
+<a id="record-c34400c0077ce98c1ad6f12683ee7e894b5190de5f33775d3c0a7f725d3d846f"></a>
+
+# 인프라 현황 — 2026-11-06 03:44 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 현재 우선은 보고 지연을30초 내외로 줄이는 작업이다. [활성 계획](../PLAN.md) · [이번 작업 전 상태](STATUS_HISTORY.md#source-2c2e913c2257a2b7).
+
+
+
+<a id="source-66c76947289ed40f-h1"></a>
+<a id="record-276f014e352b59a1e193a5d1588875f6c2922a6e2bf35ce4802c75bf67529092"></a>
+
+## 이번 완료 단위와 실제 검증 범위
+
+| 항목 | 완료·관측 | 미완료·한계 |
+|---|---|---|
+| 현재 배포 | query1.19.57/common1.5.32. B root controller/gate·양봇 공유 코드·pin/receipt 증분, 현재11파일/보호7SHA·4서비스·양봇WS/worker·root인자60,363B 확인 | 모델/FW/권한·승인/TTL·Native예산 변경0. 신규 전체설치/공격시험0 |
+| 자동 재조사 문맥 | 단일containment 웹 verify의 직전 보고/사유·현재 사건/승인 참조를 보존한 새Native세션. 완전한문맥16KiB이내만 적용 | DB/과거세션/trace 삭제0. manage/chat/다중제안·누락/초과는 기존경로; 자연발생 자동스케줄 검증 별도 |
+| 대상·보고 보완 | 실제조회된설정경로가사건과불일치하면남은등록후보에서모델이재선택. 서비스상태는정상관측의부당단정검사;추가조회묶음안내는철회 | 목적지/위협판단·실제호출은LLM. 모든 의미·시간/표본 해석·후속계획 정확성 완료 아님 |
+| 후보 자동경로 실측(1.19.56) | **43.822초**,실제7MCP/오류0/쓰기0·15근거표·unresolved. 첫선택1.992초/636토큰,최종보고22.303초/20,643토큰 | **30초 미달**. 운영DB의 별도검사본/실제MCP·모델1회,채팅전송0. 직전단문사유로변경돼앞선복합사유와동일입력비교아님 |
+| 실패·반복 관측 | 후보214.407초시간초과,116.396초ID종류거절후실패표,69.017초보고의정상단정/표본표현오류도보존 | 실패를개선성공으로집계하지않음. 기존자동214.652초는과거기록이며공유GPU/입력차이를통제하지않은전후수치 |
+| 운영자 단문 |1.19.55 실제조사→전송63.716초/7조회0오류0쓰기·15근거표/current인용 | 1.19.56 재시험은22조회/214.505초시간초과. 묶음안내철회한최종1.19.57의모델전체재시험은미실행. 원채팅접수·큐·단말렌더제외 |
+| 회귀·설치 | 고유1,061PASS. 관리384중55skip을Native61(중복6)로충족,SDK219/Native391/설치41/표19/출력7 | 최종미충족skip0. 모델품질/E2E/새OS전체설치와구분,Mac패키지0 |
+| 정리·Git | 서버소스1756/시험로그32/측정스크립트4정리·복구4/비공개검사증거4보존. Mac자체임시56파일감사후삭제·부재확인. 문서/설치경로동기화 | 소스/문서0c71dae푸시·원격main일치 확인. 게시영수증은 후속 문서 커밋에 포함. 기존topology5stage·Ansible2·NAT3보존 |
+
+[원인·실측·복구](../infra/hermes/automatic-review.md) · [검증 원장](../infra/hermes/automatic-review.validation.json). 안정적인30초 최종보고·정확한 후속계획·전체 사용자 채팅 지연은 미완료다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-66c76947289ed40f-h3"></a>
+<a id="record-d3648b1cff4aba3762092c737df847dc321f450e6ddd1181a3b2cd6f5fa2be09"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 자동 후속의 새 세션 적용 범위/이력 보존과 직접 요청의 늦은 추가 조회 선택/재작성 비용 검증. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·ID 혼동/시각·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-2c2e913c2257a2b7"></a>
+
+## STATUS-before-auto-review-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T09:13:26+09:00</summary>
+
+<a id="source-2c2e913c2257a2b7-h0"></a>
+<a id="record-c26cbe531cd5f15636ed4a85a5b1b74641162d1a20c2ba78ab3260970cb96793"></a>
+
+# 인프라 현황 — 2026-11-06 03:02 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. [계획](../PLAN.md) · [직전 상세 현황](STATUS_HISTORY.md#source-0ca2531003046a01) · [이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-2c2e913c2257a2b7-h1"></a>
+<a id="record-8756ec6012b28c77ccce6fe547ab4adae1ee0e96206e48c8e85dc8851cd22671"></a>
+
+## 현재 작업: 복합 보고 지연 후보 검증·비채택
+
+현재 query1.19.53/common1.5.32. 단문64.865초·복합87.456초(조사 시작→보고 전송, 각1회)로 **30초 목표 미달**이며 이전63.602/84.949초 대비 속도 향상을 입증하지 못했다. 두 단계 도구 규격 선택 후보는 지연/품질 실패로 철회하고 기존 단일 선택·전체 규격을 유지했다. typed ID 참조와 웹 정상 단정/미확인 검사 오탐만 보완했다. 자동 후속은 이전 대화58.9k→65.1k토큰 재사용으로214.652초 시간초과가 확인돼 별도 개선이 필요하다.
+
+| 항목 | 완료·실측 | 남은 문제·한계 |
+|---|---|---|
+| 후보 판단 |1.19.50~52 목록→규격 분리/접두부 일치 후보를 실제로 검증, 비채택·복귀 |58.231초 품질 실패/86.268초 검사 오탐/69.095초 잘못된 getter 거절. 입력 감소를 성능 향상으로 집계하지 않음 |
+| 최종 안전 보완 |root 결속 operation/proposal ID·담당 서버 검증. 서비스 정상 단정 및 정상/비정상 여부 미확인 오탐 수정 |위험판단은 계속 LLM, 전체 의미 정확성 보장 아님 |
+| 최종 보고 |단문7·복합9읽기/오류0/쓰기0, 실제15·19근거표/인용·unresolved/needs_review |반복 Apache 조회·모호한 후속계획/영문 혼재·Wazuh 표본 범위 표현 잔여. 같은 사건 개발시험, 공유GPU 통제 없음 |
+| 자동 후속 |이전 세션 재사용 입력227,602→247,679B, 첫 도구 선택63.063초 원인 확인 |214.652초/7읽기·오류0·쓰기0, 시간초과·outcome_unknown. 새 요청 비교와 분리 |
+| 검사·배포 |최종 고유1,051PASS/최종skip0, B9파일4회 후보·보호7, root59,735B·원복확정no-op,03:02 최종11파일/4서비스·양봇worker·세큐유휴 |후보1,058/1,059검사와 최종 숫자 구분. 새OS 설치/수동복구/공격·부하·PCAP0 |
+| 정리·Git |서버 시험소스1,756/기록32 SHA 대조 후 정리, 복구본4곳·DB/trace 보존 |Mac 자체임시 47파일 감사 후 삭제·부재 확인. 소스/문서25ad22c 푸시·원격main 일치 확인. 게시 영수증은 후속 문서 커밋에 포함. 기존 topology5 stage·Ansible2·NAT3 보존 |
+
+[후보 비교·미채택·복구](../infra/hermes/review-input.md) · [최종 검증 원장](../infra/hermes/review-input.validation.json) · [직전 정정 검증](../infra/hermes/report-feedback.md). 안정적인30초·최종보고 품질·일반 채팅 전체지연은 미완료다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-2c2e913c2257a2b7-h3"></a>
+<a id="record-bbec6ee7f9d2d290a779f6957a7177e2c2af22ffcc97f9207c8014052257d016"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 자동 후속의 이전 대화 반복과 직접 요청의 늦은 추가 조회 선택/재작성 비용 개선. 필수 근거·정확 인자·LLM 판단·승인·종결검사 유지. 새로운 사건/채팅큐·후속계획·30초를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-0ca2531003046a01"></a>
+
+## STATUS-before-review-input-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T03:06:08+09:00</summary>
+
+<a id="source-0ca2531003046a01-h0"></a>
+<a id="record-a2ac0f8f003a4abfee5f7d55704b2a152c6ee8298756281435a1f27d4e82e55b"></a>
+
+> 2026-11-06 입력 경량화 후보 작업 전의 과거 현황. 내용은 당시 상태이며 링크만 archive 위치에 맞췄다.
+
+# 인프라 현황 — 2026-11-06 01:57 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. [계획](../PLAN.md) · [직전 상세 현황](STATUS_HISTORY.md#source-39ab133ee97aa859) · [이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-0ca2531003046a01-h1"></a>
+<a id="record-570ba51f5fc59d9086246817ecbd20b2ab0a431aaeeaade505710ed4961d4c31"></a>
+
+## 현재 작업: 복합 사건 보고 지연·종결 일관성
+
+현재 query1.19.49/common1.5.32. **30초 목표 미달**이다. 현재 새 세션의 단문 재검토63.602초·복합84.949초이며 조사 시작→Mattermost outbox 전송 기준이다. 원 채팅 접수/대기열·단말 렌더 제외, 같은 사건 개발 반복·각1회·공유GPU 통제 없음. 직전1.19.47의64.067/85.621초와 실질적인 속도 차이를 입증하지 못했다.
+
+| 항목 | 완료·실측 | 미완료·주의 |
+|---|---|---|
+| 정정 전달 | root 문맥 교체 때 누락될 수 있던 실제 guard 피드백을 현재 turn/근거SHA와 결속. 제한 정정 입력 축소·전체 읽기 복귀 | 실제 이번 실행은 위험 재판단/일반 경로. 제한 정정 분기의 독립 모델 지연 효과는 미측정 |
+| 종결 모순 | 영향 미확인+resolved를 Native/host에서 거절. 실제 단문 첫 잘못된 판정이 needs_review로 정정됨 | 명시적 모순 검사이며 전체 위험판단 정확성 증명 아님 |
+| 실제 실패 | 중간1.19.48 단문76.732초에서 부당 종결 발견→이력 보존 재개방. 정정조사214.541초/17읽기·오류2로 시간 초과 | 잘못된 ID 종류 선택·웹 구간 분할/전체FW 반복·입력46k토큰까지 증가. 성공 집계에서 제외 |
+| 현재 보고 | 단문7읽기·복합9읽기/오류0/쓰기0, 실제15·19근거표/인용/추가검토 상태 | Apache 실행/HTTP 응답 구분, 이미 조회한 근거의 다음조사 반복, HTTP200과 공격성공 구분·후속 계획 개선 필요 |
+| 검사·배포 | 고유1,047PASS/최종skip0. B9파일 두 후보·보호7·root gate58,951B·확정 원복no-op·01:58 최종11파일/4서비스·양봇 연결·세큐 유휴 | 실제 새OS 설치/수동복구/공격·부하·PCAP0. 모델/GPU/FW/일반권한 변경0 |
+| 보존·Git | 서버 시험소스878/기록16 SHA 대조 후 정리, 두 복구본·DB/trace 보존 | Mac 자체임시28파일 감사 후 삭제/부재 확인. 소스/문서 6dba743 푸시·원격main 일치 확인. 게시 영수증은 후속 문서 커밋에 포함. 기존 topology5 stage·Ansible2·NAT3 보존 |
+
+[현재 원인·비교·복구](../infra/hermes/report-feedback.md) · [검증 원장](../infra/hermes/report-feedback.validation.json) · [이전 비교](../infra/hermes/review-scope.md). 안정적인30초·최종보고 품질·일반 채팅 전체지연은 미완료다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-0ca2531003046a01-h3"></a>
+<a id="record-89b0e0c2e42de39808482d2793a449a5668075e06b19367f19f7108b4e4c443d"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 정확 ID 종류/범위·전체FW/분할 웹 재조회·입력 반복을 줄이고 Apache실행/HTTP응답·200/공격성공·후속계획을 검증. 원문/인자·추가읽기·종결검사 유지. 새 사건/채팅큐와30초 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-39ab133ee97aa859"></a>
+
+## STATUS-before-report-feedback-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T02:01:20+09:00</summary>
+
+<a id="source-39ab133ee97aa859-h0"></a>
+<a id="record-299453ed59ed97f53c526202938351795d1537842c8f8d62c6479f611beb363b"></a>
+
+# 인프라 현황 — 2026-11-06 01:16 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. 핵심 기능11/9 마감 목표를 유지한다. [계획](PLAN.md) · [직전 상세 현황](STATUS_HISTORY.md#source-ef4b3ab1f7472a16) · [이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-39ab133ee97aa859-h1"></a>
+<a id="record-99cdcd20aae30ece27d3afee131f4e1afa2f487447d7c280791eb65f3edbbe63"></a>
+
+## 현재 작업: 복합 사건 보고 시간·근거 누락
+
+현재 query1.19.47/common1.5.32. 같은 추가진단 요청의 조사 시작→채팅 전송은 **157.866→85.621초**(각1회)로 줄었으나 **30초 목표는 미달**이다. 현재8읽기·오류0·쓰기0, 실제 Apache 진단·근거 표·재탐지 요약을 확인했다. 잘못된 서비스 정상 판단의 재작성21.462초가 포함된다. 일반 사용자 채팅 접수/대기열·단말 렌더를 포함한 평균은 미측정이다. 새 짧은 사건 요청은64.067초/9읽기·오류0·쓰기0다.
+
+| 항목 | 완료/실측 | 남은 범위 |
+|---|---|---|
+| 모델 왕복 | 추가 조사 판단과 실제 도구 선택을1회로 통합, Native 실행·등록 인자/nonce 유지 | 현재 요청별 전체 도구 규격 입력18~19k토큰과 의미 재작성 비용 |
+| 근거 표·문장 | 최근16개 표시 제한 제거, 미완료에도 실제 근거 보존, 진단 상태/수집 나이,240자 여유 | 전체 로그/침해 부재 증명 아님. 짧은 요청의 재탐지/영향 혼동·후속 계획 구체성과 다른 사건 확인 필요 |
+| 후보 비교 |1.19.45 65.043초이나 요약 약점;1.19.46 축소 안내는 잘못된 대상 선택으로 철회;현재1.19.47 85.621초·8/0/0 |30초·평균/최악 지연·채팅 큐 전체는 미달/미측정 |
+| 검사·배포 | 고유1,034PASS/최종skip0. B9파일/세 후보·보호7·root gate56,887B·확정 원복no-op·01:12 최종11파일/4서비스·양봇연결/세큐유휴 | 새OS 전체 설치/수동복구·공격/부하/PCAP0. 일반권한/GPU/FW/승인 변경0 |
+| 보존·정리·Git | 서버 시험소스1,317/기록24 정리·세 후보 복구본과 DB/trace 보존 | Mac 자체임시39파일 제거 확인. 소스/문서 a10a8cb 푸시·원격main 일치 확인. 이 영수증은 후속 문서 커밋에 포함. 기존 topology5 stage·Ansible2·NAT3 보존 |
+
+[현재 비교·실패·복구](infra/hermes/review-scope.md) · [기계 판독 원장](infra/hermes/review-scope.validation.json) · [이전 추가 조회](infra/hermes/additional-inquiry.md) · [과거 현황](STATUS_HISTORY.md#source-ef4b3ab1f7472a16). 실제 조사 미완료와 정상/종결을 구분한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-947dba4761f615e7244dfa905feb4de0bf9c9cb7ea11518b016e32ad4438bd89)
+
+<a id="source-39ab133ee97aa859-h3"></a>
+<a id="record-90e4c7b4949e60a11505af4bd7112635a8ebaa3e68027f354bf9690d5cd25e1c"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 등록 인자/원문을 보존하며 입력과 요청 범위·의미 재시도/후속 계획을 보완. 새 사건·실제 채팅 큐와30초 목표를 분리 검증 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-ef4b3ab1f7472a16"></a>
+
+## STATUS-before-review-scope-20261106.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-06T01:16:05+09:00</summary>
+
+<a id="source-ef4b3ab1f7472a16-h0"></a>
+<a id="record-96335ef0916bc82feea182a775c474938c37f917518944b18c3e0d015857adf9"></a>
+
+> 과거 기록: 이 파일은 작업 전 현황 보존본입니다. [현재 현황](../STATUS.md).
+
+# 인프라 현황 — 2026-11-06 00:23 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료다. 핵심 기능11/9 마감 목표를 유지한다. [계획](../PLAN.md) · [직전 상세 현황](STATUS_HISTORY.md#source-973ac9b921fc9e44) · [이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-ef4b3ab1f7472a16-h1"></a>
+<a id="record-e89f0b730108e451227454d73aa2dc3d2e01155fb112edb4cf6b240f9e560f26"></a>
+
+## 현재 작업: 복합 사건 조사 지연·추가 조회
+
+현재 query1.19.44/common1.5.32입니다. 추가 조사 선택→실제 MCP 실행과 최종 읽기 선택의 none 추론 강도는 검증했지만, **30초 보고 목표는 미달**입니다. 최신 추가진단 요청은157.866초/12읽기·오류2·쓰기0로 미완료 보고가 전송됐습니다. 이전 기본 보고35.5~41.3초는 다른 요구/버전의 실측입니다.
+
+| 항목 | 확인 결과 | 남은 범위 |
+|---|---|---|
+| 추가 조사 경로 | 모델 선택 뒤 실제 등록 읽기/인자→Native 실행→새 완료 영수증으로 복귀 | 현재 범위 밖 일반 관리/자동검증/전 채널 평균은 별도 |
+| 조회 추론 강도 | 외부 재시도 wrapper가 none을 medium으로 덮던 문제 수정. 최종 API none·선택 거절0 확인 | 누적 입력37,323토큰·큰 목록/불필요한 재조회로 추가 선택36~40초 발생 |
+| 실제 최종 요청 |157.866초/12읽기·오류2·쓰기0·needs_review | 중복 Apache 진단·잘못된 상태도구/24h초과 인자·예산 종료 보고. 정확한 완결 보고는 실패 |
+| 검사·운영 | 고유1,032PASS/최종skip0. B9파일·4후보/보호7SHA·확정/원복no-op, 최종11파일/4서비스·양WS/worker 일치 | 00:20별도사건214.291초 시간초과 확인,00:21:51최종 세 큐 유휴 확인. 새 OS전체설치·실제 수동복구·공격/부하/PCAP0. 일반권한/GPU·FW·승인 변경0 |
+| 복구·정리·Git | B4후보 복구본보존, 시험source1,756/기록36·Mac자체임시53파일을 SHA·감사복사 후 정리 | 소스/문서 f508ef4 푸시·원격main 일치 확인. 이 영수증은 후속 문서 커밋에 포함. 기존 topology5 stage·Ansible2·NAT3 보존 |
+
+[추가 조사 결과·실패·복구](../infra/hermes/additional-inquiry.md) · [기계 판독 원장](../infra/hermes/additional-inquiry.validation.json) · [이전 기본 보고 실측](../infra/hermes/case-latency.md). 조회 경로가 실행되는 것과 올바른 판단·완결 보고·사건 종결을 구분한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8624183eb27b6969a432bd927d24105da05e09d07bc18c263c958ec5004dd107)
+
+<a id="source-ef4b3ab1f7472a16-h3"></a>
+<a id="record-ac83d1fc682911b444994828dc4c408cf61114bbf30b89ed1b3dcab53711fea6"></a>
+
+## 다음 작업과 유지 조건
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+|1| 복합 판단 품질·지연 확대 검증 | 중복 조회/큰 입력·도구/인자 선택·예산 종료 시 확보 근거 보고부터 보완. 다른 사건·질문과 전체 평균 별도 |
+|2| 실서비스·승인 E2E·관리 경로 | 앱 가동 의도/필요 가동 확인, 보호 변경의 정확 후보·독립 복구, SDK 보호쓰기/혼합 동등성. 새 공격은 재지시 전 수행하지 않음 |
+|3| 독립 평가·장기 운용·발표 |176 미사용평가·원본/학습/하네스 비교, 수집/알림/백업 복구·무손실 한계, 논문/발표 실측 갱신 |
+
+- B Ollama 신속 조회/분류, Hermes 복합 조사/변경 우선. Thor 원본qwen3.6:35b·학습본 승격0, DGX 새 학습 예약0.
+- LLM이 조사·판단·변경안·승인·사후 확인을 주도하며 MCP/worker가 보호 주소·정확 후보·증거·허용 작업을 검증한다. 일반sudo/Docker/셸·설치 위임0.
+- 최초 임시차단600초·카드 유지 승인60분·해제/원기한 뒤60초 cooldown·새 근거 유지. 지정 IDS Native 예외 확대0.
+- 관리 경로 Mac→관리자231→A→B/C, Kali 직접. 공격·부하·PCAP재생 중단은 별도 재지시 전 유지. 새 전체 일시정지나 종료 시각은 지정되지 않았다.
+- 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외.
+
+모든 공격 차단·보안 구멍0·전 관제 업무 완료나 기관 준수 인증을 선언하지 않는다. OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인은 별도 검토다.
+
+
+</details>
+
+<a id="source-973ac9b921fc9e44"></a>
+
+## STATUS-before-case-latency-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T23:29:33+09:00</summary>
+
+<a id="source-973ac9b921fc9e44-h0"></a>
+<a id="record-7b791baf3cd38054f13c67f0db9b137fd845e7abe80da5f4c85516382c46c1f6"></a>
+
+# 인프라 현황 — 2026-11-05 21:30 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-1b9c31a3c5f672e1) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-973ac9b921fc9e44-h1"></a>
+<a id="record-202caac3b3126fe64dc2c0552db68397c968b55a24e0d650d65917b12bc8de6b"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 현재 사용자 우선 작업 | NAT/IPv4 운영 확정·7998446 푸시. HTTP Wazuh→HTTPS308 분기와 웹50r/s·동시처리50/429 보호 적용. 임시차단 사유 카드·FW IP/조건 표 공통 반영, 실제942100카드·운영자 승인해제 확인 | 사용자 공격시험 중단. 새 공격/부하/PCAP재생은 별도 재지시 전 금지. 관리자 전원 복구 후 실제 내부UI 카드1표/두봇각4표·코드블록0 확인. 새 FW 질문 각1회: Hermes12.097초/Ollama13.958초, 실제102규칙 일치. 추가 압축5종 해제/시험·공개HTTPS/모바일/전수·복합조사 평균지연은 미완료. 소스28ee1c7·영수증c211d7b 게시 완료, UI 검증 문서2d9f9e5 게시·원격 일치 확인 |
+| 요청별 필수 읽기 선택 | query1.19.32/common1.5.32·고유983PASS/최종skip0·B9파일/보호7SHA 확정.6모델 JSON→Native7읽기/70.659초·현재요청/nonce/등록 스키마 검증 | 실제85ddc3c6는 추가4조회 포함11MCP/오류0 뒤214.346초 시간초과. 표본0을 부재로 해석한 사실 정정/최종 보고·일반 지연은 미완료. [범위·실측·복구](infra/hermes/native-read-selection.md) |
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·현재는1.19.32 읽기 어댑터가 운영 반영됐으며 첫 행의 새 실측을 따른다. [근거·범위](infra/hermes/ids-impact-report.md) |
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 오전 광역 정보성 후보는 만료/미적용. 새 지정 흐름·정보성SID2개만 제외하는21조건 후보는 승인/운영 SHA 확인. 새8질의의16원문→운영native100115/level0 확인·원문 보존. 수집 세대 검증 대기는 별도 추적. 도메인/악성DNS 광역 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·발표·초기 설치 | 논문5.12.5까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+<a id="source-973ac9b921fc9e44-h2"></a>
+<a id="record-c1818b4937bbf02d8d77efab6026b935e3b88be264c72445683cc1222f16e7e8"></a>
+
+## 유지하는 운영 조건
+
+| 항목 | 현재 기준 |
+|---|---|
+| 모델/역할 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본qwen3.6:35b, 학습본 후보 보존·승격0. DGX 새 학습 예약0 |
+| 권한/승인 | LLM이 조사·판단·변경안·승인·사후 확인 주도. MCP/worker가 보호 주소·정확 후보·증거·허용 작업 검증. 일반sudo/Docker/셸·설치 위임0 |
+| 차단 | 최초600초·카드 유지 승인60분·실제 해제/원기한 뒤60초 cooldown·새 근거. 기존 지정 IDS Native 예외 유지, 다른 고정 자동차단 확대0 |
+| 관리/시험 | Mac→관리자231→A→B/C. Kali 직접. 사용자 중단 지시 이후 공격·부하·PCAP 재생0. 모델 교체·새 OS설치0 |
+| 자료/Git | 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외 |
+
+
+
+<a id="source-973ac9b921fc9e44-h3"></a>
+<a id="record-a6233efa91a6b5c8119a2cb12aac4d1565a1d671f9f0ad68e49539885a0ae42d"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 실제 사건/operation 필수 조회·시각/상관 해석·조사 지연 | 후속 IDS의 상태/센서/후보호스트·앱 조회는8성공조회로 회복했으나 최종판단전 시간초과. operation 보고의 목록은7행 표/실제 UI로 보완. 필수도구 선택 비보장·구조화 읽기 응답 어댑터와 모델 선택/대기 시간을 우선 해결. WAF원문시각은offset이없어 생산TZ/수집시각·버퍼링 대조.100112 원문/inbox 모두230으로 불일치 기록 정정·룰 변경0. 룰후보 승인만료는 임의재발급/적용0 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| 운영 하네스·관리 제어 공백 | NAT/IPv4·웹 보호·카드/FW표 운영 반영. [FW](infra/mcp/fw-consolidation.md) · [웹 보호/HTTP경로](infra/validation/web-traffic/README.md) · [카드/표](infra/mcp/containment-display.md). Ansible2·SDK 보호쓰기/혼합 동등성·UI 전수는 별도 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | PDF 발표초안20쪽과 메모를 작성·검수.11/5 이후 결과 갱신·리허설/제출형식·최신 논문PDF·독립평가·12/1 최종발표는 남음 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-973ac9b921fc9e44-h4"></a>
+<a id="record-12ad75891b236a6a236ea680d89edafcfa35d3a3e109e4ca0f766419ed785310"></a>
+
+## 앞선 Native 읽기 배포와 현재 Git 마감
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영/검사 | query1.19.32/common1.5.32·고유983PASS/최종skip0. B9파일/보호7SHA·root gate/53,515B·양WS/worker·4서비스 확정. Native/SDK/review 각1재시작·추론 서버/모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 실제 범위 | Native 구조화6응답→실제7필수읽기/70.659초. 전체11MCP/오류0/보호0·214.346초 시간초과/outcome_unknown·실패 outbox sent. 기존 완료 operation 재검토 거절/새 실행0. 채팅 사용자 왕복·평균 속도·사건 종결 향상은 미완료 |
+| 복구/정리 | 독립15분 타이머 해제/no-op·원본/복구1곳 보존·수동 복구 미시험. 서버 source438개/6585826B·시험기록9개/15776B SHA/로컬복사 후 정리. Mac26개/6129510B·폴더/소켓 제거·경로프로세스0·운영자료/복구본 보존. 공개 Git 게시는 별도 영수증으로 구분 |
+| 논문·발표 | 논문5.12.5에 실제 선택 회복/시간초과·한계 반영·이전본 보존. 발표 PDF20쪽/메모는 직전 검수본 유지·웹 호스팅0/Git 제외. 최신 논문PDF/최종 평가·발표 리허설은 잔여 |
+| Git | NAT/IPv4 공개24파일7998446 게시에 이어 웹보호·카드/표·자료 원장/가이드26파일28ee1c7d69a754499377c68a37f91712635cf731을21:15:29 KST 푸시·원격main 일치 확인. 게시 영수증 c211d7b와 재개 후 UI 검증 문서2d9f9e5도 푸시·원격 일치 확인. 마지막 커밋/원격·작업 트리 상태는 로컬 최종 영수증에 남긴다. 기존옛NAT후보3·Ansible2·topology5 보존 |
+
+21:13 KST 사용자 지시로 작업을 재개했다. 직전 운영 반영 소스 게시와 새 카드/두 봇 FW표의 실제 내부UI 검증을 마쳤다. 관리자 호스트는 사용자 전원 복구 뒤 같은 승인 경유 경로로 연결됐다. 새 조회 결과·표본 지연과 복합 사건 조사/전체 성능은 구분한다. 전체 목표는 미완료이며 새 종료 시각은 지정되지 않았다. 공격 시험은 사용자 지시로 중단했다. 공개HTTPS/모바일/UI 전수·운영부하/전체DDoS·장기수집·독립평가/전체E2E·새OS 설치는 잔여이며 기존 보호 정책은 유지한다.
+
+Mac 자체95파일86,445,121B·서버 임시소스342파일5,369,408B 제거와 디렉터리 부재를 확인했다. 양Kali 반입 자료·운영 소스·원복 백업·DB·승인·사용자 파일은 보존했다. 직전 마감 당시 격리 시험 컨테이너 잔여0을 확인했다. 재개 후21:22 A/B/C failed unit0·IPv6 수신0, A4테이블17체인102규칙과 운영 소스SHA 유지·B 봇/검토/승인 서비스 active를 새로 확인했다.
+
+재개 검증용 Mac 임시14파일50,977B와 디렉터리를 제거했다. 서버 기존 Chromium의 임시 프로필/해당 브라우저 프로세스0·시험 로그인 로그아웃을 확인했다. 신규 패키지/운영 재배포·재시작0, 기존 사용자 파일·복구본은 보존했다. 최종 게시 영수증 보완은 별도 후속 커밋으로 남긴다.
+
+
+</details>
+
+<a id="source-2eed133035d046a5"></a>
+
+## STATUS-before-web-traffic-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T21:15:20+09:00</summary>
+
+<a id="source-2eed133035d046a5-h0"></a>
+<a id="record-dddf7ae174f62c3f3048269993868a6ef32acdd2435cb88b406534ab151103c7"></a>
+
+# 인프라 현황 — 2026-11-05 19:30 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-1b9c31a3c5f672e1) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-2eed133035d046a5-h1"></a>
+<a id="record-5f1bfeccda938b53bc904d31fc42761a32120dc7b60b81ba98e3b171f4e7c828"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 현재 사용자 우선 작업 | NAT 통합·A/B/C IPv6 제거 운영 확정. A8→4테이블/30→17체인, B6→4/24→14, C8→6/28→18. 실제 관리200·정상웹200/308·시험SQLi403·MCP전체조회·실패unit0 | capstone_fw 추가 통합은 격리 호환 실패 후 사용자 취소·운영 유지. 새 요청인 임시차단 카드의 탐지 이유와 FW IP/동작 표 개선·제한적 DDoS 보완을 진행. 20:30 KST 일시정지 |
+| 요청별 필수 읽기 선택 | query1.19.32/common1.5.32·고유983PASS/최종skip0·B9파일/보호7SHA 확정.6모델 JSON→Native7읽기/70.659초·현재요청/nonce/등록 스키마 검증 | 실제85ddc3c6는 추가4조회 포함11MCP/오류0 뒤214.346초 시간초과. 표본0을 부재로 해석한 사실 정정/최종 보고·일반 지연은 미완료. [범위·실측·복구](infra/hermes/native-read-selection.md) |
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·현재는1.19.32 읽기 어댑터가 운영 반영됐으며 첫 행의 새 실측을 따른다. [근거·범위](infra/hermes/ids-impact-report.md) |
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 오전 광역 정보성 후보는 만료/미적용. 새 지정 흐름·정보성SID2개만 제외하는21조건 후보는 승인/운영 SHA 확인. 새8질의의16원문→운영native100115/level0 확인·원문 보존. 수집 세대 검증 대기는 별도 추적. 도메인/악성DNS 광역 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·발표·초기 설치 | 논문5.12.5까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+<a id="source-1b9c31a3c5f672e1-h2"></a>
+<a id="source-2eed133035d046a5-h2"></a>
+<a id="source-8a970f82c2248b8e-h2"></a>
+<a id="source-a124a369d785496c-h2"></a>
+<a id="source-a46b84acb3860404-h2"></a>
+<a id="source-a9e919ef9bcccb6a-h2"></a>
+<a id="source-c3d845577da14b6b-h2"></a>
+<a id="source-d9c898c7ced5c0f5-h2"></a>
+<a id="record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6"></a>
+
+## 유지하는 운영 조건
+
+| 항목 | 현재 기준 |
+|---|---|
+| 모델/역할 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본qwen3.6:35b, 학습본 후보 보존·승격0. DGX 새 학습 예약0 |
+| 권한/승인 | LLM이 조사·판단·변경안·승인·사후 확인 주도. MCP/worker가 보호 주소·정확 후보·증거·허용 작업 검증. 일반sudo/Docker/셸·설치 위임0 |
+| 차단 | 최초600초·카드 유지 승인60분·실제 해제/원기한 뒤60초 cooldown·새 근거. 기존 지정 IDS Native 예외 유지, 다른 고정 자동차단 확대0 |
+| 관리/시험 | Mac→관리자231→A→B/C. Kali 직접, 새 공격232만. 이번 새 공격0·보호 변경0·모델 교체0·새 OS설치0 |
+| 자료/Git | 수집/정제/검수 로컬·학습DGX·검증 가중치 적재/추론Thor. 원본1+정제본1 무손실 압축. 비밀/대화/로컬검증/업무분담/발표·논문/가중치/압축본 Git 제외 |
+
+
+
+<a id="source-2eed133035d046a5-h3"></a>
+<a id="record-e9724460f98e888094f1b5c13ddd5ba5684a62d09c473a8dd9f2527c0b484640"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 실제 사건/operation 필수 조회·시각/상관 해석·조사 지연 | 후속 IDS의 상태/센서/후보호스트·앱 조회는8성공조회로 회복했으나 최종판단전 시간초과. operation 보고의 목록은7행 표/실제 UI로 보완. 필수도구 선택 비보장·구조화 읽기 응답 어댑터와 모델 선택/대기 시간을 우선 해결. WAF원문시각은offset이없어 생산TZ/수집시각·버퍼링 대조.100112 원문/inbox 모두230으로 불일치 기록 정정·룰 변경0. 룰후보 승인만료는 임의재발급/적용0 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| 운영 하네스·관리 제어 공백 | NAT/IPv4 전용은 운영 확정·[범위/복구/미시험](infra/mcp/fw-consolidation.md). capstone_fw 유지. 카드 이유·FW IP/규칙 가독성·HTTP 폭주 제한 검증을 새 우선 작업으로 진행. Ansible2·SDK 보호쓰기/혼합 동등성은 별도 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | PDF 발표초안20쪽과 메모를 작성·검수.11/5 이후 결과 갱신·리허설/제출형식·최신 논문PDF·독립평가·12/1 최종발표는 남음 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-2eed133035d046a5-h4"></a>
+<a id="record-bee169ab161b40d70b206bd8f0d97c5acb2dad2802c3fdb330e8fc03b74f8e03"></a>
+
+## 이번 배포·복구·정리·Git
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영/검사 | query1.19.32/common1.5.32·고유983PASS/최종skip0. B9파일/보호7SHA·root gate/53,515B·양WS/worker·4서비스 확정. Native/SDK/review 각1재시작·추론 서버/모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 실제 범위 | Native 구조화6응답→실제7필수읽기/70.659초. 전체11MCP/오류0/보호0·214.346초 시간초과/outcome_unknown·실패 outbox sent. 기존 완료 operation 재검토 거절/새 실행0. 채팅 사용자 왕복·평균 속도·사건 종결 향상은 미완료 |
+| 복구/정리 | 독립15분 타이머 해제/no-op·원본/복구1곳 보존·수동 복구 미시험. 서버 source438개/6585826B·시험기록9개/15776B SHA/로컬복사 후 정리. Mac26개/6129510B·폴더/소켓 제거·경로프로세스0·운영자료/복구본 보존. 공개 Git 게시는 별도 영수증으로 구분 |
+| 논문·발표 | 논문5.12.5에 실제 선택 회복/시간초과·한계 반영·이전본 보존. 발표 PDF20쪽/메모는 직전 검수본 유지·웹 호스팅0/Git 제외. 최신 논문PDF/최종 평가·발표 리허설은 잔여 |
+| Git | DNS/저장 전달 소스 b653a28과 후속 fd4e9bf 원격 일치. NAT/IPv4 공개24파일 7998446을19:39:06 KST 커밋·푸시/실제 원격main 일치. 이 영수증은 후속 문서 커밋 예정. 기존 NAT 관련 deploy.sh/로더/unit만 현재 작업으로 인수하고, 옛 후보3·Ansible2·topology5는 유지 |
+
+15:50 마감은 완료한 이전 단위다.17:09 재개 후 현재 마감은20:30 KST이다. NAT/IPv4 단위는 운영 확정·7998446 소스 푸시 확인이며, 카드/조회 가독성과 제한적 DDoS가 새 우선 요청이다. 전체목표는 active·미완료이며 장기 수집/독립평가/전체E2E/새OS 설치도 잔여다.
+
+
+</details>
+
+<a id="source-a9e919ef9bcccb6a"></a>
+
+## STATUS-before-fw-ipv4-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T19:38:30+09:00</summary>
+
+<a id="source-a9e919ef9bcccb6a-h0"></a>
+<a id="record-507457d8a7d354fa9fa28890c8e162b7e1b0da583999ff32d0e6342c23336abf"></a>
+
+# 인프라 현황 — 2026-11-05 18:22 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-1b9c31a3c5f672e1) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-a9e919ef9bcccb6a-h1"></a>
+<a id="record-d28e77c5ae2b06d7ce682fcab804b9e50231bb10db8d25c49955f23fe0727b0d"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 현재 사용자 우선 작업 | DNS 정확 후보21조건·승인 후 운영SHA5301922c 적용 확인. B 저장 모니터1MiB 한도 실패 원인·원본1,048,268B 보존/새 로그 전달 exit0. 233 Desktop 생성시각 조사·본인 반입 기록 밖/생성자 미확정 | 저장24native+별도bind회전1·18:17자연주기/수집EOF 성공, DNS 실제16원문→운영native제외 확인. FW 체인 통합·A/B/C IPv6 전면 비활성화·추가PCAP 시험 진행 중. 원본 세대 durable 검증 대기는 별도 추적. 20:30 KST 명시 일시정지, 20:15 이후 장기 새 작업 중단 |
+| 요청별 필수 읽기 선택 | query1.19.32/common1.5.32·고유983PASS/최종skip0·B9파일/보호7SHA 확정.6모델 JSON→Native7읽기/70.659초·현재요청/nonce/등록 스키마 검증 | 실제85ddc3c6는 추가4조회 포함11MCP/오류0 뒤214.346초 시간초과. 표본0을 부재로 해석한 사실 정정/최종 보고·일반 지연은 미완료. [범위·실측·복구](infra/hermes/native-read-selection.md) |
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·현재는1.19.32 읽기 어댑터가 운영 반영됐으며 첫 행의 새 실측을 따른다. [근거·범위](infra/hermes/ids-impact-report.md) |
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 오전 광역 정보성 후보는 만료/미적용. 새 지정 흐름·정보성SID2개만 제외하는21조건 후보는 승인/운영 SHA 확인. 새8질의의16원문→운영native100115/level0 확인·원문 보존. 수집 세대 검증 대기는 별도 추적. 도메인/악성DNS 광역 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·발표·초기 설치 | 논문5.12.5까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+<a id="source-1b9c31a3c5f672e1-h3"></a>
+<a id="source-a9e919ef9bcccb6a-h3"></a>
+<a id="source-c3d845577da14b6b-h3"></a>
+<a id="record-c4729ab70a08614810f019385bc62a32acf88b3c477b8a3cde6d990de00b09ce"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 실제 사건/operation 필수 조회·시각/상관 해석·조사 지연 | 후속 IDS의 상태/센서/후보호스트·앱 조회는8성공조회로 회복했으나 최종판단전 시간초과. operation 보고의 목록은7행 표/실제 UI로 보완. 필수도구 선택 비보장·구조화 읽기 응답 어댑터와 모델 선택/대기 시간을 우선 해결. WAF원문시각은offset이없어 생산TZ/수집시각·버퍼링 대조.100112 원문/inbox 모두230으로 불일치 기록 정정·룰 변경0. 룰후보 승인만료는 임의재발급/적용0 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| FW NAT·운영 하네스·제어 공백 | 기존 NAT6은 관리자231/현재 로더SHA로 재기준·kernel/TTL/원복 검증, Ansible2 별도 미확정. C/미등록 unit 고정 진단·승인형 제어·SDK 보호쓰기/혼합 동등성 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | PDF 발표초안20쪽과 메모를 작성·검수.11/5 이후 결과 갱신·리허설/제출형식·최신 논문PDF·독립평가·12/1 최종발표는 남음 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-a9e919ef9bcccb6a-h4"></a>
+<a id="record-37dd4eaf94b9348e58df24a9853911018695a3223340a64b27d3f9cd771b3ae1"></a>
+
+## 이번 배포·복구·정리·Git
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영/검사 | query1.19.32/common1.5.32·고유983PASS/최종skip0. B9파일/보호7SHA·root gate/53,515B·양WS/worker·4서비스 확정. Native/SDK/review 각1재시작·추론 서버/모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 실제 범위 | Native 구조화6응답→실제7필수읽기/70.659초. 전체11MCP/오류0/보호0·214.346초 시간초과/outcome_unknown·실패 outbox sent. 기존 완료 operation 재검토 거절/새 실행0. 채팅 사용자 왕복·평균 속도·사건 종결 향상은 미완료 |
+| 복구/정리 | 독립15분 타이머 해제/no-op·원본/복구1곳 보존·수동 복구 미시험. 서버 source438개/6585826B·시험기록9개/15776B SHA/로컬복사 후 정리. Mac26개/6129510B·폴더/소켓 제거·경로프로세스0·운영자료/복구본 보존. 공개 Git 게시는 별도 영수증으로 구분 |
+| 논문·발표 | 논문5.12.5에 실제 선택 회복/시간초과·한계 반영·이전본 보존. 발표 PDF20쪽/메모는 직전 검수본 유지·웹 호스팅0/Git 제외. 최신 논문PDF/최종 평가·발표 리허설은 잔여 |
+| Git | DNS/저장 전달 공개17경로 소스b653a28을18:23:50 KST 커밋·푸시/실제원격main 일치 확인. 이 영수증은 후속 문서 커밋으로 분리. 아직 FW/IPv6 변경0·관련 기존NAT6/Ansible2/topology5 보존 |
+
+15:50 마감은 완료한 이전 단위다. 사용자가17:09 재개와20:30 KST 일시정지를 지정했다. 현재 DNS/저장 전달/FW·IPv6/추가PCAP 작업 중이며 아직 Git 게시 전이다. 전체목표는 active·미완료다. 지정 Native 선차단 예외와 최신 LLM 선판단 원칙의 정합·독립176/전체E2E/새OS설치도 별도 잔여다.
+
+
+</details>
+
+<a id="source-c3d845577da14b6b"></a>
+
+## STATUS-before-dns-systemd-fw-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T18:23:27+09:00</summary>
+
+<a id="source-c3d845577da14b6b-h0"></a>
+<a id="record-8f35dcd73221f212f57afb4132e911e5926a9f3f55984ffc88bae3bdc4510f50"></a>
+
+# 인프라 현황 — 2026-11-05 15:40 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-1b9c31a3c5f672e1) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-c3d845577da14b6b-h1"></a>
+<a id="record-69976335018dde830355d937cb7bf6aaa9bea41eb0268718f02c670109e35ace"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 요청별 필수 읽기 선택 | query1.19.32/common1.5.32·고유983PASS/최종skip0·B9파일/보호7SHA 확정.6모델 JSON→Native7읽기/70.659초·현재요청/nonce/등록 스키마 검증 | 실제85ddc3c6는 추가4조회 포함11MCP/오류0 뒤214.346초 시간초과. 표본0을 부재로 해석한 사실 정정/최종 보고·일반 지연은 미완료. [범위·실측·복구](infra/hermes/native-read-selection.md) |
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·호환 어댑터는 미구현. [근거·범위](infra/hermes/ids-impact-report.md) |
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·발표·초기 설치 | 논문5.12.4까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+
+[이미 보존한 동일 내용으로 이동](#record-c4729ab70a08614810f019385bc62a32acf88b3c477b8a3cde6d990de00b09ce)
+
+<a id="source-c3d845577da14b6b-h4"></a>
+<a id="record-6fd04728d55f8e69c3dda390cd4acead5ec50d00db369ccf3ade4f0cbe64ac62"></a>
+
+## 이번 배포·복구·정리·Git
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영/검사 | query1.19.32/common1.5.32·고유983PASS/최종skip0. B9파일/보호7SHA·root gate/53,515B·양WS/worker·4서비스 확정. Native/SDK/review 각1재시작·추론 서버/모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 실제 범위 | Native 구조화6응답→실제7필수읽기/70.659초. 전체11MCP/오류0/보호0·214.346초 시간초과/outcome_unknown·실패 outbox sent. 기존 완료 operation 재검토 거절/새 실행0. 채팅 사용자 왕복·평균 속도·사건 종결 향상은 미완료 |
+| 복구/정리 | 독립15분 타이머 해제/no-op·원본/복구1곳 보존·수동 복구 미시험. 서버 source438개/6585826B·시험기록9개/15776B SHA/로컬복사 후 정리. Mac26개/6129510B·폴더/소켓 제거·경로프로세스0·운영자료/복구본 보존. 공개 Git 게시는 별도 영수증으로 구분 |
+| 논문·발표 | 논문5.12.5에 실제 선택 회복/시간초과·한계 반영·이전본 보존. 발표 PDF20쪽/메모는 직전 검수본 유지·웹 호스팅0/Git 제외. 최신 논문PDF/최종 평가·발표 리허설은 잔여 |
+| Git | 공개16경로 소스24494ef을15:44:08 KST 커밋·푸시/실제원격main 일치 확인. 이 게시 영수증은 후속 커밋으로 분리하며 발표/논문·자격/원문/가중치는 포함하지 않음 |
+
+사용자가15:50 KST 전 이번 작업 마감을 요청했다. 새 시험은 중단하고 검증·기록·정리·게시를 마친다. 전체목표는 active·미완료다. 지정 Native 선차단 예외와 최신 LLM 선판단 원칙의 정합·독립176/전체E2E/새OS설치도 별도 잔여다.
+
+
+</details>
+
+<a id="source-1b9c31a3c5f672e1"></a>
+
+## STATUS-before-native-read-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T15:44:06+09:00</summary>
+
+<a id="source-1b9c31a3c5f672e1-h0"></a>
+<a id="record-c492559557f43b02f17fb9bf2edb21a9273de5aefd5c9e6a2bc99cc71ae552da"></a>
+
+> 이 문서는 Native 읽기 선택 보완 전의 과거 상태이며 현재 기준은 루트 문서를 따른다.
+
+# 인프라 현황 — 2026-11-05 15:05 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](../PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-a46b84acb3860404) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-1b9c31a3c5f672e1-h1"></a>
+<a id="record-d700f94e015001b78dcc257d1d3929b35335a9360d2d9e939037b0a4dfbab3bc"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·호환 어댑터는 미구현. [근거·범위](../infra/hermes/ids-impact-report.md) |
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](../infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](../infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](../infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](../infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](../infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](../infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](../infra/hermes/workflow-skills.md) · [지연](../infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](../infra/validation/web-policy/README.md) · [단일 E2E](../infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](../infra/validation/rule-overlap/README.md) |
+| 논문·발표·초기 설치 | 논문5.12.4까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+
+[이미 보존한 동일 내용으로 이동](#record-c4729ab70a08614810f019385bc62a32acf88b3c477b8a3cde6d990de00b09ce)
+
+<a id="source-1b9c31a3c5f672e1-h4"></a>
+<a id="record-a4cc93d8e72491e93226400c537d7663ee364f4ee7e3dc5d90c9ba337f96a7ee"></a>
+
+## 이번 배포·복구·정리·Git
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영/검사 | 운영1.19.30/common1.5.32·고유965PASS/skip0. 초기15/진행9파일을 확정했고, 미검증 묶음 후보1.19.31/966검사는 분리·9파일 실제 복구.14:38 고유15SHA/보호7SHA·양WS/worker/4서비스 확인. 모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 실제 범위 | 기존 operation7행 표·실내부UI table1/pre0/KST·값/작성자/채널 보존. IDS8MCP/오류0·필수상태/센서·등록·호스트/백엔드 읽기 회복, 최종 판단 시간초과. 추가 API4시험은 MCP0·실행권한0, JSON 읽기 연결 어댑터 미구현 |
+| 복구/정리 | 실제 복구본3곳/타이머 해제/no-op·묶음9파일 수동복구 확인. 쓰기 전 거절 시도는 중복복구본 SHA 확인 후 제거. 서버437source/20log·후보/중복12파일 정리·운영자료 보존. Mac IDS39파일11,327,716B/발표임시4파일506,300B·두 폴더 제거/해당 경로 프로세스0·새 패키지0 |
+| 발표/Git | 전달 PDF20쪽/366,471B·전쪽 개별 시각 검수, 수정용PPTX/메모/소스는 로컬 보존. 발표 웹 호스팅0·운영 서버 배포0. 공개20경로 소스306a578을15:07:54 KST 푸시·실제원격main 일치 확인. 이 게시 영수증의 후속 커밋은 별도이며 발표/논문·검증 원문은 포함하지 않음 |
+
+논문5.12.4에 실제 조회 회복·실패/표 형식·API 호환 한계를 반영하고 이전3본/해시 보존. 발표 초안은11/5 새 지시에 따라 PDF로 작성했으며 웹 호스팅·운영 서버 새 배포는 없다. 최신 논문PDF·독립평가·전체 관제·새OS설치·최종발표는 미완료다. 지정 Native 선차단 예외와 최신 LLM 선판단 원칙의 정합은 별도 검토하며 이번에 FW/Native 정책을 변경하지 않았다. 전체목표 active·미완료를 유지한다.
+
+
+</details>
+
+<a id="source-a46b84acb3860404"></a>
+
+## STATUS-before-ids-impact-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T15:07:46+09:00</summary>
+
+<a id="source-a46b84acb3860404-h0"></a>
+<a id="record-b3549a7dd413ed965e3561a798f61057583b3fd2812db776bd3517a3835a6024"></a>
+
+> 2026-11-05 IDS 영향 조사 보완 전의 과거 요약입니다. 현재 문서는 [STATUS](../STATUS.md)와 [PLAN](../PLAN.md)을 확인하세요.
+
+# 인프라 현황 — 2026-11-05 13:45 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](../PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-d9c898c7ced5c0f5) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-a46b84acb3860404-h1"></a>
+<a id="record-6abf22b4bdcef90cc8396ccce1f89bbd45d35335078f1490bfb4b09ff90ce597"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed이나 표0/목록형. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](../infra/hermes/shared-status-verification.md) |
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](../infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 공통당시1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](../infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](../infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](../infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](../infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](../infra/hermes/workflow-skills.md) · [지연](../infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](../infra/validation/web-policy/README.md) · [단일 E2E](../infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](../infra/validation/rule-overlap/README.md) |
+| 논문·초기 설치 | 로컬 초안에11/5 조회 회복·실패·수집자 혼동/영향 근거 한계를 반영하고 이전본 보존. 초기 설치는 단일deploy.sh의 기존 source 복사 경로 연결/계약39 PASS | 최신PDF/전체 제출물·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+<a id="source-a46b84acb3860404-h3"></a>
+<a id="record-268eca57694af22bcb896828ae0ba01b9c6749d25ee7e64db629ca55566c470d"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 실제 사건/operation 필수 조회·시각/상관 해석·조사 지연 | 후속 IDS의 상태/센서 누락은4성공조회로 회복했으나 당시 보호자산 경보/인용 미충족. operation2읽기/오류0로 절차 확인·보고는 목록형. WAF원문시각은offset이없어 생산TZ/수집시각·버퍼링 대조.100112 원문/inbox 모두230으로 불일치 기록 정정·룰 변경0. 룰후보 승인만료는 임의재발급/적용0 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| FW NAT·운영 하네스·제어 공백 | 기존 NAT6은 관리자231/현재 로더SHA로 재기준·kernel/TTL/원복 검증, Ansible2 별도 미확정. C/미등록 unit 고정 진단·승인형 제어·SDK 보호쓰기/혼합 동등성 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | 실제 성공/실패/미확인 근거·최신PDF/제출형식·독립평가. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-a46b84acb3860404-h4"></a>
+<a id="record-c7be6d29848c5d2f7adfda38d5dd588599f8d1869322bb87b025b86d302a74da"></a>
+
+## 이번 배포·복구·정리·Git
+
+| 범위 | 현재 결과 |
+|---|---|
+| 운영 반영 | B첫9파일13:26:52/13:28:05확정, 인자초과 발견 후 controller/receipt2만13:32:27추가·13:32:42 고유9SHA/보호7SHA/포함인자-원문 결속·양WS/worker·4서비스 확정. 첫 Native/SDK/review 각1재시작·두 번째 채팅 재시작0 |
+| 검증/복구 | 고유935PASS/skip0·실제 operation/IDS 읽기 전용 재검토 각2/4MCP·보호0. 원본/manifest/복구2곳·독립15분타이머 해제/noop, 수동원복 미시험. 모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
+| 보존/정리/Git | 운영DB·채팅·승인·실패 trace·원문로그/가중치 보존. 서버 시험437source/8log SHA대조·로그 로컬복사 후 제거, Mac자체30파일7,366,481B·SSH master/임시경로 정리·해당프로세스0.13:43 운영9SHA/보호7SHA·양WSworker/4서비스 재확인. 이번19공개경로 eecbdcc31a34754ea9a1d2aeb4d19edfe5fbcedb 커밋·푸시/13:46:05 KST 실제 원격main 일치 확인. 게시 영수증은 후속 문서 커밋으로 남기며 최종HEAD/원격 일치·관련경로 clean은 로컬 세션에 기록. 기존 NAT/Ansible8·topology5stage 보존 |
+
+논문 원고5.12.3에 이번 조회 회복·인자 실패·출력/영향 미완료를 반영하고 이전3본/해시 보존. 최신PDF·독립평가·전체 관제·새OS설치·최종발표는 미완료이며 발표 작성은11월둘째주 이후다. 전체목표 active·미완료를 유지한다.
+
+
+</details>
+
+<a id="source-d9c898c7ced5c0f5"></a>
+
+## STATUS-before-shared-status-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T13:45:57+09:00</summary>
+
+<a id="source-d9c898c7ced5c0f5-h0"></a>
+<a id="record-9254b5f42bd8101c90fe3c0fec4dd9177675407c69fa6b8134968dac99875ec7"></a>
+
+> 2026-11-05 자동 상태 조회 보완 전의 과거 요약입니다. 현재 상태는 [STATUS](../STATUS.md)와 [PLAN](../PLAN.md)을 확인하세요. 이후 확인한 정정은 현재 문서에 기록합니다.
+
+# 인프라 현황 — 2026-11-05 13:09 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](../PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-a124a369d785496c) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-d9c898c7ced5c0f5-h1"></a>
+<a id="record-dd3161ee2e5d084c5cddfded1a8eafca8c08e72e170ac7df6d0eeb2ea8887cf8"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](../infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](../infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](../infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](../infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](../infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](../infra/hermes/workflow-skills.md) · [지연](../infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](../infra/validation/web-policy/README.md) · [단일 E2E](../infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](../infra/validation/rule-overlap/README.md) |
+| 논문·초기 설치 | 로컬 초안에11/5 조회 회복·실패·수집자 혼동/영향 근거 한계를 반영하고 이전본 보존. 초기 설치는 단일deploy.sh의 기존 source 복사 경로 연결/계약39 PASS | 최신PDF/전체 제출물·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](../deployment/INSTALLER_READINESS.md) · [운영](../deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+<a id="source-d9c898c7ced5c0f5-h3"></a>
+<a id="record-93ea80923a9b13a98119e25a2cc12b1f7b6d6f79badeceaae995f1e9810f8b90"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 실제 사건/operation 필수 조회·시각/상관 해석·조사 지연 | 새IDS 최초143.306초/6MCP·승인대기 뒤 후속0조회/공유참조검증누락, WAF214.234초/6조회 시간초과, operation7호출4오류. 원천 사건/수집시각·Kali시계offset·100112 출발지230/정규화232 불일치부터 실제원문 대조/도구안내/검증. 룰후보 승인만료는 임의재발급/적용0 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| FW NAT·운영 하네스·제어 공백 | 기존 NAT6은 관리자231/현재 로더SHA로 재기준·kernel/TTL/원복 검증, Ansible2 별도 미확정. C/미등록 unit 고정 진단·승인형 제어·SDK 보호쓰기/혼합 동등성 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | 실제 성공/실패/미확인 근거·최신PDF/제출형식·독립평가. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-d9c898c7ced5c0f5-h4"></a>
+<a id="record-aa1183ce30aa33aba7350e2c47762214a0e5f650e9479d4d4d9ce987a107830c"></a>
+
+## 이번 배포·복구·정리·Git
+
+과거 웹 조회는 C3/B2파일·두 복구본/15분 타이머 해제/no-op·보호7SHA·85검사·실제 과거1행MCP복구까지 확인했고 공개15파일412b879를12:12:27 KST 원격main과 대조했다. 채팅/Apache·모델/FW/TTL/승인·키/포트·패키지/일반권한 변경0이다. C시험4소스56,749B를 정리했고 운영정제 이력/로그/백업/DB/승인/채팅/가중치는 보존한다.
+
+추가PCAP의 실제오프라인/HTTP/차단/카드/만료·복구·실패보고와 clock차이를 원장/문서에 구분했다. B/C의 새증분·초기설치소스는 Git게시·운영범위를 분리하고, 신규OS설치0이다. 양Kali전송용68,731,011B씩·Mac자체69파일/138,931,517B·임시경로/SSH소켓을 정리하고 해당프로세스0을 확인했다. B/C최종파일SHA/보호7SHA·fresh WS/worker/정제snapshot무결성을13:03재확인했다. 자료/결과·두복구본은 보존했고 추가자료 공개16파일a3d35683658e1a4318ca72714643acdc58f79531 커밋·푸시/13:10:07 KST 원격main일치 확인. 현황/검증원장3개 게시영수증은 후속 문서 커밋·푸시로 반영하며 최종HEAD/원격일치와 이번25공개경로·기존작업트리상태는 로컬세션에 기록한다. 기존 NAT/Ansible8파일·topology5stage는 별도 보존한다. 전체목표는 active·미완료다.
+
+
+</details>
+
+<a id="source-a124a369d785496c"></a>
+
+## STATUS-before-additional-pcap-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T13:10:05+09:00</summary>
+
+<a id="source-a124a369d785496c-h0"></a>
+<a id="record-f70289393007687b900f8a1c4aecc8d0aa60dc125d521b40b73aa62dd68c332d"></a>
+
+# 인프라 현황 — 2026-11-05 12:05 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-8a970f82c2248b8e) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-a124a369d785496c-h1"></a>
+<a id="record-0185d41399dfe11996f1c9b7f7ca22f04dac7af5bdef57b3dec63d12294f73ea"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·초기 설치 | 로컬 초안에11/5 조회 회복·실패·수집자 혼동/영향 근거 한계를 반영하고 이전본 보존. 초기 설치는 단일deploy.sh의 기존 source 복사 경로 연결/계약39 PASS | 최신PDF/전체 제출물·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+<a id="source-a124a369d785496c-h3"></a>
+<a id="record-8623e423823d7d1b5dbf4442742e0721da557c7abc2908f3c303bd2229b2e9db"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 추가 PCAP 양쪽 반입·232 시험과 실제 영향 조사 | 새7자료 수집·출처/정답 근거 검수 중. 232/233에 동일 PCAP·설명txt를 보관하고 실제 시험232만. 과거 백엔드 필터는 운영 확인했으나 LLM host/사후 판단·보고/기존 시간 한도 안 종결은 별도 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| FW NAT·운영 하네스·제어 공백 | 기존 NAT6은 관리자231/현재 로더SHA로 재기준·kernel/TTL/원복 검증, Ansible2 별도 미확정. C/미등록 unit 고정 진단·승인형 제어·SDK 보호쓰기/혼합 동등성 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | 실제 성공/실패/미확인 근거·최신PDF/제출형식·독립평가. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-a124a369d785496c-h4"></a>
+<a id="record-cb40c73fbba2657044092c3dbdacd4c80563ab75836aad8b0039a4adbccaf6a8"></a>
+
+## 이번 배포·복구·정리·Git
+
+과거 조회 보완은 C3/B2파일·두 복구본/15분 타이머 확정 해제·보호7SHA·채팅/Apache 재시작0·85검사·실제4MCP읽기/금지인자1거절까지 확인했다. 원본8MiB/14일·기존 권한은 유지하며 정제 이력만 별도32MiB/128k/최대8세대로 제한한다. C 시험 소스4파일/56,749B를 정리·복구본과 운영 이력은 보존했다. Mac의 공통 임시는 새PCAP 반입에 계속 사용 중이며 종료 시 정리한다. 조회 보완 공개15파일412b879 커밋·푸시/12:12:27 KST 원격main 일치 확인. 새PCAP7개/정답PDF2개·설명txt는 양쪽 반입/같은SHA 확인, 232에서 오프라인/실웹 시험 중이다. 공통 임시와 게시 영수증 문서는 시험 종료 후 마감한다. 아래는 직전 단위의 게시 영수증이다.
+
+B1차18파일11:02:00·2차14파일11:23:52 확정, 현재 고유21파일 SHA·포함gate/reference·보호7SHA·양봇WS/worker·4서비스11:35:27 재확인. 두 번의 배포에서 Native/SDK/review 각2회 재시작, 설정SOUL·모델·FW/TTL·승인·키/포트·패키지·일반 권한 변경0. 고유 회귀1,059PASS/skip0: 서버관리282/SDK219/Native391/설치39/review60/workflow4/output7/events27/table12와 설치 Native에서 chunks18. 호스트의 installed-runtime1skip은 실제 컨테이너 검사로 해소했으며 중복 합산하지 않았다. 중간 설치 fixture1실패는 새 callback 인자 대조를 갱신해39재통과했다.
+
+두 독립15분 복구 타이머 확정 해제/no-op, 원본/manifest/rollback2곳 보존·수동 원복 미시험. 시험 source/중간로그459파일6,503,664B를 SHA 대조·작은22파일 로컬 보존 후 제거. 실제 브라우저/프로필·Native 시험 임시 제거 확인, 운영DB/승인/채팅/실제trace/가중치 보존. Mac 자체37파일7,346,533B/임시 경로를 제거하고 해당 SSH 소켓 원래 부재·잔여 프로세스0을 확인했다. 기존 사용자 도구·publisher는 보존했다. 관련 공개22파일을42d1254fd9cc227baff9cb528606bca28c3e62a8로 커밋·푸시하고11:41:57 KST 실제 원격main 일치를 확인했다. 기존 NAT/Ansible8파일·topology5stage는 보존하며 이번 변경 외 파일은 커밋하지 않았다. 직전 게시68432aa와 이번 소스 게시를 구분하며, STATUS/작은 원장의 게시 영수증 보완2파일은 후속 문서 커밋·푸시로 반영한다. 그 최종HEAD/원격 일치·이번22경로와 기존 작업트리 상태는 로컬 세션 기록에 남긴다.
+
+
+</details>
+
+<a id="source-8a970f82c2248b8e"></a>
+
+## STATUS-before-web-history-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T12:12:24+09:00</summary>
+
+<a id="source-8a970f82c2248b8e-h0"></a>
+<a id="record-10ffb8dfe1f311022a88e021ccd72a0dc470daf0df2afb89c2686ddbb9a0a5f0"></a>
+
+# 인프라 현황 — 2026-11-05 11:42 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전 상세](STATUS_HISTORY.md#source-c1f4d4fa768ddb0f) · [전체 과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-8a970f82c2248b8e-h1"></a>
+<a id="record-480323ae8f3b09955237e2f196b6f228f37a114d0930c29dc56c47342b985338"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 완료·실제 확인 | 남은 범위 |
+|---|---|---|
+| 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
+| 웹 영향 추가 조사 | 공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
+| 과거 웹 접근 근거 | 실제 C DVWA 등록002/groot-web·당시 호스트7표본을 도구로 대조. 백엔드0행이어도 rows_truncated=true·malformed9 확인 | 최대10,000행 snapshot에서 과거 구간이 잘릴 수 있음. 사건 시간 기준 제한 조회 보완 필요. 운영자 직접 조회를 LLM 조사 성공으로 표시하지 않음 |
+| 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
+| 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
+| 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
+| 논문·초기 설치 | 로컬 초안에11/5 조회 회복·실패·수집자 혼동/영향 근거 한계를 반영하고 이전본 보존. 초기 설치는 단일deploy.sh의 기존 source 복사 경로 연결/계약39 PASS | 최신PDF/전체 제출물·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-7d1a638bc3cb5854b8648513abf9e8936bf24d538fe73c2adc6e491c1baeb5e6)
+
+<a id="source-8a970f82c2248b8e-h3"></a>
+<a id="record-1188c1ecbffdffeaecc5ce053319d07a1eb37b031b6d694841070f1570377fa5"></a>
+
+## 다음 작업과 완료 기준
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 과거 백엔드 구간·실제 호스트 영향/조사 시간 | 사건 구간의 보존 범위·잘림을 명확히 하는 제한 조회, 실제 모델 호스트/사후 조사와 근거 있는 판단·보고. 원문 검사·기존 시간 한도 완화로 완료 처리하지 않음 |
+|2| 실서비스·보안경로·승인 E2E | 앱 가동 의도 확인·다른 정상/공격·LLM 판단·유지/해제/재차단·장애/복구, IDS/Wazuh 중복의 참조/지속성/정확 승인·독립 복구 |
+|3| FW NAT·운영 하네스·제어 공백 | 기존 NAT6은 관리자231/현재 로더SHA로 재기준·kernel/TTL/원복 검증, Ansible2 별도 미확정. C/미등록 unit 고정 진단·승인형 제어·SDK 보호쓰기/혼합 동등성 |
+|4| 독립 평가·장기 운용 |176 미사용 평가·원본/학습/하네스 비교, 장기 알림/Vector/수집 장애 무손실·복구, 표 UI 전 경로/자동 skill_manage 제한 연결 |
+|5| 논문·발표 | 실제 성공/실패/미확인 근거·최신PDF/제출형식·독립평가. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완료를 선언하지 않는다.
+
+
+
+<a id="source-8a970f82c2248b8e-h4"></a>
+<a id="record-585eeb7c32500e5054e5e8f410b98dea7b8a9b1a269430818814cd0b233f3aa3"></a>
+
+## 이번 배포·복구·정리·Git
+
+B1차18파일11:02:00·2차14파일11:23:52 확정, 현재 고유21파일 SHA·포함gate/reference·보호7SHA·양봇WS/worker·4서비스11:35:27 재확인. 두 번의 배포에서 Native/SDK/review 각2회 재시작, 설정SOUL·모델·FW/TTL·승인·키/포트·패키지·일반 권한 변경0. 고유 회귀1,059PASS/skip0: 서버관리282/SDK219/Native391/설치39/review60/workflow4/output7/events27/table12와 설치 Native에서 chunks18. 호스트의 installed-runtime1skip은 실제 컨테이너 검사로 해소했으며 중복 합산하지 않았다. 중간 설치 fixture1실패는 새 callback 인자 대조를 갱신해39재통과했다.
+
+두 독립15분 복구 타이머 확정 해제/no-op, 원본/manifest/rollback2곳 보존·수동 원복 미시험. 시험 source/중간로그459파일6,503,664B를 SHA 대조·작은22파일 로컬 보존 후 제거. 실제 브라우저/프로필·Native 시험 임시 제거 확인, 운영DB/승인/채팅/실제trace/가중치 보존. Mac 자체37파일7,346,533B/임시 경로를 제거하고 해당 SSH 소켓 원래 부재·잔여 프로세스0을 확인했다. 기존 사용자 도구·publisher는 보존했다. 관련 공개22파일을42d1254fd9cc227baff9cb528606bca28c3e62a8로 커밋·푸시하고11:41:57 KST 실제 원격main 일치를 확인했다. 기존 NAT/Ansible8파일·topology5stage는 보존하며 이번 변경 외 파일은 커밋하지 않았다. 직전 게시68432aa와 이번 소스 게시를 구분하며, STATUS/작은 원장의 게시 영수증 보완2파일은 후속 문서 커밋·푸시로 반영한다. 그 최종HEAD/원격 일치·이번22경로와 기존 작업트리 상태는 로컬 세션 기록에 남긴다.
+
+
+</details>
+
+<a id="source-c1f4d4fa768ddb0f"></a>
+
+## STATUS-before-impact-navigation-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T11:41:54+09:00</summary>
+
+<a id="source-c1f4d4fa768ddb0f-h0"></a>
+<a id="record-0ab807446968cc5ac7184b8a6ec76090ff78660418c89abc700b2feeb7526810"></a>
+
+# 인프라 현황 — 2026-11-05 10:42 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-1d85f846d75131ad) · [실패 표/DNS 전](STATUS_HISTORY.md#source-c174690bb173e547) · [업무 스킬 전](STATUS_HISTORY.md#source-53fb9b60b63424fb) · [입력 검사 전](STATUS_HISTORY.md#source-a08bb8743d75fdcc) · [최소 종결 전](STATUS_HISTORY.md#source-2b029d3bd8b6e503) · [웹 읽기 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-c1f4d4fa768ddb0f-h1"></a>
+<a id="record-31083c2f9571ed4ade9cfb7366c8d2a289f0ec86dd11421201440277810d8ace"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 필수 조회 범위 일치 | 공통1.5.30/query1.19.25에서 verify 필수 센서의 정확 JSON 안내·MCP 전 범위 검사·같은 실제 읽기만 오류 해소를 연결. 기존 실패 이력/다른 오류 유지·서버995PASS/skip0, B11파일10:29:41확정 | 이전 run19의 소수점 구간 생략을 원인으로 확인. 실제 run20은142.767초·4읽기/오류0/보호0·필수센서3/3/미충족0, 조회 회복 확인. 정정1회 프로필 실제 사용 뒤에도 본문 사실 검사 거절·표 대체/needs_review. 실제 영향/판단·종결·속도 향상 미완료. [범위·복구](infra/hermes/required-sensor-scope.md) |
+| 사건관리 실패 보고 표 | 실제 최근5게시물 중4개가 실패/검토 필요 줄글인 경로 확인. 일반 오류·SILENT를 공통3열4행 표로 연결, B보고/helper6파일10:00:15확정·이 단위 채팅 재시작0. [실제 형식 보완 게시](https://chat.grootlab.duckdns.org/soc/pl/yioa5ni8i7r7pmyxn5ty5djwyo), API로 표6줄/코드블록 없음 확인 | 과거 줄글은 이력 보존. 이번 브라우저는 CUA kernel assets 오류로 미검증. 모든 정상/정기 카드/초장문 행 전수 검증 아님. [범위·복구](infra/hermes/incident-report-fallback.md) |
+| DuckDNS 정보·상관 | 같은 질의의 ET2SID가 Informational인데 한 category는 Potentially Bad Traffic. security-events1.2.1에 원본 표지/flow/DNS식별자·해석 범위 전달, 실제5표본 확인·조사 스킬3프로필 동기화 | Wazuh100112의 정보성 급증 오탐/실제 high·medium 반복 누락 수정 후보는 격리14조건 통과. 정확 승인 카드10:10:56만료·10:12:23 실제 expired/운영 원본SHA유지, 미적용. 모델 새 질의69.360초/1읽기·partial, 근거 없는 정상 초안 거절. [후보·검증](infra/validation/dns-noise/README.md) |
+| 복합 조사 지연 | verify의 알려진 시각/표본 고정 근거 정정에만 다음1회 none/2048토큰·원상복귀하는 제한 프로필/6검사. 초기 위험 판단·필수 근거 부족·보호 변경에는 적용 안함. 공통1.5.29/query1.19.24 | 새 Native129.206초/5읽기 성공+입력 거절1·needs_review. 정확 후속 시간 경계/manager 필수인자 실패로 이 프로필 실제 미사용.214.272→129.206초를 변경 효과로 귀속하지 않음. 실제 영향/종결·의미/지연 잔여 |
+| 공통 업무 스킬 | soc-output+조회/조사/변경/복구4개를 두 봇·root 조사/검토·초기 설치 경로에 연결. 세 프로필5파일SHA동일·Native실제UID995 선택/중복 검사·서버1,091PASS/skip0, B30파일02:14:20확정 | 새 SDK ‘fw 룰 보여줘’11.681초/모델1·MCP1/오류0·쓰기0. 채팅/UI 왕복·평균 향상·전 업무 품질·자동 skill_manage 자기수정은 별도. [범위·복구](infra/hermes/workflow-skills.md) |
+| 대응 타임라인 | 기존 API 요청 등록·신규 성공 readback 관측시각/SHA·미기록 시각 구분. A2파일02:11:16확정. 실제 과거 등록14:50:28/기한15:00:28·최초확인 미기록, 기록SHA유지. 실제 옛 보고의 최초/만료 혼동을 재생 거절 | 신규 관측시각은 격리 backend 검증이며 새 실제 차단 시각 시험0. 당시 Native 조사5읽기 뒤214.272초/outcome_unknown, 후속 새 재검토129.206초/5읽기+입력거절1·needs_review. 실제 영향·종결·보고 의미/지연 미완료. [검증](infra/hermes/workflow-skills.md) |
+| 채팅 담당 분배 | 공통1.5.28/query1.19.23/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | Native/SDK 공통 명시 판단·실제 인용·자산별 사건 시각 최소 영향 조회 검사. 과거 잘못된 종결8호출 재생은 양쪽 거절, 별도 미해결8호출은 유지. 서버951PASS/skip0·00:49:18 B13파일 확정 | 직전 Native148.766초/13호출9오류는 후속 입력검사로 보완했고 최신149.645초/8조회0오류·monitor다. 이전 최초/만료 오표기는 후속 시각 근거/검사로 보완했다. 새 실제 재검토는5읽기 뒤 시간초과로 미확인이다. 실제 영향·사후/승인 경과·종결·SDK 보호쓰기/혼합 전체 동등성은 미완료. [범위·실패·복구](infra/hermes/incident-closure-minimum.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| SDK 사건 조회·실패 보고 | 구조화 선택 묶음4·다음 선택에 검증 오류 전달·근거 없는 agent ID 제한/실제 탐색. 새 실제시험120.068초·MCP6/오류0·모델5, 수정 전103.682초·MCP0/잘못된 선택3회에서 조회 회복. SDK 실패 보고도 Native 공통 근거 표로 연결·설치본 실제6영수증 재생 통과 | 자산별 당시 경보 누락·부재/해소 단정이 거절되어 partial. 사건 종결 성공·속도 향상 아님. 최종 표 보완은 같은 실제6조회 재생이며 새 모델/채팅/UI 시험0. [검증](infra/hermes/incident-closure-minimum.md) |
+| Native 도구 입력/연결 오류 | 실제 스키마의 로컬 거절·manager/agent 구분·실제-32602를application error로 전달. 과거9잘못된호출 wire0·별도오류1뒤정상조회1/실패계수0. 서버961PASS/skip0·B14파일01:21:36확정 | 새 실제재검토8조회/0오류·149.645초·monitor/보고전달1. 최초/만료 오표기 정보공백은 후속 보완·옛 보고 재생 거절, 새 실제 조사 시간초과·정상화/조치 판단/표본 의미는 미완료. 속도향상·사건종결·새공격/설치 아님. [검증·복구](infra/hermes/mcp-input-validation.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-c1f4d4fa768ddb0f-h2"></a>
+<a id="record-34cc9135b8fd9c82ae00946eb8f741e2c46933573a1cbfa136f744b04dc8c223"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.30/query1.19.25/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-1d85f846d75131ad-h3"></a>
+<a id="source-c1f4d4fa768ddb0f-h3"></a>
+<a id="record-91c3cf5bb665359b9736b05ae236914030e6dbaf716b3378d5ba1f680c2c1f46"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백·사건 실패/정확 입력·DNS 판단 보완 | 고정 웹 백엔드 접근 읽기2개 추가 이후 실제 앱·호스트 영향과 사건 사후구간 조사, 목적지/수집 agent 관계·승인 경과 상세와 종결 의미 보완. Native/SDK 최소 종결검사와 업무 스킬은 공유했지만 실제 영향·사후 조회/판단·미등록 자산명/분류·상관 혼동·임시 차단 지연은 잔여. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 |11/4 초안의 현행WAF/Native 예외·실PCAP/단일DVWA·학습3군/한영초록·한계 및 시스템SVG 단독 시각검수, 참고문헌11개 서지/해당 개념 대조·이전본 보존. 최신PDF·전체 출판본/제출형식·독립평가/전과정 결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-c1f4d4fa768ddb0f-h4"></a>
+<a id="record-1ee3becf1944114673027d319ea97db9a015ee1664f668505094ca5a1f8ad2b5"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 verify 필수 읽기의 정확 범위와 실행 전 검사/해당 오류 회복이다. B11파일10:29:41 KST 확정·실제 포함 gate/참조70aa45f9·보호설정7SHA·fresh WS/worker·4서비스를 확인했다. root는 Trace·새 helper2개·command_for의 포함 gate만 바꾸고 그 밖 AST를 유지했다. Native/SDK/review 각1회 재시작·모델/FW/TTL/승인·키/포트/패키지·일반권한 변경0이다. 최종 서버995PASS/skip0·새7조건 포함, 초기 설치4실패는 불필요한 import의 범위 정정 후 재검사했다. 첫 확정은 heartbeat 준비 전으로 실패했고 같은 실제 서비스의 준비 상태를 확인 후 확정, 추가 재시작0이다.
+
+`/var/lib/capstone-sensor-scope/20261105-r1/deployment`의 원본·manifest·rollback을 보존하고 독립15분 타이머 해제/confirmed no-op을 확인했다. 수동 원복·새 공격·새 OS설치0이다. 실제 읽기 전용 run20은DB terminal completed로 확인·142.767초/사건needs_review다. 이후 다른 타이머 실행의 PID와 해당 run을 구별하고, 관측 지연만으로 모델을 재시작하거나 중단하지 않았다. 기존 작업의3복구본·운영DB/승인/대화/실제조사/가중치와 기존 NAT/Ansible8파일·topology5stage는 보존한다. 실제 Native 이벤트의 문자열 표본 수와 숫자 MCP 영수증 차이를 확인해 root 한 함수만10:40:16 추가 확정·실제 영수증 재생/숫자 변조 거절·추가 채팅 재시작0, 전체11파일SHA/보호7SHA·서비스를10:41:42 재확인했다. 중간 원본과 별도15분 복구는 같은 deployment의 receipt-compat에 보존하고 확정/no-op을 확인했다.
+
+서버 시험 반입/로그는 최초445파일6,476,988B·영수증 보완 재검사444파일6,473,457B를 각각 SHA 검증/작은 로그9+8개 로컬 보존 후 제거했다. 같은 공개 소스를 두 번 반입한 수량이며 고유 파일 수로 합치지 않는다. Mac 자체16파일4,924,872B와 추가9파일4,199,397B/두 임시 경로·자체 SSH master를 정리했다. 기존 사용자 도구·운영 모델·DB/승인/채팅/실제 조사·가중치는 보존한다. 관련 공개16파일을8b043a561262a4305bedb378e8db7335b9cc4c43로 커밋·푸시했고2026-11-05 10:43:35 KST 실제 원격main 일치를 확인했다. 소스/초기 설치 연결·현황/계획·작은 원장·이전 문서 보존을 마쳤다. 게시 영수증을 기록하는 STATUS/작은 원장2파일은 별도 후속 문서 커밋으로 반영하며 마지막 문서 HEAD·원격 일치·이번 경로와 기존 작업트리 확인은 로컬 세션 기록에 남긴다. 직전 최종 게시7b89b3e와 현재 로컬 변경을 구분한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-1d85f846d75131ad"></a>
+
+## STATUS-before-required-scope-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T10:43:33+09:00</summary>
+
+<a id="source-1d85f846d75131ad-h0"></a>
+<a id="record-b87198a95704d73b7cc3598cf1142599b5c01e6d900b4b8004028055a1974064"></a>
+
+# 인프라 현황 — 2026-11-05 10:17 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-c174690bb173e547) · [업무 스킬 전](STATUS_HISTORY.md#source-53fb9b60b63424fb) · [입력 검사 전](STATUS_HISTORY.md#source-a08bb8743d75fdcc) · [최소 종결 전](STATUS_HISTORY.md#source-2b029d3bd8b6e503) · [웹 읽기 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-1d85f846d75131ad-h1"></a>
+<a id="record-3f6ee0bac73b35542014d0eb1905e1ed05d6862d347816c0f7909f9e1d751ef8"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 사건관리 실패 보고 표 | 실제 최근5게시물 중4개가 실패/검토 필요 줄글인 경로 확인. 일반 오류·SILENT를 공통3열4행 표로 연결, B보고/helper6파일10:00:15확정·이 단위 채팅 재시작0. [실제 형식 보완 게시](https://chat.grootlab.duckdns.org/soc/pl/yioa5ni8i7r7pmyxn5ty5djwyo), API로 표6줄/코드블록 없음 확인 | 과거 줄글은 이력 보존. 이번 브라우저는 CUA kernel assets 오류로 미검증. 모든 정상/정기 카드/초장문 행 전수 검증 아님. [범위·복구](infra/hermes/incident-report-fallback.md) |
+| DuckDNS 정보·상관 | 같은 질의의 ET2SID가 Informational인데 한 category는 Potentially Bad Traffic. security-events1.2.1에 원본 표지/flow/DNS식별자·해석 범위 전달, 실제5표본 확인·조사 스킬3프로필 동기화 | Wazuh100112의 정보성 급증 오탐/실제 high·medium 반복 누락 수정 후보는 격리14조건 통과. 정확 승인 카드10:10:56만료·10:12:23 실제 expired/운영 원본SHA유지, 미적용. 모델 새 질의69.360초/1읽기·partial, 근거 없는 정상 초안 거절. [후보·검증](infra/validation/dns-noise/README.md) |
+| 복합 조사 지연 | verify의 알려진 시각/표본 고정 근거 정정에만 다음1회 none/2048토큰·원상복귀하는 제한 프로필/6검사. 초기 위험 판단·필수 근거 부족·보호 변경에는 적용 안함. 공통1.5.29/query1.19.24 | 새 Native129.206초/5읽기 성공+입력 거절1·needs_review. 정확 후속 시간 경계/manager 필수인자 실패로 이 프로필 실제 미사용.214.272→129.206초를 변경 효과로 귀속하지 않음. 실제 영향/종결·의미/지연 잔여 |
+| 공통 업무 스킬 | soc-output+조회/조사/변경/복구4개를 두 봇·root 조사/검토·초기 설치 경로에 연결. 세 프로필5파일SHA동일·Native실제UID995 선택/중복 검사·서버1,091PASS/skip0, B30파일02:14:20확정 | 새 SDK ‘fw 룰 보여줘’11.681초/모델1·MCP1/오류0·쓰기0. 채팅/UI 왕복·평균 향상·전 업무 품질·자동 skill_manage 자기수정은 별도. [범위·복구](infra/hermes/workflow-skills.md) |
+| 대응 타임라인 | 기존 API 요청 등록·신규 성공 readback 관측시각/SHA·미기록 시각 구분. A2파일02:11:16확정. 실제 과거 등록14:50:28/기한15:00:28·최초확인 미기록, 기록SHA유지. 실제 옛 보고의 최초/만료 혼동을 재생 거절 | 신규 관측시각은 격리 backend 검증이며 새 실제 차단 시각 시험0. 당시 Native 조사5읽기 뒤214.272초/outcome_unknown, 후속 새 재검토129.206초/5읽기+입력거절1·needs_review. 실제 영향·종결·보고 의미/지연 미완료. [검증](infra/hermes/workflow-skills.md) |
+| 채팅 담당 분배 | 공통1.5.28/query1.19.23/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | Native/SDK 공통 명시 판단·실제 인용·자산별 사건 시각 최소 영향 조회 검사. 과거 잘못된 종결8호출 재생은 양쪽 거절, 별도 미해결8호출은 유지. 서버951PASS/skip0·00:49:18 B13파일 확정 | 직전 Native148.766초/13호출9오류는 후속 입력검사로 보완했고 최신149.645초/8조회0오류·monitor다. 이전 최초/만료 오표기는 후속 시각 근거/검사로 보완했다. 새 실제 재검토는5읽기 뒤 시간초과로 미확인이다. 실제 영향·사후/승인 경과·종결·SDK 보호쓰기/혼합 전체 동등성은 미완료. [범위·실패·복구](infra/hermes/incident-closure-minimum.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| SDK 사건 조회·실패 보고 | 구조화 선택 묶음4·다음 선택에 검증 오류 전달·근거 없는 agent ID 제한/실제 탐색. 새 실제시험120.068초·MCP6/오류0·모델5, 수정 전103.682초·MCP0/잘못된 선택3회에서 조회 회복. SDK 실패 보고도 Native 공통 근거 표로 연결·설치본 실제6영수증 재생 통과 | 자산별 당시 경보 누락·부재/해소 단정이 거절되어 partial. 사건 종결 성공·속도 향상 아님. 최종 표 보완은 같은 실제6조회 재생이며 새 모델/채팅/UI 시험0. [검증](infra/hermes/incident-closure-minimum.md) |
+| Native 도구 입력/연결 오류 | 실제 스키마의 로컬 거절·manager/agent 구분·실제-32602를application error로 전달. 과거9잘못된호출 wire0·별도오류1뒤정상조회1/실패계수0. 서버961PASS/skip0·B14파일01:21:36확정 | 새 실제재검토8조회/0오류·149.645초·monitor/보고전달1. 최초/만료 오표기 정보공백은 후속 보완·옛 보고 재생 거절, 새 실제 조사 시간초과·정상화/조치 판단/표본 의미는 미완료. 속도향상·사건종결·새공격/설치 아님. [검증·복구](infra/hermes/mcp-input-validation.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-1d85f846d75131ad-h2"></a>
+<a id="record-6f5c6316a14577c9e5dfce628b4883d8a483c237aa8739983cc82affff458487"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.29/query1.19.24/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-91c3cf5bb665359b9736b05ae236914030e6dbaf716b3378d5ba1f680c2c1f46)
+
+<a id="source-1d85f846d75131ad-h4"></a>
+<a id="record-050bf10a0c2f64286e863b1cad39430f3ec850034964ac1ed38c6d36b60d3940"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 사건관리 오류 표·DNS 원본 근거·검증 helper 호환·verify의 제한된 고정 근거 정정이다. B의15파일09:31:36·5파일09:41:48·6파일10:00:15 각각 확정, 최종23개 고유 파일SHA와 gate/참조767ff88a·보호설정7SHA·양봇 fresh WS/worker·4서비스를 확인했다. Native/SDK/review 각2회 재시작은 앞선 두 하위 단위이며 보고/helper는 재시작0이다. 모델·FW/TTL/승인·키/포트·일반권한·패키지 변경0, Wazuh 후보는 미적용·운영 매니저 재시작0이다. 마지막 서버 회귀는1,081PASS/skip0이며 격리native14조건은 별도다. 이전1,091검사와 합산하지 않는다.
+
+B의 `/var/lib/capstone-investigation-latency/20261105-r1/deployment`, `/var/lib/capstone-dns-context/20261105-r1/deployment`, `/var/lib/capstone-report-helper/20261105-r1/deployment`에 원본·manifest·원복을 보존했다. 독립15분 타이머를 확인 후 해제/confirmed no-op, 수동 원복·새 공격·새 OS설치0이다. 새 그룹 룰 적용 후에는 원래 정책 복구와 구 helper의 호환 순서를 지킨다. 격리 엔진2개·비밀 포함 etc 사본2개는 독립 정리기가 제거했고10:07:58 실제 영수증을 확인했다. 초기 일부 logtest 세션은 토큰 미확보로 즉시 삭제/기한을 확인하지 못했으며 타 사용자 세션을 일괄 삭제하지 않았다.
+
+소스/설치 복사 경로·현재 문서와 후보 원장을 동기화했다. 서버 시험 소스/로그474파일6,558,654B를 SHA 대조·작은 원문38개 로컬 보존 후 정리했다. 첫 정리는 테스트 소스 내부의 deployment 폴더까지 복구본으로 제외해 남았고, 기준을 최상위 복구 폴더로 바로잡아 잔여92개를 별도 SHA 확인 후 제거했다. Mac 자체63파일7,542,458B·임시 경로/자체 SSH master를 정리했다. 기존 사용자 환경·운영DB/승인/가중치와 실제 제안 기록은 보존한다. 관련 공개25파일을4882fd956be487eb8eac38d7e0726995943cc2b2로 커밋·푸시했고2026-11-05 10:18:23 KST 실제 원격main 일치를 확인했다. 게시 결과를 기록하는 STATUS/작은 원장2파일은 별도 후속 문서 커밋으로 반영한다. 마지막 문서 커밋ID·원격 일치·이번 경로의 HEAD대비 차이와 기존 작업트리 보존 결과는 로컬 세션 기록에 남긴다. 직전 단위 최종 게시adc2ed5와 이번 소스 게시를 구분한다. 운영DB/승인/대화/실제 조사·가중치, 기존 NAT/Ansible8파일·topology5stage와 자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-c174690bb173e547"></a>
+
+## STATUS-before-dns-report-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T10:18:13+09:00</summary>
+
+<a id="source-c174690bb173e547-h0"></a>
+<a id="record-04c1708067fc05cc830188b59fd8f040fbef1bea7cbd89183072304494e57d26"></a>
+
+# 인프라 현황 — 2026-11-05 02:14 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-53fb9b60b63424fb) · [입력 검사 전](STATUS_HISTORY.md#source-a08bb8743d75fdcc) · [최소 종결 전](STATUS_HISTORY.md#source-2b029d3bd8b6e503) · [웹 읽기 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-c174690bb173e547-h1"></a>
+<a id="record-7311260ff899ba4933e39ba4cb7e50055efae9daf3850adc5b0aed779969eb25"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공통 업무 스킬 | soc-output+조회/조사/변경/복구4개를 두 봇·root 조사/검토·초기 설치 경로에 연결. 세 프로필5파일SHA동일·Native실제UID995 선택/중복 검사·서버1,091PASS/skip0, B30파일02:14:20확정 | 새 SDK ‘fw 룰 보여줘’11.681초/모델1·MCP1/오류0·쓰기0. 채팅/UI 왕복·평균 향상·전 업무 품질·자동 skill_manage 자기수정은 별도. [범위·복구](infra/hermes/workflow-skills.md) |
+| 대응 타임라인 | 기존 API 요청 등록·신규 성공 readback 관측시각/SHA·미기록 시각 구분. A2파일02:11:16확정. 실제 과거 등록14:50:28/기한15:00:28·최초확인 미기록, 기록SHA유지. 실제 옛 보고의 최초/만료 혼동을 재생 거절 | 신규 관측시각은 격리 backend 검증이며 새 실제 차단 시각 시험0. 새 Native 조사5읽기/0오류 뒤210초한도·실행기록214.272초/outcome_unknown, 실제 영향·종결·보고 의미/지연 미완료. [검증](infra/hermes/workflow-skills.md) |
+| 채팅 담당 분배 | 공통1.5.28/query1.19.23/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | Native/SDK 공통 명시 판단·실제 인용·자산별 사건 시각 최소 영향 조회 검사. 과거 잘못된 종결8호출 재생은 양쪽 거절, 별도 미해결8호출은 유지. 서버951PASS/skip0·00:49:18 B13파일 확정 | 직전 Native148.766초/13호출9오류는 후속 입력검사로 보완했고 최신149.645초/8조회0오류·monitor다. 이전 최초/만료 오표기는 후속 시각 근거/검사로 보완했다. 새 실제 재검토는5읽기 뒤 시간초과로 미확인이다. 실제 영향·사후/승인 경과·종결·SDK 보호쓰기/혼합 전체 동등성은 미완료. [범위·실패·복구](infra/hermes/incident-closure-minimum.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| SDK 사건 조회·실패 보고 | 구조화 선택 묶음4·다음 선택에 검증 오류 전달·근거 없는 agent ID 제한/실제 탐색. 새 실제시험120.068초·MCP6/오류0·모델5, 수정 전103.682초·MCP0/잘못된 선택3회에서 조회 회복. SDK 실패 보고도 Native 공통 근거 표로 연결·설치본 실제6영수증 재생 통과 | 자산별 당시 경보 누락·부재/해소 단정이 거절되어 partial. 사건 종결 성공·속도 향상 아님. 최종 표 보완은 같은 실제6조회 재생이며 새 모델/채팅/UI 시험0. [검증](infra/hermes/incident-closure-minimum.md) |
+| Native 도구 입력/연결 오류 | 실제 스키마의 로컬 거절·manager/agent 구분·실제-32602를application error로 전달. 과거9잘못된호출 wire0·별도오류1뒤정상조회1/실패계수0. 서버961PASS/skip0·B14파일01:21:36확정 | 새 실제재검토8조회/0오류·149.645초·monitor/보고전달1. 최초/만료 오표기 정보공백은 후속 보완·옛 보고 재생 거절, 새 실제 조사 시간초과·정상화/조치 판단/표본 의미는 미완료. 속도향상·사건종결·새공격/설치 아님. [검증·복구](infra/hermes/mcp-input-validation.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-c174690bb173e547-h2"></a>
+<a id="record-4710aa53f381af315fd83e8d69c533fe4411fb8367a18fab2274d69db6d5daf1"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.28/query1.19.23/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-c174690bb173e547-h3"></a>
+<a id="record-cbc77d38c71a851fbd843eaad79df2e294d3a342f60b4210aefd13eef8c49308"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 고정 웹 백엔드 접근 읽기2개 추가 이후 실제 앱·호스트 영향과 사건 사후구간 조사, 목적지/수집 agent 관계·승인 경과 상세와 종결 의미 보완. Native/SDK 최소 종결검사와 업무 스킬은 공유했지만 실제 영향·사후 조회/판단·미등록 자산명/분류·상관 혼동·임시 차단 지연은 잔여. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 |11/4 초안의 현행WAF/Native 예외·실PCAP/단일DVWA·학습3군/한영초록·한계 및 시스템SVG 단독 시각검수, 참고문헌11개 서지/해당 개념 대조·이전본 보존. 최신PDF·전체 출판본/제출형식·독립평가/전과정 결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-c174690bb173e547-h4"></a>
+<a id="record-e3cba4753944e7f9a10bdc531644df018fdb3ae54f5d0a166bd752191c64bb14"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 공통5스킬 연결과 차단 시각 역할 구분이다. A2파일02:11:16·B30파일02:14:20 KST 확정, 보호설정7SHA·gate/참조ee5bf2ad·양봇WS/worker·4서비스 확인. Native2회·SDK/review각1회 재시작, 모델·FW/TTL/승인·키/포트·일반권한·패키지 변경0이다. 두 서버의 `/var/lib/capstone-time-semantics/20261105-r1/deployment`에 복구본을 보존하고 독립15분 타이머 해제/confirmed no-op을 확인했다. 수동 원복·새 공격·새OS설치0이다.
+
+서버 시험 임시453파일6,556,918B 정리와 작은 검증 원문 로컬 보존을 마쳤다. Mac자체34파일5,930,648B·작업 임시 경로/SSH master를 정리했다. 관련 공개37파일은6467f6153ba2207d430800587513e790fccba38a로 커밋·푸시했고2026-11-05T09:16:32.063922+09:00 실제 원격main 일치를 확인했다. 게시 결과를 기록하는 STATUS/작은원장2파일은 별도 후속 문서 커밋이며 마지막 HEAD/원격/작업트리 확인은 로컬 기록에 남긴다. 운영DB/승인/대화/실제조사 원문·가중치는 보존한다. 직전 게시5b5157e와 이번 미커밋 변경을 구분한다. 기존 NAT/Ansible8파일·topology5stage와 자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-53fb9b60b63424fb"></a>
+
+## STATUS-before-workflow-skills-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T09:16:28+09:00</summary>
+
+<a id="source-53fb9b60b63424fb-h0"></a>
+<a id="record-3e0a49067ee8d9db8f9b73e86903589b7ef1b37cc045ed42163d68bdb05a6c97"></a>
+
+# 인프라 현황 — 2026-11-05 01:21 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-a08bb8743d75fdcc) · [최소 종결 전](STATUS_HISTORY.md#source-2b029d3bd8b6e503) · [웹 읽기 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-53fb9b60b63424fb-h1"></a>
+<a id="record-7c52d857aa62933cfd40349fb3caa26f5f30c8dadf3da2f6f9507ae12f784782"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.27/query1.19.22/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | Native/SDK 공통 명시 판단·실제 인용·자산별 사건 시각 최소 영향 조회 검사. 과거 잘못된 종결8호출 재생은 양쪽 거절, 별도 미해결8호출은 유지. 서버951PASS/skip0·00:49:18 B13파일 확정 | 직전 Native148.766초/13호출9오류는 후속 입력검사로 보완했고 최신149.645초/8조회0오류·monitor다. 최초 차단 시각을 만료 시각과 같게 쓴 보고 오류와 의미 검증은 잔여다. 실제 영향·사후/승인 경과·종결·SDK 보호쓰기/혼합 전체 동등성은 미완료. [범위·실패·복구](infra/hermes/incident-closure-minimum.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| SDK 사건 조회·실패 보고 | 구조화 선택 묶음4·다음 선택에 검증 오류 전달·근거 없는 agent ID 제한/실제 탐색. 새 실제시험120.068초·MCP6/오류0·모델5, 수정 전103.682초·MCP0/잘못된 선택3회에서 조회 회복. SDK 실패 보고도 Native 공통 근거 표로 연결·설치본 실제6영수증 재생 통과 | 자산별 당시 경보 누락·부재/해소 단정이 거절되어 partial. 사건 종결 성공·속도 향상 아님. 최종 표 보완은 같은 실제6조회 재생이며 새 모델/채팅/UI 시험0. [검증](infra/hermes/incident-closure-minimum.md) |
+| Native 도구 입력/연결 오류 | 실제 스키마의 로컬 거절·manager/agent 구분·실제-32602를application error로 전달. 과거9잘못된호출 wire0·별도오류1뒤정상조회1/실패계수0. 서버961PASS/skip0·B14파일01:21:36확정 | 새 실제재검토8조회/0오류·149.645초·monitor/보고전달1. 모델의 최초 차단시각 오표기·정상화/조치 판단/표본 의미는 미완료. 속도향상·사건종결·새공격/설치 아님. [검증·복구](infra/hermes/mcp-input-validation.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-53fb9b60b63424fb-h2"></a>
+<a id="record-76ddb951da4bd89845afe37565d6dbf5125a00bc2e17c203b5699f16ed489898"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.27/query1.19.22/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-2b029d3bd8b6e503-h3"></a>
+<a id="source-53fb9b60b63424fb-h3"></a>
+<a id="source-a08bb8743d75fdcc-h3"></a>
+<a id="record-99be40eb15142307780fd5d70bd04003da1ae8471beda99c3bde06242886cacb"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 고정 웹 백엔드 접근 읽기2개 추가 이후 실제 앱·호스트 영향과 사건 사후구간 조사, 목적지/수집 agent 관계·승인 경과 상세와 종결 의미 보완. Root 최소 종결검사는 적용했지만 SDK 일반채팅 동일 검사·미등록 자산명/분류·상관 혼동·임시 차단 지연은 잔여. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 |11/4 초안의 현행WAF/Native 예외·실PCAP/단일DVWA·학습3군/한영초록·한계 및 시스템SVG 단독 시각검수, 참고문헌11개 서지/해당 개념 대조·이전본 보존. 최신PDF·전체 출판본/제출형식·독립평가/전과정 결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-53fb9b60b63424fb-h4"></a>
+<a id="record-492216053ef57fbbd4d3474e4a78f9b9388d23d7378995c9630b6e8bc8efa708"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 B의 Native/SDK 입력 스키마와 읽기 프로토콜 오류 구분이다.01:21:36 KST14파일·root포함gate/참조465d8599·보호config7SHA·양WS/worker·관리timer/브로커를 확인해 확정하고15분 복구 timer를 해제/confirmed no-op을 확인했다. Native1회·SDK/review각1회 재시작, 모델·FW/TTL/승인·키/포트·일반권한 변경0이다. 원본/후보/SHA·복구는 `/var/lib/capstone-native-input/20261105-r1/deployment`에 보존한다. 새 실사건 검토는verify읽기 전용이며 실제 보고의 시각 오류를 완료로 숨기지 않는다.
+
+서버 시험441파일6,421,312B와 Mac자체29파일6478101B·자체SSH프로세스/소켓을 정리했다. 복구본·운영DB/승인/대화·실제조사 원문은 보존한다. 관련 공개17파일은7f2d1ee2f342635de0287d2c12857827815a56ef로 커밋·푸시했고2026-11-05T01:26:47.341008+09:00 실제 원격main 일치를 확인했다. 이 게시 결과의 STATUS/작은원장2파일은 별도 후속 문서 커밋이며 최종커밋/원격/작업트리는 로컬 기록에서 확인한다. [직전 최소 종결 단위](STATUS_HISTORY.md#source-a08bb8743d75fdcc)의 검증/정리/게시 이력은 보존한다. 기존 NAT/Ansible8파일·topology5stage 및 자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-a08bb8743d75fdcc"></a>
+
+## STATUS-before-mcp-input-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T01:26:44+09:00</summary>
+
+<a id="source-a08bb8743d75fdcc-h0"></a>
+<a id="record-6811ec170759e278c6cd9598b9c36eea5ccd0c58fe6ffe8680a6f2c6a44523c0"></a>
+
+# 인프라 현황 — 2026-11-05 00:49 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-2b029d3bd8b6e503) · [웹 읽기 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-a08bb8743d75fdcc-h1"></a>
+<a id="record-a2803824333024703b179387696c2c04419e17c6b9ff045f8e70d461aa7c2cb4"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.26/query1.19.21/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | Native/SDK 공통 명시 판단·실제 인용·자산별 사건 시각 최소 영향 조회 검사. 과거 잘못된 종결8호출 재생은 양쪽 거절, 별도 미해결8호출은 유지. 서버951PASS/skip0·00:49:18 B13파일 확정 | Native 새 재검토148.766초/13호출9오류·needs_review. 잘못된 장비 대상·미지원 인자/manager 로그와 agent 경보 혼동·입력 오류의 연결 장애 오분류가 잔여. 실제 영향·사후/승인 경과·종결·SDK 보호쓰기/혼합 전체 동등성은 미완료. [범위·실패·복구](infra/hermes/incident-closure-minimum.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| SDK 사건 조회·실패 보고 | 구조화 선택 묶음4·다음 선택에 검증 오류 전달·근거 없는 agent ID 제한/실제 탐색. 새 실제시험120.068초·MCP6/오류0·모델5, 수정 전103.682초·MCP0/잘못된 선택3회에서 조회 회복. SDK 실패 보고도 Native 공통 근거 표로 연결·설치본 실제6영수증 재생 통과 | 자산별 당시 경보 누락·부재/해소 단정이 거절되어 partial. 사건 종결 성공·속도 향상 아님. 최종 표 보완은 같은 실제6조회 재생이며 새 모델/채팅/UI 시험0. [검증](infra/hermes/incident-closure-minimum.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-a08bb8743d75fdcc-h2"></a>
+<a id="record-7d27f1ac5a100e9b3cbedb381f22a897287c4ab8c188aa1d534951dd10f25149"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.26/query1.19.21/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-99be40eb15142307780fd5d70bd04003da1ae8471beda99c3bde06242886cacb)
+
+<a id="source-a08bb8743d75fdcc-h4"></a>
+<a id="record-f8be57942f58a65f603f3c2b07f8d383fdc900c2ef3cedff7ac885f388cb8d79"></a>
+
+## 복구·Git·로컬 정리
+
+현재 단위는 B의 Native/SDK 최소 종결 검사와 구조화 조회/실패 보고 보완이다.00:49:18 KST13파일·root 포함gate/참조 SHA·보호config7SHA·두 봇 WS/worker·관리timer/브로커를 확인해 확정하고 독립 복구 timer를 해제·confirmed no-op을 확인했다. Native 컨테이너1회·SDK/review각3회 재시작, 운영 모델·도구 권한·FW/TTL/승인·패키지/포트/키 변경0이다. 원본/중간/최종SHA·복구는 `/var/lib/capstone-incident-parity/20261105-r1/deployment`에 보존한다. 실제 수동 원복·공격E2E·새3VM 설치0, 새 SDK 시험은 채팅 게시0/worker 직접 실행이다. 배포 도우미의 JSON 끝 문자 오류를 즉시 정정하고13파일/영수증/manifest를 재검증한 이력도 보존했다.
+
+서버 시험440파일25,435,455B와 Mac 자체29파일14304481B·자체 SSH 제어 프로세스/소켓을 정리했다. 복구본·운영DB/대화/승인은 보존한다. 관련 공개20파일은14d1a6649eb28e668e28e32b5699b7b9d304ced3로 커밋·푸시했고00:54:24 KST 실제 원격 main 일치를 확인했다. 이 게시 결과를 반영한 STATUS/작은 원장2파일은 별도 문서 커밋이며 마지막 커밋·원격 일치·작업 트리는 로컬 기록에서 확인한다. 이전 웹 근거 단위의 검증/정리/게시 상세는 [작업 전 상태](STATUS_HISTORY.md#source-2b029d3bd8b6e503)와 [웹 원장](infra/mcp/web-evidence-validation.json)에 보존했다. 기존 NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표 active·미완료다.
+
+
+</details>
+
+<a id="source-2b029d3bd8b6e503"></a>
+
+## STATUS-before-incident-parity-20261105.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-05T00:54:21+09:00</summary>
+
+<a id="source-2b029d3bd8b6e503-h0"></a>
+<a id="record-392b584bff8dff18395dfa7c610dbf78c537572fc15ffe5de299ec7bab44a80c"></a>
+
+# 인프라 현황 — 2026-11-04 23:56 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-564ef9348753a096) · [영향 검사 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-2b029d3bd8b6e503-h1"></a>
+<a id="record-282624c3bec84dd07eea22d72dc619112c185108f06fb8a730fa9bde8e5f4cfb"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.25/query1.19.20/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | 실제 포함gate SHA 결속/필수센서3/3 유지. 룰·서비스·차단 상태 API/ID를 분리하고 대응 사건의 종결 전 자산별 사건 구간 조회·인용을 검사. 실제8호출의 잘못된 종결 재생은 거절·최종344PASS | 새 실재검토8MCP·오류0·193.809초, agent002 경보7표본/전체미확인·진단coverage조회 뒤 unresolved/needs_review. 고정 백엔드 읽기는 추가했지만 실제 앱·호스트/사후영향과 초기적용/유지승인 경과 상세·보고 의미 전반·SDK일반채팅 동일 종결검사는 잔여. [실제 실패·검증·복구](infra/hermes/incident-impact.md) |
+| 웹 백엔드 읽기·단문 | security-events6도구 중 고정웹2읽기 추가·C 별도 강제 reader/정제 publisher, 기존 진단 프로토콜 유지. 실제 MCP8읽기·2거절·등록002/groot-web 확인. 공통1.5.25/query1.19.20 | 새 단문 Ollama13.369초·Hermes최종45.335초 각1MCP/오류0·표/잘림/전체미확인, 쓰기0. 일반 lead 조회 완료와 실제 사건 상태를 분리. 채팅/UI 왕복·전체 앱/호스트 영향/종결·장기 무손실은 별도. [범위·복구](infra/mcp/web-evidence.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/43도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-0b6995be4d8a9630-h2"></a>
+<a id="source-2b029d3bd8b6e503-h2"></a>
+<a id="source-564ef9348753a096-h2"></a>
+<a id="record-c3533a32cf9e0882050ac9bd61345f3d61c09ee2856d0f26b8b7724943945463"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.23/query1.19.18/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-99be40eb15142307780fd5d70bd04003da1ae8471beda99c3bde06242886cacb)
+
+<a id="source-2b029d3bd8b6e503-h4"></a>
+<a id="record-412cb161a7d61388040a95a5c7dee93e1d1a3883e0b1fe307609681d57099f5e"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 B root 관리 제어기 한파일의 대상별 API 안내·승인/만료 의미·최소 영향 조회/인용 검사다. 공통1.5.25/query1.19.20·포함gate67197ac8·보호config8/출력SKILL3/브로커3698161·양worker 유지,22:03:34 최종확정·독립원복timer정지/confirmed recovery no-op. 원본/세후보/manifest/복구는 `/var/lib/capstone-report-impact/20261104-r1/deployment`에 보존한다. 컨테이너/worker/모델 재시작0·FW/승인/일반권한/패키지/포트 변경0이다. 첫 후보의 실제 잘못된 종결은 보존·기존 API로 읽기전용 재개했고 최신 사건은 미해결이다. r3는 일반 DNS 정상 분류까지 과도하게 막지 않도록 범위를 정밀화·두 실제 출력 재생/344검사로 검증했고 별도 r3모델 생성은 하지 않았다.
+
+이번 웹 근거 단위는 C 고정 읽기와 B 공통 하네스/설치 경로를 반영했다. 최종 회귀·실제 LLM/근거·소스/운영 SHA는 [작은 원장](infra/mcp/web-evidence-validation.json)을 따른다. 최종1075검사 중1074PASS·호스트의 installed-native splitter1skip, 양봇 실제 읽기/표·SDK8서버43도구와 heartbeat/기존브로커를 확인했다. 서버 시험463파일6,801,170B와 Mac 자체61파일10,263,399B·SSH mux/프로세스를 정리하고 복구/운영DB·채팅·승인·가중치를 보존했다. 공개39파일을1470a6391bc1722c76b96f91ec40b74d65d8ed04로 커밋·푸시했고23:56:20 KST 실제 원격 main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 마감하며 마지막 원격·작업트리는 로컬 기록에서 확인한다. 기존 NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표 active·미완료다.
+
+
+</details>
+
+<a id="source-564ef9348753a096"></a>
+
+## STATUS-before-web-evidence-20261104.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T23:56:05+09:00</summary>
+
+<a id="source-564ef9348753a096-h0"></a>
+<a id="record-5146a44253605b9f34c4e351a091a71c0307da1af348ec4beaa856d81ff3f8bb"></a>
+
+# 인프라 현황 — 2026-11-04 22:12 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](../PLAN.md) · [이번 작업 전](STATUS_HISTORY.md#source-0b6995be4d8a9630) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-564ef9348753a096-h1"></a>
+<a id="record-c073df802a63b92ad7f9d719aacfb25eca0ed2f5f85143f398e36f03295fa032"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.23/query1.19.18/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](../infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](../infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](../infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](../deployment/SECURITY_GUIDELINES.md) · [운영](../deployment/OPERATIONS.md) |
+| 사건 근거·종결 검사 | 실제 포함gate SHA 결속/필수센서3/3 유지. 룰·서비스·차단 상태 API/ID를 분리하고 대응 사건의 종결 전 자산별 사건 구간 조회·인용을 검사. 실제8호출의 잘못된 종결 재생은 거절·최종344PASS | 새 실재검토8MCP·오류0·193.809초, agent002 경보7표본/전체미확인·진단coverage조회 뒤 unresolved/needs_review. 실제 백엔드 진단/앱·사후영향, 초기적용/유지승인 경과 상세·보고 의미 전반·SDK일반채팅 동일 종결검사는 잔여. [실제 실패·검증·복구](../infra/hermes/incident-impact.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](../infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](../infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](../infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](../infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](../infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](../deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](../infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-c3533a32cf9e0882050ac9bd61345f3d61c09ee2856d0f26b8b7724943945463)
+
+<a id="source-564ef9348753a096-h3"></a>
+<a id="record-0bf3d818c704e7cc7b0242462370c9a0324d2d4a346754d00a5f2c5aa97a4e77"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 최우선 가능한 실제 백엔드 진단/앱·호스트 영향과 사건 사후구간 조사, 목적지/수집 agent 관계·승인 경과 상세와 종결 의미 보완. Root 최소 종결검사는 적용했지만 SDK 일반채팅 동일 검사·미등록 자산명/분류·상관 혼동·임시 차단 지연은 잔여. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 |11/4 초안의 현행WAF/Native 예외·실PCAP/단일DVWA·학습3군/한영초록·한계 및 시스템SVG 단독 시각검수, 참고문헌11개 서지/해당 개념 대조·이전본 보존. 최신PDF·전체 출판본/제출형식·독립평가/전과정 결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-564ef9348753a096-h4"></a>
+<a id="record-ce0c23c040b8dda4c0b5ab0ae9d040eaae34d68b2b588789df1073e4cebebd51"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 B root 관리 제어기 한파일의 대상별 API 안내·승인/만료 의미·최소 영향 조회/인용 검사다. 공통1.5.23/query1.19.18·포함gate67197ac8·보호config8/출력SKILL3/브로커3698161·양worker 유지,22:03:34 최종확정·독립원복timer정지/confirmed recovery no-op. 원본/세후보/manifest/복구는 `/var/lib/capstone-report-impact/20261104-r1/deployment`에 보존한다. 컨테이너/worker/모델 재시작0·FW/승인/일반권한/패키지/포트 변경0이다. 첫 후보의 실제 잘못된 종결은 보존·기존 API로 읽기전용 재개했고 최신 사건은 미해결이다. r3는 일반 DNS 정상 분류까지 과도하게 막지 않도록 범위를 정밀화·두 실제 출력 재생/344검사로 검증했고 별도 r3모델 생성은 하지 않았다.
+
+서버9로그 SHA 반출 뒤 격리424소스와 재생DB복사2개(총426파일·25,435,198B)를 제거했다. Mac 자체237파일·212,659,087B/반입묶음·스크립트·Swift module cache·SSH mux3개를 정리하고 임시부모/자체SSH잔여0을 확인했다. 운영 DB/승인/채팅·원본·복구·가중치는 보존한다. 관련 공개15파일을 `58419cf41c527d945fdcb3b7e5532a7f7f6e03b9`로 커밋·푸시했고 2026-11-04T22:12:00.284538+09:00 실제원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 마감하며 마지막 원격·작업트리는 로컬 기록에서 확인한다. 직전64443e8과 이번 소스 게시를 구분한다. 논문·참고문헌 원장·그림/PNG 검수는 로컬 전용, 최신 PDF 미생성·발표작성0이다. 타NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-0b6995be4d8a9630"></a>
+
+## STATUS-before-incident-impact-20261104.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T22:11:41+09:00</summary>
+
+<a id="source-0b6995be4d8a9630-h0"></a>
+<a id="record-5153058e9e74eb07c2f4e0baca6a4d8847494929363ee20c04c06e94f035b656"></a>
+
+> 사건 영향 검사 전의 과거 기록. 내용·수치는 당시 상태이며 링크 경로만 archive 기준으로 조정했다.
+
+# 인프라 현황 — 2026-11-04 21:13 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](../PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-bc99faa0a43f26a3) · [사건 표 전](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-0b6995be4d8a9630-h1"></a>
+<a id="record-7b35d7aaf7599119ad11d856991738a400994366f55e0286813443bebf2922a1"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.23/query1.19.18/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](../infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](../infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](../infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](../deployment/SECURITY_GUIDELINES.md) · [운영](../deployment/OPERATIONS.md) |
+| 사건 근거·중복 | 실제 포함gate가 파일과 달라 이번 초반 보완이 실행되지 않은 원인 확인·SHA 결속 검사/실행코드 동기화. 마지막 상태+원WAF+후속WAF/IDS4MCP·필수센서3/3·오류0·927PASS |195.332초/needs_review. 침해영향·사건 종결, 승인요청/미승인만료 혼동 문구·시각 경계/표본 표현 잔여. 속도 향상으로 표시하지 않음. [실제 실행·검증·복구](../infra/hermes/management-gate-binding.md) |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](../infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](../infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](../infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](../infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](../infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과. 포함gate와같은 root참조파일도 기록·실행전SHA/설치계약38검사 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](../deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](../infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-c3533a32cf9e0882050ac9bd61345f3d61c09ee2856d0f26b8b7724943945463)
+
+<a id="source-0b6995be4d8a9630-h3"></a>
+<a id="record-206f11f2b74f1c12ee15f030f46f9ae630bf28e60289c3e3f19e6f0e12b1d5ce"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 최우선 실제 사건의 근거 인용/종결·중복 시각 JSON/미등록 자산명/분류·상관 혼동·임시 차단 지연 보완. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 |11/4 로컬 초안을 현행WAF/Native 예외·실PCAP/단일DVWA·최신학습3군/한영초록·한계로 최신화/이전본 보존. 그림/PDF·전체인용·제출형식/독립평가·전과정결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-0b6995be4d8a9630-h4"></a>
+<a id="record-80a61ceb6fcea4c219e42b9925b710293d4e131f7a876ad460acb0dd8d950121"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 공통1.5.23/query1.19.18·B 총11대상이다. 초반 파일 갱신과 실제 불변 포함gate의 불일치를 발견해21:02:51 root 제어기 포함코드/검사를 동기화했다.21:08:12 소스11/보호8/출력SKILL3SHA·양WS/worker·broker3698161·실제 필수읽기3/3을 확인해 확정·자체timer정지·confirmed recovery no-op. 원본/후보/중간SHA는 `/var/lib/capstone-incident-coverage/20261104-r1/deployment`에 보존한다. 초반 Native컨테이너/SDK/review각2회 재시작, 마지막root한파일반영은재시작0. 모델·일반권한·FW·승인·패키지·포트 변경0.927PASS/skip0·설치38은 소스/렌더 계약이며 새 OS 설치/수동원복/새공격E2E 미실시다.
+
+서버18검사로그 SHA/원문 내보내기 뒤 검증copy/mirror 각424파일·6,463,160B를 정리했다. Mac 자체33파일·7,387,183B/스크립트·묶음·SSH mux를 제거하고 임시 부모 부재를 확인했다. 관련 공개22파일을 `61d232875beb837cd2a4124259008e4b5ff5e52e`로 커밋·푸시했고 2026-11-04T21:14:04.209379+09:00 실제원격main 일치를 확인했다. 이 게시 확인 STATUS/작은원장2파일은 후속 문서 커밋으로 보존하며 최종원격·작업트리는 로컬기록에 확인한다. 직전4c7eb1d와 이번소스 게시를 구분한다. 논문은 로컬 전용으로 이전본·수정SHA를 보존했고 발표작성0이다. 타NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-bc99faa0a43f26a3"></a>
+
+## STATUS-before-gate-binding-20261104.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T21:14:01+09:00</summary>
+
+<a id="source-bc99faa0a43f26a3-h0"></a>
+<a id="record-c9d7f6340f83e90aefd8fbdc2a4d5e9269d94a2b96b25b130faedf5753f45aa4"></a>
+
+# 인프라 현황 — 2026-11-04 20:31 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-1f7786777ac7d035) · [조회·지침 전](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-bc99faa0a43f26a3-h1"></a>
+<a id="record-f26efc03049ac1320b82bb64a621d6cd0a394c696b708bc28c64529b48523dc7"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.22/query1.19.17/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·중복 | verify의 원래 사건/후속 WAF·IDS 필수 읽기와 실제 성공 영수증 대조·경계 거래 식별 지시, WAF/IDS/Wazuh ID 구분. 고정 필수 읽기 선택만 낮은 추론·이후 판단 복귀 | 마지막 읽기전용 재검토79.068초/4MCP 오류0·추가 검토 표. 원래 사건 전체 구간의 필수 조회 일부 미충족을 gate가 거절. 영향/종결 미완료. 앞선214.342초 timeout은 실패로 보존 |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. 전체 UI 경로·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | 내부 제어 줄 숨김을 유지하고 검증실패 장문/JSON을 근거 표로 전환.20:18 실제 soc-report 게시·브라우저 정상표 확인 | 실제 사건은 needs_review이며 침해 해소/종결 아님. 모든 정상/오류/정기 카드 경로의 UI 전수 검증은 별도 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 자산/실습 추정 재발 회귀·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-bc99faa0a43f26a3-h2"></a>
+<a id="record-c492bdc41a2647e7fd2956f98c9171be26b4ca06b80435abc9e2d559de227ceb"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.22/query1.19.17/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-1f7786777ac7d035-h3"></a>
+<a id="source-bc99faa0a43f26a3-h3"></a>
+<a id="source-d4a41b57cd7fdfc2-h3"></a>
+<a id="source-faecf5f020d4ac68-h3"></a>
+<a id="record-2d679ecb26047c5e3a0aa31ecc5216cdb9de30c48993465eabbb1945004edbfc"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 최우선 실제 사건의 근거 인용/종결·중복 시각 JSON/미등록 자산명/분류·상관 혼동·임시 차단 지연 보완. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-bc99faa0a43f26a3-h4"></a>
+<a id="record-e05a8a5da0eaaf95e77ea83b723fc4244d651ef9aa35844f0abc7c224003b7b8"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 공통1.5.22/query1.19.17, B Native/SDK/관리 gate·controller 및 공통SKILL 총14대상이다.19:38/19:51/20:15 세 후보 뒤20:24:31 소스14/보호8SHA·양WS/worker·broker3698161·실제 새 보고를 확인해 확정했다. 자체 타이머 정지·confirmed recovery no-op, 원본/후보/중간SHA는 `/var/lib/capstone-incident-review/20261104-r1/deployment`에 보존한다. Native 기존컨테이너3회/두worker각3회 재시작, 모델·일반권한·FW·승인·패키지·포트 변경0이다.918PASS/skip0·설치37은 소스/렌더 계약이며 새 OS 설치/수동 원복/새 공격 E2E는 수행하지 않았다. 실제 조사 미완료와 출력 개선을 구별한다.
+
+서버16검사로그의 SHA·원문을 로컬로 보존한 뒤 검증용 복사본/mirror 각424파일·6,449,498B를 제거했다. 실제 복구본/DB/채팅/승인은 보존한다. Mac 자체741파일·87,402,802B/Chrome 임시프로필·스크립트·SSH mux3개를 제거하고 임시 부모 부재·자체 Chrome 종료를 확인했다. 최종 자체 브라우저 logout200·새 Mac 패키지0이다. 관련 공개20파일은 `7362546865981f02b7d7bf443985d63128039d79`로 커밋·푸시했고 2026-11-04T20:31:43.442957+09:00 실제 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존하며 최종 원격·작업 트리는 로컬 기록에 확인한다. 직전4a3e29d와 이번 소스 게시를 구분한다. 타 NAT6/Ansible2/topology5 stage·자격/로컬기록/업무분담/발표·논문/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-1f7786777ac7d035"></a>
+
+## STATUS-before-incident-review-20261104.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T20:31:34+09:00</summary>
+
+<a id="source-1f7786777ac7d035-h0"></a>
+<a id="record-132e029daa173ad656545dba02eaa28efe057f170558a376061e2e1907aa3a8e"></a>
+
+# 인프라 현황 — 2026-11-04 19:18 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-faecf5f020d4ac68) · [조회 지연 전](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-1f7786777ac7d035-h1"></a>
+<a id="record-1a073f6b2ef275ec28b1861e1e02d85b04d92fd66edc1be8661a314cc221b5f8"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.21/query1.19.16/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | soc-output 단일 SKILL, 짧은 표 정규화·상태/조치/근거 분리. 실제 새 Hermes/Ollama4행씩 표 파서 정상. 서버1,048PASS/skip0·보호config5SHA/기존 broker PID 유지 | 브라우저 UI·새 정기 카드 게시·native UX/skill_manage의 실제 제한 연결은 잔여. 기존 broker 재시작0 |
+| 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
+| 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
+| 사건 근거·중복 | 반복 시각 JSON은 동일 요청/상태/기한만 요약, 변경/불명확 원문 유지. 인용한 누락 센서의 모델 재조회 범위 보완. Wazuh ID/상관 정의 구분 | 소스/격리검사·운영 배포 범위이며 새 공격 사건 종결 성공은 아직 미검증 |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. UI 화면·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | B15:11:14 한 파일 적용·15:12:14 확정. escape된 내부 제어 줄 숨김, strict 판정/승인 불변. 관리209·설치계약37 PASS, 보호6SHA·모델/서비스 재시작0 | 설치된 함수의 격리 송신2경우 검증. 수정 뒤 새 실제 Mattermost 보고 전달·수동 원복은 미시험 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 Socorro 언급/실습 추정·최초 차단 지연. 고정DetectionOnly 요약·한국어 연결 끊김 필터·SDK의 IDS 대상 고정은 보완/실조회 확인. 실제 worker 메모리 적재와 전 업무 종결은 별도 미검증. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 단일deploy.sh·오프라인 SHA 기반. review2작업의 원격 허용목록 누락과 host-check/verify fixture3 정정. fakeSSH46/역할·작업명12조건 통과 | WAF 증거 자동등록 연결·전체 의존성 묶음·제품 프로필 미완성. 새3VM 실제 설치0. 구 lab_waf_mode 영수증 표시 잔여. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-1f7786777ac7d035-h2"></a>
+<a id="record-ce06f2a36e4b2e89b2234627d908185f7c8fb1fa11900b3a7fa8b2e58497160a"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.21/query1.19.16/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-2d679ecb26047c5e3a0aa31ecc5216cdb9de30c48993465eabbb1945004edbfc)
+
+<a id="source-1f7786777ac7d035-h4"></a>
+<a id="record-11c5ff8222761c2ea2bd20f3763a95252b96b1c6acb1582cb71de42f42812b4e"></a>
+
+## 복구·Git·로컬 정리
+
+이번 단위는 B Native/SDK/관리 gate와 SDK 실행기16대상이다.18:44 최초 적용·중간 오답/미조회 확인 뒤 보완·19:11:31 source/보호8SHA·broker원PID·양WS/worker 확인 후 확정, 원복 timer 정지·confirmed recovery no-op. 원본/후보·중간SHA/복구는 `/var/lib/capstone-read-accuracy/20261104-r1/deployment`에 보존한다.903PASS/skip0, 실제 신규 설치·수동 원복·새 공격 E2E는 미실시다. 자세한 실패/최종 성공 표본은 read-accuracy 문서에 구분한다.
+
+공식 지침 자료3개는 기존 Swift/PDFKit으로 확인하고 원문SHA·판본·페이지를 작은 대조표에 기록했다. Mac 새 패키지 설치0. 자체 공식PDF3개/Swift캐시/격리소스/스크립트 679파일·261162992B와 SSH mux를 정리하고 임시 부모 부재를 확인했다. 서버validation/mirror 각422파일·6,429,692B도 로그5개 SHA 내보내기 뒤 제거·실제 복구본/DB/채팅/승인 보존. 공개HEAD 설치기를 사용한 추가 격리 fakeSSH46PASS로 별도 NAT후보를 배제했다. 이번 공개33파일은 `367d8f84b3199cb8736af78beb5424ce10281711`로 커밋·푸시하고 2026-11-04T19:18:45.804263+09:00 실제 원격main 일치를 확인했다. 게시 확인 STATUS/작은 검증원장2파일은 후속 문서 커밋으로 보존한다. 직전416835f와 이번 소스 게시를 구분한다. 타 Ansible2/NAT6/topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표active·미완료다.
+
+
+</details>
+
+<a id="source-faecf5f020d4ac68"></a>
+
+## STATUS-before-read-accuracy-ncsc-20261104.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T19:18:25+09:00</summary>
+
+<a id="source-faecf5f020d4ac68-h0"></a>
+<a id="record-a4b29524a1cc5f917a0f77b100251b46779113eb28f042505ded03615e05f067"></a>
+
+# 인프라 현황 — 2026-11-04 18:17 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-d4a41b57cd7fdfc2) · [하네스 정리 전](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-faecf5f020d4ac68-h1"></a>
+<a id="record-07bad3de2099f32e5370d0dc534ec4cef155546d028bcbc499b10cbdb4b4a1b7"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.20/query1.19.15/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
+| 공통 출력·카드 | soc-output 단일 SKILL, 짧은 표 정규화·상태/조치/근거 분리. 실제 새 Hermes/Ollama4행씩 표 파서 정상. 서버1,048PASS/skip0·보호config5SHA/기존 broker PID 유지 | 브라우저 UI·새 정기 카드 게시·native UX/skill_manage의 실제 제한 연결은 잔여. 기존 broker 재시작0 |
+| 사건 근거·중복 | 반복 시각 JSON은 동일 요청/상태/기한만 요약, 변경/불명확 원문 유지. 인용한 누락 센서의 모델 재조회 범위 보완. Wazuh ID/상관 정의 구분 | 소스/격리검사·운영 배포 범위이며 새 공격 사건 종결 성공은 아직 미검증 |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. UI 화면·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | B15:11:14 한 파일 적용·15:12:14 확정. escape된 내부 제어 줄 숨김, strict 판정/승인 불변. 관리209·설치계약37 PASS, 보호6SHA·모델/서비스 재시작0 | 설치된 함수의 격리 송신2경우 검증. 수정 뒤 새 실제 Mattermost 보고 전달·수동 원복은 미시험 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 Socorro 언급/실습 추정·최초 차단 지연. 고정DetectionOnly 서비스 요약 문구와 ‘연결 끊긴 에이전트만’ 상태 필터 공백 추가 발견. 후속 정정 필요. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-d4a41b57cd7fdfc2-h2"></a>
+<a id="source-faecf5f020d4ac68-h2"></a>
+<a id="record-26017a0eedaf38e0bfcd743994b6707d2090aa635d78af5e355fa75945b0981a"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.20/query1.19.15/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-2d679ecb26047c5e3a0aa31ecc5216cdb9de30c48993465eabbb1945004edbfc)
+
+<a id="source-faecf5f020d4ac68-h4"></a>
+<a id="record-c2efccfa44f131c41bcf5b3ceca867b8c470438f03db7cd72268e37dd304357d"></a>
+
+## 복구·Git·로컬 정리
+
+이번 조회 지연 단위는 B controller/worker·소유 영수증3개다. `/var/lib/capstone-native-latency/20261104-r1/deployment`에 원본/후보·중간SHA·확정·복구를 보존한다.18:01:31 조회 프롬프트 적용·18:06:01 저추론 후보·18:13:10 실제3질문/파일·보호8SHA·WS/서비스 확인 뒤 확정하고 원복 타이머를 해제했다. 관리218/review59/설치37=314PASS, 낮은 추론의review59 재검증. Native gate/Trace AST·모델/설정/SOUL 유지·서비스/컨테이너/모델 재시작0, 실제 수동 원복·새 OS 설치·새 공격 E2E는 미실시다.
+
+서버 격리419소스와 내보낸4로그를 정리했고 실제 복구본·DB/채팅/승인은 보존한다. Mac 자체 임시18파일/4,048,629B·SSH mux2개를 정리하고 부모 부재를 확인했다. 새 Mac 패키지/다운로드0, 이번 관련 공개파일의 소스 게시를 완료했다. 이번 공개13파일은 `f2ff86bd3d1c4369ab28fbe39552327a1dc08fc0`로 커밋·푸시하고 2026-11-04T18:18:22.031389+09:00 실제 원격main 일치를 확인했다. 게시 확인 STATUS/원장2파일은 후속 문서 커밋에 보존한다. 직전 b521cb3 기록은 위 archive에 보존한다. Ansible2/NAT6/topology5 stage는 이번 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표 active·미완료이고 계정 잔여율 조회 도구는 없다. 직전40파일 게시·복구·정리 기록은 위 archive에 보존한다.
+
+
+</details>
+
+<a id="source-d4a41b57cd7fdfc2"></a>
+
+## STATUS-20261104-before-lookup-latency.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T18:18:19+09:00</summary>
+
+<a id="source-d4a41b57cd7fdfc2-h0"></a>
+<a id="record-f67bd8353b700eedfd65070b50f9ceb54b0d85b05a060a419968f8d25e45d095"></a>
+
+# 인프라 현황 — 2026-11-04 17:28 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-beb1aeb23ac205e0) · [웹 E2E 전](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-d4a41b57cd7fdfc2-h1"></a>
+<a id="record-9d00cbbe331e53d8851f0c009da4b5b80e92b194a84160aeb4fab8f50bdbc090"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 채팅 담당 분배 | 공통1.5.20/query1.19.15/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 직접 지정 Hermes의 최종 같은 조회는4MCP·4행 완료/128.644초로 지연 잔여. 저추론/서버 축소 후보는 실조회 실패로 채택하지 않음. [검증·복구](infra/hermes/harness-cleanup.md) |
+| 공통 출력·카드 | soc-output 단일 SKILL, 짧은 표 정규화·상태/조치/근거 분리. 실제 새 Hermes/Ollama4행씩 표 파서 정상. 서버1,048PASS/skip0·보호config5SHA/기존 broker PID 유지 | 브라우저 UI·새 정기 카드 게시·native UX/skill_manage의 실제 제한 연결은 잔여. 기존 broker 재시작0 |
+| 사건 근거·중복 | 반복 시각 JSON은 동일 요청/상태/기한만 요약, 변경/불명확 원문 유지. 인용한 누락 센서의 모델 재조회 범위 보완. Wazuh ID/상관 정의 구분 | 소스/격리검사·운영 배포 범위이며 새 공격 사건 종결 성공은 아직 미검증 |
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. UI 화면·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | B15:11:14 한 파일 적용·15:12:14 확정. escape된 내부 제어 줄 숨김, strict 판정/승인 불변. 관리209·설치계약37 PASS, 보호6SHA·모델/서비스 재시작0 | 설치된 함수의 격리 송신2경우 검증. 수정 뒤 새 실제 Mattermost 보고 전달·수동 원복은 미시험 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·중복 JSON·미등록 Socorro 언급/실습 추정·Wazuh 분류/상관 명칭 혼동·최초 차단 지연. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-26017a0eedaf38e0bfcd743994b6707d2090aa635d78af5e355fa75945b0981a)
+
+
+[이미 보존한 동일 내용으로 이동](#record-2d679ecb26047c5e3a0aa31ecc5216cdb9de30c48993465eabbb1945004edbfc)
+
+<a id="source-d4a41b57cd7fdfc2-h4"></a>
+<a id="record-216f06a006051f277b4107b7a107b93d0653cfa07cb2b4b9921c70ecae25510d"></a>
+
+## 복구·Git·로컬 정리
+
+이번 하네스 단위는 B 운영 소스30+영수증3개이며 원본/후보/중간SHA·확정·복구를 `/var/lib/capstone-harness-cleanup/20261104-r1/deployment-v3`에 보존한다.17:05:59 초기 적용·17:12:29 역할 추가 보완·17:21:08 불합격 일반 저추론 후보 제외,17:23:09 소스/보호5SHA·WS/worker/PID 확인 뒤 확정했다.17:23:48 타이머 해제·recover no-op 확인. 실제 수동 원복·새 OS 설치·새 공격 E2E는 미실시다. 기존 SDK/역할 설치의 소스 복사 목록만 동기화했으며 새 패키지·이미지·포트·모델/FW정책 변경0이다.
+
+자체 서버 시험본/미적용 준비본과 내보낸17로그를 정리했고 실제 복구본/작은 영수증/채팅·승인·DB는 보존한다. Mac 자체 임시58파일/22,734,198B와 다운로드 파서·자체 SSH mux를 정리했고 부모 디렉터리 부재를 확인했다. 새 Mac 패키지0이며 관련 공개 파일의 소스 게시를 완료했다. 이번 공개40파일은 `a5d806b632c890ba0008f921ea890a36f2beab24`로 커밋·푸시하고 2026-11-04T17:29:08.251052+09:00 실제 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 직전 단위 최종2585dd7 기록은 위 archive에 보존한다. Ansible2/NAT6/topology5 stage는 이번 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표 active·미완료이며 계정 잔여율 조회 도구는 없다.
+
+
+</details>
+
+<a id="source-beb1aeb23ac205e0"></a>
+
+## STATUS-20261104-before-harness-cleanup.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T17:29:05+09:00</summary>
+
+<a id="source-beb1aeb23ac205e0-h0"></a>
+<a id="record-2278a2b0f0e56b2dbe46092be9258732c3a2ccf4c50144c8751b216780c182bf"></a>
+
+# 인프라 현황 — 2026-11-04 15:21 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3) · [표 보완 전](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-beb1aeb23ac205e0-h1"></a>
+<a id="record-9ffabea198a80c8cf8225dacd7cc00d20c40c5218f50a34f639228eac26ac07c"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. UI 화면·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
+| 자동 보고 표시 보완 | B15:11:14 한 파일 적용·15:12:14 확정. escape된 내부 제어 줄 숨김, strict 판정/승인 불변. 관리209·설치계약37 PASS, 보호6SHA·모델/서비스 재시작0 | 설치된 함수의 격리 송신2경우 검증. 수정 뒤 새 실제 Mattermost 보고 전달·수동 원복은 미시험 |
+| Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·중복 JSON·미등록 Socorro 언급/실습 추정·Wazuh 분류/상관 명칭 혼동·최초 차단 지연. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-beb1aeb23ac205e0-h2"></a>
+<a id="source-c9fdf9653d1fbfa3-h2"></a>
+<a id="record-9b8c434da03a9a9930fbcd4a5df8d43b570bf8dcfa82d4e134f512b87954ad93"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.19/query1.19.14/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-beb1aeb23ac205e0-h3"></a>
+<a id="record-fb73db9943278b89542bd8195f3a276174e6b14e20e63267d4ee6d15da67668c"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | 최우선 실제 사건의 근거 인용/종결·중복 시각 JSON/미등록 자산명/분류·상관 혼동·임시 차단 지연 보완. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-beb1aeb23ac205e0-h4"></a>
+<a id="record-56ca553db2f76b11f9a32367ea0c85ed4c184926ffce2c05d73c52e62cbc1e97"></a>
+
+## 복구·Git·로컬 정리
+
+이번 변경은 B `soc_management_controller.py`의 게시 전송 함수 하나다. `/var/lib/capstone-report-controls/20261104-r1/deployment`에 원본/후보·SHA·소유권/모드·확정·복구를 보존한다. 적용 전15분 독립 원복 타이머를 등록하고15:12:14 실제 소스/보호6SHA·WS/worker·설치된 함수 검증 뒤 해제했다. 확인된 recover no-op만 시험했으며 수동 원복은 미실시다. 실제 사건 DB·승인·보고 원문은 보존한다. 새 서비스/모델/권한/FW정책 변경0이며 초기 설치기 실행/수정0이다.
+
+이번 source·검증 문서·STATUS/PLAN·README/업무 범위10파일은 `3cb201b298237308d589f7416901333bbbf086bd`로 커밋·푸시하고 2026-11-04T15:22:34.471221+09:00 실제 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 직전 표 분할/페이지 단위 최종 `01c93f941842846e93c34c61af65fb19df11742f`의 실제 원격main 일치는14:35:38에 확인했고 [직전 상태](STATUS_HISTORY.md#source-c9fdf9653d1fbfa3)에 당시 게시 문구를 보존한다. B 시험 fixture/로그는 SHA 로컬 보존 후 정리했고 운영 복구본/최종 검사 영수증은 유지한다. 자체 Mac 임시본·자체 SSH mux는 정리하고 부모 부재를 확인했다. 새 다운로드/패키지 설치0, helper/진단 실패 원문은 로컬 전용 보존이다. 기존 peer6/NAT6·topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+
+</details>
+
+<a id="source-c9fdf9653d1fbfa3"></a>
+
+## STATUS-20261104-before-web-e2e.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T15:22:26+09:00</summary>
+
+<a id="source-c9fdf9653d1fbfa3-h0"></a>
+<a id="record-97a53e567d34f8242083167fcdce3f9b9c58bcf8d45a338427aebf80b0895837"></a>
+
+# 인프라 현황 — 2026-11-04 14:35 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-2410faadaea24e78) · [FW 대화 보완 전](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-c9fdf9653d1fbfa3-h1"></a>
+<a id="record-3ed6d9745e1dd2ad2589fa697c054a3599b0d006cbf68175af700a927b4f5a24"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어·실제 악성 공격의 센서→LLM→승인/대응 전체 재시험은 별도. 관리형 HTTP3개는 기존 중지 상태. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 새 WAF 악성 거래 원본 판독→LLM MCP 차단 E2E는 잔여. 원복 시에도 복원한 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 표 분할·페이지 후속 |1.5.19/query1.19.14/context1.0.1,14:26:57 확정. 새 채팅10건: 양쪽16+3행/19개 조건·handle 실제MCP와 동일, 빈3페이지·이전페이지·새root확인질문. Native 분할 표 밖 행0·서버669PASS | 앞선 페이지 요청의 양쪽 생성 오답 발견·실제 근거 재구성으로 보완. UI 화면·단일 초장문 행의 표 유지·기타 필터/사건 업무는 별도 잔여. [검증·한계·복구](infra/hermes/chat-table-chunks.md) |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·최신 채팅 followup/상관분석·종결 품질 공백. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-9b8c434da03a9a9930fbcd4a5df8d43b570bf8dcfa82d4e134f512b87954ad93)
+
+<a id="source-c9fdf9653d1fbfa3-h3"></a>
+<a id="record-ac8fbce1996beeeb75ae6ae7fe6f124d911abe3f7e1b712671551435e6bbc955"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 정상/비정상 분리·실제 sensor/raw→LLM→카드/TTL/해제·재차단 대조. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | C/고정 host 제어의 승인형 MCP 설계·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-c9fdf9653d1fbfa3-h4"></a>
+<a id="record-a77fe329eecef1c09874796194ab1479ab71ce20be1569f6ab7c16d74d46d060"></a>
+
+## 복구·Git·로컬 정리
+
+이번 B source12개·영수증2개와 원본 SHA/소유권·중간/최종 후보·복구는 `/var/lib/capstone-table-chunks/20261104-r1/deployment`에 보존한다.14:14 표 분할 반영·14:22 실제 페이지 결함 보완으로 기존 Hermes를 각각1회 재시작했고,14:26:57 실제10채팅/소스14·보호6 SHA·WS/worker를 확인한 뒤 독립15분 원복 타이머를 해제했다. 확정 recover no-op만 확인했으며 실제 수동 원복은 미실시다. DB/큐·원래 오답 게시글은 복원·삭제하지 않았다. 초기 설치기는 실행/수정하지 않았고 canonical 복사·오프라인 소스 목록만 맞췄다.
+
+이번 공개 소스·검증 문서20개는 `86c5ec5a3f2343529dd8eeff8cd79063a6682370`로 커밋·푸시하고 2026-11-04T14:34:51.894411+09:00 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 이전 단위 최종 `7ceff2d812dcd11d80e6cc6eec5dd8fb7ace3225`의 원격main 일치는14:05:01에 확인했고 [직전 상태](STATUS_HISTORY.md#source-2410faadaea24e78)에 보존했다. 이번 자체 Mac/서버 시험 작업본과 파서 다운로드는 제거·부재 확인했고 운영 복구본과 로컬 원문은 보존한다. 서버 원문 로그12개 SHA와 자체 helper snapshot도 로컬 전용으로 보존한다. 기존 peer6/NAT6와 topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+
+</details>
+
+<a id="source-2410faadaea24e78"></a>
+
+## STATUS-20261104-before-table-chunks.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T14:34:43+09:00</summary>
+
+<a id="source-2410faadaea24e78-h0"></a>
+<a id="record-e144cbfe4bee25a876ecc83bd0a9c66e34b7ae7f4e34a37ed65c0de36874111a"></a>
+
+# 인프라 현황 — 2026-11-04 14:04 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-691e354edbc8a0de) · [FW 선택 전](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-2410faadaea24e78-h1"></a>
+<a id="record-320f74d5b63820c2f1087831687424f30be1461dccf94641f07ec632c652dc14"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어·실제 악성 공격의 센서→LLM→승인/대응 전체 재시험은 별도. 관리형 HTTP3개는 기존 중지 상태. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 새 WAF 악성 거래 원본 판독→LLM MCP 차단 E2E는 잔여. 원복 시에도 복원한 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 실제 채팅·후속 요청 |1.5.18/query1.19.13/context1.0.1 운영·13:47:38 확정. 새 채팅10건: INPUT1/14·재정리0MCP·OUTPUT5/19·전체8/30/103·새root확인질문, 양쪽콜/본문 대조. 서버641PASS | 이전Ollama 미조회12개·Hermes18개 오답 정정. SDK 상세16행 표 정상, Hermes 긴 메시지 분할 뒤14행 표+2행 텍스트 잔여·브라우저 UI 미확인. [근거·복구·미완료](infra/hermes/firewall-chat.md) |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·최신 채팅 followup/상관분석·종결 품질 공백. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-2410faadaea24e78-h2"></a>
+<a id="record-48efebf2c2c349cdc12bd3cc0cfb87ca74e20b73e7465378d4feffee43069c09"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.18/query1.19.13/context1.0.1. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-2410faadaea24e78-h3"></a>
+<a id="record-e7d4166c99370524ad9a839fbf014e7823765d8b7c51ff5d8c989a340520f856"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 정상/비정상 분리·실제 sensor/raw→LLM→카드/TTL/해제·재차단 대조. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | C/고정 host 제어의 승인형 MCP 설계·권한/검증/복구, Hermes 분할 표 헤더·실제 브라우저 UI·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-2410faadaea24e78-h4"></a>
+<a id="record-9b46f1215132bb449a0b842c47cb872037d834249d7ae2e021e03b7f28ae78fd"></a>
+
+## 복구·Git·로컬 정리
+
+이번 B source11개·영수증2개와 중간/최종 SHA·원본1.5.17/권한·복구는 `/var/lib/capstone-fw-chat/20261104-r1/deployment`에 보존한다.13:33 첫 반영 뒤 빈 줄 보완13:41·추가 재시작을 거쳤고13:47 근거/소스·보호6 SHA·WS/worker 확인 후 독립 원복 타이머를 해제했다. 확정 recover no-op만 확인했으며 실제 수동 원복은 미실시다. 소스/설치 코드 연결·오프라인 의존성·포트·키·모델·FW/승인 정책과 실제 초기 설치는 구분한다. 운영 DB/큐는 복원·삭제하지 않았다.
+
+이번 공개 소스/문서22개는 `0a73804e5d7d1d46f23a4e8b1cefdda029e78680`로 커밋·푸시하고 2026-11-04T13:59:33.399446+09:00 원격main 동일을 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 초기 설치 점검은 [별도 결과](deployment/INSTALLER_READINESS.md)대로 확인만 했으며 실제 새 서버 설치·설치기 수정·패키지 제작은 하지 않았다. 원문·API/DB 기록과 임시 파서 출처는 로컬 전용이고 과거 게시 이력은 [직전 상태](STATUS_HISTORY.md#source-691e354edbc8a0de)에 보존한다. B 자체 시험 복사본/로그와 Mac 임시물·파서 다운로드는 제거·부재 확인했고 root 운영 복구본은 유지했다. 원문 로그7개 SHA와 도우미 snapshot은 로컬 전용으로 보존한다. peer6/NAT6와 topology5 stage는 보존·미포함한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+
+</details>
+
+<a id="source-691e354edbc8a0de"></a>
+
+## STATUS-20261104-before-fw-chat.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T13:59:19+09:00</summary>
+
+<a id="source-691e354edbc8a0de-h0"></a>
+<a id="record-39f7222553b03d737d5ad2245d5850f9c67a9f489528f8c1ab6b32c5340548a2"></a>
+
+# 인프라 현황 — 2026-11-04 13:11 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-c9a27591468c12b0) · [룰 감사 전](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-691e354edbc8a0de-h1"></a>
+<a id="record-3dc8bffbc2699c5f2a36a5e84bdabdd327d9e62fc960bef21d865b618cf1c707"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어·실제 악성 공격의 센서→LLM→승인/대응 전체 재시험은 별도. 관리형 HTTP3개는 기존 중지 상태. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 새 WAF 악성 거래 원본 판독→LLM MCP 차단 E2E는 잔여. 원복 시에도 복원한 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| FW 특정 체인·후속 요청 | 공통 계약1.5.17 운영 반영·13:08:42 확정. 양봇 실제 모델/MCP 각1회·전체103규칙에서 INPUT1체인/14규칙만 표시. 참조 체인/집합·같은 사용자 후속/페이지 유지. 서버187+383 PASS | 실제 채널 게시/표 UI·모든 포트/주소/동작 필터·FW 접근 경로 전체 판정은 별도. [검증·복구](infra/hermes/firewall-scope.md) |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·최신 채팅 followup/상관분석·종결 품질 공백. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-691e354edbc8a0de-h2"></a>
+<a id="record-cb4a4dd70ce865c75f272fd748101f6d41834f5842730b66a78d7784152cfb4d"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.17/query1.19.12. 가중치·모델/권한 변경0, 공통 표시 하네스는 위 범위로 보완 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-691e354edbc8a0de-h3"></a>
+<a id="record-3445fc1eb9f203ee9e2091139461b18bff8966c7543fe6ed8eb7011604156be0"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 정상/비정상 분리·실제 sensor/raw→LLM→카드/TTL/해제·재차단 대조. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | C/고정 host 제어의 승인형 MCP 설계·권한/검증/복구, FW 선택 범위 실제 채팅/UI·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-691e354edbc8a0de-h4"></a>
+<a id="record-8fc70ab89c7e9e08e4609a8d60b0b307666c992dc2af5698f656de3b4f29c647"></a>
+
+## 복구·Git·로컬 정리
+
+웹 정책은 A root `/var/lib/capstone-web-security/change-822c1487022f414f`·C `change-913fdb0a9c0c4d8e`, 이번 FW 표시 하네스는 B `/var/lib/capstone-fw-scope/20261104-r1/deployment`에 원본/후보·권한/SHA·manifest·운영자 복구를 보존한다. 각 독립 원복 타이머는 실제 검증 후 확정/해제했고 수동 원복은 미실행이다. 과거 관리 ACL·웹/설치/룰 감사의 상세 게시·정리는 [직전 상태](STATUS_HISTORY.md#source-c9a27591468c12b0)에 보존한다.
+
+FW 선택 범위 공개13파일은 5c806061d576ff00531d7c52420781dbf8476d0d로 커밋·푸시했고 2026-11-04T13:13:39.464913+09:00 실제 원격main 일치를 확인했다. 게시 확인은 후속 문서 커밋에 포함하며 마지막 ID·원격 일치·작업 트리는 로컬 기록과 최종 답변에 남긴다. 기존 peer6/NAT6·topology5 stage는 보존·미포함한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 새로운 Mac 패키지 설치·바이너리 다운로드0이며 B 시험 복사본과 Mac 자체 임시 파일을 제거했다. 원문 로그14개 SHA·임시 도우미 snapshot을 로컬에 보존하고 root 운영 복구본과 다른 작업 파일은 유지했다. 정확한 제거 수는 [원장](infra/hermes/firewall-scope-validation-20261104.json)을 따른다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+
+</details>
+
+<a id="source-c9a27591468c12b0"></a>
+
+## STATUS-20261104-before-fw-scope.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T13:13:28+09:00</summary>
+
+<a id="source-c9a27591468c12b0-h0"></a>
+<a id="record-1a808696ba6f2121d86bc26ea911d0b3e2a5cbdc631478e8a626525f7dfde739"></a>
+
+# 인프라 현황 — 2026-11-04 12:47 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](STATUS_HISTORY.md#source-7630b3f41e1fc905) · [웹 정책 적용 전](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-c9a27591468c12b0-h1"></a>
+<a id="record-acd2a989cdae933dc8dccc1b2b781b9a619d70c47dfc887ac77f30af979506e4"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어·실제 악성 공격의 센서→LLM→승인/대응 전체 재시험은 별도. 관리형 HTTP3개는 기존 중지 상태. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 새 WAF 악성 거래 원본 판독→LLM MCP 차단 E2E는 잔여. 원복 시에도 복원한 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF654·조건/동작 중복 후보0. IDS52,497 정의의7쌍은 전체 룰·동일 이미지 격리 전후14/14조건 PASS, 대상 경보14→7·유지 경보9개 관측 동일. Wazuh API/native XML4,571·172파일,17쌍 조건/동작 동일 | 운영 삭제/통합 미적용. Wazuh native8쌍 양성+음성1 통과, Windows9쌍+음성1은 경로 미검증(partial). 외부 참조·vendor 업데이트 지속성·승인/원복·FW/egress 잔여. [근거](infra/validation/rule-overlap/README.md) |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·최신 채팅 followup/상관분석·종결 품질 공백. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 실제 서버 접속/설치/코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+<a id="source-7630b3f41e1fc905-h2"></a>
+<a id="source-c9a27591468c12b0-h2"></a>
+<a id="record-306fd09df8e985a797b1144a36a393b59426ae72c3d4fb4fe05fc4b33a2030c4"></a>
+
+## 유지하는 운영 상태
+
+| 항목 | 현재 기준·완료 범위 |
+|---|---|
+| LLM 역할 | 조사·상관분석·위험 판단·변경안·정확 승인 요청·MCP 실행 후 확인·보고를 주도. 관리자만 보호 변경 승인. 일반 sudo/Docker/임의 셸·패키지 위임 없음 |
+| 모델/배치 | B Ollama 신속 조회·분류, Hermes 복합 조사·변경 우선. Thor 원본 qwen3.6:35b, 공통 계약1.5.16/query1.19.12. 이번 가중치/하네스/권한 확대0 |
+| 학습/품질 |11/2 4,348단계·학습8,695/평가176 완료, DGX→Thor 후보 적재·승격 없음. 고정1.5.14 원본18/24·동일HF20/24·학습19/24로 교체 근거 부족. 독립176 비교 잔여 |
+| 차단 | 최초600초·관리자 유지 승인부터60분·정확 해제 승인 또는 만료, 실제 해제/원기한 뒤60초 cooldown·새 근거 필요·중복 연장 없음. 지정 IDS Native 예외와 LLM 조사 역할 유지 |
+| 최근 MCP/사건 보완 | 공유 Native 참조·사건 구간/센서·KST 만료·영수증 해석 운영 반영. 실제 새 사건 MCP 오류0 표본·카드 대기 성공은 과거 검증으로 보존하며 사건 판단 전체 정확성을 뜻하지 않음 |
+| 공격/PCAP | 공개11PCAP 두Kali 반입·SHA,232 오프라인11/156,160패킷·613경보. 실제97정상+검토 공격대조3/WAF403은 기존 결과. 경보 수를 정탐 수로 보지 않으며 원본58PCAP 출처 미확정·일부 공개 capture 정답 미확정 |
+
+
+
+<a id="source-c9a27591468c12b0-h3"></a>
+<a id="record-f9531862b7b72f16f3e1087c4471eae0eea6d37c2be37c55fb0fc45517767e22"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 정상/비정상 분리·실제 sensor/raw→LLM→카드/TTL/해제·재차단 대조. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | C/고정 host 제어의 승인형 MCP 설계·권한/검증/복구, 단문/FW부분표·추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-c9a27591468c12b0-h4"></a>
+<a id="record-600b11b287e4c53d7927b8a25afeb7baa357aec562f6dd2537d9528b3c14dcce"></a>
+
+## 복구·Git·로컬 정리
+
+A root `/var/lib/capstone-web-security/change-822c1487022f414f`, C `change-913fdb0a9c0c4d8e`에 원본/후보·SHA·권한·정확 승인/복구 코드를 보존한다.15분 독립 타이머를 두고 실제 외부 검증 후 확정했다. WAF/IDS/Docker 컨테이너·SSH 재시작, 운영 DB·모델·차단 TTL 변경0. WAF 신뢰 metadata 두 SHA 갱신은 같은 검토된 설정에 대한 연계 갱신이며 전후 JSON을 A 복구본에 보존한다.
+
+직전 관리 ACL 소스4301dba·후속5a329c3 원격main 일치는11/4 10:35 과거 완료다. 이번 웹 보안/도구 점검33개 공개 파일은 683a2cf5760171291cef26f56778f3b4b0d2754a로 커밋·푸시했고 2026-11-04T12:00:28.130347+09:00에 실제 원격main 일치를 확인했다. 게시 확인 뒤 작성한 현황/정리 보완은 후속 문서 커밋에 포함하며 최종 ID·원격 일치·작업 트리는 로컬 기록과 최종 답변에 남긴다. 기존 peer6/NAT6와 별도 topology5 stage는 보존·미포함한다. 자격·대화/원문 검증·업무분담·발표/논문·데이터/가중치는 Git 제외다. 새 Mac 패키지 설치/바이너리 다운로드0이며 A 시험 스테이지559파일/9,523,690B·C29파일/336,626B와 Mac 자체 임시36파일/580,951B를 제거·부재 확인했다. 비밀 값 없는 도우미36개는 로컬 검증 원문에 보존하며 다른 작업의 도우미·운영 복구본은 유지했다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+초기 설치 점검은 위 웹정책 배포와 별개인 로컬 읽기/격리 검사다. 점검 결과만 기록했으며 운영/설치 코드는 수정하지 않았다. 점검 문서3개는 32d6222cace694647ec7967df09d7a15aa7040b2로 게시했고 2026-11-04T12:07:29.303399+09:00 원격main 일치를 확인했다. 게시확인 보완은 후속 문서 커밋이며 최종 ID와 일치는 로컬 기록에 남긴다.
+
+룰 감사 단위는 읽기/독립 시험이며 운영 룰·컨테이너·차단·모델/LLM 권한을 바꾸지 않았다. IDS는 network=none의 합성134패킷 파일, native 양쪽 exit0이다. Wazuh는 운영 알림 큐 주입 없이 first-party private 시험 세션19개를 명시 삭제했다. 12:38~12:46 KST 운영 IDS 소스/컨테이너, Wazuh172파일 SHA/컨테이너 시작 불변을 확인했다. A 시험 스테이지29파일/191,075,067B·시험 컨테이너를 제거했고 운영 복구본은 유지했다. Python 구문·PCAP SHA·미검토 ET 거부·경보 누락 시 CLI exit1을 확인했다. Mac 자체 임시26파일/207,989B와 SSH mux를 정리·부재 확인했으며 도우미26개를 로컬 원문에 보존했다. 이번 공개 감사/회귀·현재 문서·직전 상태 보존10파일은 5024f093b60567307cf3165654e10c739c0c3710로 커밋·푸시했고 2026-11-04T12:49:25.924107+09:00 원격main 동일을 확인했다. 이 게시 확인은 후속 문서 커밋이며 마지막 ID·원격 일치·잔여 작업 트리는 로컬 기록과 최종 답변에 남긴다. 이전 설치점검 최종0abe1fc 원격 일치는12:07:55 KST의 별도 완료이며 이번 게시 완료로 대신하지 않는다.
+
+
+</details>
+
+<a id="source-7630b3f41e1fc905"></a>
+
+## STATUS-20261104-before-rule-audit.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T12:49:17+09:00</summary>
+
+<a id="source-7630b3f41e1fc905-h0"></a>
+<a id="record-0214f7950dad3443ea163cca489bad30655acfe498786562d096dd780c49580b"></a>
+
+# 인프라 현황 — 2026-11-04 12:07 KST
+
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 수정 전 상세 상태](STATUS_HISTORY.md#source-a66b68f9d792afa0) · [과거 이력](STATUS_HISTORY.md#source-87368a0abd79b357).
+
+
+
+<a id="source-7630b3f41e1fc905-h1"></a>
+<a id="record-15370f40780b77fe8b2c8f4286db37408db14165dcf2c79763da0d14fca880c0"></a>
+
+## 현재 우선 과제와 실제 결과
+
+| 과제 | 구현·실제 확인 | 남은 범위 |
+|---|---|---|
+| 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어·실제 악성 공격의 센서→LLM→승인/대응 전체 재시험은 별도. 관리형 HTTP3개는 기존 중지 상태. [변경·검증·원복](infra/validation/web-policy/README.md) |
+| 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
+| WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 새 WAF 악성 거래 원본 판독→LLM MCP 차단 E2E는 잔여. 원복 시에도 복원한 정확 설정 재등록 필요 |
+| 장비 룰 중복 | WAF655→654(기본640+커스텀14), 동일 조건/동작 후보0. IDS52,497·Wazuh4,571 전체 조건 비교, 각각7/17 후보 묶음 | 후보는 모두 vendor이며 참조/시그니처 의미·재현 없이 삭제하지 않음. IDS 중복SID2개는 기존 좁은 API 오탐 override와 구분. FW 체인/순서·우회/egress 전체 점검 잔여 |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·최신 채팅 followup/상관분석·종결 품질 공백. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 실제 서버 접속/설치/코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
+| 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
+
+네이티브 동일 이미지·외부망 없는 WAF47요청(이전20+후보27), SQLi/XSS/JNDI의 실제 CRS·Enabled403·거부 메타데이터 보존, 가짜 인증자료의 bulk 감사 비복사를 검증했다. 이는 실제 앱 공격이 아니다. C 기존 vendor의 ASGI54, 로컬 배포6·portable TLS16·SOC 설치37·서비스50·bootstrap14·source bundle1·JS UI를 통과했다. bootstrap의 오래된 아이콘 fixture 누락을 수정했다. 운영 전체 설치/수동 원복/전 공격 유형 무누락은 검증하지 않았다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-306fd09df8e985a797b1144a36a393b59426ae72c3d4fb4fe05fc4b33a2030c4)
+
+<a id="source-7630b3f41e1fc905-h3"></a>
+<a id="record-b858edcabf2014d1db7c6c7273103dc85d1c6f8505822cf382efb46fb2191fbc"></a>
+
+## 다음 작업과 완료 근거
+
+| 순서 | 다음 작업 | 완료 근거 |
+|---|---|---|
+|1| 웹 실제 가동/공격·증거·대응, IDS7/Wazuh17 후보의 참조와 재현, FW 우회·egress·B/C 컨테이너 관리 경로 | 정상/비정상 분리·실제 sensor/raw→LLM→카드/TTL/해제·재차단 대조. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
+|2| LLM 전 업무 공백 보완 | C/고정 host 제어의 승인형 MCP 설계·권한/검증/복구, 단문/FW부분표·추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. peer6은 별도 미확정·이번 미배포 |
+|4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
+|5| 논문·최종 발표 | 논문은 실제 관측·공식 출처·미검증 한계·현행 배치 반영. 발표 작성은11월둘째주 이후·최종12/1 |
+
+OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
+
+
+
+<a id="source-7630b3f41e1fc905-h4"></a>
+<a id="record-74cf9d3e3b355b5bf576d08914aa76dee459c6240dae14efa268552d0e4eae43"></a>
+
+## 복구·Git·로컬 정리
+
+A root `/var/lib/capstone-web-security/change-822c1487022f414f`, C `change-913fdb0a9c0c4d8e`에 원본/후보·SHA·권한·정확 승인/복구 코드를 보존한다.15분 독립 타이머를 두고 실제 외부 검증 후 확정했다. WAF/IDS/Docker 컨테이너·SSH 재시작, 운영 DB·모델·차단 TTL 변경0. WAF 신뢰 metadata 두 SHA 갱신은 같은 검토된 설정에 대한 연계 갱신이며 전후 JSON을 A 복구본에 보존한다.
+
+직전 관리 ACL 소스4301dba·후속5a329c3 원격main 일치는11/4 10:35 과거 완료다. 이번 웹 보안/도구 점검33개 공개 파일은 683a2cf5760171291cef26f56778f3b4b0d2754a로 커밋·푸시했고 2026-11-04T12:00:28.130347+09:00에 실제 원격main 일치를 확인했다. 게시 확인 뒤 작성한 현황/정리 보완은 후속 문서 커밋에 포함하며 최종 ID·원격 일치·작업 트리는 로컬 기록과 최종 답변에 남긴다. 기존 peer6/NAT6와 별도 topology5 stage는 보존·미포함한다. 자격·대화/원문 검증·업무분담·발표/논문·데이터/가중치는 Git 제외다. 새 Mac 패키지 설치/바이너리 다운로드0이며 A 시험 스테이지559파일/9,523,690B·C29파일/336,626B와 Mac 자체 임시36파일/580,951B를 제거·부재 확인했다. 비밀 값 없는 도우미36개는 로컬 검증 원문에 보존하며 다른 작업의 도우미·운영 복구본은 유지했다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+
+초기 설치 점검은 위 웹정책 배포와 별개인 로컬 읽기/격리 검사다. 점검 결과만 기록했으며 운영/설치 코드는 수정하지 않았다. 점검 문서3개는 32d6222cace694647ec7967df09d7a15aa7040b2로 게시했고 2026-11-04T12:07:29.303399+09:00 원격main 일치를 확인했다. 게시확인 보완은 후속 문서 커밋이며 최종 ID와 일치는 로컬 기록에 남긴다.
+
+
+</details>
+
+<a id="source-a66b68f9d792afa0"></a>
+
+## STATUS-20261104-before-web-policy.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T12:00:02+09:00</summary>
+
+<a id="source-a66b68f9d792afa0-h0"></a>
+<a id="record-ce8377d153936b0edecfca05b143d4a78d6c6b1a0d92b4bc4683218225672f56"></a>
+
+# 인프라 현황 — 2026-11-04 10:35 KST
+
+현재 상태와 활성 과제를 요약한다. 전체 목표는 **LLM의 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료 active다. 핵심 기능은11/9 KST까지 마감하는 목표를 유지한다. 발표 작성은11월둘째주 리마인더 이후다.
+
+[계획](PLAN.md) · [관리 접속 수정 전](STATUS_HISTORY.md#source-d70688ad386660bb) · [만료/절차 수정 전](STATUS_HISTORY.md#source-fd1d5f234b14e0a3) · [사건 시각 보완 전](STATUS_HISTORY.md#source-6561bd16a0c95484) · [공유 차단 수정 전](STATUS_HISTORY.md#source-44b2fd9c4f0995fb) · [PCAP/IDS 수정 전 기록](STATUS_HISTORY.md#source-84055af98a0c21f3) · [11/1 이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
+
+
+
+<a id="source-a66b68f9d792afa0-h1"></a>
+<a id="record-95eb2bf3ed30bb516b45cd1f01bc4241da36dae4f9d588b4a7b137218eb596e6"></a>
+
+## 현재 우선 과제와 최신 결과
+
+| 작업 | 완료·실제 확인 | 잔여·한계 |
+|---|---|---|
+| 차단 만료 KST·절차 검증 | A/B MCP의 KST/관측 기준 남은 시간·모델 사본 투영·result 결과문장 오해석 수정. 별도 대상 도구가 없는 차단 상태는 정확한 ID의 실제 커널 관측으로 검증. 관리207·Hermes380·SDK179·양서버MCP23·설치38 PASS | 최종 A1/B14파일 반영·확정. 다른 ID의 새 Native/SDK 각각1 MCP·오류/산술0·절차 completed,60.8/9.5초 표본(게시 제외·조건 상이). 중간 자동원복1회 후 재반영/DB보존·timer 비활성. 장문/사건판단·UI왕복/새 공격 E2E는 별도. [처리/복구](infra/hermes/operation-time.md)·[원장](infra/hermes/operation-time-validation-20261103.json) |
+| 공유 Native 차단 참조 |20:08:59 B 컨트롤러 반영·20:16:15 확정. 기존 차단 ID를 다른 사건에서 참조하면 소유권 충돌로 최종 보고를 버리던 오류 수정. 로컬/서버185검사·설치계약37검사, 실제 과거 trace 전후 재생 성공. 새232공격3건/403 뒤 실제 두 사건이 같은 Native 조치에 참조2개·원소유권 유지. WAF건은6 MCP 후 승인 대기까지 성공 | 이전20:10 IDS건은10 MCP 중 미래시각 조회3실패로 needs_review. 프로토콜/공유조치 성공은 사건 판단 정확성·해결 완료가 아님. [수정/복구](infra/hermes/shared-containment.md)·[검증 원장](infra/hermes/shared-containment-validation-20261103.json) |
+| 자산·시간 근거·종결 | 실제 사건 KST 구간/미래 종료시각 제한·동일 필터/실사건 행 정정 조회 회복·반환 경보별 시각/룰/IP/수집 센서 결속을 구현. 오래된 자동 관리 내장 gate와 두 봇 공통 grounding을1.19.10으로 동기화. 로컬/서버195·실환경Hermes380/SDK179·설치38 검사 PASS |21:09 최종9파일 반영·실제 읽기전용2 MCP 오류/쓰기/게시0, 과거 실제보고의 잘못된 검사 재생 정정. 새232 공격3요청403/600초Native차단. IDS8/WAF6 MCP 모두 오류0·승인대기 보고 sent. 미래 until 거절/과거SID/센서명 혼용은 새 표본에서0. 당시 시간계산/만료 오답은 위 후속 보완과 구분하며 후속 사건 위험/피해 판단·종결은 잔여. [처리/복구](infra/hermes/incident-context.md)·[원장](infra/hermes/incident-context-validation-20261103.json) |
+| 관리 접속 | A 외부SSH·Wazuh443/10443은 관리자231/32, 내부SSH는 MCP B10.200.10.10/32로 축소. 23:13:55 적용·23:15 신규 관리자 경유 SSH 확정·23:17 타이머 비활성/4파일SHA 재검증·11/4 10:33 세서버정책/수집 재확인. Kali Wazuh302→403/위조헤더403·C→A SSH 차단카운터·공개웹/채팅 유지·양경로 MCP 실제 읽기 성공 | B/C 기존 ens160 guard 검증·운영 변경0. 로컬68검사·native 격리16조건/TTL·역변경 통과. 새OS 전체설치·B/C 컨테이너→호스트 관리/관리자 경보소음 예외·실제 운영 원복은 별도. [정책·복구](infra/groot-a/management-access.md) |
+| FW 통합 | A14:21 실제8테이블/30체인/99룰/9집합. 프로젝트NAT2테이블→inet두체인 후보는문법/격리기존·통합·원복과TTL보존검증 | NAT통합6후보는미커밋·운영미적용이며이번관리정책의새로더SHA/231출발지로기준을갱신해야한다. IPv6 SSH/웹수신이남아테이블단순삭제안함. Docker NAT 사용량은과거실확인,10443프로젝트NAT최근사용은미확인. [FW 검토](infra/mcp/fw-consolidation.md) |
+
+
+
+<a id="source-6561bd16a0c95484-h2"></a>
+<a id="source-a66b68f9d792afa0-h2"></a>
+<a id="source-d70688ad386660bb-h2"></a>
+<a id="source-fd1d5f234b14e0a3-h2"></a>
+<a id="record-f7d42137e26af4c34681e434175fc41408d8176313b6940af8d455d0efdc8910"></a>
+
+## 검증을 마친 최근 단위
+
+| 단위 | 실제 범위 | 구분해야 할 한계 |
+|---|---|---|
+| 공개 PCAP11개 | MTA4/CTU3/Netresec경유Wireshark4,99,096,119B·정답PDF4 양Kali SHA일치. 새시험232만,오프라인11/156,160패킷·실웹정상97+기존공격대조3 모두전송,공격3WAF403 | 감염캡처전체를악성정답으로보지않음. CTU281-1 악성흐름미확정·Natureforce전용C2미관측·정보성경보별도. CAIDA신청제/payload제거로제외·학습편입0. [보고서](infra/validation/pcap-web/PUBLIC_PCAP.md) |
+| IDS1000002 rev2 | 정확후보 카드승인·19:16 적용/재시작·전후각14 native조건/전체ET문법. 정상100건 경보2→0,실40445건 경보1·native source/target확인. local SHA220f9e70… | 실제404버스트 신호이며악성확정/자동차단추가아님. 초기설치기canonical룰자동포함. 수동원복/새OS전체설치미실시. [원장](infra/validation/pcap-web/http404-validation-20261103.json) |
+| 기존58PCAP/232 차단 |58개4.38GB/HTTP59,672·검토21변형233 WAF403. 232로직접SFTP/전SHA일치·옛C차단예외제거,232 21시도9전송403/12차단중연결실패·FW24 DROP/Wazuh100129·실차단/만료회수 | 첫97:3시도는실전송86이므로완전97:3과구분. 기존58개공식출처는미확정. C내부10.200.10.20보호유지. [방법/기록](infra/validation/pcap-web/README.md) |
+| 조기 해제/재차단 |15:00:10 실제해제→15:01:10 대기종료→새SQLi→15:04:58 운영Hermes MCP/FW/실카드. 이후공개PCAP차단은19:48:11 expired/19:49집합0·GET302복구확인 | 차단/카드 성공과 LLM 판단·종결을 구분. [증거/복구](infra/mcp/containment-reblock.md) |
+| 단문/근거·FW페이지1.5.15 |13:46 반영·13:54 확정. 실제채팅12/12·14읽기/2확인·서버559검사,양봇50개씩3페이지 snapshot/offset검증 | 3군모델비교를재실행한것은아님. native관리CLI 조회생략·교차검토후보와독립판단/보호쓰기/시각UI/새OS설치는별도. [상세](infra/hermes/short-read.md) |
+
+
+
+<a id="source-a66b68f9d792afa0-h3"></a>
+<a id="source-d70688ad386660bb-h3"></a>
+<a id="record-a250ee9f00041e383775f32d1ffe14d9ecbd12ec9fda44a3a20834b4d6697a8a"></a>
+
+## 운영 정책과 마지막 확인
+
+| 항목 | 적용 기준 |
+|---|---|
+| LLM 역할 | 조사·판단·제안·승인요청·결과확인을 주도. 관리자만 보호변경 승인. 일반sudo/Docker/패키지 위임없음 |
+| WAF | SecRuleEngine On. 요청별실룰/Enabled/403 검증. HTTP상태만으로침해성공/영향해소를단정하지않음 |
+| 지정 IDS→FW | 사용자승인 예외로Native선차단 후 LLM조사/관리자유지·해제확인. 비대상DNS/상태·정보성신호 자동차단 아님 |
+| 차단 시간 | 최초600초·관리자유지승인 시결정부터60분·해제승인/만료. 실제해제 또는원기한종료 후60초재차단대기,새공격근거 필요·중복요청연장없음 |
+| 모델/봇 | Thor 원본qwen3.6:35b 유지·Ollama 대화/조회, Hermes 조사/변경 우선. 현행 공통 계약1.5.16·query-completion1.19.12·A/B MCP 시각/절차 보완, 모델/승인·일반권한 변경0 |
+| 학습/비교 |11/2 4,348단계/8,695학습·평가176완료·eval_loss0.3175. DGX→Thor 후보Q4_K_M 적재/해시확인,운영승격없음. 고정1.5.14 비교원본18/24·HF기본20/24·학습19/24로승격근거부족. [방법](finetuning/RUNTIME_COMPARISON_20261103.md) |
+
+현재소프트웨어/프로토콜검사·실센서/차단·실제LLM판단·독립모델품질·새OS전체설치검증은서로대신하지않는다. 이전세부관측/원문/소스핀은위날짜별archive와각검증원장에보존한다.
+
+
+
+<a id="source-a66b68f9d792afa0-h4"></a>
+<a id="record-da090ea7fb29c528815006984dc1f7deaf1ee676e1e5c88c22237b41bea1eedb"></a>
+
+## 남은 전체 과제
+
+| 과제 | 다음 완료 근거 |
+|---|---|
+| 자산·시간·조사종결/하네스 | 신규사건의실제정확MCP·인자·시간/flow별근거·자산관계·정보성신호·정정/종결을검증. 기존peer/guard6후보는별도미확정. 이번SDK7.62초/FW1조회는성공했으나 input만요청해도전체체인표출력하는범위누락잔여 |
+| FW/관리접속 | A관리접속축소완료. B/C 컨테이너→호스트 관리경로·관리자접속경보소음 예외·NAT통합후보 재기준/실운영·IPv6 사용경로·새OS 전체설치 확인 |
+| 독립평가/쓰기/복구 |176독립평가·승인형보호쓰기/원복·복구가능한하네스정리조합비교. 원본/학습본선택은검증근거로결정 |
+| 시연/공격E2E | Nuclei경로/표본0·로그인오판·BlindSQLi·전체스캔·Log4Shell RCE와브라우저검증미완료. 선택센서시험으로전체침해대응완료주장안함 |
+| 장애·관제공백 | 장기알림/Vector지연·수집중단무손실·과거검토사건·관리CLI생략잔여. 원문/복구보존 |
+| 데이터·재현 | 전체원본1개+정제본1개규칙,기존약7.7GB통합이전·전체멤버SHA/복원검증. 수집/정제로코드오류해결했다고표시하지않음 |
+| 기타검토 | Google Harness² 전후비교,SSL VPN/모바일푸시,GPU드라이버원인/후보장기안정성·초기ready소스핀·새서버전체설치 |
+| 논문·발표 | 논문은실제관측·출처·평가/미검증한계와현행구성반영. 발표작성은11월둘째주리마인더이후·최종12/1 |
+
+
+
+<a id="source-a66b68f9d792afa0-h5"></a>
+<a id="record-f7be6a1882c4b825916731f6d017bce979b57d4a586fced95f8b1722f1fc0b08"></a>
+
+## 변경·복구·Git 상태
+
+이번 관리 ACL은 A의 FW/기존 NAT로더/10443영구 DNAT/기존 chatproxy 4파일과 kernel guard4개·mgmt_src·DNAT1개·forward1개만 증분 변경했다. 관리자231→A 경유이며 Nginx reload만 수행했다. WAF/IDS/Docker/SSH 재시작·B/C 운영소스·모델·승인/차단TTL·운영DB 변경0이다. 원본 바이트/SHA/uid/gid/mode·독립 복구 코드는 A root `/var/lib/capstone-management-access/c65d6ee3bd13d319`에 보존한다. 15분 timer 확정 해제·확정 후 recover 무동작은 실제 확인했고 운영 수동 원복은 실행하지 않았다. 격리 namespace에서 실제 증분 적용/역변경·16종 패킷·TTL보존을 검증했다.
+
+루트 deploy.sh는 기존 A 유지보수 --management-access와 새 security 역할의 host guard check/install/verify를 연결했다. 새 설치 예제도 관리/대시보드231 한주소로 제한한다. 기존 portable TLS 렌더러의 공유 bridge endpoint 누락도 수정했다. 로컬68검사·native 구문/격리16종은 PASS이며 새3VM 전체 설치 시험은 미실시다. [정책·원복·범위](infra/groot-a/management-access.md) · [소스핀/검증](infra/groot-a/management-access-validation-20261103.json).
+
+직전 만료/절차 보완 소스 fa40b84와 후속423a95c의 원격 일치는 과거 완료로 보존한다. 이번 관리 ACL26파일은4301dba66f36bdc19973f572c5a7c9d2b96a042b로커밋했고11/4 10:33:02 KST원격main일치를확인했다. 이번게시확인/정리보완은후속문서커밋대상이며최종ID·원격일치·작업트리는로컬세션기록과최종답변에남긴다. 기존peer6/NAT통합6후보와 별도topology5stage는 보존·미포함한다. NAT후보는 변경된 로더SHA/관리출발지 재검증이 필요하다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정잔여1% 중지 조건은 유지하나 현재 도구로 잔여율을 조회할 수 없다.
+
+11/4 10:33 관리자경유 신규SSH로 A4파일SHA·guard/mgmt_src/10443·확정된복구무동작/타이머inactive, B/C기존hostguard와3서버Wazuh연결을읽기재확인했다. 전일HTTP/MCP/패킷시험의재실행은아니다. 10:34:50 Mac자체임시18파일/312657B·해당부모와mux를제거하고부재확인했다. 비밀값없는도우미17개는로컬검증기록에,서버실제복구본은root전용으로보존한다. 새패키지/다운로드0이며다른작업의임시물·NAT6·peer6·topology5는보존했다.
+
+
+</details>
+
+<a id="source-d70688ad386660bb"></a>
+
+## STATUS-20261103-before-management-access.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-04T10:31:14+09:00</summary>
+
+<a id="source-d70688ad386660bb-h0"></a>
+<a id="record-e7a3f40551ec51738b82a5abd10e3f2757a58fb7a3a4ce2c0d6e09bcdd10296c"></a>
+
+# 인프라 현황 — 2026-11-03 22:40 KST
+
+현재 상태와 활성 과제를 요약한다. 전체 목표는 **LLM의 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료 active다. 핵심 기능은11/9 KST까지 마감하는 목표를 유지한다. 발표 작성은11월둘째주 리마인더 이후다.
+
+[계획](PLAN.md) · [이번 수정 전 현황](STATUS_HISTORY.md#source-fd1d5f234b14e0a3) · [사건 시각 보완 전](STATUS_HISTORY.md#source-6561bd16a0c95484) · [공유 차단 수정 전](STATUS_HISTORY.md#source-44b2fd9c4f0995fb) · [PCAP/IDS 수정 전 기록](STATUS_HISTORY.md#source-84055af98a0c21f3) · [11/1 이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
+
+
+
+<a id="source-d70688ad386660bb-h1"></a>
+<a id="record-7c7261b54d240c7bd1edaa69ba4834421d93ea3f9ca41d299f074ce0f564f958"></a>
+
+## 현재 우선 과제와 최신 결과
+
+| 작업 | 완료·실제 확인 | 잔여·한계 |
+|---|---|---|
+| 차단 만료 KST·절차 검증 | A/B MCP의 KST/관측 기준 남은 시간·모델 사본 투영·result 결과문장 오해석 수정. 별도 대상 도구가 없는 차단 상태는 정확한 ID의 실제 커널 관측으로 검증. 관리207·Hermes380·SDK179·양서버MCP23·설치38 PASS | 최종 A1/B14파일 반영·확정. 다른 ID의 새 Native/SDK 각각1 MCP·오류/산술0·절차 completed,60.8/9.5초 표본(게시 제외·조건 상이). 중간 자동원복1회 후 재반영/DB보존·timer 비활성. 장문/사건판단·UI왕복/새 공격 E2E는 별도. [처리/복구](infra/hermes/operation-time.md)·[원장](infra/hermes/operation-time-validation-20261103.json) |
+| 공유 Native 차단 참조 |20:08:59 B 컨트롤러 반영·20:16:15 확정. 기존 차단 ID를 다른 사건에서 참조하면 소유권 충돌로 최종 보고를 버리던 오류 수정. 로컬/서버185검사·설치계약37검사, 실제 과거 trace 전후 재생 성공. 새232공격3건/403 뒤 실제 두 사건이 같은 Native 조치에 참조2개·원소유권 유지. WAF건은6 MCP 후 승인 대기까지 성공 | 이전20:10 IDS건은10 MCP 중 미래시각 조회3실패로 needs_review. 프로토콜/공유조치 성공은 사건 판단 정확성·해결 완료가 아님. [수정/복구](infra/hermes/shared-containment.md)·[검증 원장](infra/hermes/shared-containment-validation-20261103.json) |
+| 자산·시간 근거·종결 | 실제 사건 KST 구간/미래 종료시각 제한·동일 필터/실사건 행 정정 조회 회복·반환 경보별 시각/룰/IP/수집 센서 결속을 구현. 오래된 자동 관리 내장 gate와 두 봇 공통 grounding을1.19.10으로 동기화. 로컬/서버195·실환경Hermes380/SDK179·설치38 검사 PASS |21:09 최종9파일 반영·실제 읽기전용2 MCP 오류/쓰기/게시0, 과거 실제보고의 잘못된 검사 재생 정정. 새232 공격3요청403/600초Native차단. IDS8/WAF6 MCP 모두 오류0·승인대기 보고 sent. 미래 until 거절/과거SID/센서명 혼용은 새 표본에서0. 당시 시간계산/만료 오답은 위 후속 보완과 구분하며 후속 사건 위험/피해 판단·종결은 잔여. [처리/복구](infra/hermes/incident-context.md)·[원장](infra/hermes/incident-context-validation-20261103.json) |
+| 관리 접속 | 관리자231→A SSH허용 한주소/영구파일 추가,16:35:34 peer231/root확정. A/B/C 변경은Mac→관리자231→A→B/C. 두Kali232/233은직결 예외. 18:13단절은18:45복구 | 관리자/MCP전용 엄격INPUT축소·관리접속로그예외 미반영. [접속](팀접속안내.md)·[FW 정책/복구](infra/groot-a/fw-v2/README.md) |
+| FW 통합 | A14:21 실제8테이블/30체인/99룰/9집합. 프로젝트NAT2테이블→inet두체인 후보는문법/격리기존·통합·원복과TTL보존검증 | 지속로더/루트설치기6후보는미커밋·운영미적용. IPv6 SSH/웹수신이남아테이블단순삭제안함. Docker NAT 사용량은과거실확인,10443프로젝트NAT최근사용은미확인. [FW 검토](infra/mcp/fw-consolidation.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-f7d42137e26af4c34681e434175fc41408d8176313b6940af8d455d0efdc8910)
+
+
+[이미 보존한 동일 내용으로 이동](#record-a250ee9f00041e383775f32d1ffe14d9ecbd12ec9fda44a3a20834b4d6697a8a)
+
+<a id="source-6561bd16a0c95484-h4"></a>
+<a id="source-d70688ad386660bb-h4"></a>
+<a id="source-fd1d5f234b14e0a3-h4"></a>
+<a id="record-c141b58e27cd69963a09be55a6afa47da7f22b8cefbd82365600f7da54126555"></a>
+
+## 남은 전체 과제
+
+| 과제 | 다음 완료 근거 |
+|---|---|
+| 자산·시간·조사종결/하네스 | 신규사건의실제정확MCP·인자·시간/flow별근거·자산관계·정보성신호·정정/종결을검증. 기존peer/guard6후보는별도미확정 |
+| FW/관리접속 | 실제관리자/MCP경로·백업/독립복구·엄격INPUT·NAT/IPv6/기존TTL·서비스통신/설치기 동기화와실운영검증 |
+| 독립평가/쓰기/복구 |176독립평가·승인형보호쓰기/원복·복구가능한하네스정리조합비교. 원본/학습본선택은검증근거로결정 |
+| 시연/공격E2E | Nuclei경로/표본0·로그인오판·BlindSQLi·전체스캔·Log4Shell RCE와브라우저검증미완료. 선택센서시험으로전체침해대응완료주장안함 |
+| 장애·관제공백 | 장기알림/Vector지연·수집중단무손실·과거검토사건·관리CLI생략잔여. 원문/복구보존 |
+| 데이터·재현 | 전체원본1개+정제본1개규칙,기존약7.7GB통합이전·전체멤버SHA/복원검증. 수집/정제로코드오류해결했다고표시하지않음 |
+| 기타검토 | Google Harness² 전후비교,SSL VPN/모바일푸시,GPU드라이버원인/후보장기안정성·초기ready소스핀·새서버전체설치 |
+| 논문·발표 | 논문은실제관측·출처·평가/미검증한계와현행구성반영. 발표작성은11월둘째주리마인더이후·최종12/1 |
+
+
+
+<a id="source-d70688ad386660bb-h5"></a>
+<a id="record-cb77bbdd17bd2a164c66c896b337556856dbf7235f7e3676bdbb47cd67758833"></a>
+
+## 변경·복구·Git 상태
+
+A1/B14파일을 관리자231→A→B 경유로 증분 반영했다. 최종 B22:15:54 반영/확정·22:25 양서버 실제SHA/uid/gid/mode·서비스·timer 비활성을 확인했다. 중간22:10:52 B자동원복1회 후 최종 후보를 재반영했으며 운영DB/WAL·승인/대화는 복원하지 않았다. 원본/중간/최종소스·원문/실제 canary·멱등 복구는 양서버 root `/var/lib/capstone-operation-time/20261103-r1`에 보존한다. 실제 수동 원복/새 OS 전체 설치는 미실시다.
+
+기존 deploy.sh의 MCP/render/내장gate·양봇 소스 묶음은 같은 canonical을 사용한다. 추가 패키지·이미지·포트·키·모델0, SOUL/설정·승인/TTL 유지다. 초기 설치기로 운영 서버를 덮어쓰지 않았다. 서버 자체 검증 작업본/재생 복제본을 정리했으며 실제 canary DB/trace·복구·운영 데이터는 보존한다. Mac 자체 도우미 35파일/3753205B·임시부모/SSH mux도 제거·부재 확인했다. 비밀 값 없는 도우미 소스 사본과 실제 검증 원문은 로컬 전용이다. 소스 게시확인과 후속 문서의 로컬 보완/게시 상태는 아래에 구분한다.
+
+이번 만료/절차 보완20파일은 `fa40b84e90e781398022250c7d36b79017bdb323`로 커밋했고22:40:07 KST 실제 원격main일치를 확인했다. 게시확인 보완은 후속 문서 커밋으로 게시한다. 기존peer6/NAT6 후보와 별도topology5stage는 보존·미포함한다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 기존 별도 작업 때문에 전체 작업트리는 clean이 아니다. 계정잔여1% 중지 조건은 유지하나 현재 도구로 잔여율을 조회할 수 없다.
+
+
+</details>
+
+<a id="source-fd1d5f234b14e0a3"></a>
+
+## STATUS-20261103-before-operation-time.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T22:37:16+09:00</summary>
+
+<a id="source-fd1d5f234b14e0a3-h0"></a>
+<a id="record-3442b01471247370349666e583f63a437b2775d9a36a7ece0f006fe22d410f7b"></a>
+
+# 인프라 현황 — 2026-11-03 21:23 KST
+
+현재 상태와 활성 과제를 요약한다. 전체 목표는 **LLM의 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료 active다. 핵심 기능은11/9 KST까지 마감하는 목표를 유지한다. 발표 작성은11월둘째주 리마인더 이후다.
+
+[계획](PLAN.md) · [이번 수정 전 현황](STATUS_HISTORY.md#source-6561bd16a0c95484) · [공유 차단 수정 전](STATUS_HISTORY.md#source-44b2fd9c4f0995fb) · [PCAP/IDS 수정 전 기록](STATUS_HISTORY.md#source-84055af98a0c21f3) · [11/1 이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
+
+
+
+<a id="source-fd1d5f234b14e0a3-h1"></a>
+<a id="record-93c40b1d0ff76f518e4e1f4553cee3166d056f74f9bcbceeaff77f04dcb0bcc3"></a>
+
+## 현재 우선 과제와 최신 결과
+
+| 작업 | 완료·실제 확인 | 잔여·한계 |
+|---|---|---|
+| 공유 Native 차단 참조 |20:08:59 B 컨트롤러 반영·20:16:15 확정. 기존 차단 ID를 다른 사건에서 참조하면 소유권 충돌로 최종 보고를 버리던 오류 수정. 로컬/서버185검사·설치계약37검사, 실제 과거 trace 전후 재생 성공. 새232공격3건/403 뒤 실제 두 사건이 같은 Native 조치에 참조2개·원소유권 유지. WAF건은6 MCP 후 승인 대기까지 성공 | 이전20:10 IDS건은10 MCP 중 미래시각 조회3실패로 needs_review. 프로토콜/공유조치 성공은 사건 판단 정확성·해결 완료가 아님. [수정/복구](infra/hermes/shared-containment.md)·[검증 원장](infra/hermes/shared-containment-validation-20261103.json) |
+| 자산·시간 근거·종결 | 실제 사건 KST 구간/미래 종료시각 제한·동일 필터/실사건 행 정정 조회 회복·반환 경보별 시각/룰/IP/수집 센서 결속을 구현. 오래된 자동 관리 내장 gate와 두 봇 공통 grounding을1.19.10으로 동기화. 로컬/서버195·실환경Hermes380/SDK179·설치38 검사 PASS |21:09 최종9파일 반영·실제 읽기전용2 MCP 오류/쓰기/게시0, 과거 실제보고의 잘못된 검사 재생 정정. 새232 공격3요청403/600초Native차단. IDS8/WAF6 MCP 모두 오류0·승인대기 보고 sent. 미래 until 거절/과거SID/센서명 혼용은 새 표본에서0. 불필요 시간계산2회·WAF만료시각오답/epoch 표시·후속조사종결은 잔여. [처리/복구](infra/hermes/incident-context.md)·[원장](infra/hermes/incident-context-validation-20261103.json) |
+| 관리 접속 | 관리자231→A SSH허용 한주소/영구파일 추가,16:35:34 peer231/root확정. A/B/C 변경은Mac→관리자231→A→B/C. 두Kali232/233은직결 예외. 18:13단절은18:45복구 | 관리자/MCP전용 엄격INPUT축소·관리접속로그예외 미반영. [접속](팀접속안내.md)·[FW 정책/복구](infra/groot-a/fw-v2/README.md) |
+| FW 통합 | A14:21 실제8테이블/30체인/99룰/9집합. 프로젝트NAT2테이블→inet두체인 후보는문법/격리기존·통합·원복과TTL보존검증 | 지속로더/루트설치기6후보는미커밋·운영미적용. IPv6 SSH/웹수신이남아테이블단순삭제안함. Docker NAT 사용량은과거실확인,10443프로젝트NAT최근사용은미확인. [FW 검토](infra/mcp/fw-consolidation.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-f7d42137e26af4c34681e434175fc41408d8176313b6940af8d455d0efdc8910)
+
+<a id="source-fd1d5f234b14e0a3-h3"></a>
+<a id="record-8a0e44fd3be3b263a00769184fc212f47fab11f5c5e10bf495fb051a92408bb9"></a>
+
+## 운영 정책과 마지막 확인
+
+| 항목 | 적용 기준 |
+|---|---|
+| LLM 역할 | 조사·판단·제안·승인요청·결과확인을 주도. 관리자만 보호변경 승인. 일반sudo/Docker/패키지 위임없음 |
+| WAF | SecRuleEngine On. 요청별실룰/Enabled/403 검증. HTTP상태만으로침해성공/영향해소를단정하지않음 |
+| 지정 IDS→FW | 사용자승인 예외로Native선차단 후 LLM조사/관리자유지·해제확인. 비대상DNS/상태·정보성신호 자동차단 아님 |
+| 차단 시간 | 최초600초·관리자유지승인 시결정부터60분·해제승인/만료. 실제해제 또는원기한종료 후60초재차단대기,새공격근거 필요·중복요청연장없음 |
+| 모델/봇 | Thor 원본qwen3.6:35b 유지·Ollama 대화/조회, Hermes 조사/변경 우선. 이번 시간/자산 보완은 공통검사/자동관리 gate9복사본과SDK receipt만 반영·모델/일반권한 변경0 |
+| 학습/비교 |11/2 4,348단계/8,695학습·평가176완료·eval_loss0.3175. DGX→Thor 후보Q4_K_M 적재/해시확인,운영승격없음. 고정1.5.14 비교원본18/24·HF기본20/24·학습19/24로승격근거부족. [방법](finetuning/RUNTIME_COMPARISON_20261103.md) |
+
+현재소프트웨어/프로토콜검사·실센서/차단·실제LLM판단·독립모델품질·새OS전체설치검증은서로대신하지않는다. 이전세부관측/원문/소스핀은위날짜별archive와각검증원장에보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-c141b58e27cd69963a09be55a6afa47da7f22b8cefbd82365600f7da54126555)
+
+<a id="source-fd1d5f234b14e0a3-h5"></a>
+<a id="record-cb5a6d57da3f689d6f29a4639dd774c4d4ed2ee78ca20d9e3e9e040662d59598"></a>
+
+## 변경·복구·Git 상태
+
+이번9파일 운영 증분은21:09:07 관리자231→A→B로 반영했다. 실제 controller SHA572a329e…/공통 gate bbbb340a…이며 기존root deploy.sh의 소스복사/내장gate 생성 경로도 같은 canonical을 사용한다. 추가 패키지·포트·키·모델0, 기존 SOUL/설정hash 보존·DB/WAL 되돌림0이다. 복구 소스/uid/gid/mode와 독립 CAS timer는 B `/var/lib/capstone-incident-time/20261103-r1`에 보존한다. 21:14:48 소스9개/메타데이터·서비스·첫 실제 조사8 MCP/오류0를 확인해 확정하고 독립 timer를 해제했다. 새차단은21:20:18 원기한 후expired·21:20:46 커널0/정상GET302복구를 확인했다. 후속 IDS는판단근거미완료needs_review·WAF는verify중으로전체종결을주장하지않는다. 수동 원복/새 OS 전체 설치는 미실시다.
+
+이번 시각/자산 보완16파일은 `9addf1a63624c7cc3de9b1be4111ed63580416a4`로 커밋했고21:22:19 KST 실제 원격main일치를 확인했다. 게시확인·정리결과 보완은 후속 문서 커밋으로 게시한다. 기존peer6/NAT6후보와별도topology5stage는포함하지 않는다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는 Git 제외다.
+
+서버 자체 시험/복제본266파일/6,127,108B와 Mac 자체 도우미34파일/3,463,578B·임시부모/SSH mux를 정리했다. canary 원문trace·복구소스·운영DB/대화·두Kali PCAP/결과는 보존했고, Mac 새 패키지 설치0이다. 도우미 소스 사본/최종 원격커밋·작업트리 상태는 로컬 기록에 남긴다. 기존 별도 후보와topology5stage 때문에 전체 작업트리는 clean이 아니다. 계정잔여1% 중지 조건은 유지하나 현재 도구로 잔여율을 조회할 수 없다.
+
+
+</details>
+
+<a id="source-6561bd16a0c95484"></a>
+
+## STATUS-20261103-before-incident-context.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T21:21:23+09:00</summary>
+
+<a id="source-6561bd16a0c95484-h0"></a>
+<a id="record-5b5eba03357d96dc7aa4e5a3a254bfe6b2ded6306ce2bcc28e4fbee3a4db5625"></a>
+
+# 인프라 현황 — 2026-11-03 20:26 KST
+
+현재 상태와 활성 과제를 요약한다. 전체 목표는 **LLM의 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료 active다. 핵심 기능은11/9 KST까지 마감하는 목표를 유지한다. 발표 작성은11월둘째주 리마인더 이후다.
+
+[계획](PLAN.md) · [이번 수정 전 현황](STATUS_HISTORY.md#source-44b2fd9c4f0995fb) · [PCAP/IDS 수정 전 기록](STATUS_HISTORY.md#source-84055af98a0c21f3) · [11/1 이전 이력](STATUS_HISTORY.md#source-87368a0abd79b357). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
+
+
+
+<a id="source-6561bd16a0c95484-h1"></a>
+<a id="record-55ff7bceb5d07c7a96316921a7b6752794ac4e036162acb0376fa076ff44b877"></a>
+
+## 현재 우선 과제와 최신 결과
+
+| 작업 | 완료·실제 확인 | 잔여·한계 |
+|---|---|---|
+| 공유 Native 차단 참조 |20:08:59 B 컨트롤러 반영·20:16:15 확정. 기존 차단 ID를 다른 사건에서 참조하면 소유권 충돌로 최종 보고를 버리던 오류 수정. 로컬/서버185검사·설치계약37검사, 실제 과거 trace 전후 재생 성공. 새232공격3건/403 뒤 실제 두 사건이 같은 Native 조치에 참조2개·원소유권 유지. WAF건은6 MCP 후 승인 대기까지 성공 | IDS건은10 MCP 중 미래시각 조회3실패로 needs_review. 프로토콜/공유조치 성공은 사건 판단 정확성·해결 완료가 아님. [수정/복구](infra/hermes/shared-containment.md)·[검증 원장](infra/hermes/shared-containment-validation-20261103.json) |
+| 자산·시간 근거·종결 | 원문 trace로 원인 대조. 앞선 WAF outcome_unknown에는 모델 최종 보고가 실제 존재했고 호스트 컨트롤러가 거절했음을 정정 |232의구장비명/센서명혼용,18:48~49의과거SID1000002를19:37~38사건에혼합,미래 until_kst·정정후 오류고정처리 잔여. 실제 근거 조회/결속을 보완하고 새 사건으로 재검증 |
+| 관리 접속 | 관리자231→A SSH허용 한주소/영구파일 추가,16:35:34 peer231/root확정. A/B/C 변경은Mac→관리자231→A→B/C. 두Kali232/233은직결 예외. 18:13단절은18:45복구 | 관리자/MCP전용 엄격INPUT축소·관리접속로그예외 미반영. [접속](팀접속안내.md)·[FW 정책/복구](infra/groot-a/fw-v2/README.md) |
+| FW 통합 | A14:21 실제8테이블/30체인/99룰/9집합. 프로젝트NAT2테이블→inet두체인 후보는문법/격리기존·통합·원복과TTL보존검증 | 지속로더/루트설치기6후보는미커밋·운영미적용. IPv6 SSH/웹수신이남아테이블단순삭제안함. Docker NAT 사용량은과거실확인,10443프로젝트NAT최근사용은미확인. [FW 검토](infra/mcp/fw-consolidation.md) |
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-f7d42137e26af4c34681e434175fc41408d8176313b6940af8d455d0efdc8910)
+
+<a id="source-6561bd16a0c95484-h3"></a>
+<a id="record-24897005fb294052a1ab49acb0b93df971d1ed9db3321ad41f568ec90f496461"></a>
+
+## 운영 정책과 마지막 확인
+
+| 항목 | 적용 기준 |
+|---|---|
+| LLM 역할 | 조사·판단·제안·승인요청·결과확인을 주도. 관리자만 보호변경 승인. 일반sudo/Docker/패키지 위임없음 |
+| WAF | SecRuleEngine On. 요청별실룰/Enabled/403 검증. HTTP상태만으로침해성공/영향해소를단정하지않음 |
+| 지정 IDS→FW | 사용자승인 예외로Native선차단 후 LLM조사/관리자유지·해제확인. 비대상DNS/상태·정보성신호 자동차단 아님 |
+| 차단 시간 | 최초600초·관리자유지승인 시결정부터60분·해제승인/만료. 실제해제 또는원기한종료 후60초재차단대기,새공격근거 필요·중복요청연장없음 |
+| 모델/봇 | 마지막13:19 검증은Thor원본qwen3.6:35b, B Ollama대화/조회·Hermes조사/변경 우선. 이번공유참조수정은모델/게이트/봇권한·컨테이너재시작 변경0 |
+| 학습/비교 |11/2 4,348단계/8,695학습·평가176완료·eval_loss0.3175. DGX→Thor 후보Q4_K_M 적재/해시확인,운영승격없음. 고정1.5.14 비교원본18/24·HF기본20/24·학습19/24로승격근거부족. [방법](finetuning/RUNTIME_COMPARISON_20261103.md) |
+
+현재소프트웨어/프로토콜검사·실센서/차단·실제LLM판단·독립모델품질·새OS전체설치검증은서로대신하지않는다. 이전세부관측/원문/소스핀은위날짜별archive와각검증원장에보존한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-c141b58e27cd69963a09be55a6afa47da7f22b8cefbd82365600f7da54126555)
+
+<a id="source-6561bd16a0c95484-h5"></a>
+<a id="record-8053e77fad1e3bbe58450570ed7cc8851d0c44c48426227b494dd99fca03ac1e"></a>
+
+## 변경·복구·Git 상태
+
+공유참조변경은canonical controller/검사와기존deploy.sh 설치경로에반영했다. B actual controller는3d1e12c3…·canonical5f79df5c…·native gate2a81ec4d…유지. 원본SHA/uid/gid/mode·독립CAS복구·소스/검증은B root `/var/lib/capstone-shared-containment/20261103-r1`에보존한다.20:16:15 확정후원복timer비활성·SQLite되돌림/삭제0이다.
+
+직전IDS57b754d·공개PCAPc875813·후속ae8be8a까지푸시/원격일치확인했다. 이번공유참조9파일은618c08d6501951c55c13ed0f7444d75e0f7faf5e로커밋·20:23:40 KST 원격main일치확인했다. 게시확인/최종정리보완은후속문서커밋으로게시한다. 기존peer6/NAT6후보와다른topology5stage는포함하지않는다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는Git제외다. 새Mac설치/가중치반입0이며자체임시코드/클론정리는로컬기록에따로확인한다. 계정잔여1%시중지조건은유지하나현재도구로계정잔여율을조회할수없다.
+
+최종후속:20:25 새공유차단은원기한20:20:30 후20:20:33 expired·커널집합0,두참조상태도expired를확인했다. WAF는읽기전용후속검증중으로사건종결/즉시깨움인과는완료주장안함. 서버자체검사/재생클론10파일19,029,703B와Mac자체도우미19파일/작업임시부모를제거했다. 복구소스/기존DB·trace/가중치/자격·대화는보존한다. 이번공개잔여와기존peer6/NAT6후보/별도topology5stage는구분한다.
+
+
+</details>
+
+<a id="source-44b2fd9c4f0995fb"></a>
+
+## STATUS-20261103-before-shared-containment.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T20:23:34+09:00</summary>
+
+<a id="source-44b2fd9c4f0995fb-h0"></a>
+<a id="record-c490b2bc0c59f231c8a1f007c1e19f84f6a73d560599a19cd92935e7f779bd26"></a>
+
+# 인프라 현황 — 2026-11-03 19:50 KST
+
+현재 상태와 활성 과제를 요약한다. [연결복구·IDS 수정 전 현황](STATUS_HISTORY.md#source-84055af98a0c21f3) · [PCAP 시험 전 현황](STATUS_HISTORY.md#source-37e640b7fc9dca78) · [단문 보완 전 현황](STATUS_HISTORY.md#source-df352eea5f615cda) · [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-44b2fd9c4f0995fb-h1"></a>
+<a id="record-99ffc02e6b91f3e3dad404856a6aaafb3a87844a71e50ee1d3915eb13eb3567c"></a>
+
+## 현재: 232 실차단·FW 상관 확인, IDS 정상 오탐 수정 완료 · 공개 PCAP 11개 양Kali 반입·232 오프라인/웹검사 완료
+
+사용자 목표는 active다. 11/10 전 대부분 완료 요청은11/9 KST 핵심 마감 목표로 해석해 [계획](PLAN.md)에 반영했다. OpenClaw는 후보로만 둔다. 발표 작성은 기존11월둘째주 리마인더 이후 조건을 유지한다.
+
+| 작업 | 실제 확인·산출물 | 현재 한계/다음 작업 |
+|---|---|---|
+| PCAP 웹·장비별 시험 | 58PCAP/4.38GB 읽기·tshark HTTP59,672건, 정규식후보는악성정답수아님. 첫100시도(정상97+샘플3)·별도5계열21변형을233에서실제전송,추가21건모두고유ID/WAF룰/Enabled403대조. 첫XSS IDS2009714→FW차단·관리자해제감사 | 첫혼합실HTTP86건·정상14연결실패는IP차단과결속. 18:45 연결복구 후232 기존실행21시도/9WAF403·12차단중연결실패 회수,FW24 DROP·Wazuh100129와 실카드 확인. LLM종결은 outcome_unknown/needs_review 잔여. [근거·시나리오](infra/validation/pcap-web/README.md) |
+| Kali232 반입·보호정리 | 사용자:옛C와별개새Kali232. 233→232직접SFTP58파일4,379,309,075B/131.71초·전SHA일치. A커널never_block232한원소·영구파일제거,16:40관리경유재조회/확정·blockhandle7유지/타이머해제 | 이전58PCAP 전송은Mac반입0. 232 IDS2010963→16:44:12 최초600초 차단·16:54:14 만료를회수확인. 원래C내부10.200.10.20보호·기존TTL유지 |
+| IDS 정상 반복 오탐 | 순수정상100건에서rev1 경보2건 재현. 정확후보 카드 승인·19:16 재시작/적용, canonical/local SHA220f9e70… 일치. 전후14조건씩 native검사·전체ET구문통과. 수정후정상100건/경보0·실404 45건/rev2경보1·공격/서버방향 확인 | 실제404 버스트를세며 악성확정은아님. 기존Native자동차단대상추가0·봇권한추가0. [근거](infra/validation/pcap-web/http404-validation-20261103.json) |
+| 새 공개 PCAP | MTA4·Stratosphere3·Netresec 경유Wireshark4=11 PCAP/99,096,119B와정답PDF4를두Kali에반입·전SHA일치. 새실행232만,233시험0 | 232 오프라인11/11 정상종료·156,160패킷/410초. 실제웹정상97+기존공격대조3 전부전송·정상302/308/공격3 WAF403·IDS XSS→600초FW·실카드/대응100121 확인. [결과/출처/한계](infra/validation/pcap-web/PUBLIC_PCAP.md). CAIDA는접근조건·payload제거로이번HTTP시험제외. 캡처전체를악성정답으로간주하지않고학습편입0 |
+
+| 조기 해제·새 공격 재차단 | A2소스/B조사prompt 반영·서버47PASS/skip0, 과거 해제3건 root감사로시각보완·signed계획/원기한보존. 15:00:10 해제→15:01:10 대기종료→15:03:01 WAF942100/403→15:04:58 운영Hermes 첫 MCP 성공/새FW차단·실카드 게시. 15:08:11 커널태그/TTL 확인·15:01 양서버확정/독립원복timer중지 | 새차단/카드경로 성공과 조사종결은별개. 별도LLM r1/r2 시간초과·인자오류/거절뒤재시도는잔여. r3/r4는입력요건미충족으로모델시작전종료. [근거·카드·복구](infra/mcp/containment-reblock.md) |
+| 공통 단문/근거·FW 페이지 |13:46 공통1.5.15 소스6사본/receipt1 증분반영·13:54 확정. 실제채팅12요청 기대처리12/12·MCP14회·대상확인2/보호0, 50개씩3페이지도 양봇 동일snapshot/0→50→100/끝에서정지 | 원본35B/설정·SOUL·권한 유지. 새보호쓰기/공격E2E·시각UI·전체자연어정확도/새OS설치는미검증. native관리CLI/교차검토후보는별도잔여 |
+| FW 기능별 정리 | A 실제8테이블/30체인/99규칙/9집합을 INPUT14·OUTPUT14·FORWARD47·NAT13·초기PREROUTING11로99/99분류. MANGLE0. 오프라인 도구6PASS. 14:21:46 KST SSH/sudo `nft -j list ruleset` 재조회에서도 테이블별 체인·규칙 수 일치 | 14:21 목록 검사는 읽기만 수행. 후속 주소 원소 변경과 구분하며 IPv6 삭제/NAT 통합 미적용, 사용량·서비스 통신 재시험 없음. 테이블별 목록은[FW 검토 문서](infra/mcp/fw-consolidation.md). 0카운터/빈 체인을 자동 삭제하지 않음 |
+| NAT 통합 후보·IPv6 요청 | 프로젝트NAT2테이블의3규칙을 기존inet capstone_fw 두NAT체인으로 이관하는 트랜잭션 생성. IPv4 guard·기존filter/차단집합 보존 | 13:11 실제 nft --check·13:14 격리3단계×3조건 성공. 14:34 추가격리에서 실제host/iptables filter복제·기존/통합/원복/NAT없음4단계×4통신조건·집합handle/TTL보존·멱등/정리 성공. 지속로더/루트진입후보는미커밋, 설치/원복운영적용은미실시. IPv6는실제수신22/80/443/8443이남아단순삭제안함 |
+| NAT 사용 |12:09~12:14 Docker443 DNAT+16·PREROUTING+43·컨테이너SNAT+79 카운터 증가 | 프로젝트NAT는카운터/conntrack조회수단없어10443최근사용등미확인 |
+| 최신 하네스3군 비교 | 공통1.5.14/13소스·계획 고정. 각24조회/16판단 정상종료·원문SHA확인. 원본18/24·HF기본20/24·학습본19/24 | 공통성공18건중앙4.79/7.82/5.04초(채팅제외·순차/공유GPU). 학습본승격근거부족·원본유지. 이번1.5.15로단문/근거·페이지보완후새표현/실채팅만검증. 학습본3군비교는재실행하지않았고1.5.14점수보존. 기계0점을정확도0%로해석안함 |
+| 관리 접속 제한 | 관리자231→A SSH허용한주소/영구파일추가,16:35:34직접Mac→231→A최종peer231/root확정·timer해제. 두Kali232/233은사용자지시로직접SSH | 엄격관리자/MCP전용INPUT축소·관리로그예외는미반영. 최초r1은15분자동원복후사용자재승인r2확정. 18:13 단절은18:45:47 복구·관리경유/직결접속재확인. [접속](팀접속안내.md)·[정책/복구](infra/groot-a/fw-v2/README.md) |
+| 하네스·교차검토 | 시험배포3소스/영수증은10:12 원복. 최신로컬후보52PASS/단순진단영수증대조·간결화. 기존guard핀2메타데이터정정 | native관리CLI새질문3건중실조회1건으로조회생략여전. 이번재차단실시험의별도LLM2건도후속종결시간초과.  새채팅·일반의미정확도 검증과 source/설치 경로 동기화 후 확정 필요 |
+| Kali 확장 | 기존17소스분석과별도PCAP 21변형·97:3시도·포트24시도. 재현소스6개/좌표·SHA/결과원장보존 | 모든기존17스크립트·전체CVE검증으로일반화안함. 232결과/FW24 DROP/100129/실차단과순수정상오탐보완은확인. 새공개자료의범위별검증과LLM종결은별도 |
+
+**연결/시험 복구:**12:33 관리망 경로 변경으로 중계가 끊겼으나13:05 A,13:08 B/Thor 재접속에 성공했다. 기존 HF기본/학습본 완료 원문·계획/13소스핀·정상종료 저널을 회수했다. Thor시험r2는12:56:33 시간상한 종료/MainPID0·11435listener없음 확인. 원본군을 위해 같은설정r3를30분상한으로 시작하고 GPU/context262144·여유메모리를 확인했다. 운영primary PID715615/원본선택은 유지했다. 13:19 세군정상종료·B중계11448/시험SSH설정·Thor시험r3/11435수신과Mac중계를종료했다. 운영primary PID715615/원본35B·서버결과/복구/가중치보존,가용메모리83,248,549,888B확인.
+
+**운영 선택:** 마지막확인에서 B의Ollama대화/조회 우선·Hermes조사/변경 우선과Thor 원본35B·PID715615를 유지했다. 관리자231허용/232예외제거 후, 정확후보승인으로SID1000002 rev2도운영반영했다. 엄격관리ACL축소/모델승격/새학습은0이다. 과거7진단/8채팅 성공은 해당표본이고 최신CLI의1/3과 구분한다. 원문/해시일치는 의미정확성의 보증이 아니며, 같은모델의추가의미검사도실패해해법으로채택하지 않았다.
+
+[FW 검토·미검증](infra/mcp/fw-consolidation.md) · [모델비교 방법·마지막확인](finetuning/RUNTIME_COMPARISON_20261103.md) · [직전배치원문](STATUS_HISTORY.md#source-1fc9e4b108b56fd4) · [정지시점기록](STATUS_HISTORY.md#source-17d77ef915100c82).
+
+공통단문/근거3소스와검사·설치경로/문서는게시완료했다. 재차단완료단위13공개파일은bd23b9b와후속ade44bb까지게시·원격일치를확인했다. 이전PCAP/관리주소단위는9f4f6c5·094cf0f까지게시·원격일치확인했다. 이번IDS수정/결과회수9파일은57b754d로커밋·19:40:20 원격main일치를확인했다. 공개PCAP13파일은c875813497ec2b925c86a51d26dff03e0edc74d7로커밋·19:51:05 KST 원격main일치를확인했다. **기존미확정review3소스/그검사/guard핀2의6파일은로컬미커밋후보로계속보존**한다. 다른 작업의topology5stage와미완료NAT6파일후보도포함하지않는다. 가중치 Mac반입0·새Mac설치0. 이번공개PCAP과기존이미지의독립분석도구는임시다운로드/반입후정리대상이며,임시중계/스크립트의종료/정리 확인은 아래Git/로컬기록에서 구분한다.
+
+
+
+<a id="source-37e640b7fc9dca78-h2"></a>
+<a id="source-44b2fd9c4f0995fb-h2"></a>
+<a id="source-84055af98a0c21f3-h2"></a>
+<a id="record-3fd5bef7bc3436c54284e7df6ec4b092fe82d9582ec0b4f2f06adad4e787f549"></a>
+
+## 단문·미조회 주장·FW 순차 조회 — 1.5.15 확정
+
+| 보완 | 실제 결과 |
+|---|---|
+| 볼래/볼 수 있나/봐줘, IP들/주소들·역순 질문 | 명시한 장비는 유지하고 대상이 없으면1회 확인. 기본/커스텀은명시하지않으면전체. 도구/인자는LLM이선택 |
+| 조회 없는 차단0/규칙수 단정 | 실제영수증·SHA·최신실패를검사. 완전한FW영수증도인정해추가검사의오검출수정 |
+| 가상snapshot·미리선택한불필요다음페이지 | 첫offset0/실반환snapshot·next_offset만허용,한묶음FW1호출·완료후중지. 실50개씩3페이지×양봇도성공 |
+| 보호 주소·진단 범위 안내 | 보호차단거절과허용조사중단구분,과거시각진단미지원/성공oneshot/yellow한계명시. 실제보호쓰기/독립판단향상검증은아님 |
+
+서버기존SDK에서O179/H380 전부PASS(559개·skip0), 로컬은O176PASS/환경3skip·H378PASS/환경2skip,초기설치계약/독립bundle각1PASS다. 스테이징5실제요청은확인질문1/실읽기4로5/5,실채팅은봇별5기본+1다중페이지로12/12다. 진행표시는실읽기10요청모두관측했다. 채팅시간은O기본조회3.30~9.77초·다중페이지9.77초,H기본조회16.10~28.96초·다중페이지33.02초며API게시~응답관측/약1초폴링/순차공유추론값이다. 모델/전체속도의인과우위로해석하지않는다.
+
+정확한이전바이트·SHA·uid/gid/mode와수동복구는B root `/var/lib/capstone-short-read/20261103-r1/deployment`에보존했다. 큐유휴후양소비자각1회stop/start·Hermes기존container1회restart,managementtimer는재개했다. 독립15분복구timer는확정후해제했고진행작업이있으면복구를defer하며동시수정은덮지않는다. stale했던trialreceipt SHA2항목도이전값보존후동기화했다. 운영모델/설정·SOUL5SHA/기존권한·MCP·포트·키·패키지는유지했다. 실제운영원복은미실시다.
+
+[사용·설치·복구](infra/hermes/short-read.md) · [근거 원장](infra/hermes/short-read-validation-20261103.json). 이전3군점수는1.5.14로고정하고새검증으로덮지않는다. 스테이징참조파일누락·SDK로그/JSON수집오류·추가guard오검출등중간실패도로컬/서버근거에보존했다.
+
+
+
+<a id="source-37e640b7fc9dca78-h3"></a>
+<a id="source-44b2fd9c4f0995fb-h3"></a>
+<a id="source-84055af98a0c21f3-h3"></a>
+<a id="record-0e001647af04c55404fbf1004ec0e7dded8f0bf1f94705f30cb59c1edcc66367"></a>
+
+## 이전 진단·채팅 근거
+
+1.5.14의진단/스키마보완·7실조회/8실채팅과복구상세는 [보완전현황](STATUS_HISTORY.md#source-df352eea5f615cda)·[진단보완기록](infra/hermes/diagnostic-harness.md)에보존한다. 이번1.5.15의559회귀/12실채팅과합쳐모델정확도점수로표시하지않는다.
+
+
+
+<a id="source-37e640b7fc9dca78-h4"></a>
+<a id="source-44b2fd9c4f0995fb-h4"></a>
+<a id="source-84055af98a0c21f3-h4"></a>
+<a id="record-3f9f1a8faed1fc2f3fba332fe73d9fc36d85f78d15ae126030b7c228d6734739"></a>
+
+## 현재 운영 정책
+
+| 항목 | 적용·실제 확인 | 남은 한계 |
+|---|---|---|
+| WAF | 11/2 SecRuleEngine On. 기존 컨테이너/원본 inode 유지·설치 기본값도On. Kali 실제 XSS403·engine Enabled·941100/949110 확인 | 단순403·프로토콜/출처 미확인만으로 FW 차단하지 않음 |
+| 지정 IDS → FW | Native AR가 flow_id/SID·공격 등급·보호 주소·소유권 확인 후 기존 임시차단. 11/2 실제 차단·카드 유지 승인·80/443 DROP 확인 | 지정 공격 룰만 LLM 대기 없는 선차단의 명시 승인 예외. LLM이 후속 조사·승인 요청·결과 확인 |
+| LLM/MCP → FW | 11/2 18:53:20 Hermes가 WAF 원본 거래1건을 기존 MCP로 검증해 FW 차단·카드 게시. 19:03 만료·19:04 커널0/expired·Kali 접속 복구 | 후속 보고는 정확3읽기 뒤 native210초 시간초과로 outcome_unknown. 종결 미완료 |
+| 임시차단·승인 | 최초10분, 관리자 카드 유지 승인 시 결정 시각부터60분. 카드 해제 승인/기한 만료. 11/3 조기 해제 실제 확인 시각 또는 자연 기한 종료 후 재차단 대기60초·종료 이후 새 공격 근거 필요 | 내부 IP·실습은 자동 면제하지 않음. 중복 탐지·채팅·봇 합의로 연장하지 않음 |
+| review 해제 | 1.19.9 lead에 기존 unblock_ip 연결. 실제 list_blocks→카드 승인/일회소비→UNBLOCKED→부재 재조회·원기록released 확인 | 자동 관리/peer/verify의 해제 권한은 없음. 알 수 없는 차단 소유권 유지 |
+| 서비스·권한 | 기존 보호 주소·정확 후보 승인·일반 sudo/Docker 위임 금지 유지. 루트 deploy.sh의 기존 source 경로에 동기화 | 이번 진단 보완에서 새 MCP/설정 키/패키지/이미지/키/공개 수신 포트0 |
+
+[차단·카드 기준](infra/mcp/approved-operations.md) · [Native 경계](infra/mcp/native-containment-ar.md) · [WAF 근거·복구](infra/mcp/waf-containment.md) · [11/2 배포 원장](infra/mcp/containment-policy-20261102.json) · [WAF 실제 검증 원장](infra/mcp/waf-containment-20261102.json). 이전 검사·상세 시각·운영 한계는 [보완 전 현황](STATUS_HISTORY.md#source-6b51787b69b033e7)에 보존한다.
+
+
+
+<a id="source-37e640b7fc9dca78-h5"></a>
+<a id="source-44b2fd9c4f0995fb-h5"></a>
+<a id="source-84055af98a0c21f3-h5"></a>
+<a id="record-328e764121be8c3dc09bea30fb14ce3e93de0486dc3bab32a9a8abaf9f81c2aa"></a>
+
+## 본학습·후보 적재와 이전 모델 비교
+
+| 항목 | 확인 결과 | 해석 |
+|---|---|---|
+| 본학습 | 11/2 21:09 완료,4,348/4,348단계·train8,695·validation176·eval_loss0.31751391291618347. 11/3 최종 adapter7파일/원장SHA 재확인 | loss는 독립 관제 정확도 점수가 아님 |
+| DGX → Thor | 11/3 CPU 병합/Q4_K_M 완료,21,713,462,816B 전체SHA 일치. 별도 후보등록·전체GPU/context262144·primary에도 같은digest 별도등록 | 원본11434/PID/두 봇 선택 유지. 후보등록은 운영 승격이 아님. 가중치는 서버 승인 경로만 보존,Mac/Git/LFS 반입0 |
+| 메모리 검사 | 적재 전64GiB/정확digest·전체GPU 적재 완료 후32GiB 검사로 분리·실제 ready 확인 | 최초 coldload90초 취소/NVIDIA0x51 기록 보존. 드라이버 근본 해결이나 coldload 개선으로 표시하지 않음 |
+
+초기05:29~05:37의7읽기/12판단비교는 [보완전현황](STATUS_HISTORY.md#source-df352eea5f615cda)에보존한다. 이후1.5.14 고정3군은위표와 [최종비교](finetuning/RUNTIME_COMPARISON_20261103.md)를따르며,1.5.15의실채팅검증으로점수를대체하거나학습본을승격하지않는다. [학습완료원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [적재/복구](finetuning/DGX_CANDIDATE.md).
+
+
+
+<a id="source-44b2fd9c4f0995fb-h6"></a>
+<a id="record-bf1dc08a1584d3238b231bbca7f7e6df239365b7a8f64be2602bece89de234d5"></a>
+
+## 남은 작업
+
+새 PCAP 실험에서 LLM 잔여를 추가 확인했다: WAF건은6 MCP뒤 outcome_unknown, IDS건은monitor 답변에232의구장비명과시험시간밖SID1000002를혼합했다. 센서/차단성공과구분하고자산메모리·시간/flow별근거결속·정보성룰분류·종결보완을우선한다. CTU281-1 경보0의악성흐름정답과Natureforce전용C2미관측도후속검토다.
+
+| 과제 | 현재 상태 | 다음 확인 |
+|---|---|---|
+| 모델·하네스 선택 | 본학습 후보 보존·운영 원본 유지. 단문진단/스키마/근거 보완과7실조회 완료 | 독립176평가·보호 쓰기/승인 E2E·복구 가능한 하네스 정리 조합 비교. 지금 점수만으로 승격하지 않음 |
+| 관제·시연 | Kali17스크립트 중 SQLi/명령삽입/외부리다이렉트 악용 재현. WAF/IDS 실제 차단·카드·만료/해제는 각각 검증 | Nuclei 경로/표본0·로그인 오판·BlindSQLi·전체스캔 및 Log4Shell RCE 미완료. 앞선7진단과 후속 실제 채팅8건을 구분. 브라우저 시각 검증은 미실시 |
+| 장애·수집 | 11/2 중복 복구 알림 방지·2실패/2성공·오류 종류 보존 배포, 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector 지연/수집 중단 전체 무손실 미검증 |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙과 제외 유지 | 기존 약7.7GB 일괄 압축 이전·전체 멤버SHA/복원 검증 미실행. 학습 입력/원장 보존 |
+| 기타 보류 | 과거 native 초기 ready.json의 source SHA는운영현행과달라별도유지보수검토필요(이번실행경계는변경manifest/실소스로검증). Google Harness² 운영 연동/전후 비교,SSL VPN·모바일 푸시,GPU 드라이버 원인·후보 장기 안정성,새 서버 전체 설치 | 이번 하네스 수정으로 완료 처리하지 않음 |
+| 논문·발표 | 출처·실험 근거 보존,11/3 시연·12/1 최종 목표 | 발표 작성은11월둘째주 리마인더 이후. 독립 평가와 미검증 한계 유지 |
+
+[보관·복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 스냅샷이다. 다른 작업의 topology 생성물5개는 이번 작업에서 변경·커밋하지 않는다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율을 확인할 수 없다. 전체 목표는 미완료다.
+
+
+
+<a id="source-44b2fd9c4f0995fb-h7"></a>
+<a id="source-84055af98a0c21f3-h7"></a>
+<a id="record-32e8fd62fb56b3f574b9befa359886264c918ecf6abff51a2b5552a7bdcc90c5"></a>
+
+## Git 반영
+
+직전공통단문38a341c/확인e01378f와FW목록f5e1a1e/확인6bd24b7까지원격main일치확인. 이번재차단완료단위는2Python/그검사2·자동조사prompt1과정책/사용법/검증원장·설치안내2·README/PLAN/STATUS의13공개파일이다. A2소스/Bprompt1만운영반영했고서비스/NAT/ACL/모델은변경하지않았다. 소스/문서검증과실카드/커널·보존검사를마쳤으며**bd23b9b**로13공개파일을커밋·푸시하고 **15:19:01 KST 실원격main일치**를확인했다. 현재후속문서/임시정리·새관리호스트점검진행상태를갱신하며마지막커밋/원격일치는로컬세션에남긴다.
+
+기존미확정review/핀6파일과타작업topology5stage는포함하지않는다. 자격·원시결과·대화/로컬검증·업무분담·발표·가중치/데이터는Git제외다. 공통 단문 작업의 서버fixture188파일/시험unit·원복timer 정리와Mac34파일/부모폴더 제거는14:09 로컬기록에확정했다. FW목록조회Mac일회소스1개제거확인은로컬기록에있다. 이번재차단에서는A검사fixture6/B별도모델시험driver4를삭제했고모든시험unit MainPID0·B입력미충족2unit만reset-failed확인했다. 소스/원문DB/감사/복구는보존한다. Mac재차단/NAT검증단위 자체임시44파일/부모폴더는삭제·부재확인했고기존진행작업의도우미와별도새관리호스트점검용임시폴더는보존한다.
+
+
+
+
+<a id="source-44b2fd9c4f0995fb-h8"></a>
+<a id="record-58a461dcf117ac53442b706928f0c10d50e39a47713fae8b0d06e36c7780a486"></a>
+
+## PCAP/관리 주소 단위의 배포·게시 구분
+
+A는관리자231의mgmt_src추가와새Kali232의never_block삭제·영구파일만변경했다. canonical FW SHA는bfff08e3f13251177995292c21e7bf6d6cb749d45c0bfb22c68cc397e9d464af,루트복구두개/원본/확정영수증보존·확정timer둘비활성이다. NAT통합/보안장비전체INPUT축소/봇수정/룰변경/모델전환/새서버전체설치는이단위에포함하지않는다.
+
+PCAP원본·원시결과/연결정보는로컬전용,공개는실행소스6개·21좌표/SHA·검증원장/안내와정책/현황문서다. 공개19파일은9f4f6c59b16af7cb21be3490bbf4d577ed795fa9로커밋/푸시했고18:40:50 KST실원격main일치를확인했다. 관리망복구후미회수시험을재개한다. 새패키지/가중치/PCAP의Mac반입0,자체임시59파일과부모폴더는제거/부재확인했다. 재현소스/설정은로컬검증기록에보존했고운영자SSH설정·공개키고정은대화기록/접속에별도보존(자격값복사0)했다. 작업용임시도우미를지우더라도프로젝트검증소스·자격·대화·서버복구/시험증거는보존한다. 마지막커밋/원격일치/작업트리상태는게시후로컬세션에남긴다.
+
+이게시확인·정리및정상대조군한계보완은소스커밋이후후속문서로게시한다. 미완료NAT6/기존peer6후보와다른topology5stage는제외한다. 마지막후속커밋ID/원격일치·작업트리상태는로컬세션및최종응답을따른다.
+
+
+
+<a id="source-44b2fd9c4f0995fb-h9"></a>
+<a id="record-09bb2554d034ae93c38c61795170869915e585863a2383b0e18a76b1b1b6257d"></a>
+
+## 공개 PCAP 완료 단위 — 19:50 KST
+
+[상세 결과](infra/validation/pcap-web/PUBLIC_PCAP.md)·[기계 원장](infra/validation/pcap-web/public-validation-20261103.json). Mac작업다운로드36파일/231,865,005B·양Kali전송압축·A도구전송2파일을검증후제거했다. Mac신규설치/가중치반입0, Kali원본/출처/PDF/분석도구·결과와서버복구본보존. 신규소스는검증도구이며운영서비스·포트·권한변경0이다. 승인한SID1000002의canonical설치소스는앞단위에동기화했다. 새OS전체설치·독립전체정답셋·LLM완전종결은이번완료범위가아니다. 차단은19:49:04 실제expired/집합0·정상GET302 복구까지확인했다. 공개PCAP소스/원장13파일의c875813 커밋·19:51:05 실제원격main일치를확인했다. 이문단등게시확인보완은후속문서커밋으로게시한다. 자체Mac임시도우미65파일도로컬검증source-snapshot으로보존후삭제·작업임시부모부재확인,SSH자체mux5개는이미종료/관리자1개는명시종료했다. 이번완료단위공개잔여와기존peer6/NAT6후보·타topology5stage를구분한다.
+
+
+</details>
+
+<a id="source-84055af98a0c21f3"></a>
+
+## STATUS-20261103-before-http404.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T19:40:17+09:00</summary>
+
+<a id="source-84055af98a0c21f3-h0"></a>
+<a id="record-f809d51c78b82ba004362851c789fb8af010a879495ccd7bc3c00a19c07d8911"></a>
+
+# 인프라 현황 — 2026-11-03 18:44 KST
+
+현재 상태와 활성 과제를 요약한다. [PCAP 시험 전 현황](STATUS_HISTORY.md#source-37e640b7fc9dca78) · [단문 보완 전 현황](STATUS_HISTORY.md#source-df352eea5f615cda) · [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-84055af98a0c21f3-h1"></a>
+<a id="record-ef2c3f9d615bb0c0e468d92a368166bcd2e08c657b56ab67fe6bf195dd6049d7"></a>
+
+## 현재: PCAP 21변형 WAF 검증·232 예외 제거/전송 완료 · 연결 복구와 장비별 후속 검증 대기
+
+사용자 목표는 active다. 11/10 전 대부분 완료 요청은11/9 KST 핵심 마감 목표로 해석해 [계획](PLAN.md)에 반영했다. OpenClaw는 후보로만 둔다. 발표 작성은 기존11월둘째주 리마인더 이후 조건을 유지한다.
+
+| 작업 | 실제 확인·산출물 | 현재 한계/다음 작업 |
+|---|---|---|
+| PCAP 웹·장비별 시험 | 58PCAP/4.38GB 읽기·tshark HTTP59,672건, 정규식후보는악성정답수아님. 첫100시도(정상97+샘플3)·별도5계열21변형을233에서실제전송,추가21건모두고유ID/WAF룰/Enabled403대조. 첫XSS IDS2009714→FW차단·관리자해제감사 | 첫혼합실HTTP86건·정상14연결실패는IP차단과결속. 혼합시험중정상경로에도SID1000002 발화·순수정상대조군은미실시/미수정. 232재생결과미회수/실행불명·FW/Wazuh100129·카드/LLM종결후속은연결복구뒤검증. [근거·시나리오](infra/validation/pcap-web/README.md) |
+| Kali232 반입·보호정리 | 사용자:옛C와별개새Kali232. 233→232직접SFTP58파일4,379,309,075B/131.71초·전SHA일치. A커널never_block232한원소·영구파일제거,16:40관리경유재조회/확정·blockhandle7유지/타이머해제 | Mac PCAP반입/패키지설치0. 232실제공격→FW차단성공은미확인. 원래C내부10.200.10.20보호·기존TTL유지 |
+
+| 조기 해제·새 공격 재차단 | A2소스/B조사prompt 반영·서버47PASS/skip0, 과거 해제3건 root감사로시각보완·signed계획/원기한보존. 15:00:10 해제→15:01:10 대기종료→15:03:01 WAF942100/403→15:04:58 운영Hermes 첫 MCP 성공/새FW차단·실카드 게시. 15:08:11 커널태그/TTL 확인·15:01 양서버확정/독립원복timer중지 | 새차단/카드경로 성공과 조사종결은별개. 별도LLM r1/r2 시간초과·인자오류/거절뒤재시도는잔여. r3/r4는입력요건미충족으로모델시작전종료. [근거·카드·복구](infra/mcp/containment-reblock.md) |
+| 공통 단문/근거·FW 페이지 |13:46 공통1.5.15 소스6사본/receipt1 증분반영·13:54 확정. 실제채팅12요청 기대처리12/12·MCP14회·대상확인2/보호0, 50개씩3페이지도 양봇 동일snapshot/0→50→100/끝에서정지 | 원본35B/설정·SOUL·권한 유지. 새보호쓰기/공격E2E·시각UI·전체자연어정확도/새OS설치는미검증. native관리CLI/교차검토후보는별도잔여 |
+| FW 기능별 정리 | A 실제8테이블/30체인/99규칙/9집합을 INPUT14·OUTPUT14·FORWARD47·NAT13·초기PREROUTING11로99/99분류. MANGLE0. 오프라인 도구6PASS. 14:21:46 KST SSH/sudo `nft -j list ruleset` 재조회에서도 테이블별 체인·규칙 수 일치 | 14:21 목록 검사는 읽기만 수행. 후속 주소 원소 변경과 구분하며 IPv6 삭제/NAT 통합 미적용, 사용량·서비스 통신 재시험 없음. 테이블별 목록은[FW 검토 문서](infra/mcp/fw-consolidation.md). 0카운터/빈 체인을 자동 삭제하지 않음 |
+| NAT 통합 후보·IPv6 요청 | 프로젝트NAT2테이블의3규칙을 기존inet capstone_fw 두NAT체인으로 이관하는 트랜잭션 생성. IPv4 guard·기존filter/차단집합 보존 | 13:11 실제 nft --check·13:14 격리3단계×3조건 성공. 14:34 추가격리에서 실제host/iptables filter복제·기존/통합/원복/NAT없음4단계×4통신조건·집합handle/TTL보존·멱등/정리 성공. 지속로더/루트진입후보는미커밋, 설치/원복운영적용은미실시. IPv6는실제수신22/80/443/8443이남아단순삭제안함 |
+| NAT 사용 |12:09~12:14 Docker443 DNAT+16·PREROUTING+43·컨테이너SNAT+79 카운터 증가 | 프로젝트NAT는카운터/conntrack조회수단없어10443최근사용등미확인 |
+| 최신 하네스3군 비교 | 공통1.5.14/13소스·계획 고정. 각24조회/16판단 정상종료·원문SHA확인. 원본18/24·HF기본20/24·학습본19/24 | 공통성공18건중앙4.79/7.82/5.04초(채팅제외·순차/공유GPU). 학습본승격근거부족·원본유지. 이번1.5.15로단문/근거·페이지보완후새표현/실채팅만검증. 학습본3군비교는재실행하지않았고1.5.14점수보존. 기계0점을정확도0%로해석안함 |
+| 관리 접속 제한 | 관리자231→A SSH허용한주소/영구파일추가,16:35:34직접Mac→231→A최종peer231/root확정·timer해제. 두Kali232/233은사용자지시로직접SSH | 엄격관리자/MCP전용INPUT축소·관리로그예외는미반영. 최초r1은15분자동원복후사용자재승인r2확정. 18:13관리231·Kali둘모두TCP22timeout으로현재연결복구대기. [접속](팀접속안내.md)·[정책/복구](infra/groot-a/fw-v2/README.md) |
+| 하네스·교차검토 | 시험배포3소스/영수증은10:12 원복. 최신로컬후보52PASS/단순진단영수증대조·간결화. 기존guard핀2메타데이터정정 | native관리CLI새질문3건중실조회1건으로조회생략여전. 이번재차단실시험의별도LLM2건도후속종결시간초과.  새채팅·일반의미정확도 검증과 source/설치 경로 동기화 후 확정 필요 |
+| Kali 확장 | 기존17소스분석과별도PCAP 21변형·97:3시도·포트24시도. 재현소스6개/좌표·SHA/결과원장보존 | 모든기존17스크립트·전체CVE검증으로일반화안함. 232저장결과회수·FW상관누락·정상대조군이후보완 |
+
+**연결/시험 복구:**12:33 관리망 경로 변경으로 중계가 끊겼으나13:05 A,13:08 B/Thor 재접속에 성공했다. 기존 HF기본/학습본 완료 원문·계획/13소스핀·정상종료 저널을 회수했다. Thor시험r2는12:56:33 시간상한 종료/MainPID0·11435listener없음 확인. 원본군을 위해 같은설정r3를30분상한으로 시작하고 GPU/context262144·여유메모리를 확인했다. 운영primary PID715615/원본선택은 유지했다. 13:19 세군정상종료·B중계11448/시험SSH설정·Thor시험r3/11435수신과Mac중계를종료했다. 운영primary PID715615/원본35B·서버결과/복구/가중치보존,가용메모리83,248,549,888B확인.
+
+**운영 선택:** 마지막확인에서 B의Ollama대화/조회 우선·Hermes조사/변경 우선과Thor 원본35B·PID715615를 유지했다. 이번에는관리자231허용과Kali232차단예외만FW증분반영했다. 엄격관리ACL축소/모델승격/새학습은0이다. 과거7진단/8채팅 성공은 해당표본이고 최신CLI의1/3과 구분한다. 원문/해시일치는 의미정확성의 보증이 아니며, 같은모델의추가의미검사도실패해해법으로채택하지 않았다.
+
+[FW 검토·미검증](infra/mcp/fw-consolidation.md) · [모델비교 방법·마지막확인](finetuning/RUNTIME_COMPARISON_20261103.md) · [직전배치원문](STATUS_HISTORY.md#source-1fc9e4b108b56fd4) · [정지시점기록](STATUS_HISTORY.md#source-17d77ef915100c82).
+
+공통단문/근거3소스와검사·설치경로/문서는게시완료했다. 재차단완료단위13공개파일은bd23b9b와후속ade44bb까지게시·원격일치를확인했다. 이번PCAP/관리주소단위의소스·원장·현황/사용문서는별도게시준비중이다. **기존미확정review3소스/그검사/guard핀2의6파일은로컬미커밋후보로계속보존**한다. 다른 작업의topology5stage와미완료NAT6파일후보도포함하지않는다. 신규패키지·가중치 Mac반입0,임시중계/스크립트의종료/정리 확인은 아래Git/로컬기록에서 구분한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-3fd5bef7bc3436c54284e7df6ec4b092fe82d9582ec0b4f2f06adad4e787f549)
+
+
+[이미 보존한 동일 내용으로 이동](#record-0e001647af04c55404fbf1004ec0e7dded8f0bf1f94705f30cb59c1edcc66367)
+
+
+[이미 보존한 동일 내용으로 이동](#record-3f9f1a8faed1fc2f3fba332fe73d9fc36d85f78d15ae126030b7c228d6734739)
+
+
+[이미 보존한 동일 내용으로 이동](#record-328e764121be8c3dc09bea30fb14ce3e93de0486dc3bab32a9a8abaf9f81c2aa)
+
+<a id="source-37e640b7fc9dca78-h6"></a>
+<a id="source-84055af98a0c21f3-h6"></a>
+<a id="record-460b602f107aedbdd3d0c02d171c27c7884769eb723ba834847074d889151f11"></a>
+
+## 남은 작업
+
+| 과제 | 현재 상태 | 다음 확인 |
+|---|---|---|
+| 모델·하네스 선택 | 본학습 후보 보존·운영 원본 유지. 단문진단/스키마/근거 보완과7실조회 완료 | 독립176평가·보호 쓰기/승인 E2E·복구 가능한 하네스 정리 조합 비교. 지금 점수만으로 승격하지 않음 |
+| 관제·시연 | Kali17스크립트 중 SQLi/명령삽입/외부리다이렉트 악용 재현. WAF/IDS 실제 차단·카드·만료/해제는 각각 검증 | Nuclei 경로/표본0·로그인 오판·BlindSQLi·전체스캔 및 Log4Shell RCE 미완료. 앞선7진단과 후속 실제 채팅8건을 구분. 브라우저 시각 검증은 미실시 |
+| 장애·수집 | 11/2 중복 복구 알림 방지·2실패/2성공·오류 종류 보존 배포, 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector 지연/수집 중단 전체 무손실 미검증 |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙과 제외 유지 | 기존 약7.7GB 일괄 압축 이전·전체 멤버SHA/복원 검증 미실행. 학습 입력/원장 보존 |
+| 기타 보류 | 과거 native 초기 ready.json의 source SHA는운영현행과달라별도유지보수검토필요(이번실행경계는변경manifest/실소스로검증). Google Harness² 운영 연동/전후 비교,SSL VPN·모바일 푸시,GPU 드라이버 원인·후보 장기 안정성,새 서버 전체 설치 | 이번 하네스 수정으로 완료 처리하지 않음 |
+| 논문·발표 | 출처·실험 근거 보존,11/3 시연·12/1 최종 목표 | 발표 작성은11월둘째주 리마인더 이후. 독립 평가와 미검증 한계 유지 |
+
+[보관·복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 스냅샷이다. 다른 작업의 topology 생성물5개는 이번 작업에서 변경·커밋하지 않는다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율을 확인할 수 없다. 전체 목표는 미완료다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-32e8fd62fb56b3f574b9befa359886264c918ecf6abff51a2b5552a7bdcc90c5)
+
+<a id="source-84055af98a0c21f3-h8"></a>
+<a id="record-4cd2e230435ccc968dc4bba038392afd9fba0880ccc16202bb53561482eb95e9"></a>
+
+## PCAP/관리 주소 단위의 배포·게시 구분
+
+A는관리자231의mgmt_src추가와새Kali232의never_block삭제·영구파일만변경했다. canonical FW SHA는bfff08e3f13251177995292c21e7bf6d6cb749d45c0bfb22c68cc397e9d464af,루트복구두개/원본/확정영수증보존·확정timer둘비활성이다. NAT통합/보안장비전체INPUT축소/봇수정/룰변경/모델전환/새서버전체설치는이단위에포함하지않는다.
+
+PCAP원본·원시결과/연결정보는로컬전용,공개는실행소스6개·21좌표/SHA·검증원장/안내와정책/현황문서다. 공개19파일은9f4f6c59b16af7cb21be3490bbf4d577ed795fa9로커밋/푸시했고18:40:50 KST실원격main일치를확인했다. 관리망복구후미회수시험을재개한다. 새패키지/가중치/PCAP의Mac반입0,자체임시59파일과부모폴더는제거/부재확인했다. 재현소스/설정은로컬검증기록에보존했고운영자SSH설정·공개키고정은대화기록/접속에별도보존(자격값복사0)했다. 작업용임시도우미를지우더라도프로젝트검증소스·자격·대화·서버복구/시험증거는보존한다. 마지막커밋/원격일치/작업트리상태는게시후로컬세션에남긴다.
+
+이게시확인·정리및정상대조군한계보완은소스커밋이후후속문서로게시한다. 미완료NAT6/기존peer6후보와다른topology5stage는제외한다. 마지막후속커밋ID/원격일치·작업트리상태는로컬세션및최종응답을따른다.
+
+
+</details>
+
+<a id="source-37e640b7fc9dca78"></a>
+
+## STATUS-20261103-before-pcap.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T18:23:22+09:00</summary>
+
+<a id="source-37e640b7fc9dca78-h0"></a>
+<a id="record-a20c4adc74322d8fd909bbb51a422601bd17ddefedfa885e2778555655a7ca97"></a>
+
+# 인프라 현황 — 2026-11-03 15:38 KST
+
+현재 상태와 활성 과제를 요약한다. [단문 보완 전 현황](STATUS_HISTORY.md#source-df352eea5f615cda) · [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-37e640b7fc9dca78-h1"></a>
+<a id="record-3cc5f7577ebe4e9b73d0a4d532761d8230139c354f53548af76297a2e1e0ca66"></a>
+
+## 현재: 조기 해제 후 새 WAF 공격 차단·카드 검증 완료 · 조사 종결/관리 CLI·FW 통합 남음
+
+사용자 목표는 active다. 11/10 전 대부분 완료 요청은11/9 KST 핵심 마감 목표로 해석해 [계획](PLAN.md)에 반영했다. OpenClaw는 후보로만 둔다. 발표 작성은 기존11월둘째주 리마인더 이후 조건을 유지한다.
+
+| 작업 | 실제 확인·산출물 | 현재 한계/다음 작업 |
+|---|---|---|
+| 조기 해제·새 공격 재차단 | A2소스/B조사prompt 반영·서버47PASS/skip0, 과거 해제3건 root감사로시각보완·signed계획/원기한보존. 15:00:10 해제→15:01:10 대기종료→15:03:01 WAF942100/403→15:04:58 운영Hermes 첫 MCP 성공/새FW차단·실카드 게시. 15:08:11 커널태그/TTL 확인·15:01 양서버확정/독립원복timer중지 | 새차단/카드경로 성공과 조사종결은별개. 별도LLM r1/r2 시간초과·인자오류/거절뒤재시도는잔여. r3/r4는입력요건미충족으로모델시작전종료. [근거·카드·복구](infra/mcp/containment-reblock.md) |
+| 공통 단문/근거·FW 페이지 |13:46 공통1.5.15 소스6사본/receipt1 증분반영·13:54 확정. 실제채팅12요청 기대처리12/12·MCP14회·대상확인2/보호0, 50개씩3페이지도 양봇 동일snapshot/0→50→100/끝에서정지 | 원본35B/설정·SOUL·권한 유지. 새보호쓰기/공격E2E·시각UI·전체자연어정확도/새OS설치는미검증. native관리CLI/교차검토후보는별도잔여 |
+| FW 기능별 정리 | A 실제8테이블/30체인/99규칙/9집합을 INPUT14·OUTPUT14·FORWARD47·NAT13·초기PREROUTING11로99/99분류. MANGLE0. 오프라인 도구6PASS. 14:21:46 KST SSH/sudo `nft -j list ruleset` 재조회에서도 테이블별 체인·규칙 수 일치 | 이번에는 읽기만 수행. IPv6 삭제/NAT 통합 미적용, 사용량·서비스 통신 재시험 없음. 테이블별 목록은[FW 검토 문서](infra/mcp/fw-consolidation.md). 0카운터/빈 체인을 자동 삭제하지 않음 |
+| NAT 통합 후보·IPv6 요청 | 프로젝트NAT2테이블의3규칙을 기존inet capstone_fw 두NAT체인으로 이관하는 트랜잭션 생성. IPv4 guard·기존filter/차단집합 보존 | 13:11 실제 nft --check·13:14 격리3단계×3조건 성공. 14:34 추가격리에서 실제host/iptables filter복제·기존/통합/원복/NAT없음4단계×4통신조건·집합handle/TTL보존·멱등/정리 성공. 지속로더/루트진입후보는미커밋, 설치/원복운영적용은미실시. IPv6는실제수신22/80/443/8443이남아단순삭제안함 |
+| NAT 사용 |12:09~12:14 Docker443 DNAT+16·PREROUTING+43·컨테이너SNAT+79 카운터 증가 | 프로젝트NAT는카운터/conntrack조회수단없어10443최근사용등미확인 |
+| 최신 하네스3군 비교 | 공통1.5.14/13소스·계획 고정. 각24조회/16판단 정상종료·원문SHA확인. 원본18/24·HF기본20/24·학습본19/24 | 공통성공18건중앙4.79/7.82/5.04초(채팅제외·순차/공유GPU). 학습본승격근거부족·원본유지. 이번1.5.15로단문/근거·페이지보완후새표현/실채팅만검증. 학습본3군비교는재실행하지않았고1.5.14점수보존. 기계0점을정확도0%로해석안함 |
+| 관리 접속 제한 | 사용자:관리자IP+MCP경로만 허용. 211.170.162.85 SSH22는인증전2회timeout | 85지정취소뒤사용자가새관리호스트192.168.16.231을확정. 15:31 A경유Groot-mgmt/계정groot-mgmt로그인·B와다른identity확인(옛B주소재할당). Mac직접SSH timeout·관리호스트GW/A행경로점검중. 이후설정변경은새관리호스트경유요구,기존ACL은미축소. 관리접속/포트스캔로그예외요청도접속검증후적용대기 |
+| 하네스·교차검토 | 시험배포3소스/영수증은10:12 원복. 최신로컬후보52PASS/단순진단영수증대조·간결화. 기존guard핀2메타데이터정정 | native관리CLI새질문3건중실조회1건으로조회생략여전. 이번재차단실시험의별도LLM2건도후속종결시간초과.  새채팅·일반의미정확도 검증과 source/설치 경로 동기화 후 확정 필요 |
+| Kali 확장 | 원본17Python소스·SHA/도구읽기·정적분석 | 새스크립트작성/반입/실행아직0. 현재실차단정책유지 |
+
+**연결/시험 복구:**12:33 관리망 경로 변경으로 중계가 끊겼으나13:05 A,13:08 B/Thor 재접속에 성공했다. 기존 HF기본/학습본 완료 원문·계획/13소스핀·정상종료 저널을 회수했다. Thor시험r2는12:56:33 시간상한 종료/MainPID0·11435listener없음 확인. 원본군을 위해 같은설정r3를30분상한으로 시작하고 GPU/context262144·여유메모리를 확인했다. 운영primary PID715615/원본선택은 유지했다. 13:19 세군정상종료·B중계11448/시험SSH설정·Thor시험r3/11435수신과Mac중계를종료했다. 운영primary PID715615/원본35B·서버결과/복구/가중치보존,가용메모리83,248,549,888B확인.
+
+**운영 선택:** 마지막확인에서 B의Ollama대화/조회 우선·Hermes조사/변경 우선과Thor 원본35B·PID715615를 유지했다. 이번 실제FW변경/관리ACL적용/모델승격/새학습0이다. 과거7진단/8채팅 성공은 해당표본이고 최신CLI의1/3과 구분한다. 원문/해시일치는 의미정확성의 보증이 아니며, 같은모델의추가의미검사도실패해해법으로채택하지 않았다.
+
+[FW 검토·미검증](infra/mcp/fw-consolidation.md) · [모델비교 방법·마지막확인](finetuning/RUNTIME_COMPARISON_20261103.md) · [직전배치원문](STATUS_HISTORY.md#source-1fc9e4b108b56fd4) · [정지시점기록](STATUS_HISTORY.md#source-17d77ef915100c82).
+
+공통단문/근거3소스와검사·설치경로/문서는게시완료했다. 이번재차단수정5소스/검사·근거원장/사용/설치/현황의13공개파일은게시준비를마쳤다. **기존미확정review3소스/그검사/guard핀2의6파일은로컬미커밋후보로계속보존**한다. 다른 작업의topology5stage와미완료NAT6파일후보도포함하지않는다. 신규패키지·가중치 Mac반입0,임시중계/스크립트의종료/정리 확인은 아래Git/로컬기록에서 구분한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-3fd5bef7bc3436c54284e7df6ec4b092fe82d9582ec0b4f2f06adad4e787f549)
+
+
+[이미 보존한 동일 내용으로 이동](#record-0e001647af04c55404fbf1004ec0e7dded8f0bf1f94705f30cb59c1edcc66367)
+
+
+[이미 보존한 동일 내용으로 이동](#record-3f9f1a8faed1fc2f3fba332fe73d9fc36d85f78d15ae126030b7c228d6734739)
+
+
+[이미 보존한 동일 내용으로 이동](#record-328e764121be8c3dc09bea30fb14ce3e93de0486dc3bab32a9a8abaf9f81c2aa)
+
+
+[이미 보존한 동일 내용으로 이동](#record-460b602f107aedbdd3d0c02d171c27c7884769eb723ba834847074d889151f11)
+
+<a id="source-37e640b7fc9dca78-h7"></a>
+<a id="record-65e358b0558c5775d6de8aa2b10871825cc4049232e1d9c288b6f5a3c84c19f0"></a>
+
+## Git 반영
+
+직전공통단문38a341c/확인e01378f와FW목록f5e1a1e/확인6bd24b7까지원격main일치확인. 이번재차단완료단위는2Python/그검사2·자동조사prompt1과정책/사용법/검증원장·설치안내2·README/PLAN/STATUS의13공개파일이다. A2소스/Bprompt1만운영반영했고서비스/NAT/ACL/모델은변경하지않았다. 소스/문서검증과실카드/커널·보존검사를마쳤으며**bd23b9b**로13공개파일을커밋·푸시하고 **15:19:01 KST 실원격main일치**를확인했다. 현재후속문서/임시정리·새관리호스트점검진행상태를갱신하며마지막커밋/원격일치는로컬세션에남긴다.
+
+기존미확정review/핀6파일과타작업topology5stage는포함하지않는다. 자격·원시결과·대화/로컬검증·업무분담·발표·가중치/데이터는Git제외다. 공통 단문 작업의 서버fixture188파일/시험unit·원복timer 정리와Mac34파일/부모폴더 제거는14:09 로컬기록에확정했다. FW목록조회Mac일회소스1개제거확인은로컬기록에있다. 이번재차단에서는A검사fixture6/B별도모델시험driver4를삭제했고모든시험unit MainPID0·B입력미충족2unit만reset-failed확인했다. 소스/원문DB/감사/복구는보존한다. Mac재차단/NAT검증단위 자체임시44파일/부모폴더는삭제·부재확인했고기존진행작업의도우미와별도새관리호스트점검용임시폴더는보존한다.
+
+
+</details>
+
+<a id="source-df352eea5f615cda"></a>
+
+## STATUS-20261103-before-short-read.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T14:05:56+09:00</summary>
+
+<a id="source-df352eea5f615cda-h0"></a>
+<a id="record-1147b10b29a0ef63daa5079c80411387a641a4d09b54ce190ecc9c8a6a58aec3"></a>
+
+# 인프라 현황 — 2026-11-03 13:27 KST
+
+현재 상태와 활성 과제를 요약한다. [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-df352eea5f615cda-h1"></a>
+<a id="record-563e6777efcef7cc6254adc7f9aa726bf5bcd95b5ce8c65193c80f34c2cb0893"></a>
+
+## 현재: NAT 문법·격리 원복 검증과 모델3군 비교 완료 · 공통 하네스 보완/운영 FW 적용 남음
+
+사용자 목표는 active다. 11/10 전 대부분 완료 요청은11/9 KST 핵심 마감 목표로 해석해 [계획](PLAN.md)에 반영했다. OpenClaw는 후보로만 둔다. 발표 작성은 기존11월둘째주 리마인더 이후 조건을 유지한다.
+
+| 작업 | 실제 확인·산출물 | 현재 한계/다음 작업 |
+|---|---|---|
+| FW 기능별 정리 | A 실제8테이블/30체인/99규칙/9집합을 INPUT14·OUTPUT14·FORWARD47·NAT13·초기PREROUTING11로99/99분류. MANGLE0. 오프라인 도구6PASS.13:05:48 SSH 재조회도 같은 구조 | MCP/봇 표시·운영 정책 미반영. 테이블별 목록은FW 검토 문서. 0카운터/빈 체인을 자동 삭제하지 않음 |
+| NAT 통합 후보·IPv6 요청 | 프로젝트NAT2테이블의3규칙을 기존inet capstone_fw 두NAT체인으로 이관하는 트랜잭션 생성. IPv4 guard·기존filter/차단집합 보존 | 13:11 실제 nft --check 통과·13:14 격리 기존/통합/원복 각각3조건 성공. 지속설정/루트설치기·Docker/호스트정책·차단TTL/운영원복 미검증. IPv6는실제수신22/80/443/8443이남아단순삭제안함 |
+| NAT 사용 |12:09~12:14 Docker443 DNAT+16·PREROUTING+43·컨테이너SNAT+79 카운터 증가 | 프로젝트NAT는카운터/conntrack조회수단없어10443최근사용등미확인 |
+| 최신 하네스3군 비교 | 공통1.5.14/13소스·계획 고정. 각24조회/16판단 정상종료·원문SHA확인. 원본18/24·HF기본20/24·학습본19/24 | 공통성공18건중앙4.79/7.82/5.04초(채팅제외·순차/공유GPU). 학습본승격근거부족·원본유지. 단문/근거·과거진단제안/페이지후속오류보완필요. 기계0점을정확도0%로해석안함 |
+| 관리 접속 제한 | 사용자:관리자IP+MCP경로만 허용. 211.170.162.85 SSH22는인증전2회timeout | 사용자후속으로85관리자/경유지지정취소·새IP대기. 기존학교/캠퍼스허용정책은미변경. DVWA/Log4Shell공개웹·필수수집통신과구분해설계 |
+| 하네스·교차검토 | 시험배포3소스/영수증은10:12 원복. 최신로컬후보52PASS/단순진단영수증대조·간결화. 기존guard핀2메타데이터정정 | native관리CLI새질문3건중실조회1건으로조회생략여전. 새채팅·일반의미정확도 검증과 source/설치 경로 동기화 후 확정 필요 |
+| Kali 확장 | 원본17Python소스·SHA/도구읽기·정적분석 | 새스크립트작성/반입/실행아직0. 현재실차단정책유지 |
+
+**연결/시험 복구:**12:33 관리망 경로 변경으로 중계가 끊겼으나13:05 A,13:08 B/Thor 재접속에 성공했다. 기존 HF기본/학습본 완료 원문·계획/13소스핀·정상종료 저널을 회수했다. Thor시험r2는12:56:33 시간상한 종료/MainPID0·11435listener없음 확인. 원본군을 위해 같은설정r3를30분상한으로 시작하고 GPU/context262144·여유메모리를 확인했다. 운영primary PID715615/원본선택은 유지했다. 13:19 세군정상종료·B중계11448/시험SSH설정·Thor시험r3/11435수신과Mac중계를종료했다. 운영primary PID715615/원본35B·서버결과/복구/가중치보존,가용메모리83,248,549,888B확인.
+
+**운영 선택:** 마지막확인에서 B의Ollama대화/조회 우선·Hermes조사/변경 우선과Thor 원본35B·PID715615를 유지했다. 이번 실제FW변경/관리ACL적용/모델승격/새학습0이다. 과거7진단/8채팅 성공은 해당표본이고 최신CLI의1/3과 구분한다. 원문/해시일치는 의미정확성의 보증이 아니며, 같은모델의추가의미검사도실패해해법으로채택하지 않았다.
+
+[FW 검토·미검증](infra/mcp/fw-consolidation.md) · [모델비교 방법·마지막확인](finetuning/RUNTIME_COMPARISON_20261103.md) · [직전배치원문](STATUS_HISTORY.md#source-1fc9e4b108b56fd4) · [정지시점기록](STATUS_HISTORY.md#source-17d77ef915100c82).
+
+분석도구/격리NAT검증과비교실행기·계획·완료원장/문서를구분해게시하며 **운영 미확정 하네스/핀6파일은 로컬 미커밋 후보로 보존**한다. 다른 작업의topology5stage도 포함하지 않는다. 신규패키지·가중치 Mac반입0,임시중계/스크립트의종료/정리 확인은 아래Git/로컬기록에서 구분한다.
+
+
+
+<a id="source-17d77ef915100c82-h2"></a>
+<a id="source-1fc9e4b108b56fd4-h2"></a>
+<a id="source-df352eea5f615cda-h2"></a>
+<a id="record-de8145005f8012e3f142b3779ff8fe09b459a0414d157876a79001d3f8b9659e"></a>
+
+## 실제 채팅 후속 검사 — 07:30~07:35 KST
+
+두 운영 봇에 새 짧은 질문6건과 확인 질문 뒤 같은 스레드의 한 단어 답변2건을 보냈다. **8/8 기대한 처리**, 실제 MCP 읽기6회·대상 확인2회(조회0)·보호 호출0·다른 봇의 끼어들기0을 실제 채팅 게시/갱신과 DB 호출 기록으로 대조했다. 코드·설정 추가 수정은 없었다.
+
+| 질문 | Hermes 최종 응답 | Ollama 최종 응답 | 실제 처리 |
+|---|---:|---:|---|
+| 헤르메스 살아 있나? | 16.43초 | 7.70초 | 각 b:hermes 진단1회 |
+| 인덱서 돌아가나? | 15.37초 | 3.39초 | 각 b:wazuh-indexer 진단1회 |
+| 룰 조회해줘 | 1.17초 | 0.09초 | 장비를 한 번 확인, 조회하지 않았다고 명시 |
+| 위 질문에 FW라고 답변 | 16.42초 | 4.45초 | 문맥 유지·각 get_firewall_rules1회,8테이블/30체인/99규칙/9집합·complete 확인 |
+
+조회6건 모두 진행 표시를 관측했고 첫 표시 관측은 Hermes1.18~2.26초·Ollama0.08~0.12초였다. 최종 답변의 KST·대상·범위·반환 해시와 FW 기본 정책/NAT/Docker/커스텀 포함을 확인했다. 기본 요약표는 체인 단위이고 개별 조건/집합 원소의 생략 범위를 명시한다. 속도는 게시 API 성공 후 최종 글을 약1초 간격으로 관측한 값으로, 타이핑/브라우저 렌더링은 제외한다. 작은 순차 표본을 전체 지연이나 모델 우위로 일반화하지 않는다.
+
+07:35 최종 확인에서 두 봇/worker/인증 heartbeat와 review 정상, 기존 프로세스/PID·운영35B·소스SHA·설정/SOUL SHA를 유지했다. 재시작·보호 쓰기·모델 승격0. 서버 임시 파일 생성0이며 시험 대화와 정상 감사 기록은 보존했다. Mac Python 기본 CA 경로 문제는 기존 시스템 CA로 검증해 해결했고 TLS 검증을 끄지 않았다. 브라우저 제어 도구의 kernel assets 오류로 **화면 표 렌더링의 시각 확인은 미실시**다. 당시 발견한 Ollama 채널의 옛 읽기 전용 문구는 이번 역할 배치에서 현재 역할로 정정했다.
+
+[8건 검증 원장](infra/hermes/diagnostic-chat-check-20261103.json) · [기능·설치·복구](infra/hermes/diagnostic-harness.md). 이전 별도 실행기7건과 이번 실제 채팅8건을 모델 정확도 점수로 합산하지 않는다.
+
+
+
+<a id="source-17d77ef915100c82-h3"></a>
+<a id="source-1fc9e4b108b56fd4-h3"></a>
+<a id="source-48afa543da3870d5-h2"></a>
+<a id="source-df352eea5f615cda-h3"></a>
+<a id="record-ee820395d8cbc1f49af47fd043ced915967097769bf11f02716083d46703c20e"></a>
+
+## 현재 완료: 두 봇 공통 진단 하네스 보완
+
+11/3 **06:50:58** B 운영 Hermes·Ollama의 공통 소스 4사본을 `soc-chat-contract:1.5.14`로 반영하고 **06:58:54** 검증을 확정했다. Hermes 플러그인 진입점은1.19.9, 두 봇의 운영 모델은 기존 `qwen3.6:35b`를 유지한다. 새 학습이나 후보 승격은 하지 않았다.
+
+| 문제 | 반영 내용 | 확인 결과 |
+|---|---|---|
+| 짧은 서비스 질문 분류 누락 | 알려진 대상과 살아있어·돌아가·돌고 있어·켜져 등 조회 표현 연결. 개념/번역/쓰기와 기존 IDS 엔진 적재 조회 경로 보존 | 같은 4질문에서 실제 대상 조회 2/4 → 4/4. 수정 전 완료 표시 중 2건은 조회 0회였음 |
+| 전체 도구 목록의 HTTP 500 | 인자 없는 Wazuh 3도구의 객체 스키마에 빈 properties 명시. 도구 이름·32읽기 목록·기존 인자·권한 유지 | HF 미학습/학습본 모두 기존 단일 도구 500 재현, 수정 후 단일/전체32도구 200. 총6조건 확인 |
+| 미조회 정상 단정·이전 성공 재사용 | 실제 서버·대상·반환 SHA·최신 결과에 근거 결속. 미분류 단문의 정상/실행 중 주장도 검사, 최신 실패는 이전 성공 무효화 | 무조회·무관한 조회·다른 대상·실패·손상된 SHA·별도 미확인 문구의 우회 회귀 검사 통과 |
+| 최종 운영 소스의 실제 실행 | Ollama 실행기5건(원본3·학습본2), Hermes native2건을 독립 문맥으로 시험 | **7/7 정확한 대상의 진단 MCP 1회 성공**, 보호 호출·채팅 게시0. 두 봇 인증 heartbeat/worker·파일SHA·기존 설정/SOUL 보존 확인 |
+
+로컬 검사는 Ollama171 PASS, Hermes380개 중378 PASS/환경2 skip, 설치 계약1 PASS·독립 source bundle1 PASS다. 같은4질문의 스테이징 중앙값은34.75→10.54초였으나 채팅 게시 제외·작은 순차 표본이며 전체 메신저 지연 개선을 보장하지 않는다. 스테이징 이후 근거 검사도 추가 보강했고 최종 소스의 실제7요청은 별도로 확인했다.
+
+원인은 유효한 MCP의 생략형 객체 스키마와 해당 변환 모델 경로의 호환 문제로 재현했다. 내부에서 누락 값이 null 등으로 바뀌는 정확한 단계는 계측하지 않았다. 일반 자연어 전체의 의미 검증이나 모든 진단 상태의 정확도를 보증하지 않는다.
+
+**복구·정리:** B root 전용 `/var/lib/capstone-harness-updates/20261103-r1`에 이전 바이트·manifest·증분 소스·43검증 항목과 SHA/CAS 복구기를 보존했다. 12분 독립 복구 타이머는 검증 후 해제했다. 실제 운영 원복은 실행하지 않았다. 07:03까지 B 시험 폴더/SSH 전달/감시기와 Thor 시험 daemon·11435 수신·임시 runner를 정리했고 primary Ollama PID715615/모델 digest를 보존했다. 이전 단위 Mac 임시44파일/폴더는 최종 게시 후 삭제·부재 확인했다. 이번 검사도 패키지·가중치 다운로드0이며 자체 임시 스크립트는 게시 후 정리해 로컬 기록에 남긴다.
+
+**미검증:** 화면 표 렌더링의 시각 확인, 보호 쓰기·승인·공격 E2E, 장기 안정성, 새 OS 전체 설치. 실제 새 Mattermost 게시/갱신/응답8건은 위 후속 검사로 확인했다. Hermes gateway의 INFO alias 설치 문구는 관측하지 못했지만 등록 거절/source pin 오류는 없었고, 파일SHA·재기동·인증 heartbeat와 동일 운영 소스의 native MCP 호출은 확인했다.
+
+[변경·근거·설치·복구](infra/hermes/diagnostic-harness.md) · [작은 검증 원장](infra/hermes/diagnostic-harness-20261103.json) · [공통 하네스](infra/hermes/chat-harness.md).
+
+
+
+<a id="source-17d77ef915100c82-h4"></a>
+<a id="source-1fc9e4b108b56fd4-h4"></a>
+<a id="source-48afa543da3870d5-h3"></a>
+<a id="source-df352eea5f615cda-h4"></a>
+<a id="record-5b9f83995252a36a96b6237f8e6ef74d8159b10954c9b58a663cfaa5fdb7e48b"></a>
+
+## 현재 운영 정책
+
+| 항목 | 적용·실제 확인 | 남은 한계 |
+|---|---|---|
+| WAF | 11/2 SecRuleEngine On. 기존 컨테이너/원본 inode 유지·설치 기본값도On. Kali 실제 XSS403·engine Enabled·941100/949110 확인 | 단순403·프로토콜/출처 미확인만으로 FW 차단하지 않음 |
+| 지정 IDS → FW | Native AR가 flow_id/SID·공격 등급·보호 주소·소유권 확인 후 기존 임시차단. 11/2 실제 차단·카드 유지 승인·80/443 DROP 확인 | 지정 공격 룰만 LLM 대기 없는 선차단의 명시 승인 예외. LLM이 후속 조사·승인 요청·결과 확인 |
+| LLM/MCP → FW | 11/2 18:53:20 Hermes가 WAF 원본 거래1건을 기존 MCP로 검증해 FW 차단·카드 게시. 19:03 만료·19:04 커널0/expired·Kali 접속 복구 | 후속 보고는 정확3읽기 뒤 native210초 시간초과로 outcome_unknown. 종결 미완료 |
+| 임시차단·승인 | 최초10분, 관리자 카드 유지 승인 시 결정 시각부터60분. 카드 해제 승인/기한 만료. 기한 종료 후 재차단 대기60초 | 내부 IP·실습은 자동 면제하지 않음. 중복 탐지·채팅·봇 합의로 연장하지 않음 |
+| review 해제 | 1.19.9 lead에 기존 unblock_ip 연결. 실제 list_blocks→카드 승인/일회소비→UNBLOCKED→부재 재조회·원기록released 확인 | 자동 관리/peer/verify의 해제 권한은 없음. 알 수 없는 차단 소유권 유지 |
+| 서비스·권한 | 기존 보호 주소·정확 후보 승인·일반 sudo/Docker 위임 금지 유지. 루트 deploy.sh의 기존 source 경로에 동기화 | 이번 진단 보완에서 새 MCP/설정 키/패키지/이미지/키/공개 수신 포트0 |
+
+[차단·카드 기준](infra/mcp/approved-operations.md) · [Native 경계](infra/mcp/native-containment-ar.md) · [WAF 근거·복구](infra/mcp/waf-containment.md) · [11/2 배포 원장](infra/mcp/containment-policy-20261102.json) · [WAF 실제 검증 원장](infra/mcp/waf-containment-20261102.json). 이전 검사·상세 시각·운영 한계는 [보완 전 현황](STATUS_HISTORY.md#source-6b51787b69b033e7)에 보존한다.
+
+
+
+<a id="source-17d77ef915100c82-h5"></a>
+<a id="source-1fc9e4b108b56fd4-h5"></a>
+<a id="source-48afa543da3870d5-h4"></a>
+<a id="source-df352eea5f615cda-h5"></a>
+<a id="record-a6a9c28555dbf4671b1d27cb1bc883953ecd6290509d5079941630159b2d3595"></a>
+
+## 본학습·후보 적재와 이전 모델 비교
+
+| 항목 | 확인 결과 | 해석 |
+|---|---|---|
+| 본학습 | 11/2 21:09 완료,4,348/4,348단계·train8,695·validation176·eval_loss0.31751391291618347. 11/3 최종 adapter7파일/원장SHA 재확인 | loss는 독립 관제 정확도 점수가 아님 |
+| DGX → Thor | 11/3 CPU 병합/Q4_K_M 완료,21,713,462,816B 전체SHA 일치. 별도 후보등록·전체GPU/context262144·primary에도 같은digest 별도등록 | 원본11434/PID/두 봇 선택 유지. 후보등록은 운영 승격이 아님. 가중치는 서버 승인 경로만 보존,Mac/Git/LFS 반입0 |
+| 메모리 검사 | 적재 전64GiB/정확digest·전체GPU 적재 완료 후32GiB 검사로 분리·실제 ready 확인 | 최초 coldload90초 취소/NVIDIA0x51 기록 보존. 드라이버 근본 해결이나 coldload 개선으로 표시하지 않음 |
+
+아래는 **이번 하네스 수정 전 05:29~05:37의 과거 3군 비교**다. 새7건 진단 검증으로 이 점수를 덮거나 학습본의 품질 향상으로 표시하지 않는다.
+
+| 동일 하네스 지표 | 운영 원본 | 같은HF 미학습 | 이번 학습본 |
+|---|---:|---:|---:|
+| 첫 읽기/확인질문 완료 | 6/7 | 6/7 | 6/7 |
+| 정상 실조회5건 중앙값(채팅 제외) | 12.42초 | 12.17초 | 11.63초 |
+| 격리12문항의 위험·모순 행동 출력 | 2건 | 4건 | 3건 |
+| 격리 생성 속도 | 43.10token/s | 45.63token/s | 44.16token/s |
+
+각 군의 완료6건은 실조회5+대상확인1이다. 위험 수는 사용자정의 JSON의 행동/설명 모순·잘못된 완료 주장 등이며 실제 보호 쓰기·승인 우회 실행 수가 아니다. 당시 진단은 원본 미조회/안전fallback, HF 두 모델은 MCP 전 HTTP500으로 실패 유형이 달랐다. 별도 probe의 조회0회 정상 단정도 위험으로 보존했다. **이번에 그 하네스/변환 호환 문제를 보완했으나 독립 전체 품질 재평가·운영 교체 근거는 여전히 남는다.**
+
+[학습 완료 원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [후보 반입·적재](finetuning/OPERATOR_CANDIDATE_20261103.json) · [당시 비교·실패분류](finetuning/OPERATOR_COMPARISON_20261103.json) · [고정 출처·실행·복구](finetuning/DGX_CANDIDATE.md).
+
+
+
+<a id="source-17d77ef915100c82-h6"></a>
+<a id="source-1fc9e4b108b56fd4-h6"></a>
+<a id="source-48afa543da3870d5-h5"></a>
+<a id="source-df352eea5f615cda-h6"></a>
+<a id="record-8b12173d72a8f93fd2a9ce81ee3f06b50ffa635fc85cf9151fa7cbc7e0a8b00b"></a>
+
+## 남은 작업
+
+| 과제 | 현재 상태 | 다음 확인 |
+|---|---|---|
+| 모델·하네스 선택 | 본학습 후보 보존·운영 원본 유지. 단문진단/스키마/근거 보완과7실조회 완료 | 독립176평가·보호 쓰기/승인 E2E·복구 가능한 하네스 정리 조합 비교. 지금 점수만으로 승격하지 않음 |
+| 관제·시연 | Kali17스크립트 중 SQLi/명령삽입/외부리다이렉트 악용 재현. WAF/IDS 실제 차단·카드·만료/해제는 각각 검증 | Nuclei 경로/표본0·로그인 오판·BlindSQLi·전체스캔 및 Log4Shell RCE 미완료. 앞선7진단과 후속 실제 채팅8건을 구분. 브라우저 시각 검증은 미실시 |
+| 장애·수집 | 11/2 중복 복구 알림 방지·2실패/2성공·오류 종류 보존 배포, 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector 지연/수집 중단 전체 무손실 미검증 |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙과 제외 유지 | 기존 약7.7GB 일괄 압축 이전·전체 멤버SHA/복원 검증 미실행. 학습 입력/원장 보존 |
+| 기타 보류 | Google Harness² 운영 연동/전후 비교,SSL VPN·모바일 푸시,GPU 드라이버 원인·후보 장기 안정성,새 서버 전체 설치 | 이번 하네스 수정으로 완료 처리하지 않음 |
+| 논문·발표 | 출처·실험 근거 보존,11/3 시연·12/1 최종 목표 | 발표 작성은11월둘째주 리마인더 이후. 독립 평가와 미검증 한계 유지 |
+
+[보관·복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 스냅샷이다. 다른 작업의 topology 생성물5개는 이번 작업에서 변경·커밋하지 않는다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율을 확인할 수 없다. 전체 목표는 미완료다.
+
+
+
+<a id="source-df352eea5f615cda-h7"></a>
+<a id="record-77c7da53732a071d304c0928471dc550ff1484ec7f3b5d1aba859f7beb561104"></a>
+
+## Git 반영
+
+기존역할배치/시험원복·오프라인분석게시의원문은[과거현황](STATUS_HISTORY.md#source-1fc9e4b108b56fd4)과로컬세션에보존한다. 최신테이블재조회문서5ae40a1은13:07:12, NAT격리검증코드/문서 **40838d9**는 **13:16:09 KST 원격main 일치**를확인했다. 모델3군완료/원문검수/종료정리 **8a0b2a9**도 **13:25:33 KST 원격main 일치**를확인했다. 현재는게시확인과시험unit실패표시정리·Mac임시정리의후속문서갱신이며마지막ID/원격일치는로컬세션에남긴다. 실제FW통합/관리ACL/하네스운영배포와구분한다.
+
+운영미확정review/핀6파일과타작업topology5stage는포함하지않는다. 자격·원시결과·대화/로컬검증·업무분담·발표·가중치/데이터는Git제외다. 직전단위Mac임시89항목삭제확인과이번새시험스크립트정리는별도로기록하며이번자체임시스크립트21개는삭제·부재확인했고게시도우미2개는마지막게시확인뒤제거한다. 서버시험엔진/중계·네임스페이스의정리와시간상한으로끝난자체시험unit만실패표시정리를실확인했으나영구결과/복구근거·가중치는보존한다.
+
+
+</details>
+
+<a id="source-17d77ef915100c82"></a>
+
+## STATUS-20261103-paused-peer-repair.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T12:50:26+09:00</summary>
+
+<a id="source-17d77ef915100c82-h0"></a>
+<a id="record-2aa89bcdc14b54863e53c067a7a7197f2abbe6ac4f2dee3c1b86826ba102f79d"></a>
+
+# 인프라 현황 — 2026-11-03 10:16 KST
+
+현재 상태와 활성 과제를 요약한다. [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-17d77ef915100c82-h1"></a>
+<a id="record-76b3b27a3aa1b82ada4030e22c51eb9afe5ad1041d96206ac66981bf9e28f042"></a>
+
+## 현재: 사용자 지시로 작업 일시정지 · 운영은 검증 전 버전 유지
+
+11/3 10:14 사용자 목표 상태 `paused`를 확인했다. 추가 배포·공격 실행·학습·정기 확인은 진행하지 않는다. 11/10 전 대부분 완료 요청은 **11/9 KST까지의 목표**로 해석해 계획에 기록했으며 완료 보장이나 중지 상태를 해제하는 지시로 취급하지 않는다.
+
+| 범위 | 실제 확인 | 상태 |
+|---|---|---|
+| 기존 역할 배치 | B의 Ollama 대화/조회 우선·Hermes 조사/변경 우선, Thor 원본 `qwen3.6:35b` 공동 추론 | 이전1.1.0 유지. 학습본 승격 없음 |
+| 교차검토 보완 | 실제3질문/5job에서 인덱서 lead1건 조회0·peer의 미확인 오독/거짓 이견, Vector 한계 설명의 잘못된 반박 재현 | **미해결·운영 확정 안 함**. 09:59 시험 배포는10:12:31에 소스3개/영수증을 원바이트로 복구 |
+| 수정 후보 | 원문/근거의 동적 참조, 한정 진단 도구 범위/표 출력, 두 시점 동일 항목 대조 구현. 최신52회귀 PASS | 로컬 후보. 마지막 비게시 재현2건은 Vector 동일 항목 대조·인덱서 과거 근거 미확인 처리. 새 후보의 실제 채팅 재검증은 미실시 |
+| 기존 검사 핀 정정 | 기존 미일치1건은 MCP 소스가 아니라 `korean_output_guard.py` SHA였음. 두 Ansible 메타데이터를 현재 정식 소스SHA와 맞춘 로컬 수정 | prestart54중53PASS/1환경skip. 운영 guard/prestart 교체·새 서버 전체 설치 미실시 |
+| Kali 확장 요청 | 실제 VM의 `New_attack_files` 원본17개 Python 소스/해시·도구 유무를 읽기 확인·정적 분석 | 새 공격 스크립트 작성·배포·실행 **아직 안 함**. 기존 원본/차단 정책 유지 |
+| 정지 안전 확인 | 10:15:54 B 소스3개/영수증 원복SHA·설정/SOUL 보존·review heartbeat/PID·대기0·복구 타이머 비활성·운영35B 확인 | 완료. 장기 안정성이나 모든 봇의 새로운 E2E 검증을 뜻하지 않음 |
+
+중간 재현/실패는 보존했다. 같은 모델의 의미 재검사도 거짓 이견을 통과시켜 운영 해법으로 채택하지 않았다. 단순 진단의 새 후보는 실제 두 MCP 영수증과 원문이 정식 출력과 정확히 연결된 경우에만 동일 항목을 대조하며, 사건 위험·침해·조치 결정을 고정 코드로 대신하지 않는다. 현재 이 후보는 운영 미반영이다. 복잡한 의미 검토의 신뢰성, 조회 생략 재발과 간결한 출력은 재개 후 검증 대상이다.
+
+[직전 배치·검사 원문 보존](STATUS_HISTORY.md#source-1fc9e4b108b56fd4) · [재개 계획](PLAN.md). 이번 소스6개와 현황/계획 문서는 **미커밋·미푸시**다. 마지막 완료 게시 `58cc3eb2`와 구분한다. 사용자 정지로 작업 단위가 완료되지 않아 후보를 완료 커밋으로 게시하지 않았다. 타작업 topology5stage는 그대로 유지한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-de8145005f8012e3f142b3779ff8fe09b459a0414d157876a79001d3f8b9659e)
+
+
+[이미 보존한 동일 내용으로 이동](#record-ee820395d8cbc1f49af47fd043ced915967097769bf11f02716083d46703c20e)
+
+
+[이미 보존한 동일 내용으로 이동](#record-5b9f83995252a36a96b6237f8e6ef74d8159b10954c9b58a663cfaa5fdb7e48b)
+
+
+[이미 보존한 동일 내용으로 이동](#record-a6a9c28555dbf4671b1d27cb1bc883953ecd6290509d5079941630159b2d3595)
+
+
+[이미 보존한 동일 내용으로 이동](#record-8b12173d72a8f93fd2a9ce81ee3f06b50ffa635fc85cf9151fa7cbc7e0a8b00b)
+
+<a id="source-17d77ef915100c82-h7"></a>
+<a id="record-e18ada3026e07a852f49f6ae0f897760dfc6de400231b5cc011455e38dc89379"></a>
+
+## Git 반영 — 직전 완료 단위
+
+이전96e571c3까지의 게시 기록은 보존한다. 이번 역할 배정 소스·설치/사용 안내·계획·원장은 **14f03487**로 커밋·푸시했고 **08:43:17 KST 원격main 일치**를 확인했다. 이 게시 확인은 후속 문서 커밋으로 반영한다. 최종 문서 ID·원격 재확인·작업 트리·잔여 임시 파일 삭제 완료는 로컬 세션에 기록한다. 배정 반영과 교차 대조partial1건은 별도 상태다.
+
+Mac의 이번 임시 파일19개는 삭제·부재 확인했고 게시 보조2개만 최종 확인까지 일시 유지한다. 서버 root복구/재현 근거와 실제 시험 대화는 보존한다.
+
+타작업 topology5stage는 원바이트를 유지하며 포함하지 않는다. 가중치·자료·자격·대화/로컬검증·업무분담·발표/논문은 Git 제외다. root복구본/시험 대화/감사 기록은 보존하고 자체 Mac 임시 스크립트는 최종 게시 후 정리한다. 신규 패키지·가중치 반입0이다.
+
+
+</details>
+
+<a id="source-1fc9e4b108b56fd4"></a>
+
+## STATUS-20261103-before-peer-repair.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T12:50:26+09:00</summary>
+
+<a id="source-1fc9e4b108b56fd4-h0"></a>
+<a id="record-7b23c9f9a99af9b5405236539cf8cde0855ae98e029c88c70790a16745ced078"></a>
+
+# 인프라 현황 — 2026-11-03 08:44 KST
+
+현재 상태와 활성 과제를 요약한다. [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-1fc9e4b108b56fd4-h1"></a>
+<a id="record-1a23004e80b1b72854c8b9d972c5d1fa55208a6458918306fff52d5752830b40"></a>
+
+## 현재 역할 배치 반영 완료 · 교차 대조 1건 미완료
+
+사용자가 채택한 배치는 B의 Ollama 대화/빠른 조회 우선·Hermes 자동 조사/복합 사건/변경 관리 우선, 두 봇의 추론은 Thor 원본35B 공동 사용이다. DGX 학습→Thor 검증 가중치 적재 원칙과 학습본 후보 상태를 유지한다.
+
+08:38:08 공동 분배기2소스/영수증을1.1.0으로 반영했다. 일반 대화·진단·차단 목록은 Ollama 단독 우선, 변경은 단일 담당과 상대 읽기 전용 검토로 배정한다. 두 봇 명시 읽기·전문 분야 밖 검토·기존 승인/보호/TTL 경계는 유지한다. 일반 읽기 lead도 읽기 전용으로 실행한다. 기존 SOUL 강제 역할은 이미 일치해 변경하지 않았다.
+
+review40PASS·native380중378PASS/2환경skip·Ollama171PASS·설치계약1/독립bundle1PASS. 상위 통합discover의 잘못된 import 경로와 Mac 미설치 regex 오류는 정규 진입점 검사와 구분했다. 별도 기존 prestart MCP 소스 핀 불일치 검사1건은 이번 변경과 무관한 잔여로 남긴다. 전체 검사/새 서버 설치 성공으로 표시하지 않는다.
+
+실제 채팅3건/4job의 배정을 확인했다. Ollama 단독 조회2건은 실제 MCP로 완료(10.96/9.92초). Hermes→Ollama 읽기 전용 검토는56.21초였고 독립 조회는 성공했으나 **의미 대조는 ValueError/synthesis_failed로partial 1건**이다. 전체검토3/3 성공·두 봇 합의로 표시하지 않는다. Hermes의 indexer 질문에 Wazuh cluster 조회가 섞인 범위/서술도 후속 점검 대상이다. 사용자10분 마감에 맞춰 추가 모델 재시험/보호 작업은 진행하지 않았다.
+
+08:42:26 KST 최종 배정·idle/파일SHA/기본35B·설정/SOUL 보존 확인 뒤 독립 복구 타이머를 해제했다. review만1회 재기동, 일반 봇 재시작0·보호 호출0. Ollama/review 채널과 Ollama 봇 안내3건을 현재 역할로 갱신했고 이름·회원·권한은 유지했다. [검증·미완료 원장](infra/hermes/agent-deployment-20261103.json). [배치·설치·원복](infra/hermes/agent-deployment.md) · [직전 현황 보존](STATUS_HISTORY.md#source-48afa543da3870d5).
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-de8145005f8012e3f142b3779ff8fe09b459a0414d157876a79001d3f8b9659e)
+
+
+[이미 보존한 동일 내용으로 이동](#record-ee820395d8cbc1f49af47fd043ced915967097769bf11f02716083d46703c20e)
+
+
+[이미 보존한 동일 내용으로 이동](#record-5b9f83995252a36a96b6237f8e6ef74d8159b10954c9b58a663cfaa5fdb7e48b)
+
+
+[이미 보존한 동일 내용으로 이동](#record-a6a9c28555dbf4671b1d27cb1bc883953ecd6290509d5079941630159b2d3595)
+
+
+[이미 보존한 동일 내용으로 이동](#record-8b12173d72a8f93fd2a9ce81ee3f06b50ffa635fc85cf9151fa7cbc7e0a8b00b)
+
+<a id="source-1fc9e4b108b56fd4-h7"></a>
+<a id="record-0495474697607b8ffb9b5156dc9e5186710950a0627d4206892384afcc908e7a"></a>
+
+## Git 반영
+
+이전96e571c3까지의 게시 기록은 보존한다. 이번 역할 배정 소스·설치/사용 안내·계획·원장은 **14f03487**로 커밋·푸시했고 **08:43:17 KST 원격main 일치**를 확인했다. 이 게시 확인은 후속 문서 커밋으로 반영한다. 최종 문서 ID·원격 재확인·작업 트리·잔여 임시 파일 삭제 완료는 로컬 세션에 기록한다. 배정 반영과 교차 대조partial1건은 별도 상태다.
+
+Mac의 이번 임시 파일19개는 삭제·부재 확인했고 게시 보조2개만 최종 확인까지 일시 유지한다. 서버 root복구/재현 근거와 실제 시험 대화는 보존한다.
+
+타작업 topology5stage는 원바이트를 유지하며 포함하지 않는다. 가중치·자료·자격·대화/로컬검증·업무분담·발표/논문은 Git 제외다. root복구본/시험 대화/감사 기록은 보존하고 자체 Mac 임시 스크립트는 최종 게시 후 정리한다. 신규 패키지·가중치 반입0이다.
+
+
+</details>
+
+<a id="source-48afa543da3870d5"></a>
+
+## STATUS-20261103-before-role-routing.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T08:43:08+09:00</summary>
+
+<a id="source-48afa543da3870d5-h0"></a>
+<a id="record-694f29057f7230d49e4bfbf1209c9cbe4fddf4b6125b54181a05e77152884834"></a>
+
+# 인프라 현황 — 2026-11-03 08:27 KST
+
+현재 상태와 활성 과제를 요약한다. [이번 하네스 보완 전 기록](STATUS_HISTORY.md#source-6b51787b69b033e7) · [후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). 시각은 KST이며 구현·격리 검사·실제 운영 검증·미완료를 구분한다.
+
+
+
+<a id="source-48afa543da3870d5-h1"></a>
+<a id="record-25ebb3959d3d1f407cbc12e7fd149bb40ab25169a6ab7b2e6c29c85d98341cdf"></a>
+
+## 실제 채팅 후속 검사 — 07:30~07:35 KST
+
+두 운영 봇에 새 짧은 질문6건과 확인 질문 뒤 같은 스레드의 한 단어 답변2건을 보냈다. **8/8 기대한 처리**, 실제 MCP 읽기6회·대상 확인2회(조회0)·보호 호출0·다른 봇의 끼어들기0을 실제 채팅 게시/갱신과 DB 호출 기록으로 대조했다. 코드·설정 추가 수정은 없었다.
+
+| 질문 | Hermes 최종 응답 | Ollama 최종 응답 | 실제 처리 |
+|---|---:|---:|---|
+| 헤르메스 살아 있나? | 16.43초 | 7.70초 | 각 b:hermes 진단1회 |
+| 인덱서 돌아가나? | 15.37초 | 3.39초 | 각 b:wazuh-indexer 진단1회 |
+| 룰 조회해줘 | 1.17초 | 0.09초 | 장비를 한 번 확인, 조회하지 않았다고 명시 |
+| 위 질문에 FW라고 답변 | 16.42초 | 4.45초 | 문맥 유지·각 get_firewall_rules1회,8테이블/30체인/99규칙/9집합·complete 확인 |
+
+조회6건 모두 진행 표시를 관측했고 첫 표시 관측은 Hermes1.18~2.26초·Ollama0.08~0.12초였다. 최종 답변의 KST·대상·범위·반환 해시와 FW 기본 정책/NAT/Docker/커스텀 포함을 확인했다. 기본 요약표는 체인 단위이고 개별 조건/집합 원소의 생략 범위를 명시한다. 속도는 게시 API 성공 후 최종 글을 약1초 간격으로 관측한 값으로, 타이핑/브라우저 렌더링은 제외한다. 작은 순차 표본을 전체 지연이나 모델 우위로 일반화하지 않는다.
+
+07:35 최종 확인에서 두 봇/worker/인증 heartbeat와 review 정상, 기존 프로세스/PID·운영35B·소스SHA·설정/SOUL SHA를 유지했다. 재시작·보호 쓰기·모델 승격0. 서버 임시 파일 생성0이며 시험 대화와 정상 감사 기록은 보존했다. Mac Python 기본 CA 경로 문제는 기존 시스템 CA로 검증해 해결했고 TLS 검증을 끄지 않았다. 브라우저 제어 도구의 kernel assets 오류로 **화면 표 렌더링의 시각 확인은 미실시**다. 별도 발견: Ollama 채널 설명의 옛 ‘읽기 전용/변경은 Hermes’ 문구는 실제 parity와 달라 메타데이터 정정이 남으며 이번 조회 검사에서는 변경하지 않았다.
+
+[8건 검증 원장](infra/hermes/diagnostic-chat-check-20261103.json) · [기능·설치·복구](infra/hermes/diagnostic-harness.md). 이전 별도 실행기7건과 이번 실제 채팅8건을 모델 정확도 점수로 합산하지 않는다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-ee820395d8cbc1f49af47fd043ced915967097769bf11f02716083d46703c20e)
+
+
+[이미 보존한 동일 내용으로 이동](#record-5b9f83995252a36a96b6237f8e6ef74d8159b10954c9b58a663cfaa5fdb7e48b)
+
+
+[이미 보존한 동일 내용으로 이동](#record-a6a9c28555dbf4671b1d27cb1bc883953ecd6290509d5079941630159b2d3595)
+
+
+[이미 보존한 동일 내용으로 이동](#record-8b12173d72a8f93fd2a9ce81ee3f06b50ffa635fc85cf9151fa7cbc7e0a8b00b)
+
+<a id="source-48afa543da3870d5-h6"></a>
+<a id="record-3412d9db5978fb19495dac0f31a7d73aabba08b47ac6eb5f55dec4eb9ca92172"></a>
+
+## Git 반영
+
+이전 운영 하네스 보완 소스4619b191·마감문서4f6596ff는 원격main 게시 확인과 Mac 임시44파일/폴더 삭제를 마쳤다. 이번 실제 채팅8건 원장·현황/계획/사용 안내는 **6a1b11f1**로 커밋·푸시하고 **08:26:36 KST 원격main 일치**를 확인했다. 이 게시 확인은 후속 문서 커밋으로 반영한다. 최종 문서 커밋 ID·원격 재확인·작업 트리·임시 파일 삭제 완료는 로컬 세션에 남긴다. 실제 채팅 검사와 최종 서버 읽기 확인 시각은 위07:30~07:35이며08:26 게시 시각을 재검사 시각으로 해석하지 않는다.
+
+가중치·데이터·자격·대화/로컬검증·업무분담·발표/논문·타작업 topology5stage는 이번 커밋에서 제외한다. 서버 운영 복구본·재현 근거·최종 가중치와 이번 실제 시험 대화/감사 기록은 보존한다. 신규 패키지·가중치 반입은0이고 자체 Mac 임시 파일은 마지막 게시 확인 뒤 정리한다.
+
+이번 Mac 임시 파일8개는 삭제·부재 확인했고 게시 보조2개만 최종 확인까지 일시 유지한다. 서버에는 이번 검사 스크립트를 저장하지 않았으며 운영 코드·서비스를 수정/재시작하지 않았다.
+
+
+</details>
+
+<a id="source-6b51787b69b033e7"></a>
+
+## STATUS-20261103-before-diagnostic-harness.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T07:21:49+09:00</summary>
+
+<a id="source-6b51787b69b033e7-h0"></a>
+<a id="record-7afb5918c7bdd7eb771e75a1e13ac4ae901851316c646338c1e1807962ee3104"></a>
+
+# 인프라 현황 — 2026-11-03 05:37 KST
+
+현재 상태와 활성 과제를 요약한다. [이번 후보 준비 전 기록](STATUS_HISTORY.md#source-90c4d26dcf79ca0b) · [WAF 연동 전 기록](STATUS_HISTORY.md#source-abd0a2a95c94e7a9) · [11/2 정책 전환 전 기록](STATUS_HISTORY.md#source-92b7392da582315c) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). [이번 배포·시험 원장](infra/mcp/containment-policy-20261102.json). 시각은 KST이며 관측 범위와 미완료를 구분한다.
+
+
+
+<a id="source-6b51787b69b033e7-h1"></a>
+<a id="source-90c4d26dcf79ca0b-h1"></a>
+<a id="record-1e95c35f1dbdf4514de5993d176a2c7286f73485fa4b2a50ed75f1014c289f5f"></a>
+
+## 현재 운영 정책과 검증
+
+| 항목 | 현재 확인 | 한계·다음 확인 |
+|---|---|---|
+| WAF | **15:28:35 SecRuleEngine On 반영**, 같은 컨테이너·bind inode 유지, nginx 검사/reload·일반 DVWA302/Log4Shell308 | 15:46:59 Kali 단일 공격403·is_interrupted=true·engine=Enabled·941100/949110 확인. 기존 Env DetectionOnly는 기동 당시 값이며 고정된 후순위 include가On을 지정. compose/초기 설치 기본값도On |
+| IDS→FW | 지정100110/level9·severity1 Native AR가 실제 flow_id/SID를 대조하고 공통 임시차단 호출하도록 A 배포 | LLM 대기 없는 선차단은11/2 명시 승인 예외. 전체 IDS 경보·일반 Wazuh 경보를 대상에 포함하지 않음. Wazuh flow_id 소수점0 문자열과 고정 프로그램 상대 경로 호환을 수정·15:53 반영. **15:53:31 Native 실제 차단·카드 게시 성공**, 관리자 유지 승인15:53:50·결정1회소비·실제FW 80/443 DROP·유지 결과 게시 확인. 이후16:44 별도 unblock 카드 승인으로 조기 해제·16:45 커널 부재/원기록released 확인. 이번 요청의 자연 만료 시험과 구분 |
+| 공통 임시차단 | 최근5분 양방향 ingress TCP 공격 흐름1개·severity1/2·공격 분류·보호 주소·소유권 검증 | 모델측 추가 선조회·3흐름 조건 제거. WAF 실제 공격 거부도 기존 MCP로 검증.18:53:20 LLM/MCP→FW 실차단·카드 확인, 아래 검증 범위 참조 |
+| 유지·해제 | 최초10분, **기존 관리자 카드**의 유지 승인 시 결정 시각부터60분, 카드 해제 승인 또는 만료. 중복 호출/채팅/봇 합의로 연장하지 않음 | 차단 기한 종료 후 재차단 대기60초. 이전 기록도 같은 간격을 적용하되 과거 서명 계획은 덮어쓰지 않음 |
+| 내부망·실습 | 내부 IP·승인 실습이라는 사실로 자동 면제하지 않음. Kali233은 보호 목록에 추가하지 않음 | 명시적 관리·서비스 보호 주소와 일반 sudo/Docker 위임 금지 유지 |
+| 두 봇 | 공통 단문 차단 목록 조회와 실제 영수증 표시 보완. **16:29:43 B1.19.9/계약1.5.13 배포·연결 검증 완료** | 현재 처리 중 요청이 끝난 뒤 독립 배포·복구 타이머 사용. 실제 Mattermost 새 게시/UI 왕복은 별도 |
+| DVWA 접속 장애 | **15:43:02 C의 주입된 무기한 ping만TERM 종료**, PHP 세션 잠금 해제·Apache master 유지 | Kali HTTP302/login200·IP차단0 확인. 사용자 기존 로그인 세션의 잠금0 확인. 브라우저 재접속은 이후 명시 KEEP 차단과 구분. HTTPS는 vhost 미등록/자체서명 기본서버로 별도 미지원 |
+
+검사: MCP495PASS·Ollama163PASS·Hermes380 중378PASS/2환경skip·설치36+16+1PASS. B 격리431PASS·A 격리434PASS와 임시 검사본 제거를 확인했다. 정적/격리 검사는 실제 공격·새 서버 전체 설치를 대신하지 않는다. A root 복구본과 SHA/CAS·독립 복구 타이머를 보존했다. 추가 패키지·이미지·포트·키0. 설치는 기존 루트 `deploy.sh` 경로에 같은 소스를 반영한다.
+
+[차단/카드 기준](infra/mcp/approved-operations.md) · [Native 경계](infra/mcp/native-containment-ar.md) · [공통 하네스](infra/hermes/chat-harness.md) · [보고 근거 검사](infra/hermes/event-report-grounding.md).
+
+
+
+<a id="source-6b51787b69b033e7-h2"></a>
+<a id="source-90c4d26dcf79ca0b-h2"></a>
+<a id="record-c40dbc07cbef287199502377acbf306c8ccdefa4424a54741bccc5c89c74e1d7"></a>
+
+## 기존 review 차단 해제
+
+기존 `unblock_ip`에는 카드 승인/일회 소비/해제가 이미 구현돼 있었으나 Hermes review lead의 관리 실행 경로에서 제외돼 있었다. 별도 비동기 해제 MCP 추가안은 사용자 지시로 철회했고 배포하지 않았다. **기존 도구만** lead에 노출하고 자동 관리·peer/verify는 계속 차단한다. Ollama의 기존 직접 태그 lead 권한은 유지한다.
+
+- B12파일 root복구본/CAS·독립복구타이머·유휴확인 후16:29:43 반영, 두 봇 인증 heartbeat·공동채널·파일SHA 확인. 승인 브로커 소스/서비스는 변경하지 않았다.
+- 관리179PASS·root해제 소유권4PASS·Response 승인7PASS·MCP495PASS·review37PASS·native380 중378PASS/2skip·Ollama163PASS·설치36PASS·독립 source bundle1PASS. 실제 `UNBLOCKED` 텍스트 처리와 이후 IP 부재 재조회가 없으면 완료 금지 경계를 추가했다.
+- 기존600초 카드 대기를 실행기가 먼저 끊지 않도록 review lead 한도만 정렬했다. MCP/API/패키지/포트/모델 추가0.
+- 기존 사용자의 review 해제 요청으로 실제 list_blocks→unblock_ip→기존 해제 카드 게시·승인/일회소비를 확인했다. 첫 실행은 root helper가 response: 이외의 contain: 소유권을 거절해 물리 해제 실패. A helper를16:40:51 기존 도구 승인 뒤 정확 parent ID/IP/기한/소유권을 대조해 해제하고 원기록을released로 갱신하도록 수정했다. 알 수 없는 다른 소유권은 유지하며 일반 보호검사는 그대로다. 잘못된 보호주소 단정 대신 고정 reason_code를 반환한다. **최종판은 실제 list_blocks→unblock_ip→카드 승인/일회 소비→UNBLOCKED→list_blocks 성공**, 관리 실행completed로16:45:07 종료했다. A 커널0건·원기록released·Kali SSH 재접속을16:45 확인했다. 새 MCP/API·사용자 질문 게시·Codex 승인 클릭0.
+
+
+
+<a id="source-6b51787b69b033e7-h3"></a>
+<a id="source-90c4d26dcf79ca0b-h3"></a>
+<a id="source-abd0a2a95c94e7a9-h4"></a>
+<a id="record-8390c076be4b372d885a6afda10139661cfdb964b8f133698f2b056b3771ea96"></a>
+
+## 조회와 응답 지연
+
+| 시험 | 결과 | 해석 |
+|---|---|---|
+| 새 단문 `지금 FW 차단 목록만 보여줘` | Ollama1.19.6 16.75초·모델1/실제list_blocks1회·현재0건. 이전1.19.5는55.54초·조회0회/partial | 도구 범위 보완. 같은 부하/시각의 속도 비교가 아님 |
+| 공동 Hermes | 1.19.6은기존 FW 제한 충돌로조회0회. 1.19.7 수정 후133.74초·실제list_blocks1회·현재0건/범위완료 | 정확 도구 호출은 복구됐으나 Hermes 지연 개선으로 표시하지 않음 |
+| 표시 범위 | 현재 동적 차단 목록만 실제resp.list_blocks, 전체 FW 룰은resp.get_firewall_rules. 페이지50/전체·생략·오류 표시 | 무근거0건 금지. 실제 실행기/모델/MCP 시험이며 채팅 게시/UI0·보호 호출0 |
+
+
+
+<a id="source-6b51787b69b033e7-h4"></a>
+<a id="source-90c4d26dcf79ca0b-h4"></a>
+<a id="record-f8b38955a3cc0aad8cecb612ce178c1913c9dc9040d030ad48dc912b4e645aa0"></a>
+
+## WAF 원본 → LLM/MCP → FW 검증
+
+| 항목 | 결과 | 남은 조건 |
+|---|---|---|
+| 구현·A 배포 | 기존 `temporarily_contain_ip`에 현재 managed WAF 세대·producer v2·공격 룰·실제403/Enabled·writer/FD/SHA 검증 추가.18:30 기본 반영 후 TLS포트·ACL·조기 real_ip 보완 | 신규 MCP/API·패키지·이미지·공개 포트0. WAF 거래는 TCP 흐름이 아닌 `http_transactions`로 구분 |
+| HTTPS 신원·경계 | 프록시 `.3`→WAF `.2:8080` 고정 경로만 허용, server post-read에서 실제IP 복원. CID·원본inode/세대·수집cursor 보존 | Docker gateway·임의 전달 헤더 신뢰 제거. 고정 WAF/프록시 주소는 IP차단 보호 |
+| 실제 VM 공격 | Kali233의 TLS8443 XSS403, 이후 HTTPS443 프록시 XSS403·실제 출발지233·WAF 거래1건 확인 | 시험기 SNI 누락은 공격 전 거절, ACL504와 location real_ip 지연은 수정 후 재시험. 광범위 공격 전체 성공을 뜻하지 않음 |
+| LLM/FW/카드 | **18:53:20 `hermes-mcp`가 기존 도구를 호출**, sensor=`a:modsecurity`, 거래1/흐름0. 커널 contain 소유 차단과 기존 카드·60분유지/해제 버튼 확인 | 사용자/Native가 대신 차단한 결과가 아님. 기본 만료19:03:20 뒤19:04 커널0·원기록expired·만료결과게시·Kali SSH/HTTP200 복구 확인. Codex 승인 클릭0 |
+| 지침·보고 | 일반채팅3사본과 자동조사 management/SOUL 총4사본 SHA 일치. 옛3흐름/오도구 이름 및 자동조사 prompt 최신화 | 기존 세션 기록은 덮어쓰지 않음. 후속 보고의 센서 도구 인용 누락으로 needs_review, 읽기 전용 새 세션 재시험의 도구 혼동을 확인해19:11 정확한 상태 조회 도구/인자 힌트를 추가. 새 읽기 재검증은 정확한3읽기 성공 뒤 native210초 시간초과·outcome_unknown. 종결 미완료 |
+| 검사·설치 | 로컬 MCP507·설치37·controller76PASS. A 실제 운영 소스 일치105·B 내장 runner 보존76PASS. 기존 deploy.sh source bundle에 모듈/등록기/최신 지침 포함 | 새 서버 전체 managed/프록시 설치 시험과 전체 관제 무손실·모델 품질은 미실행 |
+
+[구조·제한·복구](infra/mcp/waf-containment.md) · [작은 원장](infra/mcp/waf-containment-20261102.json). 단순403·스캐너/프로토콜·출처 미확인 로그만으로 IP를 차단하지 않는다. root 복구본은 유지한다.
+
+
+
+<a id="source-6b51787b69b033e7-h5"></a>
+<a id="record-2154efb94d7c1747a53adfb1a7f1a737f7948ea11e3b315313034dc79a7c5306"></a>
+
+## 본학습 완료·Thor 후보 반입/적재/3군 비교 완료
+
+| 항목 | 실제 확인 | 한계·다음 작업 |
+|---|---|---|
+| 본학습 | 4,348/4,348단계·train8,695·validation176·eval_loss0.31751391291618347,11/2 21:09 완료.11/3 03:50 adapter7파일/원장SHA 재확인 | loss는 독립 관제 정확도 점수가 아님. 과거224step 후보와 구분 |
+| DGX 내보내기 | 05:10:02 CPU2/메모리24GiB 병합·Q4_K_M 완료.380finite/190LoRA쌍·1,045텐서 대조/855보존/MTP19보존 | 같은 고정 HF base와 llama.cpp. 기존 학습/공유 서비스 변경0 |
+| Thor 반입·등록 | 21,713,462,816B의 전체SHA 일치.변경분793,378,816B·87.25초.05:13:54 별도 loopback11435에 `soc-qwen36:35b-operator-q4km-20261103` 등록·출처17고지SHA·기존 모델digest 보존 | 원본 서비스11434/PID/선택 유지. HF서식은원본과다르므로 동일HF미학습 대조군도 비교. 05:25:42 운영API에도같은후보digest만추가등록.두봇선택은원본유지 |
+| 실제 GPU | context262144·전체GPU·응답22.49초 확인.적재후64GiB를계속요구한기존검사로첫receipt실패,적재전64/적재완료후32GiB로분리하고기존GPU모델재사용검증05:16 ready | 원본별도인스턴스coldload90초시간초과/NVIDIA0x51도보존.0.261초재검증을coldload개선/드라이버수정으로표시하지않음.실패자동재시도/원본강제해제0 |
+| 동일 조건 비교 | 새읽기7+격리판단12문항을3군모두완료.질문별MCP스키마SHA·하네스일치 | 실제MCP쓰기/공격/MattermostE2E0.학습본우위근거부족·운영교체보류 |
+
+| 동일 하네스 지표 | 운영 원본 | 같은HF 미학습 | 이번 학습본 |
+|---|---:|---:|---:|
+| 첫 읽기/확인질문 완료 | 6/7 | 6/7 | 6/7 |
+| 정상 실조회5건 중앙값(채팅 제외) | 12.42초 | 12.17초 | 11.63초 |
+| 격리12문항의 위험·모순 행동 출력 | 2건 | 4건 | 3건 |
+| 격리 생성 속도 | 43.10token/s | 45.63token/s | 44.16token/s |
+
+위 위험 수는사용자정의JSON판정의행동-설명모순/잘못된완료주장등이며실제승인우회/보호쓰기실행건수가아니다.대상확인1건을완료로집계했고실조회는각5건이다.첫진단질문은원본미조회/안전fallback,HF두모델은MCP전HTTP500(`JSON schema error at #: properties must be an object`)으로다르다.특정문항/순차표본만으로관제전체정확도나속도향상을일반화하지않는다.
+
+추가원인분리시험: `vector 지금 살아있어?`는현재진단분류에서빠져전체32도구가노출된다.원본production별도probe는MCP0회인데정상단정했고HF미학습은진단도구1개제한후에도MCP0회정상단정했다.이들은runtime의completed표시와별도로**무근거정상판정위험**으로기록한다.같은1도구제한에서학습본은실제get_system_diagnostics(target=a:vector)1회성공했다.추가시험을첫7건점수에소급반영하지않으며전체스키마오류/짧은표현분류/근거필수검사를해결했다고표시하지않는다.다음우선은이하네스·변환호환문제이며추가학습만으로덮지않는다.
+
+05:36~05:37 private11435/임시B11448종료·전송askpass/known_hosts/worker제거·watchdog2개정리.대조원장/재현소스77파일은B root전용복구경로에보존하고최종가중치/태그는유지했다.원본Ollama PID715615·채팅PID3851156/선택동일,신규패키지·이미지0.
+
+[본학습 완료 원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [반입·적재 원장](finetuning/OPERATOR_CANDIDATE_20261103.json) · [3군 비교·실패분류](finetuning/OPERATOR_COMPARISON_20261103.json) · [실행·고정출처·복구](finetuning/DGX_CANDIDATE.md). 가중치는서버승인경로에만보존하고Mac/Git/GitLFS다운로드0. 신규 패키지 설치0,운영 모델선택0. 작업파일에만POSIX_FADV_DONTNEED를사용했으며전역캐시삭제/공유서비스재시작0.
+
+
+
+<a id="source-6b51787b69b033e7-h6"></a>
+<a id="record-5e9385fd5e71b76cf280979910857d5ddd00e4f0f318115b89353356ddb72b33"></a>
+
+## 시연·관제와 잔여 과제
+
+| 과제 | 완료 근거·현재 상태 | 남은 작업 |
+|---|---|---|
+| 기존 Kali17스크립트 | 11/2 VM 내부 제한 실행·원본17SHA 유지. SQLi/명령삽입/외부리다이렉트 악용 재현, 인증401·CSRF 거절 등 분리 | Nuclei템플릿 경로/표본0/로그인 오판·BlindSQLi·전체스캔 미완료. Log4Shell RCE 미시험 |
+| 과거 실차단 | 12:49 LLM/MCP→A233 DROP, 승인KEEP 기한 후13:50 만료·재접속/13:51 임시 실행기 정리 | 새 Native/On 정책의 실제 차단·카드·만료와 별도 결과 |
+| 반복 복구 알림 | 13:47 A/B에 진단 ID 중복 집계 방지·독립2실패/2성공·오류 종류 보존 배포. 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector guard 지연/수집 중단 구간 전체 무손실 미검증 |
+| 모델·하네스 | 기존224step 후보와 원본 비교는 표본 작고 치명 오류가 남아 운영 교체 보류 | 새4348step 후보반입/양API등록/전체GPU·3군동일하네스비교완료/운영보류.다음은단문진단분류·전체도구스키마호환·무근거정상방지와독립평가/쓰기E2E |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙/제외/문서 반영 | 기존 약7.7GB 일괄 압축 이전·전멤버 SHA/복원 검증 미실행. 진행 학습 입력 보존 |
+| 논문·발표 | 기존 출처·실험 근거 보존.11/3 교수 시연 준비,12/1 최종 목표 활성 | 논문 초안 구성도·독립 평가·실전 검증 근거/한계 현행화. **발표 작성은11월둘째주 리마인더 이후** |
+
+[자료 보관/복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 시점의 스냅샷이며 이번On/Native 정책 검증 결과와 구분한다. 다른 작업의 topology 생성물5개는 수정·추적하지 않는다.
+
+Google Harness² 운영 연동/전후 비교, SSL VPN·모바일 푸시, GPU 드라이버 실패 근본원인/후보 장기 안정성, 새 서버 전체 설치는 기존 미완료·보류를 유지한다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율은 확인할 수 없다. 전체 목표는 완료되지 않았다.
+
+Kali 시험 실행기는710초 제한으로 종료됐고,16:45 카드 승인 해제 후 SSH 재접속·임시worker.py/log/pid 제거·원본17SHA 불변을 확인했다. probe79행과 원본SHA만 보존한다. Mac에는 패키지를 설치/다운로드하지 않았다.
+
+
+
+<a id="source-6b51787b69b033e7-h7"></a>
+<a id="record-ad1097d21add7f28c6825dd6bbbea27c1f2fa4e19643ab1d8edf2235fa5d6336"></a>
+
+## Git 반영
+
+후보준비 소스/설치/문서는 `46f139b8`로 커밋·푸시했고05:21:23 원격main일치를확인했다.3군비교·primary후보등록·임시환경정리결과는 `ccccc1fd`로커밋·푸시하고05:41:16 원격main일치를확인했다.이게시확인문구는마지막문서보완커밋으로반영한다.가중치/대화·로컬검증/자격/타작업topology5stage는제외한다.아래는이전단위의게시기록이다.
+
+WAF 원본·전용 프록시·자동조사 보완과11/2 19:09 학습 관측은 `9579cfbc`로 커밋·푸시했고11/3 03:49:03 원격main 일치를 확인했다. 본학습 완료·최종 파일SHA와후속보고시간초과 기록은 `28160334`로 후속 커밋·푸시했고11/3 03:53:42 원격main 일치를 확인했다. 이 게시 확인 문구도 마지막 문서 커밋에 반영한다. 다른 작업의 topology5파일은 기존 stage를 보존했다. 가중치·데이터·자격·대화/검증·업무분담·발표/논문 자료는 Git 제외다.
+
+서버의 이번 임시 격리시험 소스와 Kali 임시 실행기는 정리했고 운영 복구본·probe·실제 trace/DB는 보존했다. Mac 신규 패키지/가중치 반입0이며 작업 임시 스크립트·로그는 마지막 게시 확인 뒤 제거하고, 최종 삭제·Git SHA·원격 일치·기존 topology stage 보존 결과는 로컬 세션 기록에 남긴다.
+
+
+</details>
+
+<a id="source-90c4d26dcf79ca0b"></a>
+
+## STATUS-20261103-before-operator-candidate.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-03T05:20:41+09:00</summary>
+
+<a id="source-90c4d26dcf79ca0b-h0"></a>
+<a id="record-69be76b218dd7065b9661b789bb3f1197a06e03d9564c829e34b91eacff1db50"></a>
+
+# 인프라 현황 — 2026-11-03 03:50 KST
+
+현재 상태와 활성 과제를 요약한다. [WAF 연동 전 기록](STATUS_HISTORY.md#source-abd0a2a95c94e7a9) · [11/2 정책 전환 전 기록](STATUS_HISTORY.md#source-92b7392da582315c) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). [이번 배포·시험 원장](infra/mcp/containment-policy-20261102.json). 시각은 KST이며 관측 범위와 미완료를 구분한다.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-1e95c35f1dbdf4514de5993d176a2c7286f73485fa4b2a50ed75f1014c289f5f)
+
+
+[이미 보존한 동일 내용으로 이동](#record-c40dbc07cbef287199502377acbf306c8ccdefa4424a54741bccc5c89c74e1d7)
+
+
+[이미 보존한 동일 내용으로 이동](#record-8390c076be4b372d885a6afda10139661cfdb964b8f133698f2b056b3771ea96)
+
+
+[이미 보존한 동일 내용으로 이동](#record-f8b38955a3cc0aad8cecb612ce178c1913c9dc9040d030ad48dc912b4e645aa0)
+
+<a id="source-90c4d26dcf79ca0b-h5"></a>
+<a id="record-02a4dbb3b146bafca2334bf0f5d647734c3e0fe54268b12224b6c4192f01ea21"></a>
+
+## DGX 학습 — 본학습·최종 평가 완료
+
+| 항목 | 실제 확인 | 남은 조건 |
+|---|---|---|
+| 본학습 | **4,348/4,348단계·1epoch 완료**,11/2 21:09:48 progress·21:09:51 controller completed | 같은 Qwen3.6-35B-A3B·train8,695건. 모델 성능 향상 판정과 구분 |
+| 최종 평가 | 고정 validation176건·`eval_loss=0.31751391291618347`,393.726초.03:50 현재 파일/기록 대조 | 테스트176건의 독립 SOC 품질 점수는 아직 측정하지 않음. 손실을 정확도 점수로 환산하지 않음 |
+| 계보·가중치 | 원본/현재 source·data각54파일·동일 학습수학·원controlSHA 유지. 최종 adapter7파일·run_manifest SHA를03:50 직접 재검사해21:09 완료 영수증과 일치 | 가중치 다운로드/커밋/Git LFS0. 최종 adapter약65MB는DGX 승인 경로에 유지 |
+| 종료 | 학습 MainPID0·Resultsuccess·inactive·자기컨테이너0. follow completed/finished_early_without_waiting_for_deadline | 원래21:45 상한을 기다리지 않고 종료. 진행률 정기 조회 대상은 종료 |
+| 운영 | Thor와 두 봇은 기존 원본35B 유지 | 미사용 SOC 평가·중요누락/승인/허위성공/도구·지연 비교, 변환·Thor 후보 적재·복구 검증 뒤 교체 판단 |
+
+Git 승인 대기 동안 Codex가 매시간 조회한 것으로 표시하지 않는다. 완료 시각은 서버 기록이며03:49~03:50 현재 읽기·해시로 재확인했다. [완료·파일별SHA 원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [실행 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json) · [자동 계승](finetuning/OPERATOR_FOLLOW_20261102.json).
+
+
+
+<a id="source-90c4d26dcf79ca0b-h6"></a>
+<a id="record-656763e188190985cc70565defdfcfce2efe29f22aaa246f3f5cca948c3e38b5"></a>
+
+## 시연·관제와 잔여 과제
+
+| 과제 | 완료 근거·현재 상태 | 남은 작업 |
+|---|---|---|
+| 기존 Kali17스크립트 | 11/2 VM 내부 제한 실행·원본17SHA 유지. SQLi/명령삽입/외부리다이렉트 악용 재현, 인증401·CSRF 거절 등 분리 | Nuclei템플릿 경로/표본0/로그인 오판·BlindSQLi·전체스캔 미완료. Log4Shell RCE 미시험 |
+| 과거 실차단 | 12:49 LLM/MCP→A233 DROP, 승인KEEP 기한 후13:50 만료·재접속/13:51 임시 실행기 정리 | 새 Native/On 정책의 실제 차단·카드·만료와 별도 결과 |
+| 반복 복구 알림 | 13:47 A/B에 진단 ID 중복 집계 방지·독립2실패/2성공·오류 종류 보존 배포. 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector guard 지연/수집 중단 구간 전체 무손실 미검증 |
+| 모델·하네스 | 기존224step 후보와 원본 비교는 표본 작고 치명 오류가 남아 운영 교체 보류 | 본학습·최종validation완료. 다음은 미사용 평가, 누락/승인/허위성공/지연, 원본/학습본 × 기존/정리 하네스 비교·Thor 후보 검증 |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙/제외/문서 반영 | 기존 약7.7GB 일괄 압축 이전·전멤버 SHA/복원 검증 미실행. 진행 학습 입력 보존 |
+| 논문·발표 | 기존 출처·실험 근거 보존.11/3 교수 시연 준비,12/1 최종 목표 활성 | 논문 초안 구성도·독립 평가·실전 검증 근거/한계 현행화. **발표 작성은11월둘째주 리마인더 이후** |
+
+[자료 보관/복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 시점의 스냅샷이며 이번On/Native 정책 검증 결과와 구분한다. 다른 작업의 topology 생성물5개는 수정·추적하지 않는다.
+
+Google Harness² 운영 연동/전후 비교, SSL VPN·모바일 푸시, GPU 드라이버 실패 근본원인/후보 장기 안정성, 새 서버 전체 설치는 기존 미완료·보류를 유지한다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율은 확인할 수 없다. 전체 목표는 완료되지 않았다.
+
+Kali 시험 실행기는710초 제한으로 종료됐고,16:45 카드 승인 해제 후 SSH 재접속·임시worker.py/log/pid 제거·원본17SHA 불변을 확인했다. probe79행과 원본SHA만 보존한다. Mac에는 패키지를 설치/다운로드하지 않았다.
+
+
+
+<a id="source-90c4d26dcf79ca0b-h7"></a>
+<a id="record-fdcad8aee017c19a72d9e94cfac312393534788b6667592420df48cf93dcbef1"></a>
+
+## Git 반영
+
+WAF 원본·전용 프록시·자동조사 보완과11/2 19:09 학습 관측은 `9579cfbc`로 커밋·푸시했고11/3 03:49:03 원격main 일치를 확인했다. 본학습 완료·최종 파일SHA와후속보고시간초과 기록은 `28160334`로 후속 커밋·푸시했고11/3 03:53:42 원격main 일치를 확인했다. 이 게시 확인 문구도 마지막 문서 커밋에 반영한다. 다른 작업의 topology5파일은 기존 stage를 보존했다. 가중치·데이터·자격·대화/검증·업무분담·발표/논문 자료는 Git 제외다.
+
+서버의 이번 임시 격리시험 소스와 Kali 임시 실행기는 정리했고 운영 복구본·probe·실제 trace/DB는 보존했다. Mac 신규 패키지/가중치 반입0이며 작업 임시 스크립트·로그는 마지막 게시 확인 뒤 제거하고, 최종 삭제·Git SHA·원격 일치·기존 topology stage 보존 결과는 로컬 세션 기록에 남긴다.
+
+
+</details>
+
+<a id="source-abd0a2a95c94e7a9"></a>
+
+## STATUS-20261102-before-waf-evidence.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-02T19:15:12+09:00</summary>
+
+<a id="source-abd0a2a95c94e7a9-h0"></a>
+<a id="source-abd0a2a95c94e7a9-h1"></a>
+<a id="record-2ce38bd6c4aa6682a3578809e0fbea081b665d8e1a6669d8b5b9a711ed685488"></a>
+
+# 과거 상태 — WAF 원본 연동 전 2026-11-02
+
+아래 내용은 16:47 일시정지 시점의 기록이며 현재 상태가 아니다. 최신은 [STATUS](../STATUS.md)를 따른다.
+
+# 인프라 현황 — 2026-11-02
+
+현재 상태와 활성 과제를 요약한다. [11/2 정책 전환 전 기록](STATUS_HISTORY.md#source-92b7392da582315c) · [11/1 이전 현황](STATUS_HISTORY.md#source-87368a0abd79b357) · [계획](PLAN.md). [이번 배포·시험 원장](infra/mcp/containment-policy-20261102.json). 시각은 KST이며 관측 범위와 미완료를 구분한다.
+
+
+
+<a id="source-abd0a2a95c94e7a9-h2"></a>
+<a id="record-c0ee24c55ce2a8ea7ee1a1569cfe5b7675d7962ce2a584c3f3093c0595adab97"></a>
+
+## 현재 운영 정책과 검증
+
+| 항목 | 현재 확인 | 한계·다음 확인 |
+|---|---|---|
+| WAF | **15:28:35 SecRuleEngine On 반영**, 같은 컨테이너·bind inode 유지, nginx 검사/reload·일반 DVWA302/Log4Shell308 | 15:46:59 Kali 단일 공격403·is_interrupted=true·engine=Enabled·941100/949110 확인. 기존 Env DetectionOnly는 기동 당시 값이며 고정된 후순위 include가On을 지정. compose/초기 설치 기본값도On |
+| IDS→FW | 지정100110/level9·severity1 Native AR가 실제 flow_id/SID를 대조하고 공통 임시차단 호출하도록 A 배포 | LLM 대기 없는 선차단은11/2 명시 승인 예외. 전체 IDS 경보·일반 Wazuh 경보를 대상에 포함하지 않음. Wazuh flow_id 소수점0 문자열과 고정 프로그램 상대 경로 호환을 수정·15:53 반영. **15:53:31 Native 실제 차단·카드 게시 성공**, 관리자 유지 승인15:53:50·결정1회소비·실제FW 80/443 DROP·유지 결과 게시 확인. 이후16:44 별도 unblock 카드 승인으로 조기 해제·16:45 커널 부재/원기록released 확인. 이번 요청의 자연 만료 시험과 구분 |
+| 공통 임시차단 | 최근5분 양방향 ingress TCP 공격 흐름1개·severity1/2·공격 분류·보호 주소·소유권 검증 | 모델측 추가 선조회·3흐름 조건 제거. WAF 원본 경보만으로 FW IP 임시차단하는 기능은 미구현 |
+| 유지·해제 | 최초10분, **기존 관리자 카드**의 유지 승인 시 결정 시각부터60분, 카드 해제 승인 또는 만료. 중복 호출/채팅/봇 합의로 연장하지 않음 | 차단 기한 종료 후 재차단 대기60초. 이전 기록도 같은 간격을 적용하되 과거 서명 계획은 덮어쓰지 않음 |
+| 내부망·실습 | 내부 IP·승인 실습이라는 사실로 자동 면제하지 않음. Kali233은 보호 목록에 추가하지 않음 | 명시적 관리·서비스 보호 주소와 일반 sudo/Docker 위임 금지 유지 |
+| 두 봇 | 공통 단문 차단 목록 조회와 실제 영수증 표시 보완. **16:29:43 B1.19.9/계약1.5.13 배포·연결 검증 완료** | 현재 처리 중 요청이 끝난 뒤 독립 배포·복구 타이머 사용. 실제 Mattermost 새 게시/UI 왕복은 별도 |
+| DVWA 접속 장애 | **15:43:02 C의 주입된 무기한 ping만TERM 종료**, PHP 세션 잠금 해제·Apache master 유지 | Kali HTTP302/login200·IP차단0 확인. 사용자 기존 로그인 세션의 잠금0 확인. 브라우저 재접속은 이후 명시 KEEP 차단과 구분. HTTPS는 vhost 미등록/자체서명 기본서버로 별도 미지원 |
+
+검사: MCP495PASS·Ollama163PASS·Hermes380 중378PASS/2환경skip·설치36+16+1PASS. B 격리431PASS·A 격리434PASS와 임시 검사본 제거를 확인했다. 정적/격리 검사는 실제 공격·새 서버 전체 설치를 대신하지 않는다. A root 복구본과 SHA/CAS·독립 복구 타이머를 보존했다. 추가 패키지·이미지·포트·키0. 설치는 기존 루트 `deploy.sh` 경로에 같은 소스를 반영한다.
+
+[차단/카드 기준](infra/mcp/approved-operations.md) · [Native 경계](infra/mcp/native-containment-ar.md) · [공통 하네스](infra/hermes/chat-harness.md) · [보고 근거 검사](infra/hermes/event-report-grounding.md).
+
+
+
+<a id="source-abd0a2a95c94e7a9-h3"></a>
+<a id="record-30cf2c609784266e537c7621a26ba14e611f094adbe38b6d2ec76019d807e49d"></a>
+
+## review 차단 해제 — 현재 작업 마무리
+
+기존 `unblock_ip`에는 카드 승인/일회 소비/해제가 이미 구현돼 있었으나 Hermes review lead의 관리 실행 경로에서 제외돼 있었다. 별도 비동기 해제 MCP 추가안은 사용자 지시로 철회했고 배포하지 않았다. **기존 도구만** lead에 노출하고 자동 관리·peer/verify는 계속 차단한다. Ollama의 기존 직접 태그 lead 권한은 유지한다.
+
+- B12파일 root복구본/CAS·독립복구타이머·유휴확인 후16:29:43 반영, 두 봇 인증 heartbeat·공동채널·파일SHA 확인. 승인 브로커 소스/서비스는 변경하지 않았다.
+- 관리179PASS·root해제 소유권4PASS·Response 승인7PASS·MCP495PASS·review37PASS·native380 중378PASS/2skip·Ollama163PASS·설치36PASS·독립 source bundle1PASS. 실제 `UNBLOCKED` 텍스트 처리와 이후 IP 부재 재조회가 없으면 완료 금지 경계를 추가했다.
+- 기존600초 카드 대기를 실행기가 먼저 끊지 않도록 review lead 한도만 정렬했다. MCP/API/패키지/포트/모델 추가0.
+- 기존 사용자의 review 해제 요청으로 실제 list_blocks→unblock_ip→기존 해제 카드 게시·승인/일회소비를 확인했다. 첫 실행은 root helper가 response: 이외의 contain: 소유권을 거절해 물리 해제 실패. A helper를16:40:51 기존 도구 승인 뒤 정확 parent ID/IP/기한/소유권을 대조해 해제하고 원기록을released로 갱신하도록 수정했다. 알 수 없는 다른 소유권은 유지하며 일반 보호검사는 그대로다. 잘못된 보호주소 단정 대신 고정 reason_code를 반환한다. **최종판은 실제 list_blocks→unblock_ip→카드 승인/일회 소비→UNBLOCKED→list_blocks 성공**, 관리 실행completed로16:45:07 종료했다. A 커널0건·원기록released·Kali SSH 재접속을16:45 확인했다. 새 MCP/API·사용자 질문 게시·Codex 승인 클릭0.
+
+
+
+
+[이미 보존한 동일 내용으로 이동](#record-8390c076be4b372d885a6afda10139661cfdb964b8f133698f2b056b3771ea96)
+
+<a id="source-abd0a2a95c94e7a9-h5"></a>
+<a id="record-2f2e765aa2b58453e04a0eba136b2d2033e1851c7c2b617bbd7001ef72c94e7a"></a>
+
+## DGX 학습 — 마지막 관측15:58 KST
+
+| 항목 | 라이브 관측 | 남은 조건 |
+|---|---|---|
+| 본학습 | **3,550/4,348단계(81.6%)**, 같은35B·8,695건·1epoch. 3464 저장본에서9번째 재개, 새86단계 | 전체 학습·최종validation176건·가중치 검증 미완료 |
+| 생존 | 학습PID4098498/PPID1·v3 followPID444075/PPID1 생존, 현재 시도OOM/할당재시도0 | 시간초과 관측만으로 재시작하지 않음. 현재 실행 입력/프로세스/기한 불변 |
+| 종료/예상 | r6 soft17:15/hard17:30 유지. 순수 잔여 약4.1시간/20:01 추정, follow 대기 반영 제안22:12:40 | 실제 다음 창 계승은 미검증. 완료 보장·운영 교체 아님 |
+| 저장 | checkpoint3548/11파일 완료 marker 관측, 전체 가중치 SHA 재검사는 이번 조회에서 생략 | 마지막 전체 SHA 검사는10:56 checkpoint2500 |
+
+Codex 정기 조회·보고는1시간 간격이며 다음 정기 시각은16:58 KST였으나 **현재 작업 마무리 후 사용자 요청으로 일시정지**하므로 재지시 전 정기 조회를 수행하지 않는다. follow 내부60초 주기·공유 추론 우선·정상 저장 후 ETA 계승·완료 즉시 종료는 기존 정책을 유지한다. 기존운영 `qwen3.6:35b` 유지, 새 본학습 자동 승격0. [실행 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json) · [자동 계승](finetuning/OPERATOR_FOLLOW_20261102.json) · [준비/복구](finetuning/OPERATOR_PREPARATION.md).
+
+
+
+<a id="source-abd0a2a95c94e7a9-h6"></a>
+<a id="record-b23a4ce5544a48ba32000ac550b36819aafbea294c2a1471e87a8bec8890a9cd"></a>
+
+## 시연·관제와 잔여 과제
+
+| 과제 | 완료 근거·현재 상태 | 남은 작업 |
+|---|---|---|
+| 기존 Kali17스크립트 | 11/2 VM 내부 제한 실행·원본17SHA 유지. SQLi/명령삽입/외부리다이렉트 악용 재현, 인증401·CSRF 거절 등 분리 | Nuclei템플릿 경로/표본0/로그인 오판·BlindSQLi·전체스캔 미완료. Log4Shell RCE 미시험 |
+| 과거 실차단 | 12:49 LLM/MCP→A233 DROP, 승인KEEP 기한 후13:50 만료·재접속/13:51 임시 실행기 정리 | 새 Native/On 정책의 실제 차단·카드·만료와 별도 결과 |
+| 반복 복구 알림 | 13:47 A/B에 진단 ID 중복 집계 방지·독립2실패/2성공·오류 종류 보존 배포. 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector guard 지연/수집 중단 구간 전체 무손실 미검증 |
+| 모델·하네스 | 기존224step 후보와 원본 비교는 표본 작고 치명 오류가 남아 운영 교체 보류 | 본학습 완료 후 미사용 평가, 누락/승인/허위성공/지연, 원본/학습본 × 기존/정리 하네스 비교·Thor 후보 검증 |
+| 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙/제외/문서 반영 | 기존 약7.7GB 일괄 압축 이전·전멤버 SHA/복원 검증 미실행. 진행 학습 입력 보존 |
+| 논문·발표 | 기존 출처·실험 근거 보존.11/3 교수 시연 준비,12/1 최종 목표 활성 | 논문 초안 구성도·독립 평가·실전 검증 근거/한계 현행화. **발표 작성은11월둘째주 리마인더 이후** |
+
+[자료 보관/복원](datasets/STORAGE_POLICY.md) · [저장소 정리](archive/REPOSITORY_CLEANUP.md) · [토폴로지 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg). 도식은11/1 구성/11/2 배치 정리 시점의 스냅샷이며 이번On/Native 정책 검증 결과와 구분한다. 다른 작업의 topology 생성물5개는 수정·추적하지 않는다.
+
+Google Harness² 운영 연동/전후 비교, SSL VPN·모바일 푸시, GPU 드라이버 실패 근본원인/후보 장기 안정성, 새 서버 전체 설치는 기존 미완료·보류를 유지한다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율은 확인할 수 없다. 전체 목표는 완료되지 않았다.
+
+Kali 시험 실행기는710초 제한으로 종료됐고,16:45 카드 승인 해제 후 SSH 재접속·임시worker.py/log/pid 제거·원본17SHA 불변을 확인했다. probe79행과 원본SHA만 보존한다. Mac에는 패키지를 설치/다운로드하지 않았다.
+
+
+
+<a id="source-abd0a2a95c94e7a9-h7"></a>
+<a id="record-2ca4de350fa07774e6139a35dc0132e61bb78177ce75ab4baf97c0022379a901"></a>
+
+## Git 반영
+
+기존 unblock_ip 연결·Native 소유 해제 보완·실제 승인/해제/재조회를 `ce08d7d3`로 커밋/푸시하고 16:46 KST 원격main 일치를 확인했다. 이 게시 확인 문구도 후속 커밋/푸시한다. **현재 작업 완료 후 일시정지하며 재지시 전 추가 관측/작업을 하지 않는다.** 독립 DGX 학습은 유지한다.
+
+차단 정책·단문 조회·설치 경로·실제 검증·학습15:58 관측을 `32865ce`로 커밋·푸시했고16:01 KST 원격main 일치를 확인했다. 실제 게시 확인 시각은 로컬 검증 영수증을 따른다. 이 게시 확인 문구는 후속 문서 커밋으로 반영한다. 대화/검증·자격·업무분담·가중치·데이터·포스터는 제외한다. 다른 작업의 topology 생성물5개는 미추적 상태를 유지한다. 최종 SHA·원격 일치·작업 트리는 로컬 세션 기록과 최종 답변에 남긴다.
+
+
+</details>
+
+<a id="source-92b7392da582315c"></a>
+
+## STATUS-20261102-before-native-containment.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-02T16:01:27+09:00</summary>
+
+<a id="source-92b7392da582315c-h0"></a>
+<a id="source-92b7392da582315c-h1"></a>
+<a id="record-9a77f4ab6d8bdd152e4978e5f8237683e09327342fcf9b3c7d92224275437ccc"></a>
+
+# 11/2 정책 전환 전 현황 — 과거 기록
+
+아래는14:16 KST 게시 확인까지의 현황을 보존한 기록이다. 현재 상태는 [STATUS](../STATUS.md)를 따른다. 선조회·3흐름·DetectionOnly·1시간 재차단 대기 등은 이후 정책으로 바뀌었으며 당시 문구를 현재 지침으로 사용하지 않는다.
+
+# 인프라 현황 — 2026-11-02
+
+현재 상태와 남은 작업의 요약이다. 과거 기록은 [현황 이력](STATUS_HISTORY.md#source-87368a0abd79b357), 변경 전 계획은 [계획 이력](PLAN_HISTORY.md#source-b32ddb5c903faea1)에 보존했다. 아래 라이브 수치는 명시된 관측 시각의 결과다. 최신 DGX 관측은 **11/2 13:58 KST**다. r6는3144 저장본에서 재개해3219단계까지 진행했다. 기존17:30 기한과 실행 입력은 유지했다. 자동 조사 보고의 근거 검사와 A의 현재 Suricata 증거 읽기를 보완해 실제 차단을 확인했으며, 관리자 유지 승인 기한 후13:50~13:51 KST 차단 만료·Kali 재접속/임시 실행기 정리를 확인했다. 운영 토폴로지는11/1 21:53~21:55 KST 구성 근거를 유지하고11/2 요청에 따라 준비·학습 노드를 제외했다.
+
+
+
+<a id="source-92b7392da582315c-h2"></a>
+<a id="record-ebe6005e76690633059451272cbff711678eefe0c9d123e83b309932ec8f28d7"></a>
+
+## 현재 진행
+
+**조회·보고 간격:** 11/2 사용자 후속 지시로 Codex의 학습 상태 조회·보고를15분에서 **1시간**으로 변경했다. 13:58 정기 확인을 완료했고 다음 정기 조회는 **14:58 KST**다. DGX follow의60초 내부 확인·자동계승·완료감지는기존대로유지한다.
+
+**사용량 조건:** 남은 계정 사용량1%이하가 확인되면 목표 작업만 일시정지한다. 계정 잔여율은 확인 불가하며 1% 도달로 판단하지 않았다. **11/2 08:42 일시정지 후 10:00 KST 사용자가 목표를 재개**했다. 현재는 정기 읽기 조회·기록을 재개했으며, DGX 독립 학습과 기존 종료 기한을 유지한다. 학습 입력/프로세스는 유지한다. 10:37 ETA 자동 계승과 11:56 이후 Kali 실습 스크립트 시험은 별도 후속 지시로 진행한다.
+
+**11/2 후속 지시:** 기존 학습은 유지한다. 자동 연장 v2가 재개 준비 단계(tokenizing)에 숫자가 없어11:28 종료된 것을11:58 확인했다. 별도 v3만 배치해12:07 실제 생존·주기 갱신을 확인했다. 학습 r6 소스/입력/PID/기한은 불변이다. Kali 지정 폴더17개 스크립트의 VM 내부 시험과 서버 탐지/조사 기록 대조를 완료했다. 전체 시연 준비 완료는 아니며 아래 오류를 유지한다.
+
+| 항목 | 확인 상태 | 남은 조건 |
+|---|---|---|
+| DGX 본학습 | **13:58 KST 3,219/4,348단계(74.0%)**, 같은35B·8,695건·1epoch | 8번째 시도에서75단계. 전체 학습/최종검증 미완료 |
+| 독립 실행·자동 재개 | 학습 PID4098498/PPID1·service/timer/자기 컨테이너 active, 공유 모델0 | 공유 양보/자동 재개7회. 현재 시도 CUDA OOM/할당 재시도0 |
+| 저장·종료 | checkpoint3216 완료 marker/11파일, 전체SHA 재검사 생략 | 마지막 직접 전체해시는10:56 checkpoint2500. r6 soft17:15/hard17:30 KST 유지 |
+| 예상 시간 | 현재 시도 평균17.94초, 순수 잔여 약5.6시간, 순수 종료 19:36 KST | 공유 대기/재적재/평가 제외, 완료 보장 아님 |
+| 자동 기한 계승 | v3 PID444075/PPID1 active·주기 갱신, 준비 단계 오류 보완 | 제안 새 창 약22:27 KST, 실제 계승 때 재계산. 실제 GPU 기한 계승/전체 완료 미검증 |
+| 운영 모델 | 기존 `qwen3.6:35b` 유지. 다른 기본 모델 학습 실험 보류 | 새 학습본 자동 운영 승격 없음 |
+| 기존 후보 비교 | 11/1 앞선224step 후보: 읽기6/7, 격리판단6/8. 동일HF 미학습군도6/8 | 승인 경계/설정값 치명 오류2건·표본 부족으로 학습 우위 미확정, 운영 교체 보류 |
+
+실행 설정·제어: [11/2 연장 원장](../finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json), [11/1 원실행 원장](../finetuning/OPERATOR_TRAINING_RUN_20261101.json), [준비·재개·중지 절차](../finetuning/OPERATOR_PREPARATION.md). 기본 설치 창12시간은 유지하며,이번 명시 연장에 한해 `--reviewed-window-hours 24`를 사용했다. 기존 실행/동결 입력을 덮어쓰지 않고 새 실행으로 이어받았다. 로컬42·DGX32검사,실제CPU checkpoint재개검증 성공. 운영 추론/다른 서비스는 변경하지 않았다.
+
+[자동 계승 정책·반입·중지/복구](../finetuning/DGX_FOLLOW.md) · [적용 원장](../finetuning/OPERATOR_FOLLOW_20261102.json). 로컬17·DGX격리17검사와 실제 설치/주기 갱신·기존54입력 해시를 확인했다. 추가 패키지0·운영 모델 변경0. 완료 시 학습과 해당 타이머/관찰기만 종료하며 공유 Ollama/서버는 유지한다.
+
+**Google Harness² 구분:** 10/22에는 공식 자료·연동 가능성·복구 방안을 검토했으며 설치·운영 적용은 하지 않았다. 11/2 배포 소스·기록 재대조에서도 실제 연동 및 적용 전후 비교 완료 근거가 없다. 현재 두 봇의 [자체 공통 하네스](../infra/hermes/chat-harness.md) 보완·비교와 별개다. [Google Research 공식 저장소](https://github.com/google-research/harness2) · [기존 미완료 평가 항목](../infra/추가검증_계획_2026-10-23.md). 이번에는 운영 서버 패키지·프로세스의 Harness² 전수 검사를 수행하지 않았다.
+
+**Harness² 효과 예측:** 공식 실험 절차는 기준 실행·후보 생성/시험·합성을 추가하므로 매 채팅 요청에 그대로 적용하면 지연·연산이 늘 수 있다. 단문 의도·도구 선택·누락 방지 지침 개선 가능성은 있지만 우리 Qwen/SOC에서의 향상 수치는 미측정이다. 별도 환경에서 후보를 개선하고 미사용 문제로 검증한 고정 하네스만 운영 반영하는 방향을 우선 검토한다. 승인·권한 경계는 최적화 대상에서 제외하며 실제 도입은 아직 하지 않았다. [공식 실험 절차](https://github.com/google-research/harness2/blob/main/docs/EXPERIMENTS.md).
+
+**현재 학습의 과적합:** 판정 미완료다. 준비 기록상1epoch·exact 중복/평가 겹침0이나 의미상 중복은 완전히 배제하지 못했다. CRS/Wazuh 대화59.52%, 명시적 도구 대화0.47%(입력 토큰약1.93%)로 업무 분포 편향도 별도 위험이다. 현재 실행은 최종 평가 방식이며10:20관측에서 평가 결과가 없다. [근거·한계와 완료 후 평가](../finetuning/OPERATOR_PREPARATION.md#112-과적합일반화-위험-검토)를 기록했고 현재 학습·하네스·운영 모델은 변경하지 않았다.
+
+
+
+<a id="source-92b7392da582315c-h3"></a>
+<a id="record-e5dcdfa6e9841bcbea797af0d92ef31c6745277a6ba50c1621dfbcac168b29db"></a>
+
+## 완료한 구현·검증과 범위
+
+| 구분 | 완료 근거 | 완료로 확대하지 않는 범위 |
+|---|---|---|
+| 학습 준비 | 토큰 잘림0, 별도 평가176+176+31 분리, GPU2step/4역전파·검증8건 성공, CUDA OOM/할당 재시도0 | 본학습 전체 완료·실전 정확도 향상 |
+| 학습 제어 | 로컬777검사 중774PASS/3Mac환경skip, 격리DGX20PASS, 전송56파일 SHA 일치 | 실제 공유 중단 강제 시험·전체 새 서버 설치 |
+| FW·보안 규칙 조회 | FW 읽기 도구와 WAF/IDS/Wazuh 전체·상관 조건 조회 반영. 현행 학습 도구 계약41개 | 모든 규칙의 실제 공격 탐지·차단 성공 |
+| 단문·후속 문맥·개별 룰 표 | 11/1 담당 봇/대상 상속, Hermes 표 경계, 상세 근거 기반 표 보완. 실제 WAF20행 대조 | 새 Mattermost UI 왕복 전체·모든 조사 질문의 정확성 |
+| 관제·호스트 보완 | 진단/상태 조회와 승인형 조치, 저장공간 오류 계측·Vector 복구 등의 구현/운영 근거 보존 | 과거 수집 구간 전체 무손실·모든 장애/실대응 E2E |
+
+구현별 근거: [룰 조회](../infra/mcp/security-rule-inventory.md), [표·문맥](../infra/hermes/rule-table-format.md), [호스트 조치](../infra/mcp/host-service-actions.md), [실제 관제/복구 기록](STATUS_HISTORY.md#source-87368a0abd79b357). LLM이 조사·판단·변경안 작성·승인 요청·사후 확인을 주도하고, 보호 변경은 정확 후보 승인과 MCP 경계를 유지한다.
+
+
+
+<a id="source-92b7392da582315c-h4"></a>
+<a id="record-bd1ed2f51b05d732bb1b7ff14e1e585ae0f477c3fe7b2359dbcca9d0aa036bb7"></a>
+
+## Kali 실습 시험 — 11/2 12:14 KST 정리
+
+사용자 지정VM `192.168.16.233`의 `New_attack_files` 원본17개를 전부 검토했다. 공격은 Kali VM 내부에서 실행했고 Mac은 SSH 제어/증거 조회만 했다. 원본 SHA17개 불변, 신규 패키지0, 실행 도구/시험량 제한·격리 로그를 사용했다. Log4Shell 전용 스크립트는 이 폴더에 없어 웹 도달성만 확인했다.
+
+| 확인 범위 | 결과 | 남은 문제 |
+|---|---|---|
+| SSH/실행 준비 | A경유 접속, --help17/17,16개 제한 실행+API1개 보완 시험 | 원본 그대로 전부 성공한 것은 아님 |
+| 공격 재현 | SQLi·명령삽입(www-data)·외부 리다이렉트 확인, 경로/CSP헤더 조회 | Blind SQLi 재현 미확정, 전포트/전체스캔 시간 상한 미완료 |
+| 시험 스크립트 | Nuclei4개 템플릿 경로 실패·표본0 판정·로그인/권한 허위양성 재현 | 도구rc전파·로그인/응답검증·세션ID POST/쿠키 수집·HTTPS 지원 보완 필요 |
+| API 보완 | Kali HTTPS 어댑터로 Mattermost 인증401/401/200, 세션logout200 | MCP API/전체 rate limit 미검증 |
+| 탐지/자동 조사 | WAF/Suricata→Wazuh 실제 경보, Hermes MCP조회·자동보고 전달 기록 | 후속 실제 차단은 아래 별도 결과. 모든 대기사건 처리·차단 해제 E2E 미완료 |
+| 보고 정확성 | 실제 보고의 UTC/KST 오표기, reload와모드변경 혼동, DetectionOnly 피해방지 주장 모순 발견 | 아래 근거 검사 보완·배포 완료. 모델 지연·최종 보고 및 최종 게이트 이후 E2E는 남음 |
+
+실제 원문/17개별표/실행 조건·해시는 로컬 검증 기록에 보존하며 Git에는 이 요약만 둔다. Kali 임시 실행기/단어목록 제거·원본/시험로그 보존·자식 실행 종료를 확인했다. 이번 시험은 공격·탐지 흐름 확인이며 장비 전체 탐지율·LLM 정확도 개선·새서버 전체 설치 성공으로 확대하지 않는다.
+
+
+
+<a id="source-92b7392da582315c-h5"></a>
+<a id="record-2f6e860c608b0b06a2800c6aadd2ecf5ee3096069f1cbafd94523ba21e64eb95"></a>
+
+## 공격 성공·실패 구분 — 11/2 실측 재분류
+
+공격자 관점의 악용 성공, 서버가 거절한 요청, 시험 도구 실패를 분리한다. 아래는 기존 Kali 시험 근거를 재분류했으며 새 공격을 추가 실행한 결과가 아니다.
+
+| 분류 | 시험 | 근거·범위 |
+|---|---|---|
+| 악용 재현3종 | SQL 삽입·명령 삽입·외부 리다이렉트 | UNION/time-based SQLi 확인(덤프 없음), 응답의 www-data 실행 결과, 외부 지정 주소의302 Location(추적 없음) |
+| 공격 미성공·거절 | CSRF high·API 인증 | 비밀번호 전후 동일, 미인증/틀린 인증401 및 정상 인증200. API는 HTTPS 보완 시험이며 무차별 대입 전체 방어가 아님 |
+| 도구 실패4종 | 반사/저장 XSS·파일 포함·파일 업로드 | Nuclei 템플릿 경로 오류로 검증 못 함. 보안장비 차단 성공으로 집계하지 않음 |
+| 미확정/허위 양성 | Blind SQLi·로그인·접근 권한·세션 ID | 도구가 후보 철회, 틀린 비밀번호/로그인 리다이렉트를 성공으로 오판, 쿠키 표본0 |
+| 관측/미완료 | 경로 탐색·CSP·포트/전체 스캔 | 경로와 응답 헤더만 확인, 전범위 스캔은 시간 상한. 실제 침해 성공/차단율로 환산하지 않음 |
+| 별도 FW 실차단 | Kali233의 이후 통신 | 12:49 LLM/MCP 차단 후 커널443 SYN DROP 확인. 초기 악용3종이 소급 방어된 것은 아님 |
+
+Log4Shell은 웹 도달성만 확인했으며 RCE 성공/실패는 시험하지 않았다. 상세17개 표·원시 근거는 로컬 검증 기록에 보존한다.
+
+
+
+<a id="source-92b7392da582315c-h6"></a>
+<a id="record-2aef81bdb771d657ca01e85233fe4bb96238a5b3e74cfecf367f3c9ff5d2c255"></a>
+
+## 자동 보고 보완·실제 차단 — 11/2 13:00 KST까지 확인
+
+| 구분 | 실제 완료 | 남은 문제·범위 |
+|---|---|---|
+| 보고 근거 검사 | 날짜 없는 UTC/KST 오표기, reload와 WAF 모드변경 혼동, DetectionOnly 피해방지 단정, 미호출 도구 인용·판정 스키마 검사. 실제 성공한 실행 영수증은 인용 허용 | 정정 실패 시 미확인 보고. LLM의 정확 답변·조사 완료를 보장하지 않음 |
+| 배포 | B 자동 조사 controller와 내장 gate 최종12:57 반영, A managed Suricata reader 최종12:51 반영. 원본 백업·CAS·구문 검사 | 후속14:03 일반 채팅 Hermes/Ollama도1.19.5 적용 완료. 실제 질문/UI 왕복·최종 선조회 gate 공격 E2E는 별도 |
+| 차단 근거 읽기 | 회전 state의 과거 boot ID로 유효 증거까지 거절되던 문제 수정. 현재 PID/cgroup·실행파일·UID·설정 SHA·쓰기 FD inode를 읽기 전후 확인 | 센서 상태/로그/설정·보호 주소·기존 TTL 기준 유지. 일반 권한 확대 없음 |
+| 실제 차단 | Kali 내부의 제한된3개 공격 패턴 흐름→LLM MCP 호출→A 증거 검증→233 차단. 12:50 A 커널에서443 SYN DROP·44패킷/2640바이트 확인 | 첫 성공 실행은 모델이 센서 조회보다 차단을 먼저 요청했음. 이를 막는 같은 실행 내 선조회 gate를 추가·배포했으나 그 최종판의 신규 차단 E2E는 미실행 |
+| 유지·해제 | 별도 관리자 KEEP 기한 **13:49:41 KST** 후13:50 A agent_block 비어 있음·Kali SSH 재접속,13:51 자체 worker2개 종료/임시6파일 제거·probe188행/원본17SHA 보존 | 유지 갱신/강제 해제0. Kali TCP443 양쪽 연결·Log4Shell HTTPS200. DVWA는 자가서명 인증서 검증 실패로 HTTPS 정상 완료는 확인 못 함 |
+| 회귀 검증 | 관리170PASS, 조회376PASS/2skip, Ollama156PASS, 설치35PASS. reader/containment 로컬77PASS·A격리77PASS | 새 서버 전체 설치·두 봇 채팅 UI 왕복 검증을 대신하지 않음 |
+| 실제 모델 지연 | 처음 두 실행은 각214초 제한 종료. 차단 성공 실행172초, 후속 차단 상태 읽기147초 | 성공 차단 실행의 최종 보고는 미확인 처리. 전반적 응답 지연과 보고 완결성 미해결 |
+
+**Kali 반복 시험 정책:** 11/2 후속 지시대로233을 차단 예외로 추가하지 않고 실제 차단 가능한 설정을 유지한다. 센서 근거→LLM 판단→MCP→보호 주소/TTL/승인 검증 경로를 사용하며, 단발 시험 종료를 이유로 이 경로를 되돌리지 않는다. 13:20 KST 읽기로233의 never_block 비포함·agent_block 포함과 실제 DROP284건/17,040바이트를 재확인했다. 13:50에는 승인 기한 만료로 agent_block이 비었고233의 never_block 비포함·실차단 규칙은 유지됐다. 개별 차단 만료와 차단 기능 유지가 별개다.
+
+[보고 근거 경계](../infra/hermes/event-report-grounding.md) · [차단 센서 증거/복구](../infra/mcp/native-containment-ar.md) · [승인형 작업](../infra/mcp/approved-operations.md). 새 Mac/서버 패키지 설치0, 이번 증분 배포가 수행한 서비스 재시작0. 별도로 발생한 Vector 시작 지연은 아래 감시 조사에 구분한다. 실제 상세 영수증·실패 출력은 로컬 검증 기록에 보존한다. 이번 증거 읽기/보고 gate 보완은 단일 설치기의 기존 소스 반입 경로에도 반영했으며 초기 설치기로 운영 서버를 덮어쓰지 않았다.
+
+
+
+<a id="source-92b7392da582315c-h7"></a>
+<a id="record-1eeef3e1fd8fe4befcf4366e2c35ee3c274e312de2f13c331f93dd07a97bc0a9"></a>
+
+## 일반 채팅 근거 검사 운영 동기화 — 11/2 14:03 KST
+
+| 작업 | 실제 확인 | 한계·남은 검증 |
+|---|---|---|
+| 배포 | Hermes 플러그인3파일·Ollama2파일을1.19.5로 정렬, Ollama 소스 영수증 갱신. 기타 공통 하네스/모델/권한 동일 | 기존 자동 조사 내장 검사와 일반 채팅 배포 완료 범위를 구분 |
+| 안전한 교체 | 진행 요청/lease/대기열0·자동 조사 잠금 확보 후 root 백업/CAS. 독립 실행으로 교체·연결 확인,180초 복구 타이머 준비 | 14:02:50~14:03:29 관리 타이머 일시 보류와 두 봇·공동 채널 재시작. 중단 중 모든 채팅 재수신을 보장하는 시험은 아님 |
+| 실행 확인 | B 격리57PASS(시각17·조회 정정15·사건 근거25), 임시 검사본 제거. 새 Hermes PID162의1.19.5 훅 등록·Ollama 비특권 import/pin·잘못된 KST 거절 확인 | 이전 로컬 전체 회귀와 별도 서버 부분 회귀. 전체 새 서버 설치·보호 변경 회귀를 대체하지 않음 |
+| 연결·복구 | 새 두 프로세스의 WebSocket 인증/worker·공동채널 대기0·관리 timer 복귀, 복구본 보존·실제 롤백0 | Mattermost 게시/UI·중단 중 메시지 재수신은 별도 검증 |
+| 새 단문 읽기 | 14:08~14:10 공동채널 실제 실행기에 새 요청 ID로 “지금 FW 차단 목록만 보여줘” 시험. Hermes35.58초·list_blocks 성공1회·현재0건 응답 | 보호 작업0·채팅 게시0. 실제 실행기/모델/MCP 시험이며 화면 왕복은 아님 |
+| 남은 단문 오류 | Ollama55.54초·모델2회·실제 조회0회, 근거 검사에서 partial/미확인으로 종료 | 공통 하네스가 이 문장을 전용 조회 범위로 좁히지 못해 읽기 도구32개 노출. 단문 차단 목록 조회 범위와 증거 표시 보완 후 양봇 재시험 필요. 조회 성공·속도 개선으로 표시하지 않음 |
+
+
+
+<a id="source-92b7392da582315c-h8"></a>
+<a id="record-0368c39c5461d2e91441a3a26ebd6dd2ba36817b2f54f31d08400c4d82d07d7b"></a>
+
+## 반복 장애/복구 알림 조사 — 11/2 13:25~13:29 KST 읽기
+
+| 항목 | 확인한 사실 | 해석·남은 작업 |
+|---|---|---|
+| 알림 출처 | A 독립 감시 outbox와 soc-alerts-agent 실제 게시 #212~223 대조. 각 전송시도1회, 미전송 대기0 | 관측 구간의 반복은 동일 메시지 재전송이 아니라 상태 변화 |
+| `b:llm` | 12:18~13:03 이상4회·복구4회. 진단은3분 간격/4토큰/35초 제한이며 실패 주변 실제 실행시간35.18초 패턴. B의 진단·두 봇은 같은 Thor 연결 사용 | 시간 초과 패턴이나 과거 실패의 예외 종류는 저장하지 않아 정확 원인 미확정. 같은 진단 결과를1분 감시가2번 읽어도 장애가 되고 다음 성공1회에 복구되어 알림 빈도 증가 |
+| `a:vector`·`a:collection` | 12:41~12:42 시작 guard가 `existing_native_cursor_unsafe`, `new_generation_cursor_unsafe`, `old_writer_not_closed`로3회 보류.12:42:59 service 시작,12:43:02 Vector 실행 확인 | 실제 일시 수집 프로세스 중단·시작 지연. 보호 검사 무효화/체크포인트 강제 수정은 하지 않음. 해당 구간 무손실·시작 지연 재발 원인 확인은 남음 |
+| 현재 표본 | 13:25 A Vector/collection,13:26 B 모델 진단 정상·최근 소량 추론214ms. 채팅 연결도 정상 관측 | 전체 사건 처리·전체 로그 전달·일반 질문 지연의 정상 판정으로 확대하지 않음 |
+
+“복구”는 감시 지표가 정상으로 돌아온 뜻이며 LLM이 자동 수리했거나 서버가 재부팅되었다는 뜻이 아니다. 위 내용은13:29까지의 읽기 조사다. 후속 보완은 아래와 같으며 Vector 보호 검사는 유지했다. [감시 구조·복구](../infra/mcp/monitoring.md).
+
+| 후속 보완 | 완료 범위 | 검증·한계 |
+|---|---|---|
+| 독립 진단 집계 | 같은 모델 진단 ID의 반복 관측은1회로 계산. 독립2회 실패 후 이상·독립2회 성공 후 정상 재확인 | 개별 실패는 즉시 진단/journal에 남고 채팅 연속 판정은 약3~6분 이상 소요 가능. stale/API 연결 장애는 기존 감시 주기 유지 |
+| 실패 원인 | 시간 초과·접속/전송/HTTP/프로토콜/결과 형식 구분. 최근 실패를 성공 뒤에도 이력으로 보존 | 과거 원인 미기록 구간의 예외를 소급 복원한 것은 아님 |
+| 배포·복구 | 13:46~13:47 KST A/B 소스2개 CAS·root 백업·원자 교체. A SQLite online backup·추가 열/테이블로 기존 기록 보존 | 서비스 재시작/추가 패키지/포트/보호 정책 변경0. 기존 단일 설치기의 동일 소스 경로 반영 |
+| 회귀·실측 | 로컬76PASS·A/B 각69격리PASS. B 자연 진단13:47:36 성공206ms·실행 ID/원인/KST journal·collector 통과, A DB 이관·기존225건/미전송0 보존. 13:48→13:49의 서로 다른 observer 주기에서 같은 진단 ID·streak2 불변 확인 | 실제 장애를 새로 주입하거나 채팅 복구 알림을 인위적으로 발생시키지 않음. 장기 빈도 감소·Vector 재발 원인·전체 로그 무손실은 별도 검증 |
+
+
+
+
+<a id="source-92b7392da582315c-h9"></a>
+<a id="record-0251e8d801ea3d9b36051e10c202b9812f76c637968ceeca23a3a10f9886b725"></a>
+
+## 현재 토폴로지
+
+[기존 형태 상세형](../topology/토폴로지_상세.svg) · [버스형](../topology/토폴로지_버스.svg) · [관제·MCP·승인](../infra/diagrams/current-soc-flow.svg) · [조회 근거·Mermaid·한계](../infra/diagrams/README.md).
+
+| 갱신 | 확인·표시 범위 |
+|---|---|
+| 실제 배치 | B의Hermes/Ollama 봇→B:11435 제한SSH→A→Thor loopback:11434, 운영원본35B. 준비·학습 노드는 운영 도식에서 제외 |
+| 네트워크/웹 | A 외부/내부 주소·B/C의A기본경로, WAF DetectionOnly·passive IDS, 채팅 내부TLS·실습 관리 프록시 반영 |
+| 관제/승인 | 기존14:24 계약의MCP8서버/41도구, FW전체/상관조건 조회·정확후보승인·임시차단 별도 경계 표시 |
+| 형태 정정 | 사용자 지정 `topology/` 원본의 ESXi 상단A·중앙vSwitch·하단B/C 상세형과 SVC/vNIC·INT/EXT 버스형으로 교체. SVG2종·표준라이브러리 재생성 소스 유지 |
+| 화살표·배치 | 전체 선3px·화살촉16×16 고정. 공격자 과대 화살표 축소, Kali/Thor 상단 크기·기준선 정렬. 두 봇 공통선/짧은 분기·11개 운영 연결 보존, 버스 비연결 교차16px 틈/연결점 분리. 후속 요청으로 대각선·곡선 제거, Thor 외곽 우회 단축·Mattermost/Ollama 사이 직각 경로·NIC 문구 이동 |
+| 운영 범위·이름 | 11/2 Codex·로컬 Mac/DGX 및 학습 경로 제거. `토폴로지_상세`·`토폴로지_버스`로 SVG/PNG 이름 통일, 재생성 코드·문서·Mermaid 동기화 |
+| 도식 검증 | SVG 재생성 동일성·XML/링크·PNG 상세5200×3560/버스5060×2000·전체 테두리/글자/화살표 시각 확인. 과거 PNG3/Swift 보존 |
+
+토폴로지 작업은 도식과 관련 문서만 수정했다. 진행 중 학습 입력·제어기·종료 기한·운영 모델은 유지한다. 별도 자동 보고/차단 증거 읽기 배포는 위 표에 구분했다. DGX→Thor의 현재 본학습 승격과 자동 추론 분산은 완료로 표시하지 않는다.
+
+
+
+<a id="source-92b7392da582315c-h10"></a>
+<a id="record-146984ef860613385653b1146705bb99e96717ca32fd8fbb98d977910a6171ce"></a>
+
+## 저장소 정리·데이터 보관 규칙
+
+| 작업 | 반영 내용 | 검증·한계 |
+|---|---|---|
+| 현황/계획 정리 | STATUS4,211줄·PLAN1,815줄의 과거 본문을 별도 이력으로 이동 | 본문 보존, 이동한 상대 링크만 수정. 현재 요약과 과거 시점을 분리 |
+| 검증 JSON | 큰 결과2개에서 상세 표본759개를 로컬 보관본으로 분리 | 판정·오류·집계·조건·원 SHA 유지, 나머지 후보140개 유지 |
+| 벤치마크 | 원시 결과3개·생성 룰 후보6개 Git 추적 제거 | 입력·정답·점수·기존 원본 해시 유지 |
+| 토폴로지 | 재생성 가능한 PNG3개 추적 제거 | 참조 중인 대표 그림2개·생성 입력3개·Swift 소스 유지 |
+| 복구 | 변경 전 추적1,567파일/무손실 약9.18MB 백업 | 전체 복원·파일별 SHA 일치, 임시 복원 디렉터리 제거. Git 과거 이력도 유지 |
+| 데이터셋 규칙 | 전체 통합 `original.tar.gz` 1개 + `cleaned.tar.gz` 1개, 정제본 압축 반입 후 서버 검증·해제 | **규칙/제외/문서만 반영. 기존 약7.7GB 자료의 일괄 압축 이전은 미실행** |
+| Git 제외 | 자격·대화/검증·업무분담·포스터 전체·데이터/가중치 보존 규칙 유지 | 현재 main 도달 이력의 해당 로컬 전용 경로 없음. 로컬 사적 복구 ref는 원격main과 구분 |
+
+[정리·복원 방법](../archive/REPOSITORY_CLEANUP.md) · [변경 원장](../archive/REPOSITORY_CLEANUP_20261101.json) · [데이터 보관 규칙](../datasets/STORAGE_POLICY.md). 현재 추적 파일의 비밀정보 검사4후보는 함수 참조2/시험 상수2로 분류했다. 확인된 실제 토큰 노출0이며 모든 과거 내용의 비밀정보 부재를 보장하는 검사는 아니다.
+
+위 저장소 정리는 로컬 문서·생성물 작업이다. 운영 코드·서비스·설치 포트·프록시·모델·보안 정책 변경은 없고, 서버 재배포·실제 공격 E2E·새 서버 전체 설치는 수행하지 않았다. Git 과거 이력을 재작성하지 않아 과거 blob을 포함한 clone 용량이 즉시 줄어드는 것은 아니다.
+
+
+
+<a id="source-92b7392da582315c-h11"></a>
+<a id="record-27ad14e40730c9f86b7e292d3de00a2597b14030c334fb37e7065a6f5c619081"></a>
+
+## 남은 작업
+
+1. 현재 본학습과 follow의 정상 저장 종료→검증 checkpoint→ETA 새 창 자동 계승을 확인한다. 전체 학습·최종검증·완료 즉시 종료는 별도 확인한다.
+2. 동일 모델·하네스 조건에서 미사용 질문, 짧은 요청, 다단계 조사·상관분석, 중요 누락·승인형 쓰기·원복을 평가한다. 이후 복구 가능한 하네스 중복 정리의 효과를 별도로 비교한다(원본/학습본 × 기존/정리 하네스). 품질 통과 후 Thor 후보 적재·승격을 검토한다.
+3. 최종 선조회 gate 이후 차단 E2E, 일반 채팅1.19.5 적용 후 단문 차단 목록의 도구 선택/완료 검사 보완과 실제 채팅/UI 회귀, 보고 완결성/지연과 시험 스크립트 허위양성, Kali의 DVWA 자가서명 인증서 신뢰를 보완한다. 승인 기한 만료/재접속/이번 임시 실행기 정리는 완료했다. 실제 관제·장애·탐지→조사→승인→대응→사후 확인 E2E와 이전 수집 중단 구간을 확인한다. 하네스/도구 오류를 학습 성과로 대체하지 않는다.
+4. 기존 원본/정제/검증 자료를 분류하고 통합 압축2개의 생성·복원 검증을 별도 진행한다. 현재 학습 입력은 보존한다.
+5. 11/3 교수 시연은 확인된 관제 흐름과 두 봇 비교를 목표로 한다. 12/1 최종 목표와 논문 근거 정리를 유지하고, 발표 작성은11월둘째주 리마인더 이후다. VPN/모바일 푸시는 기존 보류 범위를 유지한다.
+6. 기존 논문 초안의 오래된 구성도 교체·시각 검수와 최신 독립 비교/실전 검증 결과·출처/재현 조건 반영이 남았다. 하네스 정리 비교와 함께 과거 이력에 남아 있던 미완료 항목을 활성 계획에 다시 명시했다. 이번에는 논문·발표 본문을 작성하거나 서버 작업을 추가 실행하지 않았다.
+
+
+
+<a id="source-92b7392da582315c-h12"></a>
+<a id="record-57dc7b6f4803f9200f7f9b74360f73adcbb91c923069f40ca9403d379b79cbcf"></a>
+
+## 이번 정리 검증
+
+복구1,567파일 SHA 일치·이력 본문 보존·JSON2개에서 표본 외 모든 값 동일·JSON 전체 파싱·새로 깨진 Markdown 대상0·제외 경로16개를 확인했다. 추적 파일은1,567→1,561개, 현재 파일 합계는약25.29→22.16MB(약3.12MB 감소)다. 문서·생성물 정리이므로 운영 코드 테스트나 서버 재배포로 대신 검증하지 않았다.
+
+
+
+<a id="source-92b7392da582315c-h13"></a>
+<a id="record-92b3efa57c014d129e6dbce714eafe676ed527b8257e0dfb54e6063e2f0b95fb"></a>
+
+## Git 반영
+
+일반 채팅1.19.5 운영 동기화·새 단문 시험 결과와13:58 학습 관측을 `b6ce3024`로 커밋·푸시하고14:16 KST 실제 원격main 일치를 확인했다. 문서 링크·JSON·진행 수치 정합성·변경분 검사도 통과했다. 이 게시 확인 문구는 별도 후속 커밋·푸시한다. 이전 게시 확인은 [과거 현황](STATUS_HISTORY.md#source-87368a0abd79b357)에 보존했다. 별도 작업의 topology 생성물은 수정·추적하지 않는다. 대화·검증·자격·업무분담은 로컬 전용이며 최종 SHA·원격 일치·작업 트리 상태는 로컬 기록에 남긴다.
+
+
+</details>
+
+<a id="source-87368a0abd79b357"></a>
+
+## STATUS-history-20261101.md
+
+<details>
+<summary>당시 기록 펼치기 · 2026-11-02T14:15:53+09:00</summary>
+
+<a id="source-87368a0abd79b357-h0"></a>
+<a id="record-657e86ff04c45c91b91022631353375e30bb229da083544287c12bd917c45d1d"></a>
+
 <!-- Historical snapshot: f9291ac6625fc5dc2a6535f17e124f9ffb604a13; link targets rebased only. Current state: ../STATUS.md -->
 
 # 인프라 현황 — 2026-11-01 현재 작업 상태
 
+
+
+<a id="source-87368a0abd79b357-h1"></a>
+<a id="record-eb4eac34599b72f797cdf63cae2e9c61df1042bd7e06a0cd699a71984cf7cc7a"></a>
+
 ## 포스터 전체 Git 제외 — 2026-11-01 16:12 KST
 
 사용자 요청에 따라 루트 `.gitignore`에 `/포스터/`를 추가했다. 폴더 자체와 모든 깊이의 하위 폴더·파일을 로컬 전용으로 유지한다. 기존 Git 추적 항목은0건이며 파일 삭제나 이동은 없다. 실제 파일 3개와 폴더·깊은 하위 경로·숨김 경로의 `git check-ignore`가 모두 통과했고 변경 diff도 정상이다. README에도 로컬 전용 범위를 명시했다. 공개 `.gitignore`·README·STATUS를 커밋·푸시한다. 서버/학습 실행 변경은 없으며 소스 테스트·서버 검증은 해당하지 않는다. 규칙·README·현황3파일을 `a08d16c`로 커밋·푸시하고 실제 원격main 일치를 확인했다. 이 게시 확인 문구도 후속 커밋·푸시하며 마지막 SHA·원격 일치·작업 트리 상태는 로컬 세션에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h2"></a>
+<a id="record-facb715f48ff75ea44e6f331df91a87b33101440dd178fdfa99aaf37542dee82"></a>
 
 ## 학습·검증·Thor 적재 예상 시간 — 2026-11-01 16:07 KST
 
@@ -18,6 +6416,11 @@
 | 현재 실행 상한 | **11/2 03:47:48 KST**,soft cutoff03:32:48 | 현 속도로는 이번 창 내 완료 어려움. 저장 후 종료하며 추가 실행 창 필요. 이번 조회로 기한 연장/모델 변경하지 않음 |
 
 라이브에서 controller/service/timer active·부모PID1·공유 모델0·현재 CUDA OOM/할당 재시도0을 확인했다. 체크포인트4의11파일 검증은16:03 관측이며 이번 조회에서 최신 체크포인트를 재검사한 것으로 표시하지 않는다. Mac 종료 후 독립 실행은 유지된다. 공개 준비·본학습·첫 체크포인트 기록의 최종 `050686c`를 실제 원격main과 대조해 일치를 확인했다. 이번 시간 추정·관측 갱신3파일은 `620d3a5`로 커밋·푸시하고 실제 원격main 일치를 확인했다. 당시 이 작업의 추적 파일 변경은 없었으며 작업 범위 밖의 미추적 `포스터/`가 나타나 그대로 보존했다. JSON/diff·신규 내용 자격값 일치0·로컬 전용 자료 제외 검사를 통과했다. Mac 작업 임시 디렉터리와 위치 표시는 제거 검증했고 검사 로그/정리 영수증은 로컬 기록에 보존했다. 서버의 실행 소스·자료·가중치·복구본은 유지한다. 이 게시·정리 확인은 후속 문서 커밋으로 반영하며 마지막 SHA/원격 일치는 로컬 세션에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h3"></a>
+<a id="record-802f04f74f7e5fcd7d0494174078cb631995d49cd6ca8f196da354ec9dcd4c24"></a>
 
 ## 본학습 시작·공유 추론 종료 후 자동 재개 — 2026-11-01 15:52 KST
 
@@ -44,6 +6447,11 @@
 **최종 실행·게시 확인(16:03 KST):** 본학습 **5/4,348단계**,완전한checkpoint4의11파일 SHA·data/base 일치를 확인했다. CUDA OOM/할당 재시도0,공유모델0,독립unit/timer active다. 현재Mac을꺼도실행/조건부재개가유지된다. 초기5단계로계산한남은시간은약20.8시간이지만표본이작아확정예상으로쓰지않으며,이번03:47상한내전체완료를보장하지않는다. 기한도달시저장후정지한다.
 
 공개15파일의 본학습 소스/설정/문서를 `66a03c1b4ce85e3140f2b7e303a157bc250fd2e4`로커밋·푸시하고실origin/main일치·당시Gitclean을확인했다. 전체777검사774PASS/3Mac환경skip,portableDGX20PASS,AST/JSON/diff·신규공개자격값일치0/로컬자료제외검사를통과했다. 이완료영수증과실제step/checkpoint갱신은후속커밋·푸시하며,마지막SHA/원격일치/작업트리/Mac임시정리는로컬기록과최종답변에남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h4"></a>
+<a id="record-f9802b35e16e26a95f3cab181a4eca6ef54639e379f9f56dae071c32614b5a32"></a>
 
 ## 관제 학습 자료 준비·공유 추론 종료 후 GPU 시험 실행 — 2026-11-01 15:23 KST
 
@@ -72,6 +6480,11 @@
 
 **게시 확인(15:31:55 KST):** 공개20파일을 `63479b63562ad475c4d36ae2ba6fcae7df0406f3`로 커밋·푸시하고 실제 origin/main 일치·당시 Git clean을 확인했다. 775검사(772PASS/3환경skip), 반입 묶음30검사, AST/JSON/diff·추가 공개 내용의 자격값 일치0·로컬전용 제외를 확인했다. 공개 경로의 로그인 계정은 ACCOUNT로 표기하고 정확한 경로는 로컬 영수증에 보존한다. 이 게시 확인과 이후 시험 상태는 후속 커밋·푸시하며 마지막 SHA/원격 일치·임시 정리는 로컬 세션과 최종 답변에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h5"></a>
+<a id="record-6a70e2ba2ed5b63f21b7714f95d24135ef53d999d874cd1a0a6f480fd2072fd5"></a>
+
 ## 학습 실행 위치 정정·준비 검사 — 2026-11-01 14:34 KST
 
 사용자의 마지막 정정은 **“학습이랑 적재만 GPU 서버에서”**다. 수집·정제·자료 검수·학습 대화 작성은 로컬에서 수행하고, DGX는 학습과 실행 검증·가중치 산출, Thor는 검증한 가중치 적재·추론을 맡는다. AGENTS와 실행/자료 검수 문서에 이 기준을 명시했다. 이전 원자료 후보 반입 기록은 보존하며 GPU 서버 정제 작업으로 전환하지 않는다.
@@ -93,6 +6506,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **게시 확인(14:37:59 KST):** 공개11파일을 `8072b9419251de56783fa89598481cc87dbd0dd1`로 커밋·푸시하고 실제 `origin/main` 일치와 당시 작업 트리 clean을 확인했다. 새 내용의 자격값 일치0·로컬전용 제외·AST/JSON/diff 검사, 수집 회귀7개·자료 스키마18개 통과. 이 문단은 게시 확인 뒤 작성한 영수증으로 후속 커밋·푸시한다. 마지막 SHA·원격 일치·작업 트리와 Mac 임시 helper 제거 결과는 로컬 세션 기록과 최종 답변에 남긴다. 새 학습/적재는 실행하지 않았다.
 
+
+
+<a id="source-87368a0abd79b357-h6"></a>
+<a id="record-e59204199776ca8e0ee37bab61b12e6e683fa8d2bf89c43c6e936ab0e0551158"></a>
+
 ## 추가자료 대량 수집·기존 정제본 통합 반입 — 2026-11-01 13:40 KST
 
 사용자의 “목적에 맞게 최대한 수집·검수·정제하고 기존 자료와 한 번의 학습을 준비” 지시에 따라 **DGX 통합 준비 묶음 394파일/373,611,669B**를 새 경로에 반입하고 전파일 서버 재읽기 SHA256을 확인했다. GPU 본학습·운영 모델 교체는 시작하지 않았다.
@@ -112,6 +6530,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 새 데이터 수집/정제/혼합/경계검증 소스와 `pack.py` 반입 목록을 동기화했다. 서버 서비스·이미지설치·포트 변경이 없어 초기설치기 실행은 하지 않았다. 전체 finetuning744검사741PASS/3기존환경skip, 신규11검사PASS. 실제CPU토큰3,625입력/잘림0과구조/해시검증결과는 [원장](../finetuning/JOINT_SOURCE_REVIEW.json), 재현은 [자료 작업흐름](../finetuning/SOURCE_REVIEW_WORKFLOW.md)을 따른다. 실제 채팅/공격E2E·새서버 전체설치·새모델 성능검증은 이번 범위가 아니다.
 
 **다음:** 사례별 인과적 정답·개인정보/과거 의미중복 검수 → 실제 MCP 계약/도구 결과·정확 후보 승인·조치 후 검증/원복 근거 연결 → 모듈별 토큰·역할/클래스 혼합비율·시간 예산 확정 → 같은 학습 실행으로 편입. 전체 `ready_for_gpu_training=false` 유지. GUIDE는 사후분류 위주여서 수량 확대만으로 관제주체나 도구실행 역량 향상을 입증하지 않는다. 아직새학습0. Git상태: 공개17파일을 `640732cfce2a06c122d3fb0e26c00d37bd5abfcf`로 커밋·푸시하고 실제origin/main일치·당시작업트리clean을 확인했다. 이 게시확인 문단은 후속문서변경이며 다시커밋·푸시한다. 최종커밋/원격일치/작업트리와임시정리는로컬세션·최종답변에기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h7"></a>
+<a id="record-30ecae970439b72dbc1de5ec2ddbcb436cb1c3f961a419b78e0dd57bfaa161cd"></a>
 
 ## 조사 자료 추가 수집·동시 검수·정제 후 반입 — 2026-11-01 13:12 KST
 
@@ -134,6 +6557,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 `ready_for_gpu_training=false`를 유지한다. 다음은 조사 경로/정답 의미 검수 → 현재 MCP 계약·정확 후보 승인·사후검증/원복 자료 구성 → 토큰 검수·독립평가다. 새수집만으로 기존 JSON schema 오류나 운영 품질 문제가 해결된 것은 아니다. [출처·정제·반입 원장](../finetuning/INVESTIGATION_SOURCE_REVIEW.json) · [재현](../finetuning/SOURCE_REVIEW_WORKFLOW.md). 공개18파일을 `835983a6df226a7d732e96c9f23a223185531ae6`로 커밋·푸시하고 실제origin/main일치·당시clean을 확인했다. 이 게시영수증은 후속 문서변경이며 다시 커밋·푸시한다. 최종커밋·원격일치·작업트리와임시정리는로컬세션/최종응답에남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h8"></a>
+<a id="record-047bbab2f614c420332b12c6ddc14d9fc70d00b7aa5f9f4e73db531c3bf56e04"></a>
+
 ## 학습자료 충분성·도구 실행 과정 범위 재점검 — 2026-11-01 12:42 KST
 
 사용자가 현재 자료량으로 관제 주체 역할을 충분히 학습할 수 있는지 질문했다. 보존된 최신 DGX 학습 입력447건(SHA `42572fafd3c471e176e052c2693efc40a04425e92079d2e0bb88de26fc8ca463`)을 직접 집계한 결과 비어있지 않은 도구목록·tool/function 결과메시지·assistant tool/function call·명시tool_call마크업·여러assistant턴이 모두0이다. **이번447건은 단일 답변 분류/근거 해석 학습이며 MCP 조사→승인→실행→사후확인 전과정 학습이 아니다.** 기본모델의 사전학습 도구능력이나 과거별도합성도구시험이 없다는 뜻은 아니다.
@@ -141,6 +6569,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 현재후보는소규모판단8건에서6통과/치명2건으로동일HF미학습군과같아관제요원역할충분성/학습효과를입증하지못했다. 공식시험7,276개/문서절을확보한것만으로이공백이메워지지않는다. GUIDE학습분할토큰적격3,080중256선택이라잔여2,824사건이있지만,추가검수전편입0이며평가분할을학습으로전환하지않는다. 분류자료만확대하지않고출처근거가있는다단계조사·정확후보승인·조치후검증/원복·실패/오탐대조자료를준비하고독립평가에서검증한다. 특정건수를충분성보장으로정하지않는다.
 
 [입력집계·한계](../finetuning/TRAINING_COVERAGE_20261101.json). 이번은로컬보존입력재검수/문서수정이며서버재조회·새학습·운영변경0. 입력SHA·447건집계/휴대용목록·diff검증을마쳤고 `296b5769ab97e4623e11fc5aaa053f7718c11627` 커밋·푸시/actualorigin-main일치·당시clean을확인했다. 이게시영수증은후속문서변경이며최종커밋/원격/작업트리는로컬세션과최종응답에기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h9"></a>
+<a id="record-7a016054aa40e1402e6b26183b1110d1f34a5dfc50bd0e184a94366c7336e893"></a>
 
 ## 약점 보완·관제 전반의 추가자료 수집과 동시 검수 — 2026-11-01 12:20 KST
 
@@ -160,6 +6593,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 [수집·검수·후속 조건](../finetuning/SOURCE_REVIEW_WORKFLOW.md) · [출처/해시/실측 원장](../finetuning/DEFENSIVE_SOURCE_REVIEW.json). DGX `~/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1`,로컬ignored검수사본 보존. Mac패키지설치/모델다운로드0. 이번 단계는 자료수집·구조검수·보존이며 새 Mattermost/공격E2E·새서버설치·학습/모델품질향상을 검증하지 않았다.
 
 **Git 게시 확인(12:27:09 KST):** 공개16파일의 수집/검수 소스·출처·지침·현황을 `70c41014ddaf770215b31b4ad0db3b5507a6ea29`로 커밋·푸시하고 실제 `origin/main` 일치와 당시 작업트리 clean을 확인했다. 자격·원자료·로컬검증/대화·가중치는 제외했다. 이 문단은 그 확인 뒤 작성한 게시 영수증이다. 후속 문서 커밋의 마지막 ID·원격 일치·최종 작업트리는 로컬 세션과 최종 답변에 기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h10"></a>
+<a id="record-87aae57db00859411174ce751cad731e069f5bbe2e5f1ac2530bb6321f192e71"></a>
 
 ## DGX 학습본 비교 완료·Thor 메모리 적재 보호 — 2026-11-01 11:48 KST
 
@@ -187,12 +6625,22 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **게시·정리 확인(11:52 KST):** 메모리보호 소스/검사·비교/현황7파일을 `5920542211946dbbfb2c12ff2121c00afb5fc794`로 자동커밋·푸시하고11:50:59 actualorigin/main일치·당시clean을확인했다. 새diff비밀값부재·AST/diff·로컬전용/가중치제외검사통과. 3군 판단8문항의messages SHA/options완전동일을별도대조했다. Mac임시61파일/330575B SHA목록을남기고59개를제거했다. 이게시영수증도후속커밋·푸시하며남은게시helper2개/폴더는직후제거한다. 최종SHA·원격일치·clean/정리는로컬세션과최종답변에남긴다. 서버운영/복구·로컬검증/대화는보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h11"></a>
+<a id="record-d0e16420c92ceaf94c6e828c8bf530a6ad56e931aa46aa6a4a3ac72f7a610a9f"></a>
+
 ## 가중치 Git 영구 제외 — 2026-11-01 11:15 KST
 
 사용자 용량 제한 요청에 따라 `.gitignore`에 GGUF/safetensors/LoRA·checkpoint·optimizer 형식과 학습 output/export 디렉터리 제외를 추가하고 `AGENTS.md`·README에 Git/Git LFS 업로드 금지를 명시했다. 현재 추적 파일 및 로컬 도달 가능한 Git 전체 이력4,348blob에서 해당 가중치 파일0개를 확인했다. Git 객체는 pack12.51MiB+loose3.29MiB였으며 이는 GitHub 계정 전체 용량 조회가 아니다. 기존 가중치의 Git 삭제나 이력 재작성은 필요하지 않았고 서버 파일도 유지한다. 대표 제외8경로/코드·메타데이터 유지3경로 검증 완료. 자동 커밋·푸시 후 결과를 기록한다.
 
 
 **가중치 제외 게시:** `ebafea0a3ad02cb0d3af107df1ae3edce49afab0` 커밋·푸시,11:15:52 KST actual origin/main 일치/당시 clean 확인. 제외규칙과 상시작업지침/README/현황5파일만 게시했고 모델 파일 업로드는0이다.
+
+
+
+<a id="source-87368a0abd79b357-h12"></a>
+<a id="record-3461872198dee5a6ac153a60daca864c0d73f50f2c91d944e415149b9e06c1aa"></a>
 
 ## DGX 학습본의 Thor 후보 준비 — 2026-11-01 11:36 KST 등록·GPU 추론 성공/품질 비교 중
 
@@ -217,6 +6665,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **준비 소스 게시(11:10:57 KST):** 단일 진입점·완료/무결성/출처 검사·CPU 변환/등록·설치 반입 목록·문서11파일을 `3494a89b07ac70aaa8be2b0dc6afdbbb00e78ab1`로 커밋·푸시했고 실제 origin/main 일치/당시 clean을 확인했다. 로컬905검사 중902PASS/환경3skip,Python AST·diff·자격값 부재·로컬전용 제외 검사 통과. 모델의 실제 Thor 적재/품질 검증은 여전히 진행 중이며 이 소스 게시와 구분한다.
 
+
+
+<a id="source-87368a0abd79b357-h13"></a>
+<a id="record-c66b97ff2ba54004d1c212f354bf6c3db65832da58c3615e2461013f4ab949a3"></a>
+
 ## DGX 본학습·최종 validation 완료 — 2026-11-01 10:48 KST 실조회
 
 **학습은224/224단계(100%)와 최종 validation까지 완료됐으며10:05:56 KST에 정상 종료됐다.** 사용자 현황 요청에 따라10:47~10:48 KST DGX를 읽기 확인했다. 아래09:50의197/224·저장192는 당시 관측이며 현재 완료 결과로 갱신한다.
@@ -235,6 +6688,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 **Git·기록:** 이번은 상태 조회와 문서 갱신이다. 공개 문서의 자동 커밋·푸시 전이며 라이브 조회/로컬 증거 보존 완료와 구분한다. 직전 `5681b0728423ff37ab32fa28a589540b0b74d3dd`는10:30:33 원격 일치·Mac임시25파일 정리까지 확인했다. 이번 게시/정리 결과는 후속 기록에 남긴다. 자격·대화·검증·업무분담은 Git 제외한다.
 
 **게시·마감 확인(10:49 KST):** 완료 현황 문서5개를 `49b5cc4c265b2a3f9a5b685c5129228ffcd777d2`로 커밋·푸시하고10:49:46 실제 origin/main 일치·당시 clean을 확인했다. 문서 diff·자격값 부재·로컬 전용 제외 검사를 통과했고 지정 자격만 일회성 전달/credential helper·HTTP 상세 추적 비활성 원칙을 지켰다. 코드 변경은 없어 회귀/설치 시험 대신 위 실서버 상태·파일 검증을 근거로 삼았다. Mac 임시6파일8,804B SHA 기록 후 조회 helper4개를 제거했고 이 영수증 후속 게시 뒤 남은 게시 helper2개/전용 폴더도 제거한다. 최종 커밋·원격 일치·clean·정리 결과는 로컬 기록과 최종 답변에 남긴다. 서버 산출물/복구본과 로컬 검증 자료는 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h14"></a>
+<a id="record-16be1729e2e5a008f649429ecc0ef1b4abbabecec3ee34c1eee67dc1a612af11"></a>
 
 ## 이전 대화 조건 유지·개별 룰 표 — 2026-11-01 10:28 KST 최종 검증
 
@@ -257,6 +6715,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **게시·정리 확인(10:29 KST):** 소스·설치·문서22파일을 `67c2b4a0370680579cbbecc6592d8f3bb19c548e`로 자동 커밋·푸시하고10:29:45 실제 origin/main 일치·당시 작업 트리 clean을 확인했다. 지정 저장소 자격만 프로세스에 일회성 전달했으며 credential helper/HTTP 상세 추적은 비활성화했다. 공개 Python13파일 AST·diff·근거 SHA 핀·자격값 부재·로컬 전용 제외를 확인했다. 최종 출력도 공식 파서의 정상 상세20행/집계1행을 통과했다. Mac 작업 임시25파일1,131,799B의 SHA 목록을 로컬 검증 기록에 남기고 다운로드/검증 스크립트 등23개를 제거했다. 이 게시 영수증도 후속 커밋·푸시하며,남은 게시 helper2개/전용 폴더는 그 직후 제거하고 최종 SHA·원격 일치·clean/정리 결과를 로컬 기록과 최종 답변에 남긴다. 서버 복구본·운영 소스 및 로컬 대화/검증 자료는 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h15"></a>
+<a id="record-f1261e0c9721e7665abd42256eef19fb53704eadfcf7b08fa3a64d35abedf945"></a>
+
 ## 공동 채널 후속 대화·대기열 수정 — 2026-11-01 10:01 KST 검증
 
 사용자의 Hermes 지연과 “Ollama 확인 질문에 답했는데 Hermes가 응답” 문의를 실제 대화·실행 기록으로 대조했다. **10:00:23 KST 운영 분배기/정책2파일을 수정했고10:01:05 검증을 통과했다.** [사용·설치·복구](../infra/hermes/chat-channels.md#짧은-후속-대화와-대기열-2026-11-01).
@@ -277,6 +6740,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **게시·마감 확인(10:03 KST):** 후속문맥/대기열소스와문서7파일을 `86e7311aa2ed4dad9fab471f5b2ac38318dce93d`로자동커밋/푸시하고10:03:37 actualorigin/main일치·당시clean을확인했다. 지정자격PAT일회성/helper·HTTPtrace비활성,공개Python구문/diff·자격필드값부재/로컬제외검사를통과했다. 이영수증보완도후속게시하며최종SHA·원격일치/작업트리/임시정리는로컬기록과최종답변에남긴다. Mac임시파일은SHA목록후게시helper2개만남기고정리했고마지막게시후그2개/폴더도제거한다. 서버실행/복구소스와DB는보존하고원격격리시험DB는자동제거됐다.
 
+
+
+<a id="source-87368a0abd79b357-h16"></a>
+<a id="record-3eb3888992b4d4ee64c8240d95ca0a06e1a550601bf4db06e0a9fb2065087cdc"></a>
+
 ## Hermes 표 출력 보완 — 2026-11-01 09:47 KST 운영 반영
 
 **요청한 표 표시 보완을 B에 적용했다.** 설명과 표 사이 빈 줄이 없던 Hermes 원문을 공통 보정기로 처리하며, 단독 채널의 native1.19.3 최종본문과 공동 검토 채널 양봇render에 같은 기준을 적용한다. [동작·설치/오프라인 목록·검증·복구](../infra/hermes/chat-table-format.md).
@@ -290,6 +6758,11 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 | 학습 인계 | 09:50:20 DGX197/224단계(87.95%),저장완료marker/SHA검증checkpoint192.168복원·독립실행·입력82SHA확인 | Mac종료후계속,11:35KST상한/공유추론종료후최대4회. 최종validation/품질점수/Thor승격미완료 |
 
 09:49:05 KST 실제 agent.log에서 새 gateway PID157의 `groot-query-completion:1.19.3 aliases_installed=True`도 확인했다. Docker stdout에 등록 문구가 없던 점은 실제 파일 로그로 보완 검증했다. 이번 코드·설치·현황·README를 반영했고 Git게시/로컬임시정리는 마감 단계다. 학습인계 문서 `3296ea682d283e20104b11e29fc183a1b4336229`는09:46:17 실제origin/main일치를확인했으며그때표수정소스8파일은로컬진행중이었다. 이번표수정까지포함한게시결과는후속기록에구분한다. 비밀값/대화·검증·업무분담은Git제외를유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h17"></a>
+<a id="record-f993f046154c2325248af6e824bc0321a8c0ace44a2ff03574fbd441a54524e8"></a>
 
 ## DGX 168단계 재개·제한 자동 재시도 — 2026-11-01 09:31 KST 등록
 
@@ -311,11 +6784,21 @@ DGX 손실 검사의 기존 `pynvml` 폐기 예정 경고는 실패가 아니며
 
 **09:36 게시·운영 확인:** 구현/문서11파일을 `90d2fad1bf79e556a5caa5a94fdcae165363b463`로 커밋·푸시하고 실제 origin/main 일치·clean을 재확인했다. 최초 게시 때 HTTP verbose 변수의 문자0이 추적을 켜는 동작을 확인해 변수를 완전히 제거했고 후속 검증에서 헤더 추적 부재를 확인했다. 지정 PAT는 해당 Git 프로세스에만 전달했다. 서버 준비용 임시3디렉터리94파일389,176B는 SHA 기록 후 제거,41개 실행 입력/원본checkpoint를 보존했다. 09:37 실제조회에서 제어기 부모PID1·독립timer·attempt1 모델적재35%·새할당경고0, 아직 optimizer step 증가는 확인 전이다.
 
+
+
+<a id="source-87368a0abd79b357-h18"></a>
+<a id="record-5a1b729b84b539eedb8940faad5a25723ab2620c58e62eab4facba2e15bf5eab"></a>
+
 ## Mattermost Hermes 표 표시 원인 — 2026-11-01 09:39 KST 읽기 점검
 
 추가 사용자 질문에 따라 실제 채팅과 B의 Hermes adapter를 읽기 확인했다. [09:28 Hermes 답변](https://chat.grootlab.duckdns.org/soc/pl/pct3jt16wbn75b1ondxp8y7nsw)은 확인 내역 문장과 표 사이 빈 줄이 없고, [09:30 Ollama 답변](https://chat.grootlab.duckdns.org/soc/pl/4fayetpfgj8wtqdfx17bgomscr)은 빈 줄이 있다. Hermes adapter의 `format_message`는 이미지 링크만 바꾸고 표는 그대로 전송한다.
 
 Mattermost의 공식 marked 고정소스 `467bc9e99fc75d69424188dfbea7fe0409a9fc15`로 실제 메시지 문자열을 검사했다. Hermes 원문 table token0→빈줄1개추가후1, Ollama 원문1→동일1로 원인을 재현했다. [공식 파서](https://github.com/mattermost/marked/blob/467bc9e99fc75d69424188dfbea7fe0409a9fc15/lib/marked.js). 이는 공식 파서 격리 재현이며 설치된 웹 번들의 브라우저 UI 시험은 아니다. 전송 전 문단/표 경계 정규화가 보완 지점이다. 이번은 질문에 대한 원인 점검으로 채팅 게시/수정·봇 코드 배포0, 수정 완료로 표시하지 않는다. API 로그인 세션은 logout했고 임시 원문/파서파일은 Mac 작업종료시 제거한다.
+
+
+
+<a id="source-87368a0abd79b357-h19"></a>
+<a id="record-af0ddafabeca703d1da9a7aefdea68259a7980f6584816d4388beadcb8de40dd"></a>
 
 ## DGX 재개 학습 현황 — 2026-11-01 09:20 KST 확인
 
@@ -335,6 +6818,11 @@ Mattermost의 공식 marked 고정소스 `467bc9e99fc75d69424188dfbea7fe0409a9fc
 **검증·Git:** 입력39SHA일치,supervisor/progress/state·stage/log/journal·Ollama·run컨테이너를교차확인했다.이번에는소스/운영변경이없어코드테스트·새서버설치·실공격E2E를반복하지않았다.현황/계획/README·로컬기록을갱신했으며자동커밋/푸시는다음단계다.비밀값·원로그·로컬검증자료는공개Git에서제외한다.
 
 **게시 확인:** 결과문서5개를 `84622b0edc36c80d31f72ee9327624605b089cf6`로자동커밋/푸시했고 actual origin/main 일치·당시clean을확인했다(2026-11-01T09:22:03.517166+09:00).지정자격파일PAT만일회성참조·helper/HTTPtrace비활성,문서diff/링크/비밀값부재/localignore검사완료.이게시영수증도후속커밋/푸시하고최종SHA·원격일치·작업트리·Mac임시helper제거결과는로컬기록/최종답변에남긴다.원격변경/재개/추가GPU시험0이며관측은09:20 KST기준이다.
+
+
+
+<a id="source-87368a0abd79b357-h20"></a>
+<a id="record-5d182b0988e707fe9e0e5303df0a5373375e67571e60eeda57243f947226031c"></a>
 
 ## DGX checkpoint136 독립 재개 — 2026-11-01 08:36 KST 등록
 
@@ -360,6 +6848,11 @@ Mattermost의 공식 marked 고정소스 `467bc9e99fc75d69424188dfbea7fe0409a9fc
 
 **08:50 KST 최종 인계 보완:** 실제141/224step·136에서재개후5optimizer step/10microbatch를확인했고,이전실행과겹치는7microbatch의입력순서/내용이일치했다.직전실패139step을넘었으며이번조회로그오류0·39입력/원checkpoint불변·독립실행/timer정상이다.08:49관측및구현게시영수증을 `2912de927619fd167fa9f3b16432773cb2a97103`로후속커밋/푸시하고실원격일치·당시clean을확인했다.이마지막인계보완도자동게시하며최종SHA·원격일치·정리는로컬기록/최종답변에남긴다.이후현황조회는새지시에따른다.
 
+
+
+<a id="source-87368a0abd79b357-h21"></a>
+<a id="record-42a60c731fb68629d518d91f5314f0c1fcb239a721a4c9ccb079ad8178acb166"></a>
+
 ## DGX 야간 실행 결과 확인 — 2026-11-01 08:27 KST
 
 사용자 현황 문의에 따라 DGX를 읽기 조회했다. **본학습은 224step 중139step(62.05%)까지 진행한 뒤 02:46 KST 메모리 보호로 실패 종료했다. 완료 모델·최종 품질 점수는 아직 없다.** 아래 00:45~01:04 등록/전송 중 기록은 당시 사실로 보존한다.
@@ -381,6 +6874,11 @@ Mattermost의 공식 marked 고정소스 `467bc9e99fc75d69424188dfbea7fe0409a9fc
 **검증·Git:** 원격 입력37파일 SHA일치,stage/progress/state/log/journal·저장파일 크기/SHA 교차확인. 런타임 소스/설치경로 변경0이므로 코드 테스트·새 서버 설치·공격E2E는 재실행하지 않았다. 현황/계획/README를 갱신했고 자동 커밋·푸시 전이다. 공개 기록에는 자격/호스트 계정/실행 로그 원문을 넣지 않으며 상세 근거는 로컬 전용 기록에 보존한다.
 
 **게시 확인 (2026-11-01 08:29 KST):** 결과 문서5개를 `381d966e4cabed2c79e01676575ea8372a1ce4d0`로 커밋·푸시했고 actual origin/main 일치·당시 Git clean을 확인했다. 자격파일의 지정 저장소 PAT만 해당 Git 프로세스에 일회성 전달,helper/HTTP trace 비활성. 문서 diff/신규링크/자격값 부재/로컬전용 제외 검사를 통과했다. 첫 URL 검사는 자격파일에 `.git` 접미사가 없는 같은 저장소여서 인증 전에 중단됐고, 정확한 대상 일치를 정규화해 확인한 뒤 게시했다. 서버 조회용 임시 스크립트는 확인 후 제거하고 증거는 로컬 기록에 보존한다. 이 게시 영수증은 후속 커밋·푸시하며 마지막 SHA·원격 일치·작업 트리·임시 폴더 부재는 로컬 기록/최종 답변에 남긴다. 추가 서버 조회·변경·학습 재개는 하지 않았다.
+
+
+
+<a id="source-87368a0abd79b357-h22"></a>
+<a id="record-45461d2686631c44f0daf1ce62c78c20b8aa55da7d99fc2a7a3f13a7f9fd405b"></a>
 
 ## GUIDE 편입·DGX 독립 학습 실행 등록 — 2026-11-01 00:45 KST
 
@@ -411,6 +6909,11 @@ DGX의 기존 Ollama와 Thor의 추론/현재35B·B봇/MCP는 유지했다. 공�
 
 Mac 작업 임시85파일(45,701,837B)을 SHA 기록 후 제거했고 게시 helper2개만 이 영수증의 후속 게시 뒤 삭제한다. 모델가중치 Mac저장·로컬패키지설치0, 원자료 임시복사본도 제거했다. 프로젝트 정제자료/소스·대화/출처/검증과 Thor 원자료·DGX base/venv/학습출력·복구 snapshot은 보존한다. 원격 직접전송의 인증 helper/공개 known_hosts/list는 서버 복사 실행기가 완료·실패 시 정리하며 현재 실행에 필요한 파일을 먼저 지우지 않는다. 이 게시 영수증도 후속 커밋/푸시하고 마지막 SHA·원격일치·작업트리·Mac tmp 부재는 로컬 기록과 최종 답변에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h23"></a>
+<a id="record-460d7085688d92b9e51949816cef453a94bb2237b7cc03cb9962ea8fc5400ee7"></a>
+
 ## 향후 학습 위치 결정 — DGX 학습·Thor 추론 (2026-10-31T15:58:06.084084+09:00)
 
 사용자가 자격파일의 Jetson Thor 구역 아래 DGX Spark SSH 정보를 추가하고 향후 학습은 DGX, 가중치 추론 운용은 Thor로 지정했다. **접속·기초 환경 확인과 계획 변경을 완료했으며 새 학습·적재·운영 전환은 시작하지 않았다.** [실행 순서와 범위](../finetuning/DGX_TRAINING_THOR_INFERENCE.md).
@@ -431,6 +6934,11 @@ Mac 작업 임시85파일(45,701,837B)을 SHA 기록 후 제거했고 게시 hel
 
 
 **게시·정리 확인 (2026-10-31T15:59:28.746313+09:00):** 공개 계획7파일을 `70b7ae7f11139b189ae947fca1c3845b604eb405`로 자동 커밋·푸시했고 actual origin/main 일치·Git clean을 확인했다(2026-10-31T15:58:55.064396+09:00). 지정 저장소 PAT만 일회성 참조/helper·HTTP trace 비활성, 새 DGX 비밀번호·PAT의 공개 파일 부재·신규 문서 링크/diff 검사를 통과했다. 문서 변경이므로 코드 테스트는 추가하지 않았다. Mac 접속 시험 임시4파일을 해시 기록 후 제거했고 게시용2파일은 이 영수증 후속 게시 뒤 제거한다. 새 패키지/다운로드·원격 파일 생성·서버 변경0. 학습 환경 구축·시험/본학습·가중치 변환·전송·후보 등록/승격은 미실시로 남긴다. 마지막 SHA·실원격 일치·작업 트리·정리는 로컬 기록과 최종 답변에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h24"></a>
+<a id="record-7216c231fde92ec87c031c107b76c24fab2e358440920cef0cb73d9199e88311"></a>
 
 ## 카드 조사·진행 표시·서버 메모리 동기화 — 2026-10-31 15:40 KST
 
@@ -467,6 +6975,11 @@ Git: 이 단위의 공개 소스·설치 경로·현황 문서는 현재 커밋/
 
 **최종 게시 후 로컬 파일 구분 (15:52 KST):** 현황 후속 `c5b56fe5c5646bdf9eda10457302938ddc3d769d`의 actual origin/main 일치는 확인했다. 이때 자격파일 편집기의 `.CREDENTIALS.local.md.swp`가 새 미추적 파일로 나타나 사용자 파일을 삭제하거나 내용을 읽지 않고 해당 swap 패턴만 `.gitignore`에 추가했다. 이 제외 규칙과 현황 보완도 후속 게시한다. 작업용 임시 파일과 사용자 편집 파일을 구분해 정리한다.
 
+
+
+<a id="source-87368a0abd79b357-h25"></a>
+<a id="record-6214b36ed22e8842ba16ad99a45df2aa2ee471811b7e3f7b15a2c464291abcd9"></a>
+
 ## WAF 공식 검사·상세 조회 보완 — 2026-10-31 14:00 KST
 
 사용자 WAF 추가 보완 요청으로 해당 조회 범위만 재개했다. 기존 Nginx/libmodsecurity의 공식 설정 검사와 상세 파서를 연결하고 A/B에 증분 반영했다. [사용·출처·경계·복구](../infra/mcp/security-rule-inventory.md).
@@ -488,6 +7001,11 @@ native 시험은 운영 plugin1.18.1/정책/모델과 실제 읽기 계정을 �
 Git: 현재 단위는 게시 전이다. 현황/대화 기록·자동 커밋/푸시·Mac 임시 정리 후 이번 요청을 마감하고 일시정지한다. 학습·모델 배치·다른 조사·주기 감시는 재개하지 않는다.
 
 **게시 확인 (2026-10-31T14:02:20.530872+09:00):** WAF 조회 보완 공개11파일을 `50dc00de54e7d660998e5904a8c3971fa6e53325`로 자동 커밋·푸시하고 actual origin/main 일치·작업 트리 clean을 확인했다. 지정 저장소의 로컬 자격 토큰만 해당 Git 프로세스에 전달했고 helper/HTTP 추적은 사용하지 않았다. Mac 작업용14파일을 해시 기록 후 제거했으며 게시용2파일은 이 영수증 후속 커밋·푸시 뒤 제거한다. 신규 설치/다운로드0, 서버 root 복구본과 로컬 검증 근거 보존. 최종 SHA·원격 일치·clean·임시 정리 확인은 로컬 세션과 최종 답변에 남긴다. 이번 요청을 마감하고 일시정지하며 학습·주기 감시·다른 작업을 재개하지 않는다.
+
+
+
+<a id="source-87368a0abd79b357-h26"></a>
+<a id="record-b2ca1538075da184a271ea69d9cb679d015f649c03cec93d385c3c39b5d1bc8d"></a>
 
 ## 전체 규칙·Wazuh 상관 조건 조회 — 2026-10-31 13:38 KST
 
@@ -512,6 +7030,11 @@ Git: 현재 단위 공개 소스·검증·문서는 아직 게시 전이다. 최
 
 **게시 확인 (2026-10-31T13:39:13.157667+09:00):** 관련 공개31파일을 `cf88aba7b1b5cea16bccbb987d7a13a83294195b`로 자동 커밋·푸시하고 actual origin/main 일치·Git clean을 확인했다. 지정 자격파일의 해당 저장소 토큰만 일회성 Git 환경으로 전달했으며 credential helper/HTTP 추적은 사용하지 않았다. Mac 작업용50파일을 SHA 기록 후 제거했고 게시용2파일은 이 영수증 후속 게시 뒤 제거한다. 신규 패키지 설치·다운로드0, 서버 root 복구본·프로젝트 소스·로컬 근거 보존. 이 영수증도 후속 커밋·푸시하며 마지막 SHA·원격 일치·작업 트리·정리 결과는 로컬 세션과 최종 답변에 남긴다. 요청한 범위 마감 뒤 일시정지하며 추가 학습·모델전환·다른 작업·주기 감시를 시작하지 않는다.
 
+
+
+<a id="source-87368a0abd79b357-h27"></a>
+<a id="record-1bbfe8b1965d49a4cf0fb8913425cc135aee35d9a6b3332b0e19b59385951972"></a>
+
 ## 단문 문맥·호스트 MCP 배포와 상관분석 확인 — 2026-10-31 13:03 KST
 
 단문 대상 확인과 A/B/C 현재 실패 unit 조회, 승인형 A Vector·A/B Wazuh host-agent 조치를 운영 반영했다. 실제 보호 서비스 재시작은 하지 않았다. 사용자 후속 지시로 다음 작업은 WAF·IDS·Wazuh 기본/커스텀 전체 규칙과 Wazuh 상관 규칙 조회 확장이다. 이 추가 범위까지 검증·기록·게시한 뒤 일시정지하며 다른 목표·학습·주기 감시는 재개하지 않는다.
@@ -532,6 +7055,11 @@ Git: 이번 완료 단위의 공개 소스·검증·문서를 자동 커밋/푸�
 
 
 **게시 확인 (2026-10-31T13:03:55.647280+09:00):** 공개43파일을 `2be879d8f98bbf1ebaa09a533479bacf056325c8`로 자동 커밋·푸시하고 실제 origin/main 일치·작업 트리 clean을 확인했다. 자격파일의 지정 저장소 토큰만 일회성 Git 환경으로 전달했고 helper/HTTP 추적을 사용하지 않았다. 이 영수증은 후속 커밋·푸시한다. 추가 전체 규칙/상관규칙 조회 작업은 미구현 상태로 이어간다.
+
+
+
+<a id="source-87368a0abd79b357-h28"></a>
+<a id="record-781b8b902970bb45bbc12c9549dc1682413cab61e8a67b9c8c7614153e68bcb4"></a>
 
 ## 본학습 완료 확인·짧은 FW 질문 보완 — 2026-10-31 12:23 KST 이후
 
@@ -554,6 +7082,11 @@ Git: 이번 관련 공개 소스·회귀·평가 기준·현황을 명시적으�
 
 **게시 확인 (2026-10-31T12:29:26.523306+09:00):** 관련 공개11파일을 `1107486b7b3d53d26c827d86361137739a622031`로 자동 커밋·푸시하고 실제 origin/main 일치·Git clean을 확인했다. 프로젝트 자격파일의 해당 저장소 토큰만 Git 프로세스에 전달했고 credential helper/HTTP 추적은 사용하지 않았다. 이번 Mac 조회용 임시3파일은 SHA 기록 후 제거했으며 게시용2파일은 영수증 후속 게시 뒤 제거한다. 새 패키지 설치/다운로드0·운영 배포0·추가 학습0, 원격 완료 산출물과 로컬 검증 근거는 보존한다. 이 영수증도 후속 커밋·푸시하고 최종 SHA/원격 일치/정리는 로컬 세션·최종 답변에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h29"></a>
+<a id="record-6a68d2734843f1451aabc68142db596ddc01ad1f2f296b0845a18be7a5e53f87"></a>
+
 ## 본학습 시작 확인·작업 일시정지 인계 — 2026-10-31 09:40 KST
 
 **Thor에서 191행 전체1회 본학습을 시작했고, Mac 연결을 종료해도 계속 실행된다.** `soc-evidence-20261031-r2`는09:38:35 KST 실행됐으며09:40:53에 main training·1/96 optimizer step·성공 microbatch3개, systemd service active/parent PID1·독립 복구 timer active를 확인했다. 학습 완료나 품질 합격은 아직 확인하지 않았다. 사용자 지시로 이 인계를 마치면 작업을 일시정지하며 다음 지시 전 학습 현황 조회/정기 보고를 하지 않는다.
@@ -573,6 +7106,11 @@ Git: 관련 공개 실행 소스·자료 검수/복구 문서·원장·현황을
 
 **게시 확인 (2026-10-31T09:42:55.726552+09:00):** 이번 공개13파일을 `1adae23fdc93ea5276410f50ad6c2fab8206b309`로 자동 커밋·푸시하고 actual origin/main 일치·작업 트리 clean을 확인했다. 자격파일 지정 토큰만 해당 Git 프로세스에 전달했고 helper/HTTP 추적은 사용하지 않았다. Mac 작업 임시13파일을 SHA 기록 후 제거했고 게시용2파일은 영수증 후속 게시 뒤 제거한다. 새 패키지/모델 다운로드0이며 원자료·소스·작업 기록과 Thor R1복구/시험·R2실행/자동복구는 보존한다. 서버 최종 조회는09:40:53 KST이며 이후 추가 조회 없이 인계 정리만 수행했다. 작업은 이 마감 뒤 일시정지하고 학습/복구만 계속한다. 다음 확인은 사용자 재지시 때 진행한다. 영수증도 후속 커밋·푸시하며 최종 SHA/원격 일치/정리는 로컬 세션과 최종 답변에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h30"></a>
+<a id="record-2d0786e3f7693c2ce489ed70cc1fac2d5703ceb52ca9ed2f86b0db3f97ee066e"></a>
+
 ## 본학습 한정 재개 — 2026-10-31 09:31 KST
 
 사용자 지시로 **학습 시작·Mac 연결 해제 대비만 재개**했다. 191행 evidence-only 배합 전체1회/96step이며 검증·시험128행씩은 기존 CTI 개발 회귀다. 관제143행은 기관 원자료에 근거한 프로젝트 해석을 포함하며 독립 전문가 인증으로 표시하지 않는다. GUIDE/선택적 하네스 편입·봇/보안 변경·논문 작업·운영 모델 자동 교체는0이다.
@@ -582,6 +7120,11 @@ Git: 관련 공개 실행 소스·자료 검수/복구 문서·원장·현황을
 최장2입력 시험이 성공하고 실측 예상이 남은 시간에 들어오면 본학습으로 이어진다. 학습240분 제한·독립245분 복구·복구 작업6분, supervisor247분/정리7분이다. 완료/실패 시 원래35B를 자동 복구한다. 현시점 예상2~4시간은 실측 전 추정이며 본학습 시작 확인 후 갱신한다. 이후 별도 주기 보고 없이 사용자 재지시에 따라 확인한다. [실행·자료·복구 경계](../finetuning/DURABLE_EVIDENCE_RUN.md).
 
 Git: 이 학습 단위는 준비·실행 확인 중으로 아직 게시 전이다. 데이터/모델/원응답/실행 원장은 로컬·Thor 전용이고 완료 시 관련 공개 소스/문서만 자동 커밋·푸시한다. 다른 작업은 일시정지를 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h31"></a>
+<a id="record-c6a16c9859bce94488cb3ada6f15f8df7b70bebe4bc746251f16affe0d852c31"></a>
 
 ## 05:15 일시정지 마감 — 사건 필드 보완·본학습 미시작 (2026-10-31 KST)
 
@@ -607,6 +7150,11 @@ Git: 이 완료 단위의 공개 소스·계약·검증 원장·현황을 명시
 
 **게시 확인 (2026-10-31T05:08:25.676375+09:00):** 공개13파일을 `8f492b5c40a9179f606beb49113cf500d0a82a17`로 자동 커밋·푸시하고 actual origin/main 일치·작업 트리 clean을 확인했다. 자격파일 지정 저장소 토큰만 Git 프로세스에 일회성 전달했고 helper/HTTP 추적은 사용하지 않았다. 이번 Mac 임시18파일은 SHA 기록 후 제거했고 게시용2파일은 영수증 반영 후 제거한다. 새 패키지 설치0·운영 root 복구본/실응답/논문/로컬 기록은 보존한다. 이 영수증도 후속 커밋·푸시하고 최종 SHA·원격 일치·전체 임시 제거·목표 일시정지 결과는 로컬 세션과 최종 보고에 남긴다. 새 GPU 학습0·운영 추론 유지이며 일시정지 후 사용자 재지시 전에는 현황 확인/보고를 하지 않는다.
 
+
+
+<a id="source-87368a0abd79b357-h32"></a>
+<a id="record-e6fc36c417457cf006e52edb58c901f64fd6e2d4c9d9017d9cb83860d0ea11e8"></a>
+
 ## 사건 날짜·조회 구간 보완과 실제 재시험 — 2026-10-31 KST
 
 **연도·시각 구간 선택은 개선됐지만 사건 판단 전체는 미완료다.** query-completion1.16.1/chat-contract1.5.4를 B에 반영했다. 초기1.16.0의 정확 since/until·WAF 센서 설명 제공에 이어 턴별 KST 기준과 실제 실패 인자/오류 피드백을 추가했다. 모델이 날짜·도구·판단을 선택하며 서버는 입력과 보호 경계를 검증한다. [계약](../infra/mcp/event-evidence-window.md) · [실측 원장](../infra/mcp/event-evidence-window-validation-2026-10-31.json).
@@ -630,6 +7178,11 @@ Git: 이 단위의 공개 소스·계약·설치 검증 근거·현황만 자동
 
 **게시 확인 (2026-10-31T04:25:28.623634+09:00):** 공개17파일을 `efb10da9ef2b4471b29dc3b865712873637ee10e`로 자동 커밋·푸시하고 실제 origin/main 일치·작업 트리 clean을 확인했다. 프로젝트 자격파일 지정 토큰만 해당 Git 프로세스에 전달하고 helper·HTTP 추적은 사용하지 않았다. 이번 Mac 작업 임시24파일을 해시 기록 후 제거했고 게시용3파일은 영수증 반영 후 제거한다. 운영 source/root 복구본·실응답·로컬 논문/세션은 보존하며 서버 staging은 정리했다. 이 영수증도 후속 커밋·푸시하고 최종 SHA/원격 일치·잔여 임시 제거는 로컬 세션과 완료 보고에 남긴다. 05:15 KST 일시정지 지시는 유지하며 현재 목표는 active다.
 
+
+
+<a id="source-87368a0abd79b357-h33"></a>
+<a id="record-49ff22dab3e064cd57fc7f95297b24c89d6493e55d7122cae4b25a8f2c9d0419"></a>
+
 ## Vector 정제 중단·회전 상호 대기 복구 — 2026-10-31 04:01 KST
 
 **보고된 Vector 경보는 실제 서버 장애였다. A의 원인을 수정하고 정제·예약 회전·새 수신을 확인했다.** Storage unavailable의 정상 백업 파일 오거절과 별개다. 10/29 17:06부터 멈춘 Vector를 Suricata 완료 intent와 WAF 공유 정지 소유권의 상호 대기가 막고 있었다. 정확히 완료된 writer 전환만 먼저 기록하도록 수정했으며 원본/CP 수동 수정·시작 가드 우회는 하지 않았다.
@@ -651,6 +7204,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 **게시 확인 (2026-10-31T04:04:42.848590+09:00):** Vector 공개14파일을 `761655ceec4fac5f80ba81d802c96fad43fc4f6d`로 커밋·푸시하고 실제 origin/main 일치를 확인했다. 프로젝트 자격파일 지정 토큰만 해당 Git 프로세스에 전달했으며 helper/HTTP 추적은 사용하지 않았다. Mac의 이 단위 임시23파일을 해시 기록 후 제거했고 게시용3파일은 최종 영수증 반영 후 제거한다. 서버 격리 fixture/staging은 정리했으며 운영 코드·root 복구본·원본 로그·로컬 검증은 보존한다. 기존 미완료 봇 변경13경로는 이번 커밋에서 제외되어 전체 작업 트리는 clean이 아니다. 이 영수증도 후속 커밋·푸시하며 최종 SHA/원격 일치·잔여 임시 제거는 로컬 세션과 완료 보고에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h34"></a>
+<a id="record-7f988b3b02da1686563aa11a6b884cecd845405844210d8be83610e936d8a7e0"></a>
+
 ## Storage unavailable 재확인 — 2026-10-31 03:13 KST
 
 **반복 경보의 원인은 수정됐고, 이번 실제 조회에서도 재발을 확인하지 않았다.** A/B 최신 예약 실행은 03:02 KST에 모두 `complete/ok`, 종료0이며 timer는 active/enabled다. 디스크 사용률은 A23%/B29%다. 수정 후 01:15:49~03:13:58 KST의 Wazuh100313은 Indexer 전체105 shard 성공·실패0·timeout false·정확 집계0건이다. 정상 백업 JSON을 디렉터리 전용 검사에서 거절하던 문제이며 용량 부족은 아니었다. [조회·시각·원본 상태 해시](../infra/automation/storage-retention/deployment-validation-2026-10-31.json).
@@ -661,6 +7219,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 
 **게시 확인 (2026-10-31T03:42:03.327398+09:00):** 이번 상태·운영 원장2파일을 `2e1834754d61ef1a076480b7b33f3fd75106b957`로 커밋·푸시했고 실제 origin/main 일치를 확인했다. 프로젝트 자격파일의 지정 토큰만 Git 프로세스에 일회성 전달했고 helper·HTTP 추적은 사용하지 않았다. 이 게시 영수증도 후속 반영한다. 기존 사건 조회 보완9개 수정·문서1개 신규는 미완료 작업으로 그대로 남아 있어 전체 작업 트리는 clean이 아니다. 최종 SHA·원격 일치와 이번 점검용 임시3파일 제거는 로컬 기록에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h35"></a>
+<a id="record-d4b28d5fdba4f42c3458420bab05b5aaca3ca39dcf4f2db212b467b174375c6f"></a>
 
 ## 사건 판단 정정·실제 오답 검출 보완 — 2026-10-31T02:46:17.988600+09:00
 
@@ -694,6 +7257,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 **게시 영수증 (2026-10-31T02:49:44.147721+09:00):** 공개17파일을 `4b1d70805049a1e730c2ba7b304a27696389d20a`로 커밋·푸시했고 `2026-10-31T02:49:00.287835+09:00`에 실제 origin/main 일치·작업 트리 clean을 확인했다. 프로젝트 자격파일의 지정 토큰만 해당 Git 프로세스에 전달했으며 credential helper/HTTP 추적은 사용하지 않았다. 465통과·2생략, 실제5답변의 전체판단완료0·보호호출0, 운영/오프라인15파일 SHA·native버전 import 및 공개 AST/JSON/diff/링크/로컬제외·실제자격값부재를 확인했다. Mac 작업 임시19파일을 SHA 후 삭제하고 게시용3파일만 남겼다. 서버는 stdin 실행과 원자교체 임시 정리를 마쳤고 root 복구본은 보존한다. 이 게시 영수증도 후속 커밋·푸시하며 최종 SHA·원격 일치·clean·잔여 임시 제거 결과는 로컬 세션과 완료 보고에 남긴다. 사건 판단 전체와 실제 공격·승인·대응 E2E는 미완료다.
 
+
+
+
+<a id="source-87368a0abd79b357-h36"></a>
+<a id="record-bae1b118fdda498a439ce08e5c047e16309798a0ca380d42cb4dca3c3ef0bd9d"></a>
 
 ## 실제 사건 조회·보고 근거 보완 및 교수 시연 계획 — 2026-10-31T02:11:58.309065+09:00
 
@@ -733,6 +7301,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 이하 이전 이력을 보존한다.
 
 
+
+
+<a id="source-87368a0abd79b357-h37"></a>
+<a id="record-e50a91ad2ac3cf558aa90dc25715f2330cbcf08c9fb6affaf911e0e161206b62"></a>
+
 ## 저장공간 경보·자동 조사 종결 보완 — 2026-10-31T01:20:03.142291+09:00
 
 | 항목 | 이번 완료·운영 근거 |
@@ -755,6 +7328,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시·정리 확인 (2026-10-31T01:22:05.119108+09:00):** 공개15파일을 `2adab2f233ad21e5020f3ac476bf1befcfcf21cc`로 자동 커밋·푸시하고 2026-10-31T01:21:26.526219+09:00에 실제 origin/main 일치·작업 트리 clean을 확인했다. 프로젝트 자격파일의 해당 토큰만 일회성으로 전달했으며 helper/HTTP 추적은 비활성화했다. 258검사·실제 감시/예약 주기·B relay/수집기/native 정상 규칙·Indexer 대조, AST/JSON/Bash/신규 링크/diff·비밀값·로컬 제외·해시핀 검증을 마쳤다. B 시험용 9파일 34,439B와 Mac 작업용 22파일 434,684B를 SHA 기록 후 제거했다. 운영 파일·기존 이력·복구본은 보존한다. 이 게시 영수증도 후속 커밋·푸시하며 남은 게시 helper/파일 목록 제거와 최종 SHA·원격 일치·작업 트리는 로컬 세션/완료 보고에 남긴다. 실제 공격 대응 E2E·보고 필드 의미 개선·신규 학습은 이번 완료 범위가 아니다.
 
 이하 이전 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h38"></a>
+<a id="record-1829a41546bd28e505f9d2243a12983b6ea444384bbe8bf14d9a1bf98dc1186b"></a>
 
 ## GUIDE 사건 자료·논문 본문 현행화 — 2026-10-31T00:38:24.406500+09:00
 
@@ -779,6 +7357,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h39"></a>
+<a id="record-21e7e500f82c5b13c9e745c2ecfbcc3c0b2f722e985530a16dcc6303507e54be"></a>
+
 ## 추가 관제 자료 원출처·실파일 검수 — 2026-10-31T00:07:33.829949+09:00
 
 | 자료 | 이번 확인과 처리 |
@@ -798,6 +7381,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시 확인 (2026-10-31T00:08:39.929931+09:00):** 공개5파일을 `179aa288996f072cd8274bf87a01e7d98bed0982`로 자동 커밋·푸시하고 실제 origin/main 일치·작업 트리 clean을 2026-10-31T00:08:19.130013+09:00에 확인했다. 프로젝트의 해당 토큰만 일회성으로 사용하고 helper/HTTP 추적을 비활성화했다. 원파일 순위/선택 구간/라벨 합계와 JSON·신규 문서 링크·비밀값·로컬 제외 검증을 마쳤다. 원자료 일부·서지·이용조건은 로컬 검증 근거로 보존하며 대형 원로그/작업 패키지/임시환경은 만들지 않았다. 이 영수증도 후속 게시한 뒤 게시 helper를 제거하고 최종 SHA·원격 일치·작업 트리를 로컬 기록/완료 보고에 남긴다.
 
 이하 이전 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h40"></a>
+<a id="record-b55e2d0585cd5ae85d420b07c93dd3a2e0e9a3409d1c3fea8fca9c22cff1137b"></a>
 
 ## 반복 오류·최종 안내 보완 — 2026-10-30T23:58:44.077363+09:00
 
@@ -825,6 +7413,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h41"></a>
+<a id="record-51f4102e32c7810600cda5f111324996dfed2589609e01f78f07bfe64d3a34b0"></a>
+
 ## 제출 전 편집 검사 운영 반영 — 2026-10-30T23:08:57+09:00
 
 | 항목 | 완료 범위와 결과 |
@@ -850,6 +7443,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h42"></a>
+<a id="record-f890937527323d403ace145ab4e5b1f34309c56341983b8bb7ec39db141ae4b3"></a>
+
 ## 변경안 준비·요청 범위 검증 보완 — 2026-10-30T22:34:02+09:00
 
 - **완료한 보완:** 기존 모드 유지 문구 때문에 변경안 준비가 중단되던 분류와 승인안 작성 인식을 수정했다. 명시적인 주석1줄·앞/뒤 위치·기존 내용 유지 요청에 한해 현재 원문/실제 후보 해시를 비교하여 불일치·미확인은 승인 보류/미완료로 보고한다. 도구 호출과 후보 작성은 모델이 하며 하네스는 후보를 대신 제출·적용하거나 보호 호출을 재시도하지 않는다. 탐지 모드/규칙 유지 용어와 이벤트 관측 주장도 구분한다. [동작·제약·복구](../infra/hermes/write-preparation.md).
@@ -864,6 +7462,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h43"></a>
+<a id="record-d40e8a5f425b5deebb4080f35d4bf19d1fc0fb70d510cba2806b73edfc8ae2db"></a>
+
 ## 쓰기 변경안 준비 보완 진행 중 — 2026-10-30T22:15:21+09:00
 
 - **근거 시점:** 아래 내용은 2026-10-30 22:08 KST까지 저장된 운영 검증 결과를 이번 상담에서 확인한 것이다. 이번 상담에서는 서버 재조회·추가 채팅·보호 변경을 실행하지 않았다.
@@ -873,6 +7476,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git/완료 범위:** 이 쓰기 보완 단위는 미완료·미커밋이며 공개 소스·문서 변경이 남아 있다. 마지막 완료 단위의 최종 커밋은 `e42e7d5daf45678f904518c98ed00ef5acc1b732`이다. 이번에는 원격 브랜치를 재조회하지 않았다. 기존 SDK47.41점 재채점·신규 학습·운영 모델 교체·실제 공격 E2E·새 서버 전체 설치는 수행하지 않았다.
 
 이하 이전 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h44"></a>
+<a id="record-a7c43d92d6bce52d615c0d7e32519f0b9278a320a3c8bdacc1131db118eaef79"></a>
 
 ## 서비스·임시차단 상태와 IDS 적재 통계 보완 — 2026-10-30T21:49:06+09:00
 
@@ -889,6 +7497,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h45"></a>
+<a id="record-0c48832896c8e0e918013c3e1f7ed6e8bbd898161ca4cf8906cc68f90a93928d"></a>
+
 ## 변경 승인·실행 기록 조회 보완 — 2026-10-30T21:20:53+09:00
 
 - **실제 발견:** 새 스레드 수정 전 6건에서 Hermes는 승인·적용 질의의 결과 알림을 누락하고 불필요한 B 파일을 함께 읽었다. Ollama는 같은 질의에서 도구 호출0으로 종료했고, 과거 변경 비교에서는 32자리 제안 ID를 파일 SHA로 오인해 승인 상태를 확인하지 않았다. Wazuh 과거 recovery_failed/현재 파일 구분은 양쪽 기존 경로에서도 유지됐다.
@@ -903,6 +7516,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h46"></a>
+<a id="record-fd4f9773dbb5db29d65cc466079d627e22671fa8534ed01b75aa1fd2314727b1"></a>
+
 ## 실제 FW 채팅 12건 검증·페이지 크기 유지 보완 — 2026-10-30T20:52:09.190315+09:00
 
 - **운영 검증:** 두 전용 채널에서 새 스레드로 수정 전 4표현씩 8건, 수정 후 50개씩·새 표현 73개씩을 각 봇에 보내 4건을 확인했다. 12건 모두 실제 `get_firewall_rules` 응답의 145객체(테이블8·체인30·규칙98·집합9), 기본 정책14개, A 호스트/제외 범위와 게시 답변을 대조했다. WAF·IDS 혼입/미등록 도구 주장/보호 작업0이다. [사용·복구](../infra/mcp/firewall-read.md).
@@ -915,6 +7533,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시/정리 확인 (2026-10-30T20:57:26.441025+09:00):** 공개9파일을 `16694df5725fa12d74a2f82cdb7ac6c744ea30b8`로 자동 커밋·푸시했고 실제 origin/main 일치·clean을 2026-10-30T20:56:45.068417+09:00에 확인했다. 실제채팅12건/현재145객체·98룰·14기본정책·수정후50/73개씩 유지, 로컬65검사·배치환경각6검사·과거2재생/페이지삭제18검사·원문/게시대조·신규구문/링크/비밀값/ignore/diff 검증을 완료했다. B 임시3파일261,647B와 Mac 임시20파일642,532B를 제거했으며 실패한 일회성 unit도 해제했다. root 복구점은 유지하고 모델/권한·학습자료는 변경하지 않았다. 이 영수증도 후속 게시하며 최종SHA·원격 일치·작업트리 및 publisher 삭제는 로컬 세션과 최종 답변에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h47"></a>
+<a id="record-b256aa1e7d7b4216e85d08744b8d2aa2c3bb7cc0b1bd12828b4992f42d8bf519"></a>
 
 ## 실제 응답 58개 비교·중요 오류 확인 — 2026-10-30T20:15:42.926021+09:00
 
@@ -929,6 +7552,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h48"></a>
+<a id="record-c00b67e40077868aac7502b27ccea8a5bc78d1f68f8bda1f8ccd9ec4769b9c61"></a>
+
 ## 운영 상태 판단 평가 29개·누락 방지 채점 — 2026-10-30T19:32:47.172812+09:00
 
 - **완료:** 실제 변경기 코드와 격리된 파일·승인 브로커·컨테이너 대역으로 WAF/IDS/Wazuh의 승인·적용·원복·실패 25개 경로를 실행했다. 앞서 확보한 FW 관측과 범위/도구 부재 사례를 더해 평가용 29개·사실 근거130개를 만들었다. 전체38도구 카탈로그를 보존한다. [검수 원장](../finetuning/OPERATIONAL_REVIEW_CASES.json).
@@ -942,6 +7570,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h49"></a>
+<a id="record-e7ab16ec7b89999ac532aa5abee9f8bef9ee4e1dd3726eafabe673a6ee07a869"></a>
+
 ## 라이브 MCP·FW 평가 근거 확보와 오래된 차단 설명 수정 — 2026-10-30T19:12:15.868392+09:00
 
 - **실제 조회:** 문서의A 경유로B에 접속해 기존soc-ollama 계정/라이브 클라이언트로8서버·38도구(읽기29/보호9)를 발견했다. 현재runtime/policy/harness3소스는로컬과일치한다. 18:47KST FW는동일snapshot의offset0/50/100을이어3페이지145객체(table8·chain30·rule98·set9),기본체인정책14개를확보했다. 현재legacy테이블목록은비어있으며다른호스트/namespace·legacy는조회범위밖이다. [실측·원장](../finetuning/OPERATIONAL_EVIDENCE_REVIEW.json).
@@ -954,6 +7587,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시/정리 확인 (2026-10-30T19:14:55.120227+09:00):** 공개12파일을 `234f738a18b7675d3c7418e1206d6c97a86f821c`로 자동 커밋·푸시하고 실제 origin/main 일치·clean을 2026-10-30T19:14:33.713552+09:00에 확인했다. 라이브38도구/FW3페이지·후보3설명변경/실제1,197토큰마스크·64검사·2CLI재현/거부·별도객체/구조대조·141pack초기경로/4계약투영·구문/링크/비밀값/ignore/diff 검증 완료다. Thor임시17파일3,679,620B/검사컨테이너와Mac임시26파일9,556,252B 제거,원본/후보/근거 보존이다. 이 영수증도 후속 게시하며 최종SHA·실원격일치/작업트리와publisher삭제는로컬세션·최종답변에남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h50"></a>
+<a id="record-afc0ec24181e2dbbf3d0be0e27d42e6a9883d6f92304a59259c529f66eca4fba"></a>
 
 ## CAM 평가 원천 분리·학습 후보 혼입 검사 — 2026-10-30T18:38:46.434440+09:00
 
@@ -969,6 +7607,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h51"></a>
+<a id="record-9c3ba6be696e04c73f92908c4bda264065dd9f52d2f7c2f7a1fae92910106657"></a>
+
 ## 소규모 배합 후보·손실 가중 의미·평가 경계 정리 — 2026-10-30T18:19:34.070334+09:00
 
 - **확인한 문제:** 전체1,197건 중 CTI는1,024행(85.5%)이지만 targettoken은64,442/136,929(47.1%)다. 기존batch1 선택로짓손실은 호출 내 정답토큰 평균이므로 긴답변이 토큰수만큼 더 큰 샘플가중치를 받는다고 해석하면 안 된다. Thor의 실제torch2.8/transformers5.4.0과고정코드로 CPU작은예제를 실행해 호출평균과토큰평균의기울기차이 및외부분모거부를확인했다. 실제Qwen기울기/전체Trainer·마지막배치실험은 아니다. [원장](../finetuning/SOC_PILOT_REVIEW.json).
@@ -981,6 +7624,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시/정리 확인 (2026-10-30T18:25:38.752996+09:00):** 공개10파일을 `34f66d80f415d11d72a238ae8b9310a83909fc65`로 자동 커밋·푸시하고 실제 origin/main 일치·clean을 2026-10-30T18:25:19.339192+09:00에 확인했다. 69회귀·CLI 재현/출력거부·변조 실측증빙3종 거부·191/221행 원문/그룹/해시·136pack초기경로/ignore/신규비밀값/diff 검증 완료다. 기존1,197행 실토큰 증빙을 재사용했고 이번에는 실제 라이브러리의 CPU 손실 검사를 수행했다. 서버 임시1파일5,412B/검사컨테이너와 Mac임시33파일4,057,398B 정리, 패키지설치·새학습·운영변경0이다. 이 영수증도 후속 게시하며 최종SHA·실원격일치·작업트리와 게시helper 삭제는 로컬 세션/최종답변에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h52"></a>
+<a id="record-f26ff2ebe5393087c9e9ea65071cc7df33441cc80845787fba8a52a3d1a9fc8c"></a>
 
 ## 관제 후보126건 원문 재검수·누락 보완 — 2026-10-30T17:55:58.264786+09:00
 
@@ -995,6 +7643,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h53"></a>
+<a id="record-44785a81582095a48b072bbb02ec74a4d92fa9370b2875bf5aee08a1d1b6a20c"></a>
+
 ## 학습 후보 분리·반복 축소·FW 도구 누락 보완 — 2026-10-30T17:35:02.832213+09:00
 
 - **완료 범위:** 기존 학습 CTI 재사용1,024건 / 기관 근거 관제 후보143건(V4 미편입126+R2 17) / 선택적 하네스30건을 별도 풀로 구성했다. 합계1,197은 신규 사건 수나 확정 학습 비율이 아니다. V4의 `withheld`·기존 원본/분할/해시를 유지하며 자동 학습 편입0이다. [검수 원장](../finetuning/SOC_MIXTURE_REVIEW.json).
@@ -1007,6 +7660,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시/정리 확인 (2026-10-30T17:38:21.485393+09:00):** 공개9파일을 `c17bf4aa9044053a95a1a390e78afb29c0a17686`로 자동 커밋·푸시하고 actual origin/main 일치·clean을 2026-10-30T17:38:03.919855+09:00에 확인했다. 55회귀·1,197개 실토큰/마스크·선택 원행155 바이트 동일/27질문유형·CLI 재현/출력거부·131pack초기경로·ignore/신규내용 비밀값/diff 검증을 완료했다. Thor 임시34파일7,090,206B·컨테이너2개, Mac 임시22파일13,562,710B를 제거했고 프로젝트 자료·근거는 보존했다. 기존37개 카탈로그/운영 하네스/모델은 유지한다. 이 영수증도 후속 게시하며 마지막SHA·실원격일치·작업트리와 게시helper 제거는 로컬 세션/최종답변에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h54"></a>
+<a id="record-b802eb668af2d764b2c4571e7cf4c2baaaf24b5a43b92e7729392a49966153c6"></a>
 
 ## CAM 평가후보 구성·문맥 크기·채점 오류 보완 — 2026-10-30T17:04:11.427072+09:00
 
@@ -1021,6 +7679,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h55"></a>
+<a id="record-2af190d42abffd66b14d3970f4163aa190f9bb54eb801a688b989ca5f2467f5a"></a>
+
 ## 실제 토큰 검사·누락 과거 자료 대조 완료 — 2026-10-30T16:40:16.866864+09:00
 
 - **접속/실행:** 사용자 VPN 재연결 후16:23 KST A SSH/HTTPS·Thor TCP 연결,16:27 Thor SSH 인증을 확인했다. A/B 서비스 전체 건강성 검증은 아니다. Thor 기존 고정 이미지/venv에서 CPU4·8GiB·GPU없음·네트워크없음·읽기전용 루트로 검사했고 Ollama는 검사 전후 active였다. 서비스 중지·재시작/패키지 설치 요청0이다.
@@ -1034,6 +7697,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h56"></a>
+<a id="record-7e20c046d05721509cbcc2caadd0c2971442992ffa3b050ec3313099db54548c"></a>
+
 ## CAM-LDS 편입 전 버전·기법 범위·입력 주석 검수 — 2026-10-30 KST
 
 - **해결:** 고정 제공파일의 라벨883개는97개 기법/하위기법ID·상위81개, 질문990개는95ID·상위80개다. 빠진 `T1573`·`T1557.002`의 두 단계는 filtered 원장에 공격자 파일만 있고 제공 생성기는 공격자 호스트를 제외한다. 전체243단계 중 질문198단계/미포함45단계를 확인했다. 이전81대80의 범위 미확정을 해소했으며 빠진 관측/정답을 만들어 채우지 않는다. [출처·검증](../finetuning/CAM_INPUT_REVIEW.json).
@@ -1046,6 +7714,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시/정리 확인 (2026-10-30T16:14:29.636783+09:00):** 공개10파일을 `e3245c25a76e4a83ae77c81d6a0841c54fc779ed`로 커밋·푸시하고 실제 origin/main 일치·clean을 확인했다. 11회귀·990질문/883라벨 별도 전수대조·CLI 재현·7Gitblob/10차이원문·122개pack초기허용경로·76인용키·문서링크/구문/JSON/비밀패턴/ignore/diff·R8고정25소스/17후보불변 검사를 완료했다. 이번원본/목록/재현본/임시helper **27파일·15,816,126B**를해시후제거했고 Mac설치0이다. 이영수증도후속게시하며 게시helper정리·최종SHA/원격일치는로컬기록에남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h57"></a>
+<a id="record-969cf163362b756a435af720be07a5eda63b328995d4440c4755b9c9be068a15"></a>
 
 ## 우선 과제: 관측 후보 답변 검수·수정 — 2026-10-30 KST
 
@@ -1061,6 +7734,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h58"></a>
+<a id="record-eb86cb30fa7b9ccd770744680a4297e05bcb2d408aa2201f6840c0b0eb84641e"></a>
+
 ## 학습 편입 판단과 발표 작성 유예 — 2026-10-30 KST
 
 - **현재 데이터 단계:** 기관/학술 출처 확보와 선택 원문·정합성 검수까지 완료했다. 신규 학습 편입은 **0건**이다. 원문 행 수는 관제원 업무의 학습 문항 수와 다르다. RBD24는 메타데이터만 검토했으며 원행 검수는 미완료다.
@@ -1073,6 +7751,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 **게시 확인 (2026-10-30T15:35:39.321533+09:00):** 공개 현황·계획·README 3파일을 `a0d7d7ca0a6aa4d7e95fdb12e97b079bc1824918`로 커밋·푸시하고 실제 origin/main 일치·clean을 확인했다. 학습입력/후보 해시 불변·로컬자료 제외·문서 링크/비밀패턴/diff 검사를 완료했다. 이번 작업은 데이터 편입 판단과 발표 작성 유예 기록이며 신규 데이터 정제·학습·운영 검증 완료가 아니다. 이 영수증도 후속 게시하며 최종 SHA/원격 일치·게시 helper 정리는 로컬 기록에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h59"></a>
+<a id="record-23ba4bfc92eed903e82edfd58d423e6ad620d23f53bade3384afce7c22221a8a"></a>
 
 ## BETH 분할·원본 중복 전수 검사 — 2026-10-30T14:01:09.546820+09:00
 
@@ -1087,6 +7770,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h60"></a>
+<a id="record-b6383c6779933de8802048faa65da399d26de5ab3538c1ed32d163dd61f9928b"></a>
+
 ## 추가 원천 CAM-LDS·BETH·RBD24 검토 — 2026-10-30T13:50:22.485653+09:00
 
 - **완료/출처:** AIT CAM-LDS(학술지/Zenodo CC BY4.0), BETH(연구자·CAMLIS2021/공식 Kaggle v3 CC0), i2CAT RBD24(Computers & Security/Zenodo CC BY4.0)를 추가 확인했다. 기존 자료와 독립인 원천3종이라고 단정하지 않는다. [버전·파일·SHA·제약](../finetuning/SOC_EXTRA_CORPORA_REVIEW.json).
@@ -1100,6 +7788,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h61"></a>
+<a id="record-30cc8aa83650b960c4fff9e67844bd7f0a65a0b3211b091b097ddbfbf21d7e1e"></a>
+
 ## Hornet 실제 인터넷 관측 자료 추가 검수 — 2026-10-30T13:31:18.052453+09:00
 
 - **완료/출처:** CTU·Stratosphere의 Hornet65 공식 Mendeley 경로에서 TLS 검증을 유지해 원자료에 접근했다. 원 배포 서버의 과거 인증서 오류와 구분한다. CC BY4.0·Data in Brief58/111261 논문/DOI 연결, README·집계CSV 제공SHA 확인. 암스테르담/시드니4월30일 **198개 gzip·20,728행(연결19,772·수집손실192·경고192·stats572)**을 선택 검수했다. [원장/출처](../finetuning/HORNET_EVIDENCE_REVIEW.json).
@@ -1111,6 +7804,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **게시/정리 확인 (2026-10-30T13:35:07.184124+09:00):** 공개12파일을 `92e3f59aa0f0608436a1f2a45b518f806625cb1b`로 커밋·푸시하고 actual origin/main 일치·clean을 2026-10-30T13:34:04.810102+09:00에 확인했다. 이번 임시 gzip/공식metadata·목록/웹참조/helper **216파일·15,718,649B**를 SHA 기록 후 제거했다. Mac 설치0, 전체ZIP·duckdb 다운로드0. 프로젝트 소스/원장·로컬 근거/발표 자료는 보존했다. 이 영수증도 후속 게시하며 마지막 SHA·원격 일치/게시helper 제거는 로컬 기록에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h62"></a>
+<a id="record-ab6b904ffac6a21135f59dd036b5f8d14ead74f5424f030570c53251d769f03f"></a>
 
 ## DEDALE flow·SSH·결측값 추가 검증 — 2026-10-30T13:13:51.712930+09:00
 
@@ -1124,6 +7822,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h63"></a>
+<a id="record-face34ab1514d97bf9b6ab12820888450aafc186fa97bfbfd99aa6be0241a3aa"></a>
+
 ## DEDALE 시각 단위·정규화 손실 검증 — 2026-10-30T12:44:07.947747+09:00
 
 - **완료:** 공식 syslog ZIP125,537,856B와 alert ZIP24,596,811B의 전체 SHA/제공MD5를 확인했다. syslog **672시간·5,017,693행·3,154,221,475B**에서 경보 **1,465,627행**을 export와 전체 비시간 필드·명시적 타입2개·시각 표현/횟수로 대조했다. 누락·초과0, 원시 JSONL 제공MD5672개/CRC/BZ2완독 통과. [원장](../finetuning/DEDALE_CLOCK_REVIEW.json).
@@ -1135,6 +7838,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **게시/정리 확인 (2026-10-30T12:46:29.309750+09:00):** 공개13파일을 `d7331ea8e5241848690528670448aebbf09675ae`로 커밋·푸시하고 실제 origin/main 일치와 clean을 2026-10-30T12:46:15.458058+09:00에 확인했다. 임시 다운로드·작성자 소스 참조·metadata/helper **26파일·153,233,528B**를 해시 기록 후 제거했다. 프로젝트 소스/원장과 로컬 근거/발표 자료는 보존했다. 이 영수증은 후속 커밋·푸시하며 마지막 SHA/원격 일치·게시 helper 제거 결과는 로컬 기록에 남긴다.
 
 이하 이전 검증 이력을 보존한다.
+
+
+
+<a id="source-87368a0abd79b357-h64"></a>
+<a id="record-0e756624de5fa5900677b555ac70f6ccec2f281e20c2cc5441a504eeaa7c805f"></a>
 
 ## DEDALE IDS·호스트 연결 가능성 검증 — 2026-10-30T12:20:52.315263+09:00
 
@@ -1148,6 +7856,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검증 이력을 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h65"></a>
+<a id="record-3a249739dd05cfde90b19fab4dda1fbf84272ef645091efb065ba1605f741f70"></a>
+
 ## DEDALE 원문·라벨 연결 검증 — 2026-10-30T11:54:09.740198+09:00
 
 - **완료:** 공식 V2.1의 라벨4파일을 MD5/CRC로 확인하고 class1 부분집합을 중복 합산하지 않았다. Linux1·Windows6 시간 구간의 원본 **6,188,928행·9,986,690,545B**를 끝까지 스트림 검사해 라벨 **5,581개(5,190+391)**를 전체 JSON 내용으로 연결했다. 선정 구간 라벨 누락·중복 매칭0, 같은 시각·호스트의 다른 내용2,462행은 분리했다. [원장](../finetuning/DEDALE_LINKAGE_REVIEW.json).
@@ -1160,6 +7873,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검토·작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h66"></a>
+<a id="record-1c182cd847085e27a916d43c6f5419f2fd3262244a93fca1ac5065f65a7ee1d1"></a>
+
 ## 사건 자료의 출처·불확실성 검수 — 2026-10-30 KST
 
 - **완료:** Maastricht 흐름의18개 action·4개 condition을 인용된 공식 PDF의 관련 내용과 대조했다. 원문 PDF4,370,027B의 SHA와47쪽 추출, 관련10쪽의 시각 검토를 기록했다. 22개 노드의 해시/근거 쪽수를 묶었으며17개는 표현·기법·맥락의 한정이 필요하고5개는 사건 관측 수준에서 뒷받침된다. 17개의 확정 오류나5개의 인증된 정답을 뜻하지 않는다. [검토 원장](../datasets/ATTACK_FLOW_SOURCE_REVIEW.json).
@@ -1170,6 +7888,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **출처 검수 게시 영수증 (2026-10-30T10:46:00.362955+09:00):** 공개9파일 `a1e11f17d9c7f269556b5476224f78749add1a9e` 커밋·푸시와 실제 origin/main 일치(2026-10-30T10:45:45.862969+09:00)·당시 clean을 확인했다. 22노드 원문 연결·PDF47쪽 해시/10쪽 시각 검토·추정 주석과 연결·시각 차이,41원본 Gitblob·기존 파서/그래프/17후보/legacy·R8고정25소스/입력 불변,59인용키·ignore/diff 검증을 완료했다. 이번 PDF/렌더/Swift/cache/helper 246파일 250,678,001B를 해시 후 제거했다. Mac 설치·새 학습·운영 변경0, 실제 tokenizer와 MCP/공격 E2E는 미실행이다. 게시 helper는 이 영수증 후속 게시 뒤 제거하며 최종SHA·원격 일치·작업 트리·정리 확인은 로컬 기록에 남긴다.
 
 이하 이전 검토·작업 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h67"></a>
+<a id="record-e9b9cabcce99a4a5b2bb7391ee75358c8b550cc075f5589c79583fb90d20687d"></a>
 
 ## Attack Flow의 누락된 조건·분기 보존 — 2026-10-30 KST
 
@@ -1183,6 +7906,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검토·작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h68"></a>
+<a id="record-fde4f9cacddaa18c47e56a1aa09b654f4dc25144f49c6c457e9ae03b559267f3"></a>
+
 ## 원문 근거를 보존한 관제 입력 후보 17개 — 2026-10-30 KST
 
 - **완료:** 앞서 원문을 검수한 AIT 9개·Linux-APT 8개 조사 초안을 입력 후보로 정리했다. 94개 원문 근거의 관측값·시각·출처 연결·답변 참조와 출처 고지 2개를 모두 보존했다. 반복 필드를 묶어 입력 UTF8 크기는 38,203→21,777B(약43%)가 됐다. 토큰 수·응답 속도·모델 정확도 개선 수치가 아니다. [검증 원장](../finetuning/SOC_OBSERVATION_INPUT_REVIEW.json).
@@ -1194,6 +7922,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **입력 후보 게시 영수증 (2026-10-30T10:13:50.321988+09:00):** 공개10파일 `a9d27d4d70ad89047cb2c1470c6e038f769765f5` 커밋·푸시 및 실제 origin/main 일치(2026-10-30T10:13:24.942874+09:00)·당시 clean을 확인했다. 16개 단위검사와94근거 보존 대조, 출처 고지 불변, 원장해시·구문·pack 정적 입력105개·Bib57키·R8 고정25소스/manifest 불변·diff 검사를 마쳤다. 실제 tokenizer/전체 pack/신규 학습/운영 E2E는 미실행이다. 이번 원본 다운로드와 Mac 패키지 설치0, 자체 접속·검증 helper2개 제거 완료. 게시 helper는 이 영수증 후속 게시 후 제거하며 최종SHA·원격 일치·작업 트리·정리 증거는 로컬 기록에 남긴다.
 
 이하 이전 검토·작업 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h69"></a>
+<a id="record-ecd18e2388db698ddf21bc923f6b8e1babd72ca03b12e615521e99a575a687b4"></a>
 
 ## Linux-APT 관제 조사 초안 8개 원문 대조 완료 — 2026-10-30 KST
 
@@ -1207,6 +7940,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검토·작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h70"></a>
+<a id="record-5c23353f4b5cba4f3b38174c394ea1af6f20368b91a583d7824b2441a1d38a7e"></a>
+
 ## Linux-APT 전체 17 CSV 검증 완료 — 2026-10-30T09:04:02.365903+09:00
 
 - **완료:** 공식 CSV 17개·208,367,683B·122,563행을 끝까지 파싱하고 제공 MD5/크기와 SHA256을 확인했다. 논문 표의 개별 17파일 행 수는 전부 실측과 일치한다. 표의 합본 표기122,565·가공본125,899·본문125,898은 이번 CSV합계와 별도로 기록했다. 합본/가공본을 추가 독립 자료로 세지 않는다. [원장](../finetuning/LINUX_APT_EVIDENCE_REVIEW.json) · [출처](../finetuning/DATA_SOURCES.md).
@@ -1218,6 +7956,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Linux-APT 게시 영수증 (2026-10-30T09:05:38.330203+09:00):** 공개12파일 `b88b787f87c02ed696d2d1aa0e9ac65111675c08` 커밋·푸시 및 actual origin/main 일치(2026-10-30T09:04:55.985865+09:00)·당시 clean을 확인했다. 17CSV/122,563행/208,367,683B 제공MD5·크기·논문17개 수량일치,15회귀·독립819행/25좌표검사(최종24좌표는 검증집합 포함),원장JSON/pack구문·R8고정25소스/manifest불변·diff검사를 완료했다. 원문 구간 정답검수/새학습·서버반입/전체pack/운영SOC E2E는 미실행이다. 원시CSV디스크보존·Mac신규설치0,임시검증/문서helper3개 제거 완료. 게시helper는 이 영수증 후속게시 후 제거하며 최종SHA/실제원격/작업트리와 정리증거는 로컬기록에 남긴다.
 
 이하 이전 검토·작업 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h71"></a>
+<a id="record-548a6d2d8b1c7170ce7818b912de5cfa214dd608c5182f2f0a6eb3e016d1b856"></a>
 
 ## 추가 실제 데이터5원천 검토·소형 원본 검증 — 2026-10-30 KST
 
@@ -1231,6 +7974,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검토·작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h72"></a>
+<a id="record-3e427ab8b3b4d67e6829881b0e555922aab6d9f3ef0e5c9d6ce210eda6df74ed"></a>
+
 ## OpTC 부분 원문 검증 완료·전체 사건 연결 미완료 — 2026-10-30 KST
 
 - **완료:** 선택2파일의 첫1MiB씩에서31,797완전 JSON행·파싱/시간대불명0·표본 event ID고유31,797을 독립 대조했다. 명시적-04:00 문자열 timestamp와 인접시각 역전11,471회를 확인해 숫자형/파일명시각/정렬 가정을 금지했다. 목표호스트0은 prefix 범위 사실이며 정상/전체부재 정답이 아니다. [출처·원장](../finetuning/OPTC_EVIDENCE_REVIEW.json).
@@ -1241,6 +7989,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **OpTC 부분검증 게시 영수증 (2026-10-30T02:57:05.519382+09:00):** 공개11파일 `ed92582591748ac77fd22ea8d606b4d3cceaf34f` 커밋·origin/main 실제 일치(2026-10-30T02:56:40.376683+09:00)·당시 clean. Mac/Thor최종11검사·31,797원행 독립대조·17투영 SHA/시각·최종prefix결과동일·6근거SHA/JSON/구문·R8고정25소스/입력 불변을 확인했다. 서버의 전체원문 시도는 quota로 종료한 미완료 작업이며 학습/사건 정답 검증으로 표시하지 않는다. 자체worker부재/Ollama active 재확인·검증원장2개Thor SHA동일·Mac임시7파일2,112,316B 제거 완료. 원본/메타데이터/실패·출처 근거와R1소스는 보존하며 자격/로컬보고·대화/업무는 Git제외. 게시helper는 영수증 후속게시 뒤 제거하고 최종SHA/실제원격/트리는 로컬기록에 남긴다.
 
 이하 이전 검토·작업 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h73"></a>
+<a id="record-11b2c41cd306240ed874b1cca1ff463c68ce960df17f800db52eb9750995f5a4"></a>
 
 ## 추가 데이터 권리·누락 검토 완료 / OpTC 원본 연결 전 — 2026-10-30 KST
 
@@ -1253,6 +8006,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 검토·작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h74"></a>
+<a id="record-cdb1646984a20b069311730b6aeeca01280828ba3cdecf7fa295fc5e99ab8556"></a>
+
 ## AIT 관제 질문·근거 초안 9개 검수 — 2026-10-30 KST
 
 - **완료:** 기존 학습5환경의9구간에서 원행25개·AMiner 동일문자열 연결14개를 근거로 조사 질문/답변 초안을 만들었다. 사건은 기관 시험자료에서 왔고 질문·답변 문구는 프로젝트 에이전트 작성이다. 기관 공식 정답/독립 전문가 검수본으로 표시하지 않는다. [원장](../finetuning/AIT_CASE_REVIEW.json) · [출처/해석](../finetuning/DATA_SOURCES.md).
@@ -1263,6 +8021,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **관제초안 게시 영수증 (2026-10-30T02:11:30.329318+09:00):** 공개10파일 `4358885f2aed933300572645598fd379c11cf8ae` 커밋·origin/main 실제 일치(2026-10-30T02:11:05.366738+09:00)·당시 clean. 최종Mac CPU8검사·25원행 별도 대조·14교차참조·R1/R2/R3초안 동일·출처NOTICE 자동생성/SHA·R8고정25소스/입력 불변을 확인했다. 초안/원문근거·대화/업무/자격은 Git 제외. Mac 신규 패키지/원시ZIP 설치·보존0; 메모리 부분읽기와 프로젝트 출처기록만 사용했다. 임시게시helper1개는 이 영수증 후속게시 뒤 제거하고 마지막SHA/실제원격/트리는 로컬기록에 남긴다. Thor반입/전체pack/새학습/운영E2E는 미실행이다.
 
 이하 이전 작업 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h75"></a>
+<a id="record-e7aaed78dc172e49c9afaf9b945c9cfb7889647a24ceb251cb10e29d4b4e62df"></a>
 
 ## AIT 원시 로그 연계 완료·시각 파서 보완 — 2026-10-30T01:46:51.694593+09:00
 
@@ -1275,6 +8038,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h76"></a>
+<a id="record-c01428646f1e3e09e9f60f6b752195ba6a2afcd0f9ce67d854c214f6b67eb21c"></a>
+
 ## AIT 관제 증거 검증 완료·학습 편입 전 — 2026-10-30T01:11:08.558457+09:00
 
 - **완료:** 별도 표준 라이브러리 추출기로 기존 AIT 학습6환경의 Wazuh/Suricata 원본1,371,021행을 대조했다. 제공 MD5·멤버 CRC/SHA 검증, 파싱 실패0·복수 단계 일치585행. 검토66묶음 중57개에 원경보 고유450개(묶음 내454회)를 보존했다. 혼합 센서 묶음37개, 관측0 구간9개는 빈 상태로 유지해 정상/공격 실패로 단정하지 않았다. [출처/한계](../finetuning/DATA_SOURCES.md) · [기계판독 검증](../finetuning/AIT_EVIDENCE_REVIEW.json).
@@ -1286,6 +8054,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 이전 작업 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h77"></a>
+<a id="record-299447e64b7cb2f5a75c33bbddf65cc2af32366f83939dc91a1526c8c4c7f1c8"></a>
+
 ## 추가 SOC 학습자료 조사 완료 — 2026-10-30T00:57:16.287495+09:00
 
 - 사용자 추가 데이터 요청에 따라 신규 직접 도입 후보 LANL·OpTC·BOTS와 기존 CMU CERT·AIT 확장 경로를 구분했다. 제공자 원문·규모·라벨 한계·권리 고지와 GitHub3개 commit/CMU 공식 version1 메타데이터를 확인했다. [출처·우선순위](../finetuning/DATA_SOURCES.md) · [기계판독 후보 원장](../finetuning/SOC_DATA_CANDIDATES.json).
@@ -1296,6 +8069,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **자료 조사 게시 영수증 (2026-10-30T00:59:38.840889+09:00):** 공개7파일 `09ec06a513eda75cde7035b4dfe29cd94fb6978a` 커밋·origin/main 실제 일치(2026-10-30T00:58:58.690804+09:00)·게시 당시 clean. 후보5묶음/신규 직접 후보3종/편입0·BibTeX 키 유일성·V5 고정 입력 SHA·diff 검사 통과. 프로젝트 자격 파일의 저장소/고유 토큰을 해당 Git 프로세스에만 전달했다. 이번 임시 게시 helper1개는 이 영수증 후속 게시 뒤 제거하고 최종 SHA·원격 일치·제거 결과는 로컬 기록에 남긴다. 서버 반입·신규 학습·자료 품질 인증 완료를 뜻하지 않는다.
 
 이하 이전 운영·검증 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h78"></a>
+<a id="record-8563fb7b6f95e1ba257d56141dfa2cb9d695038d26f3516bee5f3da2c61ebdfc"></a>
 
 ## V5 최종 CTI 비교 완료 — 학습본 운영 미채택 — 2026-10-30T00:40:22.883444+09:00
 
@@ -1321,6 +8099,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 당시 진행 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h79"></a>
+<a id="record-985f1f12f7a1a339d373a4f5cf009a411111fcb2d3917c9ef9b6a3ea46dcc1cf"></a>
+
 ## R8 후보 등록·개발 비교 완료·미사용 시험 진행 — 2026-10-30T00:24:05.048706+09:00
 
 - **산출물 완료:** CPU 병합1,045텐서/190모듈 변경·855보존과 Q4_K_M 변환/최종 SHA를 검증했다.00:06 KST export 완료·컨테이너exit0/OOMKilled=false. Q4 21,713,462,816B SHA `7b9770710c42d30d77a7fe67bea15ebdb1fbaaecc456e413071d10015bb363de`;원본/어댑터/병합본/최종Q4/projector는 보존하고 이번 신규71,066,994,528B BF16 중간파일만 검증 후 제거했다. 종료된 이번 컨테이너·옛 작업 묶음1개도 정리했다.
@@ -1331,6 +8114,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **반영/정리:**공개 소스·실행 원장·README/계획/출처·Thor 안내와 로컬 기록을 동기화하며 자동 Git 반영 중이다. Mac 패키지/가중치 설치·다운로드0,진행 중 평가/진단 helper는 마감 후 정리한다. 00:32 KST Thor 학습 안내/출처/실행 원장 등5파일 SHA 일치·149파일 최신pack 검증 완료(SHA `ee929038dcbab5f6f5a52de79e94aec37ad25361c6b53d4c8733dd3db33a8952`)·옛 자체pack 제거. 게시/정리 영수증은 후속으로 구분한다.
 
 이하 당시 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h80"></a>
+<a id="record-5b1196242d8fcc597eb2b9691cf31ae600a6dee89776bcad4747cb77164b67ae"></a>
 
 ## V5 동일 조건 비교 준비·CPU 변환 진행 — 2026-10-29T23:43:10.375698+09:00
 
@@ -1348,6 +8136,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 당시 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h81"></a>
+<a id="record-7911878d2be8a7f4e725ad74fc8fa41f6aa831da2ed703d16651cefc19e4011d"></a>
+
 ## R8 본 학습 완료·원모델 복구·가중치 검증 — 2026-10-29T23:16:35.022765+09:00
 
 - **완료 실측:** Thor R8은2026-10-29 23:10:09 KST 학습 종료,23:10:21 KST 기존 추론 자동복구,23:10:22 KST 서버 완료검증 통과. 전체1epoch/512 optimizer단계·고유 관측1,024개 각각1회·성공 forward/backward1,024개와 고정 입력/프로필/원본 base 일치를 확인했다. 이는 학습 입력 누락/중복 검사이며 관제 답변 누락0을 뜻하지 않는다.
@@ -1362,6 +8155,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 기록은 진행 당시 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h82"></a>
+<a id="record-ab8cf0461a88e757f18028fddf36c77107fa09071be0dec660e3e542aa738ead"></a>
+
 ## R8 학습 상태 확인 재개 — 2026-10-29T20:53:43.193600+09:00
 
 - **사용자 지시:** 작업 재개와 학습 현황 확인을 요청해 이전 조회 보류를 해제했다. 추가 학습 실행·운영 모델 교체 지시로 확대하지 않는다.
@@ -1374,6 +8172,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **게시 영수증 (2026-10-29T20:54:48.362503+09:00):** 공개5파일 `2204f40ffe724dc0174207427c5e66ae42a0895c` 커밋·origin/main 실제 일치(2026-10-29T20:54:29.860674+09:00)·게시시 작업트리 clean을 확인했다. JSON/수치·변경5파일·고정 소스25SHA/입력SHA 불변·로컬전용4경로 제외 검증 완료. 프로젝트 고유 토큰을 해당 Git 자식 환경에만 전달했고 helper/캐시/HTTP추적을 사용하지 않았다. 이 후속 현황도 게시한 뒤 Mac 임시 publisher1개만 SHA기록 후 제거한다. 원격 학습/복구/기존 파일은 보존한다.
 
 이하 기록은 이전 확인·중지 시점의 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h83"></a>
+<a id="record-002cf52251ab867d639672a4a2d2bc713759732865188eb1fd21d365787d749d"></a>
 
 ## 최종발표 근거 정리·알림 등록·학습 진행 확인 — 2026-10-29T19:16:18.940694+09:00
 
@@ -1389,6 +8192,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **사용자 요청에 따른 중지:** 사용자가 이 문서/Git 마감까지만 완료한 뒤 나중에 다시 호출하겠다고 했다. 마감 뒤 에이전트 작업과 추가 학습 상태 조회를 일시정지한다. 서버의 실행 중 학습·기존 자동복구/진행 스냅샷은 유지하며 운영 모델 교체/추가 시험을 시작하지 않는다.
 
 이하 기록은 각 시점의 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h84"></a>
+<a id="record-0f51e91115cde1ce597e0eae95edcb66cc3890a291e4e5d6f2e544f646b161ca"></a>
 
 ## 관리자 보호·사설 출발지 대응 정책 반영 — 2026-10-29T18:55:56.693731+09:00
 
@@ -1406,6 +8214,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 기록은 각 시점의 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h85"></a>
+<a id="record-3ec4625421ad3d486727ad7ac31a8ad780f41bba4570dcf1d71d82eaa63a546e"></a>
+
 ## R8 본 학습 실행 중 — 2026-10-29T18:09:10.108063+09:00
 
 - 사용자가 약5시간28분 예상/공유추론중단·원격연결해제 후 지속실행 설명 뒤 진행을 지시했다. 기존4h30은 이전 창의 승인으로 보존하고 이번 새1회 실행을 별도로 제한했다. 사용자에게 정확한351분 승인을 받았다고 표현하지 않으며, 운영자가340분 학습/345분 독립복구+6분 복구 제한을 설정했다.
@@ -1419,6 +8232,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 이하 기록은 과거 시점의 이력이다.
 
+
+
+
+<a id="source-87368a0abd79b357-h86"></a>
+<a id="record-6a354ca123ff64b7aa010d097ac3164bf3b33059f21a456a442947c9a87fd895"></a>
 
 ## 재현성 보완 검증 완료 · 본 학습은 새 시간 계획 필요 — 2026-10-29T17:46:58.827050+09:00
 
@@ -1435,6 +8253,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 이하 기록은 각 시점의 이력이며 최신 상태는 위 항목을 따른다.
 
 
+
+
+<a id="source-87368a0abd79b357-h87"></a>
+<a id="record-2bb9bc2603dc8faa8832941cf1a30f20210f634c1ca0aa62b57a498839ab4e48"></a>
+
 ## FW 전체 조회 도입 완료 · 학습 시험 검증 중단/복구 — 2026-10-29T16:49:34.077983+09:00
 
 - **FW 완료:** `resp.get_firewall_rules` 운영 반영, A 호스트 기본 정책·30체인·98규칙·8테이블·9집합/전체145객체와 NAT/Docker 포함 조회. 임시 차단 목록과 구분하며 읽기만 수행한다. 두 봇은8서버/38도구(읽기29/보호9) 계약과 동일한 근거·KST·페이지 검사를 사용한다. A 호스트 외 서버/네임스페이스·legacy iptables는 범위 밖이다. [사용/복구](../infra/mcp/firewall-read.md).
@@ -1446,6 +8269,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git:** 공개변경을 검증 후 자동 커밋/푸시 진행 중이며 이 현황 작성 자체는 게시 완료가 아니다. 실제 커밋·원격일치는 후속 영수증/로컬 세션에 남긴다. 대화/검증raw·업무분담·자격·실데이터/가중치는 계속 로컬 전용이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h88"></a>
+<a id="record-4de806007c57e9e1ef75e459c8ea1c124c11616c7730117dfa532748677e6c66"></a>
+
 ## 작업 재개·학습 병행 승인 — 2026-10-29T16:26:14.131486+09:00
 
 - 인터넷 복구 후 FW 도입 마감을 재개했고 학습 병행 및 최대4시간30분 중단·자동복구를 명시 승인받았다. 이전 3시간 안내는 과거 기록 기준이었으며 13:15의4h30 승인/동결입력과 대조해 정정했다. FW 검증 후 GPU를 시작하며 운영 모델 자동 교체는 하지 않는다.
@@ -1453,6 +8281,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - FW는 양쪽 SDK/Ollama 자연어·Hermes private 직접CLI 실조회 성공. 공동채널 root controller가 별도 gate 파일 대신 `-c` 내장 과거 코드를 실행하던 차이를 발견해 canonical 소스와 동기화했다. 공동채널 자연어 완료 검증은 여전히 진행 중이며 전체 완료로 표시하지 않는다.
 - 상세 범위·복구점은 아래 기록을 보존한다. 새 실행/최종검증·정리·Git 영수증은 완료 후 별도 기록한다. 학습 계획은 [PLAN](../PLAN.md), FW의 실제 내장 코드 검증 기준은 [FW 문서](../infra/mcp/firewall-read.md)를 따른다.
 
+
+
+
+<a id="source-87368a0abd79b357-h89"></a>
+<a id="record-1046cd7443dadb231e98e79b01c1d29b6cf9742f8f59c5f78397cf346c6b0dab"></a>
 
 ## FW 전체 읽기 MCP — 운영 반영 후 Hermes 호출 검증에서 일시정지 (2026-10-29T14:58:47.114658+09:00)
 
@@ -1466,6 +8299,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **복구·임시물:** A/B `/var/backups/capstone-fw-read-20261029`와 B `followup` 백업을 보존한다. Mac `/private/tmp/capstone-fw-read-20261029-q9fw6i6c`는 재개용 임시 스크립트가 남아 있고 서버 평가 폴더 `/var/lib/capstone-fw-read-eval-20261029{,-r2,-r3}`도 아직 정리하지 않았다. 새 패키지 다운로드/설치는0이다. SDK/모델 시험 worker는 마지막 보고에서 종료(실패)했으며 추가 작업을 기동하지 않았다. 인터넷 중단 직전 추가 서버 상태 조회는 생략했다.
 - **Git:** 현재 FW 관련 소스·설정·설치 경로·문서는 로컬 미커밋이다. 미완료 작업이므로 커밋/푸시 완료로 표시하지 않는다. 마지막 기존 커밋은 `caf51fe862bdf2e449d7526466d359846ede897c`이며 이번 중지 시 원격 재조회는 하지 않았다. 대화·검증 보고·업무분담·자격 파일은 계속 로컬 전용이다.
 
+
+
+
+<a id="source-87368a0abd79b357-h90"></a>
+<a id="record-9f3be488879eec0d741adfc1899dd2f45b32d436b058c0925ab24dacfae08da1"></a>
 
 ## 학습 보류·계획만 정리 — 2026-10-29T13:27:35.863058+09:00
 
@@ -1481,6 +8319,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 이하 항목은 과거 실행·계획 기록이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h91"></a>
+<a id="record-e9d9ba4e2067dbe4a363dcfcc2958586318d0f7c30d1c3f0204bbce3828eae95"></a>
+
 ## V5 시험·승인된 정리 완료 / 본 학습은 시간 연장 확인 대기 — 2026-10-29T12:04:45.407795+09:00
 
 - **실행 결과:** 원래checkpointed2-step성공·전체1,024개학습예상3시간47분57초로기존3시간승인범위를넘어본학습진입전복구. 설정최적화중변수스코프NameError1회/0step는수정·전함수미정의변수검사추가. checkpointing=False2-step도완료했으나eval loss차이(0.566027→0.576358)·시간이득미확인으로동일성게이트거절/채택안함. 현재계획은원래checkpointing=True로복구했다. [실투입/성공·실패·가중치근거](../finetuning/V5_EXECUTION_RESULTS.json).
@@ -1495,6 +8338,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 이하 항목은 과거 실행·준비 시점 기록이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h92"></a>
+<a id="record-a573a531a7f4fc128997ecfda6d57e12f0d78bed392f860f201cff855d9f30e2"></a>
+
 ## V5 2-step 성공·시간 초과 예측 후 실행 최적화 재시험 — 2026-10-29T11:40:50.532781+09:00
 
 - 최초최장2-step은정상완료(실GPUpeak65.93GiB·trainloss0.543857/eval0.566027·OOM0)했지만예상본학습3시간47분57초가165분제한을초과해**본학습진입전중단/원35B11:31:57KST복구**했다. 실제공유중단2분26초. `training_failed_restored`는시간가드의계획거절이며smoke자체GPU학습실패가아니다. 과거자료/소스/가중치·window/restore영수증을별도attempt폴더에보존했다.
@@ -1503,6 +8351,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **진행중:** 재시험·시간추정·본학습/원본복구. 이전병합HF26개정리는승인받았으나아직삭제전·변환/후보등록/운영승격미완료. 코드/현황은현재로컬변경이며마감Git와구분한다. FW→하네스후속은이후순서유지.
 
 
+
+
+<a id="source-87368a0abd79b357-h93"></a>
+<a id="record-74f29998b2b0af32d3339e7e43b18711199f26687858b8605c507f5d6e78def6"></a>
+
 ## V5 실행 승인·시험 학습 시작 — 2026-10-29T11:29:30.873059+09:00
 
 - 사용자가 직전 요청한 **최대3시간 공유Ollama중단/자동복구와 이전pilotHF26shard66.97GiB한정정리**를 승인했다. 승인범위를다시묻지않고진행한다.
@@ -1510,6 +8363,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **진행중:** 시험/본학습상태·실성공microbatch/복구를감시한다. 기존HF삭제·신규가중치검증/변환·후보등록/운영승격은아직완료아니다. 중단중두봇응답/LLM자동조사영향이있다. 새학습/GPU실행0이라는아래문구는이전준비시점기록이다.
 - 소스/운영설정추가변경없음. 새상태문서는현재로컬변경이며실제마감커밋·푸시결과와구분한다. 원래vLLM/driver전환대상아님·FW/하네스후속순서유지.
 
+
+
+
+<a id="source-87368a0abd79b357-h94"></a>
+<a id="record-20481ba9c93b10474c8fed89c70cc4c2f711852128214a02139e396e549a8592"></a>
 
 ## MITRE·CISA 근거 기반 V5 정제·학습 준비 — 2026-10-29 KST
 
@@ -1531,6 +8389,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 **우선순위 확정 2026-10-29T04:37:57.446011+09:00:** 사용자 지시로 vLLM·NVFP4·MTP 추천은 향후 고려사항으로만 보관한다. 현재 설치·운영 전환·성능시험은 진행하지 않으며, 외부 기관·학술·공식 사고 자료의 추가 수집과 근거 검수·정제를 우선한다. 기존 Ollama 운영을 유지하고 학습→FW 조회 도구→하네스 정리·비교의 후속 순서는 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h95"></a>
+<a id="record-4bf8b36deb9054e35bfe095658c6472fae5a8b8412accf344f97e450696b4086"></a>
+
 ## 출처·정답 신뢰도 재검토로 신규 학습 보류 — 2026-10-29T04:16:44.348253+09:00
 
 - **Git·정리 영수증 2026-10-29T04:34:38.384477+09:00:** 공개35파일 커밋`c8cf7d7323be48d031bbd2527da739524e01e2cc`를2026-10-29T04:33:40.231079+09:00 프로젝트토큰직접인증/추적해제조건으로게시·원격main일치·당시작업트리clean확인. 이번Mac자체임시50파일1,258,682B는SHA기록후제거/부재확인·최종게시helper1개만후속게시뒤제거한다. Mac모델/가중치/패키지설치다운로드0·서버필요원천/복구백업/학습준비본보존. 이영수증도자동후속게시하며마지막SHA/원격일치/트리와helper정리는로컬세션기록에남긴다. 데이터정제/근거검수·실제신규학습/후보적재·FW도구·하네스비교는미완료상태를유지한다.
@@ -1550,6 +8413,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 이전실제v1학습144대화/R2가용192대화(48step부분학습),초기18,872행은준비풀·전체학습아님. 새자료수는중복제거후원천레코드/사건·분할·실제학습투입량을따로집계한다.
 - 새GPU학습/공유중단/모델교체0. 기존준비완료check는기술검사이력으로보존하며현재학습허용으로해석하지않는다. 출처보강·검수/소스·Thor제어기동기화와Git는후속검증후기록한다.
 
+
+
+<a id="source-87368a0abd79b357-h96"></a>
+<a id="record-76da7b6029a08025143d1ef440ce300b256b32ee3a8f76221fa70ec5ae09b59b"></a>
+
 ## 기관 직무 연계520사례·전체대화 감독 준비 완료 / GPU 미시작 — 2026-10-29T04:01:04.855525+09:00
 
 [공식출처·원격참조·한계](../finetuning/DATA_SOURCES.md) · [준비원장](../finetuning/V4_DATA_PREPARATION.json) · [동결입력](../finetuning/V4_TRAINING_INPUTS.json) · [동일비교기준](../finetuning/V4_ASSESSMENT_POLICY.json).
@@ -1562,6 +8430,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 사용자지정후속:학습·품질/Thor적재→FW전체읽기MCP·두봇실조회→복구점을확보한하네스정리→미학습/학습×기존/정리4조건반복비교. 같은도구/권한/기반·양자화/문맥/디코딩/새대화를맞추고안전·누락·정확도→지연/호출/자원으로선택한다. 기존구성이좋으면유지·핵심실행경계는학습만으로제거하지않는다.
 - 남음:최종공개소스/문서·반입목록/Git동기화,새공유중단범위확인,실제GPU2-step/전체학습·품질,export공간확보/후보등록,FW·하네스후속/최종비교. 디스크약108GiB에서기존merge→BF16→Q4변환중첩은부족하다. 재생성가능한과거pilot HF66.99GiB/원adapter SHA보존은확인했지만삭제0. Mac패키지/가중치설치·다운로드0·검증한초기tar/재현복사본11파일78.62MB정리,현재활성SSH/수집helper는작업마감후정리한다. 새서비스/포트/키변경없어deploy초기서비스설정불변·training pack목록갱신/Git는마감영수증으로분리한다.
 
+
+
+<a id="source-87368a0abd79b357-h97"></a>
+<a id="record-9ea926b7ee7fe5d5b09f0d8d37ec01088c65fd10ef0a4278f255e6eae479a523"></a>
+
 ## 추가 기관 자료·원격 참조 원칙 — 2026-10-29T02:30:04.996942+09:00
 
 - 사용자 요청에 따라 대용량/저속 자료는 **원본 전체 다운로드 없이 원격 참조**한다. 필요한 로그·행 라벨만 HTTPS 범위 요청으로 읽어 정제 SFT와 출처 URL·버전·행 번호·행 SHA를 만든다. 최소 학습 입력 전송은 필요하며 전송0 또는 전체 원본 체크섬 검증으로 표시하지 않는다. 정제/검증 뒤 취득용 원문 임시 캐시는 제거한다.
@@ -1571,6 +8444,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 추가 자료의 역할 매핑·정제·분할/토큰·평가를 마친 뒤 학습 설정/복구 계획을 새로 고정한다. 1차R3자료/준비이력은 보존하며 새GPU학습/가중치·봇전환은 아직 없다. 원35B가동 유지.
 
 - **최종 비교·복구 요구 2026-10-29T02:50:38.856472+09:00:** 학습/적재→FW전체읽기MCP운용검증→복구점을확보한하네스정리 순서. 최종A(미학습+기존하네스)·B(학습+정리하네스)를선택하며2x2중간대조로기여를분리한다. 도구/권한/FW통합·모델기반/양자화/문맥/디코딩/새대화·미사용질문/반복조건을맞춘다. 기존운영tag와동일HFcontrol템플릿차이는별도기록. 보안치명오류gate→정확도/누락→지연p50/p95·도구/자원순서,기존이좋으면유지. 승인·권한·보호주소·대상/해시검증을학습만으로제거하지않는다. 변경전코드/설정/운영버전과복원절차를검증하고정리한다.
+
+
+
+<a id="source-87368a0abd79b357-h98"></a>
+<a id="record-f2a2157ec0f16a08e92b63e8dc9497812c4cd18f467443be3643b1b93ec3f449"></a>
 
 ## SOC 관제 업무용 R3 준비·실행 전 검증 — 2026-10-29T01:52:25.257257+09:00
 
@@ -1589,6 +8467,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **1차 준비 Git 영수증 2026-10-29T02:14:46.627970+09:00:** 공개27파일 `647841c60257f30b4c25f132de25cd42fefed6be`를 자동커밋·푸시했고 2026-10-29T02:13:18.493995+09:00 실제main원격일치/작업트리clean을확인했다. 이영수증은후속게시한다. 추가공식직무/기관자료 수집은 후속작업으로진행하며 새학습/운영전환은미시작이다.
 
+
+
+<a id="source-87368a0abd79b357-h99"></a>
+<a id="record-794f9d91538db7769a37125ecd3a885b0621f2fc27a0563d46726a262c835586"></a>
+
 ## 과거 학습자료 출처·투입 이력 감사 완료 — 2026-10-29T00:49:31.904875+09:00
 
 [논문용 출처/가공·검수/정정](../finetuning/DATA_SOURCES.md) · [3corpus/12실행 원장](../finetuning/TRAINING_PROVENANCE.json) · [BibTeX](../finetuning/references.bib) · [재검증기](../finetuning/audit_training_provenance.py).
@@ -1603,6 +8486,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **Git 영수증 2026-10-29T00:57:40.231982+09:00**: 과거출처/실투입이력공개11파일`785cd28c92ea06e0b6998fcebb59f4f7efcabbd7`를 2026-10-29T00:57:12.081042+09:00 프로젝트토큰직접인증으로게시·실제remote main일치/clean확인. 이영수증도후속자동게시하고마지막SHA·작업트리/원격일치·Mac이번임시정리는로컬세션에남긴다. 과거기록의한계와추가학습미시작상태는유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h100"></a>
+<a id="record-490194a0498f4b6c4216d30066ee2d7d8ffbf4af8da1960e2376556ddad4f031"></a>
+
 ## 추가 학습자료의 학회·기관 출처 확인 — 2026-10-29T00:25:43.539884+09:00
 
 사용자의 추가자료·공신력·프로젝트근거 요청에 따라 AIT기관/CSET2024,ToolACE/ICLR2025,Salesforce APIGen/NeurIPS2024,Trend Micro PRIMUS/EMNLP2025의 공식 서지·배포·검증 방식을 확인했다. MITRE/NIST는 지식·절차 근거로 구분한다. [서지/원문·용도·라이선스·실제검사/잔여](../finetuning/DATA_SOURCES.md).
@@ -1613,6 +8501,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 남음:원천행별변환·실제MCP스키마/ID·근거검수,독립전문가판정,사건/환경별분할·새미사용평가,토큰/자원확인후학습실험. 후보확인과반입/검수/성능향상은구분한다.
 
 - **Git 영수증 2026-10-29T00:27:16.866694+09:00**: 공식자료근거/한계공개6문서`369530e87b3f5263309f983517789a72de51a6e5`를 2026-10-29T00:27:16.816519+09:00 프로젝트토큰직접참조로게시·실제remote main일치/clean확인. 이영수증도후속자동게시하며마지막SHA·원격일치/작업트리·게시helper2개제거는로컬세션/최종답변에기록한다. corpus반입/새학습·운영변경은없다.
+
+
+
+<a id="source-87368a0abd79b357-h101"></a>
+<a id="record-5fc1a621357e2eed50bccf0a11b165e0a632f106e0b78cdcb8ad2a0e280368b6"></a>
 
 ## 새 SOC 품질 비교 완료 — 2026-10-29T00:05:36.932051+09:00
 
@@ -1628,6 +8521,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **Git 영수증 2026-10-29T00:16:39.730959+09:00**: 이번공개12파일커밋`59b31385c93dbee3f22c58539a3e9e04955ba7bb`를 2026-10-29T00:16:03.654183+09:00 프로젝트자격토큰직접참조로게시·실제remote main일치/작업트리clean확인했다. 이영수증·현재날짜표기도후속자동커밋/푸시하며마지막SHA·원격일치/작업트리와게시helper2개제거는로컬세션및최종답변에남긴다. 운영승격없음/실SOC E2E·학습경고인과미검증은유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h102"></a>
+<a id="record-fce3f59d3dc39fc2a1d97e60cb0658dd27893a36b981145616e3536549511a3d"></a>
+
 ## 원본 드라이버 재현1건·추론 복구 / 실제 모듈 교체 미실행 — 2026-10-28T23:00:17.673825+09:00
 
 **SSH만 가능하다는 복구 제약으로 진단 모듈은 로드하지 않았다. 기존 드라이버의2-step 재현에서0x51 1건을 다시 확인했고 학습은 정상 종료·원35B 복구했다. 학습 품질 영향의 인과 관계는 미확정이다.** [실측/한계/영향 비교](../finetuning/THOR_35B.md).
@@ -1641,6 +8539,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **마감 검증 2026-10-28T23:11:39.775771+09:00**: 최신문서4개/79파일SHA·반입tar바이트일치(SHA`6f52f3f998025a12f0bc383f58bae1ac721f0dfa0b259544a2deee95a8710eb4`) 확인. 2026-10-28T23:11:39.277290+09:00 원드라이버SHA/srcversion·화면PID2551·Ollamaactive/원35B태그일치·추가관련커널오류0·전용timer/operator비활성·컨테이너잔여0이다. 현재모델상주여부는 true로 별도기록하며 태그/서비스와구분한다. 실제GPU재현·CPU가중치비교·API3건을이전177검사/3host생략과중복계상하지않는다. 서버결과/필요복구기보존,Mac이번 22임시파일SHA후삭제/폴더부재확인·게시helper2개만최종Git뒤삭제한다. 신규패키지/모델Mac설치·다운로드0이다. 이번공개7문서/Git는후속영수증으로남긴다.
 
 - **Git 영수증 2026-10-28T23:13:00.313669+09:00**: 재현/학습·추론영향/실모듈미로딩 공개7문서`37abeb0e6f17918d65664307a2a9a4c991f671b5`를 2026-10-28T23:12:40.749080+09:00에 직접프로젝트토큰으로게시·실제remote main일치/clean확인했다. 이영수증도후속자동게시하며마지막SHA/원격일치/작업트리·게시helper2개제거는로컬세션에남긴다. 실제드라이버교체/원인규명·품질인과미확정은유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h103"></a>
+<a id="record-d06727986e1b73fc9ab4d9e498c373d8c42441623b8cb680722e66a8b5f43f17"></a>
 
 ## 빌드 환경·서명 정책·정적 ABI 확인 완료 — 2026-10-28T22:06:03.104308+09:00
 
@@ -1656,6 +8559,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **Git 영수증 2026-10-28T22:15:33.194398+09:00**: 두 전제검증/도구·반입/문서 공개10파일`a1c94b6485b41b712b9206f7e40b076a31af91d4`를 2026-10-28T22:15:00.314937+09:00에 직접 프로젝트 토큰으로 게시·실제remote main일치/작업트리clean 확인했다. 이 영수증도 후속 자동 게시하며 마지막SHA/원격일치/마지막2helper 제거는 로컬 세션 기록에 남긴다. 실제 모듈 로딩·원래0x51 재현/해결 미검증 범위는 유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h104"></a>
+<a id="record-af05dc9812413125b3746b440f64660072a8c85531420a88f6a8539f03929f4a"></a>
+
 ## 진단 패치 구현·격리 모듈 빌드 완료 / 운영 미적용 — 2026-10-28T21:20:31.177795+09:00
 
 **원인 추적 제약을 보완할 실패 전용 진단 패치와 실제595.78 모듈을 준비했다. 원래0x51의 근본 원인/해결 여부는 아직 미확정이다.** [구현·실측·남은 전제](../finetuning/THOR_35B.md) · [진단 패치](../finetuning/driver-diagnostics/README.md).
@@ -1669,6 +8577,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **마감 검증 2026-10-28T21:24:02.313410+09:00**: 로컬/Thor172검사 중 기존host Torch3건 생략·76파일 SHA 및 반입tar 바이트 일치(SHA`7bbd7ef7594b0a8ea5c1cd90428c264a9671ce8f97e0a15ee3cfe7bc6cc2ddda`) 확인.21:23:00KST Ollamaactive/원35B 상주·추가관련커널오류0·운영모듈SHA/srcversion불변·후보미로드·진단문자열6개실제산출물포함 확인. 후보/패치·보고서·실패/성공로그 보존,서버소스압축/컴파일중간물/임시worker정리. Mac이번 28임시파일은 SHA후삭제·디렉터리부재 확인했고 게시전용2helper만 최종push뒤삭제한다. 새패키지/가중치 Mac설치·다운로드0·운영중단0이다. 근본원인/실제교체·런타임미검증은 유지하며 공개변경/Git는 아래 후속 영수증으로 남긴다.
 
 - **Git 영수증 2026-10-28T21:25:14.691733+09:00**: 진단 패치/검증기/반입/문서 공개12파일`302c09d8c0cd329441c06897d2838f5b01d692b3`를 2026-10-28T21:24:38.547145+09:00에 직접 프로젝트 토큰으로 게시·remote main 일치/작업트리clean 확인했다. 이 영수증도 후속 자동 게시하며 마지막SHA·원격일치·마지막2helper제거는 로컬 세션 기록에 남긴다. 운영 적용/원래0x51 원인·해결 미확정 범위는 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h105"></a>
+<a id="record-a279410ea675a4a6dfc742b0f7c72dba3118283ed35605f617bbaae6a4a8d597"></a>
 
 ## 드라이버 내부 조건 확인 결과 — 2026-10-28T20:55:04.220559+09:00
 
@@ -1684,6 +8597,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **문서·반입/정리 마감 2026-10-28T20:55:50.472627+09:00**: Thor 학습 문서3개 동기화·70파일 전체 SHA 일치 및 검증 tar70파일 바이트 일치(SHA`4859eb4b0d8c60acc76015836699bc31a25fcb7571d60ae5a14e06336900a7c5`) 확인. 이번 Mac 임시 23개는 SHA목록 뒤 삭제·원 디렉터리 부재 확인했다. 게시 전용 helper2개만 새로 만들며 최종push 뒤 정리한다. Mac 패키지 설치/모델·가중치 다운로드0·서버 필요 진단 증거 보존. 공개6문서의 Git 결과는 후속 영수증에 남긴다.
 
 - **Git 영수증 2026-10-28T20:57:13.770555+09:00**: 공개6문서 커밋`64d80d72a130dc757ed46bc4308832e6d4e5fbcf`를 2026-10-28T20:56:53.111583+09:00에 직접 프로젝트 토큰으로 게시·실제 remote main 일치/작업트리clean 확인했다. 이 영수증도 후속 자동 커밋·푸시하며 마지막SHA/원격일치/작업트리·게시helper2개 제거는 로컬 세션 기록에 남긴다. 원래0x51 조건 미확정·장기/정확도/SOC E2E 미검증 범위는 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h106"></a>
+<a id="record-08766d75d78f0c88a9315e27187be67d3c1ad72412d36cca4708ffbbcb0efda8"></a>
 
 ## 메모리 경고 개선·단기 재현 통과 — 2026-10-28T18:46:43.631391+09:00
 
@@ -1701,6 +8619,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **결과 Git 영수증 2026-10-28T18:50:21.297250+09:00**: 기본값/검증·최종문서공개10파일 `0a5e8e4549962272c0efca13a30ca7603c4e371b`를 2026-10-28T18:49:47.714349+09:00 직접프로젝트토큰으로게시·실제remote main일치/clean확인했다. 이영수증을후속자동게시하며마지막SHA·원격일치·작업트리·마지막게시helper2개제거는로컬세션기록에남긴다. 긴본학습·새정확도/실제SOC E2E미검증범위는유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h107"></a>
+<a id="record-9b98bb4cfcc29ad8bd5c6281a0e20c8f3fcb3b2936a6adbaae538e1c2c07b809"></a>
+
 ## 연산 추적·정답 위치 선택 계산 준비 — 2026-10-28T18:33:00.772743+09:00
 
 **첫20개 경고 시각이 `aten::_log_softmax_backward_data`와 겹쳤다. 모든 입력 위치의 전체 어휘 점수를 만드는 불필요한 손실 계산을 줄일 수정안을 준비했다.** 문맥은 backbone 전체에 그대로 입력하고 causal shift 후 정답이 있는 위치의 vocabulary projection만 계산한다. 학습자료/정답/LoRA 범위는 바꾸지 않는다.
@@ -1710,6 +8633,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 로컬/Thor166검사 중Torch3건은host에서생략했고, 기존GPU미노출이미지에서실제3검사 모두통과했다. 두배치/서로다른마스크/패딩/마지막토큰·문맥기울기·모든파라미터기울기·실제2회누적학습/평가를 확인했다. 모델패키지/원본가중치 변경0이다.
 - 별도 `soc-memory-loss`/`memory-loss`로같은VMM·최장2prefix/2-step/eval8·6분제한/8분독립복구·원35B복구 범위에서GPU확인한다. 실제35B경고해결·운영기본적용은 아직 미검증이며 성공으로 표시하지 않는다.
 
+
+
+<a id="source-87368a0abd79b357-h108"></a>
+<a id="record-b816919f6b7b8a2165aebcc62f1df5de2a4664b73af9b8b922a0688f93e90077"></a>
+
 ## VMM 비교 결과·첫 연산 추적 준비 — 2026-10-28T18:10:28.634087+09:00
 
 **동일35B/자료의2-step VMM 비교는 성공했고 경고는12→3건으로 감소했다. 적재 구간0건, 첫 학습 연산 중3건이 남아 해결 완료로 판단하지 않는다.** 기존35B는18:01:18.542KST 복구·중단174.50초(2분54.50초), exit0/OOMKilled=false·OOM/재시도0·기존R2 SHA불변이다. [상세](../finetuning/THOR_35B.md).
@@ -1717,6 +8645,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - baseline과data/LoRA범위/학습파라미터는 같고 manifest config 차이는 output_dir뿐이다. 실제 expandable segment2개/12진단표본·사전할당 시작/완료를 확인했다. peak CUDA allocated/reserved70.35/71.60GiB, host 최저43.64GiB. 원인 조사용 비교이며 일반 정확도/속도 개선 평가가 아니다.
 - 남은3건은17:59:55.395~55.471KST, 적재완료17:59:46.883 뒤 첫step 도중이다. 정확한 연산/실패크기는 아직 모른다. 사전할당만 원인이라고 단정하지 않으며 VMM을 전체 학습의 기본값으로 승격하지 않았다.
 - 첫step CPU연산 시간만 기록하는 `soc-memory-trace`/`memory-trace`를 별도 준비했다. VMM·동일최장2입력/2-step/eval8·6분 제한/8분 독립복구와 원35B복구를 유지한다. 텐서값/shape/스택/CUDA활동 프로파일은 수집하지 않는다. 로컬/Thor163검사·실제GPU미노출CPU trace/절대시각기준·서비스무조작check 통과, 새추적실행은시작전이다.
+
+
+
+<a id="source-87368a0abd79b357-h109"></a>
+<a id="record-63c419c8035c1c861bcb12fe8a33a50949b65a8f97b40cd6f73393628f0d49cc"></a>
 
 ## 경고 원인 추적·VMM 비교 준비 — 2026-10-28T17:56:52.849817+09:00
 
@@ -1726,6 +8659,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - `soc-memory-vmm` 전용 단계와 `--mode memory-vmm`를 추가했다. 기존 기본 할당과 R2/재현 결과는 보존하며, 새 컨테이너에만 `expandable_segments:True`를 설정한다. 최장2prefix/2-step/accum1/eval8,6분 학습 제한·8분 독립 복구/6분 복구 실행한도·기존35B복구 조건을 유지한다. 별도 config/출력/상태/타이머를 사용한다.
 - 로컬/Thor160검사, 실제 GPU 미노출 Torch/Transformers hook의 복원·CUDA 초기화0, root operator SHA `071983e0a40dc4eee63e21f47396694c835d504e1e17cab559befd671eed7eb1` 및 서비스 조작 없는 check를 통과했다. 모델 전체 사전 할당 앞뒤 시각과 실제 expandable segment 진단을 보완했다.
 - 사용자의 추가 재현·해결 요청에 따라 앞서 승인한 최대15분 중단/자동복구 한도 안에서 새 방식의 단일2-step 비교를 이어간다. 본 학습·드라이버/VM전역 설정·운영 모델 승격은 포함하지 않는다. 현재 시점에는 새35B 실행/서비스 중단 전이며 실제 결과·Git는 후속에 기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h110"></a>
+<a id="record-5cef96882f3ee178676d071775d24c6b609320ff82eb3d7a35cf24e67b86fab0"></a>
 
 ## 메모리 재현 완료·기존 추론 복구 — 2026-10-28T17:15:47.919739+09:00
 
@@ -1745,6 +8683,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 아래 준비/점검 항목은 각 시점의 이력이며, 현재 실행 결과는 위 내용을 기준으로 한다.
 
+
+
+<a id="source-87368a0abd79b357-h111"></a>
+<a id="record-052781cd81bd79f703434a55d2711d14e94fe6f42d99938d8a82a98353afeda6"></a>
+
 ## 실제 메모리 재현 준비 — 2026-10-28T16:55:24.663744+09:00
 
 **재현 실행 경로는 준비됐으며, 아직 공유 추론 중단과 새 GPU 실행은 시작하지 않았다.** 같은 R2 원본/프로필/자료에서 최장1664·1582토큰2prefix·2step/accum1·validation8만 별도 `soc-memory-smoke` 단계로 실행한다.48-step 본 학습·변환·새 모델 등록/운영 교체는 포함하지 않는다.
@@ -1756,6 +8699,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 
 - **준비 검증 후속 2026-10-28T17:00:11.550231+09:00**:68파일반입묶음전체소스바이트일치/SHA`9d081a41b4d19e6ee9d4e68d10cafb9100ae09559c91bda83ae3c85b9cbf72fd`확인뒤Mactar삭제.16:56:52KST1초시험타이머는root복사본의check만실행해ready/no_service_action으로정상종료했다. 초기폴링은자동회수된transientunit의ExecMainCode를기다려timeout됐지만journal에서실행/성공종료를독립확인했다. 실제8분복구timer/GPU/공유추론중지는계속0이며승인대기다.
+
+
+
+<a id="source-87368a0abd79b357-h112"></a>
+<a id="record-0e261d63fd8ce9e8a1d6fb0d5168d89e7d9d4d251c2843f8d4769c73e35690f4"></a>
 
 ## Thor 메모리 점검·진단 기록 보완 — 2026-10-28T16:00:13.036668+09:00
 
@@ -1770,6 +8718,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **마감 검증 2026-10-28T16:03:29.742647+09:00**:16:02:12KST추가관련커널오류0·Ollamaactive/NRestarts0/MainPID불변·CPU진단컨테이너제거·가용약85.68GiB를확인했다.68파일반입묶음전체소스바이트일치/SHA`de3e1cd6e63c9753f17690f6b1de92115b87863045b97e067912ea2604d4242b`검증후Mac검증tar를삭제했다. source·문서동기화/이전소스백업을완료했으며현GPU에서새진단을켜고학습하는시험은실행하지않았다. 자체helper는Git게시검증후제거한다.
 
 - **Git/정리 영수증 2026-10-28T16:07:50.733779+09:00**: 완료공개10파일 `9870e8503117d110c7ea278ab2b6a008f2199820`를 2026-10-28T16:06:33.042364+09:00 직접프로젝트토큰으로게시·실제remote main일치/clean확인했다. Mac자체진단helper11개는SHA목록뒤삭제했고게시용2개만후속현황push확인뒤제거한다. 이번작업의서버CPU컨테이너는자동제거,이전소스백업/필요진단기록은Thor보존했다. 이영수증현황도후속자동게시하며마지막SHA·원격일치·작업트리·임시디렉터리제거는로컬세션기록에남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h113"></a>
+<a id="record-326078c751f02b81ddc6df3bb886018a0aeeafd2021a4dd3d443176ea7c4e108"></a>
 
 ## R2 비교 마감: 기존 누락 회복·운영 승격 제외 — 2026-10-28T15:22:53.095759+09:00
 
@@ -1786,6 +8739,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **최종 결과 Git 영수증 2026-10-28T15:26:57.068042+09:00**: `645f040c8999681d746c9d003796c835b7013171`의 공개8파일을 직접 프로젝트 토큰으로게시하고실제remote main일치/clean을확인했다. 이영수증보완도후속커밋·푸시하며마지막SHA/원격일치/마지막게시helper정리확인은로컬세션기록에남긴다. 서버/원문/데이터는추가변경하지않는다.
 
+
+
+<a id="source-87368a0abd79b357-h114"></a>
+<a id="record-220e4100e2c2549c46cd3115220ae6658bdee868a2f895dc70f06a8a53b82274"></a>
+
 ## R2 개발 비교 완료·24-step 최종 후보 선택 — 2026-10-28T15:06:50.614100+09:00
 
 두 checkpoint의 CPU 변환/별도 등록과 네 모델의 개발 비교를 완료했다. 필수 호출은 모두27/30이며, 경보 해석이 더 보수적인24-step을 실험 후보로 사전 선택했다. 모든 후보에 미해결 도구 오류가 있어 운영 모델은 유지한다. 48-step의 조사 표현 오감점은 수동 정정 대상으로 원문과 함께 보존했다. 로컬/Thor138검사 통과·기존 frozen 판정 보존 뒤 동일 정정 기준을 적용했다.
@@ -1793,6 +8751,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 원본/HF control/선택24의 미사용 최종 각65턴 → 선택24의 기존 v1 회귀52턴을 순차 실행 중이다. 실제 MCP dispatch·채팅·보호 적용·운영 승격은 없다.
 - 48등록15:01:28KST·CPU 파이프라인15:02:48완료, 자체 BF16 중간물 SHA 정리 후 디스크110.39GiB. 원본/체크포인트/HF/Q4는 보존했다.
 - 평가 정정 커밋 `4b1e627f04bd03f479ad9a3aa6a714fe968baa8d`는14:46:16KST remote main 일치/clean 확인. 이번 개발 마감과 [상세 비교](../finetuning/R2_RESULTS.md)는 후속 자동 게시한다.
+
+
+
+<a id="source-87368a0abd79b357-h115"></a>
+<a id="record-da62bba82221b08766c6c25f0be238eb6800188daabb44886caa6a56a095989c"></a>
 
 ## R2 개발 비교·채점 오류 정정 — 2026-10-28 14:45 KST
 
@@ -1803,6 +8766,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 두 checkpoint는 각 **1045개 텐서 검증·190개 모듈 실제 변경·855개 보존·MTP 19개 보존**을 완료했다. 24-step은 별도 비교 태그 등록/개발 응답 완료, 48-step은 변환 중이다. 기존 태그와 봇 설정은 변경하지 않았다.
 - 남음: 48-step 개발 비교 → 실험 후보 사전 선택 → 미사용 최종 65턴을 원본/HF control과 동일 조건 비교 → 기존 v1 52턴 회귀·수동 확인. 실제 MCP 호출/채팅/보호 변경 E2E와 운영 승격은 이 평가에 포함하지 않는다. 추가 학습 중단은 시작하지 않는다.
 - Git: 학습 완료/비교 준비 소스 `cf8c6923071037b17e78fd9783e286412012639e`는 14:11:01 KST 원격 main 일치/clean을 확인했다. 이번 채점 정정·현황 문서는 별도 자동 커밋·푸시 대상이며 아직 서버 판정기 교체를 완료한 것으로 표시하지 않는다.
+
+
+
+<a id="source-87368a0abd79b357-h116"></a>
+<a id="record-7f81867f020dab4767e9ebf72dd6b177ab8283b00391ceddad7b5916a3c3fd21"></a>
 
 ## R2 48-step 완료·기존 추론 자동 복구·체크포인트 비교 진행 — 2026-10-28 14:02 KST
 
@@ -1816,6 +8784,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 - **2026-10-28 14:10 KST 후속 검증:** 당시후속이던Thor134검사·새판정기/반입목록동기화를완료했다. frozen assessor SHA `b9bbce1b64b2687c3d730857341d26c61dc2c39c9e339ba21eb67461cac11847`를학습본응답생성전에고정했다. 비교driver는실제운영tag35B의개발65턴도추가한뒤24/48후보등록을기다려순차개발평가하고수동선택전최종test는실행하지않는다. HF미학습control은훈련효과를비교하고운영tag는실사용후보차이를비교하는서로다른baseline이며서식/원본provenance차이를숨기지않는다. source반입tar2개는Mac에서도SHA대조후삭제했고소스/자료/기록·필요helper는유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h117"></a>
+<a id="record-db314a6480891d05fb13cd5688f4347f9b2d430d62b64845b4ee2399a58487a6"></a>
+
 ## R2 제한 학습 중단 승인·최장 smoke 검증 — 2026-10-28 11:01 KST
 
 사용자가 **최대60분 공유 Ollama 중단·자동복구**를 명시 승인했다. 같은 작업의 중단 허가를 다시 묻지 않고 원base2-step→성공시별도원base48-step을 진행한다. 학습deadline45분/독립복구timer50분·기존35B복구·자동모델교체없음 조건은 그대로다. 실제 새학습은 아직 시작 전이며 실행 후 상태를 구분해 추가한다.
@@ -1824,6 +8797,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 로컬/Thor123검사·실토크나이저최장2개선택 일치,source SHA와반입동기화를확인했다. 이CPU검사는GPU peak/실복구E2E를대신하지않는다. 운영서비스중단0·최종test요청0 상태에서승인을기록했다.
 - R2자료·제어기 공개19파일은 `574470e832d17c57035a97b99f4afbe02c3b7a2e` 자동푸시·10/28 10:48:06KST 실제remote main일치/clean확인. 이번최장smoke보완·승인/게시영수증도후속자동게시한다. 대화·검증·자료·가중치·업무분담·자격은Git제외를유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h118"></a>
+<a id="record-ea9e4cde99e19bc3a382aee51943e53d929fdaa20055e251258569a6b7ae70ee"></a>
+
 ## 데몬 중단 후 재확인·R2 개발 비교 완료 — 2026-10-28 10:47 KST
 
 **자료·코드 준비는 완료됐으며 새로운 학습은 시작하지 않았다.** 데몬 재시작으로 미커밋 상태였던 작업을 복원하고 Thor에서 읽기 재확인했다. 기존35B/Ollama active·등록digest 불변, 실행 중 학습 컨테이너0·새window기록 없음·복구timer inactive다. 중단 복구 확인은 이번조회이며 아래10/27 검증 이력과 구분한다.
@@ -1831,6 +8809,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - R2 미학습 개발32대화65턴은10/27 22:33:58 KST65응답/HTTP실패0으로완료했고원35B재적재도완료했다. frozen R2 자료/카탈로그 SHA 전후일치, operator `check`에서 currentprofile·data·strict token proof·개발입력·이전학습부재일치를통과했다. exact-string원점수60.15와호출/표현불일치숫자는의미검토전정확도로사용하지않는다. 최종test65턴·실제MCP/채팅/쓰기·새제어기실중단/복구E2E는미실행이다.
 - 로컬/Thor122회귀와실토큰390/65/65전부보존은10/27검증완료이고,이번재개에서코드를다시바꾸지않아반복실행하지않았다. 신규학습은새공유추론중단시간대확인후원base2-step→성공시별도원base48-step(lr5e-6/2048)을실행하는안이다. 예상30~45분/학습deadline45분·독립복구timer50분·최대중단60분계획이며자동재시도/원래모델교체는없다. 이전완료된2시간window와분리한다.
 - 이번단위공개19파일은자료생성/검수·versionlineage·개발분할·strict길이보존·반입/별도단계·operator복구제어기와문서다. 기존v1자료/가중치/평가를보존했고R2자료·대화/검증/업무분담/자격은Git제외다. 운영SOC권한/포트/상시서비스/초기설치변경은없다. 이제소스·문서를자동커밋/프로젝트PAT직접인증푸시하고실제원격일치·임시파일정리영수증을후속기록한다. 실제점수개선은미완료다.
+
+
+
+<a id="source-87368a0abd79b357-h119"></a>
+<a id="record-6c4893570194bd4837fdb96eff6505bb1d8fbc2ee071f38e36e11f5be65b36da"></a>
 
 ## SOC 개선 자료 R2 검증·제한 학습 준비 — 2026-10-27 22:37 KST
 
@@ -1843,6 +8826,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **비교 해석:** R1 미학습 개발65턴은65응답/HTTP0이었다. 실제 오호출/후보 anchor 손상/FW 오분류 등과 함께 유효한 추가 기본 인자·한 번에 여러 읽기 호출·표현 차이가 자동 오감점되는 사례도 있어 exact-string 원점수를 정확도로 쓰지 않는다. R2 개발 baseline 재실행은 진행 중이다. 실제 MCP를 실행하지 않는 gold-context 개별 턴/사례별 도구 부분집합 비교이며 최종test·실채팅 왕복·실제 쓰기와 다르다.
 - **소스/반입/Git:** 보완 소스·R2 자료63파일/14,533,267B·bundle SHA `8601fbcdeacc59756f6bee99862f6cea386e3664b6ec510ec6cd87d78f17173a` 반입 전후 member SHA 일치·서버전송tar제거 확인. profile SHA `2d76cd0dd8f52ee5372a7690be8eef8d75bd7fc2499bd0b89792dc6a414da9da`, source `b89ddbc86a40dd55743513a255f7d35e05adad701fca4468f347f3a5980fdeae`, train `73e6345fd0e7fdd35c31272bcdd271528ffee52d86d9fd15af363d23bef25ac7`, val `ac515b0ed1ad2e7c613512d5e32c9aa707ed68c03356e55dcb59cfcfa6320850`, test `4e7bf5e8f988895fcd9efb437c1c231295befdf7e0bc1d59614481974edb755d`다. 운영SOC서비스/포트/초기설치·보호권한 변경0, Mac패키지설치/모델반입0. 이번 단위 공개소스/설정/문서는 자동커밋·푸시하며 대화/검증/업무분담/자격/데이터/가중치 제외를 유지한다. 점수 향상은 미검증이다.
 
+
+
+<a id="source-87368a0abd79b357-h120"></a>
+<a id="record-5f0771dda921e6e58b3d79299b25a737245ddc2ddf530267a49de5baf3d2bd0f"></a>
+
 ## SOC 품질 개선 1단계 자료·실행 경로 구현 — 2026-10-27 22:13 KST
 
 사용자 “순차적으로 진행”에 따라 **검수 합성 v2 자료와 별도 개발 평가·보수적 학습 경로를 구현하고 Thor CPU 토큰 검증을 시작했다.** GPU 재학습/공유 추론 중단/점수 향상/운영 모델 교체는 아직 없다.
@@ -1853,6 +8841,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **검증/반입:** 로컬115회귀·새 profile `--check` 통과. 61파일/14,527,507B source bundle SHA `0014c857e7bc9960e53c0c34a2fd132a6147e966ff8d61083c47148d9a02066d`, 모든 member의 원소스 바이트·허용 경로·가중치/패키지 제외를 검사했다. Thor22:10 KST 원 Ollama active/기존35B digest 불변·학습 실행0·가용약85.75GiB 확인, 승인된 SSH로 반입 후 CPU 토큰 검증 진행 중이다. Mac 패키지 설치/가중치 다운로드0이며 작업 tar/helper는 마감 시 정리한다.
 - **다음 단계/승인 경계:** profile `config.qwen36-soc-v2.json`은 미학습base부터lr5e-6/48step·eval/save24,192대화 전체epoch가 아닌최대96prefix 업데이트의 제한된 비교안이다. 신규 자료+보수 설정의 복합 후보이며 개별 원인 귀속 실험/최적값 검증이 아니다. CPU 실토큰/Thor회귀·개발baseline→복구 supervisor/시간 상한 검토→공유 추론의 새 중단 시간대 승인 후2-step/48-step→개발 결과로 후보 선택→최종test65턴/기존회귀·실제MCP/채팅은 차례로 진행한다. 앞선2시간 승인 작업은 이미 복구·마감했으므로 추가 중단을 자동 재시작하지 않았다.
 - **자료 SHA/Git:** source `519355f0ec12c4e866d467c303f2acf9c21bf7fe77f9e188d97b2c09144146a8`, train `f13d53fad444fd59440d6c29d8475d13f40950371de9e25422efa8dd9117d931`, validation `f98dc1d5ac72bdf5bea455cbf5ddc177cc6d1e8e77b809c8090bed2fad210a97`, test `b07241983adc9d3eef686a9283645f4bfcabba06f4eae0b6c3c5e0bc4d22bf28`. 자료·가중치·대화/검증/업무분담/자격은 계속 Git 제외다. 직전 `b577223bd11e1c0e4d6205c04af9997c7767ad80`은 이전 사전감사 게시이며 이번 구현/배포/문서는 검증 단위가 끝나면 별도 자동 커밋·푸시한다.
+
+
+
+<a id="source-87368a0abd79b357-h121"></a>
+<a id="record-256d7f3a37e8548665a19b5b596ff1122dc6b8476e6cb844891b4148ec047d31"></a>
 
 ## 학습 품질 개선 사전 점검 — 2026-10-27 21:47 KST
 
@@ -1865,6 +8858,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **완료/남음/Git:** 로컬 자료 감사와 개선 계획·문서 동기화만 완료했다. 새 자료 작성/검수·개발 및 미사용 평가 고정·실제 재학습·수치 개선은 미완료다. 공유 추론의 새 중단 실행 계획은 아직 없으며 완료된2시간 승인으로 자동 재시작하지 않았다. 코드 변경이 없어 기존104회귀를 재실행하지 않고 diff/문서 링크/로컬 전용 제외를 확인한다. 직전 `ebe850c6ebe969ea8807cc7c95f6a780f70c6e94`의 게시/clean은 이전 마감 기록이며 이번 문서는 별도 자동 커밋·푸시한다.
 
 - **개선 점검 게시 영수증:** 공개5문서 `fb84de1c455b69ab49230136478443d9e4b5b46b` 자동 커밋·프로젝트 토큰 직접 푸시·2026-10-27T21:48:22.478039+09:00 remote main 일치/clean 확인. 실행 코드/설정/데이터·운영 모델 변경은 없으며 자료 감사 보고서는 로컬 전용으로 보존한다. 이 영수증은 후속 자동 게시하고 최종 SHA/원격·clean과 게시 helper 정리는 로컬 세션에 마감한다.
+
+
+
+<a id="source-87368a0abd79b357-h122"></a>
+<a id="record-dd5987f86570b70a3d04a5b3c72b41c5dd612ca8dbcd8323cc4414c1cfc37c02"></a>
 
 ## SOC 학습·등록·비교 완료, 이번 학습본 운영 적용 제외 — 2026-10-27 21:40 KST
 
@@ -1885,6 +8883,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **코드/문서/후속:** 평가기 수정 후 로컬/Thor104검사 통과·최신 공개 학습 문서/평가기4파일 SHA 일치 및 Thor 비교 판정 보고서 보존을 확인했다. 57파일 이관 묶음14,488,642B의 전체 바이트/허용 목록/가중치·자격 제외 검증 후 검사용 tar 제거를 확인했다. README/PLAN/학습 절차/로컬 업무분담을 동기화했다. 다음은 train 자료의 구체성·표현 다양성 검수와 새 버전 데이터, validation 기반 학습량·학습률 축소 비교 및 새 미사용 hold-out이다. 이미 확인한 test 답변을 학습 자료로 옮기지 않는다. 추가 서비스 중단/자동 재학습/봇 전환은 진행하지 않았다.
 - **Git/정리 영수증:** 결과·평가기·README/PLAN/학습 절차 공개7파일은 `502499f5052d33bed7f8f2ab39544a4c2296b7e1`로 자동 커밋·프로젝트 자격 파일의 해당 PAT로 직접 푸시했고21:42:17 KST remote main 일치/clean을 확인했다. Mac 작업 임시 스크립트·전송 묶음93파일의 SHA 기록 후 삭제했고, 별도57멤버 검사용 tar도 제거했다. 서버 반입 tar/CPU fixture 정리 결과와 필요한 모델·환경·재현 로그 보존을 구분한다. 마지막 게시에 쓰는 helper는 일회성으로 정리하고 최종 SHA/remote 일치/작업 트리·임시 경로 부재는 로컬 세션에 남긴다. 대화/검증/업무분담/자격/데이터·가중치 제외는 유지한다. 이 게시·정리 영수증 자체는 후속 자동 커밋·푸시한다.
 
+
+
+<a id="source-87368a0abd79b357-h123"></a>
+<a id="record-604f34191ecea9ebe39229849ff462e753ea69b7a5be3adfcbc692954857a4d9"></a>
+
 ## 요청 범위 평가 정정 — 2026-10-27 21:12 KST
 
 **20:54 기록에서 미학습본의 실제 누락이라고 분류한6건을 정정한다.** 원 질문은 “IDS 파일의 규칙 수만”, “LISTENING TCP 포트만”이었으므로 엔진 상태·수집 시각/실시간 전체 범위의 추가 설명을 필수로 요구할 근거가 없었다. 포트 참고 답변의 미확인을 외부 접근 미확인으로 해석한 것도 잘못이었다. 이전 판정은 이력으로 보존하며 학습 데이터·참고 답변을 바꾸지 않았다.
@@ -1893,6 +8896,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **미학습본 정정 결과:**52턴에서유효도구16/16·요청필드36/36·요청필드오류0,단기시나리오내결과다. `ait-wilson-243`의level8 경보를근거없이“일반정보성규칙”으로묘사한서술1건은수동검토로남겼다. 원래자동37.69점/불일치4/문자열누락75를실정확도로사용하지않는다. 긴참고답변과문자열이같아졌다는이유로학습효과를주장하지않으며,이평가기준은학습본의추론결과를얻기전에고정했다.
 - **검증/진행:** 로컬/Thor100검사통과. 질문밖설명 강제·유효namefilter 오감점 회귀와잘못된포트/KST이중변환/phase누락/오류를빈차단목록으로바꾸는실패를검사했다. 학습본GGUF양자화는21:12 기준520/753tensor 처리중,기존Ollama active/봇선택원래35B유지. 학습본등록·동일52턴평가·수동서술검토·최종정리는미완료다.
 - **Git:** 본학습/HF보존/서식검사보완은 `e6ea767f7a763da349567bee7ee4fdc0ffc55b9d`로자동게시·20:57:08KST remote main일치/clean확인. 이번판정정정/assessor/반입목록/문서는후속자동게시한다. 원래학습완료·추론복구·가중치SHA는아래기록과동일하며,원본·HF파생모델간서식차이와실제MCP/채팅/비전/보호E2E미실행도유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h124"></a>
+<a id="record-48ea9286b0fba90f3e3d01d1436013d872ded956f9f5bed17c8651c76798c512"></a>
 
 ## SOC 본 학습·추론 복구·HF 내보내기 완료 — 2026-10-27 20:54 KST
 
@@ -1905,6 +8913,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **base 실제등록/평가:** `soc-qwen36:35b-base-q4km-20261027`,digest `f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad`,원본5모델digest불변·정확한text/projector blob2개·HF서식/나머지옵션일치를확인했다. tools/thinking/completion/vision·llamacpp이며 native52turn은52응답/HTTP실패0·미등록/보호오호출0. 엄격자동37.69점/누락75/호출불일치4는동의어·날짜형식·유효한추가namefilter의오감점을포함해정확도점수로쓰지않는다. 수동 확인에서IDS엔진미확인누락2/4,포트외부접근미확인누락4/4는실제보완대상이다. test52gold-turn/사례별toolsubset 검증이며 전체37도구 선택·실제MCP/채팅 E2E를대신하지않는다. background CPU부하를통제하지않아1.62초평균을속도우위로판정하지않는다.
 - **코드/Git/후속:** 로컬/Thor93검사통과,HF서식/가중치blob불일치거절회귀포함. 등록/평가준비는 `67d517aa9414ea9e20e3ca20c83efaa27c74c5e8`로자동게시·20:35:59KST remote main일치/clean 확인. 이번실제학습/HF export/서식보완결과는후속자동게시대상이다. 남은순서는학습본GGUF완료→별도main등록→동일입력52턴평가/핵심누락검토→문서/Git/작업임시정리다. 운영봇선택은원래35B를유지하며새모델승격·실제보호적용/원복·비전입력/새서버설치·장기부하/재부팅E2E는미실행이다.
 
+
+
+<a id="source-87368a0abd79b357-h125"></a>
+<a id="record-4edf16b51ce9e2f69474322498792fbe5c2d8450ff13991a929efdaba9c087e3"></a>
+
 ## 동일 조건 미학습 GGUF 준비 완료 — 2026-10-27 20:35 KST
 
 **전체 SOC 본 학습은103/112step 진행 중이며, 동일 HF 원본의 미학습 GGUF/Q4_K_M 비교본은20:33:14 KST CPU 변환·검증을 완료했다.** 본 학습 완료/추론 복구와 새 모델 등록·실제 추론은 아직 미완료다.
@@ -1914,6 +8927,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - `register_soc.py`는 원본의 template/system/parameters·renderer/parser·capabilities·runner를 대조해 새 base/main 이름으로만 등록하도록 준비했다. 로컬/Thor92검사 통과(최종 metadata 보존 검사는 실제 API 등록 뒤 확인). 스트리밍 업로드는 Thor loopback API에서만 이루어지고 Mac에 가중치를 복사하지 않는다. 기존 모든 모델 digest 불변과 변환 manifest SHA를 결과에 기록한다. 아직 등록 명령은 실행하지 않았다.
 - `soc_evaluate.py --all-cases --all-turns`로test36대화/52assistant턴 전체의 gold-context 개별 턴 평가를 준비했다. 실패 HTTP body도 보존하고0점으로 계산한다. 노출 도구는 사례별 실제 카탈로그 부분집합이며 전체37도구 중 자율 선택·실제 MCP 실행·연속 조사/승인/채팅 E2E와 구분한다. 엄격한 호출/문자열 자동 점수는 유효한 이름 필터·동의어/날짜 표기를 잘못 감점할 수 있어 의미 검토 없이 우위로 해석하지 않는다. 학습 데이터/정답은 바꾸지 않았다.
 - 앞선 HF 보존 내보내기 소스는 `fb5e907670ad968d15f01704f07749fc9fb96044`로 자동 게시하고20:03:20 KST 실제remote main 일치/clean을 확인했다. 이번 등록/평가 준비와 완료 현황은 후속 자동 커밋·푸시 대상이다. 현재 원본 모델 선택·SOC 권한/서비스/설치 진입점은 유지하며, 본 학습 이후 변환·등록·정확도 평가·실제 봇 전환/보호 E2E는 미완료다.
+
+
+
+<a id="source-87368a0abd79b357-h126"></a>
+<a id="record-f272cf74a8e508d8c19e344fd1247a9af8ea36d3930f376fa9f16f37b6edb91a"></a>
 
 ## 원본 전체 보존 내보내기 검증 — 2026-10-27 20:02 KST
 
@@ -1925,6 +8943,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - `convert_soc.py`로 공식 고정 llama.cpp를 재사용해 동일 HF 원본의 미학습 GGUF/Q4_K_M 비교본을 CPU 전용으로 변환 중이다. 이후 학습본과 같은 변환·양자화·템플릿·추론 옵션으로 비교해 원 registry의 미확정 변환 이력과 학습 효과를 분리한다. MTP 포함 텍스트와 별도 비전 projector를 준비하며 GPU 추론·등록 성공은 아직 검증하지 않았다. 변환 완료 뒤 학습본은 검증된 동일 projector를 재사용한다.
 - 본 학습 시작 준비는 `09bed28503fb023dacdd5d3d6efc05fb3c63061b`로 자동 게시하고19:46:38 KST 실제remote main 일치/clean을 확인했다. 이번 내보내기 소스/문서는 후속 커밋·푸시 대상이다. 학습 중 읽는 코드/설정은 변경하지 않았고 export/반입 목록만 별도로 추가했다. 원본·pilot·실패 근거를 보존하며 실제 전체 학습/복구·학습본 변환/등록/동일조건 평가·채팅/공격 E2E/새 서버 전체 설치는 미완료로 유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h127"></a>
+<a id="record-e8f870c55a342247802976f6dc6b83296ad2ef3a761c561ad00af3e4ea38c5c1"></a>
+
 ## SOC 시험 완료·전체 1회 학습 시작 — 2026-10-27 19:43 KST
 
 **SOC 2-step+8-step 시험·어댑터 검증과 기존35B 추론 복구를 완료했다. 사용자가 본 학습·최대2시간 추론 중단/자동복구를 명시 승인해19:43:32 KST 별도 전체1회 학습을 시작했다.** 현재 전체 학습/모델 내보내기/운영 전환은 미완료다. Thor 저장 루트는 `~/Capstone_Groot_training/qwen36-20261027`이며 아래19:31의 실행 중 표기는 당시 이력이다.
@@ -1934,6 +8957,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Cisco 비교 결론:** Q4_K_M GGUF4,921,465,824B를 검증하고19:41:43 별도 `soc-foundation-sec:8b-instruct-q4km-20261027`로 등록했다. 현재 Ollama0.40.2의 show capability는completion뿐이며 실제 `/api/chat`이 `does not support tools`/HTTP400을 반환했다. 같은 gold-context8턴 중 도구 카탈로그 포함7턴은 거절됐고1턴은 응답했지만 UTC10:47을 KST10:47로 잘못 표시했다(정답19:47). 현 native MCP 봇의 대체 후보에서 제외하며 원래35B 설정을 유지한다. 다른 하네스의 일반 보안 지식 능력 전체를 평가한 것은 아니다. 원래35B의 자동53.75점에는 올바른 동의어/날짜 형식을 누락으로 본 예가 있어 정확도 우위의 정량 근거로 쓰지 않는다.
 - **검증/소스/Git:** 전체 단계도 network none·동일 제한을 유지하며 실패한pilot이면 본 학습을 거절한다. 로컬/Thor87검사 통과, 본 학습 준비5파일 SHA 일치·서버 전송tar 제거. 반입 묶음50member/14,472,066B 전체 원문 일치·자격/가중치/결과 제외를 확인하고 Mac 검사용tar를 제거했다. 앞선19공개파일은 `fd2302e5173833b071947ff93655c4600477272e`로 자동 게시·19:34:00 KST remote main 일치/clean 확인. 이번 본 학습 설정/문서 후속은 아직 미커밋이며 검증 뒤 자동 게시한다. SOC 서비스/권한/초기 설치 진입점은 유지하고 새 서버 전체 설치·실제 MCP/채팅/공격 E2E는 수행하지 않았다.
 - **다음:** 전체 학습 완료·새 경고/최종 어댑터·추론 복구 확인→정확 원본 병합/보조 가중치 보존·GGUF 변환→별도 모델 등록→동일 조건 평가. 현재 pilot만으로 SOC 정확도 향상을 주장하지 않는다. 학습 데이터/가중치/자격·대화/검증·업무분담은 Git 제외이고, Mac 이번 작업용 tar/helper는 해당 작업 마감 후 정리한다.
+
+
+
+<a id="source-87368a0abd79b357-h128"></a>
+<a id="record-c14517c66a08d3ae2a0974447c527ae7c38795217a42003f7b7c073410d5ca4f"></a>
 
 ## SOC 학습 준비·Thor 저장 경로 변경 — 2026-10-27 19:31 KST
 
@@ -1946,6 +8974,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **비교 진행/한계:** Cisco `fdtn-ai/Foundation-Sec-8B-Instruct` 고정 `aa13cb996e7fc700e7efd6b7367992f14cf349c0`의15파일/16,079,970,789B를 검증했다. Ollama0.40.2 safetensors의 Q4_K_M 미지원, int4의 MLX 런타임 부재로 등록2회 실패를 보존하고 공식 고정 llama.cpp CPU GGUF/Q4_K_M 변환 중이다. 원래35B gold-context8턴은 전부 응답했지만 자동 누락 감점 결과는 수동 의미 검토 전이다. 이 평가는 도구를 실행하지 않는 오프라인 개별 턴 검사이며 실제 agent/MCP/채팅 E2E나 품질 우위가 아니다.
 - **남은 범위/Git:** 실제 SOC 시험 결과·추론 복구, Cisco 등록/한국어·MCP 평가, Qwen 학습본 병합·GDN/MTP/vision 보존·GGUF 등록·동일 조건 비교는 진행/미완료다. 장기 본 학습과 드라이버 경고2건 검토·공격 E2E/새 서버 전체 설치도 미완료다. 이번 공개 소스/문서는 아직 미커밋이며 단위 검증 뒤 자동 게시한다. 학습 데이터·가중치·자격·대화/검증·업무분담은 Git 제외를 유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h129"></a>
+<a id="record-e7d1ac8dc81941f3e1a50daf74edf2135680adb0ae39969795204ad9c78e387b"></a>
+
 ## 추가 학습자료·가중치 후보 조사 완료 — 2026-10-27 KST
 
 사용자가 추가 자료 탐색을 요청해 **원 제공자14후보의 카드/공개 미리보기와 기존 로컬 자료를 대조했다.** [후보·규모·조건·선별 근거](../finetuning/DATA_SOURCES.md#추가-학습자료가중치-후보-조사--2026-10-27-kst). 제공자설명/권고와실제검증을구분하며운영서버조회·자료/가중치반입·학습·모델변경은수행하지않았다. 직전35B2-step완료/추론복구상태는아래기록을따른다.
@@ -1955,6 +8988,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **가중치 후보:** 공식Cisco Foundation-Sec-8B Instruct/Reasoning·TrendMicro Llama-Primus와같은35B계열CyberStrike(공격용하네스·라이선스other)·RFT(코딩용·양자화비교조건상이)의존재를확인했으나현재SOC/MCP우위나Ollama호환을검증하지않아자동대체하지않았다. 어댑터/가중치바이트다운로드0이다.
 - **보유 자료/다음:** 기존입력120,917→적격106,511→소스별상한후20,784라는준비기록과AIT/SALAD/ToolACE/지식자료경로존재를대조했다. 추가도입은현SOC검수trajectory·방어과제·소량한국어보조순으로진행하며,사건/원천/번역변형분할과누락·승인·근거평가를먼저설계한다. 선별/변환/신규수집은미실행,장기본학습시간대와드라이버경고2건검토도후속이다.
 - **Git/로컬:** 공개6문서를 `723cceacd2ef961dd9a99db1b492a23a2e7fcfea`로 자동 커밋·지정 토큰 푸시하고 2026-10-27T18:22:27.630180+09:00 실제 remote main 일치/작업트리 clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 마지막 SHA/원격 일치/작업트리는 로컬 마감 기록에 남긴다. 검증/대화기록·자격·데이터·업무분담은로컬전용. 코드/운영변경이없어GPU/회귀시험을추가실행하지않았고문서링크·수치·Git제외만검사한다. Mac다운로드/패키지설치0이며게시helper는마지막푸시후제거한다.
+
+
+
+<a id="source-87368a0abd79b357-h130"></a>
+<a id="record-35ec676009d019e4662496918852e4573b9cf0fbbe0fd613363909975d36f0f0"></a>
 
 ## 35B 적재 OOM 보완·실제 시험 학습 완료 — 2026-10-27 18:00 KST
 
@@ -1967,6 +9005,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **다음 학습 판단:**2개 micro-batch의 학습 구간은약33초,8개 평가가약25초였다. 기존35,253prefix 전체1epoch는 단순 외삽만으로도 수일 규모여서30분2-step 승인으로 장기 추론 중단을 시작하지 않는다.2표본·길이/커널/부하에 민감해 확정 일정으로 사용하지 않는다. 공개 corpus는 현재37MCP에 맞춘 검수 SOC 자료가 아니므로 SOC trajectory/독립 평가셋 보완과 학습 시간대 결정이 우선이다. 같은 마지막step에서 평가가2회 반복된25초 낭비도 수정해 현재step 평가만 재사용하고,고정 원본 revision/manifest SHA를 새 실행 결과에 기록하도록 보완했다. 이 후속은78검사와 별도 실제 CPU Trainer2step의 평가1회 유지로 확인했으며 전체35B를 다시 학습하지 않았다. 기존 smoke의 run_manifest는 덮어쓰지 않고 base-provenance.json으로 원본/어댑터 SHA를 추가 대조했다. 본 학습 시간/중단 범위를 확인한 다음 실행한다.
 - **Git/정리:** 이번 공개15파일을 `72c15dbe9fc3b36a99a184ba6c792c2af184082a`로 자동 커밋·지정 토큰 푸시하고 2026-10-27T18:11:12.798560+09:00 실제 remote main 일치/작업트리 clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 마지막 SHA/원격 일치/작업트리는 로컬 마감 기록에 남긴다. 새 반입 묶음의36member 전체 바이트/추가 모듈 포함·로컬 자격 제외를 확인하고 검사용 tar는 제거했다. Mac 패키지/가중치 다운로드·설치0, CPU 랜덤 fixture 파일7개씩은 해시 기록 후 제거했다. 서버 재개/학습 산출물·복구 백업은 보존한다. Mac 이번 임시 helper19파일은 SHA 기록 후 제거했고 게시용2파일만 마지막 푸시 후 제거한다. 자격·데이터·대화/검증기록·업무분담은 Git 제외다.
 
+
+
+<a id="source-87368a0abd79b357-h131"></a>
+<a id="record-d08440fbe28e7975e707f1f2e7b3df9559de77b88e7bba4951a4439a2d17930b"></a>
+
 ## 학습 일시정지 — 2026-10-27 16:23 KST
 
 **사용자 요청으로 일시정지했다. 환경·원본·토큰화 준비는 완료했지만 실제35B는 가중치 적재 중 메모리 부족으로 종료돼 학습0/2step이다. 기존 Ollama/35B는 복구했고, 자동 학습 대기 작업·복구 timer도 종료됐다.** 아래 다운로드/시험 대기 표기는 각 시점 이력이다.
@@ -1976,6 +9019,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **복구/정지 확인:**16:21:05 Ollama active와 원래 `qwen3.6:35b` 재적재 확인, 추론 중지 시작부터약81.4초다.16:23:48 재확인에서 학습 supervisor·복구 timer는 inactive/dead, 모든 이번 학습 단계 컨테이너는 종료 상태, 자원 샘플러도16표본 기록 후 종료했다. 자동 본 학습/재시도0. 실제 새 Mattermost 왕복·A/B/C 전체/E2E 재시험은 이번 복구 검증에 포함하지 않았다.
 - **재개 지점:** 보존한 OOM/자원 로그와 설치된 실제 로더의 CPU/GPU 메모리 이동·동시 적재·dtype를 대조해 peak를 줄이는 수정부터 진행한다. 수정/재시험은 아직 하지 않았다. 이후 제한된 실제2-step·손실/peak/속도/어댑터 검증→본 학습 시간대/설정 결정→학습 결과 변환·별도 모델 등록/동일조건 평가 순이다. 본 학습 소요시간은 현재 산출 불가, 전체 학습·병합/GGUF·Ollama 신규 등록·운영 모델 교체도 미실행이다. 사용자가 데이터 선별/설정/코드/평가를 에이전트에 맡기고 Thor는 GPU 연산·결과 저장에 쓰도록 결정했다. 기존 운영 모델은 보존한다.
 - **Git/정리:** 준비 소스 `abe1b06072994f1c1b1e2e614a2cd3ca5b4b0afd`, 토큰화/승인 현황 `c8b42e2f23cd0d918d59c004343d003cdf092829`는 각각 원격 일치 확인했다. 이번 정지/실패/복구 공개5문서도 `21cf6893d4a092e85f0676efabdab481e194d02a`로 자동 커밋·푸시하고 2026-10-27T16:26:49.792907+09:00 실제 remote main 일치/clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 마지막 SHA·원격 일치·작업트리는 로컬 마감 기록에 남긴다. Mac 패키지/모델 설치·다운로드0; 반입/검사 tar2개와 서버 전송 tar는 이미 제거했다. 서버 랜덤 축소 시험12파일도 SHA 기록 후 제거했다. Mac 작업 스크립트20파일은 SHA 기록 후 제거했고 게시 helper2개도 최종 푸시 뒤 제거한다.  서버의 실패 근거·검증된 원본/환경·중지된 컨테이너 상태는 재개 자료로 보존한다. 자격·데이터·기존 사용자 tar·검증/대화기록·업무분담은 Git 제외다.
+
+
+
+<a id="source-87368a0abd79b357-h132"></a>
+<a id="record-6ba9092d7da5c7531c1ed3415e1cd08ec63a847c3450c9b9200f397b09ba82a1"></a>
 
 ## Thor 학습 실행 준비 — 2026-10-27 KST
 
@@ -1990,6 +9038,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **검증/설치 범위:** 로컬71검사 및35B 데이터 행수/SHA 통과.32member 이관 묶음은 원본 바이트 전부 일치·로컬 전용 자격/가중치/venv 제외 확인 후 제거했다. 현재 소스13파일 SHA 동기화·Thor에서도71검사 통과. 추가 축소40층 Trainer 통합2step·평가·체크포인트/어댑터 저장도 성공(전체12.067초, train loss6.317/eval loss6.283, 랜덤 모델 검증)했고 시험 생성12파일은 SHA 기록 후 제거했다. SOC 초기 설치는 계속 root `deploy.sh`이며 외부 장비의 별도 실험으로 구분하고 학습 사용법/오프라인 반입 목록을 갱신했다. 전체35B 적재·GPU2step/본 학습·병합·GGUF/Ollama 등록·정확도/속도 비교·운영 전환·새 서버 전체 설치는 미실행이다.
 - **Git/정리:** 공개18파일 `abe1b06072994f1c1b1e2e614a2cd3ca5b4b0afd`을 지정 토큰 일회성 인증으로 푸시하고 2026-10-27T15:18:15.994940+09:00 실제 remote main 일치/clean 확인. 이 실행 경과·게시 영수증은 후속 현황 커밋으로 반영한다. 직전 준비 완료 `b5e475f24969c3d80a92baa18118ba863d3c4af0`과 구분한다. Mac에 패키지/모델 설치·다운로드0; 이번 반입/검사 tar2개28,773,393B를 SHA 대조 후 제거했고 서버 전송 tar도 제거했다. 서버 학습 원본/환경/로그·데이터는 작업 산출물로 보존, 다운로드 완료 후 불필요 캐시는 별도 정리한다. 자격/학습data/기존tar/대화기록/검증/업무분담은 Git 제외다.
 
+
+
+<a id="source-87368a0abd79b357-h133"></a>
+<a id="record-31918221cbad21fd601a5dcae40b91b5aae06cd0fdb1b041fd93ad398135d894"></a>
+
 ## 현재35B/thor 학습 준비 수정 — 2026-10-27 KST
 
 **기존30B 설정/20,784행을 보존하고 현재35B용 준비 코드를 추가했다. 실제 GPU 학습·설치·운영 모델 교체는 하지 않았다.** [설정·사용법·한계](../finetuning/THOR_35B.md). 아래 “35B용 전환 미실행”은 이 작업 전 시점이며 실제 학습 미실행은 계속 유효하다.
@@ -2001,6 +9054,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **검증:** 표준 라이브러리61검사 통과,30B/35B 두 설정의 데이터 행 수/SHA 검사, shell 구문·Mac 설치 거절/환경 미생성 확인. thor의 기존 Jinja로 공식35B 서식3대화의 문자 prefix/마스킹 경계를 확인했으나 실제 토크나이저 ID 검사가 아니다. 명시적 파일 목록으로 임시 이관 묶음을 만들고 모든 member의 소스 해시·비밀/가중치/환경 제외를 확인했다. 모델 가중치·패키지 다운로드/설치0. 임시 공개 메타데이터/서식과 시험 묶음은 작업 마감 시 제거한다.
 - **미실행:** 실제 CUDA 라이브러리 통합, 전체35B 적재·토큰화·2-step/본 학습, LoRA 병합, GGUF/양자화/Ollama 등록, 실모델 정확도/지연 비교, 운영 배포는 미실행이다. 서버 서비스/이미지/포트·공통 키/정책은 바꾸지 않아 SOC 초기 설치 경로 변경은 없으며 기존 root `deploy.sh`는 유지한다. 학습 도구의 프로필 선택·이관 목록은 함께 갱신했다.
 - **Git·정리:** 공개19파일을 `939553ed2cd8472afa4f9ffae04f5d53c786bc55`로 자동 커밋·지정 토큰 일회성 푸시하고 `2026-10-27T14:35:22.182504+09:00` 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 최종 SHA·원격 일치·작업트리는 로컬 마감 기록에 남긴다. Mac 임시13파일14,527,876B(공식 메타/서식·시험 묶음·작업 스크립트)를 해시 대조 후 제거했고 게시용2파일도 최종 푸시 후 정리한다. 첫 묶음은 동시 README 수정에 따른 해시 차이를 거절했고 문서 변경 후 만든27파일 묶음은 전부 일치했다. 서버 전송 임시 파일0, 패키지/모델 설치·다운로드0. 학습 데이터/기존 압축파일·대화기록/검증·자격·업무분담은 로컬 전용 보존/Git 제외다. 앞선 봇 보완은 최종 `e38ccf081359753fb58f728a5e44bfc9f3247438`로14:22:09 KST 원격 일치·clean/임시 경로 제거를 확인해 별도 완료했다.
+
+
+
+<a id="source-87368a0abd79b357-h134"></a>
+<a id="record-29cfcf164b585bd5af070499840050d97a6ad8b8668f46f06b09387860d73b0a"></a>
 
 ## 일반 에이전트 조회·교차 대조 보완 완료 — 2026-10-27 14:18 KST 운영 확인
 
@@ -2015,6 +9073,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **기존 학습 자료 재확인:** `finetuning/data/`의 train18,872/validation980/test932 총20,784행이 실제 존재하고 모두 manifest SHA와 일치한다. 학습/병합/평가/이관 스크립트와 기존 이관 압축파일도 남아 있다. 설정은 `Qwen/Qwen3-30B-A3B`용이며 현재 운영35B와 다르다. 해당 폴더에 학습된 어댑터/가중치가 없고 현재 MCP에 맞춘 SOC trajectory 검수·thor 학습 사전 검사는 미실행이다. 데이터/기존 압축파일은 로컬 전용으로 보존한다.
 - **남은 범위:** H 공동 불필요 호출·지연, 전체 FW/기본·내장 규칙 읽기, C AppArmor/forward 예외, 나머지 SCA·과거 사건, 복합 쓰기·노출 자격 교체와 독립 SOC 평가셋은 별도 후속이다.
 - **Git·정리:** 공개12파일을 `2fb738e5221c4e60a968680512a332d0e3c50844`로 자동 커밋·지정 토큰 일회성 푸시하고 `2026-10-27T14:21:47.945373+09:00` 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 마지막 SHA·원격 일치·최종 작업트리는 로컬 마감 기록에 남긴다. Mac 작업 임시28파일(306,394B)을 해시 대조·제거했고 게시용2파일만 최종 푸시 후 정리한다. Mac 패키지/모델 설치·다운로드0, 서버 전송 임시 파일0이며 운영 파일·복구 백업과 기존 학습 자료/압축파일은 보존한다. 대화기록/검증/자격/업무분담과 학습 데이터는 Git 제외다.
+
+
+
+<a id="source-87368a0abd79b357-h135"></a>
+<a id="record-0b3355524425183fbbcb3124aa83909a7b860718dbcd67e22e4cb2821aa1e4bf"></a>
 
 ## thor-05 추론 전환 완료 — 2026-10-27 13:32 KST 운영 확인
 
@@ -2031,6 +9094,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git·정리:** 공개32파일을 `5f2094eba4eb5d986febbeca97fc1d0a0230a36a`로 자동 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고 `2026-10-27T13:40:35.745740+09:00`에 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 영수증도 후속 현황 커밋·푸시에 포함하며 마지막 커밋·원격 일치·최종 작업트리 및 Mac 잔여2파일 제거 결과는 로컬 마감 기록에 남긴다. B staging8파일(147,894B)과 thor 다운로드 관리용2파일(327B)을 SHA 대조 후 제거하고 경로 부재를 확인했다. Mac 임시72파일(942,180B) 제거·게시용2파일만 최종 푸시 후 정리. 서버 설치 소스31파일 일치, 운영 파일·복구 백업·소스/로컬 기록은 보존하며 자격·대화기록·검증 보고서·업무분담은 Git 제외다.
 
 
+
+
+<a id="source-87368a0abd79b357-h136"></a>
+<a id="record-87bd7e60c0e61d644ee50dd96a60f1f7f9a0624465405255cccef2a2b4ceec5f"></a>
+
 ## thor 추론 전환 준비 중 — 2026-10-27 13:00 KST
 
 사용자가 새 thor-05 연결과 기존 `qwen3.6:35b` 설치·유지를 선택했다. **운영 봇은 아직 기존 DGX를 사용한다.** 모델 다운로드·호환 검사 후 전환하며 접속 성공을 전환 완료로 표시하지 않는다.
@@ -2039,6 +9107,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 공식35B 다운로드는13:07:52KST 완료. 가중치/projector SHA·템플릿·system·7파라미터가 기존 DGX와 일치해 추가 조정은 없었다. manifest digest와 Ollama버전은 다르며 도구 호출 계약 검사는 진행 중이다. Mac의 모델/패키지 설치·반입은0이다.
 - 공통 코드·관리 gate·한국어 가드의 새 경로, root 선택 설치기와 예제·오프라인 목록·복구 문서를 준비했다. [추론 연결 절차](../deployment/inference-transport.md). 해당 소스는 로컬 미커밋/미푸시다. 기존 DGX 상태, MCP·승인 권한, 기존 보호 예외는 유지한다.
 - 남은 단계: 모델 완료/동일 설정 대조→API 계약 시험→운영 구성·Memory 증분 전환→새 채팅·공동 채널·건강검사→서버 설치 소스 동기화·Git·임시 정리. 새3VM 전체 설치·공격E2E·재부팅/장기 부하는 별도다.
+
+
+
+<a id="source-87368a0abd79b357-h137"></a>
+<a id="record-8579af992ddb7cf8751e70c6bc4034dc37a0767a75c83741163b3cd7593352fa"></a>
 
 ## B 호스트 수집 보완·SSH 후속 검사 마감 — 2026-10-27 12:21 KST
 
@@ -2053,6 +9126,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **미실행·잔여:** 실제 새3VM 전체 설치, 실제 공격·탐지·보호 적용/원복 E2E, FIM 변경 이벤트·장기 부하/재부팅 시험은 미실행이다. 전체 FW/기본·내장 규칙 읽기 기능, C AppArmor/forward 예외 승인, 남은 SCA 실패의 역할별 검토, 과거 사건 검토·모델 지연/쓰기 미완료·노출 자격 교체는 별도 후속으로 유지한다. 기존45사건의 과거 집계를 이번 현재 집계로 재사용하지 않았다.
 - **Git·정리:** 공개20파일을 `fba971b01468d6977b17ac4cdcd282644fe3be2d`로 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고 `2026-10-27T12:25:10.480035+09:00`에 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 영수증을 후속 현황 커밋/푸시에 포함하며 마지막 커밋·원격 일치·Mac 잔여2파일 제거 결과는 로컬 마감 기록에 남긴다. Mac 최초 다운로드4파일은 앞서 제거했고 새 패키지 설치/다운로드0이다. 남겨 두었던 B staging 17파일 13,569,267B는 SHA 대조 후 제거·경로 부재를 확인했다. Mac 임시52개 중50개 976,378B를 대조·제거했으며 게시용2개만 최종 푸시 뒤 정리한다. 운영 파일·복구 백업은 보존한다. 로컬 대화기록/검증/업무분담/자격 파일은 Git 제외다.
 
+
+
+<a id="source-87368a0abd79b357-h138"></a>
+<a id="record-249cd2d4a1ae7fc092cd0a25985a621b780cc911543626fcae961370c7b1c58c"></a>
+
 ## 짧은 질문 범위 보완 — 2026-10-27 11:24 KST 운영 검증
 
 **이번 짧은 질문 보완만 재개해 계약1.4.13/query1.11.13을 두 봇에 반영했다.** 기존 B 호스트 보완의 미완료 마감 작업은 계속 보류한다. 전체 FW 조회 도구를 추가한 작업은 아니다.
@@ -2063,6 +9141,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **중간 실패 보존·공동채널:** 첫 H FW 시험은 임시 `list_blocks`를 불필요하게 조회해 실패로 남겼고 작성자 표시 보완 후 새 루트에서 수정 확인했다. 공동채널의 미지원 사유 저장 누락과 멘션 분류 때문에 자동 검토가 덧붙던 중간 실패도 보존했다. 최종 일반 FW 요청은 O1회, 두 봇 직접 요청은 H/O 각1회·추가 peer0·보호쓰기0·최상위 채팅으로 전달됐다. 명시적 상호 검토·실제 불확실 사건의 기존 검토 경계는 유지한다.
 - **소스·검사·배포:** 공통 회귀305검사(2선택 의존성 환경생략), Ollama76, 공동채널20, 설치 계약1의 총402검사 중400통과/2생략. 운영14파일 SHA 일치, 두 봇 WebSocket/worker 정상·공동채널 대기0·관리 timer active 확인. 기존 설치 소스의 과거 Git SHA를 대조해 이번 관련10파일을 동기화했으며 B 보류 작업의 미게시 변경은 섞지 않았다. 추가 패키지·포트·키·sudo 권한0, 보호 적용/원복·실제 공격E2E·새3VM 전체 설치는 미실행이다.
 - **Git·정리:** 공개16파일을 `cd6a1fbc04e79c9e4cebddaf0d41233215042563`로 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고11:34:35 KST 실제 remote main 일치를 확인했다. 서버 설치 소스10파일과 게시한 소스 SHA도 일치한다. 보류 B 소스를 제외한 staged 격리본의 공통302검사(2환경생략)·O76·공동20도 통과했으며 앞선 작업트리 검사와 중복 합산하지 않는다. 서버 임시4파일과 이번 Mac 검사본/스크립트는 해시 대조 후 제거·경로 부재를 확인했다. Mac 새 패키지 설치/다운로드0, 운영 복구 백업과 이전 B 작업의 임시 경로·미커밋 소스는 보존한다. 이 게시 확인을 후속 현황 커밋/푸시에 포함하며 마지막 커밋·원격 일치·남은 작업트리는 로컬 마감 기록에 남긴다. 로컬 검증 보고서·대화기록·업무분담은 Git 제외다.
+
+
+
+<a id="source-87368a0abd79b357-h139"></a>
+<a id="record-26b0a0d30c6b901dce7276ab838ea8af5324f9aee1e871cb69094961e8b95854"></a>
 
 ## 일시정지 체크포인트·FW 조회 결함 확인 (2026-10-27 KST)
 
@@ -2075,6 +9158,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **남은 범위:** SCA 채팅 결과 확인, A/C 변경 후 새 SCA 확인, 원시 로그 수집 E2E, 최종 문서/설치 소스 대조·Git 게시·임시 정리. 실제 공격/탐지/대응 E2E와 새3VM 전체 설치는 미실행이다. C AppArmor/forward 예외는 여전히 미승인이다. FW 전체 조회 공백을 추가 잔여로 등록했으며 기존 수집/진단 검증이 이를 검증한 것은 아니다.
 - **Git·정리:** SSH 단위 `659bfa111582ca2fc44f80b7f1771e9d9f3b2d4c`는09:51:49 KST 실제 remote main 일치를 확인했다. B 후속 소스와 이번 현황 보완은 로컬 미커밋·미푸시 상태다. 정지 후 원격 일치 재검증이나 게시를 진행하지 않았다. Mac 다운로드4파일 제거는 완료했고 재개용 임시 스크립트 및 B staging은 정지 지점 보존을 위해 남겨 두었다. 패키지 Mac 설치0, 운영 복구 백업은 보존한다. 로컬 상세 근거·대화기록·업무분담은 계속 Git 제외다.
 
+
+
+<a id="source-87368a0abd79b357-h140"></a>
+<a id="record-38bf6070f471b0f5fae74c16a7cce13c81b845c4be73f201ba6832ff56c03970"></a>
+
 ## SSH 통일 완료·B 호스트 수집 보완 재개 (2026-10-27 KST)
 
 - **운영 적용 완료:** A/B/C 공통 SSH MAC5종 제외. 신규 SHA256-ETM/SHA512-ETM 인증6회·금지5종×3호스트 거절15회 확인. 각 호스트 기존 SSH PID/세션 유지. B/C 첫 경유 banner timeout은 원복 후 순차 재시도했고 최종08:59:20 적용을 확인했다. 계정·키·비밀번호 인증·관리망 허용 범위를 바꾼 것은 아니다.
@@ -2084,6 +9172,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **재개 순서:** 현재 SSH/서비스/키 등록 상태 재대조 → B 전용 host agent를 관리자 컨테이너와 구별해 등록·설정·시작 → 양쪽 봇의 기존 B=manager 매핑 수정·정확 host SCA/진단 조회 검증 → 단일 설치기·반입 안내·현황 동기화 → 검증·자동 커밋/푸시·잔여 임시 정리. C AppArmor/forward 예외는 별도 미승인 상태다.
 - **재개:** 09:49 KST 사용자 지시로 재개했다. B 에이전트 inactive·미등록, SSH MAC 공통 정책 유지·failed0을 다시 확인했다. B 고유 agent 등록/수집 및 두 봇의 호스트·관리 컨테이너 구분을 구현 중이다.
 - **Git·정리:** SSH 완료 단위의 소스·설치 경로·문서를 커밋/푸시할 예정이며 현재는 미게시다. 직전 HEAD는 `221aa4a4e24d3f7280b7fa3487825ebd846b603f`다. Mac에 새 패키지를 설치하지 않았고 다운로드4파일은 SHA 대조 후 제거·부재 확인했다. 재개용 Mac 임시 스크립트와 B `/var/tmp/capstone-host-hardening-20261027` staging은 보존했다. 운영 SSH 복구 백업도 보존한다. 로컬 상세 근거·대화기록·업무분담은 Git 제외다.
+
+
+
+<a id="source-87368a0abd79b357-h141"></a>
+<a id="record-fcbb49e37d1666cf0815f9a2a85509cc2331c7470a79a594fcc38bd298f97790"></a>
 
 ## 과거 사건·호스트 정책 추가 검토 — 2026-10-27 KST
 
@@ -2104,6 +9197,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git·정리:** 공개4문서를 `a25f8165937a75405afe88ae17cbf93b0f5f0729`로 자동 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고08:40 KST 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 확인을 후속 현황 커밋·푸시에 포함하며 운영 코드 배포는 없다. 로컬 상세 근거·SSH 후보·업무분담·대화기록은 Git 제외. 서버에 실행 스크립트/패키지를 저장하지 않았고 복구 DB 백업은 운영 근거로 보존한다. Mac 이번 임시19파일 중17개를 SHA 대조 후 제거했고 게시 helper2개는 최종 푸시 뒤 제거한다. B 복구 DB 백업4개는 보존·관리 timer active를 확인했다. 마지막 커밋·원격 일치·clean·임시경로 부재는 로컬 마감 기록에 남긴다.
 
 
+
+
+<a id="source-87368a0abd79b357-h142"></a>
+<a id="record-e6e55314bd0a62687f63d117a609bccb5ea3ffd18bba2a26eeec16a2850826b1"></a>
+
 ## Ollama 읽기 연결 재사용 — 2026-10-27 07:00 KST 운영 검증
 
 **Ollama 일반 채팅에만 연결 재사용을 반영했고 Hermes는 유지했다.** 설치된 Hermes `/opt/hermes/tools/mcp_tool.py`는 이미 서버별 장기 Task·전용 event loop·재접속/종료 관리를 사용한다. 동일한 풀을 추가할 이유가 없어 코드·컨테이너 재시작0이다. 공동채널은 별도 작업 프로세스의 수명/격리를 유지하며 이번 변경의 속도 효과에 포함하지 않는다.
@@ -2121,6 +9219,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **배포·설치:**06:59:48 KST B의 runtime.py/chat.py/read_pool.py3파일을 백업 후 증분 배포하고 Ollama gateway만 재시작했다. 백업 `/var/backups/capstone-mcp-pool-20261027-065946`. 최종3SHA 일치·인증 heartbeat/worker/WebSocket 정상, 관리 timer/공동채널 active·failed unit0·O435 done/대기0(07:00 표본). Hermes/Wazuh PID·시작시각 및 설정/SOUL/Memory/Wazuh 룰 SHA 불변, WAF 전후 조회 SHA도 동일하다. 루트 deploy.sh 내부 설치 목록에 read_pool.py를 포함하고 설정 예제/오프라인 안내를 갱신했다. B의 오프라인 설치 소스27파일도 기존 Git 이력 대조·백업 후 동기화했다. 기존 묶음에 없던 내부 문맥 디렉터리에서 첫 동기화가 중단돼 확인된 바이트를 대조하고 디렉터리를 추가해 완료했다. 운영 서비스 실패나 재배포는 아니다. 추가 deb/wheel/이미지/포트/권한0이며 새3VM 전체 설치·실제 공격/쓰기 적용·원복 E2E·재부팅/장기 부하 시험은 미실행이다.
 - **잔여·자격:** 모델 지연·복합 쓰기 미착수·공동채널 작업 프로세스 초기화는 기존 후속이다. 이번 자격파일 형식 확인에서 VM 비밀번호가 도구 출력에 포함된 실수가 발생해 사용자에게 고지했다. 값은 소스/기록에 복사하지 않았으며 교체는 미완료다. 이전 웹훅/PAT 교체 미완료도 별도 유지한다.
 - **Git·정리:** 공개15파일을 `fdd027a2554cf712e382ca0fef0fd75eca0fd34f`로 자동 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고07:09 KST 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 확인은 후속 현황 커밋·푸시에 포함한다. B 시험 임시27파일238,694B는 증거·로그아웃2회 대조 후 제거했고 경로 부재를 확인했다. Mac 작업15파일 중10개는 SHA 목록 대조 후 제거했고 게시/동기화용5개는 최종 푸시 뒤 제거한다. 운영 복구 백업·프로젝트 소스·로컬 기록은 보존하며 패키지 다운로드/Mac 설치0이다. 마지막 커밋·원격 일치·clean·임시 경로 부재는 로컬 마감 기록에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h143"></a>
+<a id="record-e72244d37578347a25bf53d5052beece57812bdacc860655cd209302f7039aec"></a>
 
 ## 불필요 연산 점검·보완 — 2026-10-27 05:47 KST 운영 검증
 
@@ -2142,6 +9245,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **자격 처리 사고:** 이번 점검 도구 출력에 기존 Mattermost 수신 웹훅 주소가 포함됐다. 사용자에게 고지했으며 값은 공개 소스·문서·로컬 검증에 복사하지 않았다. 해당 훅이 여전히 존재하고 A 알림 설정에서 사용 중임을 값 없는 해시 비교로 확인했다. 교체는 미실행/후속 조치이며 이전 Git PAT 교체 미완료도 별도 유지한다.
 - **Git·정리:** 공개20파일을 `f82fbeb489e529cc50571c8e2c664473b1e9d8f0`로 자동 커밋·프로젝트 지정 토큰 일회성 인증 푸시했고05:52 KST 실제 remote main 일치·작업트리 clean을 확인했다. 이 게시 확인은 후속 현황 커밋·푸시에 포함한다. 패키지 다운로드/Mac 설치0. B 시험 임시30파일678,845B는 증거 대조·로그아웃3회·프로세스 종료 확인 후 제거했고 경로 부재를 확인했다. 최종 운영12경로 SHA도 다시 일치했다. Mac 이번 작업28파일 중26개는 SHA 목록 대조 후 제거했고 게시용2개는 후속 푸시 뒤 제거한다. 패키지/캐시 설치는 없으며 운영 백업·프로젝트 소스·로컬 상세 기록은 보존한다. 마지막 커밋·원격 일치·clean·임시 경로 부재는 로컬 마감 기록에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h144"></a>
+<a id="record-38eefabeccf2badf2654a47b2f551ae2db77149557ac5af3643486ab26f41434"></a>
+
 ## KST 중복 계산·상세 조회 보완과 새 요청 재시험 — 2026-10-27 05:12 KST
 
 **공통 계약1.4.9 / query1.11.9 운영 반영 완료. 추가 실채팅38턴을 시험했으며 전체 성공은 아니다.** 최종 버전은05:05:10 KST B의 Hermes·Ollama11경로에 배포했다. 같은 `qwen3.6:35b`·37도구를 유지했다. 생성19초안은18개가 요청 바이트와 정확히 일치했고1개는 불필요한 빈 줄을 추가했다. 모두 카드 거부 및 root 기록 `denied`를 확인했으며 실제 룰 적용·원복·차단은0이다.
@@ -2160,6 +9268,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **운영 감사:** A/B 보호 파일11SHA·기존135제안 상태/대상 불변, 보안 엔진3개의 PID/시작시각 불변, A차단0·failed unit 양쪽0. 최종11운영 파일 SHA 일치, 관리/공동채널 서비스·타이머 정상, O queue419 done·대기/실행0. 두 봇의 현재 PID/startticks와 인증 heartbeat 일치·websocket/worker 정상 확인. 초기 임시 배포 helper의 null heartbeat 확인/소유권 복원/로그 확인 오류로 재시작·원복 및 일시 접근 오류가 발생했고 소유권을 복구했다. 확인기를 실제 프로세스·heartbeat와 메타데이터 보존 방식으로 고쳐 최종 배포했다. 보안 엔진 재시작은 없었으며 이 임시 helper 오류를 초기 설치기 오류로 표시하지 않는다.
 - **잔여:** 모델이 편집 참고값을 무시하거나 복합 쓰기를 시작하지 않는 문제, 권한 밖 작업의 충분한 설명, 추가 빈 줄 등 정확 후보 보존, 응답 지연·의미 일반화가 남는다. 단계별 질문과 공유 DGX/자동 조사 부하가 달라 속도 우위·새 점수는 산출하지 않았다. 아래 H59/O39는 수정 전 시험 점수다. SSH SCA 정책·C 격리·관제 복구의 기존 잔여 및 이전 노출 Git PAT 교체 미완료도 유지한다.
 - **Git·정리:** 공개18파일은 `77141c6bc07731e9d4ee33e0de9979773e8cee70`로 자동 커밋·프로젝트 지정 일회성 인증 푸시했고05:15 KST 실제 remote main일치·작업트리 clean을 확인했다. 이 게시 확인은 후속 현황 커밋·푸시에 포함한다. B 시험 임시4경로 85파일/2,521,150B를 제거하고 경로 부재를 확인했다. Mac 작업파일33개 중29개는 SHA 목록 보존 후 제거했으며 남은 게시용4개는 최종 푸시 뒤 제거한다. 마지막 커밋/원격 일치/clean·임시 경로 부재는 로컬 마감 기록에 남긴다. 패키지 다운로드·Mac 설치0, 운영 복구 백업은 보존하며 대화·상세 검증·업무분담·자격 파일은 Git 제외한다.
+
+
+
+<a id="source-87368a0abd79b357-h145"></a>
+<a id="record-fb8cc97bc7bef9f9ddd6e24146da9c2a052709ab2be225c5124740d6c0146091"></a>
 
 ## 두 봇 공통 보고·후보 검증 보완 — 2026-10-27 03:59 KST 완료
 
@@ -2181,6 +9294,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 **문맥 해석 정정:** 아래 기준 시험의 native 저장 글에 같은 채널 과거 글이 남아 있다는 사실만으로 모델 전송 입력에도 포함됐다고 판단한 것은 철회한다. 시험 당시와 같은 SHA의 Hermes API 투영 코드로18개 입력을 재생하여18/18에서 해당 문맥이 제거됨을 확인했다. Ollama 공개 채널은 같은 루트만 읽는다. 실제 전송 payload를 별도 캡처한 검증은 아니며, 전역 Memory/native 입력 차이·공유 DGX 부하/캐시 한계는 유지한다. 점수에 문맥 혼입 감점을 사용하지 않았으므로 기준 점수는 변하지 않는다.
 
+
+
+<a id="source-87368a0abd79b357-h146"></a>
+<a id="record-300576b83b364b96c41ba76a94e903a0a175242cc00ba5365b447096dbadaf22"></a>
+
 ## 두 봇 쓰기 반복 시험 완료 — 2026-10-27 01:47 KST
 
 같은 `qwen3.6:35b`와 현재 운영 하네스로 실제 Mattermost 새 루트36개(쓰기/거절6유형×3회×2봇)를 순서를 교대하며 시험했다. **이번 범위는 후보 검증·승인 카드 생성·거부까지이며 실제 적용/원복은 미실행**이다. 점검한 운영 코드·설정·SOUL·Memory 해시는 시험 전후 동일하다.
@@ -2201,6 +9319,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **한계:** 같은 채널의 과거 글 주입과 native Memory 차이·공유 DGX 외부부하/캐시가 남는다. 완전 무문맥/부하통제 실험이 아니며, 질문·정답을 운영 코드에 추가하지 않았다. 실제 적용/원복·공격 E2E·장기/재부팅·새3VM 설치는 별도다. CVE6재현 보류/새3VM 전체설치 제외 유지. 초기 설치기·패키지·포트·권한 변경0.
 - **문서·Git·정리:** 공개 현황/안내4문서와 로컬 업무분담·세션·검증보고서를 갱신했다. 공개4문서는 `4e44d5a91b1f5109e814135e2d2fb9b1f1d27020`으로 자동 커밋·프로젝트 일회성 인증 푸시했고, 02:19 KST 실제 remote main일치·작업트리 clean을 확인했다. 이 게시 확인은 후속 현황 커밋·푸시에 포함하며 마지막 커밋/원격 일치/임시 경로 부재는 로컬 마감에 기록한다. B 임시71파일2,307,914B는 최종증거66JSON 해시 대조 후 제거·경로 부재 확인했다. Mac 작업파일21개 중19개를 SHA 대조해 제거했고 게시용2개는 최종 푸시 뒤 제거한다. 재개 전 오류기록이 로컬에 보존되어 첫 정리 전 목록검사가 중단됐으며 삭제 없이 최종 서버 목록을 재대조한 뒤 정리했다. 운영 감사기록과 로컬 검증 근거는 보존한다. 로컬 검증/대화/자격/업무분담은 Git 제외한다.
 
+
+
+<a id="source-87368a0abd79b357-h147"></a>
+<a id="record-cd3f624717dd2c526a4a842066da1c53a01c1373b90d68199171ffd6c634e63e"></a>
+
 ## A SSH MAC 4종 제외 적용 — 2026-10-27 00:24 KST
 
 사용자가 설명받은 후보의 실제 적용을 승인했다. A `/etc/ssh/sshd_config.d/01-capstone-macs.conf`에 `hmac-sha1`, `hmac-sha1-etm@openssh.com`, `umac-64@openssh.com`, `umac-64-etm@openssh.com` 제외 정책을 배치하고 구문/유효값 검사 후 SSH reload를 완료했다. 후보 SHA `a9231625009b1bc78d477bdd85db0800b22ff2d3bcc3b6d2aa817ce92cfc9e90`, 적용 모듈 SHA `02e4f139574ebf4e956ef05d1b2c01776ed6808d887df03f4cf83cc79f1342f8`. 원본 설정·모듈 백업은 A `/var/backups/capstone-ssh-macs-20261027-002422`, 정책 전후 영수증은 `/var/backups/capstone-ssh-macs-t3q_fjn3`에 보존한다.
@@ -2210,6 +9333,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **중요한 잔여·정정:** 00:26 조회된 저장 SCA35654는 변경 전 10/26 19:03:38 KST 스캔의 failed다. 더구나 설치된 정책의 금지식에는 이번 후보에서 유지한 `umac-128-etm@openssh.com`도 포함되어 있어, 단순히 다음 스캔을 기다리면 통과한다고 안내할 수 없다. 요청한4종 제거 완료와 SCA 정책 적합성/사건 종결을 구분한다. 해당 사건은 needs_review 유지, DB 강제 종결·정책 예외·SCA 재시작/스캔 강제 실행0. 정책은12h·scan_on_start이며 추가 제외 또는 정책 검토가 별도 남는다.
 - **소스·설치·검사:** 신규 내부 `deployment/ssh_macs.py`를 기존 security 역할 check/apply/verify와 소스 SHA 프로필에 연결했다. 기존의 더 엄격한 MAC 정책·타인 파일·Include 우선순위 충돌을 거절하고, 검증/reload 실패 시 추가 파일을 원복한다. 새 모듈10·A 설치16·초기 설치 controller44=70검사 통과. 설정 예제·네트워크 안내·오프라인 반입 목록/README·PLAN도 반영했다. 새3VM 전체 설치·호스트 재부팅·공격E2E·이번 변경 후 실제 쓰기는 미실행이다. 추가 deb/wheel/이미지·패키지 다운로드/Mac 설치0.
 - **Git·정리:** 공개10파일 `dbae649de71789a721fd365ec03886ef9ffd0963` 자동 커밋·프로젝트 전용 일회성 인증 푸시/실제 remote main일치·B 재현10SHA 확인. 최초 소스 전송은 명령 인자 길이 제한으로 실행 전에 중단돼 표준입력 방식으로 정정한 뒤 성공했다(운영 SSH 적용 실패 아님). 이번 임시7파일 중4개를 SHA 대조 후 삭제했고 남은3개 게시/동기화 helper도 이 게시 확인 후속 푸시 뒤 제거한다. 추가 다운로드/Mac 설치0, 로컬 자료는 Git 제외·운영 복구 백업 보존. 마지막 커밋/원격 일치/clean/임시 경로 부재는 로컬 마감에 기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h148"></a>
+<a id="record-9d82473d80da4b473db00ae899f10211826d64b628a590df8613ef17a003b926"></a>
 
 ## 잔여6건 추가 점검 결과 — 2026-10-26 23:56 KST
 
@@ -2229,6 +9357,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git·정리:** 조회보완8파일`884b94f86075b9e59ec34af55759a5c9156df72f`원격일치/서버재현8SHA확인. 최종현황3문서 `9c553a0`도자동푸시/실제remote main일치·서버재현8SHA를확인했다. 패키지다운로드/Mac설치0,자신의임시6파일39,151B 중3개를SHA대조삭제했다. 남은3개게시/동기화helper는이게시확인후속푸시후삭제한다. 소스·운영복구백업·로컬증거는보존한다. 마지막커밋/원격일치/clean/임시경로부재는로컬마감기록에남긴다.
 
 
+
+
+<a id="source-87368a0abd79b357-h149"></a>
+<a id="record-18967f318b552dad4c76e333c8fa8735622e6e1041d6bf8b2b303505afcc0618"></a>
+
 ## 남은6건 조사 필드 보완 — 2026-10-26 23:45 KST
 
 - **확인한 원인:** 기존 security-events는 색인된 실제 DNS 질의명과 HTTP 경로를 반환하지 않아 모델이 사건의 용도·시험 연관성을 조사하기 어려웠다. DNS 이름/타입 최대16개(잘림·잘못된 값 명시), HTTP 경로 최대512자(쿼리/fragment 제거·과대/잘못된 값 명시), 거래ID·User-Agent의 SHA256을 추가했다. 헤더 값·쿠키·인증정보·본문은 반환하지 않으며 해시/시그니처만으로 행위자나 무해성을 인증하지 않는다. 기존3도구·조회 권한·50건 상한·90일 과거 범위를 유지한다.
@@ -2238,6 +9371,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **Git·범위:** 앞선최종`be451e0`의원격일치/clean·Mac임시6개정리증거를보존했다. 이번변경8공개파일 `884b94f86075b9e59ec34af55759a5c9156df72f` 자동푸시/실제remote main일치·서버재현8SHA를확인했다. 최초재현동기화는기존묶음에없던내부배포script에서중단되어신뢰된부모경로에신규추가후전체재검증했다(운영MCP조회실패아님). 사건최종결과와보고실제도착은후속감사에서갱신하며현재전체완료로표시하지않는다.
 
 
+
+
+
+<a id="source-87368a0abd79b357-h150"></a>
+<a id="record-dc492e95c4fa5f55ab6a7f93bddf6896f4deda58dc0b43bbb57c674dd575d4d7"></a>
 
 ## 잔여10건 최종 결과 — 2026-10-26 23:11 KST
 
@@ -2259,6 +9397,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **검증·전달:** 494검사 중492통과/2환경생략. 이번 수동 재검토12실행의 보호 쓰기 호출0, 실제 Mattermost 보고12건의 soc-report 작성자·채널·일반 게시·본문을 GET 대조, 보고 대기0·failed unit0·관리/공동채널/Ollama 서비스 active·운영5SHA 일치. 새3VM 전체 설치·실제 공격/탐지/대응 E2E·재부팅은 미실행이다.
 - **Git·정리:** 소스·설치/상태9파일 `5b855c49608435c6f38495c97450cecfcdd4015c`는 자동 푸시/실제 remote main일치·서버 재현9SHA를 확인했다. 최종 결과 문서3파일 `2e446160f36b42450ea7865825b3a2bd0be0b8ea`도 자동 푸시/실제 remote main일치·서버 재현9SHA를 확인했다. 이번 패키지 다운로드·Mac 설치0, 임시6파일32,678B의 SHA 목록을 남기고3개를 제거했다. 남은3개 게시/동기화 helper는 이 게시 확인 후속 커밋·푸시와 SHA 대조 후 제거한다. 운영 복구 백업과 소스·로컬 기록은 보존한다. 최종 커밋·원격 일치·작업트리/임시경로 부재는 로컬 마감 기록에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h151"></a>
+<a id="record-cfa8f6ec3f28a9b42f91606b032587a3dedfe4fce2a24badab30188402dd56c7"></a>
+
 ## 남은10건 추가 검토 — 2026-10-26 22:53 KST
 
 22:42 재조회에서 기존10건은 모두 needs_review였으며 원본·이전 결과를 보존해 재조사를 시작했다. 사용자는22:43 KST DVWA3건(10/17 03:22·03:29,10/22 04:10 KST,192.168.15.80)을 승인된 실습·시험으로 명시 확인했다. 이 확인은 해당3건에만 적용하며 실제 경보 조회와 대조한다.
@@ -2269,6 +9412,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **운영:**22:53 root controller와 H/O 공통 소스·핀5파일을 백업 후 증분 반영했다. 실행 중 조사 강제 종료/채팅 봇 재시작0,기본 관리 timer active.10건은 읽기 전용 재검토로 등록했으며 종결 결과는 후속 감사 대상이다. 복구 백업 `/var/backups/capstone-ten-cases-20261026-225311`, root SHA `fdf26d8e7043e1434b97e82421f3b560a5d096f060d1acd250deb41a5c1141d7`.
 - **설정 재확인:**22:42 실제 A UsePAM=yes/sshd 구문 정상. A SSH MAC의 SHA1/umac64, C rootless 관련 AppArmor unconfined4와 IPv4 forwarding1은 그대로다. Docker bridge 영향을 확인해야 하므로 설정 변경·예외 승인으로 대체하지 않았다.
 - **검증:** 관리145·설치30·공통조회270(2환경생략)·Ollama49, 총494검사 중492통과/2생략. 최초 검사는 공통 소스 핀 미갱신을 거절했고 핀을 함께 갱신한 뒤 재통과했다. 실제10건 결과/알림 도착은 진행 중이며 새3VM전체설치·실제공격E2E는 미실행이다. 추가 패키지·이미지·포트·키·Mac 설치0,기존 deploy.sh와 오프라인 소스 묶음 동기화/Git 게시를 이어서 수행한다.
+
+
+
+<a id="source-87368a0abd79b357-h152"></a>
+<a id="record-0db54c2d82a6ebb119996d96b478938d1f562f857533046d1162e55d6743852f"></a>
 
 ## 재개 작업 결과 — 2026-10-26 18:59 KST
 
@@ -2288,6 +9436,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **검사·설치 구분:** 최종 관리139·설치 경로30·동일 저장소 소스 Linux fixture32, 총201개 검사를 통과했다. 새3VM 전체 설치·실제 공격/탐지/대응 E2E·재부팅 시험은 미실행이다. 서비스/포트/이미지/키/패키지 추가0, 기존 deploy.sh 진입점과 소스 반입 경로를 맞췄다. B 운영 controller 최종 SHA `a55f616e8ce35345f61300224131be59a9f1df5babb284363318a8efd0e7b4d3`.
 - **Git·정리 구분:** 운영 보완의 최신 코드 `8e1873a823c6d25857c55999f6e0d1cbef9e1e30`은 프로젝트 일회성 인증으로 푸시·실제 remote main일치 및 재현6파일 SHA를 확인했다. 최종 결과 문서3파일 `b28fe5bb0561349ba8184a7d1ac2cbe7c5faec60`도 자동 푸시·실제 remote main일치/서버 재현6SHA 확인했다. B 시험 stage 제거/부재 확인 완료, Mac 패키지 설치·다운로드0. Mac 임시20파일94,856B 중17파일을 SHA 대조 후 제거했고 마지막3개 게시/동기화 helper는 이 게시 확인 후속 커밋을 푸시한 뒤 제거한다. 최종 커밋/원격 일치/작업 트리·전용경로 부재 확인은 로컬 세션/검증 기록에 남긴다. 운영 복구 백업·프로젝트 소스·로컬 작업 기록은 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h153"></a>
+<a id="record-ba92a12f47f883bd896bc04a3326aa015211a4911ea964fc5d6fd2c387969ea0"></a>
+
 ## 사건 종결 근거 보완 — 2026-10-26 18:56 KST 갱신
 
 기존 사건 재검토를 재개한 뒤 두 가지 누락을 확인해 관리 제어기에 보완했다. 모델의 결론을 자동 정상 판정으로 대신하지 않으며 보호 작업 권한은 그대로다.
@@ -2304,6 +9457,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 실패/근거 부족 원래 사건과 잘못 종결된1건 등14건, 추가 감사로 확인한2건을 기존 감사 가능한 재검토 절차로 등록했다. 앞서 보류했던 SCA 등 잔여 건도 계속 처리 중이다. **개선 코드 배포와45사건 모두 해결은 다르다.** 실제 남은 MAC/AppArmor/forward 설정 경보, 과거 증거 누락, 모델 호출 누락은 검토 필요로 보존한다.
 - 백업 계측은 A/B의18:02 KST 자연 주기에서 exit0·complete/ok를 재확인했다. B relay 일치·Wazuh 체크포인트 EOF559,065B를 확인했다. 계측 공개 커밋 `b181970` 및 후속 `b40aea871229ca51f6d3ae6a27fd6bc9aa1703a5`은 원격main일치 확인 완료다. 이번 사건 검증 보완6파일은 `c5b3fb0f9f5aabce2817238bdf83d1ef985e2d6e`로 자동 커밋·프로젝트 일회성 인증 푸시·실제 remote main일치 및 서버 재현6SHA를 확인했다. 이 게시 확인은 후속 현황 커밋·푸시에 포함한다. 18:11 KST 원래45건은 completed20/running1/review_ready24, 완료 센서의 과거 경보 조회 누락0·보고 미전달0이었다. 이 시각 이후의 최종 종결 수는 후속 기록에서 확인한다.
 
+
+
+<a id="source-87368a0abd79b357-h154"></a>
+<a id="record-c4742a22bbf9707adaa2a59f43ba26f87366ad646d57ac84f2f74bd306622801"></a>
+
 ## 작업 재개·백업 계측 복구 — 2026-10-26 17:32 KST
 
 사용자 재개 요청에 따라 일시정지 기록과 현재 DB·운영 소스 해시·서비스를 다시 대조했다. 17:31 KST 보존된30건만 기존 읽기 전용 재검토 대기열에 복귀시켰다. 재개 직전 원래45건은 completed12/needs_review33이었으며, 새로 유입된 사건을 이 분모에 포함하지 않는다. 사건별 조사와 근거 검증은 진행 중이고 일괄 종결·과거 쓰기 재실행은 하지 않았다.
@@ -2315,6 +9473,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - root 복구 백업은 A `/var/backups/capstone-storage-fix-20261026-173215`, B `/var/backups/capstone-storage-fix-20261026-173230`에 보존한다. 기존 저장소 모듈의 고정 호스트 설치 계약/소스 묶음을 맞추며, 이 기존 모듈의 새 호스트 bootstrap 검증은 미완료다. 운영 서버에 초기 설치기를 재실행하지 않았다. B 시험 전용 `/var/tmp/capstone-storage-fix-7udbg5ch`의 파일별 SHA를 확인한 뒤 제거·부재 확인을 마쳤다.
 - **Git:** 중단 지점 `bdd160a052ca86e4b6b333bfa56295cfeb07cb63`에서 재개했다. 계측 소스·설치 안내·현황8파일을 `b181970d312640d84df53bbc13a3183d62cba72e`로 커밋·프로젝트 일회성 인증으로 푸시하고 실제 remote main일치를 확인했다. 서버 재현 소스8파일 SHA를 대조했으며 마지막 수집 확인/게시 문구도 재동기화하고 후속 현황 커밋·푸시에 포함한다. 1번 완료,2번 사건 재검토 진행,3번 계측 운영 복구 상태다.
 
+
+
+<a id="source-87368a0abd79b357-h155"></a>
+<a id="record-97f4888c1cbae61ff87402815dc6a6563fa833c2d3338e61e2c76e7489cae267"></a>
+
 ## 작업 일시정지 — 2026-10-26 16:05 KST
 
 사용자 요청으로 추가 구현·배포·수동 재검토를 일시정지했다. 이미 실행 중이던1건의 종료를 기다린 뒤, 이 작업이 등록한 대기/후속 검토30건을 `needs_review / operator_review_paused`로 보존했다. 사건·이력·제안을 삭제하거나 성공으로 바꾸지 않았다. 당시 실행 중0·보고 미전달0, 기본 `capstone-management.timer`는 다시 active이며 일반 관제·채팅 봇은 유지한다.
@@ -2324,6 +9487,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - **3번:** 백업 디렉터리 제한64→256과 supplementary inventory의 오류 분류·wrapper SHA 갱신 초안은 로컬4파일에 보존했다. B 전용 Linux fixture32검사 통과, **운영 적용 전·미커밋**이다. 실제 B 백업117개/디스크27%에서 기존 backup_bytes=null을 재확인했고 A55개는 기존 측정 정상이다. 백업 삭제·보존 정책 변경0.
 - **재개 지점:** `/var/backups/capstone-three-fixes-20261026-154959/operator-pause.json`과 `before-pause.sqlite3`, 로컬 세션/검증 기록. B 소스 시험 경로 `/var/tmp/capstone-storage-fix-7udbg5ch`와 Mac 작업용 스크립트는 재개용으로 보존하며 패키지 설치·다운로드0이다. 재개 때 운영 변경 여부를 다시 읽고 남은 검토·계측 배포/검증·임시 정리를 진행한다.
 - **Git 구분:** 조회 개선 `e28da77`와 게시 확인 `26d42431150d813b206cbbc6a27518e401b74544`는 실제 remote main일치를 확인했다. 일시정지 문서3파일 `6fde229c5c9a60509c1ca733b07a2d50ba87d7d5`도 푸시·실제 remote main일치를 확인했다. 이 게시 확인은 후속 현황 커밋에 포함하며, 백업 계측 초안4파일은 로컬 변경 상태로 남긴다. 마지막 문서 커밋·원격/작업트리 결과는 로컬 세션 기록에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h156"></a>
+<a id="record-578315013fa87c92cbe1c6cc67e4c755bc2769d204165459cb9d9b509d67167d"></a>
 
 ## 검토 사건 조회 보완 — 운영 적용, 사건 종결은 별도 검증 중
 
@@ -2337,6 +9505,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 신규 read-only 초기 설치의 resp 연결 누락을 보완해 런타임과6서버/28읽기를 맞췄다. 보호 호출은 여전히 거절하며 추가 패키지나 listener는 없다.
 - 검사: MCP15/관리131/query270(2환경생략)/O49/설치SOC30/설치·런타임 계약1. 새3VM 전체 설치·공격/탐지/대응 E2E 미실행. 공개18파일을 `e28da774372743a1171ebad564f51f74b7967ae6`로 커밋·프로젝트 일회성 인증 푸시·실제 원격main일치 및 서버 재현18SHA를 확인했다. 이 게시 확인은 후속 문서 커밋에 포함한다. 기존 사건은 계속 순차 재검토 중이며 백업 계측 보완은 소스 작성/검증 단계다.
 
+
+
+<a id="source-87368a0abd79b357-h157"></a>
+<a id="record-636c7251987d64b78b0e6198265a5b9954e3f482cdb004d2887703a566c82e7d"></a>
+
 ## 학과망 화이트리스트 — 운영·영구 설정 반영
 
 2026-10-26 15:04 KST, 사용자 선택 **자동 차단 예외 + SSH·Wazuh 관리 접속 허용**에 따라 `211.170.162.0/24`를 적용했다.
@@ -2348,6 +9521,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 공개9파일은 `cb50f8e`로 자동 커밋·프로젝트 일회성 인증 푸시·실제 원격main일치를 확인했다. B의 재현 소스9SHA와 A 영구 FW/프록시 재조회를 확인했고 기존 관리망의 Wazuh302/Log4Shell200을 확인했다. 이 게시 확인은 후속 문서 커밋·푸시에 포함한다. 원래 작업은1번 완료/2번 사건 조사 중/3번 백업 계측 대기다.
 
 
+
+
+
+<a id="source-87368a0abd79b357-h158"></a>
+<a id="record-ae533afc9102bdb4e6e7fe2206bb59f4521213a1be98a254c6f8d191846d9c6f"></a>
 
 ## 실습 웹 모든 출발지 허용 — 운영 적용 및 사용자 접속 확인 완료
 
@@ -2362,6 +9540,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 
 
+
+
+<a id="source-87368a0abd79b357-h159"></a>
+<a id="record-a4835f84f6572addfdc9ddcaa44a6daa703809071a6cb0951d7092542873bb90"></a>
+
 ## 잔여 3문제 순차 해결 — 1번 실행 오류 수정 완료, 2번 조사 중
 
 2026-10-26 14:27 KST 기준. 사용자 지시에 따라 Hermes 검토 실행 → 기존45사건 → 백업 계측 상한 순서로 진행한다.
@@ -2374,6 +9557,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 14:31 KST부터 2번45사건을 조사 중이다. 만료/거부11건을 읽기 전용 재검토로 요청했으며 기존 실패 이력을 보존한다. 14:38:52 KST 표본은 전체 completed31·needs_review40·review_ready1·running1(시작 completed28보다3건 증가)이었다. 이 표본을 현재 최종 종결 수치로 확대하지 않는다. 3번백업계측은 아직 착수 전이다. 이번 변경 뒤 보호쓰기·실제 공격E2E·새3VM 전체 설치·통합 점수 재평가는 미실행이다. 소스·문서는 서버 재현 소스 대조 후 자동 커밋·푸시하고2번에 착수한다.
 
 **1번 게시 확인:** 공개9파일은 `9b55039`로 자동 커밋·프로젝트 일회성 인증 푸시하고 원격main일치를 확인했다. 마지막 새 질문4작업은 전부 실제조회/completed였고 질문→최종 게시/편집은 H 최초36.133초·검토74.348초, O 최초12.049초·검토48.245초(검토는 최초 답변 대기 포함)다. 기존 포함51글의 작성자·일반게시·원질문·본문SHA를 재확인했고14:27 KST 대기0·failed unit0·관련4서비스/timer active·기존검토45건 유지였다. 서버 재현소스9SHA일치, Mac설치0. 이 게시 확인도 후속 커밋·푸시하며 작업용 임시물은3문제 종료 후 정리한다.
+
+
+
+<a id="source-87368a0abd79b357-h160"></a>
+<a id="record-4c8c2db8ac8a3844efd3fc7a0065ac7620e33fca03ceed1e0b1ba8ebd384790d"></a>
 
 ## 공동 채널 배포·마지막 시험 결과 — 2026-10-26 13:55 KST
 
@@ -2388,6 +9576,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 
 **게시·재현 소스 확인:** 공개28파일은 `20469e0c6c3920d78a99b48bfa86f0e641d718be`로 커밋·프로젝트 자격 파일의 일회성 인증으로 푸시했고 실제 원격main일치를 확인했다. 알려진 자격 값의 공개파일 일치0·diff검사·Python/shell구문검사를 확인했다. 서버 기존 재현 소스28파일 SHA를 대조했으며 운영 백업은 보존했다(새 서버 전체 설치 시험 아님). Mac 작업용63스크립트/117672바이트는 로컬 전용 재현 증거와 SHA 대조 후60개를 삭제했다. 남은3개 인증/전송 helper는 이 게시 확인 문서의 후속 커밋·푸시·원격대조 후 삭제하며 완료 근거는 로컬 세션에 남긴다. 새 패키지·Mac 설치·서버 임시 반입 파일은 없다. 이 게시 확인 현황도 후속 커밋·푸시한다.
+
+
+
+<a id="source-87368a0abd79b357-h161"></a>
+<a id="record-9bdd62741c42899e7a94b1927fbbd16ae080add4b404890a8135808fd5cdf155"></a>
 
 ## 공동 채널 직접 요청·상호 검증 — 운영 배포, 정확성 시험 중
 
@@ -2405,6 +9598,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 아래12:39절은 당시 기록이다. 보고 후속 두번째 새 질문은20초에 활성agent3개를 답했으나 일반 정상가동/시각 문구 한계가 있어 위 보완을 진행했다. 기존 읽기·쓰기 통합 점수는 H85.43/O83.62(10/25 각유형1회, 읽기40%·쓰기60%)이며 이후 변경을 반영한 새 통합 점수는 없다.
 
+
+
+<a id="source-87368a0abd79b357-h162"></a>
+<a id="record-3a3a44a379c387d933d0a8efde18da8fbf7594de1546fb2923b84159a54cd559"></a>
+
 ## 채널 접미사·보고 발신자 — 운영 반영, 후속 검증 진행
 
 2026-10-26 12:39 KST 기준. 자동 참여는 사용자별 카테고리가 아닌 **채널 표시 이름 접미사** `-agent`(두 봇), `-ollama`, `-hermes`로 통일했다. 미분류 공개 채널은 가입하지 않으며 분류 변경 시 자기 회원만 가입·퇴장한다. 신규 사용자에도 같은 기준, 기존 질의 허용 계정/승인 권한은 유지한다. [사용법](../infra/hermes/chat-channels.md).
@@ -2418,6 +9616,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 - 기존 관리 검토46건은 대표3건 v2 재검토 뒤 **45건(검토44+결과미확인1)**. 만료 제안1건만 실제 읽기 근거로 종결했고, 후속 원복 관련2건은 근거 부족으로 유지한다. 과거 실패·재검토 이력 보존. 나머지 조사와 공동 채널은 계속 진행 중이다.
 - Git: 이 항목은 현황 갱신이며 공개 소스 커밋·푸시는 아직 전이다. 완료한 채널/발신자 단위만 별도 게시하고, 관리 검토·분배기 진행 중 파일은 구분한다.
 
+
+
+
+<a id="source-87368a0abd79b357-h163"></a>
+<a id="record-f88fd76269165b696cc558d26611a5ee95cdccf2f73ae5b26e95b2f0ec49e293"></a>
 
 ## 공통 관제 진단·독립 감시 — 운영 검증 완료
 
@@ -2445,6 +9648,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 
 **문서·배포·Git:** 루트 deploy.sh의 단일 진입점, 역할별 설치 경로·설정 예제·오프라인 소스 목록·양쪽 README와 담당 기록을 동기화했다. 추가 패키지·이미지·포트·Mac 설치/다운로드0. 운영 백업은 보존한다. 공개33파일을 서버 재현 소스에 백업 후 동기화했다(게시 전 스냅샷이며 새 설치 시험 아님). 서버 임시736파일/12,804,681바이트와 Mac 임시34파일/182,537바이트를 전체 SHA 보존본 대조 후 삭제·경로 부재 확인했다. 운영 파일·상태·백업과 기존 사용자 파일은 유지했다. 공개33파일은 `d6a2ed5`로 자동 커밋·프로젝트 전용 토큰 일회성 푸시했고 실제 원격 main 일치를 확인했다(helper 파일0). 이 게시 확인 현황1파일은 후속 현황 커밋에 포함하며, 최종 HEAD/원격 일치·clean 결과는 로컬 세션에 기록한다. 상세 사전 protocol·실패·SHA·실제 응답·알림 증거는 로컬 전용 `대화기록/검증/2026-10-26-monitoring-coverage/`에 있다.
 
+
+
+<a id="source-87368a0abd79b357-h164"></a>
+<a id="record-8492c50958e856c325d83dff5bd49534ddac87f95145e4c64b7360ee8c3f7827"></a>
+
 ## 당시 기록 — 관제 공백 보완 사용자 요청 일시정지
 
 2026-10-26 09:05 KST 사용자가 인터넷 단절 예정으로 일시정지를 요청했다. 진단37대상+전체 집계, 두 봇 heartbeat, A 장애 기록·재전송과 모델/수집 경로 점검 코드·설치 경로를 증분 배포했다. **최종 운영 검증과 Git 반영은 미완료**다. 이번 신규 감시/시험 타이머3개만 정지하고 기존 봇·보안장비·진단/관리 서비스는 유지하는 인계를 수행했다. 실제 정지 확인과 재개 명령은 로컬 세션/검증 기록에 보존한다.
@@ -2452,6 +9660,11 @@ Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미
 서버 격리418검사는 통과했으나 배포 후 환경 차이를 수정한 최종 전체 회귀, 두 봇 새 스레드 및 SDK 재시험, 실제 canary 전달·알림 재전송 검증이 남았다. 최신 확인에서 두 봇 인증 heartbeat와 Wazuh 필수 프로세스/드롭0, 모델 소량 추론, C 수집 상태를 확인했다. B 관리 파이프라인 진단 실패와 A canary 미생성 원인 확인은 미완료다. Suricata 실제 적재52,497개·드롭0과 누적 검사 깊이 제한 도달을 구분하며, 과거 검토 필요 사건46건은 임의 종결하지 않았다. 마지막 다중 호스트 진단 선택 소스 수정은 운영 미반영이다.
 
 새 기능을 완료·정상으로 표시하지 않는다. 외부 즉시 알림 부재와 A 동시 중단 한계, 실제 공격·탐지·대응 E2E 및 새3VM 전체 설치 미검증을 유지한다. 패키지/이미지 추가 설치0. 재개를 위해 작업 소스·서버 백업·Mac/서버 임시 경로를 보존했으며 최종 정리·공개 문서 상세 동기화·커밋·푸시·원격 확인은 남았다. 상세 재개점은 로컬 전용 `대화기록/검증/2026-10-26-monitoring-coverage/RESUME.md`와 `pause-state.json`에 있다. 아래는 이전 완료 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h165"></a>
+<a id="record-55c1f48e3fdf4cac141c63a74ee001bed36759bfed6f8d2a7dd8842ea1f28d43"></a>
 
 ## 새 질문 156턴 반복·개선 — 2026-10-25 23:57 KST 시험 완료
 
@@ -2478,6 +9691,11 @@ Hermes query-completion **1.10.0**, 공통 SOC 계약 **1.3.0**을 B에 증분 �
 
 **문서·정리·Git:** 공개14파일을 서버 재현 소스에 백업 후 동기화했다(게시 전 스냅샷, 새 서버 전체 설치 시험 아님). 서버 임시475파일/14,699,828바이트와 Mac 작업 임시26파일/118,197바이트는 로컬 보존본의 전체 SHA 대조 후 삭제·경로 부재를 확인했다. 운영 파일·감사·복구 백업과 기존 사용자 캐시·프로젝트 소스/증거는 보존했다.06:41KST 정리 직전 B의 설정/배포SHA 변경0·failed unit0·원래 timer/service active도 재확인했다. 문서7개 상대 링크484개 누락0·AST6파일·diff 검사와 로컬 전용 미추적을 확인했다. 공개14파일은 `03bd996`으로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main 일치를 확인했다(게시 helper 파일0). 이 게시 확인 현황1파일은 후속 커밋·푸시하며 최종 HEAD/원격 일치·clean 상태는 로컬 세션에 기록한다. 상세 원문·사전 protocol/hash·실패·평가기 정정은 로컬 전용 `대화기록/검증/2026-10-25-generalization-improvement/`에 보존한다. 아래는 각 당시 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h166"></a>
+<a id="record-3f5a5c39c002aa6ef24af0eeea2223a9a398bfe7c2ee4460efcf0aa739cedf53"></a>
+
 ## 두 봇 반복 평가·개선 완료 — 2026-10-25 22:38 KST
 
 Hermes query-completion **1.9.2**, 공통 계약 **1.2.2**와 Ollama 실행/감사 저장 보완을 B에 증분 배포했다. 같은 DGX35B·8MCP/36도구·기존 권한으로 실제 Mattermost **296턴**을 실행했다. 고정10유형+표 후속×3회×2봇을4버전에서264턴, 별도8표현의 최초/재시험32턴이다. 각각 새 루트를 사용하며 표 후속만 해당 시험 스레드를 재사용했다. 최초 실패와 중간 회귀를 성공 표본으로 덮지 않았다.
@@ -2501,6 +9719,11 @@ Hermes query-completion **1.9.2**, 공통 계약 **1.2.2**와 Ollama 실행/감�
 **검증·운영:** 535 정적·격리 검사(서버 query260, Ollama45, 관리117, 설치 관리30, SIEM40, controller43), 실제 SDK canary/채팅 반복을 수행했다. Mac의 jsonschema 환경 생략1건은 서버 기존 venv에서 검사했다.22:24:57KST root 백업 후 배포,22:25:18 gateway 준비·원래 timer 복원,22:37:29 마지막66턴 완료. 독립 감사에서 MCP36스키마·설정/배포22SHA, 원본3룰 전문/ET·합본 불변·차단0·A/B/C failed unit0·O243작업 모두done·timer/service active·시험 세션 로그아웃을 확인했다. 전체296턴 보호 호출0이다. 관측기 종료 인식/standalone SDK stdout 로그 혼입 오류는 모델 실패·응답 지연과 별도로 보존했다.
 
 **남은 범위/게시:** upstream 수집기 시간대 표기·미제공 취약점 필드·빈 자료/실패 혼합, 실제 SID 적재·공격/탐지/대응 E2E, 이번 수정 뒤 쓰기6유형 반복/승인 적용·원복, 새3VM 전체 설치는 미완료/미실행이다. 정확 승인·보호주소/TTL·3번CVE 보류 유지. 추가 deb/wheel/이미지/포트와 Mac 설치·다운로드0이다. 공개18파일을 서버 재현 소스에 동기화했다(게시 전 스냅샷, 새 서버 전체 설치 시험 아님). 서버 임시495파일/24023457바이트는 로컬 보존본과 전체 SHA 대조 후 삭제·경로 부재를 확인했다. 운영 파일·감사 이력·복구 백업은 보존했다. Mac 이번 임시53파일/4035293바이트도 삭제·경로 부재를 확인했고 기존 사용자 캐시·프로젝트 소스/증거는 보존했다. 공개18파일은 `591fb2f`로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main 일치를 확인했다(게시 helper 파일0). 이 게시 확인 현황1파일은 후속 커밋·푸시하며 최종 HEAD/원격 일치·clean 상태는 로컬 세션에 기록한다. 상세 protocol/실패·선택·호출·SHA·평가·종료 증거는 로컬 전용 `대화기록/검증/2026-10-25-repeated-improvement/`에 보존한다. 아래는 각 당시 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h167"></a>
+<a id="record-a853457326caca247176a728204807235425a210f83a809d3418f78bb08a2138"></a>
 
 ## 양쪽 조회 하네스 수정·운영 반영 — 2026-10-25 20:01~21:01 KST
 
@@ -2527,6 +9750,11 @@ Hermes query-completion **1.8.3**, 공통 SOC 계약 **1.1.0**과 Ollama 실행�
 
 **독립 종료 감사:** 실제 MCP36스키마는 이전 양쪽 SDK와 동일하다. 기존6설정/Memory·배포13SHA, 원본3룰 전문/ET·합본SHA 불변·차단0·A/B failed unit0·O95작업 모두done·기존timer active를 확인했다. **마감 상태:** 서버 임시98파일/4164955바이트는 로컬 보존본·소스 SHA 대조 후 삭제·경로 부재를 확인했다. 공개21파일을 서버 재현 소스에 동기화했다(게시 전 스냅샷, 전체 초기 설치 시험 아님). Mac 이번 임시61파일/3491242바이트도 삭제·경로 부재를 확인했다. 기존 사용자 캐시·운영 기록·복구 백업·프로젝트 소스/증거는 보존했다. 공개21파일은 `243f48f`로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main 일치를 확인했다(helper 파일0). 변경 문서7개 상대 링크471개 누락0·diff 검사·로컬 전용 미추적을 확인했다. 이 게시 확인 현황1파일은 후속 커밋·푸시하며 최종 HEAD/원격 일치·clean 상태는 로컬 세션에 기록한다. 아래 과거 시험과 실패 기록은 당시 상태로 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h168"></a>
+<a id="record-8b36f648cf3f8d4bc3c387d2c3f56dd9fd0d1a3fd3101b9e5c9bc34aa14388cb"></a>
+
 ## 신규 조회 6유형 확장 시험 — 2026-10-25 19:33~19:49 KST
 
 기존 룰/쓰기 질문과 다른 에이전트 연결, C 프로세스·포트, 취약점, 수집 통계, 과거 승인 실패와 현재 상태, 날짜 경계 계산을 같은35B·현행 하네스/권한으로 시험했다. 새 스레드6유형×2봇의 최초12응답을 보존하고, 이후 문구만 단순화한 에이전트 조회 대조2건을 별도 실행했다. 모델·운영 코드·설정 수정이나 보호 변경은 하지 않았다.
@@ -2548,6 +9776,11 @@ Hermes 취약점 조회는 약2.02MB 결과가 native 파일로 분리되어 모
 **보존/남은 작업:** 운영23SHA는 시작 전과 같고, 3룰 전문·ET/합본 해시는 직전 작업의 최종 원복 검증값과 같다. 파일 정의10/14/19·차단0·B failed unit0·Ollama 작업61건 done을 확인했다. 이번에 A systemd 전체를 재점검하지 않았으며 컨테이너 running과 개별 룰 적재/필수 내부 프로세스 정상은 구분한다. 우선 수정은 열거 부정문 분류/조회 결과 보존, 특수 시각의 KST 처리, 이름→에이전트ID와 통계 도구 선택, 대용량 취약점 집계·감사 누락·반복 호출이다. 이후 기존 회귀와 새 질문을 함께 재시험한다. 자동관리 Hermes·정확 승인·CVE3번 보류를 유지한다. 실제 공격 E2E·새3VM 설치·장기 부하는 이번 범위가 아니다.
 
 **문서/Git:** 로컬 원문·점수·근거는 `대화기록/검증/2026-10-25-expanded-read-eval/`에 보존한다. STATUS/PLAN/README와 양쪽 사용 문서·로컬 담당 기록을 갱신했다. 서비스/설치 경로/패키지 변경이 없어 설치기·반입 목록 수정은 없다. 서버 관측18파일/253,819바이트는 로컬 보존본과 canonical SHA 대조 후 삭제했고, Mac 전용 임시13파일/43,616바이트도 삭제·경로 부재를 확인했다. native 결과 캐시·대화/운영 기록·복구 백업과 프로젝트 증거는 보존했다. 패키지 다운로드/설치0이다. 변경 공개5문서의 상대 링크420개 누락0·diff 검사·로컬 전용 미추적을 확인했다. 공개5문서는 `07c250b`로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main 일치를 확인했다(helper 파일0). 이 게시 확인 현황1파일은 후속 커밋·푸시하며 최종 HEAD/원격 일치·clean 상태는 로컬 세션에 기록한다.
+
+
+
+<a id="source-87368a0abd79b357-h169"></a>
+<a id="record-2e39096fe9514effe76fa5f7657d05b210f6f768d55fb5ba076284ed1eae0cac"></a>
 
 ## 공통 하네스 고정 24응답 재시험 — 2026-10-25 18:41~18:58 KST
 
@@ -2575,6 +9808,11 @@ Hermes 취약점 조회는 약2.02MB 결과가 native 파일로 분리되어 모
 
 **기록/Git:** 상세 원본·점수·카드/worker 검증은 로컬 전용 `대화기록/검증/2026-10-25-harness-retest/`에 보존한다. 서버 관측 임시53파일/2931707바이트는 로컬 보존본과 canonical SHA 대조 후 삭제·경로 부재를 확인했다. 서버 운영 소스/후보/승인 감사/복구 백업은 보존했다. 패키지 다운로드·Mac 설치0, 문서 상대 링크491개 누락0·diff 검사·추적1,207파일 비밀검사 기존4오탐/신규0을 확인했다. 공개11파일을 서버 재현 소스 묶음에도 동기화했다(게시 전 스냅샷, 전체 신규 설치 묶음 검증은 아님). Mac 작업 임시30파일/3537248바이트와 전용 경로를 삭제·부재 확인했다. 기존 사용자 파일/캐시는 유지했다. 공개11파일은 `6cc1034`로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main과 일치를 확인했다(helper 파일0). 이 게시 확인 현황1파일도 후속 커밋·푸시하며 마지막 HEAD/원격 일치·clean 상태는 로컬 세션에 기록한다.
 
+
+
+<a id="source-87368a0abd79b357-h170"></a>
+<a id="record-09f3e092bfdecde1bfb5fe5ede85f5016a7187a02954a765957ee4de75c62537"></a>
+
 ## Hermes·Ollama 하네스 공통화 운영 반영 — 2026-10-25 15:34 KST
 
 사용자 지시에 따라 내부 실행/재시도/종료는 native로 유지하고, 공통 제어 가능한 부분을 실제 코드로 공유했다. 일반 Mattermost 채팅은 동일 DGX `qwen3.6:35b`, 추론off, temperature0, top_p0.95, 출력2048토큰이다. `chat_contract.py`+공개 SOC 정책과 `harness.py`의 도구 범위·호스트 target enum·읽기 근거/누락 보고·변경안 제출 근거 표를 두 실행부에서 같은 바이트로 사용한다. 공통 SOC 지침 SHA는 `9641898190e2ac41312532b372568ac16c0e7a8854373ee0823ad933b8294851`이며 전체 native 프롬프트가 같다는 뜻은 아니다. [통일 항목·남는 차이·설치 파일](../infra/hermes/chat-harness.md).
@@ -2599,6 +9837,11 @@ Hermes query-completion1.7.0과 Ollama 증분 upgrade를 B에 배포했다. 유�
 
 Git/정리: 서버 staging20파일과 관측 JSON2개는 로컬 보존본/원본SHA 대조 후 제거했다. Mac 이번 임시23파일/3331786바이트도 삭제·부재 확인했고 패키지 설치/다운로드0이다. 운영 소스/복구 백업은 보존했다. 공개21개 소스·설치·문서를 서버 복구 bundle에 동기화했다(게시 전 스냅샷). 추적 파일 비밀정보 검사에서 기존4개 오탐 외 신규 발견0이며, 로컬 대화/검증/담당/자격 파일은 Git에서 제외했다. 공개21파일은 `a2a01a6`으로 커밋·푸시했고 실제 원격main과 동일함을 검증했다(프로젝트 로컬 토큰 일회 사용·인증 보조파일0). 이 문서 갱신은 해당 소스 게시 확인 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h171"></a>
+<a id="record-607a91f1da98d54d80ec9709a1dd4c4a022a8dda6c7a4b19eae32b2988164463"></a>
+
 ## 읽기·쓰기 누락 중심 비교·제한된 적용/원복 완료 — 2026-10-25 14:34 KST
 
 동일 DGX `qwen3.6:35b`·8 MCP/36도구에서 쓰기6유형×2봇을 새 스레드로 직렬 교대 시험했다. 먼저 기존3룰/12하네스·설정 SHA를 고정했고 실제 후보11개의 SHA/기존ID 보존을 독립 검증했다. 이전 읽기6사례는 최종 표본을 사후 채점한 것으로 같은 일괄 라운드나 통계적 정확도 시험은 아니다.
@@ -2621,6 +9864,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 **남은 범위:** Hermes 근거 없는 조회/정상 주장·쓰기 대상/전체파일 escape·시각, Ollama 다장비/복합쓰기 누락·원복 SHA 안내를 보완하고 같은 기준으로 반복 평가한다. 공통 컨테이너 재생성 뒤 callback /32 정합성을 재확인한다. 기존 Hermes 자동 관리 controller를 유지하며 무인 변경 전환은 하지 않는다. **Git:** 프로필16파일은 `36ecb597f94f3545e3df67bcb934065d895a0497`, 비교·실제 적용/원복·정리 결과5문서는 `1fdd4e78b7e695703dc9b698747d4aa95f696c98`로 각각 커밋·푸시하고 실제 원격 main 일치를 확인했다. Mac/서버 임시 정리·문법/diff·변경 문서 링크·비밀 검사(기존4오탐/신규0) 완료. 이 게시 확인 문구는 위 커밋 이후의 현황 갱신으로 별도 후속 커밋에 기록하며 최종 HEAD/원격 일치·clean 확인은 로컬 세션 기록에 남긴다. 모델/권한은 같지만 Memory·프롬프트·SDK·공유 부하·캐시는 완전히 통제하지 않았다.
 
 
+
+
+<a id="source-87368a0abd79b357-h172"></a>
+<a id="record-5c48572971c8cabe3e5889f91ececa6af0b5fed433d091cb404aaa3909604825"></a>
+
 ## 봇 프로필사진 적용과 당시 중간 기록 — 2026-10-25 08:00 KST
 
 **완료:** Mattermost `hermes`와 `ollama` 계정에 서로 다른 공식 프로젝트 아이콘을 적용했다. Hermes는 공식 앱 아이콘, Ollama는 공식 조직의 라마 아이콘이다. 두 계정의 사진 갱신 시각·API 재조회와 실제128×128 표시 이미지를 확인했다. 계정/채널 ID·모델·권한·실행 하네스 변경과 봇 재시작은 없다. 이전 이미지는 B root 복구 백업에 보존했다.
@@ -2631,6 +9879,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 
 **Git:** 프로필 자산·설치기·문서16파일은 `36ecb597f94f3545e3df67bcb934065d895a0497`로 커밋·푸시했고 실제 원격 main과 일치를 확인했다. 이 게시 확인 문장은 이후 로컬 갱신이며 비교 보고와 함께 후속 게시한다. 이 문단의 당시 중간 상태는 위 최종 결과로 갱신됐다.
 
+
+
+
+<a id="source-87368a0abd79b357-h173"></a>
+<a id="record-eed1c0afd71423a885c47b47cfd5a46cedd9b2309999b61d354f620a5d126e84"></a>
 
 ## Ollama 하네스·동등 MCP 권한·실채팅 재시험 완료 — 2026-10-25 07:18 KST
 
@@ -2662,6 +9915,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 **정리·Git:** 공개17파일의 Python7개/Bash 문법·diff 검사와 상대 링크495개 누락0, 추적1,197파일 비밀검사(기존 generic 오탐4·신규0)를 확인했다. 운영 bundle의 설치 소스/설정/안내16파일 해시를 저장소와 대조했다(수시 현황 STATUS는 저장소에서 관리). 서버 시험 기록44파일/822,644바이트는 로컬 보존본과 일치 확인 후 제거했고, Mac 작업용77파일/1,330,602바이트와 전용 임시 경로의 제거를 확인했다. 이번 패키지 다운로드/로컬 설치0, 기존 사용자 캐시 변경0이다. 공개17파일은 `1b3df79`로 자동 커밋하고 프로젝트 전용 일회성 토큰 인증으로 푸시한 뒤 실제 원격 main 일치를 확인했다(helper 파일0). 로컬 세션/검증 보고서·업무분담·자격 파일은 Git에서 제외했다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하고 최종 HEAD/원격 일치·clean 상태는 로컬 세션에 남긴다.
 
 
+
+
+<a id="source-87368a0abd79b357-h174"></a>
+<a id="record-f8593493949768027388fc7144bd6ef19223406c635059ba2d9ea61df0376930"></a>
+
 ## Ollama 기반 실행부·Mattermost 봇 추가와 Hermes 비교 — 2026-10-25 06:23 KST
 
 **완료:** 같은 B 호스트에 비특권 Python3.12 venv의 mcp-use1.7.1·ChatOllama1.1.0·Ollama Python SDK0.6.3/MCP1.30을 오프라인 설치했다. 모델은 두 실행부 모두 **기존 DGX의 qwen3.6:35b**다. B의 추론 daemon/CLI·모델 가중치를 추가하지 않았다. 기존 Hermes/MCP2.0 환경은 유지한다. [설치·권한·실행·복구](../infra/ollama-trial/README.md).
@@ -2689,11 +9947,21 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 **남은 작업/정리·Git:** 직접 채팅 질문으로 최종 게시·후속 문맥/지연을 확인하고, 위 표현 정확도와 운영 기능 동등성을 추가 평가한다. 속도 표본상 후보가 유리하지만 기존 Hermes 운영 교체는 하지 않았다. 서버의 오프라인 bundle·원래 authorized_keys 백업은 재현/복구용 운영 파일로 보존한다. Mac 작업용107파일·52,228,279바이트와 전용 임시 경로, 서버 호스트 비교56파일·Hermes 컨테이너 비교261파일·반입 archive의 제거를 확인했다. Mac 설치0·기존 사용자 캐시 변경0이며 프로젝트 소스/로컬 기록과 서버 운영 복구 bundle은 보존했다. 공개25파일의 상대 링크541개 누락0·diff/compile 검사와 추적1,195파일 비밀검사(기존 generic 오탐4/신규0)를 확인했다. 공개25파일은 `d112345`로 자동 커밋·프로젝트 전용 일회성 인증 푸시 후 실제 원격 main 일치를 확인했다(helper 파일0). 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하고 마지막 HEAD/원격 일치·clean 상태는 로컬 세션에 남긴다.
 
 
+
+
+<a id="source-87368a0abd79b357-h175"></a>
+<a id="record-ee43ad2a0e8af9d07ea307ded1c2dd1cac059e3aec83a9b15dd5efdf1a4dba49"></a>
+
 ## 별도 환경의 설치 위치 명확화 — 2026-10-25 후속
 
 사용자가 별도 환경을 다른 서버로 이해할 수 있어 의미를 명확히 한다. **같은 B 서버 안에 별도 컨테이너 또는 Python 가상환경(venv)을 두는 뜻이며, 새 물리 서버나 VM이 필수라는 의미가 아니다.** 기존 Hermes 환경은 현재 패키지를 사용하고, 시험 실행부만 자신의 의존성·설정·기억 저장 경로를 사용한다. 두 실행부 모두 기존 DGX Ollama에 추론을 요청하고 기존 MCP 서버를 이용할 수 있으므로 모델 파일과 MCP 서버를 새로 복제할 필요는 없다. venv는 Python 패키지 분리 수단이며 OS 권한/파일 접근까지 격리하는 보안 경계는 아니다. 읽기 시험용 도구 제한과 기존 승인 경계는 어느 방식에서도 별도로 유지한다.
 
 앞선 B 자원 점검은 같은 서버에 비교 환경을 둘 여유가 있다는 근거이며 실제 신규 실행부 부하 시험은 아니다. 이번은 설명·문서 명확화만 했고 서버 접근·설치·새 모델/서비스·실행 시험은 없다. STATUS/PLAN/MCP 안내 및 로컬 세션을 갱신하며 기존 계획·담당은 유지한다. 공개3문서는 `872bccb`로 자동 커밋·프로젝트 전용 인증 푸시 후 실제 원격 main 일치를 확인했다. diff check·stage 바이트/파일 범위를 확인했으며 새 링크·실행 코드가 없어 직전 비밀검사/라이브 시험을 재실행하지 않았다. 이 게시 확인 현황은 후속 자동 커밋·푸시하고 최종 HEAD/원격/clean은 로컬 기록에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h176"></a>
+<a id="record-be7b44de8572a8f9b710151b83f3f1fc51b6fdb1e7fe3b2b834baeffffa10954"></a>
 
 ## Ollama↔MCP 실제 왕복과 기존 코드 대체 후보 — 2026-10-25 05:22~05:31 KST
 
@@ -2716,6 +9984,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 
 **파일·Git·정리:** 공개 STATUS/PLAN/README/MCP/B 안내와 로컬 업무분담·세션·검증 보고서를 갱신한다. 운영/설치기 동작 변경이 없어 deploy.sh·설정 예제·반입 목록의 실행 내용은 유지한다. 실제 후보 도입 시에는 단일 설치기와 ABI별 오프라인 반입·해시 검증·복구 경로도 함께 반영해야 한다. Mac 시험 실행기5파일/14,150바이트·임시 디렉터리 제거 확인, 패키지 다운로드/설치·서버 임시 파일0이다. 공개5문서는 `b37fb75`로 자동 커밋·프로젝트 전용 일회성 인증 푸시 후 실제 원격 main 일치를 확인했다. 상대 링크463개 누락0·diff check·명시적 stage/작업 파일 바이트 일치, 추적1,183파일 비밀검사 기존generic 오탐4/신규0을 확인했다. 이번 운영 코드 변경이 없어 회귀 테스트는 재실행하지 않았고 위 라이브 시험과 구분한다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하며 최종 HEAD/원격/clean은 로컬 세션에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h177"></a>
+<a id="record-a89b6d3b476b1e002ffbb61be14bf49b99cb8054ba46480e0061c72ecf0db709"></a>
+
 ## B에 원격 Ollama 실행부를 추가할 자원 여유 — 2026-10-25 05:14 KST
 
 **판단: 여유 있음.** 모델 추론은 DGX에 유지하고 B에는 Ollama 원격 클라이언트와 SOC 실행부를 추가하는 조건이다. 현재 Hermes를 유지한 채 별도 비교 환경을 두는 것도 자원상 가능하다고 판단한다. 설치 전의 용량 판단이며 신규 실행부의 실제 사용량·최대 동시 부하·성능 개선을 검증한 결과는 아니다.
@@ -2735,6 +10008,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 
 **문서·Git:** STATUS/PLAN/README/B 안내와 로컬 업무분담·대화를 갱신했다. 원시 실측과 검증 자료는 로컬 전용이다. 공개4문서는 `64248f2`로 자동 커밋·프로젝트 전용 일회성 인증 푸시 후 실제 원격 main 일치를 확인했다. 상대 링크414개 누락0·diff check·stage 바이트 일치, 추적1,183파일 비밀검사 기존generic 오탐4/신규0을 확인했다. Mac 작업 실행기2파일/4,179바이트와 임시 경로 제거를 확인했으며 다운로드·Mac 설치·서버 임시 파일 생성0이다. 이번은 운영 코드 변경이 없어 회귀 테스트를 재실행하지 않았다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하고 최종 HEAD/원격/clean은 로컬 세션에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h178"></a>
+<a id="record-be58de1f38e4f45d5ba3fe691d8a0676a26b294bfb7ef7105242fc519cd19315"></a>
+
 ## 요청 처리 방식과 지연 가설 보완 — 2026-10-25 후속
 
 사용자는 이종 프로그램의 처리 방식 차이가 지연에 영향을 주는지 의견을 제시했다. **영향을 줄 수 있으며 현재의 지연 원인 후보로 검토할 가치가 있다.** 제품 역할이 다르다는 설명은 이 가능성을 부정하지 않는다. 모델/API에서 시간이 소비된다는 계측도 앞단 프로그램의 영향을 배제하지 않는다. 앞단이 보내는 문맥과 요청 횟수 때문에 모델 처리 시간이 늘 수 있기 때문이다.
@@ -2744,6 +10022,11 @@ Hermes는 새 조회0인데 IDS/Wazuh를 조회했다고 한 룰 표와,25진단
 별도 후보는 현재 Hermes가 사용하는 Ollama의 OpenAI 호환 /v1 경로와 Ollama 기본 API 사이의 요청 변환·기본값/추론 옵션·도구 스키마/결과 파싱 차이다. Ollama가 OpenAI API의 일부를 지원한다는 [공식 호환 문서](https://docs.ollama.com/api/openai-compatibility)를 확인했다. **호환 계층이 수십 초 지연의 원인이라는 실측은 없으며, 양쪽을 Ollama로 맞추면 자동으로 빨라진다고 확정하지 않는다.** 같은 모델·문맥·도구 정의·추론/생성 옵션과 상주/캐시 조건을 맞춘 API 단일 왕복 비교와, 같은 SOC 기능을 수행하는 전체 흐름 비교를 구분해야 한다.
 
 이번은 사용자의 가설에 대한 설명·기록 보완이다. 추가 실험/설치/운영 변경은 실행하지 않았다. 즉시 운영 변경을 보류한다는 판단과 처리 방식 개선/교체 후보의 가능성을 함께 유지한다. 기존 상세 비교와 원격 연결안 정정은 아래에 보존한다. 이 설명 보완은 `620b998`로 자동 커밋·프로젝트 전용 인증 푸시 후 실제 원격 main 일치를 확인했다. STATUS 상대 링크186개 누락0·diff check·stage 바이트 일치를 확인했다. 추가 정적 설명 변경으로 운영 회귀/부하 시험은 하지 않았고, 직전5문서 비밀검사와 이번 설명 검증을 구분한다. 게시 확인 현황은 후속 자동 커밋·푸시하며 최종 HEAD/원격/clean은 로컬 세션에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h179"></a>
+<a id="record-44ceeade3610a8fcc68a1f91323bbc65f190205784dab7bef6d902797adfc74d"></a>
 
 ## 원격 Ollama 연결안의 판단 정정 — 2026-10-25 후속
 
@@ -2762,6 +10045,11 @@ Ollama 공식 클라이언트는 OLLAMA_HOST가 가리키는 원격 모델 서�
 Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며, 실제 도구 실행과 결과를 다음 요청에 넣는 부분은 애플리케이션이 수행한다. 현재 SSH stdio MCP·승인 브로커·worker를 그 실행부에 연결하면 되지만, API 주소만 바꿔 기존 Hermes의 역할 전체가 옮겨지는 것은 아니다. [공식 실행 루프](https://docs.ollama.com/capabilities/tool-calling). 현재 통제는 Hermes 자체만의 기능이 아니라 프로젝트의 외부 MCP/승인 계층과 함께 구성되어 있음을 유지한다.
 
 **수정된 권고:** 즉시 운영 전환은 현재 기능의 동등성이 확인되지 않아 보류하고 Hermes를 유지한다. 이는 기능/운영 연속성 기준이며 성능 우열 판정은 아니다. B의 새 실행부가 같은 SOC 기능을 보존하고 더 빠르다는 실측이 나오면 교체할 수 있다. 비교 검토와 실제 구현/설치 승인은 구분하며 이번에는 설치·새 생성·추가 서버 접근 없이 공식 소스와 기존 실측으로 판단을 정정했다. 아래 자원 확인·비교는 당시 기록으로 보존한다. 이 정정의 공개 5문서는 `3185161`로 자동 커밋·프로젝트 전용 인증 푸시 후 실제 원격 main 일치를 확인했다. 상대 링크 452개 누락 0·diff check·stage 바이트 일치, 추적 1,183파일 비밀검사 기존 오탐 4건/신규 0건을 확인했다. 추가 Mac 임시 파일·패키지·서버 변경은 0이고 앞선 임시 디렉터리의 부재를 유지한다. 이 게시 확인 현황 1파일은 후속 자동 커밋·푸시하고 최종 HEAD/원격 일치/clean은 로컬 세션에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h180"></a>
+<a id="record-d6beb6dd210f08b11c0b834e92e5ad0e4713a15c92d6dac6d50fd449c309a15a"></a>
 
 ## Hermes·Ollama 특성과 현재 서버 적합성 — 2026-10-25 05:00~05:01 KST
 
@@ -2796,6 +10084,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **변경·검증·Git:** 읽기 확인과 문서 비교만 수행했다. 운영 8파일 SHA는 앞선 기준과 모두 같고 Hermes CID/PID/기동 시각도 유지됐다. 실제 management/worker timer·soc-bot이 활성임을 확인했으며 failed units 0이다. 초기 직접 B SSH는 2회 시간 초과 후 기존 A 경유로 성공했고, 초기 컨테이너 선택은 중지 복구 컨테이너까지 포함해 검사에서 중단한 뒤 실행 중 Hermes만 선택했다. 추측한 management timer 이름의 inactive와 주기성 worker service의 순간 inactive를 운영 장애로 판단하지 않았다. 설정·권한·모델·서비스 배포/재시작·패키지 설치·추가 채팅 게시·새 생성 호출은 0이다. 설치 동작/오프라인 반입 목록 변경도 없고 이전 440회귀를 새로 실행하지 않았다. 공격/보호 변경 E2E·새3VM 전체 설치는 미실행, 3번 CVE 보류 유지. 현황·계획·README·B/MCP 안내의 공개 5문서를 `7bb39a3`로 자동 커밋·프로젝트 전용 일회성 인증 푸시하고 실제 원격 main 일치를 확인했다. 상대 링크 448개 누락 0·diff check·stage 바이트 일치, 추적 1,183파일 비밀검사 기존 generic 오탐 4건/신규 0건을 확인했다. Mac 작업 실행기 4파일/16,903바이트와 임시 디렉터리 제거를 확인했고 서버 임시 파일 생성·Mac 패키지 설치는 0이다. 상세 실측·검증과 업무분담·대화는 로컬 전용이다. 이 게시 확인 현황 1파일은 후속 자동 커밋·푸시하며 최종 HEAD/원격 일치/작업 트리 상태는 로컬 세션에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h181"></a>
+<a id="record-96a7fb4db96c0fb5a2b330c4f2418baf4ce855fb78cbc1502a0782fc4016a721"></a>
+
 ## 실제 채팅·새 스레드 비교 및 에이전트/MCP 검토 — 2026-10-25 04:18~04:28 KST
 
 이전 승인된 SOC 시험 스레드와 사용자 추가 지시로 만든 새 스레드에서 같은3질문을 순차 게시했다. 다음은 **질문이 Mattermost에 등록된 시각부터 최종 봇 답변 게시까지**이며 각 칸1회 표본이다. 이전03:37 격리12턴과 측정 조건이 다르다.
@@ -2820,6 +10113,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **운영·문서·Git:** 04:31 KST 최종 확인에서도 운영 8파일 해시·CID/PID/기동 시각은 같았고 gateway running/Mattermost connected/active_agents 0/failed units 0이었다. 기존 대화의 핵심 메시지와 승인된 시험글 6개·봇 응답·새 세션은 보존했다. 현황·계획·README/조회/벤치/MCP 안내와 예제의 진단 도구 수 주석, 공개 7파일을 `073cb09`로 자동 커밋·프로젝트 전용 일회성 인증 푸시했고 실제 원격 main 일치를 확인했다. 상대 링크 450개 누락 0·diff check·예제의 실제 설정 불변·stage 바이트 일치·추적 1,183파일 비밀검사 기존 generic 오탐 4건/신규 0건을 확인했다. Mac 작업 실행기 9파일/40,103바이트와 임시 디렉터리 제거를 확인했고 패키지 다운로드·Mac 설치·서버 임시 실행파일 생성은 0이다. 운영 코드 변경이 없어 이전 440회귀를 재실행하지 않았으며, 실제 설치 동작과 오프라인 패키지 목록도 유지했다. 원시 응답/문맥/검증·대화·업무분담은 로컬 전용이다. 이 게시 확인 현황 1파일은 후속 자동 커밋·푸시하고 최종 HEAD/원격 일치/작업 트리 상태는 로컬 세션에 남긴다. 아래는 이전 단계 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h182"></a>
+<a id="record-ed328f5690c2875056a3de7d174028f41e01c89f50bbcc652a45b2c54ecf0850"></a>
+
 ## 1.6.0 응답 속도 반복 실측 — 2026-10-25 03:34~03:37 KST
 
 운영과 같은35B·SOUL·설정·등록 플러그인1.6.0·실제 MCP를 사용해 네 질문 유형을 각3회, 총12턴 순차 측정했다. **실제 채널 게시/도착시간이 아니라 native 요청 시작부터 최종 SQLite 저장까지의 시간이다.** 표본의 빠른 실패를 성공 속도에 섞지 않는다.
@@ -2841,6 +10139,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **문서·Git:** 측정 결과와 정확도 한계를 현황·계획·README/조회·벤치 안내5문서에 반영했다. 원본 응답/계측·업무분담·세션 기록은 로컬 전용이다. 공개5문서는 `ba0b319`로 자동 커밋·프로젝트 전용 일회성 인증 푸시 후 실제 원격 main 일치를 확인했다. 상대링크407누락0·diff check·추적1183 비밀검사 기존4generic 오탐/신규0·stage5바이트 일치 확인. Mac 실행기7파일/26007바이트와 작업 임시경로 제거를 확인했고 새 패키지 다운로드·설치0이다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하며 최종 HEAD/원격/clean은 로컬 세션에 남긴다. 아래는 이전 단계 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h183"></a>
+<a id="record-c66b7c16cbafd1232880fa01d2e4db5dd95254715c8023c640b6df7ca41b551b"></a>
+
 ## 시간 계산·IDS 대상·KST 저장 보완 — 2026-10-25 02:47 KST 운영 반영
 
 **서버가 KST 시각·경과값을 계산하고, 새 일반 답변·표는 KST로 저장하도록 보완했다.** 원본 로그·해시 대상 observation·승인 diff·과거 대화·내부 epoch/원본 메타데이터를 모두 KST 문자열로 다시 쓰는 변경은 아니다. 기존35B/샘플링/선택적 추론 정책을 유지한다.
@@ -2855,6 +10158,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 **남은 문제:** JSON만 요구해도 설명을 추가하는 형식 문제, 임의 자연어·다른 필드의 의미 오류, 조회된 running 상태를 전체 이상 없음으로 넓히는 표현은 완전히 해결되지 않았다. 이번 IDS 마지막 답변에도 일반적인 “이상 징후 없음/추가 조치 불필요”가 있어 기동 조회보다 넓은 주장으로 기록했다. 다양한 질문·장문 문맥/실제 채팅 반복 검증이 후속이다. 개별 SID 엔진 적재·공격 탐지 정확도·보호된 승인/대응 E2E는 이번 조회로 입증하지 않으며3번CVE 보류를 유지한다.
 
 **설치·문서·Git:** 단일 `deploy.sh`의 기존 source bundle/공용 gate/SOUL·설정 예제·진단 probe와 관련 README/계획을 동기화했다. 추가 deb/wheel/이미지가 없어 오프라인 반입 목록은 유지한다. 상세 입력·응답·실패/정정·검증·업무분담·대화는 로컬 전용이다. 공개18파일은 `304b0e9`로 자동 커밋·푸시했고 프로젝트 전용 일회성 인증으로 실제 원격 main 일치를 확인했다. 상대링크443누락0·diff check·공용 SHA핀·추적1183 비밀검사 기존4generic 오탐/신규0·stage18바이트 일치 확인. 서버 시험 임시18경로와 Mac 실행기10파일/임시경로 제거 완료, 패키지 다운로드·Mac 설치0이며 운영 복구 백업은 보존했다. 이 Git 게시 확인 현황1파일은 후속 자동 커밋·푸시하며 최종 HEAD/원격/작업트리 상태는 로컬 세션에 남긴다. 아래는 이전 단계 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h184"></a>
+<a id="record-49f7c24834c5815454c688ea843c6638d931241d71c90ce8e52a7f63ebcefdf1"></a>
 
 ## 권장 설정 전후 비교·현재 설정 유지 — 2026-10-25 01:47 KST
 
@@ -2883,6 +10191,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **Git·검증:** 공개 현황·계획·README·조회/벤치 안내5문서에 결과를 반영했다. 상대링크400누락0·diff check 통과·추적1180파일 비밀검사 기존4generic 오탐/신규0·stage5파일 바이트 일치를 확인했다. 공개5문서는 `59ee124`로 자동 커밋·푸시했고 프로젝트 전용 일회성 인증으로 실제 원격 main 일치를 확인했다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시하며 최종HEAD/원격/작업트리 상태는 로컬 세션 기록에 남긴다. 서버 시험 임시2경로와 Mac 작업 실행기9파일/임시경로의 제거를 확인했다. 새 패키지 다운로드·설치0, 기존 사용자 캐시는 건드리지 않았다. 상세 입력/응답/독립 채점/서버 검증·업무분담·자격 파일은 계속 로컬 전용이다. 아래는 이전 단계 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h185"></a>
+<a id="record-c89346136f238b63248f0fd70c0394923b7baa22e1ac3058456e7dc481764c77"></a>
+
 ## 응답 속도·정확도 균형 권장 설정 — 2026-10-25 01:23 KST
 
 **권장안은 qwen3.6:35b 유지 + 확실한 단순 조회만 reasoning_effort=none + 복잡/모호한 요청은 medium이다.** 요청별 정책이며 이번에 운영 설정을 변경하거나 분기 범위를 확장하지 않았다. 현재 소스의 일부 단순조회 none/조사 medium/검증표 provider0 경로와00:26 KST 운영 확인 기록을 대조했다. B 설정을 이번에 새로 조회한 것은 아니다.
@@ -2904,6 +10217,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **Git·정리:** 권장안과현재/미적용범위를현황·계획·루트README·조회플러그인안내4문서에반영했다. 공개4문서는 `9275276`으로 자동커밋·푸시했고 프로젝트일회성인증으로실제원격일치를확인했다. 상대링크380누락0·추적1180비밀검사기존4generic오탐/신규0·stage4바이트일치후게시했다. 이게시확인현황1파일은후속자동커밋·푸시대상이며최종HEAD/원격/clean은로컬세션기록에남긴다. 새Mac임시실행기/패키지다운로드/설치·서버임시파일0,로컬대화/검증자료·자격파일·업무분담은Git제외다. 아래는이전단계기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h186"></a>
+<a id="record-fe322f1c6a479d69b627ae6ceda186b6d474f6339f4f184de8f6e3a7d2b7148d"></a>
+
 ## 단일 에이전트 모델 전환·추론 분기 검증 — 2026-10-25 00:30 KST
 
 **설치된 Hermes의 동일 에이전트/세션에서35B→27B→35B 전환과 실제 모델 응답3회를 확인했다.** 대화 확인코드와35개 도구 스키마가 유지됐다. 그러나 복합 질문4개 비교에서는27B로 교체하는 이점이 확인되지 않았고, 현재35B의 추론 모드 활용이 더 유리한 후보였다. 운영 모델/자동 분기 설정은 변경하지 않았다.
@@ -2924,6 +10242,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **Git·Mac 정리:** Mac 전용 실행기12파일/40837바이트를 제거하고 임시 디렉터리 부재를 확인했다. 패키지 다운로드/Mac 설치0이며 프로젝트 소스/로컬 검증 자료/기존 사용자 환경은 보존했다. 현황/루트README/PLAN/벤치 안내4문서와 로컬 업무분담·세션 기록을 갱신했다. 공개4문서는 `a0c1dbf`로 자동 커밋·푸시하고 프로젝트 일회성 인증으로 실제 원격 일치를 확인했다. API19회 완료 결과·22경계 검사·16응답 독립 재채점·상대링크376누락0·추적1180 비밀 검사 기존4generic 오탐/신규0·stage4바이트 일치를 확인한 뒤 게시했다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시 대상으로 구분하며 최종HEAD/원격 일치/clean은 로컬 세션 기록에 남긴다. 대화/검증 보고서·업무분담·자격 파일은 Git 제외다. 아래는 이전 단계의 관측 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h187"></a>
+<a id="record-7a62d2d4ff6dc04aaf3994d925fc20e5e920c5af8bb448471a526b98bddfb122"></a>
+
 ## Qwen 27B와 현재 35B 정확도 비교 — 2026-10-25 00:03 KST
 
 **합성 SOC8문항을 각 모델1회씩 비교한 결과 둘 다7/8 통과로, 이번 작은 표본에서는 큰 정확도 차이를 확인하지 못했다.** 운영 모델은 `qwen3.6:35b`를 유지한다. 서버 `/api/show`에서 현재 모델은35.5B/qwen35moe/Q4_K_M, 비교 모델 `qwen3.8:27b`는27.3B/qwen35/Q4_K_M임을 확인했다. 공식 사양은 각각 총35B·활성3B의 MoE와27B Dense이므로 총 파라미터 숫자만으로 우열을 판단하지 않는다. [35B 공식 모델카드](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) · [27B 공식 모델카드](https://huggingface.co/Qwen/Qwen3.8-27B).
@@ -2939,9 +10262,19 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 
 **Git·정리:** 현황/루트README/PLAN/벤치 안내4문서를 `d2b47e7`로 자동 커밋·푸시하고 프로젝트 일회성 인증으로 실제 원격 일치를 확인했다. 16응답 재채점·상대링크373누락0·추적1180 비밀 검사 기존4generic 오탐/신규0·stage4바이트 일치를 확인한 뒤 게시했다. 이 게시 확인 현황1파일은 후속 자동 커밋·푸시 대상으로 구분하며 최종HEAD/원격 일치/clean은 로컬 세션 기록에 남긴다. 패키지 다운로드/Mac 설치/서버 임시파일0, Mac 일회성 실행기1파일/9403바이트를 검증 후 제거하고 임시 디렉터리 부재를 확인했다. 대화/검증 보고서·업무분담·자격 파일은 Git 제외다. 아래는 이전 단계의 관측 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h188"></a>
+<a id="record-e321a17c2a326cd5d32f406d17e56bab9aa9c4fc905aa5b7bbdeb1bdf8031886"></a>
+
 ## DGX 메모리 적재 스냅샷 — 2026-10-24 23:54:06 KST
 
 운영 DGX `.111`의 Ollama `/api/ps`를 직접 조회한 결과 `models: []`로 **현재 메모리에 적재된 모델은 없었다.** 설치된 모델 전체 목록이나 모델 파일 삭제를 뜻하지 않는다. 앞선 모델 상주 기록은 당시 관측이며 이번 결과는 일시적인 적재 상태 스냅샷이다. 설정·모델 설치/삭제·서비스 변경은 하지 않았다. 이 관측을 문서 커밋으로 자동 게시하고 완료 커밋/원격 일치는 로컬 대화기록에 남긴다.
+
+
+
+<a id="source-87368a0abd79b357-h189"></a>
+<a id="record-f9b0ab2530bd7d41805be83a76ee47c82f7fefc79e65fc74dc5f8f5af7b23099"></a>
 
 ## 남은 모델 처리 지연 점검 — 2026-10-24 23:41 KST
 
@@ -2959,6 +10292,11 @@ Ollama의 도구 호출 API는 모델이 선택한 함수 호출을 반환하며
 **다음 우선순위:** 현재 근거와 사용자 제약을 보존하는 중복 입력 감소/앞부분 안정화 후보를 검증하고, DGX 소유 측 지원이 있을 때 상주·전용 자원·큐/캐시 설정을 검토한다. 검증 전 스트리밍 토큰을 노출하거나 오래된 답변을 현재 근거로 캐시하지 않는다. 이번 문서에는 미배포 후보를 완료로 표시하지 않는다.
 
 **Git·정리:** 점검 결과/README/계획/현황8파일을 `f33ad4f`로 main 커밋·푸시하고 프로젝트 일회성 인증으로 실제 원격 일치를 확인했다. JSON/16측정 메타데이터·상대링크399 누락0·추적1180 비밀 검사 기존4generic 오탐/신규0·stage8바이트 일치를 확인한 뒤 게시했다. 런타임 코드 변경이 없어 기존396회귀를 재실행한 것으로 표시하지 않는다. Mac 전용 임시14파일/519,955바이트를 제거하고 디렉터리 부재를 확인했으며 로컬 증거·운영 기존파일/캐시는 보존했다. 패키지 다운로드/Mac 설치0·서버시험temp0이다. 이 게시/정리 확인2문서는 후속 자동 게시 대상으로 구분하고 최종HEAD/원격/clean은 로컬 기록에 남긴다. 대화·상세 로컬 증거·업무분담·자격 파일은 Git 제외다. 아래는 이전 단계 당시 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h190"></a>
+<a id="record-8b530c9a7e5b190bcdbbba313a19079ddfb1a16d49d5ffd1d443f7bafb72a0c0"></a>
 
 ## 실제 응답 지연 보완 1.5.1 — 2026-10-24 23:00 KST
 
@@ -2984,6 +10322,11 @@ query199+deployment157+SIEM40=중복 제외 **396 PASS**. 기존 deploy.sh가 �
 
 **Git·정리:** 소스/테스트/설치 안내/현황·검증12파일은 `1eab217`로 main 커밋·푸시했고 프로젝트 자격 파일의 일회성 인증으로 실제 원격 일치를 확인했다. 변경 문서 상대링크406 누락0·추적1178 비밀 검사 기존4generic 오탐/신규0·stage12파일 바이트 일치를 확인한 뒤 커밋했다. Mac 전용 임시32파일/380,139바이트를 제거하고 디렉터리 부재를 확인했다. 검증 근거14파일과 정리 보고는 로컬 대화기록에 보존했고 서버 시험temp0·운영 복구 백업 유지·패키지 다운로드/Mac 설치0이다. 이 게시/정리 확인2문서는 후속 자동 게시 대상으로 구분하며 최종HEAD/원격/clean은 로컬 기록에 남긴다. 대화/검증 보고서·업무분담·자격 파일은 계속 Git 제외다. 아래는 이전 단계 당시 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h191"></a>
+<a id="record-e020c38b295d23781283c0cee8a52fc565f65d15a12da7514732656dcf7dff55"></a>
+
 ## KST 통일·응답 근거 검사 1.4 — 2026-10-24 22:21 KST
 
 **일반 채팅과 관리 프로필의 기본 시간대를 `Asia/Seoul`로 설정하고, 채팅·운영 보고·승인 카드의 시간 표시를 KST로 맞췄다.** 원본 로그·승인 대상 diff/서명/epoch는 보존하며 필요한 KST 해설을 붙인다. 표시를 바꾸기 전에 실제 서비스 시작 시각과 비교해 잘못 붙은 `Z`, 9/18시간 이동, 경과시간 오산을 검사한다. [검증 메타데이터](../infra/hermes/kst-response-validation-20261024.json) · [최종 실제 답변](https://chat.grootlab.duckdns.org/soc/pl/bwogtfbnspy5py3wenod95mtka).
@@ -3000,6 +10343,11 @@ MCP362+query192+관리117+배포157+정책14+SIEM40=중복 제외 **882 PASS**. 
 
 **Git·정리:** 앞선 Memory/읽기 근거 단위는 `e093af4`, 이번24파일 소스·문서는 `2bbef91`로 main 커밋·푸시했고 프로젝트 전용 일회성 인증으로 실제 원격 일치를 확인했다. AST235·변경 문서 링크441 누락0·추적1176 비밀 검사 기존4generic 오탐/신규0·stage24바이트 일치다. Mac 전용 임시138파일/1,795,233바이트를 제거하고 디렉터리 부재, 서버 시험temp0을 확인했다. 필요한 검증 근거35파일은 로컬 대화기록 아래 보존했고 운영 복구 백업·기존 사용자 캐시/환경은 유지했다. 패키지 다운로드·Mac 설치0이다. 이 게시/정리 확인2문서는 후속 자동 게시 대상으로 구분하며 최종HEAD/원격/clean은 로컬 기록에 남긴다. 대화/검증 보고서·업무분담·자격 파일은 계속 Git 제외다. 아래는 이전 단계 당시 기록이다.
 
+
+
+
+<a id="source-87368a0abd79b357-h192"></a>
+<a id="record-b609533ff8b6720a5c2f793b6911770dcaf852e60d5d3bc005180532e82b9d78"></a>
 
 ## 실제 자연어 재시험·Memory 정리 — 2026-10-24
 
@@ -3026,6 +10374,11 @@ MCP362+query192+관리117+배포157+정책14+SIEM40=중복 제외 **882 PASS**. 
 
 **Git/정리:** 관련 소스·실측/실패·현황을 자동 게시하고 Mac 전용 임시 자료를 정리하는 단계다. 실제 결과는 후속 마감 기록을 따른다. 로컬 검증·대화·업무분담·CRED는 Git 제외다. 공격/승인/차단E2E·3번CVE 보류·새3VM 전체 설치 제외와 다른 미검증은 유지한다. 아래는 이전 단계 당시 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h193"></a>
+<a id="record-961755c31b170bf0a8674c4dd9781664682b644149eff51eeee49fa83fe295be"></a>
+
 ## 조회 기능의 읽기 전용 경로 통합 — 2026-10-24
 
 **운영 A/B에 적용했다.** 고정 룰 원문/SHA·서비스 상태·룰 제안 상태·작업 상태의4종 조회는 `rule-a/b`의 독립 `ruleview` 계정과 별도 읽기 키로만 제공한다. `rule-write-a/b`는 기존 `rulechg` 계정으로 변경 제안만 제공하며 A만 증거 기반 임시 차단을 제공한다. 같은 조회를 변경 서버에서 중복 제공하지 않는다. 읽기 경로의 변경 요청과 변경 경로의 조회는 transport와 root helper에서 모두 거부한다. 기존 조회 도구 이름/근거 연결, 정확 후보 승인·증거/보호 주소·TTL과 LLM의 조사 후 변경안 준비 역할은 유지한다.
@@ -3039,6 +10392,11 @@ Wazuh API의 전체 룰 요약과 고정 로컬 파일 집계, systemd 진단과
 
 **Git/정리:** 공개29파일을 `899035b`로 main 커밋·푸시하고 실제 프로젝트 인증 원격/HEAD 일치를 확인했다.234 Python AST·14설치 heredoc AST·409내부링크 누락0·stage29바이트 일치, 추적1173 비밀 검사의 기존 generic 오탐4/신규0을 확인했다(이력/ignored/로컬 자격 제외). Mac 전용 임시50파일/1,388,753바이트를 삭제·디렉터리 부재 확인했고 패키지 설치/다운로드·기존 사용자 캐시 삭제0이다. 서버 운영 읽기 키·소스·복구 백업은 보존한다. 백업은 A `/var/backups/capstone-mcp-unify/20261024T185524+0900`, B `/var/backups/capstone-mcp-unify/20261024T185451+0900`에 있다. 이 게시/정리 확인2문서는 소스 게시 이후의 별도 문서 변경이며 후속 자동 게시한다. 마지막 SHA/원격 일치/clean은 로컬 세션 기록과 최종 답변에 남긴다. 로컬 검증·대화·업무분담·CRED는 계속 Git 제외다. 아래는 각 이전 단계 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h194"></a>
+<a id="record-a216374b9ef8c3bb149ed12d900aced740ce0e1d4331800983f640e9d29f201f"></a>
+
 ## LLM 조사 후 변경안 준비 역할 유지 — 1.3.1 / 2026-10-24 17:45 KST
 
 최종 검토에서 장애 조사까지 계속 읽기 목록에 묶이는1.3 경계를 보정했다. **단순 목록·표는 읽기 전용으로 유지하고, 원인/장애 조사에서 도구 결과를 얻은 뒤에는 원래 허용된 도구와 승인형 변경안 준비 권한을 보존한다.** LLM이 구체 변경안을 준비하려고 사용자의 새 지시를 기다리게 하지 않는다. 실제 룰/서비스 변경의 정확 후보 승인·실행 검증과 긴급 임시 차단의 기존 증거/보호 주소·TTL 경계는 유지한다. 일반 sudo/Docker/설치 권한은 추가하지 않았다.
@@ -3048,6 +10406,11 @@ query177+SIEM40=**217 PASS**. 실제 같은 이미지/설정의 native builder�
 B의2플러그인 파일만 최소 교체하고 같은 Hermes CID를 이번 단계1회 재시작했다(일반 채팅1.2/1.3/1.3.1 합계3회). 원본native9·설정/환경/SOUL·기존1,353메시지 행 불변·새 운영 메시지0, 실제 gateway/adapter connected·관리timer active·failed0을 확인했다. 백업 `/var/backups/capstone-query-completion/20261024T174546+0900`과 앞선2백업은 운영 복구용으로 보존한다. 단일 deploy.sh는 같은2파일/7pin을 포함하며 새 패키지/이미지/포트·키 변경은 없다.
 
 1.2 `51c58c9`·1.3 `5ab0c6e`·1.3.1 `f4d5fb4` 소스/검증/문서를 모두 main 커밋·푸시하고 각각 실제 인증 원격과 일치를 확인했다. 마지막9파일 stage바이트·내부 링크358개 누락0, 추적1170 비밀 검사의 기존동일 generic 오탐4/신규0을 확인했다(이력/ignored/로컬 자격 제외). 이 게시 확인2문서는 후속 자동 커밋·푸시 대상으로 구분하며 최종SHA/원격/clean은 로컬 기록에 남긴다. 첫 임시63파일/1,250,504바이트와 마지막 역할 임시6파일/69109바이트, 합계 **69파일/1319613바이트**를 삭제하고 두 전용 디렉터리 부재를 확인했다. 패키지 설치/다운로드0·기존 사용자 캐시 삭제0이며 서버 시험DB temp0·운영3백업/소스/기록은 보존한다. 로컬 검증/대화/업무분담/CRED는 계속 Git 제외다. 실제 신규 채팅 입력→현재 gateway 전송 통합·일반 복합 해석/반복 정확도·SLA·공격/보호쓰기E2E는 미완료,3번CVE 보류·새3VM 설치 제외를 유지한다. 아래는 각 이전 단계 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h195"></a>
+<a id="record-974bd72b99dc0c891b420695c50c95fd1f836b46086499fc16dbc9e1741df535"></a>
 
 ## 일반 채팅 룰 목록·표의 추가 모델 호출 생략 — 2026-10-24 16:49 KST
 
@@ -3066,6 +10429,11 @@ B의2플러그인 파일만 최소 교체하고 같은 Hermes CID를 이번 단�
 
 **Git/정리:** 1.2 소스/문서15파일 `51c58c9`, 1.3 소스/검증/문서11파일 `5ab0c6e`를 main 커밋·푸시하고 각각 실제 인증 원격 일치를 확인했다. 추적1170 비밀 검사에서 기존 동일 generic 오탐4건/신규0, stage11바이트와 내부 링크358개 누락0을 확인했다(이력/ignored/로컬 자격 제외). Mac 전용 임시 63파일/1250504바이트를 삭제·디렉터리 부재 확인했고 서버 시험DB 임시 폴더도0이다. 패키지 설치/다운로드0·기존 사용자 캐시 삭제0이며 소스/작업 기록·운영2백업/영수증은 보존한다. 이 게시·정리 확인은 별도 후속 문서이며 같은 자동 커밋·푸시 정책을 따른다. 최종SHA/원격/clean은 로컬 기록에 남긴다. 상세 원문/대화/업무분담은 로컬 전용이다. 아래 절은1.2와 이전 작업 당시 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h196"></a>
+<a id="record-47d948db538e40ca19e0f58af83b582dc2defe89e71655dfa57c21e60dbb7b1b"></a>
+
 ## 일반 채팅 룰 조회 정확성 보완 — 2026-10-24 16:16 KST
 
 **일반 채팅 조회 플러그인1.2를 B에 최소 반영했다.** 실제 사용자 대화3건은 도구0회·약19.8/4.8/3.4초였고 WAF34·IDS6·Wazuh8→9와 잘못된 IDS 비활성을 보고했다. [새 검증 근거](../infra/hermes/chat-rule-query-validation-20261024.json) · [동작/복구](../infra/hermes/query-completion/README.md).
@@ -3081,6 +10449,11 @@ B의2플러그인 파일만 최소 교체하고 같은 Hermes CID를 이번 단�
 **Git/정리:** 이1.2 작업 단위의 소스·검증·문서를 자동 게시 마감한다. 게시 결과는 후속 최신 절/로컬 기록을 따른다. 상세 검증·대화·업무분담은 로컬 전용이다. 패키지 설치/다운로드0이며 현재 같은 작업의 속도 후속용 임시 자료를 사용 중이다. 서버 격리DB 임시 폴더는 제거했으며 Mac 전용 임시 파일은 후속 마감 때 삭제·확인한다.3번6CVE 보류·새3VM 설치 제외는 유지한다.
 
 
+
+
+<a id="source-87368a0abd79b357-h197"></a>
+<a id="record-ce393b31170c6a64dd92408ec3aa227b14b1bd6df1cffce694252a68df113c1c"></a>
+
 ## 실제 채팅 알림 도착 확인 — 2026-10-24 14:32 KST
 
 사용자 요청으로 기존 **SOC Alerts (`soc` 팀의 `soc-alerts`)** 채널에 검증 표시를 붙인2건을 실제 게시했다. 설치된 `Store.queue_report → flush_report → deliver`와 기존 webhook을 사용했고, 각각 전송 성공 응답·전달 큐 `sent`/시도1회·저장 본문 일치·올바른 채널·삭제 아님을 실제 API로 재조회했다. 인증된 별도 클라이언트의 WebSocket에서도 동일한 두 `posted` 이벤트를 수신했다.
@@ -3095,6 +10468,11 @@ B의2플러그인 파일만 최소 교체하고 같은 Hermes CID를 이번 단�
 기존 사건/제안/run/tool/전달 큐와 양쪽 모델 대화9표 해시는 불변이며 운영 controller DB 직접쓰기·보호조치·서비스 재시작0, 관리 timer는 active를 유지했다. 실제 게시2건은 Mattermost에만 추가됐다. 기존 webhook 대상·봇 권한·설정은 바꾸지 않았다. 서버 fixture 임시 폴더는 제거했고 Mac 전용 임시10파일/31045바이트도 삭제·부재 확인했다. 새 패키지/다운로드0이며 소스·작업 기록·기존 사용자 캐시는 보존한다.
 
 **Git:** 도착 시험 결과·현황·안내5파일을 `2dc55fb`로 main 커밋·푸시하고 실제 인증 원격과 일치를 확인했다. 운영 소스 변경은 없다. 추적1169파일 비밀 검사에서 기존 동일 generic 오탐4건·신규 노출0, stage5문서 바이트 일치·내부 링크363개 누락0을 확인했다. Git 이력/ignored/미추적 자격은 검사 범위에서 제외한다. 이 게시 확인은 별도 후속 현황 문서이며 같은 자동 게시 정책을 따르고, 마지막 커밋·원격 일치·clean 상태는 로컬 세션 기록에 남긴다. 검증 원문·대화·업무분담은 계속 로컬 전용이다. 3번6CVE 보류·새3VM 전체 설치 제외와 다른 미검증 범위는 유지한다. 아래 절은 각 작업 당시의 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h198"></a>
+<a id="record-35dcc89a3c69769cbea01fdbb1cb1fa62dfa58904ff20ad45d8f7bf30fc319c6"></a>
 
 ## LLM 진단·알림 추가 보완 — 2026-10-24
 
@@ -3121,6 +10499,11 @@ B의 controller/gate·진단 MCP/bootstrap mirror·manifest/prepared/intent 총7
 최종 설치 controller의 격리 loopback 수신기로 HTTP503 저장→DB 재오픈→동일 보고200 재전송·불완료 알림·no-deliver·서버 임시 폴더 제거를 확인했다. 실제 Mattermost 시험 게시0이며 실제 채팅 알림 도착 E2E를 대신하지 않는다. SDK6서버/7읽기·Wazuh000/001/002 active·실제 종료 정보/원래 properties 일치, 봇API200·WebSocket101·gateway running·webhook 설정 형식, 서명 health ready/진행 보호변경0·failed unit0을 확인하고 관리 timer를 원래 enabled/active로 복원했다. 새 패키지/다운로드0이다. Mac 전용 임시54파일/1052303바이트를 삭제·디렉터리 부재 확인했으며 소스·로컬 기록·기존 사용자 캐시와 서버의 root 운영 복구/DB 백업·timer 영수증은 보존했다.
 
 **Git:** 진단·알림 소스/회귀/안내13파일을 `4937419`로 main 커밋·푸시하고 실제 인증 원격과 일치를 확인했다. 추적1169파일 비밀 검사에서 기존 동일 generic 오탐4건·신규 노출0, stage13파일 바이트 일치·관련 내부 링크377개 누락0을 확인했다. Git 이력/ignored/미추적 자격 검사는 포함하지 않는다. 이 게시 확인 현황은 소스 게시 후의 별도 마감 문서이며 같은 자동 게시 정책을 따른다. 마지막 후속 커밋·원격 일치·clean 상태는 로컬 세션 기록에 남긴다. 3번6CVE 재현 보류·새3VM 전체 설치 제외를 유지하고 실제 채팅 게시 도착·사건/승인/차단·커널TTL E2E와 모델 일반 정확도·반복 평가는 별도로 남긴다. 아래 절은 각 작업 당시의 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h199"></a>
+<a id="record-34b761b94d5a808742b95bd8be898446c87f3b439662a5fd0aaa9dd8a5a8993d"></a>
 
 ## 보안 경계 보완·147 부팅 검증 — 2026-10-24
 
@@ -3150,6 +10533,11 @@ B의 controller/gate·진단 MCP/bootstrap mirror·manifest/prepared/intent 총7
 **Git: 보안/LLM 소스·설치 안내·현황39파일을 `96149a5`로 main 커밋·푸시하고 실제 인증 원격과 일치를 확인했다.** 추적1168파일 비밀 검사에서 기존 동일 generic 오탐4건·신규 노출0, stage39파일과 검사한 바이트 일치·관련 문서 내부 링크449개를 확인했다. Git 이력/ignored/미추적 자격은 이 검사 범위에 포함하지 않는다. 이 마감 현황은 소스 게시 이후 작성한 별도 문서이며 같은 자동 게시 정책을 따른다. 최종 후속 커밋·실제 원격 일치와 clean 상태는 로컬 세션 기록에 남긴다. 보류한6CVE 공격·탐지/실차단·커널TTL E2E는 재개하지 않았고 새3VM 전체 설치도 미실행이다. 모델의 일반 정확도·반복 지연/오탐 평가는 후속이다. 아래 절은 각 작업 당시의 이력이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h200"></a>
+<a id="record-69c90c9ffa1176baea37548a685c9c395303016aa3f3073a90ee6eacd6453b64"></a>
+
 ## 오프라인 보안 패키지 적용 — 2026-10-24
 
 공식 서명 목록을 기준으로 **A/B 각79개 보안 업데이트+커널 의존성7개, C93개+의존성7개**를 적용했다. 실제 설치는 빈 저장소 목록과 `--no-download --no-remove`로 실행했으며272개 설치 항목의 지정 버전 일치와 세 서버 `dpkg --audit` 오류0을 확인했다. 앞서 적용한 host sudo `.4`와 별개인 추가 업데이트 수다. 커널 `6.8.0-147.147`은 설치됐고 현재 실행 커널은139이므로 **재부팅·부팅 후 운영 검증은 아직 남아 있다.** 구형139 커널은 복구용으로 유지했다.
@@ -3161,11 +10549,21 @@ Mac 추가 반입 deb113,500,352바이트는 signed Packages SHA256/크기와 B/
 Java/관리망 격리의 실제16개 연결 검사는 통과했다. 내부 TLS·승인 경계도 운영에 반영하며 검증 중이고 LLM 보완은 아직 소스 작업 중이다. 이 패키지 작업 완료를 보안·LLM 전체 해결로 표시하지 않는다. **Git: 아래 패키지 설치기·안내·현황 변경은 이번 작업 단위의 커밋·푸시 예정이며, 다른 보완 소스는 미커밋 상태다.**
 
 
+
+
+<a id="source-87368a0abd79b357-h201"></a>
+<a id="record-2240a2b9a91b0555d22065cc5bf03e58f5321da57b4db60311a8edfc45839a27"></a>
+
 ## 호스트 패키지 보완 진행 — 2026-10-24
 
 A/B/C의 공식 Ubuntu 서명 검증된 패키지 목록을10월23일자로 갱신하고 호스트 sudo를 `1.9.15p5-3ubuntu5.24.04.4`로 올렸다. C의 기존 취약 패키지는 rootless 실습과 분리해 정상화했으며 원래 실습 이미지/패키지와 운영 권한·SSH는 보존했다. A/B는 sudoers 불변, C는 패키지 기본 설정으로 `use_pty`·빈 sudoers.d 포함만 추가되고 이전 권한 규칙을 유지했음을 검증했다. 설치된 실행 파일은 APT가 인증한 deb 바이트와 일치했고 dpkg audit 오류0이다. root 전용 복구 백업을 남겼다.
 
 초기 설치기는 host sudo의 최소 보안 버전을 검사해 오래된 호스트/반입물을 거절한다. 취약한 실습용 sudo bundle에는 이 조건을 적용하지 않는다. 전제조건 회귀16개 통과. C의 기존 Java 격리·B 내부 접근 축소도 적용해 검증 중이며, 승인 실행 경계·내부 TLS·잔여 보안 패치·LLM 선택/해석은 계속 진행한다. 최신 목록에서 추가 보안 업데이트가 확인됐으므로 목록 갱신 자체를 모든 패치 적용 완료로 표시하지 않는다.
+
+
+
+<a id="source-87368a0abd79b357-h202"></a>
+<a id="record-ac54d8ea0034c7ebe82d47bed5171df6ef263bacd8a2972f215218e370ccafc5"></a>
 
 ## 서버 보안·실제 LLM 도구 사용 점검 — 2026-10-24
 
@@ -3188,9 +10586,19 @@ A/B/C의 공식 Ubuntu 서명 검증된 패키지 목록을10월23일자로 갱�
 
 승인·실행·차단·진단 경계의 격리 검사 **202개 통과**, 추적1,160파일의 비밀 검사에서 기존 미변경 generic 탐지4건을 확인했다. 수집한 코드58개 중 운영 소스44개·생성 reader2개·결속 controller1개는 소스 계약과 일치했고 나머지는 비실행 테스트6개·과거 백업3개·구형 설치 사본1개·벤더1개로 구분했다. 기존 세션/메시지는 보존했고 시험용 새 대화5개만 남겼다. 실제 Mattermost 대화 화면·승인 클릭/커널TTL E2E·전체 패키지/이미지 CVE 전수 스캔은 이번 범위에 포함하지 않는다. 점검 요약·계획·사용/설치 안내5파일은 `60670dc`로 main 커밋·푸시하고 실제 원격 일치를 확인했다. 이 게시 확인 문서는 후속 커밋·푸시하며, 최종 커밋과 점검/게시용 임시 파일 정리는 로컬 기록 및 최종 답변에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h203"></a>
+<a id="record-37affecaf9440b80215df7c3d0e87f8b9e88633c793a6a5f5a085a601bb71ef9"></a>
+
 ## 작업 완료 후 자동 커밋·푸시 — 2026-10-24
 
 사용자 지시로 이후 모든 작업 단위는 관련 파일·현황 반영과 필요한 검증을 마친 뒤 별도 재요청 없이 커밋·푸시하고 실제 원격 일치를 확인한다. AGENTS와 README에 지속 규칙을 기록했다. 자격·대화기록·로컬 검증·업무분담·발표/논문 제외는 유지한다. 진단/알림·문서 최신화와 이 규칙을 **`2c89877`로 main 커밋·푸시하고 실제 원격 일치를 확인**했다(공개141파일). 게시 전 비밀 검사에서는 추적1,160파일 중 기존 미변경4건·변경 파일 신규0건이었다. 이 확인 결과를 담은 현황 보완도 후속 커밋·푸시하며 최종 커밋 ID와 작업 트리 상태는 로컬 세션 기록과 최종 답변에 남긴다. 아래 이전 미커밋 표시는 게시 전 시점의 기록이다. VPN·모바일 푸시 보류는 Git 게시와 별개로 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h204"></a>
+<a id="record-a66234f8bec9bb1348910627b176a1d78cecd6839ca3600799bd58debbe34825"></a>
 
 ## LLM 진단·알림 보완과 전체 문서 현행화 — 2026-10-24
 
@@ -3217,6 +10625,11 @@ A/B/C의 공식 Ubuntu 서명 검증된 패키지 목록을10월23일자로 갱�
 
 **마감 검증·정리:** 기존 내부 링크1,853개와 자동 게시 규칙 연결1개, 총1,854개 누락0, 추적 파일1,158개의 비밀 검사에서 기존 미변경 generic 탐지4건·변경 파일 신규0건이다(이력/미추적/로컬 자격 검사는 제외). Mac의 이번 전용 임시 파일50개/1,134,599바이트를 삭제하고 디렉터리 부재를 확인했다. 패키지 설치·다운로드0, 기존 사용자 파일·캐시 삭제0이며 서버의 완전 복구 백업과 표시된 검증 이력은 보존했다. 소스3개 SHA가 배포 근거와 일치하며 소스·문서의 `2c89877` 원격 일치를 확인했고 게시 결과를 담은 현황 문서도 후속 커밋·푸시한다.
 
+
+
+<a id="source-87368a0abd79b357-h205"></a>
+<a id="record-dbb2be5a94d8a224f4de5a5d7fd9ffb08c86214f33925b996813ac9265316e9c"></a>
+
 ## 로컬 디렉터리 전체 파악 — 이번 운영 보완 전 조사 이력 (2026-10-24)
 
 이번에는 로컬 파일·설정·검증 자료를 조사했다. **서버 접속·운영 변경·배포·모델 호출·새 원격 Git 조회는 하지 않았다.** 아래 운영 결과는 각 기록 시점의 사실이며 이번에 재측정한 상태가 아니다.
@@ -3230,6 +10643,11 @@ A/B/C의 공식 Ubuntu 서명 검증된 패키지 목록을10월23일자로 갱�
 Git 상태: 로컬 HEAD `b93139e`와 로컬 origin/main 참조가 같으며 새 원격 일치 확인은 아니다. 이번 추적 파일 변경은 이 현황 문서뿐이고 기존 소스2파일 변경을 보존했다. **이번 조사·현황 문서는 커밋·푸시하지 않았다.** 전체 경로 메타데이터와 상세 확인 범위는 로컬 전용 `대화기록/검증/2026-10-24_디렉터리_전체파악.json`, 대화 내용은 당일 세션2에 남긴다. 자격 원문은 열람·출력·복사하지 않았고 패키지 설치도 없었다. 이번 PDF 확인용 스크립트·렌더·전용 모듈 캐시234파일(236,124,545바이트)은 삭제하고 임시 디렉터리 부재를 확인했다.
 
 후속 질의에서 남은 일을 다시 대조했다. 우선순위는 **LLM 자연어 도구 선택 실패·로컬 SILENT 알림 보완 마감 → 시연 경로/현재 시나리오 →6CVE 재현·탐지 연결 → 실제 사건 조사·정확 승인/임시 차단·커널TTL → 개별 장시간/동시성 검증과 반복 평가·발표 근거 정리**다. 현재 사설 Kali 출발지로 임시 차단 시험 조건이 충족되지 않는 점을 먼저 해결할 시험 설계가 필요하다. 새 운영 조회·시험·배포·Git 게시 결과가 추가된 것은 아니다. 파인튜닝·공식 후보 룰 적용 검토·전체 백업/장기 장애 회수는 별도 후속 범위다.
+
+
+
+<a id="source-87368a0abd79b357-h206"></a>
+<a id="record-da0b57c475f5a12707096459af7579ebfa6d2e799870f5959635fdf2495d24e3"></a>
 
 ## 선택 단계1·4·5 후속 결과 (2026-10-24)
 
@@ -3253,6 +10671,11 @@ sudo의 본인 UID1000 세션 중 고정 terminal daemon만 재시작했다. 이
 
 게시 전 현재 추적 파일1158개의 경로·symlink·로컬 자격 제외를 확인한 뒤 비밀값 검사를 실행했다. 기존 미변경 파일의 generic-key 오탐4개와 이번 변경 파일의 새 탐지0개였으며, 커밋 대상20파일의 index bytes가 검사한 working tree와 같은 것도 대조했다. 스캐너 자체는 현재 추적 working tree만 읽으며 Git 이력 검사가 아니다. 운영 검증 작업용 Mac 파일88개/821080바이트는 정리했고, 상세 고정 metadata25개를 로컬 전용 기록으로 보존했다. 운영 복구 백업·bundle·키는 보존했다. 최종 Git HEAD/원격 일치와 일회성 게시 helper 제거 결과는 날짜별 로컬 작업 기록에 남긴다.
 
+
+
+<a id="source-87368a0abd79b357-h207"></a>
+<a id="record-74aa4830b7fa4693ae3aaf22c899ef9aecef87bdd38d170166124a2b52b89b7d"></a>
+
 ## 선택 단계1·4·5 후속 검증 진행 중 (2026-10-23T23:31:35+09:00)
 
 - **1번 완료:** 현황·자동 갱신 규칙4파일을 `82d50a2`로 main 푸시하고 원격 일치를 확인했다. 아래22:59 기록의 문서 미커밋 표시는 당시 이력이다.
@@ -3260,6 +10683,11 @@ sudo의 본인 UID1000 세션 중 고정 terminal daemon만 재시작했다. 이
 - **5번 진행:** 시험 소유 Samba 유휴 세션은 마지막 입력 후302.7초에 자동 종료돼 통과했다. 동일 컨테이너의 입력 유지 세션으로30분 수명을 실측 중이다. 실제 재부팅은 아직 하지 않았다. 사용자가 이번 회차는 복구 콘솔 없이 진행하도록 지시했으며, C→B→A 순차 재부팅과 호스트별 복구 확인을 계획한다. 다른 사용자의 작업과 운영 상태를 먼저 보존한다.
 
 이번 후속 검증의 결과·미완료 범위는 완료 시 이 항목 뒤에 이어 기록한다. 신규 VM3대 전체 설치 시험 제외는 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h208"></a>
+<a id="record-66bafd8e54b5634d2a56c414f4f14b3af17837420f3e97b01bcb7a5a26829161"></a>
 
 ## 일시정지 구간 무결성·회귀 재검증 완료 (2026-10-23 22:59 KST)
 
@@ -3279,6 +10707,11 @@ sudo의 본인 UID1000 세션 중 고정 terminal daemon만 재시작했다. 이
 
 Git 반영 상태: 구현·설치기·기존 운영 증거는 `b41b7c4`로 main 푸시를 완료했다(2026-10-23 22:37 KST). 이후 재검증은 읽기 전용이었으며, 이번 현황 문서와 작업 완료 시 자동 갱신 규칙 변경은 아직 추가 커밋·푸시하지 않았다.
 
+
+
+<a id="source-87368a0abd79b357-h209"></a>
+<a id="record-21dd9b97f2a1370e828211a2cbb6a1a322d6cf46529bfad3b3428e89051b7659"></a>
+
 ## 읽기 전용 시스템 진단 운영 연결 완료 (2026-10-23)
 
 A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snapshot reader·단일 `get_system_diagnostics` MCP를 연결했다. 일반 sudo·Docker·임의 shell/journal 권한은 추가하지 않는다. 기존 B는 원본 해시·유휴/승인/lease 검사와 복구 백업을 거쳐 최소 이관했으며, 단일 `deploy.sh`의 새 서버 설치 경로도 같은 소스 계약을 사용한다. 운영 서버에는 초기 설치기 전체를 실행하지 않았다.
@@ -3287,9 +10720,19 @@ A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snaps
 
 [실제 SDK·운영 증거](../infra/mcp/system-diagnostics-validation-20261023.json) · [설치·후속 핀 증거](../deployment/diagnostics-journal-fix-validation-20261023.json) · [추가 검증 계획](../infra/추가검증_계획_2026-10-23.md). 새3VM 전체 설치·실제 취약점 공격/탐지/대응 E2E·재부팅·장시간 터미널 만료는 이번 완료 범위와 구분한다.
 
+
+
+<a id="source-87368a0abd79b357-h210"></a>
+<a id="record-5e873e14b7d1929e7bc8064fa8c1c14e5a0bc46f138455cb563a748fb036a566"></a>
+
 ## 파비콘 재발 후속 완료 (2026-10-23)
 
 기본 `/favicon.ico`·Apple 아이콘 요청이 이미지로 연결되도록 프록시를 보완하고, 메인/터미널은 새 이름의 로컬 ICO를 정적으로 선언한다. 공통 테마 스크립트는 이미 맞는 아이콘을 제거하지 않는다. 실제 HTTPS의 상태·MIME·자산 SHA가 일치했고 설치기 반입/검증 목록도 갱신했다. Safari에 남은 오리 아이콘은 사용자 승인 후 아이콘 캐시만 백업·재생성하여 같은 주소의 서버 선화 표시를 확인했으며 사용자도 확인했다. 방문 기록·쿠키·암호는 변경하지 않았다. [검증 증거](../infra/groot-c/offline-labs/favicon-validation-20261023.json).
+
+
+
+<a id="source-87368a0abd79b357-h211"></a>
+<a id="record-c678217680ed81aaca5aea493b80d776b9399594c082d6b65adca31cdd67dfc0"></a>
 
 ## sudo 웹실습 연결 보완 — 운영 반영·HTTPS 검증 완료 (2026-10-23)
 
@@ -3301,6 +10744,11 @@ A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snaps
 
 
 검증은 native 콘솔97개·nonweb121개, 설치기 service50개·controller35개와 Node2종이다. 실제 HTTPS에서 sudo UID1000·패키지1.8.31-1ubuntu1·터미널 크기 변경·Ctrl+C·단일 연결·연결 종료 시 전체 중지·활성 세션 중지·새 CID 재시작을 확인했다. 기존 rootful 컨테이너는 적용 전후 동일했다. 새로고침한 Safari에서 이미지6개·sudo 항목과 시작 버튼은 확인했고, 사용자 브라우저 조작과 겹쳐 sudo 터미널 명령의 시각 검수는 별도로 완료 처리하지 않았다. [sudo 운영 증거](../infra/groot-c/nonweb-labs/sudo-web-validation-20261023.json).
+
+
+
+<a id="source-87368a0abd79b357-h212"></a>
+<a id="record-4cd86171c01153c71592f796946cef4de219910cb5b5ce9f1fa5f47586fbdbbe"></a>
 
 ## Redis·Samba 웹 터미널 확장 — sudo 웹 연결 전 완료 이력 (2026-10-23)
 
@@ -3316,6 +10764,11 @@ C native 콘솔94개(HTTP API14개 포함), 런타임40개·터미널 daemon27�
 
 단일 `deploy.sh`는 service **schema8**로6항목·재귀 정적 자산·`LAB_NONWEB_BUNDLE`과 전용 bootstrap을 연결한다. 운영 C에는 변경 부분만 적용했고 초기 설치기로 덮어쓰지 않았다. [전용 런타임 README](../infra/groot-c/nonweb-labs/README.md)는 설치 시 SHA로 결속하는 관리 계약으로 보존한다. **새 VM3대 전체 설치·실제 취약점 악용/방어 E2E·재부팅·30분 전체 세션 수명 실측은 미검증**이다. 아래4종·schema7·HTTP35개·native66개는 확장 전 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h213"></a>
+<a id="record-07bbf42afc7ca7222df61dc45646b7cff8de29e4530a091f6c185296c09136c2"></a>
+
 ## 초기 설치기 SOC 확장·관리자 차단 예외 (2026-10-23)
 
 사용자 요청에 따라 새 VM 설치 시험을 제외하고 `deploy.sh`의 SOC 구성 누락을 소스에 연결했다. 승인 브로커·정확 후보 worker·규칙/응답 MCP·LLM 관리 경로·Native AR 사건 등록, Vector0.59.0 정제·원본 회전·출력 유지관리·이전 부트 로컬 보관, Indexer 관측 모니터와14개 패널 SOC 대시보드가 대상이다. 설치용 고정 주소 대신 현재 역할의 주소·등록 agent ID·서비스 계정·컨테이너 full ID를 결속한다. 기존 운영 서버에는 이 설치기를 실행하지 않았다.
@@ -3324,11 +10777,21 @@ C native 콘솔94개(HTTP API14개 포함), 런타임40개·터미널 daemon27�
 
 검증은 로컬 구문·가상 SSH·합성 파일/엔진/승인 상태 회귀다. 새 VM 기동, 실제 모델·채팅·공격 E2E, 재부팅은 이 작업에서 검증하지 않았다. A→B 이전 로그 자동 전송, 긴 장애 구간의 무손실 회수와 일반 백업은 이번 통합 범위 밖이다. [설치 순서와 제한](../deployment/bootstrap-guide.md)을 따른다. 직접 실행한 격리 회귀252개와 병렬 담당의 기존 승인·대응·관리 회귀245개가 통과했으며 [소스·검증 기록](../deployment/soc-bootstrap-validation-20261023.json)에 구분해 보존했다. 앞선 기본 설치기·MCP2개 범위 설명은 당시 상태로 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h214"></a>
+<a id="record-b98358b5d6591c9ef7d002c45212f54a650e850aa7e86a0eea8a71f5b12bea07"></a>
+
 ## Log4Shell 하위 레이아웃 통일 후속 (2026-10-23)
 
 Java·Apache 두 버전에 메인과 같은 외곽 프레임·공통 탐색·타이포그래피·패널을 적용하고 저장된 선택이 없으면 다크로 시작하도록 맞췄다. 앞선 02:07 KST 배포 기록에서 C의 세 소스와 공개 자산 SHA, HTML 4개 HTTP200·본문 보존을 확인했다. 새로고침한 Safari에서 Apache2.4.49 양방향 모드, Java 화이트·390px 다크, Apache2.4.50 다크를 확인했으며 모든 화면/크기의 전체 조합 검증은 아니다. 이번 커밋 준비에서는 라이브 서버를 다시 조회하지 않았다.
 
 이 단계의 theme.css SHA는 `26c7fb2033b25b796795bb7b2358355ee9fc721b18d0cabb4be580f7db54076f`, theme.js SHA는 `33b52da6fe011806ac261e3e7458614424e2e5b5869dba267e252d4b31093892`였다. 이후 파비콘 반영으로 theme.js가 갱신됐으며 현재 SHA는 최상단 후속 기록을 따른다. 아래 팔레트 단계의 SHA와 검증도 당시 이력으로 보존한다. 초기 설치기는 현재 공통 자산을 반입한다.
+
+
+
+<a id="source-87368a0abd79b357-h215"></a>
+<a id="record-22dca2294a6aaa0aa031216f7d7caf2f3760b56b226f12595101da560890f942"></a>
 
 ## 메인 개편·하위 팔레트·단일 설치기 구현 (2026-10-23 후속)
 
@@ -3338,6 +10801,11 @@ Java·Apache 두 버전에 메인과 같은 외곽 프레임·공통 탐색·타
 
 새 VM3대 전체 apply는 미실행이다. 실제 sudo 공격/호스트 탐지 E2E·새 호스트 재부팅도 별도 검증이다. C의 검증된 sudo 입력10파일 복구 bundle과 vendor 서명/OCI 검증 증거는 운영 경로에 보존했으며 기존 runtime·호스트 sudo를 변경하지 않았다.
 
+
+
+<a id="source-87368a0abd79b357-h216"></a>
+<a id="record-8407f35efa3b1e30c12f56633bab1ff94250798457321482773cb5591b964838"></a>
+
 ## 공통 테마·DVWA 범위 정정 완료 (2026-10-23)
 
 사용자 요청을 정정하여 **카탈로그는 Java·Apache 2.4.49·Apache 2.4.50·sudo 총4항목, 웹 실습은 관리형3개**로 한정한다. DVWA는 원래 독립 주소에서 그대로 유지한다. 같은 Log4Shell 사이트에 추가했던 DVWA 프록시·카탈로그·전용 예외 쿠키·테마 처리를 제거했고 원래 DVWA 앱·DB·독립 접속 설정은 유지했다. 이전5항목 통합은 요청 범위 오해였으며 아래10/22 결과와 증거 JSON은 당시 기록으로 보존한다. 정정 후 C native64개·최종 HTTP35개 검사를 통과했다. 기존 DVWA 독립 주소200·테마 미주입, 제거한 DVWA3경로404·실행/중지unknown_cve409, 기존 HMAC 정상·DVWA 전용 쿠키 미발급, Apache 두 버전 canary403→200→403·sudo ready를 확인했다.
@@ -3345,6 +10813,11 @@ Java·Apache 두 버전에 메인과 같은 외곽 프레임·공통 탐색·타
 공통 테마는 콘솔·Log4Shell Java·Apache 두 버전에 적용한다. 상단 단일 버튼에 현재 모드 `다크` 또는 `화이트`와 같은16px 달·해 아이콘을 표시한다. 고정96px 버튼 안에서 아이콘 자리를16px 열로 고정하고 별도 글자 슬롯을 가운데 정렬해 모드 전환 때 위치를 유지한다. 색상·아이콘 전환은180ms이며 reduced-motion 설정에서는 끈다. 선택은 같은 사이트의 localStorage로 지속하고 저장소 접근 실패에도 페이지 전환은 동작한다. sudo는 별도CLI로 독립 웹 페이지가 없다. 최신 자산의 서버 SHA 일치와 새로고침한 Safari의4항목·고정 아이콘/글자 가운데 정렬·양방향 전환을 확인했다. Java·Apache 두 버전의 테마 동작도 확인했다. 작업 임시자료의 최종 정리는 별도 마감 중이다.
 
 sudo 후속 실측에서 rootless Docker29.8.1·RootlessKit3.1.0·UID1991 설치, native26회귀와 check/up/verify/중복up/stop/새CID up/verify의7단계 무해 검증을 통과했다. 실제 sudo1.8.31-1ubuntu1·UID/GID 매핑·seccomp·capability·cgroup 제한을 확인했고 기존 호스트 sudo·system Docker unit·전역sysctl은 유지했다. 정식 publisher unit의 실제3단계 `ready → 중지 시 needs_setup → 새 컨테이너 실행 시 ready`를 확인했다. timer는 enabled/active·60초 주기이며 root:root0600 receipt의 TTL은300초다. 전용 user@1991의 securityfs 접근 제한과 publisher의 나머지 sandbox를 유지했다. 환경 준비와 실제 권한 상승·호스트 탐지 E2E는 별개이며 `attack_tested=false`, `host_scenario_verified=false`를 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h217"></a>
+<a id="record-0c949d452c7ccb01be6701af0bca6176899a53d246e84c7954a2b6d83e12f8d3"></a>
 
 ## 다중 웹 실습 확장·sudo 별도 환경 준비 (2026-10-22 당시 이력)
 
@@ -3355,6 +10828,11 @@ sudo 후속 실측에서 rootless Docker29.8.1·RootlessKit3.1.0·UID1991 설치
 backend **64개**, 공개 HTTPS **31개** 및 DVWA 예외 경계 **15개** 검사를 통과했다. httpd는 CGI 없는 정적 fixture이며 실제 취약점 공격·RCE·탐지/차단 E2E 검증은 하지 않았다. DVWA는 Safari 기본 실습 계정 로그인·Welcome·Security 페이지를 확인하고 기존 `impossible` 수준을 유지했다. sandbox 전용 예외 cookie의 별도 서명·경로·관리 API/다른 실습 거부·양 cookie 삭제를 확인했다. 새 실습 3개에 대한 합성 WAF 검사9건(각403→200→403)이 Wazuh alerts와 Indexer까지 같은 transaction으로 전달됐다. 이 10/22 단계에서는 sudo의 별도 rootless 런타임 완료 여부가 미확정이었다. 이후 환경 검증과 남은 상태 발행 작업은 위 10/23 후속을 따른다. `ready`가 표시돼도 환경 확인일 뿐 실제 권한 상승·호스트 시나리오 성공을 뜻하지 않는다.
 
 [공식 규칙 후보27개](../infra/groot-c/offline-labs/rule-source-candidates.json)는 CRS7·ET Open10·Wazuh10의 조사 자료이며 운영 규칙에 반영하지 않았다. 이미지 export/import는 관리형3개만 처리하고 DVWA·sudo 환경은 포함하지 않는다. 초기3VM `deploy.sh`는 service schema7·TLS/WAF·rootless sudo와 오프라인 패키지/이미지 준비를 단일 진입점으로 통합하는 작업 중이다. 실제 새 VM 전체 적용은 미실행이다. [유형·설치·검증 범위](../infra/groot-c/offline-labs/README.md).
+
+
+
+<a id="source-87368a0abd79b357-h218"></a>
+<a id="record-ed205d7697e8389873fe5a9392f42c4cfec0ad5c8f680b7aefb5a501a14bd1d4"></a>
 
 ## 오프라인 CVE 관리 웹 적용 완료 (2026-10-22)
 
@@ -3374,11 +10852,21 @@ C의 비권한 FastAPI(127.0.0.1:18090), root 고정 기능 Unix broker, 전용 
 
 [사용법·설치·복구 범위](../infra/groot-c/offline-labs/README.md) · [배포 검증](../infra/groot-c/offline-labs/deployment-validation-20261022.json).
 
+
+
+<a id="source-87368a0abd79b357-h219"></a>
+<a id="record-a781744012c95ee412ace40dbd39d9e4d72ab998e38abe4941450ee39ecb24fe"></a>
+
 ## 통합 SOC 대시보드 적용 완료 (2026-10-19 23:21 KST 검증)
 
 [통합 탐지 현황](https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard)에 새 저장 객체 15개(시각화 13·검색 1·대시보드 1), 14개 패널을 생성했다. 최근 7일·30초 자동 갱신, 공통 관측/증거/합성 검증 제외 조건을 적용했다. 실제 브라우저의 수치·추이·출발지·전체 너비 알림 표와 API 재조회·내보내기 일치를 확인했다. 기존 인덱스 패턴 7개는 변경되지 않았으며 상태는 green이다.
 
 23:21 KST 고정 시점의 최근 7일은 전체 15,000 / WAF 190 / Suricata 300 / 기타 14,510 / 레벨 7 이상 270문서다. 이는 실습·정상 관리 트래픽을 포함하는 알림 문서 수이며 고유 공격 수나 차단 성공 수가 아니다. WAF DetectionOnly를 유지했다. 시간대는 이번 라이브 재조회에서 Browser 기본값이며 과거 KST 고정 기록과 구분한다. [설정·내보내기·검증 근거](../infra/groot-b/soc-dashboard/README.md).
+
+
+
+<a id="source-87368a0abd79b357-h220"></a>
+<a id="record-b0e214f8e2157eec6b093e9d887102ac16ecc34350baee9400434e6fe8f505e4"></a>
 
 ## Wazuh 시연용 VPN 접속 적용 완료 (2026-10-19 22:55 KST 검증)
 
@@ -3388,6 +10876,11 @@ C의 비권한 FastAPI(127.0.0.1:18090), root 고정 기능 Unix broker, 전용 
 
 현재 A 설정 SHA는 `fbee3603f3e395ac46d78da9e97dc83a119f459cbfbc6d8cecf950bf364bbc01`이다. 저장소의 원본 `chatproxy.nginx.conf`에 [한시 설정 생성기](../infra/groot-a/wazuh-demo-access/README.md)를 적용한 결과이며 원본은 복구 기준으로 보존한다. 미래 timer 시각 자체·호스트 재부팅·현장 학과 단말은 미시험이다. [실측 증거](../infra/groot-a/wazuh-demo-access/deployment-validation-20261019.json). 초기 자동 빌드 변경은 먼저 `204c45d`로 main에 푸시한 후 이 작업을 적용했다.
 
+
+
+<a id="source-87368a0abd79b357-h221"></a>
+<a id="record-48811aef5068afa5adda0a5d7205b96b44ceef026cdba15158efe6fc0ac60aa2"></a>
+
 ## 초기 설치기의 Log4Shell 자동 빌드 완료 (2026-10-19 22:36 KST 검증)
 
 `LOG4SHELL_APP_JAR`를 비워 두거나 생략하면 초기 `deploy.sh`가 전달한 Java 소스와 service 서버의 사전 준비 이미지 JDK8u181·원본 라이브러리로 새 앱을 자동 빌드한다. 별도 JAR 수동 빌드·반입이 기본 조건에서 빠졌다. 제공된 `/opt/*.jar`를 명시하는 선택 방식도 유지한다. service schema6에 소스 지문과 빌드 증거를 저장하며, 완료된 동일 구성 재실행은 재빌드하지 않는다. 패키지와 Docker 이미지·SSH는 계속 사전 준비 대상이다.
@@ -3395,6 +10888,11 @@ C의 비권한 FastAPI(127.0.0.1:18090), root 고정 기능 Unix broker, 전용 
 **직접 확인:** C에서 실제 `prepare_lab_jar` 함수를 격리 실행해 운영 JAR와 동일한 SHA `16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053`을 생성했다. 동일 산출물의 비root·읽기 전용 임시 앱에서 웹/버전/CSRF 정상 로깅과 콘솔을 확인했다. 운영 컨테이너 ID·기동시각은 유지했고 컴파일/앱 후보와 서버 임시 소스·시험 JAR를 제거했다. controller20·service51·빌더16 회귀, Bash 검사와 독립 리뷰를 통과했다. 최초 standalone Docker 경로 가정 오류는 컨테이너 생성 전 발견해 실제 PATH 탐색으로 수정했다.
 
 `--check`는 소스·이미지의 정적 검사이며 실제 컴파일은 SIEM 구성 이후 service `apply`에서 수행한다. 실패하면 후속 security 단계가 중단되고 기존 SIEM과 service 실패 근거를 보존한다. 신규3VM 전체 설치·Gradle 의존성 해석·실제 공격 E2E는 미실행이다. [자동 빌드 검증](../infra/groot-c/log4shell-app/autobuild-validation-20261019.json). 아래20:30의 JAR 사전 준비 필수 설명은 당시 이력이다.
+
+
+
+<a id="source-87368a0abd79b357-h222"></a>
+<a id="record-19505b799e61f47f70e10674c247637bccb9841ef903dce7478d2dc18da49370"></a>
 
 ## Log4Shell Docker 재생성 자동화 완료 (2026-10-19 20:29 적용·20:30 KST 검증)
 
@@ -3408,6 +10906,11 @@ C의 비권한 FastAPI(127.0.0.1:18090), root 고정 기능 Unix broker, 전용 
 
 **미실행:** 신규3VM 실제 설치·Gradle 의존성 해석 빌드·호스트 재부팅·실제 공격/콜백/탐지/차단 E2E. 최초 `network=none` 임시 후보의 준비 확인은 호스트명 조회 오류로 실패했으며 제거 후 실제 운영과 같은 bridge 후보에서 성공했다. 운영 전환은 성공했고 아래19:57의 재생성 제한은 당시 상태다. [관리 소스·운영 안내](../infra/groot-c/log4shell-app/README.md) · [이번 검증 근거](../infra/groot-c/log4shell-app/compose-validation-20261019.json).
 
+
+
+<a id="source-87368a0abd79b357-h223"></a>
+<a id="record-0fc4493c627c73eb524d6eacefd9f2b92b556b7ab52c3e286fb4de5eeb498949"></a>
+
 ## Log4Shell Java 웹 교체 완료 (2026-10-19 19:57 KST 적용·20:04 KST 브라우저 확인)
 
 사용자 요청에 따라 기존 PHP 중계 웹을 제거하고 **Spring Boot가 화면과 API를 직접 제공하는 웹**으로 교체했다. 주소는 **http://log4shell.grootlab.duckdns.org/** 및 선택 HTTPS·기존 IP `/log4shell/`를 유지한다. 화면에서 `message` 또는 `X-Api-Version`을 선택하면 서버가 받은 값을 필터·trim 없이 `logger.info(raw)`에 기록한다. 직접 API는 `User-Agent`도 지원한다. 응답은 요청 ID·KST 시각·전달 원문을 표시하며, 로그 호출 완료와 패킷·공격·탐지 결과는 구분한다. 공격 페이로드나 외부 콜백 기능은 추가하지 않았다.
@@ -3420,6 +10923,11 @@ C Apache의 기존 proxy/proxy_http 모듈을 활성화하고 `/log4shell/`를 �
 
 초기 설치기는 사전 준비한 `LOG4SHELL_APP_JAR` 검증·읽기 전용 마운트와 Apache 프록시를 사용하는 **service schema4**로 맞췄다. 서비스38·컨트롤러17 회귀가 통과했다. **Gradle 의존성 해석 빌드, 신규3VM 실제 설치, 실제 공격·콜백·탐지·차단 E2E는 미실행**이다. 별도 A:8080 시나리오 토글은 OFF이며 기존 OBS_SEG 설치본 차이는 이번 웹 교체에서 다루지 않았다. 아래10/15 PHP 화면과 이전 GET /계약은 당시 기록이다. [소스·운영 안내](../infra/groot-c/log4shell-app/README.md) · [검증 근거](../infra/groot-c/log4shell-app/deployment-validation-20261019.json).
 
+
+
+<a id="source-87368a0abd79b357-h224"></a>
+<a id="record-5ce04c5a1b666f076b5cd77654c4bff9c815b9702cc3380fcc67f0d6e225fb28"></a>
+
 ## 룰 개수·ID 집계 2단계 배포·검증 완료 (2026-10-16 21:02 KST)
 
 순수 커스텀 룰 목록·개수 조회는 **같은 턴에 LLM이 실제 호출한 MCP 결과의 원문·SHA-256과 `rule_inventory`가 일치할 때만** 확정 목록으로 표시하도록 보완했다. 모델이 조사 도구를 선택·실행하는 역할은 유지하고, 조회 근거가 없거나 불일치하면 미조회·집계 불가로 표시한다. 대상 파일 정의는 **WAF 10개, Suricata 14개(로컬 12+ET override 2), Wazuh 19개(level 0 포함)**이며 주석의 예약 ID·체인 후속 조건을 별도 룰로 세거나 비연속 ID를 넓은 연속 범위로 만들지 않는다. CRS/ET 전체 또는 실제 엔진 적재·발화 개수를 뜻하지 않는다. 복합 분석·사용자 지정 형식은 이 제한된 목록 렌더러의 범위 밖이다.
@@ -3429,6 +10937,11 @@ A/B 조회 실행기는 각각 **20:50:55/20:53:09 KST**에 반영했다. A SHA�
 **21:02:22.836512 KST 최종 검증 통과:** 재기동 뒤21:00:25의 새 프로세스 등록 로그에서 플러그인1.1을 확인했고,53/53 정책 참조·DB quick check·새 heartbeat·Mattermost/API 연결·`needs_attention:false`·관리/guard timer와 soc-bot active를 확인했다. native8개 SHA는 불변이고 배포 staging·probe는 제거했다. 최초 검증기가 Docker 로그만 보아 등록을 놓친 문제는 실제 `agent.log`의 재기동 이후 시각을 대조하도록 검증기를 보완해 해소했으며 배포 장애는 아니었다.
 
 실제 모델의 native 시험은 **57.38초·API3회·읽기3회**로 정확한 개수·ID와 저장된 최종 답변 일치를 확인했다. 잘못된999개 답변을 넣은 별도 합성 시험은 **12.046초·native 반복2회·실제 읽기3회·모델 호출0회**로 근거 값에 맞게 정리됐다. 플러그인150개(기존85+집계65), producer28·기존 executor53·MCP10·비교20·SIEM36 회귀가 통과했다. **실제 Mattermost 새 게시·클라이언트 화면 E2E는0**이며 응답 시간·모든 분석 답변의 정확도를 보장하지 않는다. [구현·운영 범위](../infra/hermes/query-completion/README.md) · [배포·검증 근거](../infra/hermes/rule-inventory-validation-20261016.json).
+
+
+
+<a id="source-87368a0abd79b357-h225"></a>
+<a id="record-103573b5402cd6d0fc405bb96f6100e48046307924a1a79049ca419a4f4e2877"></a>
 
 ## 조회 실행 보완 1단계 배포 완료·답변 정확도 2단계 진행 중 (2026-10-16 20:34 KST)
 
@@ -3440,6 +10953,11 @@ A/B 조회 실행기는 각각 **20:50:55/20:53:09 KST**에 반영했다. A SHA�
 
 최종 native 평가에서 문제 이력의 자연 응답 시험 93.015초와 첫 정지 응답을 주입한 시험 69.436초는 각각 실제 읽기 3건과 최종 답변까지 진행했다. 별도 9.529초 실패 경로는 모델 호출 2회·도구 호출 0회 뒤 정직한 조회 미실행 안내로 끝났다. 이는 조회 실행·실패 고지 경로의 검증이며 응답 시간 보장이 아니다. **규칙 개수·예비 규칙의 활성 여부·서술 정확도 오류는 남아 있어 사용자 요청에 따른 2단계 개선을 진행 중이다.** 1단계 배포 완료를 답변 정확도 해결이나 실제 사용자 채팅 화면 검증 완료로 확대하지 않는다. [운영 범위·복구](../infra/hermes/query-completion/README.md) · [검증 근거](../infra/hermes/rule-query-execution-validation-20261016.json).
 
+
+
+<a id="source-87368a0abd79b357-h226"></a>
+<a id="record-86a20112e16280e9717b3e94d50e9b34bdf23388f954fd0ddafa158ba2ca123b"></a>
+
 ## 채팅 표 대신 항목별 목록 적용 (2026-10-16 19:13 KST)
 
 사용자의 채팅 표 깨짐 보고에 따라 **요약 → 확인 내역 → 조치 및 다음 단계** 구획은 유지하고, 채팅 확인 내역을 `- **대상명**: 상태 — 근거` 목록으로 바꿨다. 승인 안내는 대상·변경 전·변경 후·예상 영향·검증·승인 상태의 여섯 항목을 각각 별도 줄에 쓴다. 파이프·공백 정렬·HTML·코드 블록 표는 기본 채팅 서식으로 사용하지 않는다. Markdown 문서·파일 본문 또는 명시적 표 요청만 예외이며, 승인 카드와 원문 로그·diff는 변경하지 않았다.
@@ -3447,6 +10965,11 @@ A/B 조회 실행기는 각각 **20:50:55/20:53:09 KST**에 반영했다. A SHA�
 최초 배포 사전 검사는 관리 경로 전환 후 cron에 과거 문자열이 없어 `cron policy anchor ambiguous`로 중단됐으며 **정책·DB 변경은0**이었다. Hermes와 timer를 복원한 뒤, cron을 바이트 그대로 유지하는 명시적 `--preserve-cron` 옵션을 추가했다. 기본 동작의 기존 오류 검사와 `--management-prompt` 동시 사용 거부는 유지하고 회귀11개를 통과했다. **19:13:42.660769 KST** 현재 세션52개의 정책 참조와 자동 관리용 SOUL 갱신에 성공했으며 운영 config·env·cron 내용과 DB의 다른 테이블은 보존했다. cron 파일의 inode·mtime 불변을 뜻하지는 않는다. 정책 SHA-256은 `0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8`, 백업은 `/var/backups/capstone-chat-format/20261016/rule-edit-policy-tsmn1g2c`다.
 
 SIEM 설치기 회귀31개는 공유 서식4개 항목 복사와 기존 읽기 전용 역할·MCP2개 권한 보존을 확인했다. `.111`의 `qwen3.6:35b` 합성 상태·승인 사례2개는 각각27.995초·26.646초에 표 없는 목록과 승인6항목 검사를 통과했다. **실제 채팅 게시0·클라이언트 화면 렌더링 미검증**이며, 이 표본을 모든 답변의 서식·정확도나 응답시간 보장으로 확대하지 않는다. 아래10/15 표 정책은 당시 상태로 보존한다. [서식 운영 안내](../infra/hermes/mattermost-context/README.md) · [검증 근거](../infra/hermes/chat-format-validation-20261016.json).
+
+
+
+<a id="source-87368a0abd79b357-h227"></a>
+<a id="record-9a1374908a5ffca8ec3ca2da1f58739d5e5d645be6a0fdaef003eaff4d2032d8"></a>
 
 ## 만료 승인 카드 정리 배포·실제 API 검증 완료 (2026-10-15 19:02 KST)
 
@@ -3456,6 +10979,11 @@ SIEM 설치기 회귀31개는 공유 서식4개 항목 복사와 기존 읽기 �
 
 **19:02:18 KST 재검증 통과:** 새 검증 카드2개·댓글1개를 사용했고, 실제5초 worker가 미응답 카드 만료 후2.368초에1회 정리했다. 보호 카드 변경0·댓글 보존·6초 뒤 추가 PUT0·잘못된 게시물 연결/봇 신원 거부를 확인했다. 신규39·기존51, 승인 관련90개 회귀를 통과했다. 이번 검증은 **실제 관리자 승인이나 룰 API 호출0인 정리·보호 상태 시험**으로, 별도의 승인→룰 적용 E2E가 아니다. 5초는 확인 주기이며 완료 시간 보장은 아니다. 최초 실패의 감사기록도 보존한다. [운영 안내](../infra/mcp/approval-card-cleanup.md) · [검증 근거](../infra/mcp/approval-card-cleanup-validation-20261015.json).
 
+
+
+<a id="source-87368a0abd79b357-h228"></a>
+<a id="record-4b034550f1fa943556517ca2979b039d2edb4cdf1a943b4af69039bb3e59ee44"></a>
+
 ## 만료 승인 카드 정리 준비 완료 — 방식 선택 대기·서버 미적용 (2026-10-15)
 
 > 다음은 사용자 선택·배포 이전의 준비 기록이다. 현재 상태는 위19:02 후속 결과를 따른다.
@@ -3464,6 +10992,11 @@ SIEM 설치기 회귀31개는 공유 서식4개 항목 복사와 기존 읽기 �
 
 신규33·기존51, 승인 관련84개 회귀와 별도 읽기 검토를 마쳤고 배포 스크립트2개의 모듈 복사·환경 보존도 반영했다. 선택 후 실제 Mattermost의 부분 수정 응답·댓글·결과 보존을 검증해야 한다. 아래 응답 서식과 보고 문맥 기능은 이미 서버 적용된 별도 완료 항목이다. [설계·배포·제한](../infra/mcp/approval-card-cleanup.md).
 
+
+
+<a id="source-87368a0abd79b357-h229"></a>
+<a id="record-1cf5d6024cf37e070aa88cedf1d80607f33d4e147ea612864773032fd782d499"></a>
+
 ## SOC 응답 서식 공통화 (2026-10-15 18:23 KST)
 
 조사·상태 조회·보고 해석의 답변을 **요약 → 확인 내역 → 조치 및 다음 단계**로 통일하는 지침4개를 추가했다. 구획은 정확한 굵은 글씨 이름을 사용하고 근거는 간결한 표로 정리한다. 승인 요청에는 변경 전후·영향·검증·승인 상태를 구분하며 단순 질문과 사용자 지정 형식은 예외로 둔다. **18:23:59 KST** 라이브의 현재 프롬프트 참조49개와 자동 관리용 SOUL에 반영했고 설정·cron·다른 DB 내용은 유지했다.
@@ -3471,6 +11004,11 @@ SIEM 설치기 회귀31개는 공유 서식4개 항목 복사와 기존 읽기 �
 초기 모델 표본3건 후 굵은 제목/`#` 차이를 수정해 정확한 세 구획 이름을 명시했고 재시험2건을 통과했다. 이는 지침과 표본 검증이며 모든 답변의 강제 변환이나 사실 정확도 보장이 아니다. 신규 SIEM 설치기에도 원문에서 서식4개 항목만 추출하도록 반영했고, 구획 누락·중복·구조 변경 시 사전 검사 거절과 소스 SHA-256 프로필 검증을 추가했다. 기존 읽기 전용 SOUL·MCP2개 권한을 유지하며 설치기 회귀29개·셸 문법 검사를 통과했다. 신규 VM 실제 설치는 미실시다. [서식·문맥 운영 안내](../infra/hermes/mattermost-context/README.md).
 
 당시 만료된 미결 요청 카드 정리는 아래 문맥 기능과 별도의 구현 중 작업이었다. 후속19:02에 본문·버튼 정리 배포와 실제 API 검증을 완료했으며, 승인·거부 결과와 감사 기록 보존 범위는 유지한다.
+
+
+
+<a id="source-87368a0abd79b357-h230"></a>
+<a id="record-e3860ff3042818e9ac43c0c1a828c0a120dfad37e0bb9bbad119fd70dd0493fb"></a>
 
 ## Mattermost 채널·원 보고 문맥 적용 (2026-10-15 18:11 KST)
 
@@ -3482,6 +11020,11 @@ B의 같은 Hermes 컨테이너를 **18:11:02 KST stop/start**하고 **18:11:17 
 
 이18:11 기록 당시 만료 카드 정리는 **별도 구현 중**으로 문맥 기능 완료에 포함하지 않았다. 후속19:02에는 원글 삭제 대신 본문·버튼 정리를 적용했다. 아래 같은 날 이전 기록은 당시 상태로 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h231"></a>
+<a id="record-9f91740e7807db32662854267643d735d3e09cf54401e2365dcc82affa8195cd"></a>
+
 ## Wazuh API 재시작 표시 복구·전체 서버 점검 (2026-10-15 17:36 KST)
 
 LLM의 `restarting` 답변은 **실제 Wazuh API HTTP500·오류1017**에 근거했다. A/C 에이전트와 B 프로세스가 정상이라는 앞선 확인만으로 API까지 정상인 것은 아니었다. B의 다섯 데몬은09:10:57~58부터 실행 중이었으나09:10:45에 생성된 `.restart` 표시가 남아 있었다. 같은 시간대의 제어 스크립트 실행 도중 컨테이너 재기동 이력과 부합한다. **17:24:38 KST** 파일·실제 프로세스·공식 스크립트 잠금을 대조하고 백업한 뒤 잔존 표시만 제거했으며 데몬·컨테이너 재시작은0회다.
@@ -3490,6 +11033,11 @@ LLM의 `restarting` 답변은 **실제 Wazuh API HTTP500·오류1017**에 근거
 
 **남은 문제:** CTI 피드 시간 초과로 취약점 최신 갱신을 보장할 수 없고, MCP의 CVE `Unknown` 표시에는 필드 매핑 후속이 필요하다. Indexer yellow는 단일 노드의 replica4개 미배치이며 primary90개는 모두 STARTED다. 모바일 푸시 시간 초과와 Wazuh 대시보드 자체서명 인증서 제한은 기존 보류 항목이다. API readiness 코드 보강은 미구현이다. 설명 혼동 방지 정책3개는 테스트7개를 통과하고 활성 채팅 종료 확인 후 **17:36:20 KST 라이브에 반영했다.** 기존42세션의 프롬프트 참조만 갱신하고 DB integrity·다른 테이블 및 cron 불변을 확인했다. Hermes만 stop/start1회 후 running, 관리 timer active이며 manager·보안 컨테이너는 재시작하지 않았다. 정책 반영은 자연어 품질 보장이 아니며 17:38 채팅 연결·42세션 참조·DB 정상과17:40 자동 관리용 동일 정책 반영, 실제 모델의 격리 해석2사례를 확인했다. API1017 평가는 최초 출력 한도 실패 뒤 평가 한도만 높여 통과했으며 운영 모델 한도는 그대로다. 아래 과거 기록은 당시 상태로 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h232"></a>
+<a id="record-3510e5a7ff1f89b95210a865edfb1a15583631aab4182cbdb47acfb2ecb6a32a"></a>
+
 ## Log4Shell HTTP 요청403 수정·브라우저 재검증 (2026-10-15 15:46 KST 적용)
 
 사용자가 HTTP 주소에서 화면은 열리지만 정상 요청을 보내면 `연결 재확인 필요`가 표시된다고 보고했다. Safari에서 HTTPS 사용 뒤 HTTP로 전환할 때 같은 이름의 Secure 세션 쿠키와 HTTP 쿠키가 충돌하여 CSRF403이 나는 현상을 직접 재현했다. 앞선 프로토콜별 API 검증만으로 이 브라우저 전환 상태까지 확인한 것은 아니었다. WAF 주석 추가 시험은 탐지 정책을 바꾸지 않았으며 이번 오류는 세션 쿠키 처리에서 확인했다.
@@ -3497,6 +11045,11 @@ LLM의 `restarting` 답변은 **실제 Wazuh API HTTP500·오류1017**에 근거
 C에 **15:46:43 KST** HTTP용 `groot_log4shell_ui_http`와 HTTPS용 `__Secure-groot_log4shell_ui_https`를 분리한 API를 적용했다. API SHA-256은 `797788d26ab3dd3c135b247c2cc64b9b5f52893c06943e6948346aa9ca97aa75`다. A에는 **15:46:57 KST** Log4Shell HTTPS 프록시의 고정 TLS hint와 새 Secure 쿠키 이름을 적용하고 Nginx를 한 번 reload했다. 이 hint는 더 엄격한 Secure 세션을 선택하는 용도이며 인증·권한·신뢰된 출발지의 증명이 아니다. CSRF, HttpOnly, SameSite와 기존 HTTP 기본 주소·선택 HTTPS를 유지한다. [이전 API 이력](../infra/groot-c/log4shell-ui/README.md) · [프록시 설정](../infra/groot-a/chatproxy.nginx.conf).
 
 수정 후 실제 Safari에서 **HTTP 정상200·헤더 누락400, HTTPS 정상200**을 확인했다. 같은 Safari에서 HTTPS 사용 후 기존 HTTP 탭으로 돌아온 **15:50:02 KST에도 정상200**을 확인했다. 별도 urllib의 주소 교차4회에서도 정상200·누락400·잘못된 CSRF403을 확인했고, C 직접 API검사9PASS와 초기 설치기 검사30PASS를 통과했다. 기존 WAF가 JSON403의 Content-Type을 `text/html`로 바꾸는 한계는 유지한다. 이번 쿠키 수정은 그 MIME 문제를 해결하거나 실제 Log4Shell 공격·탐지 전체 시험을 완료한 것이 아니다.
+
+
+
+<a id="source-87368a0abd79b357-h233"></a>
+<a id="record-8a064741064ea2907e46582158f69640c2ea78731b2c4ff1e104d7c16db39152"></a>
 
 ## LLM 주석 변경·원복·거부·만료 검증 완료 범위 (2026-10-15 15:59 KST)
 
@@ -3517,6 +11070,11 @@ C에 **15:46:43 KST** HTTP용 `groot_log4shell_ui_http`와 HTTPS용 `__Secure-gr
 
 완료 범위는 운영자가 요청한 통제된 주석 변경의 승인·원복·거부·만료 처리다. 첫 후보 작성에는 사람 보정이 필요했고 거부 설명에도 이 주석 변경과 무관한 공인 IP 조건이 섞여, 후보 작성·서술 정확도는 추가 평가가 필요하다. **실제 공격→LLM 판단→임시 차단→유지/해제 승인→후속 검증·만료 전체 시험은 여전히 미실시**다. 아래14:33/14:08 항목은 당시 검증 범위로 보존한다.
 
+
+
+<a id="source-87368a0abd79b357-h234"></a>
+<a id="record-b36200f4a11c7e4b1995ebc3b125afea7ad9c320b5574a84d2614fcac9c754d3"></a>
+
 ## Log4Shell 도메인 분기·공용 인증서 적용 (2026-10-15 14:33 KST)
 
 대표 주소는 **http://log4shell.grootlab.duckdns.org/** 이며 **https://log4shell.grootlab.duckdns.org/** 도 사용할 수 있다. 새 호스트에서 `/dvwa/login.php`가 열리는 문제를 재현한 뒤 `/log4shell/` 외 경로를 실습 화면으로 돌리도록 수정했다. HTTP·HTTPS 각각의 최종 URL과 Log4Shell 제목, DVWA 전용 호스트의 기존 로그인 화면을 Mac에서 직접 확인했다. C Apache는 기존 접근·오류 로그를 공유해 수집 경로를 유지하며, 기존 DVWA default vhost와 API·JS·CSS 해시는 그대로다.
@@ -3528,6 +11086,11 @@ HTTPS는 A chatproxy→기존 A:80 WAF→C UI 경로다. 기존 분리된 컨테
 C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속성, 초기 설치기 service30/controller15 및 전달 규칙 조회 모의14개를 확인했다. 외부 경로의 엄격한 전체 API 검사는 기존 WAF가 JSON403의 Content-Type을 text/html로 바꾸는 설정 때문에 csrf_missing 항목에서 실패하므로 C9개 통과와 구분한다. 입력 거부 본문은 정상이며 검증 조건이나 전역 WAF 설정은 완화하지 않았다. 기존 인증서 감시기는 수동 실행 exit0였으며 공유 인증서를 채팅 SNI로 감시한다. [경로·TLS 검증 기록](../infra/groot-c/log4shell-ui/route-tls-validation-20261015.json).
 
 신규 `deploy.sh`는 선택값 `LOG4SHELL_HOSTNAME`으로 HTTP 이름을 구성하며 DNS/hosts는 사전에 준비한다. service schema3은 이전 schema1/2를 자동 변경하지 않는다. 범용 설치기의 TLS는 별도 수동 구성이고, 신규 VM3대 실제 설치·실제 공격 전체 검증은 남아 있다.
+
+
+
+<a id="source-87368a0abd79b357-h235"></a>
+<a id="record-23d4800eaea933a7d0363e44a12fb7294cfb144af6ccacdca16c3027277cab41"></a>
 
 ## LLM 관리 주체 전환 적용·검증 (2026-10-15 14:08 KST)
 
@@ -3548,6 +11111,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 
 현재 적용과 시험 범위는 위와 같으며 기존 보관·백업, 긴 공백 회수, 실제 호스트 재부팅, 자연 오탐·채팅 품질 관찰 및 마지막 인증서 후속은 남아 있다. 학습·업로드, 프로젝트 SSL VPN/이중 VPN, 모바일 푸시는 보류를 유지한다. Mac에 새 패키지를 설치하지 않았고, 최종 마감에서 발급 계정·키·SSH 도구를 포함한 작업 임시 폴더의 제거와 부재를 확인했다. 아래 과거 시점 기록은 삭제하지 않는다.
 
+
+
+<a id="source-87368a0abd79b357-h236"></a>
+<a id="record-f942e8e9f880f3dff4d3140c539dafd7f02c850f952403ebc91ce9b49af09fe0"></a>
+
 ## Log4Shell 실습 UI 적용·신규 설치기 반영 (2026-10-15 13:20 KST)
 
 현재 실습망/VPN에서 **http://192.168.16.230/log4shell/** 로 접속할 수 있다. 기존 C Apache/PHP에 정상 헤더·헤더 누락 요청, HTTP 상태·본문·처리 시간·KST, 브라우저 최근20개 요약 화면을 적용했다. 실제 브라우저에서200/400과 새로고침 후 이력 유지, C localhost HTTP9개, 공개4파일 SHA를 확인했다. C Apache/Docker/Wazuh active·DVWA200·기존 Log4Shell 이미지/기동시각 유지, A WAF healthy·Suricata running·기존 라우팅 해시 유지도 직접 확인했다. 라이브 패키지 추가·컨테이너 변경·서비스 재시작·방화벽 변경은 없다.
@@ -3556,11 +11124,21 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 
 컨트롤러12개·서비스 함수25개 회귀, 생성 PHP2개 C native lint, Bash/JS 구문 검사를 통과했다. 응답 지연을 제한 실패로 오판하던 검증기를 보완했고 시간창이 지나면 SKIP로 구분한다. 최종 라이브 검사는9PASS/0SKIP다. **새 VM3대 실제 구축·새 이미지의 비root Java 구동·공격/보안 탐지 E2E는 미실행**이다. UI는 무해한 두 요청 비교용이며 C 내부 backend 호출이 A 외부 Suricata를 지나가는 것은 아니다. [사용·구성](../infra/groot-c/log4shell-ui/README.md) · [직접 검증 기록](../infra/groot-c/log4shell-ui/deployment-validation-20261015.json). 이전 운영 잔여 과제와 보류 항목은 아래 기록을 유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h237"></a>
+<a id="record-fc767aa187db7192d65fac1eda3b86950674f386e46338448b4dd192d69860f1"></a>
+
 ## 대화기록 로컬 전용 전환 (2026-10-15 12:50 KST)
 
 사용자 요청으로 `대화기록/` 전체를 로컬에 보존하고 Git 추적과 과거 공개 main 이력에서 제외했다. 일별 대화·작업 기록은 계속 작성하며 `.gitignore`와 AGENTS.md에 로컬 전용 원칙을 반영했다. 공개 문서에서 날짜별 대화기록을 참조하는 기존 링크는 로컬 보관 자료를 뜻하며 새 클론에는 해당 자료가 포함되지 않는다. 상세 구축 안내와 운영 소스는 그대로 유지한다.
 
 104개 커밋을 검사해 대화기록이 있던 102개에서 경로를 제거했고 관련 103개 커밋 ID가 바뀌었다. 기존 기록 blob122개는 새 main에서 참조되지 않으며 폴더 밖 동일 blob이나 이전 이름은 발견되지 않았다. 다른 파일·모드·커밋 정보와 부모 관계, 서명된 원격 최초 README 커밋을 보존했다. 명시적 lease로 원격 `b5ec2df0048cdced4844d4921c6cdbd8cc50c570` 반영을 확인했다. 로컬 대화기록15개·업무분담1개는 전후 SHA가 같고 두 경로 모두 새 main의 파일 이력0·현재추적0이다. 과거 클론·포크·GitHub 캐시와 비공개 로컬 복구 ref는 이 공개 이력 제거 범위 밖이다.
+
+
+
+<a id="source-87368a0abd79b357-h238"></a>
+<a id="record-ec9357e2dd21575216f12f0996fe14e8205a9cedcf5f9663c41962fd78345c62"></a>
 
 ## 상세 구축 안내 보완 및 Git 정리 (2026-10-15 12:43 KST)
 
@@ -3570,6 +11148,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 
 `업무분담.md`는 로컬에 보존하고 Git 추적·재추가에서 제외했다. 사용자 추가 요청에 따라 문서 커밋을 포함한 공개 main 102개 커밋을 검사해 파일이 있던 100개에서 해당 경로를 제거했고, 관련 101개 커밋 ID가 바뀌었다. 기존 파일 blob 7개는 새 main에서 참조되지 않는다. 다른 파일·권한과 커밋 정보·병합 관계, 원격 초기 README의 서명을 보존했다. 명시적 lease로 main만 반영해 원격 `2b2c1014cd1e63400159414e2507a27393df04e4` 일치를 확인했다. 로컬 업무분담 파일은 전후 SHA가 같으며 로컬 전용 복구 ref는 공개하지 않았다. 기존 클론·포크·GitHub의 과거 객체 캐시 자체는 이 푸시로 삭제되는 범위가 아니다.
 
+
+
+<a id="source-87368a0abd79b357-h239"></a>
+<a id="record-558aeb6133b713dd1a460cdd5e4fee681ac27ebe198a6e1601fa689fd5ef7a4c"></a>
+
 ## 새 환경 SSH 구축 자동화 — 로컬 구현 (2026-10-15 12:17 KST)
 
 사용자 후속 요청으로 로컬 구축 도구·문서·Git 게시 작업을 재개했다. `deploy.sh` 하나를 실행하면 security→siem→service 초기 IPv4를 입력받고, 검증된 SSH 키/host key와 sudo를 이용해 전체 사전검사 후 SIEM→service→security 순으로 구성한다. [README](../README.md)에 패키지·이미지·공식 자료·SSH/sudo 수동 선행 준비와 실행 절차를 기록했다. 실행기는 패키지 설치나 이미지 다운로드를 하지 않는다.
@@ -3577,6 +11160,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 기본 자동 구성은 탐지 WAF/IDS, Wazuh 3종+agent, Mattermost/PostgreSQL, 가드가 포함된 Hermes+읽기 MCP2개, DVWA/MariaDB다. 새 주소·CA·등록 암호·계정으로 구성하며 기존 운영 비밀·상태를 복제하지 않는다. 승인형 쓰기 MCP/AR, Vector 회전·정제·상관 정책, 운영망 NAT, 고정 IP 예외·공개 인증서·모바일 푸시는 별도 이식 대상이다. 기존 라이브에 적용한 기능 전체를 자동 복제하는 설치기는 아니다.
 
 실제 셸+가짜 SSH 회귀10개와 SIEM 실제 함수 기반 격리 회귀20개, Bash/내장 Python 구문 검사를 통과했다. 역할별 생성 설정의 독립 검토도 마쳤다. **새 Ubuntu VM3대에서 실제 구축·전체 서비스 E2E는 미실행**이며 이번 작업의 기존 라이브 SSH 접속·변경도0이다. 아래10:52/10:54 상태는 과거 직접 확인이다. Git 공개 전 현재 파일의 알려진 비밀/키 패턴 매칭0, 과거 문서 blob1개의 비밀번호 포함 값을 공개 이력에서 제거했고 원래 이력은 로컬 전용 ref로 보존했다. 원격 README 초기 이력을 병합한 main `8bff139`를 일반 푸시하고 원격 일치를 확인했다. 비밀번호 교체는 하지 않았다.
+
+
+
+<a id="source-87368a0abd79b357-h240"></a>
+<a id="record-b6c41d9ddfbe308ba96c72fbe1464406040886790f601aae7f336fb64bee0341"></a>
 
 ## 사용자 요청에 따른 작업 종료 (2026-10-15 11:12 KST)
 
@@ -3587,6 +11175,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 다음 재개 시 첫 구현 대상은 **주기 보관·일반 백업 이관**, 이후 **긴 장애의 누락 감시·회수 및 재시작 후 중복 방지**다. 실제 차단 흐름은 통제 Kali 접속 정보, 호스트 재부팅은 ESXi 복구 콘솔 정보가 필요하다. 실제 채팅 품질·Imperva 자연 요청·인증서 경고 전달은 관찰 과제로 남는다. 비밀번호의 앞선 도구 출력 노출은 값 없이 기록했으며 **비밀번호 교체는 미실행**이다.
 
 서버 검증 자료와 최종 문서 스냅샷은 보관했고 Mac 작업용 임시71파일은 제거했다. 새 Mac 패키지 설치0, 이번 마감 문답의 Git 커밋0이다. 기존 정기 감시·이관 설정은 유지한다. 모델 학습·업로드, 프로젝트 SSL VPN/이중 VPN, 모바일 푸시의 보류도 유지한다. [최종 점검·정리 근거](../infra/automation/sequential-finalization-2026-10-15.json) · [대화기록](../대화기록/2026-10-15.md). 이 종료 문구는 앞선 서버 스냅샷 이후 로컬에서 추가했다.
+
+
+
+<a id="source-87368a0abd79b357-h241"></a>
+<a id="record-4cccf0ac46ab9520f016c959a3883de62179b1a3e06279628d0a8e0c49dd8880"></a>
 
 ## 잔여 7개 순차 진행 결과 (2026-10-15 10:49 KST)
 
@@ -3607,6 +11200,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 > **2026-10-15 10:06 KST 후속:** 잔여 작업 순차 진행 중 1번 모델 도구 호출·지연 개선을 적용했다. 현재 `.111 qwen3.6:35b`만 추론 `none`으로 설정, 재시작0·권한/승인/가드 유지. 동일 native 읽기2건 medium22초/호출0 → none0.7초/정확호출각1, 한국어6/6·0.96~1.75초, 실제 제한 Hermes 읽기1건 대화6.14초(초기화 포함12.25초). 실제 채팅/승인 전체 지연과 장기 혼입률은 후속 관찰이며 합성 수치를 확대하지 않는다. 다음은 2번 보관 수명주기다. [검증·한계](../infra/hermes/benchmarks/native-tools-20261015/README.md).
 
 > **2026-10-15T09:39:52+09:00 마감:** 추가 도구와 우선순위1~5의 적용·관측을 마쳤다. A183파일/2,201,692B·B603파일/9,755,621B를영구보존하고서버taskstage·평가aux를제거했다. 정리후양guard·WAFhealthy/보안서비스·agent001/자동timer정상. Mac이번작업임시2경로와패키지캐시를삭제했고새Mac패키지설치0이다. 도구호출지연/형식실패,정확Imperva예외실증,자동보관삭제수명주기는잔여이며6~8/학습/VPN/모바일푸시는미착수다. [증거](../infra/automation/followup-finalization-2026-10-15.json).
+
+
+
+<a id="source-87368a0abd79b357-h242"></a>
+<a id="record-3df81abbb1abacf9a8d1f50bc827a0a27863af599c06fcd31b79478a7c813347"></a>
 
 ## 2026-10-15 추가 도구와 우선순위 1~5 결과
 
@@ -3632,6 +11230,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 
 > 05:03 KST 최종 마감: 인증서 단계의 서버 증거 A77파일/766601B·B80파일/804888B를 각각 영구 백업에 전수 해시 대조·fsync 보존하고 stage6를 제거했다. Mac 임시 127파일/969026B도 제거·경로부재를 확인했다. 새 패키지 설치0이다. 계획한1~6단계의 해당 범위 적용·검증·문서·정리를 마쳤으며 첫09:00예약실행·CP일시불일치 재발·실제사용 효과는 관찰대기다.
 
+
+
+<a id="source-87368a0abd79b357-h243"></a>
+<a id="record-96f8c20caaf2bc64f4d21ce37f1c417425f39f330bc3a758853af12697069deb"></a>
+
 ## 순차 작업 1~6 운영·검증 완료 (2026-10-15 05:00 KST)
 
 원본 회전·복구, Hermes 첫 시작과 복귀, 새 WAF의 Imperva 예외 유지 확인을 마쳤다. WAF·Vector·Wazuh 수집은 정상이며 세 회전 점검 타이머는 분산된 예약 실행에서 모두 정상 종료했다. 인증서 감시와 Wazuh 전용 디코더·규칙100300~100305를 적용했다. A의 실제 TLS·native26, B의 native51 및 실제 감시 JSON1건이 통과했고 manager는04:59:47에정상재시작1회후필수4프로세스·agent001 Active를확인했다. 기존규칙/config/인증서는유지한다. 만료는2027-01-06 15:02:33KST, timer는매일09:00KST다. 첫예약실행과실제만료경보의원격색인ACK는미관측이며자동갱신은하지않는다. 증거 보존·임시 정리를 마감한다. 아래는 이전 시점 기록이다.
@@ -3639,6 +11242,11 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 
 > 04:48 WAF 단계 마감: 서버 증거 319파일/2660278B를 /var/backups/capstone-waf-recreation-validation-20261015에 보존·해시대조·fsync한 뒤 stage5를 제거했다. Mac 임시 363파일/2879578B도 제거·경로부재 확인했다. 패키지 설치0. 마지막 인증서 단계에 착수한다.
 
+
+
+
+<a id="source-87368a0abd79b357-h244"></a>
+<a id="record-c152f8c32debc9e7e497be42929595d5e5a0fc7b7efb0f936619bc5778cf6981"></a>
 
 ## 남은 확인과 보류 항목 (2026-10-15 05:00 KST)
 
@@ -3650,36 +11258,76 @@ C 직접 API9개, Mac HTTP·HTTPS의 정상200/헤더누락400, HTTPS 쿠키 속
 | 별도 실증 | 실제 호스트 재부팅·장시간 부하/지연, 실제 만료 경보의 원격 색인 ACK | 이번 검증 범위 밖이다. 기존 native 복구·회전·상관 검증 결과와 혼동하지 않는다. |
 | 보류 | 모델 학습·업로드, 이중 SSL VPN, 모바일 푸시, 추가 도구5번 | 기존 사용자 결정 유지. 상위 방화벽 변경 없음. |
 
+
+
+<a id="source-87368a0abd79b357-h245"></a>
+<a id="record-528cfc8d3f388e8556c89a69a8525303969705b7b2f04589e54c17e18878e19c"></a>
+
 ## WAF 재생성 검증 완료 (2026-10-15 04:45 KST)
 
 새 WAF6c72d5a5…의 실제 Imperva 예외·producer·template 연결과 원본 인계를 확인했다. Vector2627991·Wazuh1909632·Suricata1990031은 정상이고 원본은 gen1/rev6·gen4/rev13 active다. 세 점검 timer를 5분 간격 안에서 0·1·3분으로 분산하여 실제 예약 실행 exit0를 모두 확인했다. 04:45 양 시작가드가 통과했다. 일시적인 Suricata CP offset/hash 불일치는 후속 저장에서 해소됐으나 정확 원인은 미확정이며 가드·CP는 변경하지 않았다. 증거 보존·임시 정리 후 인증서 관리로 이동한다. 실제 자연 스캔 효과·원격 경보 ACK·호스트 재부팅은 별도 관찰 항목이다. 아래는 이전 시점 기록이다.
 
+
+
+
+<a id="source-87368a0abd79b357-h246"></a>
+<a id="record-78cdba285de7f6afe4390f51234da7d78d8c72104e55b4c2cfeefaeab40b8899"></a>
 
 ## WAF 새 컨테이너 전환 완료·마감 확인 중 (2026-10-15 04:31 KST)
 
 새 WAF6c72d5a5…가 healthy이며 Imperva 예외·로그 producer·시작 template을 실제 읽기 전용 bind로 유지한다. Vector2627991과 Wazuh1909632가 실행 중이고 원본 상태는 Suricata gen1/rev6·WAF gen4/rev13 active다. 무해 요청1건의 v2 감사·KST 정제1행 및 Wazuh 로컬 소비를 확인했다. 기존 WAF는 정지 보존, CP·원문 수동 재작성은 없다. 자동 timer3개와 구형 배포 보호도 반영했고 다음 예약 실행·영구 증거 보존·임시 정리를 마감 확인한다. 실제 Imperva 자연 스캔 효과와 원격 보안경보 ACK, 호스트 재부팅은 이번 확인과 구분한다. 아래는 이전 시점 기록이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h247"></a>
+<a id="record-146b042eda2b5f22638ef8375950ec11b1f301817ec6831a389ec173238b9989"></a>
+
 ## 현재 진행 — 새 WAF 실행·수집 인계 (2026-10-15 04:20 KST)
 
 새 WAF6c72d5a5…가 첫 시작 후 healthy이며 Imperva 예외·producer·template의 호스트 연결과 새 감사 로그 생성을 확인했다. 기존 WAF는 정상 정지 보존한다. Vector 중지 전 JSON 정렬 오류는 원문 보존 후 수정했고, Vector는 정상 중지된 상태에서 새 CID·원본 세대 메타데이터를 인계 중이다. 무해 빈 POST는405·감사1행을 생성했으며 숫자형 Host에 대한 CRS920350 경고1개가 있어 messages0 검증 기대를 정정한다. HTTP 재전송 없이 저장 증거로 확인하고 수집 재개→timer복원을 진행한다. 아래는 이전 시점 기록이다.
 
 
+
+
+<a id="source-87368a0abd79b357-h248"></a>
+<a id="record-b50917670ee81dad5399084bf87d59f4c0d9815ec56705101764b15bf344b65b"></a>
+
 ## 현재 진행 — WAF 전환 중 (2026-10-15 04:05 KST 이후)
 
 기존 WAF는 SIGQUIT로 정상 종료됐고 새 후보는 아직 미시작이다. 마지막 감사 로그는 봉인·EOF 검증을 마쳤다. Vector는 기존 PID2406117로 실행 중이며, 중지 직전 JSON 정렬 검사 오류로 절차가 보류됐다. 저장한 상태의 원문을 보존하고 정렬 형식만 보완하여 첫 Vector 중지와 새 WAF 시작을 이어가는 중이다. 자동 회전 timer3개는 일시 중지, reader 새 시작은 임시 가드로 차단했다. 아래는 전환 전 상태다.
+
+
+
+<a id="source-87368a0abd79b357-h249"></a>
+<a id="record-58160ec8ce31665fbcba6da1d8a7acf17770f29066fa7e34c9263542a5de3fac"></a>
 
 ## WAF 지속성 작업 진행 (2026-10-15 03:54 KST)
 
 호스트 producer/template 두 파일과 실제 compose의 읽기 전용 연결을 반영했다. 기존 WAF·Suricata·Vector·Wazuh는 계속 실행 중이다. 새 WAF 정지 후보6c72d5a5…를 한 번 생성했고 PID0·미시작 상태를 유지한다. Docker의 빈 목록 표현 차이를 확인한 후조건 검사와 새 CID 로그 인계 도구 검증을 진행 중이다. 기존 WAF 중지·새 후보 시작은 아직 하지 않았다. 인증서 관리는 이 단계 완료 후 마지막으로 진행한다. [실측·진행 기록](../infra/groot-a/imperva-exception/recreation-validation-2026-10-15.json). 아래는 이전 시점 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h250"></a>
+<a id="record-75c93ae755dafb0d67954cc393f6616d689ed172734557a17102e0a936f85b42"></a>
+
 ## 최신 확인 — WAF 재생성 지속성 보완 착수 (2026-10-15 03:20 KST)
 
 WAF·Vector·Wazuh·Suricata와 원본 회전 timer 3개는 정상이다. Imperva 예외는 현재 적용돼 있으나 read-only bind는 compose에만 있고, v2 로그 producer와 시작 template은 현재 컨테이너 내부에만 있다. 따라서 host 원본·compose bind를 보완한 뒤 새 CID의 원본 로그·수집기 결속을 인계해야 한다. 실제 생성 프로필은 서버에 비공개 보존했으며 현재는 준비 중이다. 컨테이너 교체·중지·운영 설정 변경은 아직 없다. [읽기 점검](../infra/groot-a/imperva-exception/recreation-readiness-2026-10-15.json) · [비밀 제외 생성 프로필](../infra/groot-a/imperva-exception/recreation-profile-2026-10-15.json). 아래는 이전 시점이다.
 
+
+
+<a id="source-87368a0abd79b357-h251"></a>
+<a id="record-e741399365f1b199bc42e219d4f1574bc6a041c3122715a3a9d32b5a8dd01356"></a>
+
 ## 최신 확인 — Hermes 단계 보존·정리 완료 (2026-10-15 03:17 KST)
 
 Hermes 실제 첫 시작·복귀 및 구형 배포 우회 차단을 검증하고 마감했다. 서버 증거406개/2,709,137B를 root 전용 백업에 전수 해시 대조·fsync로 보관한 뒤 임시 stage를 제거했다. Mac 작업파일432개/2,505,123B도 제거했고 패키지 설치0, 기존 Hermes PID2248019와 정지 후보 상태는 유지됐다. [검증·정리 기록](../infra/automation/ansible/hermes-prestart-validation-2026-10-15.json). 이 마감 문구는 소스·문서105개 서버 스냅샷 이후 작성됐으며 서버에는 별도 정리 영수증이 있다. 다음은 WAF 새 CID 재생성 시 Imperva 예외·원본 로그 결속 지속성 확인이다. 아래는 이전 시점이다.
+
+
+
+<a id="source-87368a0abd79b357-h252"></a>
+<a id="record-d50f87141557e76af2c29ff62094e4c82155ed05fb0ef1486ae00e53d35efe2e"></a>
 
 ## 최신 확인 — Hermes 첫 시작 가드·실제 복귀 완료 (2026-10-15 03:02 KST)
 
@@ -3687,9 +11335,19 @@ Hermes 실제 첫 시작·복귀 및 구형 배포 우회 차단을 검증하고
 
 구형 deploy의 prep/test/all은 관리 상태가 있으면 즉시78로 중단하도록 B 실제 사본에 반영했다. 기존 gateway 재생성 스크립트도 저장소에서 동일하게 보호했다(검색한 B 경로에는 사본 없음). 현재 PID 불변·native41개와 실제 설치본의 보호된 사본 검증을 확인했다. 고정 root 운영 경로의 보장이며 임의 Docker 명령의 전역 통제·일반 crash 자동복구는 아니다. 증거·문서 보존과 임시 정리를 마친 뒤5단계로 이동한다. 아래는 이전 시점이다.
 
+
+
+<a id="source-87368a0abd79b357-h253"></a>
+<a id="record-c6a36ad58dcc6a566d896c4b2ce4b725760ccb495fd6b9cb967e562c8c034623"></a>
+
 ## 최신 확인 — Hermes 정지 후보 검증 진행 (2026-10-15)
 
 기존 Hermes CID6c2ed…/PID1896873은 실행 중이며, 새 후보47aa31c8…는 created/PID0로 한 번도 시작하지 않았다. SDK2 응답 필드명 오류는 수정했고 실제 MCP5개 읽기 연결과 B native50개 검사를 통과했다. Docker create의 stdout/stderr 기본값과 시작 시 OOM 설정 표현 차이를 확인해 후보에만 적용하는 좁은 검증을 보완 중이다. 기존 create 의도·원장·plan은 보존하며 중복 생성하지 않는다. 실제 첫 시작·복귀는 아직 미완료이고, 5·6단계 운영 변경은 시작하지 않았다. 아래는 이전 시점이다.
+
+
+
+<a id="source-87368a0abd79b357-h254"></a>
+<a id="record-a44c915b2345d035a1d139e351d465fef9e0373041508573c0b9f7acf89d7969"></a>
 
 ## 최신 확인 — 원본·출력 회전 타이머 정상 운영 (2026-10-15 02:15 KST)
 
@@ -3697,9 +11355,19 @@ Suricata·WAF 원본 회전과 정제 출력 유지보수 timer 3개를 활성�
 
 중간 logger 한 행의 systemd 귀속 누락과 종료 unit의 실행메타 초기화 때문에 검증기 사후 확인을 보완했다. 원래 실패 증거는 보존했고 실제 실행 exit0·동일 Invocation의 시작/완료 journal·파일 보존 증거로 완료를 확인했다. **02:20 KST 최종 보존·정리 완료:** 소스·문서267개 해시를 대조해 보관하고 A 작업515파일·격리8파일을 백업 후 정리했다. B 조회 임시2파일과 Mac 임시650파일을 제거했고, 미사용 v1 가드만 삭제했다. 정리 후 양 시작가드·저장 점검·timer3개 정상을 재확인했다. 이 마감 문구는 서버 소스 스냅샷 이후 작성했다. Hermes 4단계는 후보 구현 중이며 운영 전환 전이다. 실제 호스트 재부팅·새 WAF CID·이번 자연 보안사건의 원격 ACK는 검증하지 않았다. 아래는 이전 시점이다.
 
+
+
+<a id="source-87368a0abd79b357-h255"></a>
+<a id="record-e65429097b5055f202549851f271178758d7483b7e0e5430b8dfa596cf414685"></a>
+
 ## 최신 확인 — WAF 재시작 후 로그·설정 유지 검증 (2026-10-15 01:49 KST)
 
 같은 WAF 컨테이너를 정상 종료 신호로 한 번 재시작했고 새 master PID2377669·healthy를 확인했다. 시작 템플릿/중간본/실제 override, custom·Imperva 규칙과 producer가 유지됐고, gen3 원본 inode·기존 기록 및 봉인 세대도 보존됐다. Vector2368467·Wazuh1909632는 재시작하지 않았으며 양 guard가 전후 통과했다. raw state는 Suricata gen1/rev5·WAF gen3/rev11 active다. 자동 timer 활성화와 최종 보존·정리를 이어간다. 호스트 재부팅·새 CID 생성 시험은 아니며 아래는 이전 시점이다.
+
+
+
+<a id="source-87368a0abd79b357-h256"></a>
+<a id="record-7560e9152c5623aef21142a2856e5973a9ba6ec83447722b1ba7433b011fa5df"></a>
 
 ## 최신 확인 — 출력 회전·WAF 시작 설정 보완 (2026-10-15 01:40 KST)
 
@@ -3707,11 +11375,21 @@ Suricata gen1/rev5·WAF gen3/rev11이 active이며 Vector PID2368467·Wazuh logc
 
 이번 시간창에는 원격 보안경보의 선정 조건을 만족한 자연 사건이 없어 새 ACK는 확인하지 않았다. 실제 호스트 재부팅은 하지 않았다. 3단계 마무리 후 Hermes→재생성 예외 지속성→인증서 순서를 유지한다. 아래는 이전 시점 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h257"></a>
+<a id="record-1b2cc02d61c6970a8a035f955dc94bcc85e3918738ce811bf51573f82123c303"></a>
+
 ## 최신 확인 — 두 원본 실제 회전 완료 (2026-10-15 01:07 KST)
 
 Suricata는 gen1/rev5, WAF는 gen2/rev6의 active 상태로 실제 회전을 마쳤다. Vector PID2180571·Wazuh logcollector PID1909632가 실행 중이고 양 시작 가드 및 기존 maintenance check가 정상이다. WAF의 재개 HUP 반복을 막는 FD 대조 수정은 native24개와 전후 검사를 통과했다. 파일 교체 중 Wazuh 체크포인트 경로가 일시 누락돼 Vector 재개가 보류됐으나, 정상 저장을 기다린 뒤 수동 CP 수정·Wazuh 재시작 없이 완료했다.
 
 자동 원본·출력 timer는 아직 비활성이다. 기존 출력 로그의 실제 회전/재시작 호환 검증과 불확실 HUP의 지속 의도 기록 보완을 진행한다. 원본/체크포인트 수동 재작성0이며 실제 호스트 재부팅 및 이번 입력의 원격 분석·색인 ACK는 아직 확인하지 않았다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
+
+
+
+<a id="source-87368a0abd79b357-h258"></a>
+<a id="record-3909a771b6fc912daf09ddc90b778d4c51a2328969c7561e6e8890b9ac14b992"></a>
 
 ## 최신 확인 — 원본 세대 전환 적용·운영 회전 검증 중 (2026-10-15 00:44 KST)
 
@@ -3719,9 +11397,19 @@ Suricata는 gen1/rev5, WAF는 gen2/rev6의 active 상태로 실제 회전을 마
 
 Suricata entrypoint의 관리 폴더 제외를 적용했고, WAF native 설정 검사의 계정을 실제 nginx UID101:101로 맞췄다. runtime 한 줄 수정은 native12개(내부30+24 회귀 포함) 및 전후 양 가드를 통과했다. 원래 plan/source/ledger와 수정 전 사본은 보존했으며 원문·CP 수동 재작성은 없다. 자동 회전 timer와 기존 출력 유지보수 timer는 아직 비활성이다. Suricata·WAF 실제 한 세대 회전과 운영 확인 후 활성화를 검토한다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h259"></a>
+<a id="record-1aead353de92608fd1ce05b3cc7206a81c6901907f697161510feaac3fbf83e7"></a>
+
 ## 최신 확인 — Vector 수집 재개 (2026-10-15 00:28 KST)
 
 제한 가드 통과 후 명시 start 한 번으로 Vector PID2011863이 active/running 상태로 돌아왔다. 기동 직후 controller 후검사가 거절돼 원래 차단 가드는 복원됐고 한시 권한은 폐기됐다. 별도 조회에서 같은 Invocation의 실제 guard PASS와 raw3개 체크포인트 유효성, 새 ready/evidence의 Wazuh EOF 소비를 확인했다. 추가 기동 없이 증거와 pending 후처리를 마무리한다. 출력 유지보수 timer는 계속 disabled/inactive이며 WAF·Suricata·Wazuh도 실행 중이다. 아래 중지 상태는 복구 전 기록이다.
+
+
+
+<a id="source-87368a0abd79b357-h260"></a>
+<a id="record-97d84fad25d90d8415f136e7de0e1dfacc2cc844e4b1066f514d51539c5ffb25"></a>
 
 ## 최신 복구 진행 — 출력 회전과 초기 전환 경합 (2026-10-15 00:13 KST)
 
@@ -3729,11 +11417,21 @@ Suricata entrypoint의 관리 폴더 제외를 적용했고, WAF native 설정 �
 
 그 사이 00:01 기존 출력 회전이 Vector를 정상 중지한 뒤 blocked 가드 때문에 재시작하지 못했다. 현재 **Vector는 명시 중지된 상태이며, Wazuh·Suricata·WAF는 실행 중**이다. 원본·현재 체크포인트·회전 출력은 보존했고 raw3개 Vector CP의 유효성을 확인했다. Wazuh는 새 ready/evidence 빈 파일을 각각 FD1개·pos0로 열고 있다. 출력 회전 timer의 원래 enabled 상태를 기록한 후 임시 disable했다. 제한된 v1 복구 가드와 새 Invocation 재결속을 검증해 Vector를 먼저 복구하며, 원본/CP 복원 덮어쓰기나 추가 회전은 하지 않는다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h261"></a>
+<a id="record-6657979e611ff0fc6d703453d40e51fce500816c6579aa6f44dad935bf2e3f42"></a>
+
 ## 작업 재개 — 3단계 초기 회전 전환 보완 (2026-10-14 23:43 KST)
 
 사용자 재개 지시에 따라 3단계부터 순차 실행한다. 구 배포 도구의 v1 덮어쓰기 방지를 A 프로젝트 소스에 반영했고 실제 Ansible26개 검사를 통과했다. 초기 시작 가드31개와 별도 systemd 재시도/수동중지 시험도 통과했다. 23:43 실제 prepare에서 WAF·Suricata 격리 설정 검사2개와 운영 설정/서비스/원본 불변 확인을 완료했다. 앞선 실패2회는 별도 백업에 보존했으며 실제 원본 전환은 아직 시작하지 않았다. 초기 전환의 중단/재개 트랜잭션 검증을 계속하고, 운영 copytruncate/WAF v1은 유지한다. 23:34 자동 보존 표본은13,741건·완료9/대기0/보류0(발견한 이전 boot의 고정 cutoff 범위)이다. 4~6단계는 아직 시작하지 않았으며 아래 마감 기록은 이전 상태다.
 
 **23:59 KST 운영 전환 진행 상황:** 초기 가드와 legacy 회전 대상 분리는 적용했다. 같은 Suricata 컨테이너를 한 번 재시작했고 원본 inode·하드링크·reader는 유지됐다. 컨테이너 entrypoint의 재귀 chown이 관리 디렉터리 소유권을 바꾸는 충돌을 실제 확인해 후검증에서 보류 중이다. 관리 트리와 `eve.json`을 제외하는 좁은 시작 스크립트 보완을 검증하고 있다. Vector/WAF v1은 유지하며 추가 재시작·WAF 전환은 아직 하지 않았다. 위 23:43의 원본 전환 전 상태와 아래 마감 기록은 이전 시점이다.
+
+
+
+<a id="source-87368a0abd79b357-h262"></a>
+<a id="record-856091117e40445e6ed36f47cf28df9088b905daefc875b60dccd8ed5e7f579b"></a>
 
 ## 현재 작업 마감 — 3단계 부분 적용·운영 회전 전환 보류 (2026-10-14 23:03 KST 확인)
 
@@ -3745,13 +11443,23 @@ Suricata entrypoint의 관리 폴더 제외를 적용했고, WAF native 설정 �
 
 **23:10 KST 마감 완료:** A에 소스·문서92개(1,201,878bytes)를 해시 대조해 보관하고 변경 전 원본을 백업했다. 증거314개를 보존한 뒤 서버 임시407개와 Mac 임시606개를 제거했다. 정리 후 운영 설정·PID/CID·연결·감시는 정상이며, 자동 보존 최신 표본은10,806건/4,566,236bytes·완료7/대기2/보류0이다. 새 패키지 설치0·추가 운영 전환0. 이 마감 문구와 최종 JSON은 서버92파일 스냅샷 이후 작성됐고 서버에는 별도 source-closure/postcleanup 증거가 있다.
 
+
+
+<a id="source-87368a0abd79b357-h263"></a>
+<a id="record-27890dd47b6968364ca370c4ee7c5cfba5ca5c124095015bec0cc96b823d90d3"></a>
+
 ## 최신 진행 방향 — 인증서 관리를 마지막으로 이동 (2026-10-14)
 
-사용자 지시로 **WAF 회전 격리 → 과대 EOF 행 감시 → 운영 raw 회전/영속 복구 → Hermes 시작 전 가드/복귀 → 재생성 예외 지속성 → 인증서 관리** 순서로 진행한다. 각 단계 검증·기록을 끝낸 뒤 다음 단계로 이동하며, 현재 1단계 WAF 회전 격리 검증을 통과했다. 네 세대·6요청과 두 reader, 보관본 pair6건·음성 대조가 일치했고 운영 보호59파일·서비스/PID/CID는 사전 상태와 같다. 원본205파일과 소스·문서13파일을 A에 보관했고 시험224파일을 정리한 뒤20:52 운영 불변을 재확인했다. 2단계도 A의 기존5분 감시와 B의 상태 규칙100252/100253에 반영했다. 검사기34개·통합12개·B104/116/116검사를 통과했고 A의실제oneshot 상태저장·재적용changed0·기존Vector무재시작을 확인했다. 21:29 A/B 소스·문서120파일씩을 보관하고 A270/B228개 작업 파일을 제거해 2단계를 마감했다. 자연 타이머 실행도 확인했으며 3단계 설계·운영 경로 대조를 시작한다. 운영 copytruncate는 유지하고 실시간 pair·crash/재부팅·원격 ACK는 후속 단계다. 이전 Indexer v2 적용·두 주기 검증 결과는 유지한다. [최신 실행 계획](PLAN-history-20261101.md#최신-순차-실행--인증서-관리-마지막-2026-10-14). 아래는 이전 시점 기록이다.
+사용자 지시로 **WAF 회전 격리 → 과대 EOF 행 감시 → 운영 raw 회전/영속 복구 → Hermes 시작 전 가드/복귀 → 재생성 예외 지속성 → 인증서 관리** 순서로 진행한다. 각 단계 검증·기록을 끝낸 뒤 다음 단계로 이동하며, 현재 1단계 WAF 회전 격리 검증을 통과했다. 네 세대·6요청과 두 reader, 보관본 pair6건·음성 대조가 일치했고 운영 보호59파일·서비스/PID/CID는 사전 상태와 같다. 원본205파일과 소스·문서13파일을 A에 보관했고 시험224파일을 정리한 뒤20:52 운영 불변을 재확인했다. 2단계도 A의 기존5분 감시와 B의 상태 규칙100252/100253에 반영했다. 검사기34개·통합12개·B104/116/116검사를 통과했고 A의실제oneshot 상태저장·재적용changed0·기존Vector무재시작을 확인했다. 21:29 A/B 소스·문서120파일씩을 보관하고 A270/B228개 작업 파일을 제거해 2단계를 마감했다. 자연 타이머 실행도 확인했으며 3단계 설계·운영 경로 대조를 시작한다. 운영 copytruncate는 유지하고 실시간 pair·crash/재부팅·원격 ACK는 후속 단계다. 이전 Indexer v2 적용·두 주기 검증 결과는 유지한다. [최신 실행 계획](PLAN_HISTORY.md#source-b32ddb5c903faea1-h125). 아래는 이전 시점 기록이다.
 
 **3단계 후속 운영 반영:** 이전 boot 자동 보존기를 A에 설치하고 5분 timer를 활성화했다. 최초 수동/자동 회차로 1,488건·625,132bytes, 9개 boot 중 complete1/ready8/blocked0을 확인했다(22:07 표본). raw Suricata/WAF audit 두 입력은 no/2GB로 변경했으며 새 logcollector PID1909632·fresh manager 연결·기존 원본 inode/접두 SHA 보존을 확인했다. WAF v2는 실제 격리 원문3건 정제까지 통과했지만 운영 producer/Vector 변경은 아직 전이다. 22:34 후속 표본은 5,876건/2,495,151bytes·complete3/ready6/blocked0이다. 체크포인트53·상태34·감시통합39 및 private systemd 재시도/수동중지 검증도 통과했다. 원본 회전 controller는 stop과 상태 커밋 사이 중단 복구를 추가 보완 중이며 기존 copytruncate는 유지한다. 초기 전환 설치기는 check/prepare만 검토 완료로, 아직 운영 전환은 실행하지 않았다. 4~6단계는 아직 시작하지 않았다.
 
 **19:46 KST 마감:** 서버소스/문서42개 반영·증거A33/B114파일 보존과 서버작업stage·Mac135개 임시파일 정리를 마쳤다. 설치0·운영상태 유지이며 [전체 마감 기록](../infra/normalization/wazuh-vector/indexer-native/window-v2/finalization-2026-10-14.json)을 남겼다. 이 마감 문구/JSON은42파일 서버스냅샷 이후 작성됐고 서버에는 별도 정리 증거가 있다.
+
+
+
+<a id="source-87368a0abd79b357-h264"></a>
+<a id="record-6e2f1b44be3f284026441a8d4bc5a5a678add80fec069baa196425688f055b3c"></a>
 
 ## 단기1 점검 완료·단기2 Indexer 시간창 운영 반영 (2026-10-14 19:38 KST)
 
@@ -3763,14 +11471,24 @@ Suricata entrypoint의 관리 폴더 제외를 적용했고, WAF native 설정 �
 
 다음은 **WAF 두 reader 회전 격리 검증 → 인증서 만료 감시/수동 갱신 정리**다. 이후 과대 EOF 행 감시, raw 운영 회전/영속복구·전달확인, Hermes 첫실행 전 가드/복귀를 진행한다. 오탐/언어혼입 및 Wazuh 장기부하 관찰은 병행하고 기존 보류는 유지한다.  **19:40:33 후속 확인 완료:** 변경 후 정기실행2회/on_time, 별도dryrun57/57shard·유효empty·두trigger false·내부alert0·drop0, 서비스/컨테이너/analysisd PID/보호hash불변을확인했다. 아래는 각 시점의 이력이다.
 
+
+
+<a id="source-87368a0abd79b357-h265"></a>
+<a id="record-171548339abd7a39f1493f3f05c8a4a3c28c01d944c895c26ebae88e7562aeee"></a>
+
 ## 남은 항목의 실행 순서 재정리 (2026-10-14)
 
 사용자 요청으로 단기 확인·수정을 우선한다. **① Imperva/한국어 가드의 실제 재발 로그 확인 → ② Indexer 검색 시간 경계·색인 지연·반복 판정 보완 → ③ WAF writer와 두 reader의 격리 회전 검증 → ④ 인증서 만료 감시·수동 갱신 절차 정리** 순서다. ①은 확인 작업이고 ②가 우선 개선이다. 자연 스캔이 없으면 재발 없음으로 판정하지 않는다.
 
-과대 행 EOF 감시 사각, 원본 회전의 운영 전환·영속 복구, Hermes 재생성 전 가드/실제 복귀는 별도 설계·구현 과제다. Wazuh 1/1의 장기 처리량·상관 누락과 오탐·언어 혼입 관찰은 단기 작업과 병행한다. 학습·VPN·모바일 푸시·추가 도구는 보류다. [단계별 완료 기준](PLAN-history-20261101.md#단기-완료-항목-우선-실행-순서-2026-10-14).
+과대 행 EOF 감시 사각, 원본 회전의 운영 전환·영속 복구, Hermes 재생성 전 가드/실제 복귀는 별도 설계·구현 과제다. Wazuh 1/1의 장기 처리량·상관 누락과 오탐·언어 혼입 관찰은 단기 작업과 병행한다. 학습·VPN·모바일 푸시·추가 도구는 보류다. [단계별 완료 기준](PLAN_HISTORY.md#source-b32ddb5c903faea1-h127).
 
 이번 정리는 저장된 최신 라이브 결과와 문서 대조에 따른 계획 변경이다. 추가 SSH·서버 변경·새 패키지 설치는 없다. 아래 18:56 검증과 19:02 정리 결과는 그대로 유효하다.
 
+
+
+
+<a id="source-87368a0abd79b357-h266"></a>
+<a id="record-42c4378dc7d5dc771b6d7341468af47843d83af477c98ff3388825ec86ef9abc"></a>
 
 ## 운영 분석기 1/1 적용·실제 20회 종단 검증 완료 (2026-10-14 18:56 KST)
 
@@ -3785,6 +11503,11 @@ canary를 포함하지 않은 **60.000186초 운영 관찰**에서 60건(약 1 E
 **19:00~19:02 KST 보관·정리 완료:** A/B에 관련 소스·문서136개씩(1,754,010bytes)을 해시 대조해 보관했고 각 변경45/유지91개다. 원본 소스와 운영 옵션 복구 백업, 합성 시험 기록을 보존했다. 서버 작업임시 A165개/B316개와 Mac298개를 제거하고 경로 부재·운영 상태 보존을 확인했다. Mac 패키지 설치0·기존 사용자 환경/캐시 삭제0이다. 이 마감 문구와 정리 JSON은 서버 소스 스냅샷 이후 작성됐으며 서버에는 별도 preservation/cleanup/postcleanup 기록이 있다. [마감 증거](../infra/normalization/wazuh-vector/correlation-fix/finalization-resume-2026-10-14.json).
 
 
+
+
+<a id="source-87368a0abd79b357-h267"></a>
+<a id="record-24101e09df40b6cdb4904e4415ca4c893d88d876248a20f8eded68caa16d0ee5"></a>
+
 ## 상관 누락 보완 검증 완료·운영 적용 대기 (2026-10-14 18:18 KST)
 
 검증기의 고정 사건 ID 가정을 수정했고 합성47개 및 기존 성공/누락 회차 대조를 통과했다. 같은 입력을 사용한 격리 부하 시험은 각30,000행을 전부 수신·처리했다. 디코딩/판정 worker1/1은 예상 상관 경보4,000건 전부 생성했고, 자동 병렬 설정은1,362건만 생성했다. 두 설정 모두 입력 drop0이므로 이번 시험의 상관 판정 누락을 전송 유실과 구분한다.
@@ -3796,6 +11519,11 @@ canary를 포함하지 않은 **60.000186초 운영 관찰**에서 60건(약 1 E
 [보완 내용과 실측](../infra/normalization/wazuh-vector/correlation-fix/README.md) · [배포/복구 절차](../infra/normalization/wazuh-vector/correlation-fix/DEPLOYMENT.md). 아래는 이전 시점 기록이다.
 
 **18:27 KST 정리:** 서버 증거 보존 후 A임시2/B1,051파일과 Mac임시137파일을 제거하고 경로 부재·운영 불변을 확인했다. 패키지 설치0·배포소스 반입0·새운영입력0이며 사용자 전송 승인 대기는 유지한다. [정리 및 미실행 항목](../infra/normalization/wazuh-vector/correlation-fix/finalization-2026-10-14.json).
+
+
+
+<a id="source-87368a0abd79b357-h268"></a>
+<a id="record-5fa641e0d131160b239a93b2cc54443b20e22e9b6a198d18e4780d8c58403795"></a>
 
 ## 상관 경보 누락 조사 — 병렬 판정에서 재현 (2026-10-14 13:12 KST)
 
@@ -3811,6 +11539,11 @@ B의 설치 Wazuh 4.14.8 바이너리·규칙 복사본을 격리해 비교했�
 
 사용자 요청에 따라 WAF 회전보다 상관 누락 조사를 우선했다. 아래는 이전 시점의 기록이다.
 
+
+
+<a id="source-87368a0abd79b357-h269"></a>
+<a id="record-d10c6cfdb4b3b46d36b64de750bb83e817c3e8af21a99163adb73ee43c453073"></a>
+
 ## 보존 자료 전수 판정·현재 전달 경로 재검증 (2026-10-14 12:00 KST)
 
 보존한 두 배치 **1,481건·621,820bytes**를 A/B에서 독립 대조했다. 원본·manifest 해시가 일치하며, 모두 현재 nft 선택 조건의 비대상으로 후보와 실제 정제 보안 이벤트는 **0건**이다. 이는 모든 kernel 로그가 무해하다는 판정이 아니다. 실제 자료의 Wazuh 재주입·Indexer 쓰기는 수행하지 않았으며, 이 1,481건을 색인 완료로 표시하지 않는다.
@@ -3822,6 +11555,11 @@ B의 설치 Wazuh 4.14.8 바이너리·규칙 복사본을 격리해 비교했�
 
 **12:28 KST 보관·정리 완료:** A/B에 관련 소스·문서38개씩(621,689bytes)과 증거를 보관하고 SHA를 대조했다. 변경 전 소스는 root 백업에 보존했다. 삭제 전 보관 해시를 다시 검사한 뒤 A 임시106파일·B133파일·Mac 공용67파일을 정리했고, 담당자 별도 임시물도 제거했다. B의 보관된 확인 도구로 기존 시험2건/2건·57shard를 다시 확인했다. 운영 서비스/컨테이너·원본 배치/수신증은 유지됐으며 신규 패키지 설치는0이다. [마감 증거](../infra/normalization/vector/history-replay/finalization-2026-10-14.json). 이 마감 문구와 정리 JSON은38파일 서버 스냅샷 이후 작성했고 서버에는 별도 cleanup.json을 보관했다.
 
+
+
+<a id="source-87368a0abd79b357-h270"></a>
+<a id="record-6443e54aa4f7d6a774a33578735ff03216e6dab1fc54d0f830f14ea0ec3e3de1"></a>
+
 ## 이전 부팅 로그 후속 회수·B 파일 보관 완료 (2026-10-14 10:57 KST)
 
 고정 이전 boot/kernel/cutoff의 남은481건을 회수해 기존1,000건과 합계 **1,481건·621,820bytes**를 보존했다. 두 배치를 기존 SSH/rsync로 A→B 직접 전송하고, SHA 대조·파일/디렉터리 fsync·원자 저장 후 B 수신증을 A에도 별도로 보관했다. 양쪽1,481개 cursor가 서로 중복되지 않으며 원본·manifest·수신증 해시가 일치했다.
@@ -3832,6 +11570,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 
 **11:02 KST 정리 완료:** A/B에 관련 소스·문서43개씩과 검증 증거를 보관하고 SHA를 대조했다. A 임시137파일, B 임시110파일+업로드6파일, Mac 작업임시97파일을 삭제하고 경로 부재를 확인했다. 운영 배치·수신증·백업은 보존하며 Mac 신규 설치와 infra 패키지/bytecode 잔존은0이다. 정리 후 관련서비스도active다. [정리 집계](../infra/normalization/vector/history-transfer/cleanup-2026-10-14.json).
 
+
+
+<a id="source-87368a0abd79b357-h271"></a>
+<a id="record-dddca697e916561344f2e67f0c9221fe7bcfdab6dc9b62df8752770fa53e3801"></a>
+
 ## Imperva 정기 점검 오탐 예외 적용 (2026-10-14 05:50 KST)
 
 사용자가 확인한 실습망 Imperva `211.170.162.9`의 최근5시간 경보4건을 실제 로그와 대조했다. HTTP/1.0의 Host 누락3건과 HTTP/1.1의 숫자 Host1건이 각각 기본 CRS920280/920350에 걸렸으며, 커스텀 공격룰 발화는 없었다.
@@ -3839,6 +11582,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 정확한 `.9 → 172.18.0.2:8080`, `GET /`, 관측된 protocol/Host·CL/TE없음 조건에만 early CRS10020/10021 예외를 적용했다. 다른 IP·경로·헤더 및 SQLi/XSS·949110·nft 정책을 유지한다. 격리21쌍/42요청을 통과했고 운영 nginx862룰·healthy·기존 컨테이너/시작 시각·정상HEAD302를 확인했다. 향후 단일read-only bind를 실제 compose에 반영했으며 현재 컨테이너는 재생성 없이 파일 설치/reload했다. **다음 실제 정기 스캔의 재발 여부는 아직 관찰 전**이다. [범위·검증·복구](../infra/groot-a/imperva-exception/README.md).
 
 06:22:59 KST 재조회에서도 호스트/컨테이너 예외 SHA와 WAF healthy를 확인했고 적용 이후 `.9`의 새 색인 경보는0건이었다(54/54 shard). 실제 다음 점검의 실행을 확인한 것은 아니므로 자연 스캔 검증은 계속 남는다.
+
+
+
+<a id="source-87368a0abd79b357-h272"></a>
+<a id="record-96f8233a36afe9ab166c34a99ad1b98179b121d9ae84b89c8c1781aae0d22128"></a>
 
 ## 별도 evidence·Indexer 관측 모니터 적용 (2026-10-14 06:23 KST)
 
@@ -3851,6 +11599,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 
 **06:30 KST 정리 완료:** A/B 각각 최신소스236개(1,141,760bytes)와 배포 증거를 영구 보관하고 SHA를 확인했다. 서버 작업임시 A349개/B370개, Mac392개(1,626,573bytes)를 삭제하고 경로 부재를 확인했다. 별도 agent 임시물도 정리했고 Mac 신규 설치0·infra wheel/bytecode0이다. 보관된 소스로 B모니터 enabled/설정 검증과 A이전boot 배치 보존을 다시 확인했다. 정리 후 A/B 감시·서비스는 active다. [정리 집계](../infra/normalization/indexer-cleanup-validation-2026-10-14.json).
 
+
+
+<a id="source-87368a0abd79b357-h273"></a>
+<a id="record-d10c6f15b386ff5c2a4e4c1b92d1b3d4cd49bca826c58b7fb4f3b5614c981ccd"></a>
+
 ## 잔여 작업 후속 — 오류 해소·수집 감시 적용 (2026-10-14 04:54 KST)
 
 - **Wazuh 필드 초과 오류 해결:** 매분 Suricata stats 504개 필드와 출처 label 1개가 기본 한도 256개를 넘어 오류 249건을 만들던 원인을 확인했다. A의 고정 형식 stats 전송만 native ignore로 제외했다. 원본 통계·보안 이벤트·decoder 기본값은 유지하며, 적용 후 약 29분 동안 새 오류 0건을 확인했다. [검증](../infra/normalization/wazuh-vector/stats-filter/README.md).
@@ -3861,6 +11614,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 **다음 순서:** (1) 별도 evidence와 actions 없는 Indexer 상관 관찰 연결, (2) 이전 boot 보존·B 파일 수신 확인·Suricata→WAF raw 회전 검증, (3) Hermes 시작 전 가드 lifecycle 구현과 실제 중단/복구 시험, 장기 관찰. EOF의 과대 행은 counter에서도 누락될 수 있어 무손실 수집을 완료한 것은 아니다. [수집 잔여 실행안](../infra/normalization/wazuh-vector/NEXT-RELIABILITY.md) · [Hermes 준비 상태](../infra/automation/ansible/hermes-prestart-plan.md). 5번 추가 도구·학습·VPN·모바일 푸시는 계속 보류한다. 아래 내용은 이전 단계 기록이다.
 
 **05:00 KST 정리 완료:** A/B 소스 149개씩과 실측 증거를 영구 보관한 뒤 서버 임시 A340개/B206개·Mac 임시300개를 삭제했다. Mac 신규 설치0·infra wheel/pyc 잔존0이며 운영 의존성·복구 백업은 보존했다. 정리 후 A/B 서비스·감시 정상 상태를 확인했다. [정리 집계](../infra/normalization/next-cleanup-validation-2026-10-14.json).
+
+
+
+<a id="source-87368a0abd79b357-h274"></a>
+<a id="record-7d41ebb9e579eadad1d27a18526b6f6c1405475d96f6ef60b964b72ec478551e"></a>
 
 ## 후속 실행 — 1~4번 우선 진행 (2026-10-14)
 
@@ -3874,6 +11632,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 **남은 검증·보완:** no_log 상관의 운영 경보 승격, 전체 고유 집계·정제 후 전송 지연 재평가, raw copytruncate와 이전 부팅 journal 회수, 과대 입력·장기 부하·전원 장애/영속 수신증, 실제 컨테이너 재생성/강제 롤백 및 사용자 채팅 장기 관찰이다. 재생성 timer는 시작 전 가드 적용을 보장하지 않으며 약5분 주기와 유휴 대기 동안 공백이 있을 수 있다. B에서 JSON decoder 필드 초과 오류를 관측했지만 원천은 미확정으로, 제한값을 임의로 올리지 않았다. 추가 도구·학습·VPN·모바일 푸시는 보류한다.
 
 **후속 반입 정리 완료(03:38 KST):** A/B 각각 최종 소스·검증 자료102개를 영구 경로에 보관하고 SHA-256을 확인했다. 서버 임시 파일 A230개/B172개와 Mac 작업 임시190개(1,538,114bytes)를 삭제하고 경로 부재를 확인했다. 병렬 작업의 별도 임시34파일·1디렉터리도 정리됐다. Mac 패키지 설치0·프로젝트 wheel/pyc 잔존0이며 서버 운영 의존성·복구 백업은 보존한다. 정리 후 B Hermes/Wazuh 실행·가드 timer/observer·승인 timer active를 확인했다.
+
+
+
+<a id="source-87368a0abd79b357-h275"></a>
+<a id="record-79d8c703afdf7f987181082037c23c332c81888483fee10f2cb82179461f2af6"></a>
 
 ## 최신 적용 — Vector·Ansible·승인 정책 유지·언어 검사 패키지 (2026-10-14)
 
@@ -3889,6 +11652,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 
 **정리 완료:** 미사용 Python40개(정제 구현/검증21·전용 테스트16·일회성 비교3)와 전용 예제1개를 삭제했다. [삭제 목록](../infra/normalization/RETIRED-2026-10-14.md) 및 [과거 성능 결과](../infra/hermes/benchmarks/README.md)는 보존한다. Mac 신규 패키지 설치0·이번 반입 임시84파일/약258MB 삭제와 A/B 임시 반입 경로 제거를 확인했다. 추후에도 같은 원칙을 적용하도록 AGENTS.md에 기록했다. 프로젝트 소스·문서와 서버 운영 의존성·복구 백업은 유지한다.
 
+
+
+<a id="source-87368a0abd79b357-h276"></a>
+<a id="record-0f3b4c0cb81346d8bb4a225c477d08b7438b93f86a0145c2aa30b64b859c7802"></a>
+
 ## 최신 검토 — 자체 Python 구현과 기존 도구 비교 (2026-10-14)
 
 사용자가 구현 진행 전에 패키지 대안을 비교하도록 요청했고, 로그 정제 외 최근 Python 문제 해결 코드까지 검토 범위를 넓혔다. **추가 구현·운영 전환보다 도구 선정이 우선**이다. 저장소 코드와 공식 자료를 대조한 설계 검토이며 이번에 SSH 라이브 재조회·패키지 설치·성능 실측·배포는 하지 않았다.
@@ -3897,6 +11665,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 
 설정 배포는 Ansible, Suricata 룰셋 관리는 suricata-update, 모델 비교는 promptfoo가 대체 후보다. 승인된 후보의 해시 결속·보호 주소 정책과 한국어 원문 보존 검사는 전용 로직이 남는다. sudoers/systemd/nftables 등 이미 활용 중인 기본 기능과 일회성 배포·검증 스크립트를 상시 Python 서비스와 구분했다. 기존 코드·과거 검증 결과는 보존하고 모바일 푸시·VPN·학습 보류도 유지한다. [상세 비교와 근거](../대화기록/2026-10-14.md#python-자체-구현과-패키지대체-비교).
 
+
+
+<a id="source-87368a0abd79b357-h277"></a>
+<a id="record-74c93912c52db90a68a60c6f408f56d9f409dac20538170c21f27bd79d235d58"></a>
+
 ## 최신 진행 — 별도 inbox 전달·수신 확인, WAF 격리 재처리 검증 (2026-10-14 00:43 KST)
 
 **2026-10-14 00:43 KST — 전달·수신 확인과 격리 재처리 분리 검증 완료.** A→B 임시 inbox에 실제 journal3건·격리 Suricata1건을 보내고, 첫 응답 유실 뒤 재전송까지 총5회 통신에서 B의 유일4행·일치 수신증4개를 확인했다. WAF 보관 원문4건은 독립 시간 근거로 재처리하여 KST를 복구했고 원래 격리 판정·원문·사건ID·체크포인트를 보존했다. 전체285회귀 통과. `durable_inbox`는 B 저장 확인이며 Wazuh 분석/색인 확인은 아니다. 기존 Wazuh 입력과 copytruncate는 유지하며 다음은 Wazuh 전달·신규 상관/시간창·재전송 및 기존 입력의 이중 집계 검증이다.
@@ -3904,6 +11677,11 @@ native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 �
 수신 응답 유실·B 프로세스 재실행·A outbox 재개방을 시험했으며 원문은 외부 전송에 포함하지 않았다. WAF 원문은 자정 회전된 `audit.log.1`에서 이전8,432bytes SHA와 일치했다. 재처리한4건은 아직 일반 파일 입력이므로 배출을 보류했다. 파일 전달은 전체 검증이 끝난 폐쇄 세대만 허용하므로 실시간 처리는 후속 설계가 필요하다.
 
 운영 설정 해시·컨테이너 ID/시작 시각은 전후 같고 별도 시험 저장소·프로세스는 정리했다. 새 패키지·계정·키·컨테이너는 설치하지 않았다. [계약·실측·남은 조건](../infra/normalization/DELIVERY.md) · [검증 집계](../infra/normalization/delivery-validation-2026-10-14.json). 아래 기록은 당시 상태다.
+
+
+
+<a id="source-87368a0abd79b357-h278"></a>
+<a id="record-69bbe47f4127c89a00a84c84e9debcc88cdb2033b456dfe79727911ee9664290"></a>
 
 ## 최신 진행 — 회전 방식·수집기 연동 분리 검증 완료 (2026-10-13 23:47 KST)
 
@@ -3914,6 +11692,11 @@ Suricata8.0.6의 rename+SIGHUP 후 새 inode 전환을 실제 설치본의 별�
 **운영 copytruncate는 유지한다.** 기존 Wazuh4.14.8 localfile의 inode 교체 경로에는 이전 FD를 끝까지 읽는 보장이 없어 단순 rename 전환만으로 기존 경보 수집을 안전하게 바꿀 수 없다. 이는 소스에서 확인한 위험이며 실제 운영 로그 유실을 관측했다는 뜻이 아니다. 다음은 **안전한 출력/전달·수신 확인과 기존 Wazuh 원천 경로 이전 검증**이다. 운영 자동 회전기·전달기는 미배포다.
 
 23:48 확인 시 운영 Nginx master/worker·Suricata PID, 컨테이너 ID/시작 시각, 확인 대상 설정 SHA와 WAF 원문은 유지됐다. 시험 프로세스·파일·스풀은 제거했다. 새 패키지·컨테이너는 설치하지 않았다. [회전 계약·결과](../infra/normalization/ROTATION.md) · [검증 집계](../infra/normalization/rotation-validation-2026-10-13.json).
+
+
+
+<a id="source-87368a0abd79b357-h279"></a>
+<a id="record-734480a43ef6324195c06be75bf34628968ce6eda5d88fb39c8f526789b36114"></a>
 
 ## 최신 진행 — 수집기 구현·분리 검증 완료, 운영 연결 보류 (2026-10-13 22:57 KST)
 
@@ -3926,6 +11709,11 @@ Suricata8.0.6의 rename+SIGHUP 후 새 inode 전환을 실제 설치본의 별�
 [수집기 계약·남은 조건](../infra/normalization/COLLECTOR.md) · [실제 검증 집계](../infra/normalization/collector-validation-2026-10-13.json). 아래 시각별 기록은 당시 상태로 보존한다.
 
 
+
+
+<a id="source-87368a0abd79b357-h280"></a>
+<a id="record-d915c699f4260f5710b1b32e1acd3018eff5e2bbd394a769f9152b6d536bf5b0"></a>
+
 ## 최신 진행 — 정제 순차 보완 2단계 완료 (2026-10-13 22:09 KST)
 
 WAF 과거4건을 동일 요청의 Nginx 접근 로그(명시적+0000)와 Docker UTC 시각에 대조해 **UTC 근거를 확인하고 KST 변환을 검증했다.** 예: 10/12 18:00:36 → 10/13 03:00:36+09:00. 현재 컨테이너 UTC라는 사실만으로 과거를 결정하지 않았다.
@@ -3935,11 +11723,21 @@ WAF 과거4건을 동일 요청의 Nginx 접근 로그(명시적+0000)와 Docker
 다음은 **3단계 수집기의 회전·체크포인트·재전송·미래 레코드 시간 근거 처리**다. 새 시간 필드의 실제 전달/상관 룰은 후속검증이다. [2단계 계약·결과](../infra/normalization/README.md) · [직접 검증 기록](../infra/normalization/waf-time-validation-2026-10-13.json).
 
 
+
+
+<a id="source-87368a0abd79b357-h281"></a>
+<a id="record-682bb994ed05c730afb0d545cf1ec62e7b7506e0982949f3d6f3926cb5943e84"></a>
+
 ## 최신 진행 — 정제 순차 보완 1단계 완료 (2026-10-13 21:47 KST)
 
 사용자가 한 번에 진행하지 말고 순차적으로 처리하도록 지시해 **WAF 중복 헤더 입력 어댑터만** 보완했다. 정확한 `transaction.response.headers.Server` 문자열 중복을 구별해 응답 헤더를 정제에서 제외하고, 다른 경로·판단 필드 중복 거절은 유지한다. 원문 바이트 해시·별도 ID 계약으로 추적 근거를 남긴다.
 
 신규17+기존62=**79개 회귀 통과**, A 실제 WAF 원문 **4/4 수용·원문 해시 일치**를 확인했다. 원문 파일·WAF 실행 상태·확인 대상 수집 설정은 불변이며 운영 수집에는 연결하지 않았다. 다음은 **2단계: 무offset 원천 시각의 시간대 근거 확인**이다. 현재 네 건의 시간대 누락 표시는 유지한다. [1단계 계약·결과](../infra/normalization/README.md#순차-보완-1단계--waf-중복-헤더-1013-2147-kst).
+
+
+
+<a id="source-87368a0abd79b357-h282"></a>
+<a id="record-9f420c7f4184592a1c11e24f880f06239fe304539933805ba8f3780c4ffabca3"></a>
 
 ## 최신 검증 — 로그 정제 운영 연결 보류 (2026-10-13 21:27 KST)
 
@@ -3948,6 +11746,11 @@ WAF 과거4건을 동일 요청의 Nginx 접근 로그(명시적+0000)와 Docker
 **WAF 원문 4건은 모두 중복 `response.headers.Server` 때문에 strict 파싱이 거절됐고, 원천 시각도 offset이 없었다.** 입력 처리 정책·원천 시간대 근거와 수집기 회전/체크포인트/재전송/부하, 신규 상관 룰·시간창·실제 전달/인덱싱 검증이 남아 운영 연결은 보류한다. 기본 디코딩 통과를 신규 상관분석 완료로 간주하지 않는다.
 
 이번에는 운영 설정·룰·서비스를 변경하지 않았다. A/B 확인 대상 설정 해시·컨테이너 ID/시작 시각이 같고, 마지막 Wazuh 큐는 0이었다. [상세 결과·남은 조건](../infra/normalization/VALIDATION-2026-10-13.md) · [모듈 안내](../infra/normalization/README.md).
+
+
+
+<a id="source-87368a0abd79b357-h283"></a>
+<a id="record-c62dc6c693991b3f0ecb4f1996fb22b8efcc1bceab60575968bcab64574bf33d"></a>
 
 ## 최신 반영 — 한국어 전송 검사 배포·로그 정제 준비 (2026-10-13 20:52 KST)
 
@@ -3960,11 +11763,21 @@ WAF 과거4건을 동일 요청의 Nginx 접근 로그(명시적+0000)와 Docker
 20:51:04 같은 Hermes 재시작→20:51:15 Mattermost 연결→20:51:17 gateway 정상. 20:52 `.111`·기존 모델/MCP 5개·DB quick_check ok·active agent/lease 0 확인, 로컬 **42개**와 설치본 가짜 HTTP/실제 교정 **10개** 검증 통과. 실제 채팅 게시 시험은 하지 않았다. 중간 설명·텍스트 스트리밍·추론 표시를 Mattermost에서 끄고 검사 후 전달한다. **컨테이너 재생성 시 재적용이 필요**하며 독립 cron은 원문 근거가 없어 한자 인용도 안내로 대체될 수 있다. [범위·한계·백업](../infra/hermes/korean-output-guard.md).
 
 
+
+
+<a id="source-87368a0abd79b357-h284"></a>
+<a id="record-2d787bc0db75b0832aa9942542e5283f439643d5165bee36af0cbaf781727a21"></a>
+
 ## 추가 검토 — Wazuh 상관분석 룰 (2026-10-13 20:04 KST 이후)
 
 Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b` → `b:wazuh-local-rules` → `propose_rule_edit`로 추가·수정할 수 있다. 현재 파일에도 Suricata·WAF·방화벽 반복 경보를 묶는 룰이 있다. 파일 SHA는 직전 라이브 조회와 일치하며 이번 확인은 코드·공식 문서 대조다.
 
 장비 간 상관분석에는 서로 다른 IP 필드·NAT·에이전트 범위를 대조하고 정상/공격 이벤트열을 재현하는 검증이 필요하다. 현재 MCP의 사전 검사는 XML 구조 중심이며 전체 엔진 검사는 승인 후 재시작 전에 수행한다. 사전 logtest 자동화나 새로운 상관 룰은 아직 배포하지 않았다. 기존 승인·권한·차단 정책을 유지하며 구체 보완 범위를 확인 중이다. [현재 룰](../infra/groot-b/local_rules.xml) · [검토·제약·다음 단계](../대화기록/2026-10-13.md).
+
+
+
+<a id="source-87368a0abd79b357-h285"></a>
+<a id="record-ebb4239b5b4729424aac0d4a6d8d6aed7072c9f8d4042b711fdf1e0445c50f50"></a>
 
 ## 최신 완료 — DGX .111 전환·두 주소 차단 보호 (2026-10-13 19:54 KST)
 
@@ -3976,6 +11789,11 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 
 아래 승인 대기·`.110` 유지 내용은 각 확인 시점의 이력이다. 이번 사용자 직접 관리 작업에도 추가 카드 승인이 반드시 필요하다고 안내한 것은 과도한 해석이었음을 정정했다. 실제 룰은 재조회 사이 들어온 정상 카드 승인으로 적용됐으며 별도 직접 적용이나 승인 상태 변경은 하지 않았다. [백업·해시·검증·정정 기록](../대화기록/2026-10-13.md).
 
+
+
+<a id="source-87368a0abd79b357-h286"></a>
+<a id="record-3875705e0cb97ba52fe3b44b37ee61f26597485119a70814e82443e1f4c09b9c"></a>
+
 ## 추가 요청 진행 — DGX .111 전환·차단 방지 (2026-10-13 19:40 KST)
 
 사용자가 공유 부하를 의심해 `.111` 전환과 해당 주소의 화이트리스트 추가를 요청했다. 공유 트래픽이 실제 지연 원인인지는 아직 확인되지 않았다. 아래 19:14 `.110` 유지 결정은 이 추가 요청 이전 상태다.
@@ -3984,6 +11802,11 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 - **Suricata 승인 대기:** 기존 `.110`의 선택6종 예외를 유지하고 `.111:11434`도 추가하는 후보가 전체 ET 구문 검사 및 기존/후보 각각27개 PCAP 사례를 통과했다. 새 부분 편집 MCP로 제안 **`d466dc53aef84540443266a3a6db786b`**를 게시했다(만료19:50:28 KST). 지정 관리자 카드 승인 전 실제 센서 룰은 기존 `.110`만 포함한다.
 - **모델 전환 준비:** `.111` `qwen3.6:35b` 접근·한국어 응답을 확인했고 URL 한 곳 변경·기존 대화 보존·동일 Hermes 재시작/실제 resolver 검증을 준비했다. 현재 운영 endpoint는 아직 `.110`이며, 예외 적용 확인 뒤 전환한다. 마지막사용 경로를 기록하는 세션 메타데이터는 일괄 덮어쓰지 않는다.
 - **코드 검증:** 고정 `.110/rev1` 또는 정확한 `[.110,.111]/rev2`만 허용하는 helper를 A/B에 배포했다. 전체 MCP175개 테스트 통과. 일반IP·대역·추가포트 허용이나 승인 경계 확대는 없다. [배포·백업·승인 상태](../대화기록/2026-10-13.md).
+
+
+
+<a id="source-87368a0abd79b357-h287"></a>
+<a id="record-dd21c69201155de17b86d75ae392762c26a6a554599b1b06cf705a5c37e4cc95"></a>
 
 ## 최신 반영 — 부분 편집 MCP 배포 완료 (2026-10-13 19:10~19:14 KST)
 
@@ -3998,6 +11821,11 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 
 [사용법·한도](../infra/mcp/README.md) · [측정 조건과 결과](../infra/hermes/benchmarks/README.md#부분편집-비교) · [배포 해시·백업·검증 기록](../대화기록/2026-10-13.md).
 
+
+
+<a id="source-87368a0abd79b357-h288"></a>
+<a id="record-8c90226cdc5217d8ad8ea7a006fdec36a8ad54041cf4133de1590ab7c7e2bf9e"></a>
+
 ## 작업 마감과 재개 지점 (2026-10-13 16:52 KST)
 
 사용자 요청으로 이번 작업은 여기서 마무리한다. 마지막 작업은 쓰기 지연 조사와 기존·보조 DGX의 후보 생성 비교이며, 아래 실측 결과와 재현 자료를 저장했다. 이 마감 시각에 서버를 다시 조회한 것은 아니다.
@@ -4007,6 +11835,16 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 - **다음 재개 지점:** 쓰기 MCP의 제한적 부분 편집 지원 설계·구현 검토. 모델이 변경 부분을 제출하고 서버가 기준 SHA를 대조해 전체 후보를 구성하도록 하되, 전체 diff 검토·관리자 승인·엔진 검사는 유지한다. 아직 구현하거나 배포하지 않았다.
 - **별도 미완료:** `.111` 운영 전환은 미실행이며 선택 시 해당 주소의 오탐 예외·검증기 정렬과 실제 채팅 경로 검증이 필요하다. 학습은 보류, SSL VPN·모바일 푸시는 추후 발전과제로 유지한다.
 - **보존 상태:** 결과 파일은 작업 폴더에 저장했고 SSH 조사용 임시 파일은 삭제했다. Mac 패키지 설치는 없으며 Git 변경 사항은 아직 커밋하지 않았다.
+
+
+
+<a id="source-87368a0abd79b357-h289"></a>
+<a id="source-87368a0abd79b357-h290"></a>
+<a id="source-87368a0abd79b357-h291"></a>
+<a id="source-87368a0abd79b357-h292"></a>
+<a id="source-87368a0abd79b357-h293"></a>
+<a id="source-87368a0abd79b357-h294"></a>
+<a id="record-3cdccade473c41bdfccedfebd317691f039a371b496b909327f9e934981ee283"></a>
 
 ## 최신 확인 (2026-10-13 KST)
 
@@ -4089,7 +11927,7 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 
 ### 운영 현황과 후속 범위
 
-**추후 발전과제 이관(10/13 사용자 결정):** 프로젝트 SSL VPN 원격접속 시나리오와 모바일 푸시 복구는 현재 완료 범위에서 제외하고 사용자가 재개를 요청할 때 진행한다. VPN은 미구축·중첩 접속 호환성 미검증이며, 학과의 폐쇄 정책으로 호환이 어려울 것이라는 판단은 사용자 예상이다. Android·iOS 로그인·채팅 성공은 기존 사용자 확인 사항이고 푸시는 `SendPushNotifications=false`·수신 미복구 상태다. 배포된 설정과 목적지 DNS 갱신 타이머는 유지하며 이번 결정에 따른 추가 라이브 점검·배포는 없다. [발전과제와 재개 조건](PLAN-history-20261101.md#추후-발전과제-2026-10-13-사용자-결정).
+**추후 발전과제 이관(10/13 사용자 결정):** 프로젝트 SSL VPN 원격접속 시나리오와 모바일 푸시 복구는 현재 완료 범위에서 제외하고 사용자가 재개를 요청할 때 진행한다. VPN은 미구축·중첩 접속 호환성 미검증이며, 학과의 폐쇄 정책으로 호환이 어려울 것이라는 판단은 사용자 예상이다. Android·iOS 로그인·채팅 성공은 기존 사용자 확인 사항이고 푸시는 `SendPushNotifications=false`·수신 미복구 상태다. 배포된 설정과 목적지 DNS 갱신 타이머는 유지하며 이번 결정에 따른 추가 라이브 점검·배포는 없다. [발전과제와 재개 조건](PLAN_HISTORY.md#source-b32ddb5c903faea1-h140).
 
 **프로젝트 망 정의(10/13 사용자 명확화):** 외부는 학과 실습망, 내부는 이미 구성된 `10.200.10.0/24` 서버망과 Docker 가상 NIC·네트워크 영역이다. Docker 가상 NIC 전체가 같은 IP 대역이라는 뜻은 아니다. 새 가상 스위치 구축을 전제로 하지 않는다. 학과망 관리자 단말→프로젝트 SSL VPN→기존 내부 서비스라는 원격근무 모의가 가능하며, 실제 인터넷/학교 상위 방화벽 접속 문제와 구별한다. VPN은 가능성 검토 단계이고 구축을 진행한 것은 아니다.
 
@@ -4146,11 +11984,21 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 > **외부 주소 확인 주의:** 10/08 SSH에서 A `ens192=192.168.16.230/25`, 직결 라우트 `192.168.16.128/25`, 기본 게이트웨이 `.129`를 재확인했다. 10/06에 확인한 A:10443 DNAT·`CAPSTONE-FWD`의 허용 출발지 `192.168.16.0/25`는 **다른 대역**이다. Kali 주소·라우팅이 미확인이므로 이 허용목록이 의도대로 작동하는지는 시나리오 전에 검증해야 한다.
 > **채팅 인증서(2026-10-08 약 16:02 KST, 라이브 배포):** `chat.grootlab.duckdns.org`에 Let's Encrypt 인증서를 적용했다. 만료 2027-01-06 15:02 KST. A 배포 스크립트의 SNI·CA 검증 ping과 Mac의 `curl` HTTP 200/TLS 검증 결과 0을 확인했다. 이번 문서 점검에서도 Mac HTTPS ping은 HTTP 200·TLS 검증 결과 0·접속 IP `192.168.16.230`으로 재확인했다. 실제 모바일 앱은 A에 도달하는 학교 내부 Wi-Fi에서 검증해야 한다. 사용자 보고로 관리자가 모바일 GlobalProtect 지원을 거절했으므로 모바일 VPN은 검증 계획에서 제외했고, 인증서 갱신은 미자동화다. [운영 기록](../infra/dns/README.md).
 
+
+
+<a id="source-87368a0abd79b357-h295"></a>
+<a id="record-a57eb1d151e1deea30d1eaa72ef40a5facbc967d4a4fab19c4587294543453df"></a>
+
 ## 로컬 학습 준비 (2026-10-08, 라이브 배포와 별개)
 
 **상태: 준비 완료·사용자 요청으로 추후 재개.** SSH로 학습 묶음을 전송하고 원격 GPU에서 학습한 뒤 결과를 Mac으로 회수하는 방식으로 정했다. 실제 전송·학습은 시작하지 않았다.
 
 사용자 요청으로 [finetuning/](../finetuning/README.md)에 30B 후보의 별도 GPU 장비용 학습 폴더를 준비했다. 기본값은 `Qwen/Qwen3-30B-A3B`·NF4 LoRA이며, 기존 `datasets/`에서 train 18,872 / validation 980 / test 932개를 정제했다. 최종 산출물은 원본 모델이 필요한 LoRA 어댑터이고 전체 모델 병합 스크립트도 포함한다. 로컬 학습·패키지 설치·모델 다운로드·서버 업로드는 하지 않았다. 실제 GPU 학습·현 35B 대비 속도/정확도 검증은 미착수다. 운영 모델은 계속 `qwen3.6:35b`다.
+
+
+
+<a id="source-87368a0abd79b357-h296"></a>
+<a id="record-2eab0064a3b19f8acab84081818ff0821b95ffc2bf54f8e7c335bd046d2da14c"></a>
 
 ## 라이브 헬스 (A/B는 2026-10-13 추가 점검, C는 10/08 기록)
 | 호스트 | 역할 | 상태 |
@@ -4167,6 +12015,11 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
 | Log4Shell 랩 경로 | 평상시 C 내부 전용 / 시나리오 때 A 경유 | ⚙️ **10/6 라이브 토글 OFF**(A:8080 시나리오 NAT/DOCKER-USER 룰 없음). `sudo scenario_log4shell_route.sh on\|off\|status`(A)로 전환하는 설계. 저장소 스크립트의 `OBS_SEG` 관찰 룰은 A 설치본에 없으므로 재배포·경로 검증이 선행돼야 한다. |
 
+
+
+<a id="source-87368a0abd79b357-h297"></a>
+<a id="record-e3ecfab927fe9fa6a0bc8e4fdcec80d97f1ff80fa8fe08e8ed3640c9bba0d412"></a>
+
 ## 완료된 것
 - **네트워크/게이트웨이**: A NAT(masquerade) + 이름 기반 A:443 프록시(대시보드·채팅), A:10443→B:443 DNAT, WAF TLS 8443. VPN은 A로 22/80/443만 통과.
 - **A 보안장비**: FW v2의 FORWARD 기본 차단, WAF 신규 룰 마운트(DetectionOnly), Suricata ET+local 합본·Phase-A(passive) 적용을 SSH 재확인. B에 인덱싱된 Suricata 로컬 SID `1000010` 경보 1종과 CRS `920350` 경보 1종을 읽기 전용 조회로 확인했다. 다른 신규 룰 및 시나리오별 발화는 미검증이다.
@@ -4179,6 +12032,11 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 - **승인형 룰 변경 MCP**(A/B, 2026-10-08 약 12:58 KST): B 브로커에 별도 룰 승인 API를 배포하고 A/B에 `rulechg` 강제 명령·root helper·worker timer를 설치했다. Hermes에 `rule-a`·`rule-b`를 추가하면서 기존 읽기·응답 MCP 서버를 유지했다. HMAC health와 세 로컬 룰 대상의 읽기 조회가 통과했고 운영 룰 해시는 배포 전후 동일했다. 실제 Mattermost 버튼 승인→룰 적용은 아직 검증하지 않았다.
 - **문서**: `scenarios/`(탐지 검증 매트릭스 + 공개 표준 레퍼런스), infra README(A/B/C/MCP).
 
+
+
+<a id="source-87368a0abd79b357-h298"></a>
+<a id="record-fa7dcc3af1f11b7dd796fc8822057071bb72e98c52b2771f6c70e82cf7a0f3bc"></a>
+
 ## 접속 치트시트 (Mac, ssh config 등록됨)
 - SIEM 대시보드: **`https://wazuh.groot.lab`**(A:443 프록시; 학과망·VM세그먼트만, VPN·외부 403). VM세그먼트 직결이면 `https://192.168.16.230:10443` 도 가능. (admin, 비번 CREDENTIALS)
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
@@ -4189,9 +12047,14 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 - 읽기 MCP: 기존 Wazuh `ssh -T groot-mcp`, Suricata·ModSecurity 경보 `ssh -T groot-mcp security-events` · 응답 MCP: `ssh -T groot-resp`. 10/06 읽기 도구 2개의 LLM 호출을 확인했다. 10/08 룰 변경 전용 `rule-a`·`rule-b`를 추가해 Hermes에 총 5개 서버를 등록했고, 룰 대상의 읽기 조회를 확인했다.
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 
+
+
+<a id="source-87368a0abd79b357-h299"></a>
+<a id="record-bc46898fa7cc455df457a895ab8427ba5dc0ecdba9bab8589700f84cf4d446cb"></a>
+
 ## 보류 / 다음
 - **10/13 오탐 조치 후속:** 커스텀 네 SID와 ET 두 SID의 좁은 예외가 모두 승인·적용됐다. payload 부재로 실제 본문 매칭 원인은 미확정이며 API 흐름 상관관계와 합성 회귀 검증에 근거했다. 적용 후 새 LLM 요청에서 여섯 SID의 재발과 다른 흐름의 탐지·큐를 관찰한다. IP 전체/ET 전체 허용은 하지 않았고, 앞으로 ET 원본을 갱신하면 두 override를 새 원본에 맞춰 재생성·검증해야 한다. 큐 삭제·학습 재개는 하지 않았다.
-- **추후 발전과제:** SSL VPN 원격접속과 모바일 푸시는 위 10/13 사용자 결정에 따라 현재 완료 범위에서 제외했다. 추가 조사·구축·활성화·수신 시험은 사용자 재개 요청 후 진행하며 미완료 상태를 유지한다. 모바일 GlobalProtect는 기존 지원 거절·실패 보고에 따라 경로에서 제외한다. [발전과제와 재개 조건](PLAN-history-20261101.md#추후-발전과제-2026-10-13-사용자-결정).
+- **추후 발전과제:** SSL VPN 원격접속과 모바일 푸시는 위 10/13 사용자 결정에 따라 현재 완료 범위에서 제외했다. 추가 조사·구축·활성화·수신 시험은 사용자 재개 요청 후 진행하며 미완료 상태를 유지한다. 모바일 GlobalProtect는 기존 지원 거절·실패 보고에 따라 경로에서 제외한다. [발전과제와 재개 조건](PLAN_HISTORY.md#source-b32ddb5c903faea1-h140).
 - **채팅 인증서 운영:** 10/13 사용자 확인으로 Android·iOS 인증서 인식·로그인·채팅은 성공했다. 채팅 인증서 갱신 관리는 모바일 푸시 이관과 별개로 유지하며 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
 - **다음 작업·검증**: B 라이브 룰 파일에 없는 신규 FW(`SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`)·WAF(`GROOT_A/*` 100200–299) 디코더·룰을 추가하고 IPS local SID 1000xxx의 나머지 분류도 확인. SID `1000010`→Wazuh `100110`은 이미 관측했다. 이어 VM 세그먼트 공격 프로브로 WAF audit·IPS eve·FW 로그→Wazuh alerts 실발화를 시나리오별로 검증.
 - **별도 전환**: WAF `On`과 IPS 인라인 drop은 아직 적용하지 않았다. 탐지 검증 후 차단 게이트와 평가 범위를 결정. Log4Shell egress 관찰용 `OBS_SEG` 룰은 저장소에만 있고 A 설치본에는 없다.
@@ -4203,6 +12066,12 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 - **HITL 채널**: 온프레미스 Mattermost(B)와 Tier 2 [승인][거부] 버튼의 차단 E2E는 2026-09-28 실측이다. 2026-10-08 라이브 SSH에서 A의 브로커 URL·토큰, B의 브로커 토큰·허용 승인자 목록이 비어 있지 않음을 값 출력 없이 확인했다. A→B `GET /pending`은 HTTP 200(대기 0건)이었다. 오늘 승인 카드→클릭→차단 E2E는 재시험하지 않았다.
 - **주의**: 공격성 테스트 트래픽은 캠퍼스 VPN 경유 금지(캠퍼스 FW가 차단). `never_block`에 관리 VPN 대역(192.168.15.0/24) 포함 — VPN 대역 바뀌면 갱신.
 
+
+
+<a id="source-87368a0abd79b357-h300"></a>
+<a id="source-87368a0abd79b357-h301"></a>
+<a id="record-d8b376fd1b6b971ef6a6bf2bf454da02abd917a3e539e8b9268bab21882aa887"></a>
+
 ## 저장소 동기화 주의
 - 10/6 라이브 적용 사실은 작업 기록에 있으나 저장소의 일부 배포 설정은 적용 전 상태일 수 있다. 배포 재실행 전 라이브와 비교해야 한다.
 - 추적 문서 `로그_파이프라인.md`에서 발견한 평문 자격증명은 현재 작업 파일에서 제거하고 gitignored `CREDENTIALS.local.md` 참조로 바꿨다. 과거 Git 이력·이전 도구 출력에는 노출 흔적이 남아 있어 자격증명 교체와 이력 처리 범위를 별도로 결정해야 한다. 값은 문서에 옮기지 않는다.
@@ -4213,9 +12082,19 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 공개35파일 커밋 `fda3858f11192f9ea85a5bf582e7bc13b077e54a`를 프로젝트 자격 파일의 고유 토큰/해당 Git 프로세스 환경만 사용해 origin/main에 푸시했고 2026-10-29T16:51:13.548491+09:00 실제 원격과 일치를 확인했다. 인증 helper/캐시·HTTP 상세 추적은 사용하지 않았다. 이 영수증은 후속 커밋으로 게시하며 최종 SHA/트리는 로컬 세션에 남긴다. FW 완료·학습 r7 실패 후 자동복구/재현성 진단 중이라는 범위는 그대로다.
 
 
+
+
+<a id="source-87368a0abd79b357-h302"></a>
+<a id="record-04a77d1377a7d2abb0b4f3a76d4780495b3ec9fab3aff3694b789c8a2edaa658"></a>
+
 ## 11/1 21:23 DGX 관측 보존 — 11/2 종료 연장 전
 
 아래는 연장 전 과거 관측이다. 현재 실행은 [STATUS](../STATUS.md)와 [11/2 연장 원장](../finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json)을 따른다.
+
+
+
+<a id="source-87368a0abd79b357-h303"></a>
+<a id="record-c0b2ee3a55e7da059ca58195b7daacaaa947515177db93fcfcb1821b193d90c7"></a>
 
 ## 현재 진행
 
@@ -4231,6 +12110,14 @@ Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b
 실행 설정·제어: [본학습 원장](../finetuning/OPERATOR_TRAINING_RUN_20261101.json), [준비·재개·중지 절차](../finetuning/OPERATOR_PREPARATION.md). Mac/SSH와 독립된 제어기가 대기를 유지한다. 마지막 학습 프로세스의 CUDA OOM/할당 재시도0을 확인했으며 공유 서비스·학습 입력·소스·체크포인트·종료 기한은 변경하지 않았다.
 
 
+
+
+<a id="source-87368a0abd79b357-h304"></a>
+<a id="record-e39d873edb4d3445bf441926d3eb696c185dbdceb9681c0323f67d664997eae9"></a>
+
 ## 11/2 13:53까지 Git 게시 확인 — 현황에서 이관
 
 보고/증거 읽기 보완 `bb74294`와 운영 도식·현황 `3468354`를 커밋·푸시하고13:17 KST 실제 원격main 일치·당시clean을 확인했다. 후속 화살표·배치 정리와 Kali 차단 정책 유지 기록도 `beee0af`로 커밋·푸시하고 실제 원격main 일치·당시clean을 확인했다. 게시 확인 문구 `e57e521`도 원격main 일치 확인했다. 직각 경로 정리·반복 복구 알림 조사도 `08b95a3`로 커밋·푸시하고 원격main 일치·당시clean을 확인했다. 게시 확인 `e43683e`까지 원격main 일치를 확인했다. 독립 진단 집계/실패 원인 보완·공격 결과 재분류·Kali 만료 후 정리도 `ec5a719`로 커밋·푸시하고13:53 KST 실제 원격main 일치를 확인했다. 포스터 이름의 파일/디렉터리는 다른 위치에서도 Git 제외한다. 별도 작업의 topology 신규 소스/SVG2개는 수정·추적하지 않았으며 작업 트리 전체가 clean인 상태는 아니다. 이 게시 확인 문구도 후속 커밋·푸시한다. 마지막 SHA·원격 일치·작업 트리와 임시 정리는 로컬 세션에 남긴다. 대화·검증·자격·업무분담은 로컬 전용으로 유지한다.
+
+
+</details>

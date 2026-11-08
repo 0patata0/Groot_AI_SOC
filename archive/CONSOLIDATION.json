@@ -1,0 +1,1231 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-08T12:14:23.662830+09:00",
+  "original_commit": "dbbe7ef1838fa87d8de7f340bb7e02be9e292266",
+  "method": "H2 sections deduplicated only when content is identical after link relocation. All original text, dates, failures and corrections verified; original bytes remain in Git.",
+  "books": {
+    "STATUS_HISTORY.md": {
+      "sha256": "1c4d183a3fbab510bfd749044f913cacea551fc21039453a890be099e00adff6",
+      "bytes": 1829104,
+      "sources": 83,
+      "sections": 715,
+      "unique_sections": 621
+    },
+    "PLAN_HISTORY.md": {
+      "sha256": "bed1b38523830c0ea7af04baf82519da782018d19f8a7b313dd98e653fd6fb3f",
+      "bytes": 702873,
+      "sources": 51,
+      "sections": 466,
+      "unique_sections": 312
+    },
+    "DEPLOYMENT_HISTORY.md": {
+      "sha256": "5130e2f63a7c3c0d41e3c15af54c95d75c43c57f4b1ebf4833276d3c0f36adb0",
+      "bytes": 184663,
+      "sources": 6,
+      "sections": 44,
+      "unique_sections": 44
+    },
+    "DESIGN_ALTERNATIVES.md": {
+      "sha256": "f9822a1362da7b724df59aa370f449ed1f65a94534e68f61dc77d0820a0fbda0",
+      "bytes": 26384,
+      "sources": 3,
+      "sections": 24,
+      "unique_sections": 24
+    },
+    "DIAGNOSTIC_HISTORY.md": {
+      "sha256": "53c3a2a5ab841762b5801bb9c364440b71d9562858647bce85f617ade2bb3a3c",
+      "bytes": 13973,
+      "sources": 2,
+      "sections": 8,
+      "unique_sections": 8
+    }
+  },
+  "external_links": [
+    "PLAN.md",
+    "STATUS.md",
+    "archive/REPOSITORY_CLEANUP.md",
+    "deployment/INSTALLER_READINESS.md",
+    "deployment/README.md",
+    "deployment/bootstrap-guide.md",
+    "deployment/configuration-guide.md",
+    "deployment/verify-troubleshoot.md",
+    "infra/README.md",
+    "infra/diagrams/history-20261008.md",
+    "infra/groot-c/offline-labs/README.md",
+    "infra/hermes/diagnostic-navigation.md",
+    "infra/hermes/short-read.md",
+    "infra/validation/pcap-web/README.md",
+    "simulation_report.md",
+    "suggestion_review.md"
+  ],
+  "sources": {
+    "archive/STATUS-before-evidence-guardrails-20261108.md": {
+      "path": "archive/STATUS-before-evidence-guardrails-20261108.md",
+      "sha256": "723949c94fdde64eb517629952230cceb731a400dd904eeca23a25bb20ebb342",
+      "bytes": 12661,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-fa8974b97371746e",
+      "git_commit_kst": "2026-11-08T11:07:45+09:00"
+    },
+    "archive/STATUS-before-journal-rollout-20261108.md": {
+      "path": "archive/STATUS-before-journal-rollout-20261108.md",
+      "sha256": "f329e02119c0133b46214a928cd307142a68e343b4bbd2b34067814f94ff8d58",
+      "bytes": 15403,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-56d0c711ab2eddc4",
+      "git_commit_kst": "2026-11-08T04:17:35+09:00"
+    },
+    "archive/STATUS-before-report-guards-20261107.md": {
+      "path": "archive/STATUS-before-report-guards-20261107.md",
+      "sha256": "2794138321f5bfa08436b82ae90a1afaefac4ce0852f023c9d9923bd4f2b6503",
+      "bytes": 13276,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-f13eab275822f266",
+      "git_commit_kst": "2026-11-07T23:22:30+09:00"
+    },
+    "archive/STATUS-before-trained-trial-20261107.md": {
+      "path": "archive/STATUS-before-trained-trial-20261107.md",
+      "sha256": "deaa899422e34e0ba54c9bfe3d88de0298af207663976611aa82da162834bf07",
+      "bytes": 9306,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-f4faba4634d4a845",
+      "git_commit_kst": "2026-11-07T16:13:44+09:00"
+    },
+    "archive/STATUS-before-threshold-read-20261107.md": {
+      "path": "archive/STATUS-before-threshold-read-20261107.md",
+      "sha256": "a05c48359db42dcf734446a5146a058f2f676c58f87004d1c72fb5b43be43ea2",
+      "bytes": 8917,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-4469cd7a492e918d",
+      "git_commit_kst": "2026-11-07T14:49:48+09:00"
+    },
+    "archive/STATUS-before-ids-method-20261107.md": {
+      "path": "archive/STATUS-before-ids-method-20261107.md",
+      "sha256": "84a3c260ce045d74e8a118df38c03edad2b4c9cdc3adaabaa9edfa63a80b42cb",
+      "bytes": 8992,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2d645dfe728c28f4",
+      "git_commit_kst": "2026-11-07T14:15:58+09:00"
+    },
+    "archive/STATUS-before-current-scope-20261107.md": {
+      "path": "archive/STATUS-before-current-scope-20261107.md",
+      "sha256": "e4b0a385ae15ad95ead25fb25263adcc3d37997a4570fea625b51887b8a2a789",
+      "bytes": 8067,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-03db4ffc7fe5ff4e",
+      "git_commit_kst": "2026-11-07T11:35:09+09:00"
+    },
+    "archive/STATUS-before-service-properties-20261107.md": {
+      "path": "archive/STATUS-before-service-properties-20261107.md",
+      "sha256": "ec167f7bc4523649f11756493ccec81285babbbff65ec194e29a911859f936f2",
+      "bytes": 8678,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-11c0fa69e377889c",
+      "git_commit_kst": "2026-11-07T10:52:03+09:00"
+    },
+    "archive/STATUS-before-service-audit-20261107.md": {
+      "path": "archive/STATUS-before-service-audit-20261107.md",
+      "sha256": "95d22033c6cd4989caee0014eeb6de689f9f1c177695b1ff5cc5b464ac8a2db3",
+      "bytes": 8336,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-13885056bb40d264",
+      "git_commit_kst": "2026-11-07T10:21:47+09:00"
+    },
+    "archive/STATUS-before-feedback-20261107.md": {
+      "path": "archive/STATUS-before-feedback-20261107.md",
+      "sha256": "8eb957a58636510ca5ef68cf76c01b461cd142b555b0f8f60952517b3149b734",
+      "bytes": 8565,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2fe80c609495c562",
+      "git_commit_kst": "2026-11-07T09:53:43+09:00"
+    },
+    "archive/STATUS-before-resume-20261107.md": {
+      "path": "archive/STATUS-before-resume-20261107.md",
+      "sha256": "a80c12a1f0260dc00775f69f9cb7e5a8423a10792be6d7eace0e1b76ee8faf4d",
+      "bytes": 7680,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-e5bd26f83fd0ff5e",
+      "git_commit_kst": "2026-11-07T09:32:11+09:00"
+    },
+    "archive/STATUS-before-calendar-20261107.md": {
+      "path": "archive/STATUS-before-calendar-20261107.md",
+      "sha256": "bb49310e423dc9052762cad594c91fbbae806f6a048b8c40224e77b4b4f2cbd1",
+      "bytes": 7567,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-f9e96c6210e55d5a",
+      "git_commit_kst": "2026-11-07T04:58:55+09:00"
+    },
+    "archive/STATUS-before-runtime-clock-20261107.md": {
+      "path": "archive/STATUS-before-runtime-clock-20261107.md",
+      "sha256": "66a872619d033334e0276f0e9d5c120dfd24ab8beb2e1a44e0e86def488248e2",
+      "bytes": 7876,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-6315596a4cf4e319",
+      "git_commit_kst": "2026-11-07T04:29:30+09:00"
+    },
+    "archive/STATUS-before-pipeline-20261107.md": {
+      "path": "archive/STATUS-before-pipeline-20261107.md",
+      "sha256": "ae28af97117ed09a2ece66d1002da4e067c13a30679b63f8ff0d9a73404adc87",
+      "bytes": 8112,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-8e4786f63f6ceded",
+      "git_commit_kst": "2026-11-07T04:11:07+09:00"
+    },
+    "archive/STATUS-before-service-report-20261107.md": {
+      "path": "archive/STATUS-before-service-report-20261107.md",
+      "sha256": "34a3a98c37a71e4f52b869f6f9682c2aec55402eb65e0f0a284d82518752e556",
+      "bytes": 7156,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-ef8860920cc8c49f",
+      "git_commit_kst": "2026-11-07T03:00:24+09:00"
+    },
+    "archive/STATUS-before-service-semantics-20261107.md": {
+      "path": "archive/STATUS-before-service-semantics-20261107.md",
+      "sha256": "0b70c3221707ea89be8669a613d795f9e44b7592daa67c998cb0a1e27a712d46",
+      "bytes": 7021,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-af8d2c2f27331fdf",
+      "git_commit_kst": "2026-11-07T00:42:48+09:00"
+    },
+    "archive/STATUS-before-service-history-20261106.md": {
+      "path": "archive/STATUS-before-service-history-20261106.md",
+      "sha256": "f21189aecaff3e53b344788703e413b70d9a04999a36e5d2b8929948149eb768",
+      "bytes": 6948,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-1233d8b203cd8eb8",
+      "git_commit_kst": "2026-11-06T23:59:16+09:00"
+    },
+    "archive/STATUS-before-diagnostic-navigation-20261106.md": {
+      "path": "archive/STATUS-before-diagnostic-navigation-20261106.md",
+      "sha256": "a097c9e31f26f0d4007039b981868d1aa4b7bcb3de8b3ea369bee8e35a7418ae",
+      "bytes": 7390,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-f0feb692e888e61d",
+      "git_commit_kst": "2026-11-06T23:04:38+09:00"
+    },
+    "archive/STATUS-before-systemd-comparison-20261106.md": {
+      "path": "archive/STATUS-before-systemd-comparison-20261106.md",
+      "sha256": "38291da6d3aa6fc7abf98403e402b343d47d8923d93540f943ced5e67789a16c",
+      "bytes": 7047,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a6347e4a2e1e65bd",
+      "git_commit_kst": "2026-11-06T22:40:01+09:00"
+    },
+    "archive/STATUS-before-event-view-20261106.md": {
+      "path": "archive/STATUS-before-event-view-20261106.md",
+      "sha256": "e311cd7664f09229f7c4d27afb66f6834e3eb1d33f8e336c28c390981c6c2c79",
+      "bytes": 7202,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-0cd09f27eb93c1d9",
+      "git_commit_kst": "2026-11-06T21:42:22+09:00"
+    },
+    "archive/STATUS-before-chat-report-20261106.md": {
+      "path": "archive/STATUS-before-chat-report-20261106.md",
+      "sha256": "0898055d4336effb1e1ecdaf51d9d6a527b7fd1d9651a12d64da2fac4a17a2fb",
+      "bytes": 7445,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-8c103bea13856efc",
+      "git_commit_kst": "2026-11-06T21:16:06+09:00"
+    },
+    "archive/STATUS-before-chat-scope-20261106.md": {
+      "path": "archive/STATUS-before-chat-scope-20261106.md",
+      "sha256": "0de839c82ccbe6682458e575f14cde935b0594fc82ecb947cbf5401d019003fe",
+      "bytes": 8601,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-9a18aa4d0dbec5b4",
+      "git_commit_kst": "2026-11-06T20:33:58+09:00"
+    },
+    "archive/STATUS-before-chat-latency-20261106.md": {
+      "path": "archive/STATUS-before-chat-latency-20261106.md",
+      "sha256": "c32db491e7ebd063bb9a522552b23244dd572e9dfa58507f92a573b4af2205fd",
+      "bytes": 6921,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2e3dff554929067d",
+      "git_commit_kst": "2026-11-06T18:51:46+09:00"
+    },
+    "archive/STATUS-before-review-execution-20261106.md": {
+      "path": "archive/STATUS-before-review-execution-20261106.md",
+      "sha256": "0d7dd806a66ed49e6dbb8e3105b1711d0301825182615e7ba4cc8aecc4552c74",
+      "bytes": 7501,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-361550c8afc0e994",
+      "git_commit_kst": "2026-11-06T17:30:21+09:00"
+    },
+    "archive/STATUS-before-controller-contention-20261106.md": {
+      "path": "archive/STATUS-before-controller-contention-20261106.md",
+      "sha256": "67c3bf5776fe02d50e8f6af158cf5617f30e7f47ce83d416ac38c74c9df78a24",
+      "bytes": 6766,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-b016ec30d558b604",
+      "git_commit_kst": "2026-11-06T16:43:36+09:00"
+    },
+    "archive/STATUS-before-observation-scope-20261106.md": {
+      "path": "archive/STATUS-before-observation-scope-20261106.md",
+      "sha256": "425e6fb42e0bc4cb7e92db1bd497447ab148d2d1b33894a124a2c0fd59162d1c",
+      "bytes": 6912,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-ebfa7513628adfd3",
+      "git_commit_kst": "2026-11-06T16:17:47+09:00"
+    },
+    "archive/STATUS-before-status-scope-20261106.md": {
+      "path": "archive/STATUS-before-status-scope-20261106.md",
+      "sha256": "0843156282cf8c7919be4f0bf804ee257d29d2b97b3d3d0ac7d9b668a8928a4a",
+      "bytes": 6832,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-636e864e6d556704",
+      "git_commit_kst": "2026-11-06T15:53:38+09:00"
+    },
+    "archive/STATUS-before-bundle-integration-20261106.md": {
+      "path": "archive/STATUS-before-bundle-integration-20261106.md",
+      "sha256": "cbff72a5ad634d0003d19f88fb21d66df080ad747122b1476f534897e6103fed",
+      "bytes": 6998,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-3a995fd08a9ea9a6",
+      "git_commit_kst": "2026-11-06T15:08:36+09:00"
+    },
+    "archive/STATUS-before-incident-bundle-20261106.md": {
+      "path": "archive/STATUS-before-incident-bundle-20261106.md",
+      "sha256": "b670b307bfe42ad9cc64335165afca8d1e8a5c849e781254a205472cd6cd0ad8",
+      "bytes": 7219,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-7da751b04634e30c",
+      "git_commit_kst": "2026-11-06T14:12:46+09:00"
+    },
+    "archive/STATUS-before-health-claims-20261106.md": {
+      "path": "archive/STATUS-before-health-claims-20261106.md",
+      "sha256": "91eca1d42a3da3fc5af8d986d3cdd1918b33c99b3f34e9a19e7ceffa444c8260",
+      "bytes": 7000,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-17c2cec7702ab8ff",
+      "git_commit_kst": "2026-11-06T13:41:06+09:00"
+    },
+    "archive/STATUS-before-report-input-audit-20261106.md": {
+      "path": "archive/STATUS-before-report-input-audit-20261106.md",
+      "sha256": "bda31b675f69a674c6cc49b2b401d5a3f5267e0cd8e33d7435122cbde5ce071f",
+      "bytes": 6862,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-655dd5ebf759089c",
+      "git_commit_kst": "2026-11-06T12:59:26+09:00"
+    },
+    "archive/STATUS-before-read-ledger-20261106.md": {
+      "path": "archive/STATUS-before-read-ledger-20261106.md",
+      "sha256": "86f98a1a9849b795dff9b9c9609ed1ba56a1a37932cf8f532d34111f768e8aca",
+      "bytes": 7016,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-241c17b126f0f67d",
+      "git_commit_kst": "2026-11-06T12:28:48+09:00"
+    },
+    "archive/STATUS-before-request-scope-20261106.md": {
+      "path": "archive/STATUS-before-request-scope-20261106.md",
+      "sha256": "1bb1ef30f0838de0995919a2da951980490525a3285130720902c66af69566fd",
+      "bytes": 6896,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-4c9b48cff99b2302",
+      "git_commit_kst": "2026-11-06T11:39:31+09:00"
+    },
+    "archive/STATUS-before-journal-history-20261106.md": {
+      "path": "archive/STATUS-before-journal-history-20261106.md",
+      "sha256": "b8b5c001b8431198a61f45be4639ffdf4e749a78e15e2a1836f2a8ea11bb0ad5",
+      "bytes": 7038,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a8a0f12ef0526826",
+      "git_commit_kst": "2026-11-06T10:57:09+09:00"
+    },
+    "archive/STATUS-before-review-startup-20261106.md": {
+      "path": "archive/STATUS-before-review-startup-20261106.md",
+      "sha256": "013c504b7dc49d9af1671ae82dced1e3661a1884b1249872ae421347e12a5f79",
+      "bytes": 7337,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-9dfb993f2737d8a4",
+      "git_commit_kst": "2026-11-06T10:18:18+09:00"
+    },
+    "archive/STATUS-before-review-payload-20261106.md": {
+      "path": "archive/STATUS-before-review-payload-20261106.md",
+      "sha256": "fa69efaa70ec7875e0c33ba021d3088a4fe91da828b44bd1f8dab66bc2b2311d",
+      "bytes": 7582,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-66c76947289ed40f",
+      "git_commit_kst": "2026-11-06T09:55:30+09:00"
+    },
+    "archive/STATUS-before-auto-review-20261106.md": {
+      "path": "archive/STATUS-before-auto-review-20261106.md",
+      "sha256": "be694bd002f8bc2c272825689caea6d46edda9ed2de90bfce87378ad9b7ec610",
+      "bytes": 7349,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2c2e913c2257a2b7",
+      "git_commit_kst": "2026-11-06T09:13:26+09:00"
+    },
+    "archive/STATUS-before-review-input-20261106.md": {
+      "path": "archive/STATUS-before-review-input-20261106.md",
+      "sha256": "5edf03c335add8880c2f4b8812e0cd1a5228c0aa7c35131e77b195acf671e2c8",
+      "bytes": 7405,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-0ca2531003046a01",
+      "git_commit_kst": "2026-11-06T03:06:08+09:00"
+    },
+    "archive/STATUS-before-report-feedback-20261106.md": {
+      "path": "archive/STATUS-before-report-feedback-20261106.md",
+      "sha256": "99dd86070364e2985f702718cab633aede12c8b8ad12145a969a1190ddbc0ee1",
+      "bytes": 6938,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-39ab133ee97aa859",
+      "git_commit_kst": "2026-11-06T02:01:20+09:00"
+    },
+    "archive/STATUS-before-review-scope-20261106.md": {
+      "path": "archive/STATUS-before-review-scope-20261106.md",
+      "sha256": "30a5eeb6dec3afe07aa71a5133488f8a6ea0a6b5e3239ee4190a9db704f57287",
+      "bytes": 6902,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-ef4b3ab1f7472a16",
+      "git_commit_kst": "2026-11-06T01:16:05+09:00"
+    },
+    "archive/STATUS-before-case-latency-20261105.md": {
+      "path": "archive/STATUS-before-case-latency-20261105.md",
+      "sha256": "b0fa4648cce8836f6a306c011f6a6bc61982db8eedabfee4f9c52bf520a52d70",
+      "bytes": 13670,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-973ac9b921fc9e44",
+      "git_commit_kst": "2026-11-05T23:29:33+09:00"
+    },
+    "archive/STATUS-before-web-traffic-20261105.md": {
+      "path": "archive/STATUS-before-web-traffic-20261105.md",
+      "sha256": "903f2655e252e847b611b073ef142fb3ade0c4291883720d2ece939a08951a02",
+      "bytes": 12134,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2eed133035d046a5",
+      "git_commit_kst": "2026-11-05T21:15:20+09:00"
+    },
+    "archive/STATUS-before-fw-ipv4-20261105.md": {
+      "path": "archive/STATUS-before-fw-ipv4-20261105.md",
+      "sha256": "beccfce2e4fda900054fc59e7f0c1924571aa316be9f07c995e47270be382dee",
+      "bytes": 12157,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a9e919ef9bcccb6a",
+      "git_commit_kst": "2026-11-05T19:38:30+09:00"
+    },
+    "archive/STATUS-before-dns-systemd-fw-20261105.md": {
+      "path": "archive/STATUS-before-dns-systemd-fw-20261105.md",
+      "sha256": "c7287494066fcde21ad2d19b0a25fe7f773f285fdac412d88a7eb2b9951ad4f3",
+      "bytes": 11171,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-c3d845577da14b6b",
+      "git_commit_kst": "2026-11-05T18:23:27+09:00"
+    },
+    "archive/STATUS-before-native-read-20261105.md": {
+      "path": "archive/STATUS-before-native-read-20261105.md",
+      "sha256": "906d1b667211f95c0cf9a4abfc66a336c802899894fd3aa2f012eb953b25f392",
+      "bytes": 11093,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-1b9c31a3c5f672e1",
+      "git_commit_kst": "2026-11-05T15:44:06+09:00"
+    },
+    "archive/STATUS-before-ids-impact-20261105.md": {
+      "path": "archive/STATUS-before-ids-impact-20261105.md",
+      "sha256": "264d3579b5350f8bb3e8a52049f49fea59a0e5f015bac7d4231cbfe1f8cf9a93",
+      "bytes": 9663,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a46b84acb3860404",
+      "git_commit_kst": "2026-11-05T15:07:46+09:00"
+    },
+    "archive/STATUS-before-shared-status-20261105.md": {
+      "path": "archive/STATUS-before-shared-status-20261105.md",
+      "sha256": "c3684c5815225913e0a3c1a41850dd36efd4adfefbd0a0f28443a0544100a824",
+      "bytes": 8982,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-d9c898c7ced5c0f5",
+      "git_commit_kst": "2026-11-05T13:45:57+09:00"
+    },
+    "archive/STATUS-before-additional-pcap-20261105.md": {
+      "path": "archive/STATUS-before-additional-pcap-20261105.md",
+      "sha256": "d7fc2aee04e09d5f7f601f28b47ba5c5c769f8d36639ec9dd1369e6164d7983f",
+      "bytes": 9323,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a124a369d785496c",
+      "git_commit_kst": "2026-11-05T13:10:05+09:00"
+    },
+    "archive/STATUS-before-web-history-20261105.md": {
+      "path": "archive/STATUS-before-web-history-20261105.md",
+      "sha256": "b19971bf31858fcade2ea80b87ec2851f99755e0f6557b3d6e451e5c3b079a1b",
+      "bytes": 8396,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-8a970f82c2248b8e",
+      "git_commit_kst": "2026-11-05T12:12:24+09:00"
+    },
+    "archive/STATUS-before-impact-navigation-20261105.md": {
+      "path": "archive/STATUS-before-impact-navigation-20261105.md",
+      "sha256": "95d23817b056142150f967e0aa911889f790c0bdacf71b05967781f3186706be",
+      "bytes": 21362,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-c1f4d4fa768ddb0f",
+      "git_commit_kst": "2026-11-05T11:41:54+09:00"
+    },
+    "archive/STATUS-before-required-scope-20261105.md": {
+      "path": "archive/STATUS-before-required-scope-20261105.md",
+      "sha256": "2f97257866e018c770f49a3523b50f03671934e8d5756a79b8dabb480b28ffef",
+      "bytes": 20564,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-1d85f846d75131ad",
+      "git_commit_kst": "2026-11-05T10:43:33+09:00"
+    },
+    "archive/STATUS-before-dns-report-20261105.md": {
+      "path": "archive/STATUS-before-dns-report-20261105.md",
+      "sha256": "f98eae333e2dfaa06c6b68a7fecdec940fecae60fad25807ab01af013d345db2",
+      "bytes": 17343,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-c174690bb173e547",
+      "git_commit_kst": "2026-11-05T10:18:13+09:00"
+    },
+    "archive/STATUS-before-workflow-skills-20261105.md": {
+      "path": "archive/STATUS-before-workflow-skills-20261105.md",
+      "sha256": "032b9b194e39a8087e8f49fb4fe995afd40cfb151b81c781c364a317e39d69b6",
+      "bytes": 16148,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-53fb9b60b63424fb",
+      "git_commit_kst": "2026-11-05T09:16:28+09:00"
+    },
+    "archive/STATUS-before-mcp-input-20261105.md": {
+      "path": "archive/STATUS-before-mcp-input-20261105.md",
+      "sha256": "35b25d02131b2aed607c8baf6bfab55a36383f8eee4c1648366f614d311ae66f",
+      "bytes": 15763,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a08bb8743d75fdcc",
+      "git_commit_kst": "2026-11-05T01:26:44+09:00"
+    },
+    "archive/STATUS-before-incident-parity-20261105.md": {
+      "path": "archive/STATUS-before-incident-parity-20261105.md",
+      "sha256": "704956af97dbcbb1a5267a441fb334cadd8f29929e5ecefa6521d49a71432efb",
+      "bytes": 15297,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2b029d3bd8b6e503",
+      "git_commit_kst": "2026-11-05T00:54:21+09:00"
+    },
+    "archive/STATUS-before-web-evidence-20261104.md": {
+      "path": "archive/STATUS-before-web-evidence-20261104.md",
+      "sha256": "9a66b9e733c88b96ceee8cfddcb6f9ee933f56db786780192df5ca55f3dc419b",
+      "bytes": 14686,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-564ef9348753a096",
+      "git_commit_kst": "2026-11-04T23:56:05+09:00"
+    },
+    "archive/STATUS-before-incident-impact-20261104.md": {
+      "path": "archive/STATUS-before-incident-impact-20261104.md",
+      "sha256": "60a0f5205ed3bfd408a44675d353cf57fa4990e43c73eb70a70eb304e57603a8",
+      "bytes": 14116,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-0b6995be4d8a9630",
+      "git_commit_kst": "2026-11-04T22:11:41+09:00"
+    },
+    "archive/STATUS-before-gate-binding-20261104.md": {
+      "path": "archive/STATUS-before-gate-binding-20261104.md",
+      "sha256": "82a372176eac67594943870a6c2c215ffe96d35e856c77d1483a5d5fa31e14ca",
+      "bytes": 13670,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-bc99faa0a43f26a3",
+      "git_commit_kst": "2026-11-04T21:14:01+09:00"
+    },
+    "archive/STATUS-before-incident-review-20261104.md": {
+      "path": "archive/STATUS-before-incident-review-20261104.md",
+      "sha256": "e931b331bbeebe672973b645e04687b0124601217ac854dad53a1fab53311383",
+      "bytes": 13242,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-1f7786777ac7d035",
+      "git_commit_kst": "2026-11-04T20:31:34+09:00"
+    },
+    "archive/STATUS-before-read-accuracy-ncsc-20261104.md": {
+      "path": "archive/STATUS-before-read-accuracy-ncsc-20261104.md",
+      "sha256": "368a5c424f96151cd42cc1b31ab91276951b9befe744c24d9a77b81b75d7b5a9",
+      "bytes": 12335,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-faecf5f020d4ac68",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/STATUS-20261104-before-lookup-latency.md": {
+      "path": "archive/STATUS-20261104-before-lookup-latency.md",
+      "sha256": "b672f9380a46ec9d5f7bd3bc5a71df85cbbabddaaff9576df175f95992e77ddf",
+      "bytes": 12117,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-d4a41b57cd7fdfc2",
+      "git_commit_kst": "2026-11-04T18:18:19+09:00"
+    },
+    "archive/STATUS-20261104-before-harness-cleanup.md": {
+      "path": "archive/STATUS-20261104-before-harness-cleanup.md",
+      "sha256": "e4c4f1a45d176584b3c43fe38378c626a75bc7aab737b51373aac464301eab7d",
+      "bytes": 11005,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-beb1aeb23ac205e0",
+      "git_commit_kst": "2026-11-04T17:29:05+09:00"
+    },
+    "archive/STATUS-20261104-before-web-e2e.md": {
+      "path": "archive/STATUS-20261104-before-web-e2e.md",
+      "sha256": "ca97018bb402eb9440e241597ec0c419f83d3b5a647b1821d744a2bb4860b72f",
+      "bytes": 9434,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-c9fdf9653d1fbfa3",
+      "git_commit_kst": "2026-11-04T15:22:26+09:00"
+    },
+    "archive/STATUS-20261104-before-table-chunks.md": {
+      "path": "archive/STATUS-20261104-before-table-chunks.md",
+      "sha256": "53b59a48715c83f3a266a6ae2369bed806e4405acf24c91558642ff6c9d3be65",
+      "bytes": 9369,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-2410faadaea24e78",
+      "git_commit_kst": "2026-11-04T14:34:43+09:00"
+    },
+    "archive/STATUS-20261104-before-fw-chat.md": {
+      "path": "archive/STATUS-20261104-before-fw-chat.md",
+      "sha256": "f769be4290fd0df3be50f7f9eecfe5fab9e0d8be430f601d0daa6460d29cf887",
+      "bytes": 9029,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-691e354edbc8a0de",
+      "git_commit_kst": "2026-11-04T13:59:19+09:00"
+    },
+    "archive/STATUS-20261104-before-fw-scope.md": {
+      "path": "archive/STATUS-20261104-before-fw-scope.md",
+      "sha256": "2012ebec878551f8dd2db5ea1299282374b19dbd6012b1139b0ae7ca4d623b95",
+      "bytes": 10171,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-c9a27591468c12b0",
+      "git_commit_kst": "2026-11-04T13:13:28+09:00"
+    },
+    "archive/STATUS-20261104-before-rule-audit.md": {
+      "path": "archive/STATUS-20261104-before-rule-audit.md",
+      "sha256": "77168ae4620340c4f8abd12bce60d9d6a79237c33d8e41e63c6b1546d55d7df1",
+      "bytes": 8685,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-7630b3f41e1fc905",
+      "git_commit_kst": "2026-11-04T12:49:17+09:00"
+    },
+    "archive/STATUS-20261104-before-web-policy.md": {
+      "path": "archive/STATUS-20261104-before-web-policy.md",
+      "sha256": "931e54ae23ead919e09282c5f5ea46f76f8e17245ec7bf0ed48267b55fe49957",
+      "bytes": 12162,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-a66b68f9d792afa0",
+      "git_commit_kst": "2026-11-04T12:00:02+09:00"
+    },
+    "archive/STATUS-20261103-before-management-access.md": {
+      "path": "archive/STATUS-20261103-before-management-access.md",
+      "sha256": "5e15675bfd5e83e66b1b455f02787cbc6fef331d41cece7f4a48dba53ea4a24f",
+      "bytes": 10782,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-d70688ad386660bb",
+      "git_commit_kst": "2026-11-04T10:31:14+09:00"
+    },
+    "archive/STATUS-20261103-before-operation-time.md": {
+      "path": "archive/STATUS-20261103-before-operation-time.md",
+      "sha256": "e95c75e262090f6f63e4d7b84589267c9de0f2116170da9ffd56ea516a379a51",
+      "bytes": 10021,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-fd1d5f234b14e0a3",
+      "git_commit_kst": "2026-11-03T22:37:16+09:00"
+    },
+    "archive/STATUS-20261103-before-incident-context.md": {
+      "path": "archive/STATUS-20261103-before-incident-context.md",
+      "sha256": "240db6b42b28b7ff5dc2daa5d080725b50f04b84012417b7a38cad5411e47cd5",
+      "bytes": 9191,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-6561bd16a0c95484",
+      "git_commit_kst": "2026-11-03T21:21:23+09:00"
+    },
+    "archive/STATUS-20261103-before-shared-containment.md": {
+      "path": "archive/STATUS-20261103-before-shared-containment.md",
+      "sha256": "010a44e1e3a7c095465c4c2f29865ecf1c51152da0223f7e4be99aa4066eebc1",
+      "bytes": 22679,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-44b2fd9c4f0995fb",
+      "git_commit_kst": "2026-11-03T20:23:34+09:00"
+    },
+    "archive/STATUS-20261103-before-http404.md": {
+      "path": "archive/STATUS-20261103-before-http404.md",
+      "sha256": "000d12775ac78956504fb67bebdca880049c0a7bd0a7d0ec8875312df403956c",
+      "bytes": 19564,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-84055af98a0c21f3",
+      "git_commit_kst": "2026-11-03T19:40:17+09:00"
+    },
+    "archive/STATUS-20261103-before-pcap.md": {
+      "path": "archive/STATUS-20261103-before-pcap.md",
+      "sha256": "04ec4544bca50ef27f529fbb29e10b390e13847ab984eb80723f4c76d68f605a",
+      "bytes": 16656,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-37e640b7fc9dca78",
+      "git_commit_kst": "2026-11-03T18:23:22+09:00"
+    },
+    "archive/STATUS-20261103-before-short-read.md": {
+      "path": "archive/STATUS-20261103-before-short-read.md",
+      "sha256": "9226a780087626b3b85c907006db35f2ab093b342ef17a7778790233b821d7d1",
+      "bytes": 18666,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-df352eea5f615cda",
+      "git_commit_kst": "2026-11-03T14:05:56+09:00"
+    },
+    "archive/STATUS-20261103-paused-peer-repair.md": {
+      "path": "archive/STATUS-20261103-paused-peer-repair.md",
+      "sha256": "13a8eebcaa28f91dbc77246b96be49febcee297f0ae9b51f41e414301680b7ef",
+      "bytes": 17024,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-17d77ef915100c82",
+      "git_commit_kst": "2026-11-03T12:50:26+09:00"
+    },
+    "archive/STATUS-20261103-before-peer-repair.md": {
+      "path": "archive/STATUS-20261103-before-peer-repair.md",
+      "sha256": "aad8ea6854732533e47dd1fd20101a1cd8a41b22d76d04d96157badd87843fd1",
+      "bytes": 16244,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-1fc9e4b108b56fd4",
+      "git_commit_kst": "2026-11-03T12:50:26+09:00"
+    },
+    "archive/STATUS-20261103-before-role-routing.md": {
+      "path": "archive/STATUS-20261103-before-role-routing.md",
+      "sha256": "fbbb155ea50a2f083f99febe92cd37839c4c3880a7ae7f6371d9514be182cc35",
+      "bytes": 14350,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-48afa543da3870d5",
+      "git_commit_kst": "2026-11-03T08:43:08+09:00"
+    },
+    "archive/STATUS-20261103-before-diagnostic-harness.md": {
+      "path": "archive/STATUS-20261103-before-diagnostic-harness.md",
+      "sha256": "23b4aeecd52ff8270f2a4a74d6477cfa6b8691371899edc8c4a67de1b6c7caea",
+      "bytes": 17129,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-6b51787b69b033e7",
+      "git_commit_kst": "2026-11-03T07:21:49+09:00"
+    },
+    "archive/STATUS-20261103-before-operator-candidate.md": {
+      "path": "archive/STATUS-20261103-before-operator-candidate.md",
+      "sha256": "c1e5af28b34c8afb4c9be614457100ad910e71960155ed31379936b7ceb75017",
+      "bytes": 14249,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-90c4d26dcf79ca0b",
+      "git_commit_kst": "2026-11-03T05:20:41+09:00"
+    },
+    "archive/STATUS-20261102-before-waf-evidence.md": {
+      "path": "archive/STATUS-20261102-before-waf-evidence.md",
+      "sha256": "5681a1500602ad3e73ee2abdda6532ca10ae5ddb1c976d3694fbc3f010d64efe",
+      "bytes": 11683,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-abd0a2a95c94e7a9",
+      "git_commit_kst": "2026-11-02T19:15:12+09:00"
+    },
+    "archive/STATUS-20261102-before-native-containment.md": {
+      "path": "archive/STATUS-20261102-before-native-containment.md",
+      "sha256": "ee08d3616046c607503d9bfd2710554945ad636fec06e681452ba4b9732dec6f",
+      "bytes": 27592,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-92b7392da582315c",
+      "git_commit_kst": "2026-11-02T16:01:27+09:00"
+    },
+    "archive/STATUS-history-20261101.md": {
+      "path": "archive/STATUS-history-20261101.md",
+      "sha256": "994bc704309a64d1aab2941e6e5a8b1655044f4094f0b74725c8f3020c805666",
+      "bytes": 1012605,
+      "target": "STATUS_HISTORY.md",
+      "anchor": "source-87368a0abd79b357",
+      "git_commit_kst": "2026-11-02T14:15:53+09:00"
+    },
+    "archive/PLAN-before-journal-rollout-20261108.md": {
+      "path": "archive/PLAN-before-journal-rollout-20261108.md",
+      "sha256": "1ab2dec74c8b34ee27c39274e67f9057404da46707fc90913ade13593340acf8",
+      "bytes": 14475,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-e37213ac10e573dd",
+      "git_commit_kst": "2026-11-08T04:17:35+09:00"
+    },
+    "archive/PLAN-before-report-guards-20261107.md": {
+      "path": "archive/PLAN-before-report-guards-20261107.md",
+      "sha256": "af789742ddabd80093513aa6ea902e10f51a9ea092ba857127bb48c537613508",
+      "bytes": 11808,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-8df65d5161b0a224",
+      "git_commit_kst": "2026-11-07T23:22:30+09:00"
+    },
+    "archive/PLAN-before-trained-trial-20261107.md": {
+      "path": "archive/PLAN-before-trained-trial-20261107.md",
+      "sha256": "7d5b1fbb3d67a28120884c1a59fdaf2afc54c6312d290d2655161c87d7a3e55a",
+      "bytes": 12871,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-75393fee4dd5b145",
+      "git_commit_kst": "2026-11-07T16:13:44+09:00"
+    },
+    "archive/PLAN-before-threshold-read-20261107.md": {
+      "path": "archive/PLAN-before-threshold-read-20261107.md",
+      "sha256": "a60263a3616630b64a354e7861c69cc04541ab68a9a1d644298399e06def584d",
+      "bytes": 12270,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-5b2c4a394e28ac09",
+      "git_commit_kst": "2026-11-07T14:49:48+09:00"
+    },
+    "archive/PLAN-before-ids-method-20261107.md": {
+      "path": "archive/PLAN-before-ids-method-20261107.md",
+      "sha256": "649a1640e3c7bc3483b3a00bc21b86c7f915c349092de31dd8aa33b4ce8df679",
+      "bytes": 12283,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-2cf8db8c5b7e89c9",
+      "git_commit_kst": "2026-11-07T14:15:58+09:00"
+    },
+    "archive/PLAN-before-current-scope-20261107.md": {
+      "path": "archive/PLAN-before-current-scope-20261107.md",
+      "sha256": "0923ecf1a9a4d5b1706903f2b2b5ff97335d8ed2dfe162c7b84377b14590050e",
+      "bytes": 9827,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-2542ab8108d92da0",
+      "git_commit_kst": "2026-11-07T11:35:09+09:00"
+    },
+    "archive/PLAN-before-service-properties-20261107.md": {
+      "path": "archive/PLAN-before-service-properties-20261107.md",
+      "sha256": "5a16e33c3f1f07ec76c6e0331e91305ee3ce18415e9d0664499e95551ebcaa1e",
+      "bytes": 10021,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-e6588f3d6becbe7d",
+      "git_commit_kst": "2026-11-07T10:52:03+09:00"
+    },
+    "archive/PLAN-before-service-audit-20261107.md": {
+      "path": "archive/PLAN-before-service-audit-20261107.md",
+      "sha256": "eb89da60e810972ed5c4d423c5beb3021230b899e2c93383149ac668c7ef434e",
+      "bytes": 9737,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-40b85c04214ea00e",
+      "git_commit_kst": "2026-11-07T10:21:47+09:00"
+    },
+    "archive/PLAN-before-feedback-20261107.md": {
+      "path": "archive/PLAN-before-feedback-20261107.md",
+      "sha256": "f881f2859fa3f3373373b7a6516a25531c743483b5cfeed354bbb8eb8122c1e8",
+      "bytes": 9354,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-a69ef45639bd2e19",
+      "git_commit_kst": "2026-11-07T09:53:43+09:00"
+    },
+    "archive/PLAN-before-resume-20261107.md": {
+      "path": "archive/PLAN-before-resume-20261107.md",
+      "sha256": "29bebfaacee6ec36ceb29d5d32c57e31d76bb8659461a0020bbf75102d7400c8",
+      "bytes": 8752,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-7a8e38316a92b2f3",
+      "git_commit_kst": "2026-11-07T09:32:11+09:00"
+    },
+    "archive/PLAN-before-calendar-20261107.md": {
+      "path": "archive/PLAN-before-calendar-20261107.md",
+      "sha256": "638e00bf99076cdb111fd67033acea043ff1bd184abee8773299cef812d20a19",
+      "bytes": 8290,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-fe23a939ffd5a26f",
+      "git_commit_kst": "2026-11-07T04:58:55+09:00"
+    },
+    "archive/PLAN-before-runtime-clock-20261107.md": {
+      "path": "archive/PLAN-before-runtime-clock-20261107.md",
+      "sha256": "57d8f951726023aa1a0692aa5b8d1e1dcd0709bb5b3e4f451a0f3f5214f3e16f",
+      "bytes": 8455,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-cac45f6b6ab43996",
+      "git_commit_kst": "2026-11-07T04:29:30+09:00"
+    },
+    "archive/PLAN-before-pipeline-20261107.md": {
+      "path": "archive/PLAN-before-pipeline-20261107.md",
+      "sha256": "f73d61c143745e0e09a9c51066fcf54f46c72ef5e1b1928273602036093ff659",
+      "bytes": 8446,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-d924290c8a0879e5",
+      "git_commit_kst": "2026-11-07T04:11:07+09:00"
+    },
+    "archive/PLAN-before-service-report-20261107.md": {
+      "path": "archive/PLAN-before-service-report-20261107.md",
+      "sha256": "3b14ad5ae73f5d7bdb2c95d85a745fabd93e838ae5fd546132653c0185369e3a",
+      "bytes": 10060,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-46598fcaaecbaf8f",
+      "git_commit_kst": "2026-11-07T03:00:24+09:00"
+    },
+    "archive/PLAN-before-service-semantics-20261107.md": {
+      "path": "archive/PLAN-before-service-semantics-20261107.md",
+      "sha256": "59435eabbc9732f862382ffa2a3e1c369eca93c26734276ccbf697c7210910cd",
+      "bytes": 9756,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-686dec137f848459",
+      "git_commit_kst": "2026-11-07T00:42:48+09:00"
+    },
+    "archive/PLAN-before-service-history-20261106.md": {
+      "path": "archive/PLAN-before-service-history-20261106.md",
+      "sha256": "969f4fd8418893878a7b77b758d9c84abb7d4e45a094556f889839a44ca630e6",
+      "bytes": 9749,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-58e32a4cc0d03db3",
+      "git_commit_kst": "2026-11-06T23:59:16+09:00"
+    },
+    "archive/PLAN-before-diagnostic-navigation-20261106.md": {
+      "path": "archive/PLAN-before-diagnostic-navigation-20261106.md",
+      "sha256": "03a87255faddd293c96984c44208d0833c189764f3474fb98058e4321ca8ac44",
+      "bytes": 9085,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-be5a8baa1fc15538",
+      "git_commit_kst": "2026-11-06T23:04:38+09:00"
+    },
+    "archive/PLAN-before-systemd-comparison-20261106.md": {
+      "path": "archive/PLAN-before-systemd-comparison-20261106.md",
+      "sha256": "e01639788ce6fa070f5c7d56c9142b6bea5f1595ce57d48ebe33e10a3ca01802",
+      "bytes": 9160,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-87bf6baa33e8c819",
+      "git_commit_kst": "2026-11-06T22:40:01+09:00"
+    },
+    "archive/PLAN-before-chat-latency-20261106.md": {
+      "path": "archive/PLAN-before-chat-latency-20261106.md",
+      "sha256": "3d8309eddfa12683a0ad4317f9cfaa10de081886f7c107a1d639530b9dba2b67",
+      "bytes": 12881,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-249f48cb1a8bed9c",
+      "git_commit_kst": "2026-11-06T18:51:46+09:00"
+    },
+    "archive/PLAN-before-case-latency-20261105.md": {
+      "path": "archive/PLAN-before-case-latency-20261105.md",
+      "sha256": "9dedc2358641cd9e52cecf6027deaf7461000a72a83f84e652e0e5540ae2bcbb",
+      "bytes": 9427,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-4decbf392a5ab08b",
+      "git_commit_kst": "2026-11-05T23:29:33+09:00"
+    },
+    "archive/PLAN-before-web-traffic-20261105.md": {
+      "path": "archive/PLAN-before-web-traffic-20261105.md",
+      "sha256": "c1c204b7a43e53318c7e20dcb55ba059bb5f96863cac416ed2a51d2c0f479aa1",
+      "bytes": 9043,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-aeea912c331e78fc",
+      "git_commit_kst": "2026-11-05T21:15:20+09:00"
+    },
+    "archive/PLAN-before-fw-ipv4-20261105.md": {
+      "path": "archive/PLAN-before-fw-ipv4-20261105.md",
+      "sha256": "039de2a8b1370bbe79b0c2b6d39e5d6c0aacba0abe5f9315b599bc2e2757e6c0",
+      "bytes": 9025,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-b1816fdff95734b0",
+      "git_commit_kst": "2026-11-05T19:38:30+09:00"
+    },
+    "archive/PLAN-before-dns-systemd-fw-20261105.md": {
+      "path": "archive/PLAN-before-dns-systemd-fw-20261105.md",
+      "sha256": "301e68d9cb2dfaa3d35083c5a5dd8bb16a91f187812de6fbaa9a4ef6cecfc5fa",
+      "bytes": 8399,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-c4c1f67682873f7c",
+      "git_commit_kst": "2026-11-05T18:23:27+09:00"
+    },
+    "archive/PLAN-before-native-read-20261105.md": {
+      "path": "archive/PLAN-before-native-read-20261105.md",
+      "sha256": "8fc62b0490c9201b2a6fd2f0cdd1d96bd7d55098fa12b0d91c420bbb4f1ca3a7",
+      "bytes": 8673,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-66b6bf84541de262",
+      "git_commit_kst": "2026-11-05T15:44:06+09:00"
+    },
+    "archive/PLAN-before-ids-impact-20261105.md": {
+      "path": "archive/PLAN-before-ids-impact-20261105.md",
+      "sha256": "1ac3cc57822fca3521c786875b8a5a82cfe0ecfc1905c47868b2879b3222e95b",
+      "bytes": 8805,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-f95cd4e20778a966",
+      "git_commit_kst": "2026-11-05T15:07:46+09:00"
+    },
+    "archive/PLAN-before-shared-status-20261105.md": {
+      "path": "archive/PLAN-before-shared-status-20261105.md",
+      "sha256": "8fa3b870dc148f2825c3ae43fd645ec06541b34258eee3e7021227118a3514c5",
+      "bytes": 8297,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-b46dff983eef7c32",
+      "git_commit_kst": "2026-11-05T13:45:57+09:00"
+    },
+    "archive/PLAN-before-additional-pcap-20261105.md": {
+      "path": "archive/PLAN-before-additional-pcap-20261105.md",
+      "sha256": "25c84228f16d08bdce6e9942b9338f5d8422481e3130f7a7823e4bc6031758f8",
+      "bytes": 7446,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-9758471c29c63c97",
+      "git_commit_kst": "2026-11-05T13:10:05+09:00"
+    },
+    "archive/PLAN-before-web-history-20261105.md": {
+      "path": "archive/PLAN-before-web-history-20261105.md",
+      "sha256": "20f9c2fa0c283440d39712974526e0b009cb1d1fda4515a29ed340633ad56078",
+      "bytes": 7086,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-a50b00fd17f944c2",
+      "git_commit_kst": "2026-11-05T12:12:24+09:00"
+    },
+    "archive/PLAN-before-impact-navigation-20261105.md": {
+      "path": "archive/PLAN-before-impact-navigation-20261105.md",
+      "sha256": "5eb5398ea98c4f60fbf936e12e09d03f25fc7fe53e68bc7456faf0ad890d4b9c",
+      "bytes": 17750,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-c5eb4f3f59fc21b5",
+      "git_commit_kst": "2026-11-05T11:41:54+09:00"
+    },
+    "archive/PLAN-before-required-scope-20261105.md": {
+      "path": "archive/PLAN-before-required-scope-20261105.md",
+      "sha256": "23ca5c71940bb3f1b9d017fbab10092eeeb056f0c922fc2e9a07c3bf813b084c",
+      "bytes": 17243,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-59397da0b9e3d02b",
+      "git_commit_kst": "2026-11-05T10:43:33+09:00"
+    },
+    "archive/PLAN-before-dns-report-20261105.md": {
+      "path": "archive/PLAN-before-dns-report-20261105.md",
+      "sha256": "6ff9d72fcafb32b22d9bc33ce6a88bf30808abddb95e4f009064dcd8c05540f2",
+      "bytes": 16232,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-e2210a8220ad3fa7",
+      "git_commit_kst": "2026-11-05T10:18:13+09:00"
+    },
+    "archive/PLAN-before-workflow-skills-20261105.md": {
+      "path": "archive/PLAN-before-workflow-skills-20261105.md",
+      "sha256": "ce5b7c0d3ca11cb64bd0b09367bda45b92c7a41080ea92fa1f0fc94effd6fd46",
+      "bytes": 15279,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-f744c421359c9b99",
+      "git_commit_kst": "2026-11-05T09:16:28+09:00"
+    },
+    "archive/PLAN-before-mcp-input-20261105.md": {
+      "path": "archive/PLAN-before-mcp-input-20261105.md",
+      "sha256": "da84693a450360d72c2f37eb600fdb18a3506699de7eda5f5f749bbfdbff79a6",
+      "bytes": 14592,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-0b7fbf4f2e761500",
+      "git_commit_kst": "2026-11-05T01:26:44+09:00"
+    },
+    "archive/PLAN-before-incident-parity-20261105.md": {
+      "path": "archive/PLAN-before-incident-parity-20261105.md",
+      "sha256": "32975d6fc6ba69ceba61ce77037d857b375cc970f21094240a4263b3a627017d",
+      "bytes": 13704,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-58b4519499579417",
+      "git_commit_kst": "2026-11-05T00:54:21+09:00"
+    },
+    "archive/PLAN-before-web-evidence-20261104.md": {
+      "path": "archive/PLAN-before-web-evidence-20261104.md",
+      "sha256": "5a1202f02344217c4c9ee1375601bd32598e69df8dbf7c79ffb3d7bda654dce2",
+      "bytes": 13074,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-32dce28eb44130a5",
+      "git_commit_kst": "2026-11-04T23:56:05+09:00"
+    },
+    "archive/PLAN-before-incident-impact-20261104.md": {
+      "path": "archive/PLAN-before-incident-impact-20261104.md",
+      "sha256": "005d1dd22f593b2758bda8cd0f0e9bf1da6f036bea144cada3baa74a0ad9bee5",
+      "bytes": 12651,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-1c213c5c51139233",
+      "git_commit_kst": "2026-11-04T22:11:41+09:00"
+    },
+    "archive/PLAN-before-gate-binding-20261104.md": {
+      "path": "archive/PLAN-before-gate-binding-20261104.md",
+      "sha256": "9cef4c0374ca6e95a9e3ed786e21291e51989dd48e1c3277fa873b9594e36d2d",
+      "bytes": 11830,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-42c6ce08631d114b",
+      "git_commit_kst": "2026-11-04T21:14:01+09:00"
+    },
+    "archive/PLAN-before-incident-review-20261104.md": {
+      "path": "archive/PLAN-before-incident-review-20261104.md",
+      "sha256": "20637be3f48c07b18f147effd225fb3b058e6a870e373ff39a69efcca0618b1e",
+      "bytes": 11045,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-365f631599e163f1",
+      "git_commit_kst": "2026-11-04T20:31:34+09:00"
+    },
+    "archive/PLAN-before-read-accuracy-ncsc-20261104.md": {
+      "path": "archive/PLAN-before-read-accuracy-ncsc-20261104.md",
+      "sha256": "388cf0d1f7d920305c1b72d187646ec60a8193f5ea4281546c28dd1104986be4",
+      "bytes": 10269,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-1e1b01d4db7ba826",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/PLAN-20261104-before-lookup-latency.md": {
+      "path": "archive/PLAN-20261104-before-lookup-latency.md",
+      "sha256": "e012ae5f9e40da00f35cbbdf341faa0c4a739e910a1c081c9a761a9aa74de9ca",
+      "bytes": 9889,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-6c5ad922cff85850",
+      "git_commit_kst": "2026-11-04T18:18:19+09:00"
+    },
+    "archive/PLAN-20261104-before-harness-cleanup.md": {
+      "path": "archive/PLAN-20261104-before-harness-cleanup.md",
+      "sha256": "0b6e131d752d2f1713eab3acb27ca6a339567f3ed04b80b29dcd6ae3d6e8956b",
+      "bytes": 9011,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-bc40746488f22230",
+      "git_commit_kst": "2026-11-04T17:29:05+09:00"
+    },
+    "archive/PLAN-20261104-before-web-e2e.md": {
+      "path": "archive/PLAN-20261104-before-web-e2e.md",
+      "sha256": "0a3763fcc378c79adc6c416121e69fc3b94fc10f5f1a8305736d444efe7501df",
+      "bytes": 8212,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-39ccbfd890e3ea66",
+      "git_commit_kst": "2026-11-04T15:22:26+09:00"
+    },
+    "archive/PLAN-20261104-before-table-chunks.md": {
+      "path": "archive/PLAN-20261104-before-table-chunks.md",
+      "sha256": "4fc329bcd2ec6e19505a032e2abdab1be15032426178e6e6bb66327ad8c8e746",
+      "bytes": 8128,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-d0e0f5a88c12a642",
+      "git_commit_kst": "2026-11-04T14:34:43+09:00"
+    },
+    "archive/PLAN-20261104-before-fw-chat.md": {
+      "path": "archive/PLAN-20261104-before-fw-chat.md",
+      "sha256": "2d7a966003e2fe360f3984329978a0d1f2eb7360c29c4d82e3f0d54e3431b738",
+      "bytes": 7494,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-6b34b95f47d5ae4c",
+      "git_commit_kst": "2026-11-04T13:59:19+09:00"
+    },
+    "archive/PLAN-20261104-before-fw-scope.md": {
+      "path": "archive/PLAN-20261104-before-fw-scope.md",
+      "sha256": "ab3dc16d6cc0bddc025fb4e322d07dca2bb67d1f0987c8d9f420a3bcb2c347bf",
+      "bytes": 7335,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-8a3b0c88d7e89462",
+      "git_commit_kst": "2026-11-04T13:13:28+09:00"
+    },
+    "archive/PLAN-20261104-before-rule-audit.md": {
+      "path": "archive/PLAN-20261104-before-rule-audit.md",
+      "sha256": "348cd4e941067dc2c479e7f5ba5af016c8d85f0cf68227f3cb5e46eecfe024ac",
+      "bytes": 6703,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-5b0aaa10d9fe4992",
+      "git_commit_kst": "2026-11-04T12:49:17+09:00"
+    },
+    "archive/PLAN-20261104-before-web-policy.md": {
+      "path": "archive/PLAN-20261104-before-web-policy.md",
+      "sha256": "662d9bb95e3fb2cb2749a7d57dd05038216ba4f35f656c1326a10227e112dba4",
+      "bytes": 19702,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-0886edfdf24df6e8",
+      "git_commit_kst": "2026-11-04T12:00:02+09:00"
+    },
+    "archive/PLAN-20261103-before-management-access.md": {
+      "path": "archive/PLAN-20261103-before-management-access.md",
+      "sha256": "e309663ee6c48467022c7724f0da7fa98fbf2b6ea679bde9c8c8f2971fedb075",
+      "bytes": 19113,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-407513fdddc58f8f",
+      "git_commit_kst": "2026-11-04T10:31:14+09:00"
+    },
+    "archive/PLAN-20261103-before-operation-time.md": {
+      "path": "archive/PLAN-20261103-before-operation-time.md",
+      "sha256": "cd363e6841581020f5a22dba08e88ee5b4323c37d21c81f54cc48a78e55883d3",
+      "bytes": 19193,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-781c10d05618f926",
+      "git_commit_kst": "2026-11-03T22:37:16+09:00"
+    },
+    "archive/PLAN-20261103-before-incident-context.md": {
+      "path": "archive/PLAN-20261103-before-incident-context.md",
+      "sha256": "96e70914cfc67cf98a1d3723d0684f16172044df4bd0f59cbb695e9c3095e8b8",
+      "bytes": 19348,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-775b713122d598c7",
+      "git_commit_kst": "2026-11-03T21:21:23+09:00"
+    },
+    "archive/PLAN-history-20261101.md": {
+      "path": "archive/PLAN-history-20261101.md",
+      "sha256": "41255f2c0ff88ff6ff4db627b41cb7f26457392169af9f956bdd861e4eb2ce8a",
+      "bytes": 311664,
+      "target": "PLAN_HISTORY.md",
+      "anchor": "source-b32ddb5c903faea1",
+      "git_commit_kst": "2026-11-01T16:35:22+09:00"
+    },
+    "archive/deployment-verify-troubleshoot-before-ncsc-20261104.md": {
+      "path": "archive/deployment-verify-troubleshoot-before-ncsc-20261104.md",
+      "sha256": "d48633a38f68d9387e840f3f047f2d1211a44d7c515e756c8c3efbd5cd0fe961",
+      "bytes": 45175,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-7a802540e249541b",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/deployment-configuration-guide-before-ncsc-20261104.md": {
+      "path": "archive/deployment-configuration-guide-before-ncsc-20261104.md",
+      "sha256": "336b584a24c5376d323b58108fc7369c58183848cfeb5e4d7b032e853f804882",
+      "bytes": 20163,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-5f5f782f6b670953",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/deployment-bootstrap-guide-before-ncsc-20261104.md": {
+      "path": "archive/deployment-bootstrap-guide-before-ncsc-20261104.md",
+      "sha256": "370134ed638685e72ff722bef2eb6ccfd615a72dedd43df3eedb0ae84897d422",
+      "bytes": 26062,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-6da49272bde6c9e3",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/deployment-README-before-ncsc-20261104.md": {
+      "path": "archive/deployment-README-before-ncsc-20261104.md",
+      "sha256": "9fe0565e604355ea6e26c08b4ac0018dc3371d68f16b6bb45cf5d4ea56d6b8eb",
+      "bytes": 27562,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-252038d31234088c",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md": {
+      "path": "archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md",
+      "sha256": "18a55f58cb5bcdad6da9dab67bee3875099443238f04272144550bd32b77ce10",
+      "bytes": 4942,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-ef7424bbadcff1f6",
+      "git_commit_kst": "2026-11-04T19:18:25+09:00"
+    },
+    "archive/README-offline-labs-20261104-before-enforce.md": {
+      "path": "archive/README-offline-labs-20261104-before-enforce.md",
+      "sha256": "eeb24ffa230ae8b2c13310985f2559c7bbe7d9ef03baf4cce9aecdac7f333f6d",
+      "bytes": 52306,
+      "target": "DEPLOYMENT_HISTORY.md",
+      "anchor": "source-429cb0b9c8ff56ec",
+      "git_commit_kst": "2026-11-04T12:00:02+09:00"
+    },
+    "archive/인프라_구축순서_2.md": {
+      "path": "archive/인프라_구축순서_2.md",
+      "sha256": "ed53f795cafe3f9e48838002c307a780dc95d647de3591d418e5b05b881bef86",
+      "bytes": 5674,
+      "target": "DESIGN_ALTERNATIVES.md",
+      "anchor": "source-5b415158725ce466",
+      "git_commit_kst": "2026-10-06T14:43:26+09:00"
+    },
+    "archive/PLAN_2.md": {
+      "path": "archive/PLAN_2.md",
+      "sha256": "2d692325ed98594edc622a7e955be169b2652b556257941d29b0cfe6a43acc64",
+      "bytes": 10656,
+      "target": "DESIGN_ALTERNATIVES.md",
+      "anchor": "source-a2270ebcec45d64e",
+      "git_commit_kst": "2026-10-06T14:43:26+09:00"
+    },
+    "archive/suggestion_2.md": {
+      "path": "archive/suggestion_2.md",
+      "sha256": "8d18cefd1e1a7b0ea2a380f99bb36390ff260570f03eba7dbc9f2089c11fb594",
+      "bytes": 4795,
+      "target": "DESIGN_ALTERNATIVES.md",
+      "anchor": "source-ecaa84fc6e2f7f15",
+      "git_commit_kst": "2026-09-27T04:14:30+09:00"
+    },
+    "archive/diagnostic-navigation-common41-20261107.md": {
+      "path": "archive/diagnostic-navigation-common41-20261107.md",
+      "sha256": "260febc618d45005253240b14532aaecf5b9fdb98eef2949106af281b600a6da",
+      "bytes": 6357,
+      "target": "DIAGNOSTIC_HISTORY.md",
+      "anchor": "source-f629bdb3b39925b3",
+      "git_commit_kst": "2026-11-07T00:42:48+09:00"
+    },
+    "archive/diagnostic-navigation-common39-20261106.md": {
+      "path": "archive/diagnostic-navigation-common39-20261106.md",
+      "sha256": "6dba109bbcff44f8f65e2e54c9fbdab8f834fd21d3a180e9ad728fe2361c20e7",
+      "bytes": 5613,
+      "target": "DIAGNOSTIC_HISTORY.md",
+      "anchor": "source-79acb30e59e11eea",
+      "git_commit_kst": "2026-11-06T23:59:16+09:00"
+    }
+  },
+  "verification": {
+    "all_originals_match_git": true,
+    "all_sections_preserved_after_link_rewrite": true,
+    "original_sections": 1257,
+    "unique_sections": 1009,
+    "source_bytes": 2993489,
+    "unique_content_bytes": 2541725
+  }
+}

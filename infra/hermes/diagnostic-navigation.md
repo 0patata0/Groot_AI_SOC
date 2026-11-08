@@ -1,6 +1,6 @@
 # 서비스 현재·과거 조회와 응답 지연 — 2026-11-07
 
-현재 query1.19.89/common1.5.44이다. 서비스 현재·과거 조회의 검증 오탐, 질문별 지침 누락, 교차검토의 상태 해석 검사를 보완했다. 실제 채팅 최종 시간·품질은 아래 실측과 구분한다. [현황](../../STATUS.md) · [수치 원장](diagnostic-navigation.validation.json) · [직전 기록](../../archive/diagnostic-navigation-common41-20261107.md).
+현재 query1.19.89/common1.5.44이다. 서비스 현재·과거 조회의 검증 오탐, 질문별 지침 누락, 교차검토의 상태 해석 검사를 보완했다. 실제 채팅 최종 시간·품질은 아래 실측과 구분한다. [현황](../../STATUS.md) · [수치 원장](diagnostic-navigation.validation.json) · [직전 기록](../../archive/DIAGNOSTIC_HISTORY.md#source-f629bdb3b39925b3).
 
 ## 수정한 원인
 

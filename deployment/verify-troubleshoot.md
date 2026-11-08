@@ -11,7 +11,7 @@
 - 부분 설치 실패의 pending/원본 config는 보존한다. 다른 agent 키를 삭제하거나 등록 파일을 비워 재시도하지 않는다. 실패 시 새 host agent만 중지되며 manager/다른 agent는 재시작하지 않는다.
 
 
-> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/deployment-verify-troubleshoot-before-ncsc-20261104.md).
+> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-7a802540e249541b).
 
 이 문서는 [README](../README.md)의 단일 설치기로 **새 환경**을 구성한 뒤 사용하는 절차입니다. 경로와 성공 판정은 `deploy.sh`와 `deployment/roles/{security,siem,service}.sh`의 구현을 기준으로 작성했습니다. 기존 운영 서버의 이름·계정·경로와 혼용하지 않습니다. **새 Ubuntu VM 세 대에서의 실제 통합 구축 검증은 아직 수행하지 않았습니다.** 아래 명령은 운영자가 해당 환경에서 실행할 검증 절차이며, 이미 확인된 라이브 결과를 뜻하지 않습니다.
 

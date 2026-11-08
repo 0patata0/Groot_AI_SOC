@@ -13,6 +13,24 @@ def receipt(data=None, **updates):
 
 
 class BlockLists(unittest.TestCase):
+    def test_conditional_empty_display_and_no_change_preserve_actual_read(self):
+        for q in ('현재 fw에서 임시 차단 중인 IP만 확인해줘. 없으면 없다고 하고, 설정은 바꾸지 마.',
+                  '차단 목록 보여줘. 없다면 0건이라고 알려주세요. 정책은 바꾸지 마세요.',
+                  '지금 차단된 주소 알려줘. 없으면 없음으로 표시해줘.'):
+            with self.subTest(q=q):
+                self.assertEqual(h.tool_scope(q), {h.READ.BLOCKS})
+                self.assertTrue(h.missing_reads(q, []))
+                self.assertEqual(h.missing_reads(q, [receipt()]), [])
+                self.assertIn('**0개**', h.read_report(q, [receipt()]))
+        for q in ('차단 목록 보여줘. 없으면 192.0.2.8 차단해줘',
+                  '차단 목록 보여줘. 없으면 없다고 하고, WAF 룰도 보여줘',
+                  '어제 차단 목록 보여줘. 없으면 없다고 말해줘',
+                  '차단 목록 보여줘. 없으면 없다고 하고, 지금 설정 바꿔줘',
+                  '차단 목록 보여줘. 없으면 없다고 하고, 조회하지 마'):
+            with self.subTest(q=q):
+                p = h.read_plan(q)
+                self.assertFalse(p and p['kind'] == 'block_list')
+
     def test_short_current_variants_choose_one_actual_read(self):
         for q in ('지금 FW 차단 목록만 보여줘', '차단 목록', '방화벽 차단목록 보여줄래?',
                   '현재 차단된 IP 목록', '막힌 아이피 알려줘', '지금 차단 중인 주소는?',

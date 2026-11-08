@@ -411,6 +411,13 @@ def block_list_plan(text):
     history, a write, or an explanation. Unrecognized requests stay with the
     ordinary agent; this function never dispatches an MCP call.
     """
+    text = re.sub(r'(?:(?:설정|룰|규칙|정책)(?:은|는|을|를)?\s*)?바꾸지\s*'
+                  r'(?:마세요|말아(?:줘|주세요)?|마)(?=$|[\s.!?,;])', '', text)
+    # A conditional presentation request does not supply the observed count.
+    # Only this closed grammar is removed; other conditions/subjects stay visible.
+    text = re.sub(r'(?:없으면|없다면)\s*(?:없다고|없음으로|0건이라고)\s*'
+                  r'(?:말해(?:줘|주세요)|알려(?:줘|주세요)|표시해(?:줘|주세요)|하고)'
+                  r'\s*(?:[,.!?;]|$)', '', text)
     prefix = r'(?:(?:지금|현재|FW|의|에서|에|임시(?:로)?)\s*)*'
     address = r'(?:(?:IPv[46]|IP|아이피)(?:\s*주소)?|주소)(?:들)?'
     subject = (r'(?:(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
@@ -418,7 +425,7 @@ def block_list_plan(text):
     suffix = (r'(?:(?:만|을|를|은|는|이|가|도|함께|같이|좀|전체|모두|전부|현재|지금|표로|상세히|자세히|'
               r'정리해서|한눈에|몇\s*개|몇\s*건|있어|있나|있니|뭐야|누구야|알려줘|조회해줘|조회|'
               r'확인해줘|확인|보여줘|보여줄래|보여주세요|알려주세요|알려줄래|부탁해|조회해줄래|'
-              r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？])*')
+              r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？]\s*)*')
     reverse = (r'(?:어느|어떤)\s*' + address + r'\s*(?:이|가|은|는)?\s*'
                r'(?:차단\s*됐|막혔)(?:어|니|나(?:요)?)')
     if not re.fullmatch(r'\s*' + prefix + '(?:' + subject + '|' + reverse + r')\s*' + suffix + r'\s*', text, re.I):

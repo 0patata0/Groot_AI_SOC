@@ -1829,7 +1829,7 @@ def management_gate_argument(source):
     value=("import base64,hashlib,bz2; s=bz2.decompress(base64.b85decode("+repr(encoded)+")); "
            "assert hashlib.sha256(s).hexdigest()=="+repr(hashlib.sha256(source).hexdigest())+"; "
            "exec(compile(s,'capstone-immutable-management-gate','exec'))")
-    if len(value.encode())>=65536:
+    if len(value.encode())>=98304:
         raise ControllerError('management_gate_argument_size_invalid')
     return value
 

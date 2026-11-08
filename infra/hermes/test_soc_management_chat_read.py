@@ -159,6 +159,36 @@ class ChatRead(unittest.TestCase):
                 w.management_read_request(r,a,pending=True)
 
     @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_event_listing_selection_excludes_unasked_program_and_identity_filters(self):
+        from jsonschema import Draft202012Validator
+        name='mcp__security_events__search_wazuh_alerts'
+        tool={'type':'function','function':{'name':name,'parameters':{
+            'type':'object','additionalProperties':False,'properties':{
+                'since_kst':{'type':'string'},'until_kst':{'type':'string'},
+                'lookback_minutes':{'type':'integer','minimum':1,'maximum':1440},
+                'limit':{'type':'integer','minimum':1,'maximum':50},
+                'program_name':{'type':'string'},'agent_id':{'type':'string'},
+                'source_ip':{'type':'string'},'wazuh_rule_id':{'type':'string'}}}}}
+        for question in ('Wazuh 최근 경보를 표로 보여줘','오늘 Wazuh 경보 보여줘'):
+            a=agent();a.valid_tool_names={name};r=request();r['tools']=[tool];before=copy.deepcopy(r)
+            env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,tools=[name],request=question)))
+            with patch.dict(w.os.environ,env,clear=True):
+                for _ in range(2):
+                    out=w.management_read_request(r,a,pending=True);lease=a._capstone_management_selection
+                    validator=Draft202012Validator(out['response_format']['json_schema']['schema'])
+                    absolute={'since_kst':'2026-11-06T00:00:00+09:00','until_kst':self.context['requested_at_kst']}
+                    args=absolute if '오늘' in question else {'lookback_minutes':60}
+                    def value(args):return {'request_nonce':lease['nonce'],'calls':[{'tool':name,'arguments':args}]}
+                    self.assertTrue(validator.is_valid(value(args)))
+                    if '최근' in question:
+                        self.assertFalse(validator.is_valid(value(absolute)))
+                        self.assertFalse(validator.is_valid(value({'lookback_minutes':1440})))
+                    for key in ('program_name','agent_id','source_ip','wazuh_rule_id'):
+                        self.assertFalse(validator.is_valid(value(dict(args,**{key:'ossec'}))))
+                        self.assertNotIn(key,lease['catalog'][name]['properties'])
+            self.assertEqual(r,before)
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
     def test_three_hosts_remain_required_and_current_duplicates_are_coalesced(self):
         from openai.types.chat import ChatCompletion
         a=agent();a.valid_tool_names={NAME};r=request();r['tools']=[self.tool]
@@ -288,6 +318,26 @@ class LiteralLookup(unittest.TestCase):
         self.assertEqual(text.count('현재 로드된 failed unit 0개'),3)
         self.assertIn('전체 공격 탐지·대응 성공을 뜻하지',text)
         self.assertEqual(w.evidence_claim_violations(text,self.facts,{NAME}),[])
+
+    def test_event_listing_completes_from_bound_receipts_not_filtered_empty_or_incident(self):
+        from datetime import datetime,timedelta
+        name='mcp__security_events__search_wazuh_alerts'
+        end=datetime.now(self.h.EVIDENCE.KST);start=end-timedelta(minutes=60)
+        ctx=dict(self.context,request='최근 Wazuh 경보 보여줘',tools=[name],requested_at_kst=end.isoformat())
+        args={'lookback_minutes':60,'limit':1}
+        data={'source':'wazuh','applied_filters':{},'requested_since_kst':start.isoformat(),
+              'requested_until_kst':end.isoformat(),'window_mode':'lookback','limit':1,'scanned':1,
+              'scan_capped':True,'returned_count':1,'alerts':[{'timestamp':end.isoformat(),
+              'wazuh_rule_id':'5501','wazuh_rule_description':'PAM: Login session opened.'}]}
+        def rendered(args,data,context=ctx):
+            raw=json.dumps({'result':json.dumps(data)})
+            return w.literal_chat_lookup(context,[w.read_ledger_entry(name,args,raw)],
+                [{'tool':name,'output':raw,'is_error':False}],self.h)
+        text=rendered(args,data)
+        self.assertIn('5501',text);self.assertIn('조회 한도 도달',text)
+        self.assertIn('MANAGEMENT_STATUS: resolved',text)
+        self.assertIsNone(rendered(dict(args,program_name='ossec'),dict(data,applied_filters={'program_name':'ossec'},alerts=[],returned_count=0)))
+        self.assertIsNone(rendered(args,data,dict(ctx,request='Wazuh 경보가 공격인지 판단해줘')))
 
     def test_missing_error_mismatched_or_duplicate_receipts_cannot_complete(self):
         for mutate in ('missing','error','sha','duplicate','unavailable'):

@@ -2,7 +2,7 @@
 
 현행 복합 조사에는 [실제 조회 원장·ID/인용·사실 모순 보완](read-ledger.md)과 [부정 표현·정상 단정 검사](health-claim-check.md)를 적용했다. 실제 모델/채팅/독립평가 범위와 미완료는 해당 원장을 따른다. [입력·재조회 추가 비교](report-input-audit.md)의 후보는 비채택으로 현행 버전에 포함되지 않는다.
 
-현재 운영 계약은 **soc-chat-contract:1.5.82 / query1.19.130 / soc-review-routing:1.1.6**, 진단 MCP는 **1.3.2**다. 모델은 최신 균형 1,220건 학습본 **soc-qwen36:35b-balanced-q4km-20261108**이며 11/8 11:46 KST 전환을 확정했다. 운영 사용과 독립 정확도 우위는 구분한다. [학습본 전환](../../finetuning/TRAINED_OPERATION_20261108.md) · [근거 가드레일](evidence-guardrails.md) · [단문 조회](short-read.md).
+현재 운영 계약은 **soc-chat-contract:1.5.82 / query1.19.131 / soc-review-routing:1.1.6**, 진단 MCP는 **1.3.2**다. 모델은 최신 균형 1,220건 학습본 **soc-qwen36:35b-balanced-q4km-20261108**이며 11/8 11:46 KST 전환을 확정했다. 운영 사용과 독립 정확도 우위는 구분한다. [학습본 전환](../../finetuning/TRAINED_OPERATION_20261108.md) · [근거 가드레일](evidence-guardrails.md) · [단문 조회](short-read.md) · [경보 표본·조회 스킬 연결](event-listing-parity.md).
 
 [Harness² 보완 점검](../validation/harness2/README.md)은 라이브 SHA·실제 MCP 스키마를 수집한 뒤 로컬의 기준본/후보를 비교한다. 기존 B 에이전트→Thor 추론 경로를 유지하며 프레임워크에 운영 권한·자격·자동 배포 권한을 넘기지 않는다. 연결 단절 후의 검사는 관측 시점의 자료에 대한 검사이며, 재접속 후 상태 대조와 실제 채팅 확인이 필요하다.
 

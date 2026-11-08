@@ -2601,7 +2601,8 @@ def literal_chat_lookup(context, ledger, receipts, harness):
     if not context or not context['tools'] or not ledger or len(ledger)>32 or len(receipts)!=len(ledger):return None
     question=context['request']
     comparison=getattr(harness,'systemd_comparison_request',lambda _:False)(question)
-    plain=bool(comparison or getattr(harness,'pipeline_lookup_request',lambda _:False)(question))
+    plain=bool(comparison or getattr(harness,'pipeline_lookup_request',lambda _:False)(question)
+               or getattr(harness,'event_lookup_scope',lambda _:None)(question))
     if (not harness.structured_read(question) or harness.READ.wants_write(harness.normalized(question))
             or not plain and re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지|위험|침해|판단|검토',question)):
         return None
@@ -2637,8 +2638,7 @@ def literal_chat_lookup(context, ledger, receipts, harness):
     diagnostic=harness.diagnostic_request(question)
     targets=diagnostic.get('requested',[]) if diagnostic and not diagnostic.get('all') and not diagnostic.get('unresolved') else []
     if harness.missing_reads(question,calls,targets):return None
-    literal=(harness.read_report(question,calls) or harness.inventory(question,calls)
-        or harness.service_report(question,calls) or (harness.diagnostic_report(question,calls,targets) if targets else None))
+    literal=harness.lookup_report(question,calls,targets,include_diagnostics=bool(targets))
     if not literal or len(literal.encode())>65536:return None
     return literal+'\nMANAGEMENT_STATUS: resolved'
 
@@ -2909,6 +2909,7 @@ def management_read_request(request, agent, *, pending=False):
         and chat_lookup_harness().ids_policy_question(chat['request']))
     security=chat_lookup_harness().security_inventory_request(chat['request']) if chat and chat['tools'] else None
     security_scope=chat_lookup_harness().tool_scope(chat['request']) if security else None
+    events=chat_lookup_harness().event_lookup_scope(chat['request']) if chat and chat['tools'] else None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2919,6 +2920,7 @@ def management_read_request(request, agent, *, pending=False):
         if current and name!=diagnostic:continue
         if ids_policy and name!=ids_tool:continue
         if security_scope is not None and name not in security_scope:continue
+        if events and name not in events:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2938,6 +2940,9 @@ def management_read_request(request, agent, *, pending=False):
         if security and selected is not None:
             selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
             if selected is None:raise RuntimeError('chat_inventory_scope_unregistered')
+        if events and selected is not None:
+            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
+            if selected is None:raise RuntimeError('chat_event_scope_unregistered')
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)

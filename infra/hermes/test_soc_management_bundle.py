@@ -161,7 +161,7 @@ class Provenance(unittest.TestCase):
 
     def test_gate_argument_stays_bounded_and_preserves_exact_source(self):
         value=controller.management_gate_argument(Path(w.__file__).read_bytes())
-        self.assertLess(len(value.encode()),65536)
+        self.assertLess(len(value.encode()),98304)
         self.assertIn('b85decode',value)
 
     def test_native_wire_audit_and_guard_keep_full_bundle_without_fake_calls(self):

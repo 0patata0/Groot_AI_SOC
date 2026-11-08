@@ -52,6 +52,18 @@ class EmbeddedGateBinding(unittest.TestCase):
         self.assertNotEqual(result.returncode,0)
         self.assertEqual(result.stdout,'')
 
+    def test_gate_transport_accepts_bounded_growth_and_rejects_oversized_arguments(self):
+        def source(count):
+            return b''.join(b'#'+hashlib.sha256(str(i).encode()).hexdigest().encode()+b'\n'
+                            for i in range(count))+b'print("bounded-gate-ok")\n'
+        value=m.management_gate_argument(source(1800))
+        self.assertGreater(len(value.encode()),65536)
+        self.assertLess(len(value.encode()),98304)
+        result=subprocess.run([sys.executable,'-I','-B','-c',value],check=True,capture_output=True,text=True)
+        self.assertEqual(result.stdout,'bounded-gate-ok\n')
+        with self.assertRaisesRegex(m.ControllerError,'management_gate_argument_size_invalid'):
+            m.management_gate_argument(source(4000))
+
 
 class AutomaticReviewContext(unittest.TestCase):
     def setUp(self):

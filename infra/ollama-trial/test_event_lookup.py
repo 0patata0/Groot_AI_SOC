@@ -55,6 +55,40 @@ class EventLookup(unittest.TestCase):
                   'WAF 룰 보여줘','로그 조회해줘'):
             with self.subTest(q=q): self.assertIsNone(h.event_lookup_scope(q))
 
+    def test_short_alert_queries_use_indexed_wazuh_and_exact_count(self):
+        for q,count in (('최근 올라온 경보 10개 보여줄래',10),('경보 7건 보여줘',7),
+                        ('최근 이벤트 3개 조회해줘',3),('Wazuh 경보10개만 보여줘',10)):
+            with self.subTest(q=q):
+                scope={'mcp__security_events__search_wazuh_alerts'}
+                self.assertEqual(h.event_lookup_scope(q),scope)
+                self.assertEqual(h._event_lookup_request(q)[1],count)
+                self.assertTrue(h.structured_read(q))
+                self.assertEqual(h.workflow_names(q),('soc-query',))
+        for q in ('경보 전체 보여줘','경보 100개 보여줘','경보 0건 보여줘',
+                  '경보 -5건 보여줘','경보 10건 중 3개 보여줘','경보 30분 10개 보여줘',
+                  '경보 10개 원인 알려줘','WAF IDS 경보 10개 보여줘',
+                  '192.0.2.1 경보 10개 보여줘','룰 조회해줘','로그 10개 보여줘'):
+            with self.subTest(q=q):self.assertIsNone(h.event_lookup_scope(q))
+
+    def test_exact_requested_count_binds_schema_and_receipt(self):
+        q='최근 올라온 경보 10개 보여줄래';name='mcp__security_events__search_wazuh_alerts'
+        schema={name:{'type':'object','properties':{'lookback_minutes':{'type':'integer'},
+                    'limit':{'type':'integer','minimum':1,'maximum':50}},'required':[]}}
+        got=h.refine_read_schemas(q,schema,[])[name]
+        self.assertEqual(got['properties']['limit']['enum'],[10])
+        self.assertEqual(set(got['required']),{'lookback_minutes','limit'})
+        for change in ({'maximum':5},{'enum':[20,50]},{'type':'string'}):
+            bad=copy.deepcopy(schema);bad[name]['properties']['limit'].update(change)
+            with self.subTest(change=change):self.assertEqual(h.refine_read_schemas(q,bad,[]),{})
+        good=receipt('wazuh',limit=10);good['arguments']['limit']=10
+        self.assertEqual(h.event_lookup_missing(q,[good]),[])  # Fewer real rows is valid.
+        report=h.lookup_report(q,[good]);self.assertIn('반환 표본 1건',report)
+        self.assertIn('**Wazuh**',report);self.assertNotIn('미기록',report)
+        bad=receipt('wazuh',limit=20);bad['arguments']['limit']=20
+        self.assertTrue(h.event_lookup_missing(q,[bad]))
+        del good['arguments']['limit']
+        self.assertTrue(h.event_lookup_missing(q,[good]))
+
     def test_today_requires_midnight_and_fresh_actual_window(self):
         q='오늘 WAF 차단 로그 보여줘';good=receipt()
         self.assertEqual(h.missing_reads(q,[good]),[])
@@ -62,6 +96,38 @@ class EventLookup(unittest.TestCase):
                         receipt(requested_until_kst='2026-11-08T10:00:00+09:00'),
                         receipt(requested_until_kst='2026-11-08T14:00:00+09:00')):
             with self.subTest(changed=changed['result']):self.assertTrue(h.missing_reads(q,[changed]))
+
+    def test_sensor_alerts_cannot_complete_requests_for_unattested_block_actions(self):
+        for q in ('IDS 차단 로그 보여줘','IPS 차단 경보 조회','Wazuh 차단 이벤트 목록',
+                  'WAF IDS 차단 로그 보여줘'):
+            with self.subTest(q=q):
+                self.assertIsNone(h.event_lookup_scope(q))
+                self.assertIsNone(h.event_lookup_missing(q,[receipt('suricata')]))
+        self.assertTrue(h.event_lookup_scope('WAF 차단 로그 보여줘'))
+
+    def test_malformed_rows_and_unmatched_requested_limit_remain_incomplete(self):
+        q='오늘 WAF 차단 로그 보여줘'
+        for bad in (receipt(alerts=[None]),receipt(alerts=['not an event']),
+                    receipt(limit=10),dict(receipt(),arguments={**receipt()['arguments'],'limit':True})):
+            with self.subTest(bad=bad):self.assertTrue(h.missing_reads(q,[bad]))
+
+    def test_filled_recent_sample_is_complete_but_never_an_exhaustive_window(self):
+        q='최근 Wazuh 경보 보여줘'
+        c=receipt('wazuh',limit=1,scanned=1,scan_capped=True)
+        c['arguments']['limit']=1
+        self.assertEqual(h.missing_reads(q,[c]),[])
+        text=h.lookup_report(q,[c])
+        self.assertIn('조회 한도 도달',text)
+        self.assertIn('추가 경보 존재 여부/구간 전체 건수 미확인',text)
+        self.assertIn('IP 정보 없음',text)
+        self.assertEqual(text.count('로컬 접속을 뜻하지 않습니다.'),1)
+        self.assertNotIn('부분 조회·미완료',text)
+        for changes in ({'scanned':2},{'scanned':True},{'returned_count':0,'alerts':[]}):
+            bad=receipt('wazuh',limit=1,scanned=1,scan_capped=True)
+            bad['arguments']['limit']=1
+            data=json.loads(bad['result']);data.update(changes);bad['result']=json.dumps(data)
+            bad['result_sha256']=hashlib.sha256(bad['result'].encode()).hexdigest()
+            with self.subTest(changes=changes):self.assertTrue(h.missing_reads(q,[bad]))
 
     def test_bad_receipts_and_incomplete_results_never_complete(self):
         q='오늘 WAF 로그 보여줘';good=receipt()
@@ -115,6 +181,24 @@ class EventLookup(unittest.TestCase):
         self.assertEqual(worker.lookup_read_scope(h,q,'lead'),h.event_lookup_scope(q))
         self.assertIsNone(worker.lookup_read_scope(h,q,'peer'))
         self.assertEqual(h.lookup_report(q,[receipt()]),h.event_report(q,[receipt()]))
+
+    def test_recent_listing_cannot_select_a_future_absolute_window(self):
+        name='mcp__security_events__search_wazuh_alerts'
+        schema={name:{'type':'object','properties':{
+            'since_kst':{'type':'string'},'until_kst':{'type':'string'},
+            'lookback_minutes':{'type':'integer','minimum':1,'maximum':1440},
+            'limit':{'type':'integer','minimum':1,'maximum':50}}}}
+        selected=h.refine_read_schemas('Wazuh 최근 경보를 표로 보여줘',schema,[])[name]
+        self.assertEqual(set(selected['properties']),{'lookback_minutes','limit'})
+        self.assertEqual(selected['properties']['lookback_minutes']['enum'],[60])
+        self.assertEqual(selected['required'],['lookback_minutes'])
+        self.assertFalse(selected['additionalProperties'])
+        for changes in ({'maximum':30},{'enum':[5,10]}, {'type':'string'}):
+            bad=copy.deepcopy(schema)
+            bad[name]['properties']['lookback_minutes'].update(changes)
+            self.assertEqual(h.refine_read_schemas('최근 Wazuh 로그 보여줘',bad,[]),{})
+        required=copy.deepcopy(schema);required[name]['required']=['since_kst']
+        self.assertEqual(h.refine_read_schemas('최근 Wazuh 로그 보여줘',required,[]),{})
 
 
 if __name__ == '__main__':unittest.main()

@@ -13,6 +13,26 @@ from convert_reference import REVISION,digest
 from download_model import verify_artifact
 
 
+def verified_base_projector(root):
+    """Check the reused projector before spending time on text conversion."""
+    baseline=Path(root)/'exports/qwen36-soc-base-gguf'
+    record=baseline/'conversion-status.json'
+    projector=baseline/'mmproj-qwen36-soc-f16.gguf'
+    if baseline.is_symlink() or record.is_symlink() or projector.is_symlink():
+        raise ValueError('Base projector inputs must be regular local artifacts')
+    reference=json.loads(record.read_text())
+    if (reference.get('status')!='completed' or reference.get('variant')!='base'
+            or reference.get('llama_cpp_revision')!=REVISION):
+        raise ValueError('Verified pinned base projector required')
+    matches=[a for a in reference.get('artifacts',[]) if a.get('path')==projector.name]
+    if len(matches)!=1:raise ValueError('One verified base projector artifact required')
+    expected=matches[0]
+    if (not projector.is_file() or projector.stat().st_size!=expected.get('bytes')
+            or digest(projector)!=expected.get('sha256')):
+        raise ValueError('Base projector hash or size mismatch')
+    return projector
+
+
 def convert(root,variant,tools_root=None):
     root=Path(root);tools=Path(tools_root) if tools_root is not None else root/'comparisons/foundation-sec-8b-instruct-20261027'
     source=tools/'llama.cpp';quantizer=source/'build-cpu/bin/llama-quantize'
@@ -45,6 +65,7 @@ def convert(root,variant,tools_root=None):
             if saved.get('global_step')!=step or digest(checkpoint/'adapter_model.safetensors')!=manifest['adapter_sha256']:
                 raise ValueError('Merged v2 adapter does not match the named checkpoint')
     else:raise ValueError('Unknown conversion variant')
+    if variant!='base':verified_base_projector(root)
     folder=root/f'exports/qwen36-soc-{variant}-gguf';folder.mkdir(parents=True,exist_ok=False)
     record=folder/'conversion-status.json';state={'status':'checking','variant':variant,'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'llama_cpp_revision':REVISION}
     if variant=='dgx-guide':
@@ -77,11 +98,7 @@ def convert(root,variant,tools_root=None):
                 # Streaming merge proves every non-LoRA tensor identical to the base.
                 # Reuse the already verified projector rather than converting it again.
                 import shutil
-                baseline=root/'exports/qwen36-soc-base-gguf';reference=json.loads((baseline/'conversion-status.json').read_text())
-                if reference.get('status')!='completed':raise ValueError('Verified base projector required')
-                expected=next(a for a in reference['artifacts'] if a['path']==projector.name)
-                if digest(baseline/projector.name)!=expected['sha256']:raise ValueError('Base projector hash mismatch')
-                shutil.copyfile(baseline/projector.name,projector)
+                shutil.copyfile(verified_base_projector(root),projector)
             state['status']='quantizing_q4_k_m';save()
             run([quantizer,full,quant,'Q4_K_M','2'])
             # Inspect metadata only; GGUFReader keeps tensor storage memory-mapped.

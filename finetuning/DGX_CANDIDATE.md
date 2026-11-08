@@ -1,12 +1,12 @@
 # DGX 학습본의 Thor 후보 내보내기
 
-현재 후보는 8,695건/4,348step·validation176을 완료한 `soc-qwen36:35b-operator-q4km-20261103`이다. 11/3 CPU 병합·변환과 Thor 별도 등록·전체 GPU 적재를 확인했고 동일 하네스 3군 비교를 마쳤으며 운영 교체는 보류한다. [현행 원장](OPERATOR_CANDIDATE_20261103.json) · [STATUS](../STATUS.md). 등록·적재·품질 합격·두 봇의 운영 선택을 구분한다.
+현재 후속은 균형1,220건/610step의 `soc-qwen36:35b-balanced-q4km-20261108`이며, 가중치/재개계보·병합을 검증한 뒤 변환 중이다. [새 결과·실패/복구](BALANCED_MAIN_20261107.md). 기존 비교 후보는8,695건/4,348step·validation176을 완료한 `soc-qwen36:35b-operator-q4km-20261103`이다. 11/3 CPU 병합·변환과 Thor 별도 등록·전체 GPU 적재를 확인했고 동일 하네스 3군 비교를 마쳤으며 운영 교체는 보류한다. [현행 원장](OPERATOR_CANDIDATE_20261103.json) · [STATUS](../STATUS.md). 등록·적재·품질 합격·두 봇의 운영 선택을 구분한다.
 
 과거 11/1의447건/224step 후보는 `soc-qwen36:35b-dgx-guide-q4km-20261101`이며 산출물과 당시 실패·점수를 보존한다. 아래 날짜가 있는 11/1 수치는 이번 본학습 결과가 아니다.
 
 ## 새 후보 프로필과 별도 Ollama
 
-새 root의 `candidate-profile.json`은 정확한 `schema: 1`, `model`, `adapter_sha256`, `run_manifest_sha256`, `source_notices` 키를 갖는다. 모델 이름은 별도 `soc-qwen36:35b-...` 범위이며 운영 이름을 쓸 수 없다. `source_notices`는 고지 파일명→SHA256 사전이다. 이번에는 실제 학습의17개 고지를 모두 고정한다. profile SHA→완료 학습/adapter/run manifest→변환 receipt→등록 blob을 연결하고 어느 단계가 달라도 거절한다. 프로필이 없는 과거 root는 기존 이름과8개 고지 검증을 유지한다.
+새 root의 `candidate-profile.json`은 정확한 `schema: 1`, `model`, `adapter_sha256`, `run_manifest_sha256`, `source_notices` 키를 갖는다. 모델 이름은 별도 `soc-qwen36:35b-...` 범위이며 운영 이름을 쓸 수 없다. `source_notices`는 고지 파일명→SHA256 사전이다. 11/3 후보는실제학습의17개,11/8 균형후보는18개 고지를 고정한다. profile SHA→완료 학습/adapter/run manifest→변환 receipt→등록 blob을 연결하고 어느 단계가 달라도 거절한다. 프로필이 없는 과거 root는 기존 이름과8개 고지 검증을 유지한다.
 
 기본 API는 기존 `http://127.0.0.1:11434`다. 작업자가 준비한 격리 Ollama를 사용할 때만 register/preflight/warmup에 `--api-base-url http://127.0.0.1:11435`를 지정할 수 있다. 외부 주소·다른 포트·사용자정보·URL 경로는 허용하지 않는다. 기존 설치 바이너리를 재사용하며 패키지·이미지 추가가 없다. 별도 loopback fixture 생성은 서버 초기 설치나 운영 서비스 전환이 아니다.
 
@@ -29,7 +29,7 @@ bash SOURCE/deploy.sh --model-candidate --phase warmup \
 | --- | --- |
 | `--phase check` | 완료 단계·finite validation loss·자료 SHA/건수·토큰 보존·base provenance·최종 adapter/checkpoint SHA·실제380텐서 finite/190LoRA쌍 |
 | `--phase merge` | 같은 검사 후 CPU BF16 병합.190대상만 변경,전체1,045텐서 재대조·나머지855/MTP19 보존.출처 고지와 training-verification 기록 |
-| `--phase convert` | 고정 공식 llama.cpp·CPU quantizer 검사,모든 병합 파일 SHA 재확인 후 BF16 GGUF→Q4_K_M.비전 projector 재사용·Qwen35MoE/MTP metadata 검사 |
+| `--phase convert` | 고정 공식 llama.cpp·CPU quantizer·base projector의 완결원장/길이/SHA를 무거운 변환 전에 검사,모든 병합 파일 SHA 재확인 후 BF16 GGUF→Q4_K_M.비전 projector 재사용·Qwen35MoE/MTP metadata 검사 |
 | `--phase register` | Thor loopback Ollama에 새 태그만 생성.훈련receipt→변환adapter/receipt SHA→text/projector blob SHA 검증·기존 모델 digest 유지·runtime/템플릿/출처 고지 대조 |
 | `--phase preflight` | Thor에서 모델 digest·다른 모델 적재 여부·사용 가능 메모리 검사. 적재 전64GiB, 정확한 후보가 전체GPU/context262144로 이미 적재된 경우32GiB 잔여 여유. GPU 할당 요청 없이 기록 |
 | `--phase warmup` | 같은 검사/직전 재검사 후90초 단일 예열. 실제 응답/전체GPU/context262144 확인,실패 시 자동 재시도·운영전환 없음 |
@@ -47,7 +47,7 @@ bash /installer/deploy.sh --model-candidate --phase convert \
   --root /workspace --tools /tools
 ```
 
-`/tools`는 기존 검증된 `llama.cpp`, `conversion-python-deps`, `conversion-manifest.json`을 포함한다. 원본과 같은 고정 commit `276378515ceebee5d14bcc8536603dd5c87491a2`를 사용한다. 다른 서버의 build-tree RPATH 대신 해당 `build-cpu/bin`을 명시한 뒤 작은 실제 GGUF 양자화로 CPU 호환성을 확인한다. 새 라이브러리 설치를 요구하거나 학습/추론의 Python 환경을 덮어쓰지 않는다.
+`/tools`는 기존 검증된 `llama.cpp`, `conversion-python-deps`, `conversion-manifest.json`을 포함한다. 별도로 `exports/qwen36-soc-base-gguf/`에 검증된 `conversion-status.json`과 `mmproj-qwen36-soc-f16.gguf`를 준비해야 한다. text 가중치만 변환한다고 이 입력을 생략할 수 없다. 11/8 누락실패를 계기로 출력 생성 전에 검사를 옮겼으며 기존27검사를 통과했다. 원본과 같은 고정 commit `276378515ceebee5d14bcc8536603dd5c87491a2`를 사용한다. 다른 서버의 build-tree RPATH 대신 해당 `build-cpu/bin`을 명시한 뒤 작은 실제 GGUF 양자화로 CPU 호환성을 확인한다. 새 라이브러리 설치를 요구하거나 학습/추론의 Python 환경을 덮어쓰지 않는다.
 
 운영 DGX 작업은 `dgx-export-20261101-r1`의 새 디렉터리에 CPU2·메모리24GiB/swap추가0·네트워크/GPU 없는 컨테이너로 실행한다. 독립 systemd unit의7200초 상한과 해당 컨테이너만 정리하는 종료 명령을 둔다. 기존 학습의11:35 종료 unit과 식별자를 공유하지 않는다. Thor는 디스크 여유를 확인한 뒤 최종 Q4 약21.7GB와 검증 자료만 받는다. 큰 병합 HF/BF16 중간 파일은 DGX에 둔다.
 

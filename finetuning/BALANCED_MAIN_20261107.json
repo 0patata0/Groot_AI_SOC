@@ -1,7 +1,7 @@
 {
   "schema": "groot-balanced-main-registration-v1",
   "registered_at_kst": "2026-11-07T20:54:28.303677+09:00",
-  "last_verified_at_kst": "2026-11-08T08:32:47.117034+09:00",
+  "last_verified_at_kst": "2026-11-08T09:29:41.907628+09:00",
   "run_id": "capstone-dgx-20261107-balancedmain",
   "run_directory": "~/Capstone_Groot_training/dgx-20261107-balancedmain",
   "status": "training_completed_soc_quality_unverified",
@@ -71,11 +71,11 @@
   },
   "shared_inference_preempted": false,
   "deadline_kst": "2026-11-08T08:30:00+09:00",
-  "independent_timer_active": true,
-  "main_pid": 2463374,
-  "parent_pid": 1,
+  "independent_timer_active": false,
+  "main_pid": 0,
+  "parent_pid": null,
   "ssh_reconnection_verified": true,
-  "monitoring": "manual checks suspended until user resumes in morning; server-local guards remain active",
+  "monitoring": "User resumed work on 2026-11-08; end at 17:00 KST unless user stops earlier.",
   "soc_quality_passed": false,
   "production_promotion_allowed": false,
   "local_tests": {
@@ -198,5 +198,189 @@
     "thor_transferred": false,
     "production_promoted": false,
     "read_only": true
+  },
+  "registration_runtime_observation": {
+    "independent_timer_active": true,
+    "main_pid": 2463374,
+    "parent_pid": 1
+  },
+  "integrity_observation": {
+    "at_kst": "2026-11-08T09:16:57.249492+09:00",
+    "input_files_verified": 59,
+    "committed_microbatches": 1220,
+    "unique_training_conversations": 1220,
+    "exact_input_identity_matches": true,
+    "artifacts": {
+      "adapter/adapter_config.json": {
+        "sha256": "b738e42f40ffaf75c906fadf2688e2e071da2b2d3422072b73d01381b456c0e8",
+        "bytes": 1095
+      },
+      "adapter/adapter_model.safetensors": {
+        "sha256": "5166b554636fc4ee90f19aaa462dcd4670038ce6b8b8ffd0cfc1bb463c09a158",
+        "bytes": 65061752
+      },
+      "checkpoint-610/adapter_config.json": {
+        "sha256": "b738e42f40ffaf75c906fadf2688e2e071da2b2d3422072b73d01381b456c0e8",
+        "bytes": 1095
+      },
+      "checkpoint-610/adapter_model.safetensors": {
+        "sha256": "5166b554636fc4ee90f19aaa462dcd4670038ce6b8b8ffd0cfc1bb463c09a158",
+        "bytes": 65061752
+      },
+      "quality-best/step-000000610/adapter_config.json": {
+        "sha256": "b738e42f40ffaf75c906fadf2688e2e071da2b2d3422072b73d01381b456c0e8",
+        "bytes": 1095
+      },
+      "quality-best/step-000000610/adapter_model.safetensors": {
+        "sha256": "5166b554636fc4ee90f19aaa462dcd4670038ce6b8b8ffd0cfc1bb463c09a158",
+        "bytes": 65061752
+      }
+    },
+    "splits": {
+      "train": {
+        "sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+        "records": 1220
+      },
+      "validation": {
+        "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+        "records": 176
+      },
+      "test": {
+        "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+        "records": 176
+      }
+    },
+    "attempts": [
+      {
+        "attempt": 1,
+        "start_step": 0,
+        "end_step_exclusive": 168,
+        "kept_microbatches": 336,
+        "uncommitted_rows_excluded": 1,
+        "run_manifest_sha256": "3766b358b9a34985260e158457faa45e1d11eab3b2637b07bd61610d7d13d6e7"
+      },
+      {
+        "attempt": 2,
+        "start_step": 168,
+        "end_step_exclusive": 380,
+        "kept_microbatches": 424,
+        "uncommitted_rows_excluded": 8,
+        "run_manifest_sha256": "ec40c5e410b63c4ba0995aeaa9f25ccedbf2846a6239cf2a21de6c5ef9e7afc5"
+      },
+      {
+        "attempt": 3,
+        "start_step": 380,
+        "end_step_exclusive": 588,
+        "kept_microbatches": 416,
+        "uncommitted_rows_excluded": 4,
+        "run_manifest_sha256": "69d5ebfc02380e380fbb981f932aa938e1607407fd3d61d092ab1da9d756eecb"
+      },
+      {
+        "attempt": 4,
+        "start_step": 588,
+        "end_step_exclusive": 610,
+        "kept_microbatches": 44,
+        "uncommitted_rows_excluded": 0,
+        "run_manifest_sha256": "69d6e4ba9515664d0abbcb53dcc1d935cddbb51f6e83f54bd6fa07d2098947b6"
+      }
+    ],
+    "soc_accuracy_verified": false
+  },
+  "export_history": [
+    {
+      "at_kst": "2026-11-08T09:25:43.562534+09:00",
+      "status": "failed",
+      "stage": "convert",
+      "root": "~/Capstone_Groot_training/dgx-balanced-export-20261108-r1",
+      "unit": "capstone-dgx-balanced-export-20261108-r1",
+      "main_pid": 0,
+      "container_pid": 3037548,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "control_sha256": "5ea91d536554bea7f654e9b34ec7d8a57524e67b3b7a1f678a86f8abd4c0bb84",
+      "cpu_limit": 2,
+      "memory_gib": 24,
+      "network": "none",
+      "gpu_enabled": false,
+      "runtime_limit_seconds": 7200,
+      "source_notices": 18,
+      "merged_tensors_verified": 1045,
+      "unchanged_tensors": 855,
+      "changed_modules": 190,
+      "preserved_mtp_tensors": 19,
+      "existing_dgx_ollama_pid": 2510711,
+      "existing_dgx_ollama_restarts": 0,
+      "thor_transferred": false,
+      "production_promoted": false,
+      "error": "missing verified base projector conversion-status.json; training and merge completed"
+    }
+  ],
+  "export_observation": {
+    "at_kst": "2026-11-08T09:29:41.907628+09:00",
+    "status": "running",
+    "stage": "convert",
+    "root": "~/Capstone_Groot_training/dgx-balanced-export-20261108-r2",
+    "unit": "capstone-dgx-balanced-export-20261108-r2",
+    "main_pid": 3039388,
+    "container_pid": 3039443,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "control_sha256": "57291a6e7e48e3f7bacc008b88a0481b758ca669df5344da494e41f70bf01ba5",
+    "cpu_limit": 2,
+    "memory_gib": 24,
+    "network": "none",
+    "gpu_enabled": false,
+    "runtime_limit_seconds": 7200,
+    "source_notices": 18,
+    "merged_tensors_verified": 1045,
+    "unchanged_tensors": 855,
+    "changed_modules": 190,
+    "preserved_mtp_tensors": 19,
+    "existing_dgx_ollama_pid": 2510711,
+    "existing_dgx_ollama_restarts": 0,
+    "thor_transferred": false,
+    "production_promoted": false,
+    "conversion_only_retry": true,
+    "prior_failed_artifacts_preserved": true,
+    "runtime_projector_preflight_passed": true,
+    "source_sha256": {
+      "deploy.sh": "91b535600a1847df9de78d07fb2711bece7c09491c88fe5de41ebf44ebaa58a3",
+      "finetuning/candidate_model.py": "ff995f5b2e3c3f3b0147ee825fa58ecdfeaf99a8090fb98b8318733c3aad23df",
+      "finetuning/merge_streaming.py": "6477ee8bac20c4642399f778b32b9a166428fe4b06136e36d0eaca98891444d3",
+      "finetuning/merge_adapter.py": "d1157eb6ac4d58f0ee95b9abdaae2c2290ded3114ce8985849ad5af0fa0c5045",
+      "finetuning/model_profile.py": "bf4941122f11cc87cf49297481abf46ddce874db9bfdbb3d2c4c6d18d6ed553b",
+      "finetuning/bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+      "finetuning/download_model.py": "3642c4b7ced0c49d5dfe07c6025985bc1b8f35d130530fe0afd733da2c1b28ad",
+      "finetuning/convert_soc.py": "1e8349d21cd1d0d394a3881b8c986be12e3d4e64362adf143052cce054685865",
+      "finetuning/convert_reference.py": "c756a96da0fbfbf42157777a47da4a60af1b0ca47c35396fd396463bbb298e00",
+      "finetuning/register_soc.py": "e8e168bc3c1bedd822377adfeeb0525434f6945afc7cdca789030a547c2ca3b5"
+    }
+  },
+  "conversion_regression_tests": {
+    "executed": 27,
+    "passed": 27,
+    "skipped": 0,
+    "modules": [
+      "test_conversion_preflight",
+      "test_candidate_model",
+      "test_soc_registration"
+    ],
+    "new_test_file_sha256": "183c274d659d3f5b26775bf8e52c9612bd16d5cccd5c358d99ac61892c1a55b9",
+    "scope": "stdlib unit tests; actual CPU container projector preflight also passed; final GGUF not yet verified"
+  },
+  "thor_storage_consolidation": {
+    "completed_at_kst": "2026-11-08T09:25:48.454438+09:00",
+    "full_sha_after": "810199c2ce42d7db26e6fdd77ffbc1347df1e8ac7cb927377940879c26f34f63",
+    "before_free_bytes": 25040588800,
+    "after_free_bytes": 46754041856,
+    "reclaimed_bytes": 21713453056,
+    "contents_and_paths_preserved": true,
+    "source_owner_changes_to_ollama": true,
+    "canonical_permissions_unchanged": true,
+    "primary_pid_unchanged": true,
+    "models_unchanged": true,
+    "artifact": "qwen36-soc-base-gguf/qwen36-soc-q4_k_m.gguf",
+    "method": "atomic hardlink of byte-identical immutable export to existing canonical Ollama blob; full SHA verified before and after",
+    "restore_record": "/var/lib/capstone-model-storage/20261108-balanced/receipt.json",
+    "restore_script": "/var/lib/capstone-model-storage/20261108-balanced/restore-independent-copy.py",
+    "restoration_executed": false
   }
 }

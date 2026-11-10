@@ -26,6 +26,106 @@ class DiagnosticClaims(unittest.TestCase):
     def setUp(self):self.facts=[diagnostic(),historical()]
     def issues(self,text):return g.evidence_claim_violations(text,self.facts)
 
+    def test_exact_registered_unit_names_do_not_escape_health_checks(self):
+        for unit in ('capstone-management.service','vector.service','docker.service','wazuh-agent.service'):
+            facts=copy.deepcopy(self.facts)
+            for row in facts:row['unit']=unit
+            for text in (unit+'(Type=oneshot)는 정상적으로 시작·종료 반복을 수행했습니다.',
+                         unit+'가 정상적으로 동작합니다.'):
+                with self.subTest(unit=unit,text=text):
+                    self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations(text,facts))
+            self.assertEqual(c.snapshot_health_violations('현재 '+unit+'의 마지막 메인 프로세스가 정상 종료했습니다.',facts),[])
+
+    def test_partial_receipts_cannot_prove_entire_period_even_if_latest_exit_is_zero(self):
+        for text in ('c:vector는 구간 내내 정상적으로 시작·종료를 반복했습니다.',
+                     'vector.service는 요청된 기간 전체에 걸쳐 정상 종료했습니다.',
+                     'c:vector는 모든 시간대에 계속 실패했습니다.',
+                     'c:vector was running throughout the entire period.',
+                     'c:vector는 기간 내내 정상 종료했습니다. 전체 기능은 미확인입니다.'):
+            with self.subTest(text=text):
+                self.assertIn('diagnostic_period_coverage_unverified',self.issues(text))
+
+    def test_sample_and_current_observations_are_not_universal_period_claims(self):
+        for text in ('반환 로그 표본에는 시작·종료 기록이 있습니다. 전체 기간의 상태는 미확인입니다.',
+                     '현재 vector.service의 마지막 프로세스가 정상 종료했습니다.',
+                     '구간 내내 정상 여부는 미확인입니다.',
+                     '전체 기간이 정상이라고 단정할 수 없습니다.',
+                     '전체 기간의 실패 원인은 확인되지 않았습니다.',
+                     '전체 기간의 오류 이력을 추가로 조회해야 합니다.',
+                     '구간 내내 실패했는지는 미확인입니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('diagnostic_period_coverage_unverified',self.issues(text))
+
+    def test_period_claim_is_bound_to_the_named_diagnostic_subject(self):
+        self.assertEqual(c.diagnostic_period_claim_violations('b:management는 구간 내내 정상 종료했습니다.',self.facts),[])
+        self.assertIn('diagnostic_period_coverage_unverified',c.diagnostic_period_claim_violations(
+            'c:vector는 구간 내내 정상 종료했습니다.',self.facts+[{'kind':'blocks','addresses':[]}]))
+        complete=[dict(historical(),requested_window_total_count=2)]
+        self.assertEqual(c.diagnostic_period_claim_violations('c:vector는 구간 내내 정상 종료했습니다.',complete),[])
+        # Declining this narrow coverage check is not proof of functional health.
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations('c:vector는 정상입니다.',complete))
+
+    def test_rejected_sentences_pinpoint_only_the_offending_claims(self):
+        # R30 (2026-11-10): the model kept a rejected "정상" sentence in basis
+        # while editing limitations, because feedback named only codes/fields.
+        facts=[historical()]
+        prose=('**판단**\nc:vector 시작 실패 표본이 있습니다. 현재 c:vector는 정상 동작 중입니다.\n\n'
+               '**미확인·한계**\n- 과거 실패 원인은 미확인입니다.\n- 현재 c:vector는 정상이나 원인은 미확인입니다.\n'
+               '| 표 | c:vector는 정상 |')
+        found=c.rejected_claim_sentences(prose,facts,['diagnostic_snapshot_is_not_functional_health','diagnostic_report_empty_field'])
+        self.assertEqual([x['sentence'] for x in found],
+                         ['현재 c:vector는 정상 동작 중입니다.','현재 c:vector는 정상이나 원인은 미확인입니다.'])
+        self.assertTrue(all(x['issues']==['diagnostic_snapshot_is_not_functional_health'] for x in found))
+        # Only codes the full check raised; structural codes and no-issue input yield nothing.
+        self.assertEqual(c.rejected_claim_sentences(prose,facts,['diagnostic_report_empty_field']),[])
+        self.assertEqual(c.rejected_claim_sentences(prose,facts,[]),[])
+        self.assertEqual(c.rejected_claim_sentences(prose,'not-a-list',['diagnostic_snapshot_is_not_functional_health']),[])
+
+    def test_parenthesized_candidate_causes_are_not_absence_claims(self):
+        facts=[historical()]
+        ok=('세부 원인(설정 오류, 권한 문제 등)은 확인되지 않았습니다.','후보(권한 오류 등)는 확인되지 않았습니다.')
+        bad=('설정 오류, 권한 문제 등은 확인되지 않았습니다.','오류는 확인되지 않았습니다.',
+             '세부 원인(설정 오류)은 확인되지 않았지만 다른 오류는 발생하지 않았습니다.')
+        for text in ok:
+            with self.subTest(text=text):
+                self.assertNotIn('sample_zero_presented_as_absence',c.snapshot_health_violations(text,facts))
+        for text in bad:
+            with self.subTest(text=text):
+                self.assertIn('sample_zero_presented_as_absence',c.snapshot_health_violations(text,facts))
+
+    def test_rejected_sentences_reach_the_repair_request_only_when_valid(self):
+        context={'question':'q','background':''}
+        good={'issues':['diagnostic_snapshot_is_not_functional_health'],'untrusted_prior_answer':'',
+              'untrusted_rejected_sentences':[{'sentence':'현재 c:vector는 정상입니다.','issues':['diagnostic_snapshot_is_not_functional_health']}]}
+        system,user=c.service_report_messages(context,{},[],good)
+        self.assertIn('untrusted_rejected_sentences',system['content'])
+        self.assertEqual(json.loads(user['content'])['untrusted_rejected_sentences'],good['untrusted_rejected_sentences'])
+        for bad in ([{'sentence':'x','issues':['not_raised']}],[{'sentence':'x'}],'x',[]):
+            with self.subTest(bad=bad):
+                system,user=c.service_report_messages(context,{},[],{**good,'untrusted_rejected_sentences':bad})
+                self.assertNotIn('untrusted_rejected_sentences',json.loads(user['content']))
+
+    def test_period_limitations_remain_valid_with_mixed_sensor_facts(self):
+        facts=self.facts+[{'kind':'alerts','count':4}]
+        text='구간 전체 경보 건수·과거 오류의 현재 복구 여부는 미확인입니다.'
+        self.assertEqual(c.diagnostic_period_claim_violations(text,facts),[])
+        self.assertIn('diagnostic_period_coverage_unverified',c.diagnostic_period_claim_violations(
+            text+' c:vector는 구간 내내 정상 종료했습니다.',facts))
+
+    def test_unknown_cause_does_not_mean_error_absence(self):
+        for text in ('시작 실패의 구체적인 애플리케이션 설정 오류 원인은 확인되지 않았습니다.',
+                     '장애의 이유는 확인되지 않았습니다.',
+                     '오류 배경이 발견되지 않았습니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('sample_zero_presented_as_absence',self.issues(text))
+
+    def test_unknown_cause_does_not_excuse_independent_error_absence(self):
+        for text in ('오류 원인은 확인되지 않았지만 오류도 발생하지 않았습니다.',
+                     '오류 원인은 확인되지 않았습니다. 장애는 발생하지 않았습니다.',
+                     '오류가 확인되지 않았으며 원인은 미확인입니다.'):
+            with self.subTest(text=text):
+                self.assertIn('sample_zero_presented_as_absence',self.issues(text))
+
     def test_structured_incident_closure_cannot_hide_behind_process_only_prose(self):
         basis='과거 종료값 3; 현재 마지막 종료값 0으로 종료했습니다.'
         for assessment,status in (('benign','resolved'),('remediated','resolved'),('benign','needs_review')):
@@ -96,6 +196,83 @@ class DiagnosticClaims(unittest.TestCase):
         self.assertIn('web_snapshot_is_not_application_health',c.snapshot_health_violations('백엔드 기능 장애가 없습니다.',facts))
         self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations('vector 서비스 기능 장애가 없습니다.',facts))
         self.assertEqual(c.snapshot_health_violations('기능 장애가 없습니다.',[]),[])
+
+    def test_collection_and_registered_subjects_cannot_gain_functional_health_from_snapshots(self):
+        self.facts=[diagnostic('a:vector'),{'kind':'diagnostics','target':'a:collection',
+            'diagnostic_mode':'runtime','collection_metrics':{'agent_connected':True,'msg_buffer':0}}]
+        for text in ('현재 수집 상태는 정상입니다.','현재 전송은 정상입니다.',
+                     '파이프라인은 건강합니다.','Vector는 정상입니다.','a:collection은 정상입니다.',
+                     '수집 장애는 없습니다. 전체 손실 여부는 미확인입니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+        for text in ('수집 상태 정상 여부는 미확인입니다.','수집이 정상이라고 단정할 수 없습니다.',
+                     '연결 지표 true, 메시지 버퍼0으로 관측됐습니다. 지속 전달은 미확인입니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_health_claims_are_not_exempt_after_a_long_failure_clause(self):
+        self.facts=[diagnostic('a:vector')]
+        for subject in ('Vector','서비스','수집 파이프라인'):
+            for middle in ('', '반환된 과거 시각의 제한된 로그를 확인했고 기록의 일부만 조회한 뒤 현재 '):
+                self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(subject+'는 '+middle+'정상 재시작되었습니다.'))
+                self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(subject+'는 '+middle+'정상 여부가 미확인입니다.'))
+
+    def test_no_impact_claim_requires_more_than_process_and_collection_metrics(self):
+        for text in ('수집에 영향이 없습니다.', '전송에도 손실은 없습니다.', '서비스의 영향 없음.',
+                     '과거 오류는 있었지만 현재 수집에 영향이 없습니다. 전체 검증은 미확인입니다.'):
+            self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+        for text in ('수집에 영향이 없다고 단정할 수 없습니다.', '수집 영향 여부는 미확인입니다.',
+                     '전송의 손실은 없다는 판정은 미확인입니다.'):
+            self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_relative_age_is_not_invented_from_a_clock_like_log_string(self):
+        self.assertIn('diagnostic_relative_time_requires_calculation',self.issues('11일 전(2026-11-08 11:13) 기록입니다.'))
+        self.assertNotIn('diagnostic_relative_time_requires_calculation',self.issues('2026-11-08 11:13 KST 기록입니다.'))
+        self.assertNotIn('diagnostic_relative_time_requires_calculation',self.issues('| 로그 발췌 | 11일 전 기록 |'))
+        self.assertIn('diagnostic_relative_time_requires_calculation',c.snapshot_health_violations('11일 전 기록',self.facts+[{'kind':'time_calculation'}]))
+        calculated=self.facts+[{'kind':'time_calculation','timestamps':[{'id':'event','kst':STAMP,'seconds_until_reference':172805}]}]
+        self.assertNotIn('diagnostic_relative_time_requires_calculation',c.snapshot_health_violations('2일 전(2026-10-30 12:34 KST) 기록',calculated))
+        for text in ('11일 전(2026-10-30 12:34 KST) 기록','2일 전(2026-11-08 11:13 KST) 기록'):
+            self.assertIn('diagnostic_relative_time_requires_calculation',c.snapshot_health_violations(text,calculated))
+
+    def test_duration_claims_cannot_relabel_lookback_or_invent_a_service_cadence(self):
+        for target in ('a:vector','b:management','c:apache'):
+            facts=[dict(diagnostic(target),lookback_minutes=15,age_seconds=15)]
+            for claim in ('약 15분 간격으로 시작 기록이 반복되었습니다.',
+                          '15초마다 실행합니다.','실행 주기는 15분입니다.',
+                          '실행 간격은 0.25시간입니다.'):
+                with self.subTest(target=target,claim=claim):
+                    self.assertIn('diagnostic_duration_claim_unbound',c.snapshot_health_violations(target+' '+claim,facts))
+        for text in ('c:vector의 조회 구간은 최근 15분입니다.',
+                     'c:vector의 15분 간격 여부는 미확인입니다.',
+                     '현재 c:vector의 실행 간격은 아직 미확인입니다.'):
+            self.assertNotIn('diagnostic_duration_claim_unbound',self.issues(text))
+
+    def test_observed_interval_requires_bound_pair_calculation_and_correct_unit(self):
+        a='2026-11-09T01:21:15.413305+09:00';b='2026-11-09T01:21:31.415085+09:00'
+        history=dict(historical(),journal_valid=True,journal_entries=[{'at_kst':a},{'at_kst':b}])
+        calculation={'kind':'time_calculation','timestamps':[{'id':'a','kst':a},{'id':'b','kst':b}],
+                     'differences':[{'from':'a','to':'b','seconds':16.00178}]}
+        clause=f'c:vector 두 관측 {a}와 {b} 사이의 간격은 16초입니다.'
+        facts=[history,calculation]
+        self.assertEqual(c.diagnostic_duration_claim_violations(clause,facts),[])
+        self.assertEqual(c.diagnostic_duration_claim_violations(clause.replace('16초','0.27분'),facts),[])
+        for text in (clause.replace('16초','16분'),clause.replace('16초','15초'),
+                     'c:vector가 16초마다 실행됩니다.',clause.replace(b,'2026-11-09T01:22:31+09:00')):
+            self.assertIn('diagnostic_duration_claim_unbound',c.diagnostic_duration_claim_violations(text,facts))
+        self.assertIn('diagnostic_duration_claim_unbound',c.diagnostic_duration_claim_violations(clause,[history]))
+        wrong=copy.deepcopy(facts);wrong[-1]['differences'][0]['seconds']=900
+        self.assertIn('diagnostic_duration_claim_unbound',c.diagnostic_duration_claim_violations(clause.replace('16초','15분'),wrong))
+        self.assertIn('diagnostic_duration_claim_unbound',c.diagnostic_duration_claim_violations(clause,[dict(history,target='b:management'),calculation,diagnostic()]))
+
+    def test_absence_verb_cannot_turn_partial_journal_into_a_whole_window_claim(self):
+        for text in ('요청 구간의 Vector 오류는 관측되지 않았으며 현재 수집 상태는 정상입니다.',
+                     '장애가 발견되지 않았습니다.','오류는 확인되지 않았습니다.',
+                     '실패는 발생하지 않았습니다. 전체 오류 건수는 미확인입니다.',
+                     '반환 표본에는 오류가 발견되지 않았습니다. 전체 구간의 장애가 관측되지 않았습니다.'):
+            with self.subTest(text=text):self.assertIn('sample_zero_presented_as_absence',self.issues(text))
+        for text in ('반환 표본에서 오류가 관측되지 않았습니다.',
+                     '오류가 관측되지 않았다고 단정할 수 없습니다.',
+                     '오류 원문 발췌 0행이며 전체 오류 건수는 미확인입니다.'):
+            with self.subTest(text=text):self.assertNotIn('sample_zero_presented_as_absence',self.issues(text))
 
     def test_disclaimer_does_not_excuse_positive_or_double_negative_claim(self):
         for text in ('서비스의 정상 가동 상태를 증명합니다.',
@@ -352,6 +529,38 @@ class DiagnosticClaims(unittest.TestCase):
                      '검토 상태 수만으로 처리 지연을 입증하지 않습니다.'):
             with self.subTest(text=text):self.assertEqual(self.issues(text),[])
 
+    def test_shared_negative_predicate_covers_coordinated_nominal_claims(self):
+        self.facts=[self.pipeline()]
+        for subject in ('처리 지연','과부하','성능 저하'):
+            for tail in (' 또는 실행 실패 건수가 아님.', '이나 중단 상태가 아닙니다.',
+                         ' 혹은 장애를 의미하지 않습니다.'):
+                with self.subTest(subject=subject,tail=tail):
+                    self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 '+subject+tail))
+
+    def test_adverbs_do_not_turn_negative_evidence_predicates_into_assertions(self):
+        self.facts=[self.pipeline()]
+        for adverb in ('직접','충분히','객관적으로','반드시'):
+            for term in ('병목','처리 지연','과부하'):
+                with self.subTest(adverb=adverb,term=term):
+                    self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(
+                        '관제 '+term+'을 '+adverb+' 입증하지 않습니다.'))
+
+    def test_negative_scope_does_not_excuse_independent_assertions(self):
+        self.facts=[self.pipeline()]
+        negatives=('관제 병목이나 실행 실패 건수가 아님', '관제 과부하를 직접 증명하지 않음')
+        for negative in negatives:
+            for bridge in ('. ', '; ', ', 하지만 ', '에도 불구하고 '):
+                with self.subTest(negative=negative,bridge=bridge):
+                    self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(
+                        negative+bridge+'현재 관제 처리 지연이 있습니다.'))
+        for text in ('관제 처리 지연이 있으며 실행 실패는 아닙니다.',
+                     '관제 병목 또는 실행 실패가 있고 정상은 아님.',
+                     '관제 병목 또는 실행 실패가 발생하고 정상은 아님.',
+                     '관제 병목 또는 실행 실패가 발생하며 정상은 아님.',
+                     '관제 과부하를 직접 증명하지 않는 것은 아닙니다.'):
+            with self.subTest(text=text):
+                self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+
     def test_other_read_does_not_disable_explicit_pipeline_claim_validation(self):
         for other in ({'kind':'blocks'}, {'kind':'events'}, {'kind':'web_access'}):
             self.facts=[self.pipeline(),diagnostic('b:management'),other]
@@ -534,6 +743,40 @@ class DiagnosticClaims(unittest.TestCase):
     def test_empty_field_guard_does_not_rewrite_plain_failures_or_other_reports(self):
         self.assertNotIn('diagnostic_report_empty_field',self.issues('조회 근거 부족으로 판단을 완료하지 못했습니다.'))
         self.assertEqual(c.diagnostic_report_text_violations(self.report_prose(step=','),[{'kind':'rules'}]),[])
+
+    def test_original_markdown_basis_survives_projection_but_not_substitution(self):
+        basis='| 구분 | 판단 |\n|---|---|\n| 관측 | 반환 표본만 확인했습니다. |'
+        text=self.report_prose(basis=c.report_field_display(basis))
+        original='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved','basis':basis},ensure_ascii=False)
+        text=text.replace('INCIDENT_DISPOSITION: {"assessment":"unresolved"}',original)
+        self.assertNotIn('diagnostic_report_empty_field',self.issues(text))
+        # A valid source field must match its projection; neither a receipt
+        # table nor an unrelated structured basis may repair empty prose.
+        for displayed in ('', '| 조회 근거 | 표본 |'):
+            bad=text.replace(c.report_field_display(basis),displayed,1)
+            with self.subTest(displayed=displayed):
+                self.assertIn('diagnostic_report_empty_field',self.issues(bad))
+        bad=text.replace(json.dumps(basis,ensure_ascii=False),'""')
+        self.assertIn('diagnostic_report_empty_field',self.issues(bad))
+
+    def test_meaningful_markdown_limitations_and_actions_are_not_empty_fields(self):
+        table='| 항목 | 내용 |\n|---|---|\n| 범위 | 전체 구간은 미확인입니다. |'
+        for fields in ({'limit':table},{'step':table},{'limit':'- 전체 구간은 미확인입니다.\n- 원인은 별도 검토가 필요합니다.'}):
+            with self.subTest(fields=fields):
+                self.assertNotIn('diagnostic_report_empty_field',self.issues(self.report_prose(**fields)))
+
+    def test_negative_pipeline_and_markdown_do_not_hide_real_sample_absence(self):
+        self.facts=[diagnostic(),self.pipeline()]
+        for basis in ('요청 기간 내 오류 기록 없음.',
+                      '| 구분 | 판단 |\n|---|---|\n| 요청 구간 | 오류 기록이 없음. |'):
+            report={'assessment':'unresolved','basis':basis,'evidence_tools':[],
+                'limitations':['검토 상태 수는 관제 병목을 직접 증명하지 않음.'],
+                'next_steps':[],'status':'needs_review'}
+            issues=self.issues(g.render_model_review(report,self.facts))
+            with self.subTest(basis=basis):
+                self.assertIn('sample_zero_presented_as_absence',issues)
+                self.assertNotIn('diagnostic_pipeline_congestion_unverified',issues)
+                self.assertNotIn('diagnostic_report_empty_field',issues)
 
     def test_current_review_total_does_not_supply_calendar_arrival_counts(self):
         self.facts=[{'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{

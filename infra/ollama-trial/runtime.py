@@ -214,6 +214,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                         'validator': str(exc.validator), 'executed': False}
                                     report.setdefault('input_rejections', []).append(rejection)
                                     return canonical({**rejection, 'expected_schema': input_schema})
+                                rejection = (harness.CONTRACT.read_time_input_rejection(arguments,input_schema)
+                                    if harness.EVIDENCE.allowed(alias(backend,bare_name),'verify') else None)
+                                if rejection:
+                                    report.setdefault('input_rejections', []).append({
+                                        'server':backend,'name':bare_name,**rejection})
+                                    return canonical(rejection)
                                 rejection = harness.proposal_preflight(current, report['calls'], backend, bare_name, arguments)
                                 if rejection:
                                     report.setdefault('proposal_input_rejections', []).append({
@@ -296,15 +302,15 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
                           if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
             service_background=question if service_plan and question!=current else ''
-            if service_plan:
-                options=service_plan['requirements']
+            async def select_required_service_reads(options, phase):
+                nonlocal selection_active
                 schema={'type':'object','additionalProperties':False,'required':['indexes'],
                     'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
                         'uniqueItems':True,'items':{'type':'integer','minimum':0,'maximum':len(options)-1}}}}
                 selection_messages=[
                     ('system','사용자가 명시한 서비스와 기간의 필수 읽기를 확인하고 각 항목에 표시된 index 값을 모두 선택하세요. index는 0부터 시작하며 새 번호를 만들지 않습니다. 결과·원인·정상·승인은 생성하지 않습니다. 도구 실행은 검증 후 이루어집니다.'),
                     ('human',canonical({'request':current,'requested_at_kst':report['at_kst'],
-                        'options':[{'index':i,**option} for i,option in enumerate(options)]}))]
+                        'selection_reason':phase,'options':[{'index':i,**option} for i,option in enumerate(options)]}))]
                 for attempt in range(2):
                     selection=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(selection_messages),90)
                     try:
@@ -312,7 +318,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         break
                     except ValidationError as exc:
                         report.setdefault('service_report_audit',[]).append({
-                            'phase':'required_read_selection_rejected','attempt':attempt+1,
+                            'phase':('required_read_selection_rejected' if phase=='initial_required_reads' else phase+'_selection_rejected'),'attempt':attempt+1,
                             'response':selection,'validator':str(exc.validator),'dispatched':False,
                             'read_result_sha256':[]})
                         if attempt:raise
@@ -326,6 +332,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         option=options[index]
                         await selected_tools[option['tool']].ainvoke(option['arguments'])
                 finally:selection_active=False
+                return selection
+            if service_plan:
+                options=service_plan['requirements']
+                selection=await select_required_service_reads(options,'initial_required_reads')
                 report['required_service_reads']={'selected':selection['indexes'],'count':len(options)}
                 question=harness.incident_observation_prompt(current,report['calls'])+harness.read_background(question,current)
             async def service_synthesis(feedback=None):
@@ -334,20 +344,47 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 # A request for more evidence must reach real read dispatch,
                 # rather than replaying the original question through agent.run.
                 for _ in range(steps):
-                    service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
-                        report['at_kst'],harness.service_history_receipts(report['calls']),
-                        background=service_background) if service_plan and
-                        len(report['calls'])==len(harness.service_history_receipts(report['calls'])) else None)
-                    if service_context is None:return None
-                    citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
                     readable={t.name:t for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')}
+                    receipts=harness.service_report_receipts(report['calls'])
+                    refresh=(harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+                        if service_plan and receipts is not None else [])
+                    if refresh:
+                        before=len(report['calls'])
+                        await select_required_service_reads(refresh,'expired_current_refresh')
+                        receipts=harness.service_report_receipts(report['calls'])
+                        pending=(harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+                            if receipts is not None else refresh)
+                        report.setdefault('service_current_refreshes',[]).append({
+                            'targets':[o['arguments']['target'] for o in refresh],
+                            'read_count':len(report['calls'])-before,
+                            'still_expired':[o['arguments']['target'] for o in pending]})
+                        if pending:
+                            report['stop_reason']='service_current_refresh_unavailable'
+                            report['unqueried']=harness.missing_reads(current,report['calls'],
+                                report.get('diagnostic_targets',()),reference,service_plan)
+                            raise RuntimeError(report['stop_reason'])
+                    service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
+                        report['at_kst'],receipts,background=service_background,allowed_reads=set(readable))
+                        if service_plan and receipts is not None else None)
+                    if service_context is None:
+                        if service_plan and service_plan.get('compact_scope'):
+                            report['stop_reason']='service_evidence_incomplete'
+                            report['unqueried']=harness.missing_reads(current,report['calls'],
+                                report.get('diagnostic_targets',()),reference,service_plan)
+                            raise RuntimeError(report['stop_reason'])
+                        return None
+                    citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
                     descriptions={name:harness.CONTRACT.service_tool_description(t.description,t.args_schema)
                                   for name,t in readable.items()}
+                    direct=os.environ.get('CAPSTONE_SERVICE_DIRECT_READS','0')=='1'
+                    schemas={n:(harness.EVIDENCE.chat_read_schema(n,t.args_schema) if direct else t.args_schema)
+                             for n,t in readable.items()}
                     schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
-                        facts=harness.facts_for(report['calls']),read_schemas={n:t.args_schema for n,t in readable.items()},
-                        lookup_only=service_context.get('lookup_only') is True)
+                        facts=harness.facts_for(report['calls']),read_schemas=schemas,
+                        lookup_only=service_context.get('lookup_only') is True,
+                        direct_reads=min(4,max(0,budget.limit-budget.used)) if direct else None)
                     messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True,
-                        execution_rejections=report.get('service_inquiry_rejections'))
+                        execution_rejections=report.get('service_inquiry_rejections'),direct_reads=direct)
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(messages),90)
                     # Preserve generated JSON, including invalid choices, before
                     # schema validation or rendering. Never store reasoning.
@@ -356,7 +393,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         'repair': feedback is not None,
                         'read_result_sha256': [c.get('result_sha256') for c in report['calls']]})
                     report['service_report_audit'] = report['service_report_audit'][-12:]
-                    Draft202012Validator(schema).validate(value)
+                    value,removed_names=harness.CONTRACT.validated_service_report(value,schema)
+                    if removed_names:
+                        key='deduplicated_read_calls' if direct else 'deduplicated_read_tool_names'
+                        report[key]=report.get(key,0)+removed_names
                     report['service_compact_report']={'more_evidence':value['more_evidence']}
                     report.setdefault('service_compact_reports',[]).append({'more_evidence':value['more_evidence'],'repair':feedback is not None})
                     if not value['more_evidence']:
@@ -365,33 +405,39 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         report['service_lookup_complete']=review.get('scope')=='verified_service_lookup'
                         report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
                         return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
-                    selected={n:readable[n] for n in value['read_tools']}
-                    call_schema=harness.selection_schema({n:t.args_schema for n,t in selected.items()},budget.limit-budget.used)
-                    nonce=os.urandom(16).hex()
-                    call_schema['properties'].update(request_nonce={'const':nonce},report={'type':'null'})
-                    call_schema['required']+=['request_nonce','report']
-                    plan=await asyncio.wait_for(llm.with_structured_output(call_schema,method='json_schema').ainvoke(
-                        harness.CONTRACT.service_inquiry_messages(service_context,
-                            {n:descriptions[n] for n in selected},citations,call_schema,
-                            {'model_calls_used':meter.used,'model_calls_limit':steps,
-                             'tool_calls_used':budget.used,'tool_calls_limit':budget.limit})),90)
-                    report['service_report_audit'].append({'phase':'inquiry','response':json.loads(json.dumps(plan,ensure_ascii=False)),
-                        'read_result_sha256':[c.get('result_sha256') for c in report['calls']]})
-                    report['service_report_audit']=report['service_report_audit'][-12:]
-                    plan,removed=harness.validated_selection(plan,call_schema)
-                    if removed:report['deduplicated_read_calls']=report.get('deduplicated_read_calls',0)+removed
+                    if direct:
+                        selected={row['tool']:readable[row['tool']] for row in value['calls']}
+                        plan={'calls':value['calls']}
+                        report['service_direct_read_plans']=report.get('service_direct_read_plans',0)+1
+                    else:
+                        selected={n:readable[n] for n in value['read_tools']}
+                        call_schema=harness.CONTRACT.service_inquiry_schema(
+                            harness.selection_schema({n:t.args_schema for n,t in selected.items()},budget.limit-budget.used))
+                        nonce=os.urandom(16).hex()
+                        call_schema['properties'].update(request_nonce={'const':nonce},report={'type':'null'})
+                        call_schema['required']+=['request_nonce','report']
+                        plan=await asyncio.wait_for(llm.with_structured_output(call_schema,method='json_schema').ainvoke(
+                            harness.CONTRACT.service_inquiry_messages(service_context,
+                                {n:descriptions[n] for n in selected},citations,call_schema,
+                                {'model_calls_used':meter.used,'model_calls_limit':steps,
+                                 'tool_calls_used':budget.used,'tool_calls_limit':budget.limit},
+                                execution_rejections=report.get('service_inquiry_rejections'))),90)
+                        report['service_report_audit'].append({'phase':'inquiry','response':json.loads(json.dumps(plan,ensure_ascii=False)),
+                            'read_result_sha256':[c.get('result_sha256') for c in report['calls']]})
+                        report['service_report_audit']=report['service_report_audit'][-12:]
+                        plan,removed=harness.validated_selection(plan,call_schema)
+                        if removed:report['deduplicated_read_calls']=report.get('deduplicated_read_calls',0)+removed
                     # The read-only service phase has no intervening writes.
-                    # Reject the whole batch if it repeats a successful call;
-                    # failed reads and changed input/page/limit remain eligible.
-                    done=[{'tool':alias(c['server'],c['name']),'arguments':c['arguments']} for c in report['calls']
-                          if not c.get('is_error') and isinstance(c.get('result'),str)
-                          and c.get('result_sha256')==hashlib.sha256(c['result'].encode()).hexdigest()]
-                    repeated=harness.CONTRACT.service_repeated_calls(plan['calls'],done)
-                    if repeated:
-                        rejection={'code':'already_completed_read','calls':repeated,'dispatched':False}
+                    # Reject repeated successful reads and subsets of verified
+                    # empty journal windows; wider/changed evidence stays eligible.
+                    done=service_context['untrusted_completed_reads']
+                    rejection=harness.CONTRACT.service_inquiry_rejection(plan['calls'],done,
+                        {n:t.args_schema for n,t in readable.items()})
+                    if rejection:
                         history=report.setdefault('service_inquiry_rejections',[])
                         if rejection in history:
-                            report['stop_reason']='repeated_service_inquiry_without_new_evidence'
+                            report['stop_reason']=('repeated_service_inquiry_without_new_evidence'
+                                if rejection['code']=='already_completed_read' else 'repeated_invalid_service_inquiry')
                             raise RuntimeError(report['stop_reason'])
                         history.append(rejection)
                         continue
@@ -404,7 +450,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     report['service_inquiry_count']=report.get('service_inquiry_count',0)+1
                     feedback=None  # New actual receipts require a fresh judgment.
                 raise RuntimeError('service_inquiry_budget_exhausted')
-            structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
+            structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference,service_plan))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
                 report['policy_definition_rendered'] = True
@@ -417,11 +463,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
             if not report['protected_calls']:
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
-                           harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
+                           harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan))
                 literal = harness.lookup_report(current, report['calls'], report.get('diagnostic_targets', ()),
                            include_diagnostics=not service_plan)
-                issues = [] if literal else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
-                audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
+                issues = [] if literal else (harness.violations(current, str(final), report['calls'],reference,service_plan) + harness.card_answer_issues(reference,str(final),report['calls']))
+                audit = harness.incident_judgment_check(current, str(final), report['calls'],reference,service_plan)
                 if audit:
                     report.setdefault('judgment_audit', []).append(audit)
                 repair_passes = 0
@@ -445,9 +491,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         report['repair']['incident_evidence_missing'] = True
                     elif audit and issues:
                         instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues)
-                    read_scope = harness.incident_selection_scope(current, report['calls'],reference) or harness.tool_scope(current, report['calls'])
-                    compact_final=(await service_synthesis({'issues':issues,'untrusted_prior_answer':str(final)[:8192]})
-                        if service_plan and not (missing or incident_gap or gap) else None)
+                    read_scope = harness.incident_selection_scope(current, report['calls'],reference,service_plan) or harness.tool_scope(current, report['calls'])
+                    compact_final=(await service_synthesis({'issues':issues,'untrusted_prior_answer':str(final)[:8192],
+                        'untrusted_rejected_sentences':harness.CONTRACT.rejected_claim_sentences(
+                            str(final),harness.facts_for(report['calls']),issues)})
+                        if service_plan and service_plan.get('compact_scope') and not gap else None)
                     if compact_final is not None:
                         final=compact_final
                     elif read_scope and not gap and budget.used < budget.limit:
@@ -494,7 +542,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                             final = ''  # Failed/missing reads cannot become observations.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
-                    audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
+                    audit = harness.incident_judgment_check(current, str(final), report['calls'],reference,service_plan)
                     if audit:
                         report.setdefault('judgment_audit', []).append(audit)
                         report['judgment_audit'] = report['judgment_audit'][-4:]
@@ -505,14 +553,16 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         break
                     gap = harness.preparation_gap(current, report['calls'])
                     incident_gap = harness.incident_evidence_gap(current, report['calls'],reference,service_plan)
-                    missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
-                    issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
+                    missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan)
+                    issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference,service_plan) + harness.card_answer_issues(reference,str(final),report['calls']))
                 rendered = harness.lookup_report(current, report['calls'], report.get('diagnostic_targets', ()),
                             include_diagnostics=not service_plan)
-                issues = (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
-                still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
+                issues = (harness.violations(current, str(final), report['calls'],reference,service_plan) + harness.card_answer_issues(reference,str(final),report['calls']))
+                if not isinstance(final,str) or not final.strip():issues.append('empty_model_answer')
+                still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan)
                 if service_plan:
-                    still_missing+=harness.CONTRACT.service_history_state(service_plan,harness.service_history_receipts(report['calls']))['incomplete']
+                    still_missing=list(dict.fromkeys(still_missing+harness.CONTRACT.service_history_state(
+                        service_plan,harness.service_history_receipts(report['calls']))['incomplete']))
                 if still_missing:
                     report['unqueried'] = still_missing
                     issues.append('requested_read_scope_incomplete')

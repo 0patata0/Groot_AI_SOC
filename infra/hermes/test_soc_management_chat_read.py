@@ -341,6 +341,8 @@ class LiteralLookup(unittest.TestCase):
         text=w.literal_chat_lookup(self.context,self.ledger,self.receipts,self.h)
         self.assertEqual(text.count('현재 로드된 failed unit 0개'),3)
         self.assertIn('전체 공격 탐지·대응 성공을 뜻하지',text)
+        self.assertIn('표시된 수집 시각 기준 자료',text)
+        self.assertNotIn('60초 주기',text)
         self.assertEqual(w.evidence_claim_violations(text,self.facts,{NAME}),[])
 
     def test_event_listing_completes_from_bound_receipts_not_filtered_empty_or_incident(self):

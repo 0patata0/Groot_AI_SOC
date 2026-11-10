@@ -9,6 +9,7 @@ MARKERS={
     'soc-change':'SOC_WORKFLOW_CHANGE_V1',
     'soc-recover':'SOC_WORKFLOW_RECOVER_V1',
 }
+SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사')}
 
 def policy_text(name,raw):
     if name not in MARKERS:raise ValueError('soc_workflow_unknown')
@@ -37,3 +38,17 @@ def policy(names,directory=None):
         path=paths[0]
         blocks.append(policy_text(name,path.read_bytes()))
     return '\n\n'.join(blocks)
+
+
+def section_policy(names, section, directory=None):
+    """Load one explicit part of a validated skill for a focused model phase."""
+    if section not in SECTIONS or names!=(SECTIONS[section][0],):
+        raise ValueError('soc_workflow_section_selection')
+    name,heading=SECTIONS[section];body=policy(names,directory)
+    matches=list(re.finditer(r'^'+re.escape(heading)+r'\s*$',body,re.M))
+    if len(matches)!=1:raise ValueError('soc_workflow_section_missing_or_duplicate')
+    rest=body[matches[0].end():]
+    stop=re.search(r'^#{1,2} ',rest,re.M)
+    selected=rest[:stop.start()] if stop else rest
+    if not selected.strip():raise ValueError('soc_workflow_section_empty')
+    return MARKERS[name]+'\n'+heading+'\n'+selected.strip()

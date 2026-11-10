@@ -22,37 +22,46 @@ mcp=load('sdk_service_mcp',ROOT/'infra/mcp/system-diagnostics-mcp.py');mcp._libr
 
 @unittest.skipUnless(importlib.util.find_spec('jsonschema'),'existing server jsonschema required')
 class ServiceRuntime(unittest.TestCase):
-    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None,blocks=False,failed_blocks=False,selection_prompts=None):
+    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None,blocks=False,failed_blocks=False,selection_prompts=None,agent_response=None,extra_read=False,stale_first=False,stale_always=False,failed_extra=False,direct=False):
         order=[];prompts=[];calls=[]
         class Connector:
             async def list_tools(self):return [types.SimpleNamespace(**mcp.tools()[0])]
             async def call_tool(self,name,arguments,**kw):
                 order.append('read');calls.append(arguments)
                 from datetime import datetime,timedelta,timezone
-                data={'schema':1,'target':'b:management','host':'b','unit':'capstone-management.service',
+                target=arguments['target'];host=target.split(':')[0]
+                unit=core.TARGETS.get(target)
+                data={'schema':1,'target':target,'host':host,'unit':unit,
                       'mutation_performed':False,'observed_at_kst':datetime.now(timezone(timedelta(hours=9))).isoformat()}
                 past='since_kst' in arguments
                 if past:data.update(kind='journal_history',history_coverage={'status':'partial_or_unavailable'},has_more=False,
                     requested_since_kst=arguments['since_kst'],requested_until_kst=arguments['until_kst'],recent_errors=[])
                 elif arguments['target']=='b:management-pipeline':
                     data.update(target='b:management-pipeline',kind='runtime',status='degraded',metrics={'review_required_cases':2},codes=['case_review_required'],lookback_scope='latest_snapshot_only_not_requested_history');data.pop('unit')
+                elif target in ('a:collection','b:collection'):
+                    data.update(kind='runtime',status='ok',codes=[],lookback_scope='latest_snapshot_only_not_requested_history',
+                        metrics={'agent_connected':True,'msg_buffer':0,'vector_error_series_nonzero':0})
+                    data.pop('unit')
                 else:data.update(status='observed',properties={'ActiveState':'active','Result':'success'})
                 if arguments.get('view')=='journal':
                     at=datetime.fromisoformat(arguments['since_kst'])+timedelta(microseconds=1)
-                    row={'_SYSTEMD_UNIT':'capstone-management.service','__REALTIME_TIMESTAMP':str(int(at.timestamp()*1000000)),
+                    row={'_SYSTEMD_UNIT':unit,'__REALTIME_TIMESTAMP':str(int(at.timestamp()*1000000)),
                          '__CURSOR':'fixture1','PRIORITY':'6','MESSAGE':'{"status":"failed","error":"controller_already_running"}'}
                     history=load('sdk_journal_fixture_history',ROOT/'infra/mcp/diagnostic_history.py');history.core=core
                     journal=load('sdk_journal_fixture_excerpt',ROOT/'infra/mcp/diagnostic_journal.py');journal.core=core
                     with patch.object(core,'_history',history):
-                        data=journal.answer(arguments,'b',now=int(datetime.now(timezone.utc).timestamp())+1,
+                        data=journal.answer(arguments,host,now=int(datetime.now(timezone.utc).timestamp())+1,
                             runner=lambda *args:(0,json.dumps(row).encode()+b'\n'))
                 if past and failed:data={'error':'history unavailable'}
+                if not past and (stale_always or stale_first and sum(a.get('target')==target and 'since_kst' not in a for a in calls)==1):
+                    data['observed_at_kst']=(datetime.now(timezone(timedelta(hours=9)))-timedelta(seconds=181)).isoformat()
                 return types.SimpleNamespace(isError=bool(past and failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
         class Client:
             def __init__(self,**kw):pass
             def get_all_active_sessions(self):
                 sessions={'system-diagnostics':types.SimpleNamespace(connector=Connector())}
                 if blocks:sessions['resp']=types.SimpleNamespace(connector=BlockConnector())
+                if extra_read:sessions['rule-b']=types.SimpleNamespace(connector=ExtraConnector())
                 return sessions
             async def close_all_sessions(self):pass
         class BlockConnector:
@@ -60,6 +69,14 @@ class ServiceRuntime(unittest.TestCase):
             async def call_tool(self,name,arguments,**kw):
                 order.append('block_read');calls.append(arguments)
                 return types.SimpleNamespace(isError=failed_blocks,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'unavailable'} if failed_blocks else {'blocks':['192.0.2.7']}))])
+        class ExtraConnector:
+            async def list_tools(self):return [types.SimpleNamespace(name='get_service_action_target',description='등록 서비스 설정 조회',inputSchema={
+                'type':'object','additionalProperties':False,'required':['target'],'properties':{'target':{'enum':['b:management']}}})]
+            async def call_tool(self,name,arguments,**kw):
+                order.append('extra_read');calls.append(arguments)
+                return types.SimpleNamespace(isError=failed_extra,content=[types.SimpleNamespace(type='text',text=json.dumps(
+                    {'error':'fixture_unavailable'} if failed_extra else {
+                    'target':'b:management','fixture_marker':'additional_actual_service_receipt'}))])
         class Tool:
             def __init__(self,**kw):self.__dict__.update(kw)
             async def ainvoke(self,args):return await self.coroutine(**args)
@@ -81,12 +98,16 @@ class ServiceRuntime(unittest.TestCase):
                         return copy.deepcopy((compact_report[min(order.count('compact')-1,len(compact_report)-1)] if isinstance(compact_report,list) else compact_report) or self_report())
                     if 'request_nonce' in args[0].get('properties',{}):
                         order.append('inquiry');prompts.append(messages)
-                        value=copy.deepcopy(inquiry_plan if inquiry_plan is not None else {'calls':[{
+                        value=copy.deepcopy((inquiry_plan[min(order.count('inquiry')-1,len(inquiry_plan)-1)]
+                            if isinstance(inquiry_plan,list) else inquiry_plan) if inquiry_plan is not None else {'calls':[{
                             'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':{'target':'b:management','limit':50}}],'report':None})
                         value.setdefault('request_nonce',args[0]['properties']['request_nonce']['const'])
                         return value
                     order.append('select')
                     if selection_prompts is not None:selection_prompts.append(copy.deepcopy(messages))
+                    body=json.loads(messages[1][1])
+                    if body.get('selection_reason')=='expired_current_refresh' and selection is None:
+                        return {'indexes':list(range(len(body['options'])))}
                     if isinstance(selection,list):return copy.deepcopy(selection[min(order.count('select')-1,len(selection)-1)])
                     return {'indexes':[0,1,2]} if selection is None else selection
                 return types.SimpleNamespace(ainvoke=select)
@@ -95,6 +116,7 @@ class ServiceRuntime(unittest.TestCase):
             async def initialize(self):await self.adapter.create_all(self.client)
             async def run(self,prompt):
                 order.append('assess');prompts.append(prompt)
+                if agent_response is not None:return agent_response
                 return '과거 오류 원인은 반환된 제한된 메타데이터만으로 확정할 수 없습니다. 현재 상태와 사건 당시 상태는 구분해야 합니다.'
         definitions={'mcp_use':{'MCPClient':Client,'MCPAgent':Agent},
             'mcp_use.agents.adapters.langchain_adapter':{'LangChainAdapter':object},
@@ -103,10 +125,130 @@ class ServiceRuntime(unittest.TestCase):
         modules={}
         for name,values in definitions.items():
             m=types.ModuleType(name);m.__dict__.update(values);modules[name]=m
-        with patch.dict(runtime.os.environ,{'CAPSTONE_SERVICE_REPORT_COMPACT':'1' if enabled else '0'}),patch.dict(sys.modules,modules),patch.object(runtime,'capabilities',return_value={'system-diagnostics':['get_system_diagnostics'],'resp':['list_blocks']}),patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools):
+        with patch.dict(runtime.os.environ,{'CAPSTONE_SERVICE_REPORT_COMPACT':'1' if enabled else '0','CAPSTONE_SERVICE_DIRECT_READS':'1' if direct else '0'}),patch.dict(sys.modules,modules),patch.object(runtime,'capabilities',return_value={'system-diagnostics':['get_system_diagnostics'],'resp':['list_blocks'],'rule-b':['get_service_action_target']}),patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools):
             result=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid','access_mode':'hermes-parity',
-                'mcpServers':{'system-diagnostics':{},**({'resp':{}} if blocks else {})}},{'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
+                'mcpServers':{'system-diagnostics':{},**({'resp':{}} if blocks else {}),**({'rule-b':{}} if extra_read else {})}},
+                {'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
         return result,order,prompts,calls
+
+    def test_direct_plan_executes_identical_read_with_one_less_model_phase(self):
+        tool='mcp__rule_b__get_service_action_target';call={'tool':tool,'arguments':{'target':'b:management'}}
+        done={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'등록 서비스 설정과 오류 이력을 대조했으며 배경 원인은 미확인입니다.',
+            'current_observation':'현재 검토 상태는 2건으로 관측했으며 전송 영향은 미확인입니다.',
+            'evidence_indexes':[0,1],'limitations':['원인 배경은 확인하지 못했습니다.'],'next_steps':[]}}
+        before=self.run_case(extra_read=True,compact_report=[{'more_evidence':True,'read_tools':[tool],'report':None},done],
+            inquiry_plan={'calls':[call],'report':None})
+        after=self.run_case(extra_read=True,direct=True,compact_report=[{'more_evidence':True,'calls':[call],'report':None},done])
+        r,order,prompts,calls=after
+        self.assertEqual(calls[-1],before[3][-1]);self.assertEqual(len(calls),len(before[3]))
+        self.assertEqual(order.count('compact'),2);self.assertNotIn('inquiry',order)
+        self.assertEqual(before[1].count('inquiry'),1);self.assertEqual(r['service_direct_read_plans'],1)
+        self.assertNotIn('error_type',r);self.assertEqual(r['protected_calls'],0)
+        self.assertEqual(r['service_judgment'],before[0]['service_judgment'])
+
+    def test_direct_invalid_time_can_be_corrected_without_dispatching_bad_batch(self):
+        tool='mcp__system_diagnostics__get_system_diagnostics'
+        args={'target':'b:management','view':'journal','journal_scope':'all',
+              'since_kst':'2026-11-06T16:40:00+09:00','until_kst':'2026-11-06T16:20:00+09:00'}
+        fixed=dict(args,since_kst='2026-11-06T16:19:00+09:00')
+        plans=[{'more_evidence':True,'calls':[{'tool':tool,'arguments':v}],'report':None} for v in (args,fixed)]
+        r,order,prompts,calls=self.run_case(direct=True,compact_report=plans+[None])
+        self.assertNotIn('error_type',r);self.assertNotIn('inquiry',order)
+        self.assertEqual(len(calls),4);self.assertNotIn(args,calls);self.assertEqual(calls[-1],fixed)
+        self.assertEqual(r['service_inquiry_rejections'][0]['code'],'invalid_read_time')
+        self.assertEqual(r['protected_calls'],0)
+
+    def test_direct_plan_rejects_protected_tools_without_dispatch(self):
+        r,order,prompts,calls=self.run_case(direct=True,compact_report={'more_evidence':True,
+            'calls':[{'tool':'mcp__resp__block_ip','arguments':{'ip':'192.0.2.7'}}],'report':None})
+        self.assertEqual(r['error_type'],'ValidationError');self.assertEqual(len(calls),3)
+        self.assertEqual(r['protected_calls'],0);self.assertNotIn('inquiry',order)
+
+    def test_failed_extra_read_keeps_successful_evidence_and_explicit_failure(self):
+        tool='mcp__rule_b__get_service_action_target'
+        done={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'과거 오류 표본을 확인했지만 추가 설정 조회가 실패하여 상세 원인은 미확인입니다.',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 반환되지 않아 미확인입니다.',
+            'evidence_indexes':[0],'limitations':['추가 설정 조회는 실패했습니다.'],'next_steps':[]}}
+        result,order,prompts,calls=self.run_case(extra_read=True,failed_extra=True,
+            compact_report=[{'more_evidence':True,'read_tools':[tool],'report':None},done],
+            inquiry_plan={'calls':[{'tool':tool,'arguments':{'target':'b:management'}}],'report':None})
+        self.assertNotIn('error_type',result);self.assertNotIn('assess',order)
+        self.assertEqual(order.count('extra_read'),1);self.assertEqual(len(calls),4)
+        body=json.loads(prompts[-1][1]['content'])
+        self.assertEqual(len(body['untrusted_completed_reads']),3)
+        self.assertEqual(body['untrusted_failed_read_attempts'][0]['data'],{'error':'fixture_unavailable'})
+        self.assertEqual(list(body['current_successful_tools'].values()),['mcp__system_diagnostics__get_system_diagnostics'])
+        self.assertTrue(result['calls'][-1]['is_error']);self.assertEqual(result['protected_calls'],0)
+
+    def test_reversed_time_is_not_dispatched_and_model_can_correct_it(self):
+        tool='mcp__system_diagnostics__get_system_diagnostics'
+        more={'more_evidence':True,'read_tools':[tool],'report':None}
+        args={'target':'b:management','view':'journal','journal_scope':'all',
+              'since_kst':'2026-11-06T16:40:00+09:00','until_kst':'2026-11-06T16:20:00+09:00'}
+        fixed=dict(args,since_kst='2026-11-06T16:19:00+09:00')
+        result,order,prompts,calls=self.run_case(compact_report=[more,more,None],inquiry_plan=[
+            {'calls':[{'tool':tool,'arguments':args}],'report':None},
+            {'calls':[{'tool':tool,'arguments':fixed}],'report':None}])
+        self.assertNotIn('error_type',result);self.assertNotIn('assess',order)
+        self.assertEqual(len(calls),4);self.assertNotIn(args,calls);self.assertEqual(calls[-1],fixed)
+        self.assertEqual(result['service_inquiry_rejections'][0]['code'],'invalid_read_time')
+        self.assertEqual(result['service_inquiry_count'],1);self.assertEqual(result['protected_calls'],0)
+        body=json.loads(prompts[2][1]['content'])
+        self.assertEqual(len(body['untrusted_completed_reads']),3)
+        self.assertEqual(body['execution_rejections'][0]['calls'][0]['arguments'],args)
+
+    def test_expired_current_reads_refresh_without_replaying_history_or_agent(self):
+        selected=[]
+        result,order,prompts,calls=self.run_case(stale_first=True,selection_prompts=selected)
+        self.assertEqual(order,['select','read','read','read','select','read','read','compact'])
+        self.assertEqual(sum('since_kst' in a for a in calls),1)
+        self.assertEqual(result['service_current_refreshes'][0]['still_expired'],[])
+        self.assertEqual(json.loads(selected[1][1][1])['selection_reason'],'expired_current_refresh')
+        self.assertEqual(len(json.loads(prompts[0][1]['content'])['untrusted_completed_reads']),5)
+        self.assertEqual(result['protected_calls'],0)
+
+    def test_duplicate_tool_names_do_not_repeat_dispatch_or_lose_model_choice(self):
+        tool='mcp__rule_b__get_service_action_target'
+        done={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'등록 서비스 설정과 오류 이력을 대조했으며 배경 원인은 미확인입니다.',
+            'current_observation':'현재 검토 상태는 2건으로 관측했으며 전송 영향은 미확인입니다.',
+            'evidence_indexes':[0,1],'limitations':['원인 배경은 확인하지 못했습니다.'],'next_steps':[]}}
+        first={'more_evidence':True,'read_tools':[tool,tool],'report':None}
+        result,order,prompts,calls=self.run_case(extra_read=True,compact_report=[first,done],
+            inquiry_plan={'calls':[{'tool':tool,'arguments':{'target':'b:management'}}],'report':None})
+        self.assertEqual(result['deduplicated_read_tool_names'],1)
+        self.assertEqual(order.count('extra_read'),1)
+        self.assertEqual(result['service_report_audit'][0]['response'],first)
+        self.assertEqual(result['protected_calls'],0);self.assertNotIn('error_type',result)
+
+    def test_still_expired_after_refresh_stops_without_claiming_success(self):
+        result,order,prompts,calls=self.run_case(stale_always=True)
+        self.assertEqual(result['status'],'partial')
+        self.assertEqual(result['stop_reason'],'service_current_refresh_unavailable')
+        self.assertEqual(len(calls),5)
+        self.assertEqual(sum('since_kst' in a for a in calls),1)
+        self.assertNotIn('assess',order);self.assertNotIn('compact',order)
+        self.assertTrue(result['unqueried']);self.assertEqual(result['protected_calls'],0)
+
+    def test_additional_registered_service_read_keeps_compact_context(self):
+        tool='mcp__rule_b__get_service_action_target'
+        inquiry={'calls':[{'tool':tool,'arguments':{'target':'b:management'}}],'report':None}
+        report={'more_evidence':False,'report':{'assessment':'unresolved',
+            'basis':'현재 속성과 과거 오류 표본을 구분해 읽었으며, 추가 서비스 설정 조회도 원인 확정 근거는 아닙니다.',
+            'current_observation':'현재 검토 상태는 2건으로 관측됐으며 처리·전송 영향은 미확인입니다.',
+            'evidence_indexes':[0,1],'limitations':['과거 실패의 상세 배경은 확보하지 못했습니다.'],
+            'next_steps':[],'status':'needs_review'}}
+        result,order,prompts,calls=self.run_case(extra_read=True,inquiry_plan=inquiry,
+            compact_report=[{'more_evidence':True,'read_tools':[tool],'report':None},report])
+        self.assertNotIn('assess',order)
+        self.assertEqual(order.count('extra_read'),1)
+        self.assertEqual(len(result['calls']),4)
+        self.assertEqual(result['protected_calls'],0)
+        body=json.loads(prompts[-1][1]['content'])
+        self.assertEqual(len(body['untrusted_completed_reads']),4)
+        self.assertEqual(body['untrusted_completed_reads'][-1]['data']['fixture_marker'],'additional_actual_service_receipt')
 
     def test_compound_service_and_blocks_are_selected_read_and_passed_to_model(self):
         question='오늘 B 서버 capstone-management.service 실패 원문과 지금 관제 처리 대기를 확인해줘. 현재 임시차단 목록도 함께 보여줘. 변경은 하지 마.'
@@ -190,6 +332,12 @@ class ServiceRuntime(unittest.TestCase):
         body=json.loads(prompts[0][1]['content'])
         receipts=body['untrusted_completed_reads'];self.assertEqual(len(receipts),4)
         self.assertEqual(receipts[2]['data']['kind'],'journal_excerpt')
+        highlighted=body['untrusted_journal_structured_messages'][0]
+        original=receipts[2]['data']['entries'][0]
+        self.assertEqual(highlighted['message'],json.loads(original['message_excerpt']))
+        self.assertEqual(highlighted['record_sha256'],original['record_sha256'])
+        self.assertEqual(highlighted['receipt_sha256'],receipts[2]['receipt_sha256'])
+        self.assertEqual(highlighted['at_kst'],original['at_kst'])
         self.assertIn('controller_already_running',result['final_response'])
         self.assertIn('반환 1행',result['final_response'])
         self.assertNotIn('assess',order)
@@ -231,7 +379,66 @@ class ServiceRuntime(unittest.TestCase):
         self.assertFalse(saved[0]['repair']);self.assertTrue(saved[1]['repair'])
         self.assertEqual(saved[0]['read_result_sha256'],[c['result_sha256'] for c in result['calls']])
         self.assertNotIn(bad['report']['basis'],result['final_response'])
-        self.assertNotIn(bad['report']['basis'],str(prompts[1]))
+        self.assertEqual(body['untrusted_rejected_model_claims']['basis'],bad['report']['basis'])
+        self.assertNotIn(bad['report']['basis'],prompts[1][0]['content'])
+
+    def test_service_cause_repair_uses_complete_journal_evidence_without_unrelated_event_reads(self):
+        for host in ('A','B'):
+            question=f'{host} 서버 Vector 오류 원인과 지금 로그 수집 영향 확인해줘. 설정은 변경하지 마.'
+            good={'more_evidence':False,'report':{'assessment':'unresolved',
+                'current_observation':'수집 연결 지표는 true, 메시지 버퍼는 0으로 관측됐습니다. 지속 전달과 손실 여부는 미확인입니다.',
+                'basis':'오류 표본과 현재 프로세스 관측을 확인했지만 질문한 과거 사건의 배경 원인은 미확인입니다.',
+                'evidence_indexes':[0],'limitations':['초기 조회 구간 밖의 과거 기록은 아직 확인하지 않았습니다.'],
+                'next_steps':[],'status':'needs_review'}}
+            bad=copy.deepcopy(good);bad['report']['basis']='현재 서비스는 완전히 정상이며 모든 기능이 정상으로 복구되었습니다.'
+            result,order,prompts,calls=self.run_case(question=question,selection={'indexes':[0,1,2]},compact_report=[bad,good])
+            with self.subTest(host=host):
+                self.assertEqual(len(calls),3,result)
+                self.assertEqual([x.get('view') for x in calls],[None,'journal',None])
+                self.assertEqual([x['target'] for x in calls],[host.lower()+':vector',host.lower()+':vector',host.lower()+':collection'])
+                self.assertEqual(order.count('compact'),2,result)
+                self.assertNotIn('assess',order)
+                self.assertEqual(result['service_compact_reports'],[{'more_evidence':False,'repair':False},{'more_evidence':False,'repair':True}])
+                self.assertNotIn('incident_evidence_missing',result['repair']['issues'])
+                self.assertNotIn('remaining_issues',result)
+                self.assertIn(good['report']['basis'],result['final_response'])
+                self.assertNotIn(bad['report']['basis'],result['final_response'])
+                self.assertEqual(result['status'],'partial')
+                self.assertEqual(result['protected_calls'],0)
+
+    def test_empty_model_answer_preserves_observations_and_cannot_be_completed(self):
+        result,order,prompts,calls=self.run_case(enabled=False,agent_response='')
+        self.assertEqual(result['status'],'partial',result)
+        self.assertIn('empty_model_answer',result['remaining_issues'])
+        self.assertTrue(result['final_response'].strip())
+        self.assertIn('b:management',result['final_response'])
+        self.assertNotIn('정상으로 복구',result['final_response'])
+
+    def test_service_evidence_scope_cannot_hide_missing_stale_or_separate_incident_reads(self):
+        q='A 서버의 Vector 오류는 왜 난 거고 지금 로그 수집에도 영향이 있어? 실제 로그와 현재 상태를 확인해서 알려줘. 설정은 바꾸지 마.'
+        result,_,_,_=self.run_case(question=q,selection={'indexes':[0,1,2]})
+        h=runtime.harness
+        plan=h.CONTRACT.service_history_plan({'tools':[{'function':{'name':'mcp__system_diagnostics__get_system_diagnostics',
+            'parameters':mcp.tools()[0]['inputSchema']}}]},q,result['at_kst'])
+        calls=result['calls']
+        self.assertFalse(h.incident_evidence_gap(q,calls,service_plan=plan))
+        self.assertEqual(h.missing_reads(q,calls,service_plan=plan),[])
+        stale=copy.deepcopy(calls);payload=json.loads(stale[0]['result'])
+        payload['observed_at_kst']='2000-01-01T00:00:00+09:00'
+        stale[0]['result']=json.dumps(payload)
+        stale[0]['result_sha256']=hashlib.sha256(stale[0]['result'].encode()).hexdigest()
+        failed=copy.deepcopy(calls);failed[0]['is_error']=True
+        for label,changed in (('missing',calls[:-1]),('stale',stale),('failed',failed)):
+            with self.subTest(label=label):
+                self.assertTrue(h.incident_evidence_gap(q,changed,service_plan=plan))
+                self.assertTrue(h.missing_reads(q,changed,service_plan=plan))
+        corrupted=copy.deepcopy(calls);corrupted[0]['result_sha256']='0'*64
+        self.assertTrue(h.incident_evidence_gap(q,corrupted,service_plan=plan))
+        ref={'families':['suricata'],'source_ips':['192.0.2.9'],
+             'since_kst':'2026-11-08T00:00:00+09:00','until_kst':'2026-11-08T00:05:00+09:00'}
+        self.assertTrue(h.incident_evidence_gap(q,calls,reference=ref,service_plan=plan))
+        mixed=copy.deepcopy(plan);mixed['only_service']=False
+        self.assertTrue(h.incident_evidence_gap(q,calls,service_plan=mixed))
 
     def test_more_evidence_dispatches_selected_read_then_returns_to_structured_report(self):
         more={'more_evidence':True,'report':None,'read_tools':['mcp__system_diagnostics__get_system_diagnostics']}
@@ -262,6 +469,25 @@ class ServiceRuntime(unittest.TestCase):
                 self.assertEqual(len(calls),3);self.assertEqual(result['protected_calls'],0)
                 self.assertNotEqual(result['status'],'completed');self.assertNotIn('assess',order)
                 self.assertEqual(result['service_report_audit'][-1]['phase'],'inquiry')
+
+    def test_additional_journal_explicit_filter_is_validated_before_dispatch(self):
+        more={'more_evidence':True,'report':None,'read_tools':['mcp__system_diagnostics__get_system_diagnostics']}
+        good={'more_evidence':False,'report':{'assessment':'unresolved',
+            'current_observation':'현재 검토 상태 사건은 2건이며 처리·전송 지표는 미확인입니다.',
+            'basis':'실제 오류 발췌와 현재 관측을 확인했지만 배경 원인은 추가 검토가 필요합니다.',
+            'evidence_indexes':[0],'limitations':['전체 기능 검증은 수행하지 않았습니다.'],
+            'next_steps':[],'status':'needs_review'}}
+        for scope in (None,'errors','all','unknown'):
+            args={'target':'b:management','view':'journal','since_kst':'2026-11-08T00:00:00+09:00',
+                  'until_kst':'2026-11-08T00:01:00+09:00'}
+            if scope is not None:args['journal_scope']=scope
+            plan={'calls':[{'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':args}],'report':None}
+            result,order,prompts,calls=self.run_case(compact_report=[more,good],inquiry_plan=plan)
+            with self.subTest(scope=scope):
+                self.assertEqual(result['protected_calls'],0)
+                self.assertEqual(len(calls),4 if scope in ('errors','all') else 3)
+                if scope in ('errors','all'):self.assertEqual(calls[-1],args)
+                else:self.assertEqual(result['error_type'],'ValidationError')
 
     def test_unavailable_read_name_is_rejected_before_selector(self):
         result,order,prompts,calls=self.run_case(compact_report={

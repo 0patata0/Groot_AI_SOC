@@ -19,6 +19,22 @@ class WorkflowContract(unittest.TestCase):
         self.assertIn(w.MARKERS['soc-query'],text)
         for name in ('soc-investigate','soc-change','soc-recover'):self.assertNotIn(w.MARKERS[name],text)
 
+    def test_service_section_reuses_skill_without_unrelated_event_procedures(self):
+        text=w.section_policy(('soc-investigate',),'service-investigation')
+        self.assertIn('journal_scope=all',text)
+        self.assertIn('최근24시간',text)
+        self.assertNotIn('DNS',text)
+        self.assertIn(text.split('\n',2)[2],w.policy(('soc-investigate',)))
+        with self.assertRaises(ValueError):w.section_policy(('soc-query',),'service-investigation')
+
+    def test_service_section_missing_or_duplicate_is_not_silently_omitted(self):
+        raw=(Path(w.__file__).parent/'skills/soc-investigate/SKILL.md').read_text()
+        for value in (raw.replace('## 서비스 원인 조사','## 다른 절차'),raw+'\n## 서비스 원인 조사\n중복'):
+            with tempfile.TemporaryDirectory() as directory:
+                folder=Path(directory)/'skills/soc-investigate';folder.mkdir(parents=True)
+                (folder/'SKILL.md').write_text(value)
+                with self.assertRaises(ValueError):w.section_policy(('soc-investigate',),'service-investigation',directory)
+
     def test_missing_and_symlink_skill_do_not_silently_proceed(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);folder=root/'skills/soc-query';folder.mkdir(parents=True)

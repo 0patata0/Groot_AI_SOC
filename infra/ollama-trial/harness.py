@@ -965,7 +965,7 @@ def soc_overview_report(question, calls, targets=()):
     if blocks:lines+=['','차단 IP: '+', '.join(blocks[:20])+(' · 나머지는 차단 목록 상세 조회' if len(blocks)>20 else '')]
     if not events:lines+=['',event_report('최근 경보 5개 보여줘',calls)]
     if missing:lines+=['','**미확인 범위**','',*READ.table(['확인 항목'],[[m] for m in missing])]
-    lines+=['','상태 수집은 약60초 주기입니다. 경보 표본은 전체 발생 건수·공격 성공 건수가 아니며, 점검 통과도 보안 사고 부재를 뜻하지 않습니다.']
+    lines+=['','상태는 표시된 수집 시각 기준입니다. 경보 표본은 전체 발생 건수·공격 성공 건수가 아니며, 점검 통과도 보안 사고 부재를 뜻하지 않습니다.']
     return '\n'.join(lines)
 
 
@@ -1242,7 +1242,7 @@ def wazuh_text(raw):
         return raw if isinstance(raw, str) else None
 
 
-def violations(question, answer, calls, reference=None):
+def violations(question, answer, calls, reference=None, service_plan=None):
     calls=evidence_reads(calls)
     facts = facts_for(calls)
     # Configuration terminology is not an event observation. Preserve other
@@ -1276,7 +1276,7 @@ def violations(question, answer, calls, reference=None):
     if EVIDENCE.incident_investigation_request(normalized(question)):
         issues.extend(incident_context_violations(answer))
         issues.extend(incident_field_violations(answer, calls))
-    if incident_evidence_gap(question, calls):
+    if incident_evidence_gap(question, calls, reference, service_plan):
         issues.append('incident_evidence_missing')
     return sorted(set(issues))
 
@@ -1402,6 +1402,17 @@ def service_history_receipts(calls):
     return rows
 
 
+def service_report_receipts(calls):
+    ledger=[];outputs=[]
+    for c in calls:
+        name='mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name','')
+        if not EVIDENCE.allowed(name,'verify') or c.get('is_write'):return None
+        ledger.append({'tool':name,'arguments':c.get('arguments'),'result_sha256':c.get('result_sha256'),
+            'result_state':'error' if c.get('is_error') else 'returned'})
+        outputs.append({'tool':name,'output':c.get('result'),'is_error':c.get('is_error',False)})
+    return CONTRACT.bind_service_read_attempts(ledger,outputs,{r['tool'] for r in ledger})
+
+
 def incident_evidence_gap(question, calls, reference=None, service_plan=None):
     """A read-only incident judgment needs an actual event read, not an inventory.
 
@@ -1511,7 +1522,7 @@ def incident_completion_issues(question,answer,calls,reference=None):
     return ['incident_impact_verification_missing'] if EVIDENCE.incident_impact_missing(decision,requirements,receipts,linked,bundle_receipts) else []
 
 
-def incident_judgment_check(question, answer, calls, reference=None):
+def incident_judgment_check(question, answer, calls, reference=None, service_plan=None):
     """Bounded private audit of a model draft; never a replacement judgment."""
     if (not EVIDENCE.incident_investigation_request(normalized(question))
             or READ.wants_write(question)
@@ -1520,7 +1531,7 @@ def incident_judgment_check(question, answer, calls, reference=None):
         return None
     return {'draft': answer[:16384], 'draft_truncated': len(answer) > 16384,
             'draft_sha256': hashlib.sha256(answer.encode()).hexdigest(),
-            'issues': violations(question, answer, calls,reference) + card_answer_issues(reference,answer,calls),
+            'issues': violations(question, answer, calls,reference,service_plan) + card_answer_issues(reference,answer,calls),
             'tool_result_sha256': [c.get('result_sha256') for c in calls[-32:]],
             'earlier_tool_results_omitted': len(calls) > 32}
 
@@ -1562,8 +1573,8 @@ def repeated_judgment(audits):
                 and all(a[k] == b[k] for k in ('draft_sha256', 'issues', 'tool_result_sha256')))
 
 
-def incident_selection_scope(question, calls, reference=None):
-    if not incident_evidence_gap(question, calls, reference):
+def incident_selection_scope(question, calls, reference=None, service_plan=None):
+    if not incident_evidence_gap(question, calls, reference, service_plan):
         return None
     if reference:return {EVIDENCE.BUNDLE_TOOL}|{'mcp__security_events__search_'+kind+'_alerts' for kind in card_evidence_gaps(reference,calls)}
     scope = {EVIDENCE.BUNDLE_TOOL, 'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_modsecurity_alerts',
@@ -2463,7 +2474,7 @@ def host_inventory_report(question, calls):
         if display is not None:capacity_shown=True
         return cell(display if display is not None else entry[field])
     out = ['**호스트 조회**', '', '범위: A/B/C 운영 호스트' if requests[0]['host'] == 'all' else '범위: '+requests[0]['host'].upper()+' 서버',
-           '60초 주기 수집 스냅샷입니다. 실행 상태는 기능 정상 판정이 아닙니다.']
+           '표시된 수집 시각 기준 스냅샷입니다. 실행 상태는 기능 정상 판정이 아닙니다.']
     out += ['', '**조회 요약**', '', '| 호스트 | 구분 | 조회 시각(KST) | 조건 일치 | 표시 | 다음 |',
             '|---|---|---|---:|---:|---|']
     for req in requests:
@@ -2685,8 +2696,13 @@ def inventory_tool_scope(request):
                                        ('mcp__rule_b__get_rule_change_target', b or not a)] if selected}
 
 
-def missing_reads(question, calls, diagnostic_targets=()):
-    missing=_missing_reads(question,calls,diagnostic_targets)
+def missing_reads(question, calls, diagnostic_targets=(), reference=None, service_plan=None):
+    # A plan is resolved from this request's actual catalog by the common
+    # contract. A chat/card cannot supply it. Keep failed/stale service reads
+    # incomplete; an independent incident reference still needs event evidence.
+    missing=(CONTRACT.service_history_state(service_plan,service_history_receipts(evidence_reads(calls)))['incomplete']
+        if service_plan and service_plan.get('only_service') and not reference
+        else _missing_reads(question,calls,diagnostic_targets))
     if READ.companion_block_request(normalized(question)) and READ.block_list_state(evidence_reads(calls)) is None:
         missing=list(dict.fromkeys(missing+['list_blocks: 현재 동적 차단 목록 미확인']))
     return missing
@@ -3466,7 +3482,7 @@ def diagnostic_report(question, calls, targets):
         '반환 오류 표본(최대10건):', *(errors[:10] or ['- 반환된 오류 표본이 없습니다. 구간 전체 오류가 없다는 뜻은 아닙니다.']),
         '', '**조치 및 다음 단계**',
         '- inactive/dead인 oneshot과 failed를 구분해야 합니다. 위 표의 상태값을 임의로 정상/장애로 바꾸지 않았습니다.',
-        '- 약60초 주기 수집 자료이며 실시간 journal 전체 조회가 아닙니다. 현재 장애 원인·미수집 구간은 미확인입니다.'])
+        '- 표시된 수집 시각 기준 자료이며 실시간 journal 전체 조회가 아닙니다. 현재 장애 원인·미수집 구간은 미확인입니다.'])
     return '\n'.join(rows)
 
 
@@ -3509,7 +3525,7 @@ def runtime_diagnostic_report(targets, latest, unsupported, *, detailed=False):
     if 'case_review_required' in records.get('b:management-pipeline',{}).get('codes',[]):
         rows += ['', '관리 파이프라인에 needs_review/outcome_unknown 사건이 남아 있습니다. 조회 성공과 사건 처리 완료는 다르며 임의 종결하지 않았습니다.']
     if unsupported: rows += ['','미지원·미확인 요청: '+', '.join(unsupported)]
-    rows += ['', '약60초 주기 수집 자료입니다. 미확인은 정상·0건이 아니며, 이상 항목의 원인 조사가 필요합니다.']
+    rows += ['', '표시된 수집 시각 기준 자료입니다. 미확인은 정상·0건이 아니며, 이상 항목의 원인 조사가 필요합니다.']
     if not detailed and any(r.get('metrics') for r in records.values()):
         rows += ['개별 수치는 생략했습니다. 상세 수치를 요청하면 표시합니다.']
     return '\n'.join(rows)

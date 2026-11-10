@@ -446,7 +446,7 @@ def tool_input_rejection(name, arguments, schema):
                 'path':[str(v)[:80] for v in list(exc.absolute_path)[:8]],'expected_schema':schema,
                 'detail':'호출하지 않았습니다. 이 도구의 스키마로 인자를 정정하세요.'}
     except Exception:return {**base,'error':'tool_input_schema_unavailable'}
-    return None
+    return diagnostic_contract().read_time_input_rejection(arguments,schema)
 
 
 def read_protocol_error_result(name, exc):
@@ -1666,18 +1666,18 @@ def render_model_review(report, facts):
     """Model owns judgment; receipts supply the table without model retyping."""
     if report.get('scope')=='verified_service_lookup':
         return diagnostic_contract().service_lookup_report(literal_evidence_table(facts))
-    def line(value):
-        if any(token in value for token in ('OUT-OF-BAND', 'TRUSTED_CONTROLLER',
-                'INCIDENT_DISPOSITION', 'MANAGEMENT_STATUS')):
-            raise ValueError('report_control_echo')
-        return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', ' ').replace('\r', ' ')
+    contract=diagnostic_contract()
+    if contract.diagnostic_facts_only(facts) and contract.diagnostic_report_field_violations(report):
+        raise ValueError('diagnostic_report_empty_field')
+    line=contract.report_field_display
     basis=line(report['basis'])
     text='**판단**\n'+basis
     if 'current_observation' in report:
         text+='\n\n**현재 처리 상태**\n'+line(report['current_observation'])
     text+='\n\n'+literal_evidence_table(facts)
-    text+='\n\n**미확인·한계**\n'+'\n'.join('- '+line(x) for x in report['limitations'])
-    text+='\n\n**다음 조치**\n'+'\n'.join('- '+line(x) for x in diagnostic_contract().service_follow_up_lines(report['next_steps']))
+    items=contract.report_list_display
+    text+='\n\n**미확인·한계**\n'+items(report['limitations'])
+    text+='\n\n**다음 조치**\n'+items(contract.service_follow_up_lines(report['next_steps']))
     disposition={k:report[k] for k in ('assessment','basis','evidence_tools')}
     return text+'\n\nINCIDENT_DISPOSITION: '+json.dumps(disposition,ensure_ascii=False)+'\nMANAGEMENT_STATUS: '+report['status']
 
@@ -1779,6 +1779,7 @@ LITERAL_REPAIR_ISSUES = frozenset({
     'invalid_disposition_tool_names',
     'web_continuity_unverified_is_not_outage',
     'diagnostic_snapshot_is_not_functional_health',
+    'diagnostic_relative_time_requires_calculation',
 })
 
 
@@ -2075,7 +2076,8 @@ def operator_diagnostic_options(request, receipts=()):
     chat=chat_read_context()
     if chat:
         plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst'])
-        return diagnostic_contract().service_history_state(plan,receipts)['pending']
+        return (diagnostic_contract().service_history_state(plan,receipts)['pending']
+                +diagnostic_contract().service_current_refresh_reads(plan,receipts))
     if not readonly_incident_review() or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1':return []
     context=compact_controller_context()
     return diagnostic_contract().operator_diagnostic_options(request,context,receipts) if context else []
@@ -2451,6 +2453,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         if isinstance(turn,str) and getattr(agent,'_capstone_service_repeat_turn',None)==turn:
             agent._capstone_service_repeat_turn=None
             issues.append('service_completed_read_repeat')
+        if isinstance(turn,str) and getattr(agent,'_capstone_service_invalid_turn',None)==turn:
+            agent._capstone_service_invalid_turn=None
+            issues.append('service_invalid_read_time')
         if completed_calls and management_status(content) is None:
             issues.append('missing_or_invalid_management_status')
         verify=os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
@@ -2545,7 +2550,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                     'prior_status':management_status(content),
                     'prior_assessment':(parse_incident_disposition(content,set(successful_reads or ()))[0] or {}).get('assessment'),
                     'untrusted_prior_prose':'\n'.join(line for line in content.splitlines()
-                        if not line.lstrip().startswith('|'))[:8192]}
+                        if not line.lstrip().startswith('|'))[:8192],
+                    'untrusted_rejected_sentences':diagnostic_contract().rejected_claim_sentences(
+                        content,list(facts or []),sorted(set(issues)))}
             nudge = (('모델이 추가 근거 조사를 선택했습니다: ' if inquiry else '조회 근거 일치 검사: ') + ','.join(issues) +
                 '. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. '
                 '아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '
@@ -3221,7 +3228,8 @@ def management_report_request(request, agent, snapshot):
         report['required']=list(fields)
     feedback=getattr(agent,'_capstone_review_feedback',None)
     feedback=(copy.deepcopy(feedback) if isinstance(feedback,dict) and set(feedback)=={
-        'turn','issues','facts_sha256','prior_status','prior_assessment','untrusted_prior_prose'}
+        'turn','issues','facts_sha256','prior_status','prior_assessment','untrusted_prior_prose',
+        'untrusted_rejected_sentences'} and isinstance(feedback['untrusted_rejected_sentences'],list)
         and feedback['turn']==snapshot['turn'] and isinstance(feedback['issues'],list)
         and 1<=len(feedback['issues'])<=32 and all(isinstance(x,str) and re.fullmatch(r'[a-z_]+(?::[a-z_]+)?',x) for x in feedback['issues'])
         and isinstance(feedback['untrusted_prior_prose'],str) and len(feedback['untrusted_prior_prose'])<=8192
@@ -3262,31 +3270,40 @@ def management_report_request(request, agent, snapshot):
         registered=({'tools':[{'function':{'name':n,'parameters':s}} for n,s in bound[1].items() if n in catalog]}
             if isinstance(bound,tuple) and len(bound)==2 and bound[0]==snapshot['turn'] and isinstance(bound[1],dict) else {})
         service=diagnostic_contract().service_report_context(registered,service['question'],service['requested_at_kst'],
-            service['untrusted_completed_reads'],background=service['background'])
+            snapshot.get('service_attempts',service['untrusted_completed_reads']),
+            background=service['background'],allowed_reads=set(catalog))
         if service is not None and inquiry:
+            schema=diagnostic_contract().service_inquiry_schema(schema)
+            Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_inquiry','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_inquiry_messages(service,
                 {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools if chosen is None or t['function']['name'] in chosen},
-                citations,schema,review_execution_view(agent,snapshot.get('read_ledger')))
+                citations,schema,review_execution_view(agent,snapshot.get('read_ledger')),
+                execution_rejections=(getattr(agent,'_capstone_service_rejections',(None,[]))[1]
+                    if getattr(agent,'_capstone_service_rejections',(None,[]))[0]==snapshot['turn'] else None))
             result['max_tokens']=1024;result.pop('max_completion_tokens',None)
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':copy.deepcopy(schema),
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
                 'receipt_count':len(receipts),'additional_inquiry':True,
-                'completed_service_reads':[{'tool':r['tool'],'arguments':r['arguments']} for r in service['untrusted_completed_reads']]}
+                'completed_service_reads':copy.deepcopy(service['untrusted_completed_reads'])}
             agent._capstone_review_feedback=None
             return result
         if service is not None:
-            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,read_schemas=catalog,lookup_only=service.get('lookup_only') is True)
+            direct=os.environ.get('CAPSTONE_SERVICE_DIRECT_READS','0')=='1'
+            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,
+                read_schemas={n:chat_read_schema(n,s) for n,s in catalog.items()} if direct else catalog,
+                lookup_only=service.get('lookup_only') is True,direct_reads=4 if direct else None)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,
                 {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback,structured_followups=True,execution_rejections=(
                     getattr(agent,'_capstone_service_rejections',(None,[]))[1]
-                    if getattr(agent,'_capstone_service_rejections',(None,[]))[0]==snapshot['turn'] else None))
-            result['max_tokens']=1024;result.pop('max_completion_tokens',None)
+                    if getattr(agent,'_capstone_service_rejections',(None,[]))[0]==snapshot['turn'] else None),direct_reads=direct)
+            result['max_tokens']=2048 if direct else 1024;result.pop('max_completion_tokens',None)
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':schema,
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
-                'receipt_count':len(receipts),'compact_citations':citations,'service_report':True}
+                'receipt_count':len(receipts),'compact_citations':citations,'service_report':True,
+                'direct_service_reads':direct,'completed_service_reads':copy.deepcopy(service['untrusted_completed_reads'])}
             agent._capstone_review_feedback=None
             return result
     result['response_format']={'type':'json_schema','json_schema':{'name':'soc_read_or_review','strict':True,'schema':schema}}
@@ -3404,9 +3421,13 @@ def management_selection_response(response, selection, agent):
         parse_constant=lambda _value:(_ for _ in ()).throw(ValueError('nonfinite_json')))
     if selection.get('current_diagnostic'):
         value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
+    elif selection.get('service_report'):
+        value,removed=diagnostic_contract().validated_service_report(value,selection['schema'])
+        if removed:
+            print('management_service_tool_names_deduplicated '+json.dumps({'turn':selection['turn'],'removed':removed,'dispatched':False}),file=sys.stderr)
     else:Draft202012Validator(selection['schema']).validate(value)
     if 'compact_citations' in selection:
-        if value.get('more_evidence'):
+        if value.get('more_evidence') and not selection.get('direct_service_reads'):
             if selection.get('service_report'):
                 agent._capstone_service_inquiry_tools=(agent._current_turn_id,list(value['read_tools']))
             agent._capstone_more_evidence_turn=agent._current_turn_id
@@ -3427,28 +3448,37 @@ def management_selection_response(response, selection, agent):
         return result,0
     if 'indexed_options' in selection:
         value={'calls':[copy.deepcopy(selection['indexed_options'][i]) for i in value['reads']]}
+    service_inquiry=bool(selection.get('additional_inquiry') or selection.get('direct_service_reads'))
     seen=set()
     for item in value['calls']:
         name=item['tool'];arguments=item['arguments']
         key=(name,json.dumps(arguments,sort_keys=True)) if ('indexed_options' in selection or
             selection.get('additional_inquiry') or selection.get('chat_read') or 'report_facts' in selection) else name
         if (key in seen or name not in selection['catalog'] or not allowed(name,'verify')
-                or name not in getattr(agent,'valid_tool_names',())
-                or tool_input_rejection(name,arguments,selection['catalog'][name])):
+                or name not in getattr(agent,'valid_tool_names',())):
+            raise ValueError('management_selection_read_not_authorized')
+        invalid=tool_input_rejection(name,arguments,selection['catalog'][name])
+        if invalid and not (service_inquiry and invalid.get('error') in
+                ('tool_input_time_invalid','tool_input_time_order_invalid')):
             raise ValueError('management_selection_read_not_authorized')
         seen.add(key)
-    repeated=(diagnostic_contract().service_repeated_calls(value['calls'],selection['completed_service_reads'])
-        if selection.get('completed_service_reads') else [])
-    if repeated:
-        rejection={'code':'already_completed_read','calls':repeated,'dispatched':False}
+    rejection=(diagnostic_contract().service_inquiry_rejection(value['calls'],selection.get('completed_service_reads',[]),selection['catalog'])
+        if service_inquiry else None)
+    if rejection:
         prior=getattr(agent,'_capstone_service_rejections',(None,[]))
         rows=prior[1] if prior[0]==agent._current_turn_id else []
         agent._capstone_service_rejections=(agent._current_turn_id,(rows+[rejection])[-2:])
         agent._capstone_full_review_turn=agent._capstone_more_evidence_turn=None
-        agent._capstone_service_repeat_turn=agent._current_turn_id
-        selection['repeated_read_rejected']=True
+        if rejection['code']=='already_completed_read':
+            agent._capstone_service_repeat_turn=agent._current_turn_id
+            selection['repeated_read_rejected']=True
+        else:
+            agent._capstone_service_invalid_turn=agent._current_turn_id
+            selection['invalid_read_rejected']=True
         result=copy.deepcopy(response)
-        result.choices[0].message.content='추가 조회 묶음은 이미 성공한 동일 조회를 포함해 실행하지 않았습니다. 확보한 근거로 판단을 이어가야 합니다.'
+        result.choices[0].message.content=('추가 조회 묶음은 이미 성공한 동일 조회를 포함해 실행하지 않았습니다. 확보한 근거로 판단을 이어가야 합니다.'
+            if rejection['code']=='already_completed_read' else
+            '추가 조회 묶음의 시간 인자가 잘못되어 실행하지 않았습니다. 기존 근거를 유지하고 인자를 정정해 조사를 이어가야 합니다.')
         return result,0
     result=copy.deepcopy(response)
     result.choices[0].message.tool_calls=[ChatCompletionMessageToolCall(
@@ -3716,15 +3746,18 @@ def main():
         cited=completed_citation_request(value,successful_read_names)
         result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements),component_reads=component_read_names)
         chat=chat_read_context()
+        service_reads={t['function']['name'] for t in scope_catalog if allowed(t['function']['name'],'verify')}
+        service_receipts=(diagnostic_contract().bind_service_read_attempts(read_ledger,current_receipts,service_reads)
+            if receipts_complete and read_ledger_complete else None)
         service=(diagnostic_contract().service_report_context({'tools':scope_catalog},chat['request'],chat['requested_at_kst'],
-            diagnostic_receipts,background=chat['background']) if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1'
-            and chat and receipts_complete and
-            len(current_receipts)==len(diagnostic_receipts) else None)
+            service_receipts,background=chat['background'],allowed_reads=service_reads)
+            if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and chat and service_receipts is not None else None)
         if result is not cited or service or (getattr(self,'_current_turn_id',None) and
                 getattr(self,'_capstone_full_review_turn',None)==self._current_turn_id):
             self._capstone_management_report={'turn':getattr(self,'_current_turn_id',None),
                 'reads':sorted(n for n in successful_read_names if allowed(n,'verify')),'facts':copy.deepcopy(read_facts),
                 'service_context':service,
+                'service_attempts':copy.deepcopy(service_receipts),
                 'read_ledger':copy.deepcopy(read_ledger) if read_ledger_complete else None,
                 'receipts':copy.deepcopy(current_receipts) if receipts_complete else None}
         return result

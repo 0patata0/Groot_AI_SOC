@@ -2,6 +2,20 @@
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 발표**이며 미완료다. 정확성이 속도보다 우선이다. 최신 균형1,220건 학습본을 운영하면서 보완한다. 학습본 사용과 독립적인 정확도 우위는 구분한다. [활성 계획](PLAN.md) · [직전 상세 상태·실패 이력](archive/STATUS_HISTORY.md#source-a961b1d1c0e72743).
 
+## 현재 작업: 룰-조회 신뢰성·자동 사건보고 공백 (11/10 21:00, 실제 Mattermost 검증)
+
+사용자가 실제 Mattermost로 봇을 시험하며 두 공백을 보고: (1) DDoS 사건보고 자동 미게시, (2) 추가한 룰을 LLM이 조회 못 함("없다/오타/답 바뀜"). 실제 사용자 경로(`https://chat.grootlab.duckdns.org`, socadmin)로 재현·검증했다.
+
+| 항목 | 확인한 상태 | 남은 일 |
+|---|---|---|
+| DDoS 탐지·상관 | ✅ 정상: 재생 때 Wazuh 룰 100112(level 12) 15회·100110(9) 19회·level≥10 47건 생성(라이브) | — |
+| 자동 **사건보고** | ❌ **열린 공백**: 구 cron `soc-alert-watch`는 10/15 durable controller 교체로 의도적 비활성. 대체 `capstone-management`는 실행되나 매 틱 `events_received:0·report_delivery.attempted:0` → 보고 0건 | 보안경보→controller 이벤트 feeder 복구 (task #10) |
+| 룰 그라운드트루스 | ✅ 1000090/1000091(A·69건 발화)·100111/100112(B)는 실재. `get_security_rules` 도구가 `matched_count:1`로 정확 반환(라이브 재현) | — |
+| 룰-조회 봇 신뢰성 | ⚠️ **부분 해결**: 원인=모델이 bare 룰ID를 Suricata로 단정·타 네임스페이스 미조회·문맥의 다른 룰로 대체. `soc-query` 스킬에 네임스페이스 추론+특정ID `rule_id`조회+대체금지 규칙 추가, **라이브 3곳 배포**(`/opt/capstone-management`·`groot-query-completion`·`capstone-ollama-trial`, 소비자 재시작). 실제 채팅 재검증: bare `100112`→a:suricata+b:wazuh 모두 조회→Wazuh 정의 정확 반환(수정 전 "없음/오타"에서 개선) | 잔여: 출력이 영문 추론문 유출(soc-output 미적용)·반복 동일질문 "이미 답변" 문맥혼란·명시케이스 ID목록만 반환. 결정적 해결은 쿼리 하네스의 룰ID 사전 그라운딩(후보) |
+| 진행표시 "스팸" | 정정: 봇 글 52개 중 51개 `delete_at`로 삭제돼 사용자 화면엔 진행표시 1개만 보임. 의도대로 동작 | 저우선 최적화: 생성+삭제 churn→edit-in-place |
+
+배포 백업 `/var/lib/capstone-service-grounding/20261110-soc-query-skill{,-r2}`. 스킬 변경은 도구 권한·승인·보호 정책을 바꾸지 않는다. 구조·도구 정상과 모델 신뢰성 문제를 구분한다. [실측 원문](대화기록/검증/2026-11-10-ddos-inspect/)(로컬). 시나리오 탐지 결과는 [scenario-4](scenarios/scenario-4-ddos.md).
+
 ## 현재 작업: 실제 복합 답변 보완·서버 Harness² 정기 점검 연결
 
 | 영역 | 확인한 상태 | 남은 일 |

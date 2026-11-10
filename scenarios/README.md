@@ -34,6 +34,7 @@
 | 1 | [scenario-1-recon-web.md](scenario-1-recon-web.md) | 외부 정찰 + 웹 공격(정찰·스캐너·SQLi·XSS·인증 무차별) | 호스트 FW / Suricata / WAF / Wazuh 웹 |
 | 2 | [scenario-2-log4shell.md](scenario-2-log4shell.md) | CVE-2021-44228 Log4Shell (A:8080 토글→C:8080 랩) | 네트워크(토글 시) / 엔드포인트 / 컨테이너 JAR 확인·조건부 취약점 인벤토리 |
 | 3 | [scenario-3-privesc.md](scenario-3-privesc.md) | 침투 후 권한상승 (CVE-2021-3156 Baron Samedit) | 엔드포인트(auditd/rootcheck/SCA) |
+| 4 | [scenario-4-ddos.md](scenario-4-ddos.md) | 볼류메트릭 DDoS (2호스트 ICMP+SYN 플러드, A 게이트웨이) · **2026-11-10 실측: IDS·SIEM 미탐 공백** | 호스트 FW / Suricata / Wazuh |
 | — | [alerts.md](alerts.md) | 전체 탐지·대응 매트릭스(실행 중 체크) | — |
 | — | [references.md](references.md) | 트래픽 생성용 공개 권위 레퍼런스(OWASP/Wazuh/앱 README/룰) | — |
 

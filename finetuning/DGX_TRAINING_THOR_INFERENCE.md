@@ -57,3 +57,10 @@
 - [고정 base 설정](config.qwen36-thor.json), [병합](merge_streaming.py), [변환](convert_soc.py), [기존 Thor 실행 기록](THOR_35B.md)은 재사용 검토 대상이다. 파일명이 Thor인 기존 실행기의 검증 이력은 유지하며 실제 DGX 실행 전 별도 구성·경로·자원/복구 검사를 마련한다.
 - 새 서버 학습 환경은 기존 `deploy.sh` 진입점과 연결할 구체 변경을 준비할 때 설치 소스·설정 예제·오프라인 반입 목록을 함께 갱신한다. 현재 계획 확정만으로 미검증 DGX 설치 기능을 추가하거나 기존 초기 설치기로 운영 서버를 덮어쓰지 않는다.
 - 실제 서버·서비스·이미지·포트·키·모델 연결은 이번에 변경하지 않았으므로 운영 설치 경로의 변경도 없다. [이전 추론 분산 검토의 현재 위치](../infra/hermes/dual-inference-plan.md)를 함께 확인한다.
+
+## Thor Ollama 운영 설정 (2026-11-10)
+
+- `/etc/systemd/system/ollama.service.d/capstone-parallel.conf`: `OLLAMA_CONTEXT_LENGTH=65536`(이전 기본 슬롯당 262,144). 관측된 최대 입력은 약 4.1만 토큰이라 여유가 있다. GPU 적재 23.6→22.5GB.
+- `OLLAMA_NUM_PARALLEL=2`도 시도했으나 Ollama 0.40.2가 `model architecture does not currently support parallel requests (qwen35moe)` 경고와 함께 단일 슬롯을 유지해 설정에서 제거했다. 동시 요청은 계속 순서대로 처리된다.
+- 되돌리기: 위 drop-in 삭제 → `systemctl daemon-reload` → `systemctl restart ollama` → 작은 요청으로 모델 재적재(약 6~9초).
+- 이 하이브리드 모델은 체크포인트 위치에서만 입력 상태를 재사용하므로, B의 3분 주기 모델 상태 점검(`capstone-soc-model.timer`)이 단일 슬롯 상태를 덮어쓰는 문제는 남아 있다. [분석](../infra/hermes/latency-and-queue-20261110.md)

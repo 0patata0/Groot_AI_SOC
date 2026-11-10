@@ -91,6 +91,23 @@ def atomic(path, data, gid=0):
         if os.path.exists(name): os.unlink(name)
 
 
+# The package default (5000 events, 500/s) filled within 4 s when the
+# 12-hourly rootcheck started on the busy SIEM host (2026-11-08..10), so
+# ordinary events could be dropped for ~6 s. Size the existing buffer only.
+BUFFER = {'queue_size': '20000', 'events_per_second': '1000'}
+
+
+def tuned_buffer(text):
+    blocks = re.findall(r'<client_buffer>.*?</client_buffer>', text, flags=re.S)
+    need(len(blocks) == 1, 'host_agent_buffer_ambiguous')
+    block = blocks[0]
+    need(re.search(r'<disabled>\s*no\s*</disabled>', block) is not None, 'host_agent_buffer_disabled')
+    for key, value in BUFFER.items():
+        block, count = re.subn(r'<' + key + r'>\s*\d+\s*</' + key + '>', '<' + key + '>' + value + '</' + key + '>', block)
+        need(count == 1, 'host_agent_buffer_field_missing')
+    return text.replace(blocks[0], block, 1)
+
+
 def candidate(raw, address='127.0.0.1'):
     ip = ipaddress.IPv4Address(address)
     need(str(ip) == address and not ip.is_multicast and not ip.is_unspecified, 'host_agent_invalid_endpoint')
@@ -122,7 +139,7 @@ def candidate(raw, address='127.0.0.1'):
         return block
     text, count = re.subn(r'<active-response>.*?</active-response>', disable, text, flags=re.S)
     need(count == 1, 'host_agent_response_missing')
-    return text.encode()
+    return tuned_buffer(text).encode()
 
 
 def check():
@@ -238,9 +255,40 @@ def install(layout):
         raise
 
 
+def tune_buffer(layout):
+    """Existing install: apply the same buffer sizing, restart once, re-bind the receipt."""
+    before = verify(layout)
+    receipt = json.loads(read(STATE / 'receipt.json'))
+    conf = HOME / 'etc/ossec.conf'; raw = read(conf); gid = grp.getgrnam('wazuh').gr_gid
+    proposed = tuned_buffer(raw.decode()).encode()
+    if proposed == raw:
+        return {**before, 'buffer': 'already_tuned'}
+    stamp = datetime.now(ZoneInfo('Asia/Seoul')).strftime('%Y%m%dT%H%M%S')
+    backup = STATE / ('ossec.conf.before-buffer-' + stamp)
+    atomic(backup, raw)
+    try:
+        atomic(conf, proposed, gid)
+        for binary in ('wazuh-agentd', 'wazuh-logcollector', 'wazuh-modulesd', 'wazuh-syscheckd'):
+            run([str(HOME / 'bin' / binary), '-t'])
+        run(['systemctl', 'restart', 'wazuh-agent'], timeout=90)
+        for _ in range(30):
+            path = HOME / 'var/run/wazuh-agentd.state'
+            if path.exists() and "status='connected'" in path.read_text(): break
+            time.sleep(2)
+        else: raise ValueError('host_agent_connection_timeout')
+    except Exception:
+        atomic(conf, raw, gid)
+        run(['systemctl', 'restart', 'wazuh-agent'], check=False, timeout=90)
+        raise
+    receipt.update(config_sha256=sha(proposed), buffer={**BUFFER, 'backup': str(backup),
+                   'tuned_at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat()})
+    atomic(STATE / 'receipt.json', (json.dumps(receipt, indent=2) + '\n').encode())
+    return {**verify(layout), 'buffer': BUFFER, 'backup': str(backup)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('check', 'install', 'verify'))
+    parser.add_argument('action', choices=('check', 'install', 'verify', 'tune-buffer'))
     parser.add_argument('--layout', choices=NAMES, default='fresh')
     args = parser.parse_args()
     need(os.geteuid() == 0, 'host_agent_root_required')
@@ -253,7 +301,7 @@ def main():
         fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
         with os.fdopen(fd, 'r+') as lock:
             trusted(LOCK); fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            result = install(args.layout)
+            result = tune_buffer(args.layout) if args.action == 'tune-buffer' else install(args.layout)
     print(json.dumps(result, sort_keys=True))
 
 

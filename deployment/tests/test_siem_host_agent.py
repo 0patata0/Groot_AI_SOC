@@ -12,6 +12,7 @@ m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 RAW = b'''<!-- preserve -->\n<ossec_config>
 <client><server><address>MANAGER_IP</address></server></client>
+<client_buffer><disabled>no</disabled><queue_size>5000</queue_size><events_per_second>500</events_per_second></client_buffer>
 <sca><enabled>yes</enabled><scan_on_start>yes</scan_on_start></sca>
 <wodle name="syscollector"><disabled>no</disabled></wodle>
 <syscheck><disabled>no</disabled></syscheck>
@@ -33,6 +34,19 @@ class HostAgent(unittest.TestCase):
         for name in ('sca', 'syscheck', 'wodle', 'localfile'):
             original = ET.fromstring(b'<root>' + RAW + b'</root>').find('ossec_config/' + name)
             self.assertEqual(ET.tostring(original), ET.tostring(root.find('ossec_config/' + name)))
+
+    def test_buffer_sized_for_rootcheck_burst_without_other_changes(self):
+        changed = m.candidate(RAW)
+        root = ET.fromstring(b'<root>' + changed + b'</root>')
+        self.assertEqual(root.findtext('ossec_config/client_buffer/queue_size'), '20000')
+        self.assertEqual(root.findtext('ossec_config/client_buffer/events_per_second'), '1000')
+        self.assertEqual(root.findtext('ossec_config/client_buffer/disabled'), 'no')
+        self.assertEqual(m.tuned_buffer(m.tuned_buffer(RAW.decode())), m.tuned_buffer(RAW.decode()))
+        for bad in (RAW.replace(b'<client_buffer>', b'<x>').replace(b'</client_buffer>', b'</x>'),
+                    RAW.replace(b'<disabled>no</disabled><queue', b'<disabled>yes</disabled><queue'),
+                    RAW.replace(b'<queue_size>5000</queue_size>', b'')):
+            with self.subTest(bad=bad[:40]), self.assertRaises(ValueError):
+                m.tuned_buffer(bad.decode())
 
     def test_reject_existing_or_duplicate_clients(self):
         for bad in (RAW.replace(b'MANAGER_IP', b'192.0.2.10'), RAW + RAW,

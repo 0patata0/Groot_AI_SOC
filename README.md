@@ -99,7 +99,7 @@
 
 모델3군비교는1.5.14로고정한원본18/24·HF미학습20/24·학습19/24를보존하며1.5.15로세군을다시비교한결과는아닙니다. [방법·결과·한계](finetuning/RUNTIME_COMPARISON_20261103.md). NAT실문법/격리검증은통과했으나운영통합은미적용입니다. 관리자231의SSH허용추가·Kali232차단예외제거만증분반영했으며엄격INPUT축소는남습니다. OpenClaw는후보로유지합니다. [FW검토](infra/mcp/fw-consolidation.md).
 
-하네스 정리는 이후에도 [Harness² 보완 점검 절차](infra/validation/harness2/README.md)를 따른다. 구조 검사와 실제 답변 검증은 구분한다. 로컬 `G_Harness2/`는 Git 제외로 보존하며 사용자 명시 지시가 있을 때만 삭제한다.
+하네스 정리는 이후에도 [Harness² 보완 점검 절차](infra/validation/harness2/README.md)를 따른다. B에는 11/10부터 매일03:00 KST 정기 구조 점검이 설치돼 있다([설치·실측](infra/validation/harness2/README.md#b-서버-정기-점검-설치)). 구조 검사와 실제 답변 검증은 구분한다. 로컬 `G_Harness2/`는 Git 제외로 보존하며 사용자 명시 지시가 있을 때만 삭제한다.
 
 ## 현재 역할 배정 · 2026-11-04
 

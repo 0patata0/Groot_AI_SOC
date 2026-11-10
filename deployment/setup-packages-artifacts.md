@@ -49,6 +49,8 @@
 > **2026-10-25 프로필 자산:** `deployment/bot-icons/`의 두 PNG·출처/SHA·라이선스 및 `deployment/bot_profiles.py`는 기존 `deploy.sh` 소스 archive에 포함한다. 별도 deb/wheel/이미지 반입은 추가하지 않는다. 설치 중 인터넷 다운로드가 필요하지 않다.
 
 
+> **2026-11-10 선택 반입물 추가(Harness²):** `HARNESS2_ENABLE=1`일 때만 SIEM의 root 전용 `/opt/capstone-prereqs/harness2`에 공식 `harness2-6868817.tar.gz`(7,102,702 bytes, SHA256 `b940b1908121480b13ef8bd4bd33f8a8ddde67811197e8ab86b84005db57a3ed`, 140파일은 [framework.lock.json](../infra/validation/harness2/framework.lock.json))과 `./deploy.sh --harness-config --layout legacy|fresh`로 만든 `audit.json`을 둔다. pip·패키지 설치 없이 서버 기존 Python 3.12/3.13 표준 라이브러리만 사용한다. [설치·검증](../infra/validation/harness2/README.md#b-서버-정기-점검-설치).
+
 > **2026-10-25 선택 반입물 추가:** Ollama 시험 옵션을 켤 때만 `/opt/capstone-prereqs/ollama-trial`에 deb3개·Linux CPython3.12 wheel70개와 정확한 [별도 manifest](../infra/ollama-trial/offline-manifest.json)를 준비한다. python3.12-venv3.12.3-1ubuntu0.17 / pip-whl24.0+dfsg-1ubuntu1.3 / setuptools-whl68.1.2-2ubuntu1.2 및 [전체 Python lock](../infra/ollama-trial/requirements.lock)을 사용한다. 이 묶음은 기존 평면 artifacts.json 목록과 구분하며 자체 설치기가 해시/추가 파일을 검증한다. [준비·적용·정리](../infra/ollama-trial/README.md). 채팅 옵션은 이 wheel 묶음에 포함된 httpx/websockets를 사용하므로 별도 바이너리가 더 필요하지 않다. 기본 설치에는 추가하지 않는다.
 
 

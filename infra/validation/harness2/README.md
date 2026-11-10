@@ -113,3 +113,34 @@ PYTHONPATH=G_Harness2 python3 -B infra/validation/harness2/audit.py \
 ## 후속107 — 2026-11-08 21:08
 
 실제20:46 운영47SHA·MCP45스키마·모델 대조 후 공식 core로 구조25구성/5스킬/18스크립트·상시16848문자 불변을 확인했다. 다른 편집 색인인 과거27개와 삭제 수를 비교하지 않는다. 변경은 채널 담당계승/정책·공통 계약·SDK 연결·soc-query의5표면이다. 후보 재동결/관련1289검사→관리자 경유12파일 적용→새 실제8채팅 원문/게시 확인→21:08:31 확정 순서를 마쳤다. 실제 과거2오류와 최초 환경/범위 검사 실패는 [기록](../../hermes/service-followups.md)에 구분한다. G_Harness2/운영 복구본 보존, 모델 기반 자동 후보 생성·선택은 수행하지 않았다.
+
+## B 서버 정기 점검 설치
+
+**2026-11-10 기존 B에 설치·활성화 완료(관리자231 경유).** 공식 Harness² 0.1.0/`6868817`을 B에 고정 SHA로 보관하고, 매일 03:00 KST에 공통 SOC 스킬·스크립트의 구조 점검을 실행한다. 모델 호출·도구 실행·채팅 게시·소스 수정·자동 적용은 없다. 보고서의 개선안 초안은 `review_only`이며, 운영 반영은 관리자 승인 카드 이후 별도로 진행한다.
+
+| 항목 | 위치·값 |
+|---|---|
+| 반입 번들 | `/opt/capstone-prereqs/harness2/` (root 0700): 공식 압축, `audit.json`, 설치기, 고정 소스 3개 |
+| 공식 소스 | `/opt/capstone-harness2/vendor/6868817…/` (140파일, lock SHA 일치) |
+| 설정·영수증 | `/etc/capstone-harness2/{audit.json,framework.lock.json,installation.json}` |
+| 상태·보고서 | `/var/lib/capstone-harness2/{context.json,sources/,reports/}` |
+| systemd | `capstone-harness2-context.service`(현재 모델·MCP 목록 수집) → `capstone-harness2-audit.service`(구조 점검), `capstone-harness2-audit.timer`(03:00 KST, Persistent=false) |
+
+```sh
+# 로컬: 설정 생성(기존 B는 legacy, 새 설치는 fresh)
+./deploy.sh --harness-config --layout legacy > audit.json
+# B(root): 사전검사 → 설치(준비+타이머 활성) → 검증
+python3 -I -B /opt/capstone-prereqs/harness2/harness_maintenance.py check|install|verify \
+  --source-root /opt/capstone-prereqs/harness2/source --bundle /opt/capstone-prereqs/harness2
+# B(root): 관리자 요청 시 수동 점검
+systemctl start capstone-harness2-audit.service
+```
+
+새 서버는 `HARNESS2_ENABLE=1`로 `deploy.sh`가 같은 `harness-check/install/verify`를 호출한다. 기존 설치는 덮어쓰지 않고 검증만 한다.
+
+**11/10 설치 중 실패와 수정.** 첫 설치 후 수동 실행에서 수집 서비스가 `discovery_unavailable`로 끝나 점검이 `incomplete`였다. 같은 sandbox 옵션을 하나씩 바꿔 시험한 결과, `User=root`를 명시하고 `NoNewPrivileges=yes`를 함께 쓰면 wrapper의 `runuser`가 soc-ollama로 전환하지 못했다(`setuid` EPERM). 둘 중 하나만 있으면 정상이었다. `NoNewPrivileges`는 유지하고 수집 unit에서 `User=`/`Group=`만 제거했다(기본 root 실행; `deployment/review_chat.py`의 같은 사례와 동일). 직후 생성분만 제거하고 재설치했다.
+
+**실측(11/10 17:29 KST, 2차 수동 실행).** 수집 16초: `observed`, 45도구, 학습 모델 `soc-qwen36:35b-balanced-q4km-20261108`, 모델/도구/채팅/보호 호출 0. 점검 3초: status `findings`. native/sdk/management 세 표면 모두 `official_validation_failed`(같은 진단 SHA `c7f6c0d2…`), 5개 공통 스킬 사본은 세 표면에서 동일, 중복 후보 0. 세부 진단 문구는 보고서에 들어 있지 않아 원인 분석은 남았다. 설치 전후 운영 48 manifest/보호 6 차이 0, 두 봇 연결·대기열 0을 확인했다.
+
+남은 일: `official_validation_failed`의 실제 원인 분석·수정 후보, 03:00 첫 정기 실행 결과 확인, 관리자 채팅 요청으로 수동 점검을 시작하는 봇 연결과 승인형 개선 경로. 구조 점검 통과를 품질 향상이나 정확도로 표시하지 않는다.
+

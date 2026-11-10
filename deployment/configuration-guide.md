@@ -108,6 +108,7 @@ LLM_MODEL=qwen3.6:35b
 | `LLM_BASE_URL`, `LLM_MODEL` | 내부 `/v1` API와 실제 모델 ID. URL 안의 자격·query 금지 |
 | `SURICATA_IMAGE`, `WAF_IMAGE`, `DVWA_IMAGE`, `MARIADB_IMAGE` | 선택 로컬 이미지 참조. 반입된 ID·플랫폼·역할 계약을 검사하며 pull하지 않음 |
 | `ET_RULES_FILE` | 선택 security 룰 경로. 기본 `/opt/capstone-prereqs/suricata.rules` |
+| `HARNESS2_ENABLE`, `HARNESS2_BUNDLE` | 선택 SIEM 공식 Harness² 정기 구조 점검(매일03:00 KST). `OLLAMA_TRIAL_ENABLE=1` 필요. 번들 기본 `/opt/capstone-prereqs/harness2`. [반입·설치·검증](../infra/validation/harness2/README.md#b-서버-정기-점검-설치) |
 
 읽기 전용 시스템 진단에는 별도 비밀번호 입력이 없다. 설치기가 `SECURITY_HOST`·`SIEM_HOST`·`SERVICE_HOST`와 `SSH_PORT`를 새 진단 전용 SSH 경로에도 결속한다. B에서 생성한 새 키는 A/C의 고정 snapshot reader만 호출하며 관리자 SSH 키·Lab 관리자 인증 키·Wazuh 자격증명을 공유하지 않는다. collector는 root로 고정 상태와 오류 분류 메타데이터만 수집하고, MCP 계정에는 root·sudo·Docker·원본 journal 읽기 권한을 주지 않는다. 기존 서버는 새 진단 namespace가 없는지 확인한 뒤 확장 부분만 별도 배포한다.
 

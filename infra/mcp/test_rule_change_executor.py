@@ -254,6 +254,19 @@ class ExecutorTests(unittest.TestCase):
         self.assertTrue(candidate.endswith("\t공백 \n\n".encode()))
         self.assertEqual(path.read_bytes(), before)
 
+    def test_edit_errors_name_locations_without_changing_validation(self):
+        # 2026-11-10: blind anchor retries; errors now carry bounded locations.
+        current = b"# head\n# ---\nSecRule A\n# ---\nSecRule B\n"
+        with self.assertRaisesRegex(MOD.RuleChangeError, r"exactly once in the original file; matches at lines 2,4;"):
+            MOD._edit_candidate(current, MOD._validated_edits([{"old_text": "# ---", "new_text": "x"}]))
+        with self.assertRaisesRegex(MOD.RuleChangeError, r"absent from the original file; nearest line 5: SecRule B"):
+            MOD._edit_candidate(current, MOD._validated_edits([{"old_text": "SecRule C", "new_text": "x"}]))
+        with self.assertRaisesRegex(MOD.RuleChangeError, r"invalid Suricata rule boundary; active rule 2 begins: alert"):
+            MOD._validate_candidate("suricata", 'alert tcp any any -> any any (msg:"x"; sid:1; rev:1;)\n'
+                                                'alert tcp any any -> any any msg:"broken"\n')
+        hint = MOD._edit_hint(b'x (msg:"a|b"; sid:1;)\n', b'x (msg:"a|b"; sid:2;)', True)
+        self.assertNotIn(";", hint.split("; nearest ", 1)[1].split("; copy")[0])
+
     def test_literal_edit_rejects_missing_ambiguous_overlapping_and_sequential_matches(self):
         engine, _, target, current = self.engine("waf")
         path = Path(engine.targets[target]["path"])

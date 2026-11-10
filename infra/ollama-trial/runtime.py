@@ -6,6 +6,7 @@ dedicated unprivileged user. The benchmark may select a subset of read tools.
 """
 import argparse
 import contextlib
+import copy
 import asyncio
 import hashlib
 import json
@@ -376,13 +377,17 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
                     descriptions={name:harness.CONTRACT.service_tool_description(t.description,t.args_schema)
                                   for name,t in readable.items()}
-                    direct=os.environ.get('CAPSTONE_SERVICE_DIRECT_READS','0')=='1'
+                    # Default on: the validated R29-R32 configuration selects the tool and
+                    # arguments in one structured response. '0' restores the two-step path.
+                    direct=os.environ.get('CAPSTONE_SERVICE_DIRECT_READS','1')=='1'
+                    more_allowed=report.get('service_inquiry_count',0)<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS
                     schemas={n:(harness.EVIDENCE.chat_read_schema(n,t.args_schema) if direct else t.args_schema)
                              for n,t in readable.items()}
                     schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
                         facts=harness.facts_for(report['calls']),read_schemas=schemas,
                         lookup_only=service_context.get('lookup_only') is True,
-                        direct_reads=min(4,max(0,budget.limit-budget.used)) if direct else None)
+                        direct_reads=(min(4,max(0,budget.limit-budget.used)) if more_allowed else 0) if direct else None,
+                        allow_more=more_allowed)
                     messages=harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback,structured_followups=True,
                         execution_rejections=report.get('service_inquiry_rejections'),direct_reads=direct)
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(messages),90)
@@ -404,6 +409,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         review['evidence_tools']=[citations[i] for i in indexes]
                         report['service_lookup_complete']=review.get('scope')=='verified_service_lookup'
                         report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
+                        report['last_service_review']=copy.deepcopy(review)  # for bounded sentence pruning
                         return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
                     if direct:
                         selected={row['tool']:readable[row['tool']] for row in value['calls']}
@@ -568,6 +574,16 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     issues.append('requested_read_scope_incomplete')
                 if rendered:
                     final = rendered
+                elif issues and service_plan and not still_missing and (pruned:=harness.CONTRACT.prune_rejected_review(
+                        report.get('last_service_review'),harness.facts_for(report['calls']),issues))[0] is not None and not (
+                        pruned_issues:=harness.violations(current,(pruned_text:=harness.EVIDENCE.render_model_review(
+                            pruned[0],harness.facts_for(report['calls']))),report['calls'],reference,service_plan)
+                        + harness.card_answer_issues(reference,pruned_text,report['calls'])):
+                    # Every remaining issue was a phrasing issue in identifiable sentences;
+                    # the rest of the model's own judgment re-passed all checks.
+                    report['pruned_unverified_sentences']=pruned[1]
+                    report['pruned_issues']=sorted(set(issues))
+                    final=pruned_text
                 elif issues:
                     report['remaining_issues'] = issues
                     final = (harness.action_fallback(current, report['calls']) if

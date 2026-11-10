@@ -1258,7 +1258,7 @@ class ServiceReport(unittest.TestCase):
                 value['report'][field]=empty if field=='basis' else [empty]
                 with self.subTest(field=field,empty=empty),self.assertRaises(ValidationError):validator.validate(value)
 
-    def wire(self,context=None,direct=False):
+    def wire(self,context=None,direct=False, retries=None):
         from types import SimpleNamespace
         req=catalog();req['tools'][0]['type']='function'
         req.update(model='qwen3.6:35b',tool_choice='auto',messages=[{'role':'system','content':'DUPLICATED_FULL_POLICY'},
@@ -1266,6 +1266,7 @@ class ServiceReport(unittest.TestCase):
         a=SimpleNamespace(provider='custom',model='qwen3.6:35b',api_mode='chat_completions',
             base_url='http://10.200.10.10:11435/v1',_current_turn_id='current',valid_tool_names={NAME},
             _capstone_registered_read_conditions=('current',{NAME:req['tools'][0]['function']['parameters']}))
+        if retries:a._capstone_inquiry_retries=('current',tuple(retries))
         snap={'turn':'current','reads':[NAME],'facts':[{'kind':'diagnostic','target':'b:management'}],
               'receipts':[{'tool':r['tool'],'is_error':False,'output':json.dumps(r['data'])} for r in self.rows],
               'service_context':context or self.context()}
@@ -1274,6 +1275,17 @@ class ServiceReport(unittest.TestCase):
              'CAPSTONE_CHAT_READ_JSON':json.dumps({'request':self.f.question,'background':'','tools':[NAME],'requested_at_kst':self.f.at})}
         with patch.dict(w.os.environ,env,clear=True):value=w.management_report_request(req,a,snap)
         return req,a,snap,value,env
+
+    def test_native_additional_rounds_are_capped_then_report_is_required(self):
+        # Production 2026-11-10: six consecutive more_evidence rounds (199 s).
+        for direct in (False,True):
+            with self.subTest(direct=direct):
+                *_,wire,_=self.wire(direct=direct)
+                schema=wire['response_format']['json_schema']['schema']
+                self.assertEqual({b['properties']['more_evidence']['const'] for b in schema['anyOf']},{True,False})
+                *_,wire,_=self.wire(direct=direct,retries=range(1,c.SERVICE_INQUIRY_ROUNDS+1))
+                schema=wire['response_format']['json_schema']['schema']
+                self.assertEqual([b['properties']['more_evidence']['const'] for b in schema['anyOf']],[False])
 
     def test_native_direct_read_dispatches_without_second_model_selection(self):
         from openai.types.chat import ChatCompletion

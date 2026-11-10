@@ -2496,12 +2496,20 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status'))
                 for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors or pending_web})
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
+        # 2026-11-10: a compound Hermes report fell back after its single factual
+        # rewrite still carried one phrasing issue. Allow exactly one more rewrite
+        # when every remaining issue is a literal phrasing repair (no new reads,
+        # no new claims); the continuation counter cap below still applies.
+        if (factual and not inquiry and getattr(agent, '_capstone_factual_turn', None) == turn
+                and issues and set(issues) <= LITERAL_REPAIR_ISSUES):
+            marker = '_capstone_factual_turn2'
         prior_inquiries=getattr(agent,'_capstone_inquiry_retries',None)
         inquiry_retries=(prior_inquiries[1] if isinstance(prior_inquiries,tuple) and len(prior_inquiries)==2
             and prior_inquiries[0]==turn and isinstance(prior_inquiries[1],tuple) else ())
         inquiry_key=getattr(agent,'_capstone_inquiry_receipts',None)
         known_retries = sum(getattr(agent, name, None) == turn for name in
-                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn'))+len(read_retries)+len(inquiry_retries)
+                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn',
+                             '_capstone_factual_turn2'))+len(read_retries)+len(inquiry_retries)
         if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
@@ -2538,7 +2546,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                         '도구가 제시되지 않은 ID·target을 추정하지 말고 실제 inputSchema를 따르세요.')
         elif factual:
             if inquiry:agent._capstone_inquiry_retries=(turn,(*inquiry_retries,inquiry_key))
-            else:agent._capstone_factual_turn = turn
+            else:setattr(agent, marker, turn)
             if not missing_evidence:
                 arm_literal_repair(agent, turn, ['invalid_disposition_tool_names' if
                     citation_only and x == 'unobserved_disposition_tools' else x for x in issues])
@@ -3290,9 +3298,14 @@ def management_report_request(request, agent, snapshot):
             return result
         if service is not None:
             direct=os.environ.get('CAPSTONE_SERVICE_DIRECT_READS','0')=='1'
+            prior=getattr(agent,'_capstone_inquiry_retries',None)
+            rounds=(len(prior[1]) if isinstance(prior,tuple) and len(prior)==2 and prior[0]==snapshot['turn']
+                and isinstance(prior[1],tuple) else 0)
+            more_allowed=rounds<diagnostic_contract().SERVICE_INQUIRY_ROUNDS
             schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,
                 read_schemas={n:chat_read_schema(n,s) for n,s in catalog.items()} if direct else catalog,
-                lookup_only=service.get('lookup_only') is True,direct_reads=4 if direct else None)
+                lookup_only=service.get('lookup_only') is True,
+                direct_reads=(4 if more_allowed else 0) if direct else None,allow_more=more_allowed)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,

@@ -81,6 +81,51 @@ class DiagnosticClaims(unittest.TestCase):
         self.assertEqual(c.rejected_claim_sentences(prose,facts,[]),[])
         self.assertEqual(c.rejected_claim_sentences(prose,'not-a-list',['diagnostic_snapshot_is_not_functional_health']),[])
 
+    def test_service_report_schema_can_require_a_report(self):
+        # Direct-read catalogs are exercised by the native wire test (server profile).
+        open_schema=c.service_report_schema(['t'],available_reads=['t'])
+        closed=c.service_report_schema(['t'],available_reads=['t'],allow_more=False)
+        self.assertIn(True,[b['properties']['more_evidence']['const'] for b in open_schema['anyOf']])
+        self.assertEqual([b['properties']['more_evidence']['const'] for b in closed['anyOf']],[False])
+        self.assertGreaterEqual(c.SERVICE_INQUIRY_ROUNDS,1)
+
+    def test_prune_drops_only_rejected_sentences_and_discloses_it(self):
+        # R37 (2026-11-10): correct judgments fell back because one sentence
+        # kept an over-broad phrase after every rewrite.
+        facts=[historical()]
+        review={'assessment':'unresolved','status':'needs_review','evidence_tools':['t'],
+                'basis':'c:vector 시작 실패 표본이 있습니다. 현재 c:vector는 정상 동작 중입니다.',
+                'current_observation':'현재 c:vector는 ActiveState=active입니다.',
+                'limitations':['원인은 미확인입니다.'],'next_steps':[]}
+        pruned,n=c.prune_rejected_review(review,facts,['diagnostic_snapshot_is_not_functional_health'])
+        self.assertEqual(n,1)
+        self.assertEqual(pruned['basis'],'c:vector 시작 실패 표본이 있습니다.')
+        self.assertIn('1개는 근거 범위를 넘어 제외',pruned['limitations'][-1])
+        self.assertEqual(review['basis'].count('정상'),1)  # input untouched
+        # Non-phrasing issues, nothing to drop, or an emptied basis keep the fallback.
+        self.assertEqual(c.prune_rejected_review(review,facts,['requested_read_scope_incomplete']),(None,0))
+        self.assertEqual(c.prune_rejected_review({**review,'basis':'c:vector 시작 실패 표본이 있습니다.'},facts,
+                         ['diagnostic_snapshot_is_not_functional_health'])[0],None)
+        self.assertIsNone(c.prune_rejected_review({**review,'basis':'현재 c:vector는 정상 동작 중입니다.'},facts,
+                          ['diagnostic_snapshot_is_not_functional_health'])[0])
+
+    def test_control_lines_are_not_rescanned_for_absence_phrasing(self):
+        facts=[historical()]
+        body='- c:vector 오류 표본 0건(전체 건수 미확인)\n- c:vector 실제 오류 원인은 표본 부재로 인해 확인되지 않음.'
+        control='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved','basis':body},ensure_ascii=False)
+        self.assertNotIn('sample_zero_presented_as_absence',c.snapshot_health_violations(body+'\n'+control,facts))
+
+    def test_period_sample_counts_are_not_continuity_claims(self):
+        # R35 (2026-11-10): "전체 기간의 오류 표본 0건" was rejected as continuity.
+        facts=[historical()]
+        for text in ('요청된 전체 기간의 c:vector journal 오류 표본은 0건이며 원인은 미확인입니다.',
+                     'c:vector 전체 기간 조회: 반환 entries 0건(전체 오류 건수 미확인)입니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('diagnostic_period_coverage_unverified',c.diagnostic_period_claim_violations(text,facts))
+        for text in ('c:vector는 전체 기간 내내 오류 없이 실행됐습니다.','요청한 전체 기간 동안 c:vector는 정상입니다.'):
+            with self.subTest(text=text):
+                self.assertIn('diagnostic_period_coverage_unverified',c.diagnostic_period_claim_violations(text,facts))
+
     def test_parenthesized_candidate_causes_are_not_absence_claims(self):
         facts=[historical()]
         ok=('세부 원인(설정 오류, 권한 문제 등)은 확인되지 않았습니다.','후보(권한 오류 등)는 확인되지 않았습니다.')

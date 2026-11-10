@@ -530,7 +530,10 @@ class SharedContract(unittest.TestCase):
                     'edit 1 old_text is absent from the original file',
                     'base_sha256 must be a SHA-256 from get_rule_change_target',
                     'target changed since it was read; fetch current content and retry',
-                    'Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden']
+                    'Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden',
+                    'edit 1 old_text must match exactly once in the original file; matches at lines 2,4; extend old_text with an adjacent unique line',
+                    'edit 1 old_text is absent from the original file; nearest line 5: SecRule B; copy old_text exactly from get_rule_change_target',
+                    'invalid Suricata rule boundary; active rule 2 begins: alert tcp any any -> any any msg:"broken"']
         for error in messages:
             for depth in range(3):
                 wrapped = error

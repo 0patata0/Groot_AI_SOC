@@ -22,7 +22,7 @@ from types import ModuleType, SimpleNamespace
 VERSION = "groot-query-completion:1.19.137"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = '054073e9c671aff08324eb3a1cd2b5049b7f97b256391844b26e9aa2b085ee95'
+EVIDENCE_SOURCE_SHA256 = '96876e4e76fb65801fdfbb12b9ae8731bbe9aa4a227ccbf24e81e59bef46f5d8'
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')

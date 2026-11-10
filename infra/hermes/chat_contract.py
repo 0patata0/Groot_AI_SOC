@@ -1100,7 +1100,13 @@ def service_follow_up_lines(steps):
     return lines
 
 
-def service_report_schema(citations, nonce=None, available_reads=None, facts=(), read_schemas=None, lookup_only=False, direct_reads=None):
+# Additional evidence rounds per service report. Production (2026-11-10)
+# requested more evidence six times in a row (8 reads, 12 model calls, 199 s)
+# before failing; after this many rounds the model must report what it has.
+SERVICE_INQUIRY_ROUNDS = 2
+
+
+def service_report_schema(citations, nonce=None, available_reads=None, facts=(), read_schemas=None, lookup_only=False, direct_reads=None, allow_more=True):
     """Model may request the full read catalog; it is never forced to conclude."""
     if lookup_only:
         fields={'scope':{'const':'verified_service_lookup'},'assessment':{'const':'observed'},
@@ -1120,7 +1126,8 @@ def service_report_schema(citations, nonce=None, available_reads=None, facts=(),
         'status':{'enum':['resolved','monitor','needs_review','awaiting_approval']}}
     if any(f.get('kind')=='diagnostics' and (isinstance(f.get('pipeline_metrics'),dict)
             or f.get('diagnostic_mode') in ('snapshot','runtime')) for f in facts):
-        fields['current_observation']={'type':'string','minLength':20,'maxLength':384,'pattern':'[A-Za-z가-힣]',
+        # 384 rejected a valid 394-char observation table (R36, 2026-11-10); tables need room.
+        fields['current_observation']={'type':'string','minLength':20,'maxLength':768,'pattern':'[A-Za-z가-힣]',
             'description':'현재 서비스와 요청한 기능 영향에 대한 별도 답변. 관측된 대상·시점·지표만 사용합니다. 프로세스 상태, 수집 heartbeat, 실제 전달, 처리·전송 대기, 사건 검토 상태는 서로 다른 근거입니다. 단일 관측을 연속성·무손실·전체 정상·과거 오류 해결로 확대하지 않습니다.'}
         fields['basis']['description']='과거 원문의 직접 이유와 확인 범위. 원문에 reason/error가 있으면 실제 문자열을 근거로 사용하고, 종료값만으로 설정 오류 등 배경 원인을 만들지 않습니다. 현재 상태는 current_observation에서만 답합니다.'
     if diagnostic_closure_unverified(facts):
@@ -1145,7 +1152,7 @@ def service_report_schema(citations, nonce=None, available_reads=None, facts=(),
     report={'type':'object','additionalProperties':False,'required':list(fields),'properties':fields}
     branches=[]
     for more in (True,False):
-        if more and direct_reads==0:continue
+        if more and (direct_reads==0 or not allow_more):continue
         props={'more_evidence':{'const':more},'report':{'type':'null'} if more else report}
         if more:
             if direct_reads is not None:
@@ -1289,6 +1296,12 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
         'untrusted_failed_read_attempts는 실제 실패 내역이며 관측·부재·정상 근거가 아닙니다. '
         '앞선 성공 근거는 유지하고, 남은 공백에 필요한 인자 정정·다른 읽기를 선택하거나 미확인으로 보고하세요. '
         '프로세스 속성만 나열해 현재 수집·처리 영향 답변을 대신하지 않습니다. '
+        # 2026-11-10: first drafts were rejected for exactly these phrasings on both
+        # paths (Hermes allowed one rewrite, Ollama looped); state them up front.
+        '표현 규칙: 반환 오류 표본이 0건이면 "조회 구간의 반환 오류 표본 0건(전체 건수 미확인)"으로 쓰고 '
+        '"오류 없음", "오류가 발생하지 않음", "오류는 확인되지 않음"으로 바꾸지 않습니다. '
+        '서비스·수집·전송 상태는 "ActiveState=active, SubState=running(관측 시각)"처럼 실제 값으로 쓰고 '
+        '"정상", "정상 작동", "문제없음", "영향 없음"이라고 쓰지 않습니다. 기능·영향을 검증한 근거가 없으면 "미확인"으로 씁니다. '
         '추가 읽기가 질문의 구체적 근거 공백을 해소하면 more_evidence=true, report=null, read_tools에 등록된 도구 이름을 선택합니다. '
         '등록 target 스키마에 질문의 서비스가 없으면 같은 호스트의 다른 서비스를 대신 고르거나 agent ID를 추정하지 않습니다. '
         '확인한 이유·현재 관측·남은 미확인으로 답할 수 있으면 false와 unresolved/needs_review 보고를 작성합니다. 이는 사건 종결이 아닙니다. '
@@ -2116,6 +2129,61 @@ def rejected_claim_sentences(prose, facts, issues):
     return out
 
 
+PRUNE_ISSUES = frozenset({'diagnostic_snapshot_is_not_functional_health', 'sample_zero_presented_as_absence',
+    'diagnostic_period_coverage_unverified', 'diagnostic_duration_claim_unbound'})
+
+
+def prune_rejected_review(review, facts, issues):
+    """Last resort after repairs: drop only checker-rejected model sentences.
+
+    R36/R37 (2026-11-10): judgments with correct evidence fell back to an
+    evidence-only table because one sentence kept an over-broad phrase after
+    every rewrite. Remove exactly those sentences (no rewriting, no new text
+    from code beyond a disclosed omission note), and only for phrasing issues.
+    The caller must re-run the full checks on the rendered result.
+    """
+    wanted = {x for x in issues if isinstance(x, str)}
+    if not wanted or not wanted <= PRUNE_ISSUES or not isinstance(review, dict):
+        return None, 0
+    dropped = 0
+
+    def clean(text):
+        nonlocal dropped
+        if not isinstance(text, str):
+            return text
+        kept = []
+        for line in text.split('\n'):
+            stripped = line.strip()
+            if not stripped or stripped.startswith(('|', '**')):
+                kept.append(line)
+                continue
+            prefix = re.match(r'^\s*(?:[-*•]|\d+[.)])\s+', line)
+            body = line[prefix.end():] if prefix else line
+            parts = re.split(r'(?<=[.!?])\s+', body)
+            good = []
+            for part in parts:
+                if part.strip() and rejected_claim_sentences(part, facts, wanted):
+                    dropped += 1
+                else:
+                    good.append(part)
+            joined = ' '.join(p for p in good if p.strip())
+            if joined.strip():
+                kept.append((prefix.group(0) if prefix else '') + joined)
+        return '\n'.join(kept).strip()
+
+    result = copy.deepcopy(review)
+    for key in ('basis', 'current_observation'):
+        if key in result:
+            result[key] = clean(result[key])
+    result['limitations'] = [x for x in (clean(v) for v in result.get('limitations', [])) if x]
+    if not dropped or not meaningful_report_field(result.get('basis')):
+        return None, dropped
+    if 'current_observation' in result and not meaningful_report_field(result['current_observation']):
+        return None, dropped
+    result['limitations'].append('검증 기준을 넘는 표현이 남은 문장 %d개는 근거 범위를 넘어 제외했습니다. 원문은 감사 기록에 보존합니다.' % dropped)
+    return result, dropped
+
+
 def report_list_display(items):
     """Render list fields as one bullet per model line; tables stay tables."""
     out = []
@@ -2224,6 +2292,10 @@ def diagnostic_period_claim_violations(text, facts):
             # A requested investigation or unknown cause is not an assertion
             # that the error/state itself persisted throughout the interval.
             if re.match(r'\s*(?:의\s|원인|이유|배경|기록|이력|로그|내역|사유)',after):continue
+            # "전체 기간의 오류 표본 0건" / "전체 오류 건수 미확인" count returned samples;
+            # the sample_zero check governs those. Not an interval-continuity claim
+            # (R35 false positives, 2026-11-10).
+            if re.match(r'\s*(?:반환\s*)?(?:표본|건수|횟수|entries|count)',after,re.I):continue
             if _claim_is_unasserted(after):continue
             if re.match(r'(?:적으로\s*)?(?:동작|작동|실행)?\s*(?:했는지|하는지|여부|인지)',after):continue
             if re.match(r'(?:적)?(?:인|으로)?\s*(?:상태)?\s*(?:이었다고|했다고|했다는|이라고|하다고)?\s*'
@@ -2312,7 +2384,10 @@ def snapshot_health_violations(text, facts):
     # A bounded zero-result excerpt is not absence over an incident interval.
     # Scope/uncertainty must qualify this proposition, not a disclaimer later.
     if any(f.get('kind')=='diagnostics' and f.get('requested_window_total_count') is None for f in facts):
-        for clause in re.split(r'\n|;|(?<=[.!?])\s+|이며,?\s*|으며,?\s*',re.sub(r'[*`]', '',text)):
+        # Control lines repeat model fields as escaped JSON (one line, '\n'
+        # literals); the displayed body already carries the same sentences.
+        prose=re.sub(r'(?m)^(?:INCIDENT_DISPOSITION|MANAGEMENT_STATUS):[^\n]*$','',text)
+        for clause in re.split(r'\n|;|(?<=[.!?])\s+|이며,?\s*|으며,?\s*',re.sub(r'[*`]', '',prose)):
             pattern=(r'(?:오류|장애|에러|실패)(?P<subject>[^\n.!?;]{0,30}?)'
                 r'(?:(?:관측|확인|발견)되지\s*않(?:았|음|습)|(?:발생|존재)하지\s*않(?:았|음|습))')
             for match in re.finditer(pattern,clause):

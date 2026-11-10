@@ -3794,8 +3794,15 @@ def preparation_instruction(targets):
 def rejected_before_proposal(error):
     # These exact executor validations precede _propose_candidate and cannot have
     # submitted a card. Transport/timeouts/unknown errors remain unresolved.
+    # Executor errors may append only these exact location hints (2026-11-10).
+    # Any other suffix (e.g. '; applied') keeps the outcome unresolved.
     return bool(preproposal_rejection(error) or re.fullmatch(
-        r'edit [1-9][0-9]* old_text (?:must match exactly once in|is absent from) the original file'
+        r'edit [1-9][0-9]* old_text must match exactly once in the original file'
+        r'(?:; matches at lines [0-9]{1,6}(?:,[0-9]{1,6}){0,5}; extend old_text with an adjacent unique line)?'
+        r'|edit [1-9][0-9]* old_text is absent from the original file'
+        r'(?:(?:; nearest line [0-9]{1,6}: [^\n|;]{0,120}(?: \| line [0-9]{1,6}: [^\n|;]{0,120})?)?'
+        r'; copy old_text exactly from get_rule_change_target)?'
+        r'|invalid Suricata (?:rule|option) boundary(?:; active rule [0-9]{1,5} begins: [^\n]{0,100})?'
         r'|candidate must end with a newline'
         r'|base_sha256 must be a SHA-256 from get_rule_change_target'
         r'|target changed since it was read; fetch current content and retry'

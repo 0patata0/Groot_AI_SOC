@@ -127,6 +127,33 @@ def _validated_edits(edits):
     return encoded
 
 
+def _line_number(data, offset):
+    return data.count(b"\n", 0, offset) + 1
+
+
+def _edit_hint(current, old, absent):
+    """Bounded, original-file-only guidance appended after the stable error text.
+
+    2026-11-10: models retried blind anchors 3-4 times (20-60 s per model call)
+    because the error named no location. Validation and approval are unchanged.
+    """
+    if not absent:
+        found, pos = [], current.find(old)
+        while pos >= 0 and len(found) < 6:
+            found.append(_line_number(current, pos))
+            pos = current.find(old, pos + 1)
+        return ("; matches at lines %s; extend old_text with an adjacent unique line"
+                % ",".join(str(n) for n in found))
+    first = next((line.strip() for line in old.split(b"\n") if line.strip()), b"")[:200]
+    lines = [line.decode("utf-8", "replace").strip() for line in current.split(b"\n")]
+    hints = []
+    for candidate in difflib.get_close_matches(first.decode("utf-8", "replace"), lines, n=2, cutoff=0.6):
+        # ';' and '|' delimit the hint grammar the harness matches exactly.
+        hints.append("line %d: %s" % (lines.index(candidate) + 1,
+                                      candidate[:120].replace(";", ",").replace("|", "/")))
+    return ("; nearest " + " | ".join(hints) if hints else "") + "; copy old_text exactly from get_rule_change_target"
+
+
 def _edit_candidate(current, edits):
     """Resolve every edit in the original bytes, then splice once without normalization."""
     spans = []
@@ -134,10 +161,12 @@ def _edit_candidate(current, edits):
     for index, (old, new) in enumerate(edits, 1):
         start = current.find(old)
         if start < 0:
-            raise RuleChangeError("edit %d old_text is absent from the original file" % index)
+            raise RuleChangeError("edit %d old_text is absent from the original file" % index
+                                  + _edit_hint(current, old, True))
         # Searching one byte after the first start also detects overlapping matches.
         if current.find(old, start + 1) >= 0:
-            raise RuleChangeError("edit %d old_text must match exactly once in the original file" % index)
+            raise RuleChangeError("edit %d old_text must match exactly once in the original file" % index
+                                  + _edit_hint(current, old, False))
         spans.append((start, start + len(old), new))
         size += len(new) - len(old)
     spans.sort(key=lambda span: span[0])
@@ -376,7 +405,14 @@ def _validate_candidate(kind, content):
         if re.search(r"(?i)\bexec\s*:|\bctl\s*:\s*ruleEngine\b", active):
             raise RuleChangeError("WAF exec/ruleEngine override action is forbidden")
     elif kind == "suricata":
-        rules = [_suricata_rule(*line) for line in _suricata_lines(encoded)]
+        rules = []
+        for number, (line, single_line) in enumerate(_suricata_lines(encoded), 1):
+            try:
+                rules.append(_suricata_rule(line, single_line))
+            except RuleChangeError as exc:
+                # Name the failing active rule so a model can fix it in one retry.
+                raise RuleChangeError("%s; active rule %d begins: %s" % (
+                    exc, number, line[:100].decode("utf-8", "replace"))) from None
         if any(not rule["header"] or rule["header"][0] != b"alert" for rule in rules):
             raise RuleChangeError("Suricata local rules must remain alert-only")
         sids = [_suricata_number(rule, b"sid")[0] for rule in rules]

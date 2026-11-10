@@ -12368,3 +12368,7 @@ Native/SDK가 추가 읽기의 도구명과 실제 인자를 한 모델 응답�
 ## 2026-11-10 Harness² 점검 findings 원인·수정
 
 17:29 2차 실행의 세 표면 `official_validation_failed`(진단 SHA `c7f6c0d2…`)는 코드 라우팅 스킬4개가 always-on 문구에 없다는 공식 규칙 때문이었다. 이 findings 보고서는 B와 로컬 검증 폴더에 보존하며, 17:39 passed로 덮어쓰지 않는다. 수정 전 STATUS는 Git `4428029efc6f93bd3a1877a0c5112db71c49ac59:STATUS.md`로 복원한다.
+
+## 2026-11-10 18시 후보108 적용 대기 전 상태
+
+직전 STATUS는 Git `8b6c0870c0781c7fe78fc2a52abd22b7d1bb22ff:STATUS.md`로 복원한다. 17:50 기록의 "R28 결과 미기록"은 R29~R32 재시험으로 대체됐고, R29~R31의 Vector 판단 거절·검사 오탐은 실패 이력으로 보존한다.

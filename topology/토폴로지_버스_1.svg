@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2530" height="1000" viewBox="0 0 2530 1000" role="img" aria-labelledby="title desc">
+<title id="title">Groot Agentic SOC — Bus Topology</title>
+<desc id="desc">버스형: 상단 SOC Server 호스트·SVC·vNIC, 하단 INT/EXT 논리 버스. 라이트 블루 테마 · 논리적 재배치이며 실제 버스 배선·동일 L2망이 아니다.</desc>
+<style>text{font-family:"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif;fill:#12304f}</style>
+<defs>
+<marker id="attack" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d94141"/></marker>
+<marker id="management" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#6b86a6"/></marker>
+<marker id="logs" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#1b93cf"/></marker>
+<marker id="llm" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#7656dc"/></marker>
+<marker id="mcp" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d08608"/></marker>
+<marker id="approval" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2f9e55"/></marker>
+<marker id="internal" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d6497f"/></marker>
+<marker id="external" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d97a2b"/></marker>
+</defs>
+<rect x="0" y="0" width="2530" height="1000" rx="0" fill="#e2edf9" stroke="none" stroke-width="2"/>
+<text x="35" y="58" font-size="36" style="fill:#12304f" text-anchor="start" font-weight="700">Groot Agentic SOC</text>
+<rect x="30" y="118" width="2470" height="860" rx="14" fill="#f4f8fd" stroke="#6f93bf" stroke-width="2"/>
+<rect x="65" y="153" width="1740" height="470" rx="10" fill="none" stroke="#7f9fc6" stroke-width="2" stroke-dasharray="9 7"/>
+<text x="83" y="183" font-size="23" style="fill:#12304f" text-anchor="start" font-weight="700">SOC Server</text>
+<rect x="85" y="205" width="700" height="385" rx="10" fill="#ffffff" stroke="#8eaacb" stroke-width="2"/>
+<text x="103" y="242" font-size="25" style="fill:#12304f" text-anchor="start" font-weight="700">Groot-sec / A</text>
+<text x="103" y="271" font-size="18" style="fill:#3e5c7e" text-anchor="start">GW · Security · 10.200.10.1</text>
+<rect x="103" y="295" width="443" height="270" rx="8" fill="#f4f8fd" stroke="#9db8d8" stroke-width="2"/>
+<rect x="290.5" y="305" width="68" height="27" rx="6" fill="#dce8f6" stroke="#9db8d8" stroke-width="2"/>
+<text x="324.5" y="326" font-size="17" style="fill:#12304f" text-anchor="middle">SVC</text>
+<rect x="113" y="344" width="423" height="209" rx="6" fill="none" stroke="#9db8d8" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="123" y="357" width="403" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="324.5" y="378" font-size="16" style="fill:#12304f" text-anchor="middle">nginx / chatproxy · nftables FW/NAT</text>
+<rect x="123" y="393" width="403" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="324.5" y="414" font-size="16" style="fill:#12304f" text-anchor="middle">WAF ModSecurity + CRS · DetectionOnly</text>
+<rect x="123" y="429" width="403" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="324.5" y="450" font-size="16" style="fill:#12304f" text-anchor="middle">Suricata · passive / all.rules</text>
+<rect x="123" y="465" width="403" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="324.5" y="486" font-size="16" style="fill:#12304f" text-anchor="middle">Vector · Wazuh Agent</text>
+<rect x="123" y="501" width="403" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="324.5" y="522" font-size="16" style="fill:#12304f" text-anchor="middle">MCP A: resp / rule-a / rule-write-a</text>
+<rect x="558" y="393" width="100" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="608.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">vNIC</text>
+<text x="608.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">ens160</text>
+<path d="M608.0 463V710" fill="none" stroke="#d6497f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="608.0" cy="710" r="6" fill="#d6497f"/>
+<rect x="668" y="393" width="100" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="718.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">vNIC</text>
+<text x="718.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">ens192</text>
+<path d="M696.0 463V785" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="696.0" cy="785" r="6" fill="#d97a2b"/>
+<path d="M740.0 463V860" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="740.0" cy="860" r="6" fill="#d97a2b"/>
+<rect x="810" y="205" width="540" height="385" rx="10" fill="#ffffff" stroke="#8eaacb" stroke-width="2"/>
+<text x="828" y="242" font-size="25" style="fill:#12304f" text-anchor="start" font-weight="700">Groot-siem / B</text>
+<text x="828" y="271" font-size="18" style="fill:#3e5c7e" text-anchor="start">SIEM · Agent · Chat · 10.200.10.10</text>
+<rect x="828" y="295" width="385" height="270" rx="8" fill="#f4f8fd" stroke="#9db8d8" stroke-width="2"/>
+<rect x="986.5" y="305" width="68" height="27" rx="6" fill="#dce8f6" stroke="#9db8d8" stroke-width="2"/>
+<text x="1020.5" y="326" font-size="17" style="fill:#12304f" text-anchor="middle">SVC</text>
+<rect x="838" y="344" width="365" height="209" rx="6" fill="none" stroke="#9db8d8" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="848" y="357" width="345" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1020.5" y="378" font-size="16" style="fill:#12304f" text-anchor="middle">Wazuh · Mattermost + PostgreSQL</text>
+<rect x="848" y="393" width="345" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1020.5" y="414" font-size="16" style="fill:#12304f" text-anchor="middle">soc-bot / 승인 브로커 · soc-report</text>
+<rect x="848" y="429" width="345" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1020.5" y="450" font-size="16" style="fill:#12304f" text-anchor="middle">Hermes + Ollama Agents</text>
+<rect x="848" y="465" width="345" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1020.5" y="486" font-size="16" style="fill:#12304f" text-anchor="middle">MCP B 5서버 · 공통 전체 8서버/41도구</text>
+<rect x="848" y="501" width="345" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1020.5" y="522" font-size="16" style="fill:#12304f" text-anchor="middle">추론 SSH 터널 B:11435 → A → Thor</text>
+<rect x="1225" y="393" width="108" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="1279.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">vNIC</text>
+<text x="1279.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">ens160</text>
+<path d="M1279.0 463V710" fill="none" stroke="#d6497f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1279.0" cy="710" r="6" fill="#d6497f"/>
+<rect x="1375" y="205" width="410" height="385" rx="10" fill="#ffffff" stroke="#8eaacb" stroke-width="2"/>
+<text x="1393" y="242" font-size="25" style="fill:#12304f" text-anchor="start" font-weight="700">Groot-web / C</text>
+<text x="1393" y="271" font-size="18" style="fill:#3e5c7e" text-anchor="start">서비스 · 10.200.10.20</text>
+<rect x="1393" y="295" width="255" height="270" rx="8" fill="#f4f8fd" stroke="#9db8d8" stroke-width="2"/>
+<rect x="1486.5" y="305" width="68" height="27" rx="6" fill="#dce8f6" stroke="#9db8d8" stroke-width="2"/>
+<text x="1520.5" y="326" font-size="17" style="fill:#12304f" text-anchor="middle">SVC</text>
+<rect x="1403" y="344" width="235" height="209" rx="6" fill="none" stroke="#9db8d8" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="1413" y="357" width="215" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1520.5" y="378" font-size="16" style="fill:#12304f" text-anchor="middle">Wazuh Agent</text>
+<rect x="1413" y="393" width="215" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1520.5" y="414" font-size="16" style="fill:#12304f" text-anchor="middle">Apache / DVWA</text>
+<rect x="1413" y="429" width="215" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1520.5" y="450" font-size="16" style="fill:#12304f" text-anchor="middle">Log4Shell</text>
+<rect x="1413" y="465" width="215" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1520.5" y="486" font-size="16" style="fill:#12304f" text-anchor="middle">CVE 콘솔 · 터미널</text>
+<rect x="1413" y="501" width="215" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1520.5" y="522" font-size="16" style="fill:#12304f" text-anchor="middle">선택 기동 실습 대상</text>
+<rect x="1660" y="393" width="108" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="1714.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">vNIC</text>
+<text x="1714.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">ens160</text>
+<path d="M1714.0 463V710" fill="none" stroke="#d6497f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1714.0" cy="710" r="6" fill="#d6497f"/>
+<rect x="1810" y="205" width="320" height="385" rx="10" fill="#ffffff" stroke="#8eaacb" stroke-width="2"/>
+<text x="1828" y="242" font-size="25" style="fill:#12304f" text-anchor="start" font-weight="700">공격 호스트 / Kali</text>
+<text x="1828" y="271" font-size="18" style="fill:#3e5c7e" text-anchor="start">승인된 시험 출발지</text>
+<rect x="1828" y="295" width="165" height="270" rx="8" fill="#f4f8fd" stroke="#9db8d8" stroke-width="2"/>
+<rect x="1876.5" y="305" width="68" height="27" rx="6" fill="#dce8f6" stroke="#9db8d8" stroke-width="2"/>
+<text x="1910.5" y="326" font-size="17" style="fill:#12304f" text-anchor="middle">SVC</text>
+<rect x="1838" y="344" width="145" height="209" rx="6" fill="none" stroke="#9db8d8" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="1848" y="357" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1910.5" y="378" font-size="16" style="fill:#12304f" text-anchor="middle">승인된 시험 요청</text>
+<rect x="1848" y="393" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1910.5" y="414" font-size="16" style="fill:#12304f" text-anchor="middle">대상: DVWA</text>
+<rect x="1848" y="429" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="1910.5" y="450" font-size="16" style="fill:#12304f" text-anchor="middle">대상: Log4Shell</text>
+<rect x="2005" y="393" width="108" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="2059.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">NIC</text>
+<text x="2059.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">ens192</text>
+<path d="M2059.0 463V785" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="2059.0" cy="785" r="6" fill="#d97a2b"/>
+<rect x="2155" y="205" width="320" height="385" rx="10" fill="#ffffff" stroke="#8eaacb" stroke-width="2"/>
+<text x="2173" y="242" font-size="25" style="fill:#12304f" text-anchor="start" font-weight="700">Jetson Thor</text>
+<text x="2173" y="271" font-size="18" style="fill:#3e5c7e" text-anchor="start">현재 운영 추론 서버</text>
+<rect x="2173" y="295" width="165" height="270" rx="8" fill="#f4f8fd" stroke="#9db8d8" stroke-width="2"/>
+<rect x="2221.5" y="305" width="68" height="27" rx="6" fill="#dce8f6" stroke="#9db8d8" stroke-width="2"/>
+<text x="2255.5" y="326" font-size="17" style="fill:#12304f" text-anchor="middle">SVC</text>
+<rect x="2183" y="344" width="145" height="209" rx="6" fill="none" stroke="#9db8d8" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="2193" y="357" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="2255.5" y="378" font-size="16" style="fill:#12304f" text-anchor="middle">Ollama</text>
+<rect x="2193" y="393" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="2255.5" y="414" font-size="16" style="fill:#12304f" text-anchor="middle">qwen3.6:35b</text>
+<rect x="2193" y="429" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="2255.5" y="450" font-size="16" style="fill:#12304f" text-anchor="middle">loopback:11434</text>
+<rect x="2193" y="465" width="125" height="29" rx="5" fill="#ffffff" stroke="#c3d4e8" stroke-width="2"/>
+<text x="2255.5" y="486" font-size="16" style="fill:#12304f" text-anchor="middle">SSH 8022</text>
+<rect x="2350" y="393" width="108" height="70" rx="6" fill="#eaf2fb" stroke="#8eaacb" stroke-width="2"/>
+<text x="2404.0" y="417" font-size="16" style="fill:#c43c3c" text-anchor="middle" font-weight="700">NIC</text>
+<text x="2404.0" y="445" font-size="16" style="fill:#12304f" text-anchor="middle">enP2p1s0</text>
+<path d="M440 710H2460" fill="none" stroke="#d6497f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#internal)"/>
+<text x="850" y="695" font-size="20" style="fill:#d6497f" text-anchor="start">10.200.10.0/24</text>
+<path d="M440 785H2460" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#external)"/>
+<text x="850" y="770" font-size="20" style="fill:#d97a2b" text-anchor="start">승인된 실습·관리 경로</text>
+<path d="M440 860H2460" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#external)"/>
+<text x="850" y="845" font-size="20" style="fill:#d97a2b" text-anchor="start">B → A → Thor SSH 8022</text>
+<rect x="70" y="688" width="130" height="45" rx="6" fill="#f4f8fd" stroke="#d6497f" stroke-width="2"/>
+<text x="135" y="719" font-size="22" style="fill:#12304f" text-anchor="middle" font-weight="700">INT</text>
+<rect x="235" y="688" width="180" height="45" rx="6" fill="#f4f8fd" stroke="#d6497f" stroke-width="2"/>
+<text x="325" y="719" font-size="22" style="fill:#12304f" text-anchor="middle" font-weight="700">vSwitch</text>
+<path d="M200 710H235M415 710H440" fill="none" stroke="#d6497f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="70" y="762" width="130" height="120" rx="6" fill="#f4f8fd" stroke="#d97a2b" stroke-width="2"/>
+<text x="135" y="830" font-size="22" style="fill:#12304f" text-anchor="middle" font-weight="700">EXT</text>
+<rect x="235" y="762" width="180" height="46" rx="6" fill="#f4f8fd" stroke="#d97a2b" stroke-width="2"/>
+<text x="325" y="793" font-size="21" style="fill:#12304f" text-anchor="middle" font-weight="700">Attack Segment</text>
+<path d="M200 785H235M415 785H440" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="235" y="837" width="180" height="46" rx="6" fill="#f4f8fd" stroke="#d97a2b" stroke-width="2"/>
+<text x="325" y="868" font-size="21" style="fill:#12304f" text-anchor="middle" font-weight="700">LLM Inference</text>
+<path d="M200 860H235M415 860H440" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M2404.0 463V860" fill="none" stroke="#d97a2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="2404.0" cy="860" r="6" fill="#d97a2b"/>
+<text x="70" y="925" font-size="22" style="fill:#67819f" text-anchor="start">B/C는 A가 기본 게이트웨이. EXT 두 줄은 용도별 논리 경로이며 실제 별도 NIC·전용선·동일 네트워크가 아니다.</text>
+<text x="70" y="957" font-size="22" style="fill:#67819f" text-anchor="start">점은 연결, 틈은 연결 없는 교차. 추론은 Thor 원본35B. 두 봇·MCP·승인·보안장비 연결은 상세형 참조.</text>
+</svg>

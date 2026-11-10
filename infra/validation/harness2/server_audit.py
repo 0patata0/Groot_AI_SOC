@@ -392,9 +392,59 @@ def _official_tree(framework, imports):
                 sys.modules.pop(name, None)
 
 
-def _surface(tree, name):
+ROUTING_SOURCE = "scripts/workflow_contract.py"
+ROUTING_INDEX = "routing_index.md"
+_SKILL_NAME = re.compile(r"soc-[a-z][a-z0-9-]{0,62}")
+_UNTRIGGERED = re.compile(r"skill '(soc-[a-z][a-z0-9-]{0,62})' is never named in the always-on text")
+
+
+def _code_routed_skills(tree):
+    """Skill names the runtime router loads, from the literal MARKERS dict only.
+
+    SOC skills are injected by code (harness.workflow_names -> workflow_contract.
+    policy), not invoked by the model from always-on text. The official check
+    assumes model invocation, so the audit projects the router's own literal
+    MARKERS keys as an always-on index. A skill absent from MARKERS is still
+    reported as untriggered. Nothing is imported or executed.
+    """
+    source = tree.get(ROUTING_SOURCE)
+    if source is None:
+        return []
+    names = []
+    for node in ast.parse(source, filename=ROUTING_SOURCE).body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name) and node.targets[0].id == "MARKERS"
+                and isinstance(node.value, ast.Dict)):
+            names = [k.value for k in node.value.keys
+                     if isinstance(k, ast.Constant) and isinstance(k.value, str) and _SKILL_NAME.fullmatch(k.value)]
+    return sorted(set(names))
+
+
+def _routing_view(tree, routed):
+    """Validation-only copy; the observed source tree is never modified."""
+    view = dict(tree)
+    if routed:
+        view[ROUTING_INDEX] = ("Code-routed workflow skills (derived from " + ROUTING_SOURCE
+                               + " MARKERS; selected by the runtime router): " + ", ".join(routed) + "\n")
+    return view
+
+
+def _finding_kinds(message):
+    """Bounded, literal-free classification of official messages for reviewers."""
+    kinds, other = [], 0
+    for part in message.split(" | "):
+        match = _UNTRIGGERED.match(part)
+        if match:
+            kinds.append({"kind": "untriggered_skill", "skill": match.group(1)})
+        else:
+            other += 1
+    return kinds, other
+
+
+def _surface(tree, name, routed=False):
     return tree.SurfaceSpec(
-        name="soc-" + name, always_on=("systemprompt.md",), always_on_max=65536,
+        name="soc-" + name, always_on=("systemprompt.md", ROUTING_INDEX) if routed else ("systemprompt.md",),
+        always_on_max=65536,
         always_on_cap_reason="fixed audit structural cap; not a model context estimate",
         skill_dir="skills", skill_name_rule="must_match", trigger_hint="Review actual runtime skill routing.",
         autotrigger_file="systemprompt.md", trigger_line="", subagent_requires_mode=True,
@@ -645,7 +695,7 @@ def run_audit(config, origin="manual", *, policy=None, now=None):
         "model_calls": 0, "tool_calls": 0, "chat_posts": 0, "protected_calls": 0,
         "source_writes": 0, "automatic_adoption": False, "operational_changes_require_approval": True,
         "limitations": ["No correctness, improvement, latency or live inference claim.",
-                        "Fixed SOC projection, not exhaustive runtime composition; no synthetic trigger text.",
+                        "Fixed SOC projection, not exhaustive runtime composition; the only added always-on text is the code-routing index derived from workflow_contract MARKERS.",
                         "Per-file observations are not a transactional snapshot of all services.",
                         "Duplicate candidates are bounded lexical leads, never automatic merges."],
         "framework": {"status": "incomplete", "commit": PINNED_COMMIT,
@@ -671,19 +721,23 @@ def run_audit(config, origin="manual", *, policy=None, now=None):
         hashes, imports = _verify_framework(config["framework"], policy)
         report["framework"].update(status="verified", files=hashes)
         with _official_tree(config["framework"], imports) as official:
+            routed = {surface: _code_routed_skills(trees[surface]) for surface in SURFACES}
             for surface in SURFACES:
-                spec = _surface(official, surface)
+                spec = _surface(official, surface, bool(routed[surface]))
+                view = _routing_view(trees[surface], routed[surface])
                 missing = [key for key, value in report["sources"].items()
                            if key.startswith(surface + "/") and value["status"] != "read"]
-                result = {"status": "incomplete" if missing else "passed", "unreadable_components": missing}
+                result = {"status": "incomplete" if missing else "passed", "unreadable_components": missing,
+                          "routing_projection": {"source": ROUTING_SOURCE, "skills": routed[surface]}}
                 try:
-                    _need(all(official.is_allowed(spec, rel) for rel in trees[surface]), "off_surface_component")
-                    result["census"] = official.validate(spec, trees[surface], allow_subagents=False)
+                    _need(all(official.is_allowed(spec, rel) for rel in view), "off_surface_component")
+                    result["census"] = official.validate(spec, view, allow_subagents=False)
                 except ValueError as exc:
                     result["status"] = "incomplete" if missing else "findings"
                     # Do not echo exception text: it can contain arbitrary source literals.
                     result["error_code"] = "official_validation_failed"
                     result["diagnostic_sha256"] = _sha(str(exc).encode("utf-8", errors="replace"))
+                    result["finding_kinds"], result["unclassified_findings"] = _finding_kinds(str(exc))
                 report["surfaces"][surface] = result
             for left, right in itertools.combinations(SURFACES, 2):
                 complete = all(report["sources"][key]["status"] == "read" for key in report["sources"]

@@ -140,7 +140,9 @@ systemctl start capstone-harness2-audit.service
 
 **11/10 설치 중 실패와 수정.** 첫 설치 후 수동 실행에서 수집 서비스가 `discovery_unavailable`로 끝나 점검이 `incomplete`였다. 같은 sandbox 옵션을 하나씩 바꿔 시험한 결과, `User=root`를 명시하고 `NoNewPrivileges=yes`를 함께 쓰면 wrapper의 `runuser`가 soc-ollama로 전환하지 못했다(`setuid` EPERM). 둘 중 하나만 있으면 정상이었다. `NoNewPrivileges`는 유지하고 수집 unit에서 `User=`/`Group=`만 제거했다(기본 root 실행; `deployment/review_chat.py`의 같은 사례와 동일). 직후 생성분만 제거하고 재설치했다.
 
-**실측(11/10 17:29 KST, 2차 수동 실행).** 수집 16초: `observed`, 45도구, 학습 모델 `soc-qwen36:35b-balanced-q4km-20261108`, 모델/도구/채팅/보호 호출 0. 점검 3초: status `findings`. native/sdk/management 세 표면 모두 `official_validation_failed`(같은 진단 SHA `c7f6c0d2…`), 5개 공통 스킬 사본은 세 표면에서 동일, 중복 후보 0. 세부 진단 문구는 보고서에 들어 있지 않아 원인 분석은 남았다. 설치 전후 운영 48 manifest/보호 6 차이 0, 두 봇 연결·대기열 0을 확인했다.
+**실측(11/10 17:29 KST, 2차 수동 실행).** 수집 16초: `observed`, 45도구, 학습 모델 `soc-qwen36:35b-balanced-q4km-20261108`, 모델/도구/채팅/보호 호출 0. 점검 3초: status `findings`. native/sdk/management 세 표면 모두 `official_validation_failed`(같은 진단 SHA `c7f6c0d2…`), 5개 공통 스킬 사본은 세 표면에서 동일, 중복 후보 0. 설치 전후 운영 48 manifest/보호 6 차이 0, 두 봇 연결·대기열 0을 확인했다.
 
-남은 일: `official_validation_failed`의 실제 원인 분석·수정 후보, 03:00 첫 정기 실행 결과 확인, 관리자 채팅 요청으로 수동 점검을 시작하는 봇 연결과 승인형 개선 경로. 구조 점검 통과를 품질 향상이나 정확도로 표시하지 않는다.
+**원인 분석·수정(11/10 17:36~17:39 KST).** B에서 같은 검증을 읽기 전용으로 재현한 결과, 공식 규칙 "skill이 always-on 문구에 이름이 없으면 호출되지 않는 dead weight"에 `soc-change`·`soc-investigate`·`soc-query`·`soc-recover`가 걸렸다(세 표면 동일). 실제 런타임은 모델이 always-on 문구를 보고 스킬을 호출하지 않고, 코드(`harness.workflow_names`→`workflow_contract.policy`)가 질문별로 스킬 본문을 주입한다. 따라서 실제 죽은 스킬이 아니라 점검 투영의 불일치였다. `server_audit.py`가 `scripts/workflow_contract.py`의 리터럴 `MARKERS` 키만 AST로 읽어 검증용 always-on 색인(`routing_index.md`)을 만들고, 관찰 원본 트리는 바꾸지 않는다. MARKERS에 없는 스킬은 계속 untriggered로 잡히며, 결과에 `routing_projection`(근거 파일·스킬)과 리터럴 없는 `finding_kinds` 분류를 남긴다. 재설치(기존 보고서 보존) 후 17:39 수동 실행: **세 표면 passed**(각 5스킬), 중복0·사본 차이0, 모델/도구/채팅/보호 호출·소스 쓰기0. 사후 48/6 차이0·양봇·큐0. 한계: MARKERS 등록이 각 스킬이 질문 분기에서 실제로 선택된다는 증명은 아니다.
+
+남은 일: 03:00 첫 정기 실행 결과 확인, 관리자 채팅 요청으로 수동 점검을 시작하는 봇 연결과 승인형 개선 경로. 구조 점검 통과를 품질 향상이나 정확도로 표시하지 않는다.
 

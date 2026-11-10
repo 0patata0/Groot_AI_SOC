@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-10 17:40 KST
+# 인프라 현황 — 2026-11-10 17:45 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 발표**이며 미완료다. 정확성이 속도보다 우선이다. 최신 균형1,220건 학습본을 운영하면서 보완한다. 학습본 사용과 독립적인 정확도 우위는 구분한다. [활성 계획](PLAN.md) · [직전 상세 상태·실패 이력](archive/STATUS_HISTORY.md#source-a961b1d1c0e72743).
 
@@ -21,7 +21,7 @@ R25/R26 서버 시험본은 종료·432소스/로그 SHA 대조 후 각449파일
 
 11/9 20:56 사용자 목표 재활성화로 재개했다. 관리자231 접속 시간초과2회 후 사용자가 연결/전원을 확인했고20:59:01에48manifest/보호6 차이0·양봇/큐0를 실제 확인했다. 같은432파일 동결과 R26 회귀 결과를 대조한 R27 실제 B관리 시험은70.027초·3읽기/5모델·partial이다. 최종 경고3개 중 부정문/판단표 검사2개는 오탐이고, 제한 표본0을 하루 전체 오류 부재로 설명한1개는 실제 모델 오류다. 도구·인자 동시 선택은 추가 조회가 발생하지 않아 아직 실측하지 못했다.
 
-사용자가 두 봇의 스스로 개선하는 기능과 B의 공식 Harness² 설치를 요청했다. 최초 요청 시만 실행 지시는 후속 자동 실행 요청으로 갱신됐으며 **매일03:00 KST 자동 점검 + 요청 시 수동 점검**으로 확정했다. 정기 점검/격리 개선안 작성과 관리자 카드 승인 후 운영 적용을 구분한다. **11/10 B 설치·03시 타이머 활성 완료(관리자231 경유).** 설치기 check/install/verify 통과(공식140파일·설정/영수증 SHA), 타이머 enabled/active·다음 11/11 03:00 KST. 1차 수동 실행은 수집 unit의 `User=root`+`NoNewPrivileges` 조합으로 runuser 전환 실패(`discovery_unavailable`→점검 incomplete). User=/Group=만 제거해 재설치했고 2차 실행에서 수집 observed(45도구·학습 모델·모델/도구/채팅/보호 호출0)·점검 완료(status findings). 세 표면 모두 `official_validation_failed`(같은 진단SHA)이며 세부 원인 분석은 남았다. 설치 전후 48manifest/보호6 차이0·양봇·큐0. 임시 반입본(/var/tmp) 제거. 봇 채팅 요청 연결·승인형 개선 경로는 미구현이다. [설치·실측](infra/validation/harness2/README.md#b-서버-정기-점검-설치). 기존5스킬 재사용/중복검토·근거·정확후보·회귀·승인·복구가 목표이고, 구조 점검 자체를 자동 품질 향상으로 주장하지 않는다.
+사용자가 두 봇의 스스로 개선하는 기능과 B의 공식 Harness² 설치를 요청했다. 최초 요청 시만 실행 지시는 후속 자동 실행 요청으로 갱신됐으며 **매일03:00 KST 자동 점검 + 요청 시 수동 점검**으로 확정했다. 정기 점검/격리 개선안 작성과 관리자 카드 승인 후 운영 적용을 구분한다. **11/10 B 설치·03시 타이머 활성 완료(관리자231 경유).** 설치기 check/install/verify 통과(공식140파일·설정/영수증 SHA), 타이머 enabled/active·다음 11/11 03:00 KST. 1차 수동 실행은 수집 unit의 `User=root`+`NoNewPrivileges` 조합으로 runuser 전환 실패(`discovery_unavailable`→점검 incomplete). User=/Group=만 제거해 재설치했고 2차 실행에서 수집 observed(45도구·학습 모델·모델/도구/채팅/보호 호출0)·점검 완료(status findings). 원인은 코드 라우팅 스킬 4개가 always-on 문구에 없다는 공식 규칙으로, 점검 투영 불일치였다. workflow_contract MARKERS 기반 라우팅 색인을 추가해 재설치했고 17:39 수동 실행에서 세 표면 passed. 설치 전후 48manifest/보호6 차이0·양봇·큐0. 임시 반입본(/var/tmp) 제거. 봇 채팅 요청 연결·승인형 개선 경로는 미구현이다. [설치·실측](infra/validation/harness2/README.md#b-서버-정기-점검-설치). 기존5스킬 재사용/중복검토·근거·정확후보·회귀·승인·복구가 목표이고, 구조 점검 자체를 자동 품질 향상으로 주장하지 않는다.
 
 
 ## 최근 완료: B Harness² 정기 점검 설치 (11/10)
@@ -29,9 +29,9 @@ R25/R26 서버 시험본은 종료·432소스/로그 SHA 대조 후 각449파일
 | 항목 | 결과 | 남은 일 |
 |---|---|---|
 | 설치 | `/opt/capstone-harness2`·`/etc`·`/var/lib/capstone-harness2`, 수집/점검 서비스+03시 타이머 | 03:00 첫 정기 실행 결과 확인 |
-| 실제 실행 | 2차 수동: 수집16초 observed·45도구, 점검3초 findings | `official_validation_failed` 원인 분석 |
-| 수정 | 수집 unit `User=`/`Group=` 제거(NoNewPrivileges 유지), 테스트 갱신 | — |
-| 회귀 | harness_maintenance37·server_audit24·server_context8·remote1·prerequisites18 PASS, `bash -n` | 새 서버 전체 설치 시험 미실행 |
+| 실제 실행 | 2차 수동: 수집16초 observed·45도구, 점검3초 findings → 원인(코드 라우팅 투영) 수정 후 3차 passed(세 표면·5스킬) | MARKERS 등록≠질문별 실제 선택 증명 |
+| 수정 | 수집 unit `User=`/`Group=` 제거(NoNewPrivileges 유지), 점검 라우팅 색인·finding_kinds 추가, 테스트 갱신 | — |
+| 회귀 | harness_maintenance37·server_audit27·server_context8·remote1·prerequisites18 PASS, `bash -n` | 새 서버 전체 설치 시험 미실행 |
 | 공용 스킬 점검 | secret-scanner: 추적1,967파일 중 5건 모두 오탐(생성 코드·테스트 값). review-agent: 이번 unit 수정 결함 없음 | semgrep CLI 없음→미수행 |
 
 ## 최근 완료: 포스터 토폴로지 색상 변경 (11/10)

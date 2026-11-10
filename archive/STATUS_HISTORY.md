@@ -12364,3 +12364,7 @@ Native/SDK가 추가 읽기의 도구명과 실제 인자를 한 모델 응답�
 ## 2026-11-10 Harness² B 설치
 
 설치 전 STATUS는 Git `9b1bd09bb7e6db545c72720f3835ef476ed7b000:STATUS.md`로 복원한다. 당시 "반입 완료·설치0·타이머 비활성"은 17:05 관측이며 17:26 설치·17:29 2차 실행으로 대체됐다. 1차 실행 `incomplete`(수집 runuser 전환 실패) 보고서는 로컬 검증 폴더에 보존하고 성공으로 덮어쓰지 않는다.
+
+## 2026-11-10 Harness² 점검 findings 원인·수정
+
+17:29 2차 실행의 세 표면 `official_validation_failed`(진단 SHA `c7f6c0d2…`)는 코드 라우팅 스킬4개가 always-on 문구에 없다는 공식 규칙 때문이었다. 이 findings 보고서는 B와 로컬 검증 폴더에 보존하며, 17:39 passed로 덮어쓰지 않는다. 수정 전 STATUS는 Git `4428029efc6f93bd3a1877a0c5112db71c49ac59:STATUS.md`로 복원한다.

@@ -198,6 +198,40 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "findings")
         self.assertTrue(any(d["kind"] == "review_structural_findings" for d in report["review_drafts"]))
 
+    ROUTER = ("MARKERS={\n" + "".join(f"    '{n}':'X',\n" for n in
+              ("soc-query", "soc-investigate", "soc-change", "soc-recover")) + "}\n"
+              "raise RuntimeError('router code must never run')\n")
+
+    def test_code_routed_skills_projected_from_router_markers_only(self):
+        # Model-facing text names only soc-output; the router literally loads the rest.
+        self.change("native/systemprompt.md", b"Always apply soc-output.\n")
+        self.change("native/scripts/workflow_contract.py", self.ROUTER.encode())
+        report = self.run_audit()["report"]
+        native = report["surfaces"]["native"]
+        self.assertEqual(native["status"], "passed")
+        self.assertEqual(native["routing_projection"],
+                         {"source": "scripts/workflow_contract.py",
+                          "skills": ["soc-change", "soc-investigate", "soc-query", "soc-recover"]})
+        self.assertNotIn("native/routing_index.md", report["sources"])
+        self.assertEqual(Path(self.paths["native/systemprompt.md"]).read_bytes(), b"Always apply soc-output.\n")
+
+    def test_skill_absent_from_router_is_still_untriggered_and_classified(self):
+        self.change("native/systemprompt.md", b"Always apply soc-output.\n")
+        self.change("native/scripts/workflow_contract.py",
+                    self.ROUTER.replace("    'soc-recover':'X',\n", "").encode())
+        report = self.run_audit()["report"]
+        native = report["surfaces"]["native"]
+        self.assertEqual(native["status"], "findings")
+        self.assertEqual(native["finding_kinds"], [{"kind": "untriggered_skill", "skill": "soc-recover"}])
+        self.assertEqual(native["unclassified_findings"], 0)
+
+    def test_router_markers_require_literal_dict(self):
+        tree = {"scripts/workflow_contract.py": "MARKERS=dict(soc_query='X')\nOTHER={'soc-query':'X'}\n"}
+        self.assertEqual(audit._code_routed_skills(tree), [])
+        self.assertEqual(audit._code_routed_skills({}), [])
+        tree = {"scripts/workflow_contract.py": "MARKERS={'soc-query':'X', 'Bad Name':'Y', 1:'Z'}\n"}
+        self.assertEqual(audit._code_routed_skills(tree), ["soc-query"])
+
     def test_cross_copy_drift_and_official_diff_are_exact(self):
         key = "sdk/skills/soc-query/SKILL.md"
         raw = self.skill("soc-query", "Different investigation evidence for this copy.")

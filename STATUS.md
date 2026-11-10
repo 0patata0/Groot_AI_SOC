@@ -9,7 +9,7 @@
 | 항목 | 확인한 상태 | 남은 일 |
 |---|---|---|
 | DDoS 탐지·상관 | ✅ 정상: 재생 때 Wazuh 룰 100112(level 12) 15회·100110(9) 19회·level≥10 47건 생성(라이브) | — |
-| 자동 **사건보고** | ❌ **열린 공백**: 구 cron `soc-alert-watch`는 10/15 durable controller 교체로 의도적 비활성. 대체 `capstone-management`는 실행되나 매 틱 `events_received:0·report_delivery.attempted:0` → 보고 0건 | 보안경보→controller 이벤트 feeder 복구 (task #10) |
+| 자동 **사건보고** | ⚠️ **파이프라인 정상, 모델 실패**: 구 cron은 10/15 durable controller로 의도적 교체(정상). controller DB에 report_outbox **854건 전부 sent**, DDoS 경보 inbox **6150건** 적재, DDoS 시간대 case 3건 생성·전달. HOME_CHANNEL(`soc-alerts-agent`) 실제: 20:06 경보 62건→20:07/20:11 "**자동 조사 실패·확인 필요**"→20:13 경보 124건→20:13 "추가 검토 필요". 즉 **탐지·상관·적재·전달은 모두 동작**하고 **모델 조사가 타임아웃/도구실패(`model_subprocess_timeout`·`model_tool_failure`)로 불완전 보고만 전달**. (앞 "feeder 단절"은 조용한 틱 오해로 정정) | 모델 조사 신뢰성/지연(Thor 단일 슬롯 경합)이 핵심. Hermes 반복 재시작도 기여 (task #10→#3/#7/#8과 동일 뿌리) |
 | 룰 그라운드트루스 | ✅ 1000090/1000091(A·69건 발화)·100111/100112(B)는 실재. `get_security_rules` 도구가 `matched_count:1`로 정확 반환(라이브 재현) | — |
 | 룰-조회 봇 신뢰성 | ⚠️ **부분 해결**: 원인=모델이 bare 룰ID를 Suricata로 단정·타 네임스페이스 미조회·문맥의 다른 룰로 대체. `soc-query` 스킬에 네임스페이스 추론+특정ID `rule_id`조회+대체금지 규칙 추가, **라이브 3곳 배포**(`/opt/capstone-management`·`groot-query-completion`·`capstone-ollama-trial`, 소비자 재시작). 실제 채팅 재검증: bare `100112`→a:suricata+b:wazuh 모두 조회→Wazuh 정의 정확 반환(수정 전 "없음/오타"에서 개선) | 잔여: 출력이 영문 추론문 유출(soc-output 미적용)·반복 동일질문 "이미 답변" 문맥혼란·명시케이스 ID목록만 반환. 결정적 해결은 쿼리 하네스의 룰ID 사전 그라운딩(후보) |
 | 진행표시 "스팸" | 정정: 봇 글 52개 중 51개 `delete_at`로 삭제돼 사용자 화면엔 진행표시 1개만 보임. 의도대로 동작 | 저우선 최적화: 생성+삭제 churn→edit-in-place |

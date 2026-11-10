@@ -107,7 +107,7 @@ B의 **Ollama는 일반 대화·신속 조회**, **Hermes는 자동 조사·복�
 
 ## 현재 배치 · 2026-11-02
 
-[최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
+[최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg) · [포스터용 상세형(흰 배경)](topology/토폴로지_상세_1.svg) · [포스터용 버스형](topology/토폴로지_버스_1.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
 
 | 위치 | 역할 |
 |---|---|

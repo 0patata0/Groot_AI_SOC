@@ -12,7 +12,7 @@
 <marker id="internal" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d6497f"/></marker>
 <marker id="external" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d97a2b"/></marker>
 </defs>
-<rect x="0" y="0" width="2800" height="1540" rx="0" fill="#e2edf9" stroke="none" stroke-width="2"/>
+<rect x="0" y="0" width="2800" height="1540" rx="0" fill="#ffffff" stroke="none" stroke-width="2"/>
 <text x="60" y="155" font-size="45" style="fill:#12304f" text-anchor="start" font-weight="700">Groot Agentic SOC</text>
 <rect x="1130.0" y="118" width="540" height="182" rx="12" fill="#f7fafe" stroke="#7f9fc6" stroke-width="2" stroke-dasharray="9 7"/>
 <text x="1155.0" y="148" font-size="21" style="fill:#3e5c7e" text-anchor="start" font-weight="700">EXT</text>
@@ -66,7 +66,7 @@
 <text x="2475.0" y="576" font-size="19" style="fill:#3e5c7e" text-anchor="middle">B/C 외부 통신 NAT</text>
 <text x="2475.0" y="608" font-size="19" style="fill:#3e5c7e" text-anchor="middle">정책·보호 주소·차단 TTL</text>
 <text x="2475.0" y="640" font-size="19" style="fill:#3e5c7e" text-anchor="middle">승인된 조치 실행·검증</text>
-<rect x="100" y="738" width="2600" height="46" rx="8" fill="#c9dcf1" stroke="#5b85b3" stroke-width="2"/>
+<rect x="100" y="738" width="2600" height="46" rx="8" fill="#e3e5e8" stroke="#8c939c" stroke-width="2"/>
 <text x="1400" y="769" font-size="23" style="fill:#12304f" text-anchor="middle" font-weight="700">vSwitch · 내부망 10.200.10.0/24</text>
 <path d="M315 666V738" fill="none" stroke="#6b86a6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M747 666V738" fill="none" stroke="#d08608" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>

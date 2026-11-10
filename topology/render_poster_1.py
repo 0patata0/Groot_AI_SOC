@@ -3,7 +3,7 @@
 
 원본 render_current.py / 토폴로지_상세·버스.svg 는 그대로 두고, 이 스크립트는
 '_1' 접미사가 붙은 포스터 전용 버전만 생성한다. 표준 라이브러리만 사용.
-두 도식 모두 라이트 블루 테마(배경 sRGB 0.886/0.931/0.977 ≈ #E2EDF9). 다크 팔레트(DARK)는 보존.
+두 도식 모두 라이트 테마(흰 배경, 상세형 vSwitch 회색). 다크 팔레트(DARK)는 보존.
 
 적용한 변경:
   - 밝은 하늘색 배경에 맞춰 패널·카드·텍스트·의미색을 명도 반전/채도 조정(이전 다크 네이비 테마 대체).
@@ -41,7 +41,7 @@ MUTED = "#7f9cc0"         # 흐린 캡션
 DARK = {"colors": COLORS, "page": PAGE, "card": CARD, "card_border": CARD_BORDER,
         "text": TEXT, "subtext": SUBTEXT}
 
-# 상세형 라이트 테마: 배경 sRGB(0.886, 0.931, 0.977) → 8bit #E2EDF9(채널 오차 ≤0.002).
+# 라이트 테마: 흰 배경(이전 하늘색 #E2EDF9에서 변경). vSwitch는 중립 회색.
 # 밝은 배경 위 대비를 위해 의미색은 같은 색상 계열에서 명도를 낮추고,
 # 박스는 흰색/연한 틴트 + 의미색 테두리, 제목은 진한 같은 계열색으로 바꾼다.
 LIGHT_COLORS = {
@@ -50,7 +50,7 @@ LIGHT_COLORS = {
     "internal": "#d6497f", "external": "#d97a2b",
 }
 L = {
-    "page": "#e2edf9",        # 바탕 (요청값)
+    "page": "#ffffff",        # 바탕 흰색
     "panel": "#f4f8fd",       # SOC Server 큰 패널
     "panel_border": "#6f93bf",
     "panel2": "#f7fafe",      # 범례·운영 흐름·EXT 서브 패널
@@ -65,7 +65,7 @@ L = {
     "mcp_fill": "#fdf3de", "mcp_title": "#955e00",
     "ok_fill": "#e9f6ec", "ok_border": "#4fa65f", "ok_title": "#2b7a3c",
     "a_fill": "#fbf1ec", "a_border": "#c96a4a", "a_title": "#a3452a", "a_sub": "#93604c",
-    "vs_fill": "#c9dcf1", "vs_border": "#5b85b3",
+    "vs_fill": "#e3e5e8", "vs_border": "#8c939c",
     "b_fill": "#e7f5f1", "b_border": "#3aa58c", "b_title": "#1d7661",
     "c_fill": "#fbebf2", "c_border": "#c05a84", "c_title": "#983962",
 }

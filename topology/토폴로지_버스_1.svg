@@ -12,7 +12,7 @@
 <marker id="internal" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d6497f"/></marker>
 <marker id="external" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d97a2b"/></marker>
 </defs>
-<rect x="0" y="0" width="2530" height="1000" rx="0" fill="#e2edf9" stroke="none" stroke-width="2"/>
+<rect x="0" y="0" width="2530" height="1000" rx="0" fill="#ffffff" stroke="none" stroke-width="2"/>
 <text x="35" y="58" font-size="36" style="fill:#12304f" text-anchor="start" font-weight="700">Groot Agentic SOC</text>
 <rect x="30" y="118" width="2470" height="860" rx="14" fill="#f4f8fd" stroke="#6f93bf" stroke-width="2"/>
 <rect x="65" y="153" width="1740" height="470" rx="10" fill="none" stroke="#7f9fc6" stroke-width="2" stroke-dasharray="9 7"/>

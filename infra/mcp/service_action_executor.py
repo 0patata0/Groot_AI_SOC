@@ -711,3 +711,223 @@ class ServiceActionService:
                 out["after_observation"] = record["after"]
                 out["after_observation_sha256"] = digest(record["after"])
             return out
+
+
+HARNESS_UNIT = "capstone-harness2-audit.service"
+HARNESS_TARGET = "b:harness2-audit"
+HARNESS_TTL = 600
+
+
+class HarnessCheckService:
+    """Approval-bound, non-mutating one-shot: run the official Harness2 structural
+    self-audit once after an admin approves. It changes no skill, config, rule,
+    service or firewall; it only starts a fixed systemd unit a single time, and
+    the result is read back separately (get_harness_check_status). It keeps the
+    same durable exactly-once discipline as service actions: an interrupted
+    dispatch is never replayed, and no model/caller field becomes a command.
+    """
+
+    def __init__(self, engine):
+        self.engine = engine
+        self.helper = sys.modules[type(engine).__module__]
+        self.error = self.helper.RuleChangeError
+        self.state_dir = engine.state_dir / "harness-checks"
+        if not getattr(engine, "read_only", False):
+            self.state_dir.mkdir(mode=0o700, exist_ok=True)
+        st = self.state_dir.lstat()
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.geteuid() or stat.S_IMODE(st.st_mode) != 0o700:
+            raise self.error("harness check state directory must be owned by executor and mode 0700")
+
+    def _path(self, request_id):
+        if not isinstance(request_id, str) or not REQUEST_ID.fullmatch(request_id):
+            raise self.error("invalid operation request ID")
+        return self.state_dir / (request_id + ".json")
+
+    def _save(self, record):
+        data = canonical(record)
+        if len(data) > MAX_STATE:
+            raise self.error("harness check state too large")
+        self.helper._atomic_bytes(self._path(record["request_id"]), data, mode=0o600)
+
+    def _load(self, request_id):
+        data, _ = self.helper._read_regular(self._path(request_id), MAX_STATE)
+        record = json.loads(data)
+        if record.get("request_id") != request_id:
+            raise self.error("harness check state identity mismatch")
+        return record
+
+    def _public(self, record):
+        return {key: record[key] for key in
+                ("request_id", "target", "status", "plan_sha256", "proposal_digest", "result", "result_posted")}
+
+    def _binding(self, record, answer):
+        for key, expected in (("request_id", record["request_id"]), ("plan_sha256", record["plan_sha256"]),
+                              ("proposal_digest", record["proposal_digest"]),
+                              ("kind", "harness_check"), ("target", HARNESS_TARGET),
+                              ("expires_at", record["proposal"]["expires_at"])):
+            if answer.get(key) != expected:
+                raise self.error("harness check broker binding mismatch")
+
+    def _validate_record(self, record):
+        proposal = record["proposal"]
+        plan = proposal["plan"]
+        if (proposal["request_id"] != record["request_id"] or proposal["kind"] != "harness_check" or
+                proposal["target"] != HARNESS_TARGET or proposal["plan_sha256"] != record["plan_sha256"] or
+                digest(proposal) != record["proposal_digest"] or digest(plan) != record["plan_sha256"] or
+                plan.get("action") != "run_structural_audit_once" or plan.get("unit") != HARNESS_UNIT or
+                plan.get("host") != "b"):
+            raise self.error("harness check plan or executor binding changed")
+
+    def _post(self, record):
+        answer = self.engine.broker.request("POST", "/operations", record["proposal"])
+        self._binding(record, answer)
+        if not answer.get("posted"):
+            raise self.error("harness check approval card was not posted")
+        record["status"] = "pending"
+        self._save(record)
+
+    def _decision(self, record):
+        self._validate_record(record)
+        answer = self.engine.broker.request("GET", "/operations/" + record["request_id"])
+        self._binding(record, answer)
+        if answer.get("kind") != "harness_check" or answer.get("target") != HARNESS_TARGET:
+            raise self.error("operation kind or target binding mismatch")
+        if answer.get("status") not in ("pending", "approved", "denied", "expired", "consumed", "applied", "failed", "aborted"):
+            raise self.error("invalid operation decision")
+        return answer
+
+    def _post_result(self, record):
+        if record["result_posted"]:
+            return
+        try:
+            answer = self.engine.broker.request("POST", "/operations/" + record["request_id"] + "/result",
+                                                record["result_payload"])
+            self._binding(record, answer)
+            if (not answer.get("result_posted") or answer.get("status") != record["status"] or
+                    answer.get("after_observation_sha256") != record["result_payload"]["after_observation_sha256"]):
+                raise self.error("harness check result was not posted")
+            record["result_posted"] = True
+            self._save(record)
+        except (self.error, OSError):
+            pass  # Retry reporting only. The audit is never started again.
+
+    def _finish(self, record, status, detail):
+        record["status"], record["result"] = status, detail
+        after = {"unit": HARNESS_UNIT, "status": status, "detail": detail}
+        record["result_payload"] = {"proposal_digest": record["proposal_digest"], "status": status,
+                                    "after_observation_sha256": digest(after), "detail": detail}
+        self._save(record)
+        self._post_result(record)
+
+    def _execute(self, record):
+        try:
+            self._validate_record(record)
+            if int(self.engine.clock()) >= record["proposal"]["expires_at"]:
+                raise self.error("approval expired before dispatch")
+        except Exception:
+            self._finish(record, "aborted", "Approved harness-check preconditions changed; no audit was started")
+            return
+        record["status"] = "prepared"
+        self._save(record)
+        answer = self.engine.broker.request("POST", "/operations/" + record["request_id"] + "/consume",
+                                            {"proposal_digest": record["proposal_digest"]})
+        self._binding(record, answer)
+        if answer.get("status") != "consumed" or answer.get("consumed_decision") != "approve":
+            raise self.error("harness check approval consume was not confirmed")
+        record["status"] = "executing"
+        record["dispatch_started_at"] = self.engine.clock()
+        self._save(record)  # Durable intent before exactly one dispatch.
+        try:
+            result = self.engine.runner.call(["/usr/bin/systemctl", "start", HARNESS_UNIT], timeout=300)
+            if getattr(result, "returncode", 1) != 0:
+                raise self.error("harness audit unit did not start cleanly")
+        except Exception:
+            self._finish(record, "failed", "Harness audit start failed; no automatic retry. Read status separately")
+            return
+        self._finish(record, "applied",
+                     "Harness2 structural audit started once; read the result with get_harness_check_status")
+
+    def worker_once(self):
+        results = []
+        with self.engine.locked():
+            for path in sorted(self.state_dir.glob("*.json")):
+                record = self._load(path.stem)
+                try:
+                    if record["status"] in ("applied", "failed", "aborted"):
+                        self._post_result(record)
+                        continue
+                    if record["status"] in ("denied", "expired"):
+                        continue
+                    expired = int(self.engine.clock()) >= record["proposal"]["expires_at"]
+                    if record["status"] in ("posting", "pending") and expired:
+                        record["status"] = "expired"
+                        record["result"] = "Local approval deadline elapsed; no audit was started"
+                        self._save(record)
+                    elif record["status"] == "prepared" and expired:
+                        self._finish(record, "failed",
+                                     "Approval consumption outcome could not be confirmed before expiry; no dispatch or replay")
+                    elif record["status"] == "executing":
+                        # A crash can occur after durable intent but before/after
+                        # the start. Never start the audit again from here.
+                        self._finish(record, "failed",
+                                     "Interrupted harness-check dispatch outcome is uncertain; no automatic replay")
+                    elif record["status"] == "posting":
+                        self._post(record)
+                    else:
+                        decision = self._decision(record)
+                        if decision["status"] in ("denied", "expired"):
+                            record["status"] = decision["status"]
+                            self._save(record)
+                        elif decision["status"] == "consumed":
+                            self._finish(record, "failed", "Approval was already consumed; no automatic dispatch or replay")
+                        elif decision["status"] == "approved":
+                            if int(self.engine.clock()) >= record["proposal"]["expires_at"]:
+                                self._finish(record, "aborted", "Approval expired; no audit was started")
+                            else:
+                                self._execute(record)
+                except (self.error, OSError, KeyError, ValueError):
+                    record["result"] = "Operation validation or broker unavailable; no additional action dispatched"
+                    self._save(record)
+                results.append(self._public(record))
+        return results
+
+    def status(self, request_id):
+        with self.engine.locked():
+            record = self._load(request_id)
+            out = self._public(record)
+            if record["status"] in ("pending", "prepared"):
+                try:
+                    out["approval_status"] = self._decision(record)["status"]
+                except self.error:
+                    out["approval_status"] = "unavailable"
+            return out
+
+    def propose(self, reason):
+        if self.engine.host != "b":
+            raise self.error("harness check is available only on host b")
+        if (not isinstance(reason, str) or not 1 <= len(reason.strip()) <= 200 or len(reason.encode("utf-8")) > 500 or
+                any(unicodedata.category(c) in ("Cc", "Cf", "Zl", "Zp", "Cs") for c in reason)):
+            raise self.error("harness check reason must be 1..200 printable characters")
+        with self.engine.locked():
+            plan = {"action": "run_structural_audit_once", "unit": HARNESS_UNIT, "host": "b", "reason": reason.strip()}
+            active = 0
+            for path in self.state_dir.glob("*.json"):
+                old = self._load(path.stem)
+                if old["status"] in ("posting", "pending", "prepared", "executing"):
+                    active += 1
+                    if old["proposal"]["plan"] == plan:
+                        if old["status"] == "posting":
+                            self._post(old)
+                        return self._public(old)
+            if active >= 8:
+                raise self.error("too many active harness check requests")
+            request_id = secrets.token_hex(16)
+            proposal = {"request_id": request_id, "kind": "harness_check", "target": HARNESS_TARGET, "plan": plan,
+                        "plan_sha256": digest(plan), "requested_by": "hermes-harness-check",
+                        "expires_at": int(self.engine.clock()) + HARNESS_TTL}
+            record = {"request_id": request_id, "target": HARNESS_TARGET, "proposal": proposal,
+                      "plan_sha256": proposal["plan_sha256"], "proposal_digest": digest(proposal),
+                      "status": "posting", "result": "", "result_posted": False}
+            self._save(record)  # Same id and exact payload survive a lost POST response.
+            self._post(record)
+            return self._public(record)

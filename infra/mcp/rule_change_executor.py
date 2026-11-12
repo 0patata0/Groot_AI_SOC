@@ -1527,6 +1527,8 @@ def _operation_services(engine):
     services = [_load_extension("service_action_executor").ServiceActionService(engine)]
     if engine.host == "a":
         services.append(_load_extension("incident_containment").ContainmentService(engine))
+    if engine.host == "b":
+        services.append(_load_extension("service_action_executor").HarnessCheckService(engine))
     return services
 
 
@@ -1706,6 +1708,9 @@ def main(argv=None):
             result["operations"].extend(services[1].worker_once())
         result["processed"] = engine.worker_once()
         result["operations"].extend(services[0].worker_once())
+        if engine.host == "b":
+            # services[1] on host b is the non-mutating Harness2 check worker.
+            result["operations"].extend(services[1].worker_once())
     elif readonly or not argv:
         if request.get("operation") == "inventory":
             try:
@@ -1735,6 +1740,10 @@ def main(argv=None):
                 request["ip"], request["reason"], requested_by="hermes-mcp")
         elif request.get("operation") == "operation-status" and set(request) == {"operation", "request_id"}:
             result = _operation_status(engine, request["request_id"])
+        elif request.get("operation") == "harness-check-request" and set(request) == {"operation", "reason"}:
+            if engine.host != "b":
+                raise RuleChangeError("harness check request is available only on host b")
+            result = _load_extension("service_action_executor").HarnessCheckService(engine).propose(request["reason"])
         else:
             raise RuleChangeError("unsupported operation or arguments")
     else:

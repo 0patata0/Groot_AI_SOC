@@ -54,6 +54,9 @@ SERVICE_FIELDS = frozenset(("action", "before_observation_sha256", "before_summa
 CONTAINMENT_FIELDS = frozenset(("ip", "action", "temporary_expires_at", "keep_seconds",
                               "before_observation_sha256", "evidence_sha256"))
 CONTAINMENT_DISPLAY_FIELDS = frozenset(('reason', 'evidence_summary'))
+HARNESS_TARGET = "b:harness2-audit"
+HARNESS_UNIT = "capstone-harness2-audit.service"
+HARNESS_PLAN_FIELDS = frozenset(("action", "unit", "host", "reason"))
 KST = timezone(timedelta(hours=9), "KST")
 
 
@@ -139,6 +142,15 @@ class OperationsBroker:
                     plan["temporary_expires_at"] != req["expires_at"] or
                     not _hash(plan["before_observation_sha256"]) or not _hash(plan["evidence_sha256"])):
                 raise ValueError("invalid temporary containment plan")
+        elif req["kind"] == "harness_check":
+            # Non-mutating one-shot: run the official Harness2 structural audit
+            # once. It has no "before observation" of a changed resource and no
+            # policy hash; the plan is a fixed, bounded request.
+            if req["target"] != HARNESS_TARGET:
+                raise ValueError("harness check target is not allowlisted")
+            if (set(plan) != HARNESS_PLAN_FIELDS or plan.get("action") != "run_structural_audit_once"
+                    or plan.get("unit") != HARNESS_UNIT or plan.get("host") != "b" or not _text(plan.get("reason"))):
+                raise ValueError("invalid harness check plan")
         else:
             raise ValueError("invalid operation kind")
         return digest(req)
@@ -169,7 +181,7 @@ class OperationsBroker:
         keys = ("request_id", "kind", "target", "plan_sha256", "proposal_digest", "expires_at", "status",
                 "decision", "by", "decided_at", "posted", "consumed_decision", "result_posted", "result_attempts", "result_status")
         return {**{key: rec.get(key, "") for key in keys}, "operation_id": rec["request_id"],
-                "before_observation_sha256": rec["plan"]["before_observation_sha256"],
+                "before_observation_sha256": rec["plan"].get("before_observation_sha256", ""),
                 "after_observation_sha256": rec.get("after_observation_sha256", "")}
 
     def health(self):
@@ -184,6 +196,16 @@ class OperationsBroker:
     def _card(rec):
         plan = rec["plan"]
         expiry = datetime.fromtimestamp(rec["expires_at"], KST).strftime("%Y-%m-%d %H:%M:%S KST")
+        if rec["kind"] == "harness_check":
+            hdr = ("요청 ID: `%s`\n종류: `%s`\n대상: `%s`\n요청자: `%s`\n제안 SHA-256: `%s`\n"
+                   "작업 계획 SHA-256: `%s`\n만료: `%s`" %
+                   (rec["request_id"], rec["kind"], rec["target"], rec["requested_by"],
+                    rec["proposal_digest"], rec["plan_sha256"], expiry))
+            return (hdr + "\n\n작업: `%s` (`%s` 1회 실행)\n"
+                    "공식 Harness² **구조 자가점검만** 1회 실행합니다. 스킬·설정·룰·서비스·방화벽을 **변경하지 않습니다**. "
+                    "구조 점검 통과는 런타임 정확도의 증거가 아니며, 점검이 제안하는 개선안은 **별도 승인 카드**로만 적용됩니다.\n"
+                    "사유:\n\n    %s\n\n지정된 이 점검 1회만 승인합니다. 결과는 읽기 도구로 확인합니다." %
+                    (plan["action"], plan["unit"], plan["reason"]))
         header = ("요청 ID: `%s`\n종류: `%s`\n대상: `%s`\n요청자: `%s`\n"
                   "제안 SHA-256: `%s`\n작업 계획 SHA-256: `%s`\n변경 전 관찰 SHA-256: `%s`\n만료: `%s`" %
                   (rec["request_id"], rec["kind"], rec["target"], rec["requested_by"], rec["proposal_digest"],
@@ -252,7 +274,7 @@ class OperationsBroker:
             if len(rec["card_text"].encode("utf-8")) > 8000:
                 return {"error": "operation card too large"}, 400
             self.records[oid] = rec
-        choices = (("승인", "approve"), ("거부", "deny")) if rec["kind"] == "service" else \
+        choices = (("승인", "approve"), ("거부", "deny")) if rec["kind"] in ("service", "harness_check") else \
                   (("60분 유지", "keep"), ("해제 요청", "release"))
         actions = [{"id": decision, "name": label, "style": "primary" if index == 0 else "danger",
                     "integration": {"url": self.action_url() + "/operation-actions", "context": {
@@ -260,7 +282,9 @@ class OperationsBroker:
                         "proposal_digest": proposal_digest, "decision": decision}}}
                    for index, (label, decision) in enumerate(choices)]
         payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800",
-                   "title": "서비스 작업 승인 요청" if rec["kind"] == "service" else "임시 IP 차단 · 시험 여부 확인 및 유지/해제",
+                   "title": ("서비스 작업 승인 요청" if rec["kind"] == "service" else
+                             "Harness² 구조 점검 실행 승인 요청" if rec["kind"] == "harness_check" else
+                             "임시 IP 차단 · 시험 여부 확인 및 유지/해제"),
                    "text": rec["card_text"], "actions": actions, "footer": "capstone operations HITL", "ts": int(time.time())}]}
         posted, _ = self.post_card(rec, payload)
         with self.lock:
@@ -295,7 +319,7 @@ class OperationsBroker:
             rec = self.records.get(oid)
             if not rec or rec["status"] != "pending":
                 return {"ephemeral_text": "처리되었거나 만료된 작업입니다."}
-            choices = ("approve", "deny") if rec["kind"] == "service" else ("keep", "release")
+            choices = ("approve", "deny") if rec["kind"] in ("service", "harness_check") else ("keep", "release")
             if (ctx.get("kind") != rec["kind"] or ctx.get("decision") not in choices or
                     not isinstance(ctx.get("nonce"), str) or not isinstance(ctx.get("proposal_digest"), str) or
                     not secrets.compare_digest(ctx["nonce"], rec["nonce"]) or
@@ -321,7 +345,7 @@ class OperationsBroker:
                 return {"error": "operation not found"}, 404
             if not secrets.compare_digest(req["proposal_digest"], rec["proposal_digest"]):
                 return {"error": "proposal digest mismatch"}, 409
-            allowed = ("approved",) if rec["kind"] == "service" else ("approved", "denied", "expired")
+            allowed = ("approved",) if rec["kind"] in ("service", "harness_check") else ("approved", "denied", "expired")
             if rec["status"] not in allowed:
                 return {"error": "operation cannot be consumed"}, 409
             if not self.card_state("protect", rec):
@@ -348,7 +372,7 @@ class OperationsBroker:
                 return {"error": "operation not found"}, 404
             if not secrets.compare_digest(req["proposal_digest"], rec["proposal_digest"]):
                 return {"error": "proposal digest mismatch"}, 409
-            allowed = ("applied", "failed", "aborted") if rec["kind"] == "service" else \
+            allowed = ("applied", "failed", "aborted") if rec["kind"] in ("service", "harness_check") else \
                       (("kept", "released", "failed") if rec["consumed_decision"] == "keep" else ("released", "expired", "failed"))
             if not isinstance(req["status"], str) or req["status"] not in allowed:
                 return {"error": "result is incompatible with operation decision"}, 409
@@ -357,7 +381,7 @@ class OperationsBroker:
                 return {"error": "result differs from first report"}, 409
             if rec["result_posted"]:
                 return self._public(rec), 200
-            abort_before_consume = (rec["kind"] == "service" and req["status"] == "aborted" and
+            abort_before_consume = (rec["kind"] in ("service", "harness_check") and req["status"] == "aborted" and
                                     rec["status"] in ("pending", "approved", "denied", "expired"))
             if rec["status"] not in ("consumed", "report_error") and not abort_before_consume:
                 return {"error": "operation has not been consumed or result is in progress"}, 409

@@ -626,6 +626,58 @@ class ExecutorTests(unittest.TestCase):
                         return_value=MOD.subprocess.CompletedProcess([], 0, out, b"")):
                 self.assertIn("error", MOD._harness_status())
 
+    def test_harness_check_request_dispatch_is_host_b_only(self):
+        from types import SimpleNamespace
+        eng_b = MOD.Engine("b", self.broker, self.base / "hb-state", clock=lambda: 1000)
+        eng_a = MOD.Engine("a", self.broker, self.base / "ha-state", clock=lambda: 1000)
+        calls = []
+
+        class FakeHCS:
+            def __init__(self, engine):
+                self.engine = engine
+
+            def propose(self, reason):
+                calls.append((self.engine.host, reason))
+                return {"request_id": "a" * 32, "status": "pending"}
+
+        fake_mod = SimpleNamespace(HarnessCheckService=FakeHCS)
+        req = json.dumps({"operation": "harness-check-request", "reason": "분기 점검"}).encode()
+        stdout = io.StringIO()
+        with mock.patch.object(MOD.os, "geteuid", return_value=0), \
+                mock.patch.dict(MOD.os.environ, {"SUDO_USER": "rulechg"}, clear=False), \
+                mock.patch.object(MOD, "_secure_config", return_value=("b", self.broker)), \
+                mock.patch.object(MOD, "Engine", return_value=eng_b), \
+                mock.patch.object(MOD, "_load_extension", return_value=fake_mod), \
+                mock.patch.object(MOD.sys, "stdin", io.TextIOWrapper(io.BytesIO(req))), \
+                mock.patch.object(MOD.sys, "stdout", stdout):
+            MOD.main([])
+        self.assertEqual(calls, [("b", "분기 점검")])
+        self.assertEqual(json.loads(stdout.getvalue())["status"], "pending")
+        # Host a refuses the request before loading any operation extension.
+        with mock.patch.object(MOD.os, "geteuid", return_value=0), \
+                mock.patch.dict(MOD.os.environ, {"SUDO_USER": "rulechg"}, clear=False), \
+                mock.patch.object(MOD, "_secure_config", return_value=("a", self.broker)), \
+                mock.patch.object(MOD, "Engine", return_value=eng_a), \
+                mock.patch.object(MOD, "_load_extension", side_effect=AssertionError("must not load on host a")), \
+                mock.patch.object(MOD.sys, "stdin",
+                    io.TextIOWrapper(io.BytesIO(json.dumps({"operation": "harness-check-request", "reason": "x"}).encode()))):
+            with self.assertRaisesRegex(MOD.RuleChangeError, "only on host b"):
+                MOD.main([])
+
+    def test_operation_services_include_harness_check_on_host_b_only(self):
+        from types import SimpleNamespace
+        eng_b = MOD.Engine("b", self.broker, self.base / "svc-b", clock=lambda: 1000)
+        eng_a = MOD.Engine("a", self.broker, self.base / "svc-a", clock=lambda: 1000)
+        fake = SimpleNamespace(ServiceActionService=lambda e: ("service", e.host),
+                               HarnessCheckService=lambda e: ("harness", e.host),
+                               ContainmentService=lambda e: ("containment", e.host))
+        with mock.patch.object(MOD, "_load_extension", side_effect=lambda name: fake):
+            svcs_b = MOD._operation_services(eng_b)
+            svcs_a = MOD._operation_services(eng_a)
+        self.assertIn(("harness", "b"), svcs_b)
+        self.assertNotIn("harness", [s[0] for s in svcs_a])
+        self.assertIn(("containment", "a"), svcs_a)
+
     def test_full_size_korean_replacement_survives_state_reload_and_one_use_approval(self):
         engine, _, target, _ = self.engine("waf")
         path = Path(engine.targets[target]["path"])

@@ -112,8 +112,44 @@ class RuleChangeTransportTests(unittest.TestCase):
         msg['params']['arguments'] = {}
         self.assertEqual(mcp.handle(msg, 'write', 'b')['error']['code'], -32602)
 
+    def test_request_harness_check_is_write_tool_on_siem_host_only(self):
+        write_b = {t['name'] for t in mcp.tool_list('write', 'b')}
+        self.assertIn('request_harness_check', write_b)
+        for access, host in (('read', 'b'), ('read', 'a'), ('write', 'a')):
+            self.assertNotIn('request_harness_check', {t['name'] for t in mcp.tool_list(access, host)})
+        self.assertNotIn('request_harness_check', mcp.READ_TOOLS)
+        tool = next(t for t in mcp.TOOLS if t['name'] == 'request_harness_check')
+        self.assertFalse(tool['annotations']['readOnlyHint'])
+        self.assertFalse(tool['annotations']['destructiveHint'])
+        self.assertFalse(tool['inputSchema']['additionalProperties'])
+        self.assertEqual(set(tool['inputSchema']['required']), {'reason'})
+        self.assertIn('approv', tool['description'].lower())
+
+    def test_request_harness_check_dispatches_exact_fields(self):
+        msg = {'id': 1, 'method': 'tools/call',
+               'params': {'name': 'request_harness_check', 'arguments': {'reason': '분기 점검 요청'}}}
+        with patch.object(mcp, '_call_helper', return_value=mcp._result({'status': 'posting'})) as call:
+            reply = mcp.handle(msg, 'write', 'b')
+        self.assertFalse(reply['result']['isError'])
+        call.assert_called_once_with({'operation': 'harness-check-request', 'reason': '분기 점검 요청'}, readonly=False)
+        # Extra/arbitrary fields are rejected before the helper runs.
+        for extra in ({'command': 'id'}, {'unit': 'x.service'}):
+            with patch.object(mcp, '_call_helper') as call:
+                msg['params']['arguments'] = {'reason': 'x', **extra}
+                self.assertTrue(mcp.handle(msg, 'write', 'b')['result']['isError'])
+                call.assert_not_called()
+        # The read MCP never advertises or dispatches this write tool.
+        msg['params']['arguments'] = {'reason': 'x'}
+        self.assertEqual(mcp.handle(msg, 'read', 'b')['error']['code'], -32602)
+
+    def test_harness_check_request_uses_card_posting_timeout(self):
+        with patch.object(mcp.subprocess, 'run',
+                          return_value=subprocess.CompletedProcess([], 0, b'{"status":"posting"}', b'')) as run:
+            mcp._call_helper({'operation': 'harness-check-request', 'reason': 'x'})
+        self.assertEqual(run.call_args.kwargs['timeout'], 360)
+
     def test_operation_schemas_expose_no_arbitrary_install_or_container_tool(self):
-        self.assertEqual(len(mcp.TOOLS), 10)
+        self.assertEqual(len(mcp.TOOLS), 11)
         for tool in mcp.TOOLS:
             self.assertFalse(tool['inputSchema']['additionalProperties'])
         tool = next(t for t in mcp.TOOLS if t['name']=='propose_service_action')

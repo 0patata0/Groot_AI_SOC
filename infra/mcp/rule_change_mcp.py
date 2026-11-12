@@ -143,6 +143,14 @@ TOOLS.extend([
         "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
         "annotations": {"title": "Read Harness² self-audit status", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
+    {
+        "name": "request_harness_check",
+        "description": "Request an administrator-approved run of the official Harness² structural self-audit on the SIEM host. This does NOT run anything by itself: it posts one approval card to the administrators; only after an admin approves does a separate worker start the fixed audit service exactly once. The audit is non-mutating - it changes no skill, config, rule, service or firewall - and a structural pass is not proof of runtime accuracy. Read the outcome afterwards with get_harness_check_status (new observed_at_kst), and track the request with get_operation_status. Any improvement the audit suggests still needs its own separate approval card. Repeated identical requests reuse the same pending card.",
+        "inputSchema": {"type": "object", "additionalProperties": False,
+                        "properties": {"reason": {"type": "string", "minLength": 1, "maxLength": 200}},
+                        "required": ["reason"]},
+        "annotations": {"title": "Request admin-approved Harness² check", "readOnlyHint": False, "destructiveHint": False, "idempotentHint": False},
+    },
 ])
 
 
@@ -160,7 +168,7 @@ def tool_list(access, host):
             continue
         if original["name"] == "temporarily_contain_ip" and host != "a":
             continue
-        if original["name"] == "get_harness_check_status" and host != "b":
+        if original["name"] in ("get_harness_check_status", "request_harness_check") and host != "b":
             continue
         tool = copy.deepcopy(original)
         target = tool["inputSchema"]["properties"].get("target")
@@ -177,7 +185,7 @@ def _call_helper(payload, readonly=False):
     try:
         proc = subprocess.run(
             ["/usr/bin/sudo", "-n", HELPER] + (["--read-only"] if readonly else []), input=request, capture_output=True,
-            timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get"} else 45, check=False,
+            timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get", "harness-check-request"} else 45, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
         return _result({"error": "rule-change helper unavailable"}, True)
@@ -308,6 +316,8 @@ def handle(message, access="write", host="a"):
                 result = call_helper({"operation": "status", **args})
         elif name == "get_harness_check_status":
             result = call_helper({"operation": "harness-status"}) if not args else _result({"error": "required/unsupported arguments"}, True)
+        elif name == "request_harness_check":
+            result = call_helper({"operation": "harness-check-request", **args}) if set(args) == {"reason"} else _result({"error": "required/unsupported arguments"}, True)
         elif name in {"get_service_action_target", "propose_service_action", "temporarily_contain_ip", "get_operation_status"}:
             operation, required = {
                 "get_service_action_target": ("service-get", {"target"}),

@@ -415,5 +415,104 @@ class ServiceTests(unittest.TestCase):
                 backend.verify("a:waf", "reload", before, self.now)
 
 
+class FakeSystemctl:
+    def __init__(self):
+        self.calls = []
+        self.returncode = 0
+        self.fail = False
+
+    def call(self, argv, timeout=30):
+        self.calls.append((list(argv), timeout))
+        if self.fail:
+            raise helper.RuleChangeError("systemctl unavailable")
+        from types import SimpleNamespace
+        return SimpleNamespace(returncode=self.returncode, stdout=b"", stderr=b"")
+
+
+class HarnessCheckTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.now = time.time()
+        self.broker = BrokerAdapter()
+        self.runner = FakeSystemctl()
+        self.engine = helper.Engine("b", self.broker, Path(self.tmp.name).resolve() / "state",
+                                    runner=self.runner, clock=lambda: self.now)
+        self.svc = service.HarnessCheckService(self.engine)
+
+    def _propose(self, reason="분기 정기 구조 점검"):
+        created = self.svc.propose(reason)
+        self.assertEqual(created["status"], "pending")
+        return created["request_id"]
+
+    def test_propose_posts_one_non_mutating_card_and_is_idempotent(self):
+        rid = self._propose()
+        self.assertEqual(len(self.broker.cards), 1)
+        att = self.broker.cards[0]["attachments"][0]
+        self.assertEqual(att["title"], "Harness² 구조 점검 실행 승인 요청")
+        self.assertEqual([a["id"] for a in att["actions"]], ["approve", "deny"])
+        self.assertEqual(self.runner.calls, [])
+        # Same pending request reuses the same card (no duplicate).
+        again = self.svc.propose("분기 정기 구조 점검")
+        self.assertEqual(again["request_id"], rid)
+        self.assertEqual(len(self.broker.cards), 1)
+
+    def test_approved_runs_audit_exactly_once_and_never_replays(self):
+        rid = self._propose()
+        self.broker.decide(rid, "approve")
+        self.svc.worker_once()
+        record = self.svc._load(rid)
+        self.assertEqual(record["status"], "applied")
+        self.assertEqual(self.runner.calls, [(["/usr/bin/systemctl", "start",
+                                               "capstone-harness2-audit.service"], 300)])
+        self.assertEqual(self.broker.consumes, 1)
+        # Repeated worker passes only re-post the result; the unit never starts again.
+        self.svc.worker_once()
+        self.svc.worker_once()
+        self.assertEqual(len(self.runner.calls), 1)
+        self.assertEqual(self.broker.consumes, 1)
+
+    def test_denied_request_never_starts_the_audit(self):
+        rid = self._propose()
+        self.broker.decide(rid, "deny")
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(rid)["status"], "denied")
+        self.assertEqual(self.runner.calls, [])
+
+    def test_interrupted_executing_is_failed_without_replay(self):
+        rid = self._propose()
+        record = self.svc._load(rid)
+        record["status"] = "executing"  # simulate a crash after durable intent
+        self.svc._save(record)
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(rid)["status"], "failed")
+        self.assertEqual(self.runner.calls, [])
+
+    def test_local_expiry_before_approval_starts_nothing(self):
+        rid = self._propose()
+        self.now += service.HARNESS_TTL + 5
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(rid)["status"], "expired")
+        self.assertEqual(self.runner.calls, [])
+
+    def test_systemctl_failure_marks_failed_and_does_not_retry(self):
+        rid = self._propose()
+        self.broker.decide(rid, "approve")
+        self.runner.fail = True
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(rid)["status"], "failed")
+        self.assertEqual(len(self.runner.calls), 1)
+        # No automatic replay on the next pass.
+        self.svc.worker_once()
+        self.assertEqual(len(self.runner.calls), 1)
+
+    def test_host_a_engine_refuses_harness_check_proposal(self):
+        engine_a = helper.Engine("a", self.broker, Path(self.tmp.name).resolve() / "state-a",
+                                 runner=self.runner, clock=lambda: self.now)
+        svc_a = service.HarnessCheckService(engine_a)
+        with self.assertRaises(helper.RuleChangeError):
+            svc_a.propose("not allowed on a")
+
+
 if __name__ == "__main__":
     unittest.main()

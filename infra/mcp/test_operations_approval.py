@@ -24,6 +24,9 @@ def operation(kind="service"):
         plan = {"action": "reload", "before_observation_sha256": "1" * 64,
                 "before_summary": "container=abc123 running=true health=healthy StartedAt=2026-10-13T00:00:00Z",
                 "policy_sha256": "2" * 64, "reason": "승인된 설정을 다시 읽기"}
+    elif kind == "harness_check":
+        target = ops.HARNESS_TARGET
+        plan = {"action": "run_structural_audit_once", "unit": ops.HARNESS_UNIT, "host": "b", "reason": "정기 구조 점검"}
     else:
         target = "a:incident-ip"
         plan = {"ip": "8.8.4.4", "action": "temporary_block", "temporary_expires_at": expiry,
@@ -49,6 +52,35 @@ class OperationsTest(unittest.TestCase):
         self.assertEqual(self.broker.create(req)[1],400)
         req=operation('containment');req['plan'].update(reason='@here [링크](https://invalid.example) | <tag>',evidence_summary='검증 요약');req['plan_sha256']=ops.digest(req['plan'])
         self.create(req);text=self.cards[-1]['attachments'][0]['text'];self.assertNotIn('@here',text);self.assertIn('&#124;',text);self.assertNotIn('<tag>',text)
+
+    def test_harness_check_card_is_non_mutating_and_approve_consume_result(self):
+        req = operation("harness_check")
+        created = self.create(req)
+        att = self.cards[-1]["attachments"][0]
+        self.assertEqual(att["title"], "Harness² 구조 점검 실행 승인 요청")
+        self.assertEqual([a["id"] for a in att["actions"]], ["approve", "deny"])
+        for value in ("변경하지 않습니다", "별도 승인 카드", "1회 실행", "정기 구조 점검"):
+            self.assertIn(value, att["text"])
+        self.assertEqual(created["before_observation_sha256"], "")
+        self.click("approve")
+        self.assertEqual(self.broker.get(created["operation_id"])[0]["status"], "approved")
+        consumed, code = self.consume(created)
+        self.assertEqual((code, consumed["status"], consumed["consumed_decision"]), (200, "consumed", "approve"))
+        after = {"unit": ops.HARNESS_UNIT, "status": "applied", "detail": "done"}
+        res, code = self.broker.result(created["operation_id"], {"proposal_digest": created["proposal_digest"],
+            "status": "applied", "after_observation_sha256": ops.digest(after), "detail": "완료"})
+        self.assertEqual((code, res["result_status"]), (200, "applied"))
+
+    def test_harness_check_rejects_malformed_plan_or_target(self):
+        for mutate in (lambda p: p.update(action="x"), lambda p: p.update(unit="evil.service"),
+                       lambda p: p.update(host="a"), lambda p: p.update(extra="1")):
+            req = operation("harness_check")
+            mutate(req["plan"])
+            req["plan_sha256"] = ops.digest(req["plan"])
+            self.assertEqual(self.broker.create(req)[1], 400)
+        req = operation("harness_check")
+        req["target"] = "a:harness2-audit"
+        self.assertEqual(self.broker.create(req)[1], 400)
 
     def setUp(self):
         self.cards = []

@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-12 22:54 KST
+# 인프라 현황 — 2026-11-12 23:10 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 발표**이며 미완료다. 정확성이 속도보다 우선이다. 최신 균형1,220건 학습본을 운영하면서 보완한다. 학습본 사용과 독립적인 정확도 우위는 구분한다. [활성 계획](PLAN.md) · [직전 상세 상태·실패 이력](archive/STATUS_HISTORY.md#source-a961b1d1c0e72743).
 
@@ -16,6 +16,17 @@
 - **미완·배포 전제**: 거버넌스 배포(관리자231 경유)와 **실제 카드 클릭→워커 실행 E2E** 미검증. **재동기화 배포 전 반드시 라이브에서 확인**: ① 3 surface 스킬 파일 경로가 실제 런타임 로드 파일인지(소유자·모드), ② 덮어쓰기 후 봇이 재로드하는지(또는 재시작 필요), ③ 어느 surface가 정본인지는 관리자 판단. 후보는 server_audit 고정 경로맵을 권위로 사용. 구현/정적 통과와 실제 운영 검증을 구분한다.
 
 [MCP 도구](infra/mcp/rule_change_mcp.py)·[실행기/워커](infra/mcp/rule_change_executor.py)·[운영 실행기 HarnessCheckService](infra/mcp/service_action_executor.py)·[승인 브로커](infra/mcp/operations_approval.py)·[감사 CLI](infra/validation/harness2/server_audit.py)·[프로토콜 문서](infra/mcp/approved-operations.md). 로컬 세션 기록은 Git 제외.
+
+## 현재 작업: LLM 운영설정 공통화·SKILL.md 공통 정리(#6) (11/12 23:10, 리포 문서·테스트)
+
+핵심 확인: **스킬·공통 스크립트·시스템 프롬프트는 이미 `infra/hermes/` 단일 소스**에서 sdk(`ollama_trial.py`)·management(`soc_management.py`)가 배포한다(배포 시 동일 바이트, 드리프트는 라이브 핫에디트에서만—#5가 처리). 즉 **물리적 공통화는 사실상 완료**였고, 남은 작업은 그 공통 모델을 **명시·강제**하는 것.
+
+| 산출물 | 내용 | 상태 |
+|---|---|---|
+| `infra/hermes/OPERATIONAL_SETTINGS.md` | 단일 소스 지도(소스→surface 경로/파일명), 5개 스킬 공통 운영원칙 7가지(권한 미부여·soc-output 재사용·단계 구분·근거/미확인 보존·상태 비승계·KST/용량 공통·내부 제어 줄), 정당한 surface 차이, 유지·강제 경로(Harness² 드리프트 탐지 + #5 승인 카드) | ✅ 작성 |
+| `infra/hermes/test_common_operational_settings.py` | 불변식 회귀 **5통과**: 단일 스킬 소스 트리·skill-soc-*.md 포크 없음, frontmatter 공식 창(≤600B)·name 일치, 워크플로 스킬의 soc-output 재사용·버전 마커, 공통 스크립트/SOUL 단일본, 두 배포기(ollama_trial·soc_management)가 hermes에서 소싱 | ✅ 통과 |
+
+- **범위·한계**: 스킬·프롬프트 **내용 변경은 운영 변경**(Harness² 구조검증·거버넌스 배포·실제 채팅 검증 대상)이라 이번엔 변경하지 않았다. native(A `groot-query-completion` 플러그인)의 스킬·SOUL 빌드 경로는 리포에서 전체 추적 못함(문서에 사실대로 구분). 이 작업은 소스 공통화의 **명시·강제**이며 라이브 바이트 일치·런타임 로드를 증명하지 않는다.
 
 ## 현재 작업: 전원복귀(콜드부트) 복구 — outer 타임아웃·Vector 로테이션 (11/12 21:16, 라이브 A/B/C)
 

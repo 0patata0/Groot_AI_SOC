@@ -1,6 +1,6 @@
 # 볼류메트릭 플러드 전용 Wazuh 룰 100113 후보
 
-2026-11-13 KST. **후보·격리 검증까지이며 운영 룰에는 미적용**이다. 적용은 룰변경 승인 경로(`propose_rule_edit` → 관리자 카드 → `wazuh-analysisd -t`·매니저 재시작·읽기 확인)로만 한다. [현황 #7](../../../STATUS.md) · [작은 원장](validation.json) · [후보 룰](candidate-100113.xml) · [편집안](edit.json).
+2026-11-13 KST. **후보·격리 검증까지이며 운영 룰에는 미적용**이다(컨트롤러 측 전제 1·2단계는 완료). 적용은 룰변경 승인 경로(`propose_rule_edit` → 관리자 카드 → `wazuh-analysisd -t`·매니저 재시작·읽기 확인)로만 한다. [현황 #7](../../../STATUS.md) · [작은 원장](validation.json) · [후보 룰](candidate-100113.xml) · [편집안](edit.json).
 
 ## 왜 필요한가
 
@@ -44,10 +44,10 @@
 
 Suricata 룰이 `threshold: type both, track by_dst`라 경보는 **SID·목적지별 5초에 1건**으로 제한된다. 수량은 작다. 그러나 다출발지 플러드에서는 경보마다 출발지가 달라질 수 있어, 컨트롤러가 출발지별로 사건을 나누면 사건 단편화(#7 병목)가 다시 생긴다. 따라서 다음 순서를 지킨다.
 
-1. 컨트롤러 ②③ 운영 배포(T4, 관리자231 경유 리터럴패치).
-2. 메타 `flood_rule_ids=100113` 지정. 룰이 아직 없으면 효과가 없어 안전하다.
+1. 컨트롤러 ②③ 운영 배포(T4, 관리자231 경유 리터럴패치). **완료(11/13 01:43 배포, 01:48 확정, 라이브 `178c8dbb`)**
+2. 메타 `flood_rule_ids=100113` 지정. 룰이 아직 없으면 효과가 없어 안전하다. **완료(11/13 01:48:53, 컨트롤러 잠금 획득 후 지정, 감사 로그 기록)**
 3. 이 편집안으로 `propose_rule_edit`를 제출하고 관리자 카드 승인 후 적용한다(`base_sha256` 불일치 시 거부).
-4. 적용 후 `infra/groot-b/local_rules.xml`을 운영과 동기화하고 해당 픽스처 테스트(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`)를 갱신한다. 그 전까지 이 파일은 운영과 같은 기준본으로 두며 후보를 넣지 않는다.
+4. 적용 후 `infra/groot-b/local_rules.xml`을 운영과 동기화하고 해당 픽스처 테스트(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`)를 갱신한다. 그 전까지 이 파일은 운영과 같은 기준본으로 두며 후보를 넣지 않는다. 새 서버 설치 경로가 이 메타를 기본값으로 지정하도록 하는 작업도 이때 함께 반영한다(현재 설치기는 메타를 지정하지 않음).
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -I -m unittest discover -s infra/validation/flood-rule -p 'test_*.py'

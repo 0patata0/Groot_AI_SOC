@@ -64,8 +64,21 @@
   },
   "not_done": [
     "governed propose_rule_edit approval card and apply (wazuh-analysisd -t, manager restart, read-back)",
-    "controller T4 deploy of flood correlation and meta flood_rule_ids=100113 (must precede the rule apply)",
     "sync of infra/groot-b/local_rules.xml and its fixture tests after an approved apply",
-    "real Kali flood E2E (attacks remain paused)"
-  ]
+    "real Kali flood E2E (attacks remain paused)",
+    "installer default for meta flood_rule_ids (with the post-apply repo sync)"
+  ],
+  "prerequisites_done": {
+    "controller_t4_deploy": {
+      "live_sha16": "178c8dbbff25788a",
+      "deployed_kst": "2026-11-13T01:43:56+09:00",
+      "confirmed_kst": "2026-11-13T01:48:45+09:00"
+    },
+    "meta_flood_rule_ids": {
+      "value": "100113",
+      "set_kst": "2026-11-13T01:48:53+09:00",
+      "previous": null,
+      "effect": "none until rule 100113 exists"
+    }
+  }
 }

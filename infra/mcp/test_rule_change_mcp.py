@@ -83,8 +83,37 @@ class RuleChangeTransportTests(unittest.TestCase):
                 self.assertTrue(mcp.handle(msg, access)['result']['isError'])
                 call.assert_not_called()
 
+    def test_harness_check_status_is_read_only_on_siem_host_only(self):
+        read_b = {t['name'] for t in mcp.tool_list('read', 'b')}
+        self.assertIn('get_harness_check_status', read_b)
+        for access, host in (('read', 'a'), ('write', 'a'), ('write', 'b')):
+            self.assertNotIn('get_harness_check_status', {t['name'] for t in mcp.tool_list(access, host)})
+        self.assertIn('get_harness_check_status', mcp.READ_TOOLS)
+        tool = next(t for t in mcp.TOOLS if t['name'] == 'get_harness_check_status')
+        self.assertTrue(tool['annotations']['readOnlyHint'])
+        self.assertFalse(tool['annotations']['destructiveHint'])
+        self.assertFalse(tool['inputSchema']['additionalProperties'])
+        self.assertEqual(tool['inputSchema']['properties'], {})
+        self.assertIn('approval', tool['description'])
+
+    def test_harness_check_status_dispatches_fixed_read_operation(self):
+        msg = {'id': 1, 'method': 'tools/call',
+               'params': {'name': 'get_harness_check_status', 'arguments': {}}}
+        with patch.object(mcp, '_call_helper', return_value=mcp._result({'scope': 'structural checks', 'status': 'passed'})) as call:
+            reply = mcp.handle(msg, 'read', 'b')
+        self.assertFalse(reply['result']['isError'])
+        call.assert_called_once_with({'operation': 'harness-status'}, readonly=True)
+        # Any argument is rejected before the helper runs.
+        msg['params']['arguments'] = {'origin': 'all'}
+        with patch.object(mcp, '_call_helper') as call:
+            self.assertTrue(mcp.handle(msg, 'read', 'b')['result']['isError'])
+            call.assert_not_called()
+        # The write MCP never advertises or dispatches this read tool.
+        msg['params']['arguments'] = {}
+        self.assertEqual(mcp.handle(msg, 'write', 'b')['error']['code'], -32602)
+
     def test_operation_schemas_expose_no_arbitrary_install_or_container_tool(self):
-        self.assertEqual(len(mcp.TOOLS), 9)
+        self.assertEqual(len(mcp.TOOLS), 10)
         for tool in mcp.TOOLS:
             self.assertFalse(tool['inputSchema']['additionalProperties'])
         tool = next(t for t in mcp.TOOLS if t['name']=='propose_service_action')

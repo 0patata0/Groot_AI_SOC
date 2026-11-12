@@ -1613,6 +1613,44 @@ def _native_contain(host, broker, request):
     return {'incident':queued,'containment':result}
 
 
+HARNESS2_AUDIT = "/opt/capstone-harness2/server_audit.py"
+HARNESS2_STATUS_TIMEOUT = 20
+HARNESS2_MAX_OUTPUT = 64 * 1024
+
+
+def _harness_status():
+    """Read-only Harness² latest structural-audit summary; never starts an audit.
+
+    Runs the fixed, root-owned server_audit.py --latest as an isolated child and
+    relays its bounded JSON summary. No model or request input influences the
+    path or arguments. Returns an {"error": ...} envelope (never raises) when the
+    summary is absent or unreadable, so the read-only MCP reports a bounded tool
+    error instead of crashing. A passed structural audit is not proof of runtime
+    accuracy, and nothing here adopts or applies a change.
+    """
+    try:
+        meta = os.stat(HARNESS2_AUDIT)
+    except OSError:
+        return {"error": "harness2 audit tool is not installed"}
+    if meta.st_uid != 0 or meta.st_mode & 0o022:
+        return {"error": "harness2 audit tool must be root-owned and not writable by others"}
+    try:
+        proc = subprocess.run(["/usr/bin/python3", "-IB", HARNESS2_AUDIT, "--latest"],
+                              stdin=subprocess.DEVNULL, capture_output=True,
+                              timeout=HARNESS2_STATUS_TIMEOUT, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return {"error": "harness2 status read did not complete"}
+    if len(proc.stdout) > HARNESS2_MAX_OUTPUT:
+        return {"error": "harness2 status response too large"}
+    try:
+        summary = json.loads(proc.stdout)
+    except (UnicodeDecodeError, ValueError):
+        return {"error": "harness2 status output was not valid JSON"}
+    if not isinstance(summary, dict) or summary.get("scope") != "structural checks":
+        return {"error": "harness2 status output had an unexpected shape"}
+    return summary
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if os.geteuid() != 0:
@@ -1628,11 +1666,19 @@ def main(argv=None):
         request = json.loads(raw, object_pairs_hook=_unique_request)
         if not isinstance(request, dict):
             raise RuleChangeError("request must be a JSON object")
-        read_operations = {"inventory", "get", "status", "service-get", "operation-status"}
+        read_operations = {"inventory", "get", "status", "service-get", "operation-status", "harness-status"}
         if readonly and request.get("operation") not in read_operations:
             raise RuleChangeError("operation is not read-only")
         if caller == "rulechg" and request.get("operation") in read_operations:
             raise RuleChangeError("queries belong to the read-only MCP")
+        if request.get("operation") == "harness-status":
+            # Independent of the rule-change engine/config/broker: a read-only
+            # relay of the SIEM-side Harness² status. Reached only by ruleview
+            # (--read-only); rulechg is already rejected above as a read op.
+            if set(request) != {"operation"}:
+                raise RuleChangeError("invalid harness-status request fields")
+            print(json.dumps(_harness_status(), ensure_ascii=False, sort_keys=True))
+            return
     host, broker = _secure_config()
     if readonly or not argv:
         if request.get('operation') == 'native-contain':

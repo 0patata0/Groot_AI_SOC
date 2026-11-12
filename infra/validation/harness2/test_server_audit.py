@@ -479,6 +479,32 @@ class AuditTests(unittest.TestCase):
                     audit.main(argv)
                 self.assertEqual(raised.exception.code, 2)
 
+    def test_cli_latest_is_readonly_summary_and_never_starts_an_audit(self):
+        summary = {"scope": "structural checks", "status": "passed", "origin": "scheduled",
+                   "observed_at_kst": "2026-11-12T03:00:00+09:00", "schema_version": 1,
+                   "report_file": "r.json", "sha256": "a" * 64, "automatic_adoption": False,
+                   "operational_changes_require_approval": True}
+        with mock.patch.object(audit, "get_latest", return_value=summary) as latest, \
+                mock.patch.object(audit, "run_audit") as run, \
+                mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            self.assertEqual(audit.main(["--latest"]), 0)
+        self.assertEqual(json.loads(output.getvalue()), summary)
+        latest.assert_called_once_with()
+        run.assert_not_called()
+        # A missing/corrupt stored report surfaces as incomplete, never passed.
+        with mock.patch.object(audit, "get_latest", side_effect=audit.AuditError("invalid_latest_pointer")), \
+                mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            self.assertEqual(audit.main(["--latest"]), 2)
+        failed = json.loads(output.getvalue())
+        self.assertEqual(failed["status"], "incomplete")
+        self.assertEqual(failed["error_code"], "invalid_latest_pointer")
+        # --latest never takes an origin, and a bare run still requires a mode.
+        with mock.patch("sys.stderr", new_callable=io.StringIO):
+            for argv in (["--latest", "scheduled"], ["--latest", "manual"]):
+                with self.assertRaises(SystemExit) as raised:
+                    audit.main(argv)
+                self.assertEqual(raised.exception.code, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

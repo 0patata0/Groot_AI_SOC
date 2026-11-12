@@ -563,6 +563,69 @@ class ExecutorTests(unittest.TestCase):
         self.assertNotIn("diff", response)
         self.assertEqual(Path(engine.targets[target]["path"]).read_bytes(), current)
 
+    def test_harness_status_read_only_relay_and_write_mcp_rejection(self):
+        sentinel = {"scope": "structural checks", "status": "passed", "origin": "scheduled"}
+        stdin = io.TextIOWrapper(io.BytesIO(json.dumps({"operation": "harness-status"}).encode()))
+        stdout = io.StringIO()
+        # Read-only caller (ruleview) relays the summary verbatim, without the
+        # rule-change engine or config (never calls _secure_config/Engine).
+        with mock.patch.object(MOD.os, "geteuid", return_value=0), \
+                mock.patch.dict(MOD.os.environ, {"SUDO_USER": "ruleview"}, clear=False), \
+                mock.patch.object(MOD, "_harness_status", return_value=sentinel) as hs, \
+                mock.patch.object(MOD, "_secure_config", side_effect=AssertionError("must not be reached")), \
+                mock.patch.object(MOD.sys, "stdin", stdin), \
+                mock.patch.object(MOD.sys, "stdout", stdout):
+            MOD.main(["--read-only"])
+        hs.assert_called_once_with()
+        self.assertEqual(json.loads(stdout.getvalue()), sentinel)
+        # The write MCP (rulechg) may not run read queries at all.
+        with mock.patch.object(MOD.os, "geteuid", return_value=0), \
+                mock.patch.dict(MOD.os.environ, {"SUDO_USER": "rulechg"}, clear=False), \
+                mock.patch.object(MOD, "_harness_status") as hs, \
+                mock.patch.object(MOD.sys, "stdin",
+                    io.TextIOWrapper(io.BytesIO(json.dumps({"operation": "harness-status"}).encode()))):
+            with self.assertRaisesRegex(MOD.RuleChangeError, "read-only MCP"):
+                MOD.main([])
+            hs.assert_not_called()
+        # Any extra field is rejected before any read.
+        with mock.patch.object(MOD.os, "geteuid", return_value=0), \
+                mock.patch.dict(MOD.os.environ, {"SUDO_USER": "ruleview"}, clear=False), \
+                mock.patch.object(MOD, "_harness_status") as hs, \
+                mock.patch.object(MOD.sys, "stdin",
+                    io.TextIOWrapper(io.BytesIO(json.dumps({"operation": "harness-status", "origin": "all"}).encode()))):
+            with self.assertRaisesRegex(MOD.RuleChangeError, "invalid harness-status request fields"):
+                MOD.main(["--read-only"])
+            hs.assert_not_called()
+
+    def test_harness_status_runs_fixed_command_and_fails_closed(self):
+        ok = {"scope": "structural checks", "status": "findings", "origin": "manual",
+              "observed_at_kst": "2026-11-12T03:00:00+09:00", "report_file": "r.json",
+              "sha256": "a" * 64, "schema_version": 1, "automatic_adoption": False,
+              "operational_changes_require_approval": True}
+        rootfile = MOD.os.stat_result((0o100755, 1, 1, 1, 0, 0, 100, 0, 0, 0))
+        with mock.patch.object(MOD.os, "stat", return_value=rootfile), \
+                mock.patch.object(MOD.subprocess, "run",
+                    return_value=MOD.subprocess.CompletedProcess([], 0, json.dumps(ok).encode(), b"")) as run:
+            self.assertEqual(MOD._harness_status(), ok)
+        self.assertEqual(run.call_args.args[0], ["/usr/bin/python3", "-IB", MOD.HARNESS2_AUDIT, "--latest"])
+        self.assertEqual(run.call_args.kwargs["timeout"], MOD.HARNESS2_STATUS_TIMEOUT)
+        # Not installed, writable-by-others, or non-root owner: refused before run.
+        for meta in (FileNotFoundError,
+                     MOD.os.stat_result((0o100777, 1, 1, 1, 0, 0, 100, 0, 0, 0)),
+                     MOD.os.stat_result((0o100755, 1, 1, 1, 1000, 0, 100, 0, 0, 0))):
+            kwargs = {"side_effect": meta} if meta is FileNotFoundError else {"return_value": meta}
+            with mock.patch.object(MOD.os, "stat", **kwargs), \
+                    mock.patch.object(MOD.subprocess, "run") as run:
+                self.assertIn("error", MOD._harness_status())
+                run.assert_not_called()
+        # Oversize, non-JSON, or wrong-shape child output all fail closed.
+        for out in (b"x" * (MOD.HARNESS2_MAX_OUTPUT + 1), b"not json",
+                    json.dumps({"scope": "other"}).encode()):
+            with mock.patch.object(MOD.os, "stat", return_value=rootfile), \
+                    mock.patch.object(MOD.subprocess, "run",
+                        return_value=MOD.subprocess.CompletedProcess([], 0, out, b"")):
+                self.assertIn("error", MOD._harness_status())
+
     def test_full_size_korean_replacement_survives_state_reload_and_one_use_approval(self):
         engine, _, target, _ = self.engine("waf")
         path = Path(engine.targets[target]["path"])

@@ -20,7 +20,7 @@ HELPER = "/usr/local/sbin/rule-change-executor"
 MAX_INPUT = 1024 * 1024
 MAX_OUTPUT = 4 * 1024 * 1024
 READ_TOOLS = frozenset({"get_security_rules", "get_rule_change_target", "get_rule_change_status",
-                        "get_service_action_target", "get_operation_status"})
+                        "get_service_action_target", "get_operation_status", "get_harness_check_status"})
 
 TOOLS = [
     {
@@ -137,6 +137,12 @@ TOOLS.extend([
                         "properties": {"request_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"}}, "required": ["request_id"]},
         "annotations": {"title": "Read operation status", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
+    {
+        "name": "get_harness_check_status",
+        "description": "Read the most recent Harness² structural self-audit summary on the SIEM host: status (passed/findings/incomplete), origin, KST observation time, report file and SHA-256. Read-only: it never starts an audit and never adopts or applies anything. 'automatic_adoption' is always false and 'operational_changes_require_approval' always true - a passed structural check is NOT proof of runtime accuracy, and any skill or config improvement it suggests still needs a separate admin approval card. observed_at_kst reflects when the stored audit ran and may be stale; status 'incomplete' means no valid stored report is available. Takes no arguments.",
+        "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
+        "annotations": {"title": "Read Harness² self-audit status", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
+    },
 ])
 
 
@@ -153,6 +159,8 @@ def tool_list(access, host):
         if (original["name"] in READ_TOOLS) != (access == "read"):
             continue
         if original["name"] == "temporarily_contain_ip" and host != "a":
+            continue
+        if original["name"] == "get_harness_check_status" and host != "b":
             continue
         tool = copy.deepcopy(original)
         target = tool["inputSchema"]["properties"].get("target")
@@ -298,6 +306,8 @@ def handle(message, access="write", host="a"):
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
                 result = call_helper({"operation": "status", **args})
+        elif name == "get_harness_check_status":
+            result = call_helper({"operation": "harness-status"}) if not args else _result({"error": "required/unsupported arguments"}, True)
         elif name in {"get_service_action_target", "propose_service_action", "temporarily_contain_ip", "get_operation_status"}:
             operation, required = {
                 "get_service_action_target": ("service-get", {"target"}),

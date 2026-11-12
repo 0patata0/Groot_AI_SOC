@@ -813,8 +813,25 @@ def get_latest(reports_dir=REPORTS_DIR, *, policy=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Pinned official Harness² structural checks only.")
-    parser.add_argument("origin", choices=sorted(ORIGINS))
+    parser.add_argument("origin", nargs="?", choices=sorted(ORIGINS))
+    parser.add_argument("--latest", action="store_true",
+                        help="Print the read-only summary of the latest stored report; never starts an audit.")
     args = parser.parse_args(argv)
+    if args.latest:
+        # Read-only status read-back for the governed MCP tool. It inspects the
+        # already-stored latest report and never initiates an audit, so it takes
+        # no origin. observed_at_kst is always returned; a missing or corrupt
+        # report surfaces as status "incomplete", never as a passed check.
+        if args.origin is not None:
+            parser.error("--latest does not take an origin")
+        try:
+            print(json.dumps(get_latest(), sort_keys=True))
+            return 0
+        except (AuditError, OSError) as exc:
+            print(json.dumps({"scope": "structural checks", "status": "incomplete", "error_code": _error_code(exc)}))
+            return 2
+    if args.origin is None:
+        parser.error("an origin is required unless --latest is given")
     try:
         config = _decode_json(_read(CONFIG_PATH, MAX_CONFIG, FilePolicy()))
         result = run_audit(config, args.origin)

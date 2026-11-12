@@ -146,8 +146,16 @@ class BindingTests(unittest.TestCase):
         for host in ('a', 'b'):
             m = module('rule_change_mcp.py', host)
             reads, writes = m.tool_list('read', host), m.tool_list('write', host)
-            self.assertEqual(len(reads), 5)
-            self.assertEqual(len(writes), 4 if host == 'a' else 3)
+            # Harness² self-audit tools are B-only (#5); containment is A-only.
+            harness_read = {'get_harness_check_status'} if host == 'b' else set()
+            harness_write = ({'request_harness_check', 'request_harness_skill_resync',
+                              'acknowledge_harness_finding'} if host == 'b' else set())
+            self.assertEqual({t['name'] for t in reads},
+                             {'get_security_rules', 'get_rule_change_target', 'get_rule_change_status',
+                              'get_service_action_target', 'get_operation_status'} | harness_read)
+            self.assertEqual({t['name'] for t in writes},
+                             {'propose_rule_change', 'propose_rule_edit', 'propose_service_action'}
+                             | ({'temporarily_contain_ip'} if host == 'a' else set()) | harness_write)
             self.assertFalse({t['name'] for t in reads} & {t['name'] for t in writes})
             for tool in reads + writes:
                 targets = tool['inputSchema']['properties'].get('target', {}).get('enum', [])

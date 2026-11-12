@@ -108,6 +108,39 @@ def tuned_buffer(text):
     return text.replace(blocks[0], block, 1)
 
 
+# The 20000-event buffer still overflowed for ~7 s at every 12-hourly rootcheck
+# (Wazuh rule 203, 2026-11-11..13). Root cause: this host's Docker uses the
+# containerd image store (overlayfs + io.containerd.snapshotter.v1), so image
+# layers live under these two paths, which the package ignore list
+# (/var/lib/containerd, /var/lib/docker/overlay2) misses. The 2026-11-13 01:39
+# scan sent 24,488 "owned by root and writable by anyone" results, all inside
+# container image layers; with both paths ignored about 20 host files remain.
+# Host directories and Docker named volumes stay checked; nothing is disabled.
+ROOTCHECK_IGNORE = ('/var/lib/docker/rootfs', '/var/lib/docker/containerd')
+
+
+def tuned_rootcheck(text):
+    """Add only the missing container-image ignores; every other byte is kept."""
+    blocks = re.findall(r'<rootcheck>.*?</rootcheck>', text, flags=re.S)
+    need(len(blocks) == 1, 'host_agent_rootcheck_ambiguous')
+    block = blocks[0]
+    need(re.search(r'<disabled>\s*no\s*</disabled>', block) is not None, 'host_agent_rootcheck_disabled')
+    need(re.search(r'<check_sys>\s*yes\s*</check_sys>', block) is not None, 'host_agent_rootcheck_check_sys_missing')
+    present = {x.strip() for x in re.findall(r'<ignore>([^<]*)</ignore>', block)}
+    missing = [p for p in ROOTCHECK_IGNORE if p not in present]
+    if not missing:
+        return text
+    lines = list(re.finditer(r'([ \t]*)<ignore>[^<]*</ignore>[ \t]*\n', block))
+    if lines:
+        indent, at = lines[-1].group(1), lines[-1].end()
+    else:
+        close = re.search(r'([ \t]*)</rootcheck>$', block)
+        need(close is not None, 'host_agent_rootcheck_layout')
+        indent, at = close.group(1) + '  ', close.start()
+    added = ''.join(indent + '<ignore>' + p + '</ignore>\n' for p in missing)
+    return text.replace(block, block[:at] + added + block[at:], 1)
+
+
 def candidate(raw, address='127.0.0.1'):
     ip = ipaddress.IPv4Address(address)
     need(str(ip) == address and not ip.is_multicast and not ip.is_unspecified, 'host_agent_invalid_endpoint')
@@ -139,7 +172,7 @@ def candidate(raw, address='127.0.0.1'):
         return block
     text, count = re.subn(r'<active-response>.*?</active-response>', disable, text, flags=re.S)
     need(count == 1, 'host_agent_response_missing')
-    return tuned_buffer(text).encode()
+    return tuned_rootcheck(tuned_buffer(text)).encode()
 
 
 def check():
@@ -255,16 +288,16 @@ def install(layout):
         raise
 
 
-def tune_buffer(layout):
-    """Existing install: apply the same buffer sizing, restart once, re-bind the receipt."""
+def _tune(layout, label, transform, applied):
+    """Existing install: apply one reviewed transform, restart once, re-bind the receipt."""
     before = verify(layout)
     receipt = json.loads(read(STATE / 'receipt.json'))
     conf = HOME / 'etc/ossec.conf'; raw = read(conf); gid = grp.getgrnam('wazuh').gr_gid
-    proposed = tuned_buffer(raw.decode()).encode()
+    proposed = transform(raw.decode()).encode()
     if proposed == raw:
-        return {**before, 'buffer': 'already_tuned'}
+        return {**before, label: 'already_tuned'}
     stamp = datetime.now(ZoneInfo('Asia/Seoul')).strftime('%Y%m%dT%H%M%S')
-    backup = STATE / ('ossec.conf.before-buffer-' + stamp)
+    backup = STATE / ('ossec.conf.before-' + label + '-' + stamp)
     atomic(backup, raw)
     try:
         atomic(conf, proposed, gid)
@@ -280,15 +313,23 @@ def tune_buffer(layout):
         atomic(conf, raw, gid)
         run(['systemctl', 'restart', 'wazuh-agent'], check=False, timeout=90)
         raise
-    receipt.update(config_sha256=sha(proposed), buffer={**BUFFER, 'backup': str(backup),
-                   'tuned_at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat()})
+    receipt.update({'config_sha256': sha(proposed), label: {**applied, 'backup': str(backup),
+                    'tuned_at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat()}})
     atomic(STATE / 'receipt.json', (json.dumps(receipt, indent=2) + '\n').encode())
-    return {**verify(layout), 'buffer': BUFFER, 'backup': str(backup)}
+    return {**verify(layout), label: applied, 'backup': str(backup)}
+
+
+def tune_buffer(layout):
+    return _tune(layout, 'buffer', tuned_buffer, dict(BUFFER))
+
+
+def tune_rootcheck(layout):
+    return _tune(layout, 'rootcheck', tuned_rootcheck, {'ignore_added': list(ROOTCHECK_IGNORE)})
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('check', 'install', 'verify', 'tune-buffer'))
+    parser.add_argument('action', choices=('check', 'install', 'verify', 'tune-buffer', 'tune-rootcheck'))
     parser.add_argument('--layout', choices=NAMES, default='fresh')
     args = parser.parse_args()
     need(os.geteuid() == 0, 'host_agent_root_required')
@@ -301,7 +342,8 @@ def main():
         fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
         with os.fdopen(fd, 'r+') as lock:
             trusted(LOCK); fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            result = tune_buffer(args.layout) if args.action == 'tune-buffer' else install(args.layout)
+            actions = {'tune-buffer': tune_buffer, 'tune-rootcheck': tune_rootcheck, 'install': install}
+            result = actions[args.action](args.layout)
     print(json.dumps(result, sort_keys=True))
 
 

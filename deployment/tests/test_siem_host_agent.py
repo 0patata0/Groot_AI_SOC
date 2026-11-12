@@ -1,3 +1,4 @@
+import contextlib
 import importlib.util
 import json
 from pathlib import Path
@@ -16,6 +17,15 @@ RAW = b'''<!-- preserve -->\n<ossec_config>
 <sca><enabled>yes</enabled><scan_on_start>yes</scan_on_start></sca>
 <wodle name="syscollector"><disabled>no</disabled></wodle>
 <syscheck><disabled>no</disabled></syscheck>
+<rootcheck>
+    <disabled>no</disabled>
+    <check_sys>yes</check_sys>
+    <frequency>43200</frequency>
+    <skip_nfs>yes</skip_nfs>
+
+    <ignore>/var/lib/containerd</ignore>
+    <ignore>/var/lib/docker/overlay2</ignore>
+  </rootcheck>
 <active-response><disabled>no</disabled><ca_store>etc/wpk_root.pem</ca_store></active-response>
 </ossec_config><ossec_config><localfile><log_format>journald</log_format>
 <location>journald</location></localfile></ossec_config>'''
@@ -47,6 +57,110 @@ class HostAgent(unittest.TestCase):
                     RAW.replace(b'<queue_size>5000</queue_size>', b'')):
             with self.subTest(bad=bad[:40]), self.assertRaises(ValueError):
                 m.tuned_buffer(bad.decode())
+
+    def test_rootcheck_ignores_container_image_store_only(self):
+        changed = m.tuned_rootcheck(RAW.decode())
+        root = ET.fromstring('<root>' + changed + '</root>')
+        self.assertEqual([x.text for x in root.findall('ossec_config/rootcheck/ignore')],
+                         ['/var/lib/containerd', '/var/lib/docker/overlay2',
+                          '/var/lib/docker/rootfs', '/var/lib/docker/containerd'])
+        self.assertIn('    <ignore>/var/lib/docker/overlay2</ignore>\n'
+                      '    <ignore>/var/lib/docker/rootfs</ignore>\n'
+                      '    <ignore>/var/lib/docker/containerd</ignore>\n  </rootcheck>', changed)
+        # nothing else changes: removing the two added lines restores the input exactly
+        restored = changed.replace('    <ignore>/var/lib/docker/rootfs</ignore>\n', '', 1) \
+                          .replace('    <ignore>/var/lib/docker/containerd</ignore>\n', '', 1)
+        self.assertEqual(restored, RAW.decode())
+        self.assertEqual(m.tuned_rootcheck(changed), changed)  # idempotent
+        self.assertEqual(root.findtext('ossec_config/rootcheck/disabled'), 'no')
+        self.assertEqual(root.findtext('ossec_config/rootcheck/check_sys'), 'yes')
+        # docker named volumes (persistent data) and host paths are never ignored
+        self.assertNotIn('/var/lib/docker/volumes', changed)
+        self.assertNotIn('<ignore>/var/lib/docker</ignore>', changed)
+
+    def test_rootcheck_partial_or_missing_ignore_layouts(self):
+        one = RAW.decode().replace('    <ignore>/var/lib/docker/overlay2</ignore>\n',
+                                   '    <ignore>/var/lib/docker/overlay2</ignore>\n    <ignore>/var/lib/docker/rootfs</ignore>\n')
+        self.assertEqual(m.tuned_rootcheck(one).count('<ignore>/var/lib/docker/rootfs</ignore>'), 1)
+        self.assertEqual(m.tuned_rootcheck(one).count('<ignore>/var/lib/docker/containerd</ignore>'), 1)
+        none = RAW.decode().replace('    <ignore>/var/lib/containerd</ignore>\n', '') \
+                           .replace('    <ignore>/var/lib/docker/overlay2</ignore>\n', '')
+        root = ET.fromstring('<root>' + m.tuned_rootcheck(none) + '</root>')
+        self.assertEqual([x.text for x in root.findall('ossec_config/rootcheck/ignore')], list(m.ROOTCHECK_IGNORE))
+
+    def test_rootcheck_fails_closed_on_unexpected_configuration(self):
+        text = RAW.decode()
+        block = text[text.index('<rootcheck>'):text.index('</rootcheck>') + len('</rootcheck>')]
+        for bad in (text.replace(block, ''), text.replace(block, block + block),
+                    text.replace('<rootcheck>\n    <disabled>no', '<rootcheck>\n    <disabled>yes'),
+                    text.replace('<check_sys>yes</check_sys>', '<check_sys>no</check_sys>')):
+            with self.subTest(bad=bad[-200:]), self.assertRaises(ValueError):
+                m.tuned_rootcheck(bad)
+
+    def test_fresh_candidate_includes_rootcheck_tuning(self):
+        changed = m.candidate(RAW)
+        self.assertIn(b'<ignore>/var/lib/docker/rootfs</ignore>', changed)
+        self.assertIn(b'<ignore>/var/lib/docker/containerd</ignore>', changed)
+
+    def _tune_env(self, directory, raw, run):
+        state = Path(directory)
+        (state / 'receipt.json').write_text(json.dumps({'status': 'connected', 'config_sha256': m.sha(raw)}))
+        written = {}
+        def atomic(path, data, gid=0):
+            written[Path(path).name] = data
+        def read(path):
+            path = Path(path)
+            return written.get('ossec.conf', raw) if path.name == 'ossec.conf' else path.read_bytes()
+        return written, [patch.object(m, 'STATE', state), patch.object(m, 'HOME', state),
+                         patch.object(m, 'verify', return_value={'status': 'connected'}),
+                         patch.object(m, 'read', side_effect=read), patch.object(m, 'atomic', side_effect=atomic),
+                         patch.object(m.grp, 'getgrnam', return_value=types.SimpleNamespace(gr_gid=999)),
+                         patch.object(m, 'run', side_effect=run), patch.object(m.time, 'sleep')]
+
+    def test_tune_rootcheck_backs_up_tests_restarts_and_rebinds_receipt(self):
+        calls = []
+        def run(args, **kw):
+            calls.append(args); return types.SimpleNamespace(returncode=0, stdout=b'')
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / 'var/run').mkdir(parents=True)
+            (Path(directory) / 'var/run/wazuh-agentd.state').write_text("status='connected'\n")
+            written, patches = self._tune_env(directory, RAW, run)
+            with contextlib.ExitStack() as stack:
+                for p in patches: stack.enter_context(p)
+                result = m.tune_rootcheck('groot')
+        self.assertIn(b'<ignore>/var/lib/docker/containerd</ignore>', written['ossec.conf'])
+        self.assertTrue(any(k.startswith('ossec.conf.before-rootcheck-') for k in written))
+        receipt = json.loads(written['receipt.json'])
+        self.assertEqual(receipt['config_sha256'], m.sha(written['ossec.conf']))
+        self.assertEqual(receipt['rootcheck']['ignore_added'], list(m.ROOTCHECK_IGNORE))
+        self.assertEqual(sum(1 for a in calls if a[-1] == '-t'), 4)
+        self.assertIn(['systemctl', 'restart', 'wazuh-agent'], calls)
+        self.assertEqual(result['rootcheck'], {'ignore_added': list(m.ROOTCHECK_IGNORE)})
+
+    def test_tune_rootcheck_syntax_failure_restores_original(self):
+        calls = []
+        def run(args, **kw):
+            calls.append(args)
+            if args[-1] == '-t': raise ValueError('syntax_failed')
+            return types.SimpleNamespace(returncode=0, stdout=b'')
+        with tempfile.TemporaryDirectory() as directory:
+            written, patches = self._tune_env(directory, RAW, run)
+            with contextlib.ExitStack() as stack:
+                for p in patches: stack.enter_context(p)
+                with self.assertRaisesRegex(ValueError, 'syntax_failed'): m.tune_rootcheck('groot')
+        self.assertEqual(written['ossec.conf'], RAW)  # original bytes written back
+        self.assertNotIn('receipt.json', written)
+        self.assertIn(['systemctl', 'restart', 'wazuh-agent'], calls)
+
+    def test_tune_rootcheck_already_applied_changes_nothing(self):
+        tuned = m.tuned_rootcheck(RAW.decode()).encode()
+        calls = []
+        with tempfile.TemporaryDirectory() as directory:
+            written, patches = self._tune_env(directory, tuned, lambda a, **k: calls.append(a))
+            with contextlib.ExitStack() as stack:
+                for p in patches: stack.enter_context(p)
+                self.assertEqual(m.tune_rootcheck('groot')['rootcheck'], 'already_tuned')
+        self.assertEqual((written, calls), ({}, []))
 
     def test_reject_existing_or_duplicate_clients(self):
         for bad in (RAW.replace(b'MANAGER_IP', b'192.0.2.10'), RAW + RAW,

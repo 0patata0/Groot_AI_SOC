@@ -60,3 +60,7 @@
 ## 3. 서버 운영 상태 (17:57~18:03 KST 관측)
 
 A/B/C 실패 unit 0, 디스크 사용 21~29%, 메모리 여유 67~81%, 시간 동기화 정상, 재부팅 필요 없음. Wazuh 에이전트 3대 Active, 경보 적재 최신, IDS·WAF 로그 갱신 1초 이내, WAF→DVWA 200, 채팅 HTTPS 200, Mattermost OK, Thor 학습 모델 적재 상태. A Vector는 11/9 18:05 수집 커서 보류로 두 번 시작 실패 후 18:06:33 자동 기동(공백 약 84초). A suricata는 11/10 12:02 룰 변경 적용과 함께 재기동.
+
+## 11/13 후속: 버퍼 확대만으로는 해결되지 않음
+
+18:44 B 버퍼 확대(20000/1000) 뒤에도 rule 203이 11/11 06:45, 11/12 13:38, 11/13 01:43에 재발했다. 매니저 rootcheck 결과를 보면 스캔마다 컨테이너 이미지 계층(`/var/lib/docker/rootfs`·`/var/lib/docker/containerd`, containerd 이미지 저장소) 안의 world-writable 파일 약 2.4만 건을 보고하고 있었다. 패키지 기본 제외 목록에 이 두 경로가 없는 것이 근본 원인이다. 두 경로를 rootcheck 제외에 추가하는 후보(`tune-rootcheck`)와 근거·드라이런은 [rule 203 후보](../validation/rule203/README.md)에 있다. 이번 기록의 "A는 미적용" 상태는 그대로다.

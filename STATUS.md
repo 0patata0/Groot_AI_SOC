@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-13 01:52 KST
+# 인프라 현황 — 2026-11-13 02:02 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 발표**이며 미완료다. 정확성이 속도보다 우선이다. 최신 균형1,220건 학습본을 운영하면서 보완한다. 학습본 사용과 독립적인 정확도 우위는 구분한다. [활성 계획](PLAN.md) · [직전 상세 상태·실패 이력](archive/STATUS_HISTORY.md#source-a961b1d1c0e72743).
 
@@ -34,7 +34,7 @@
 
 ## 현재 작업: 에이전트 큐/병목 원인 분석(#7) (11/12 23:07, 라이브 B 읽기전용 진단)
 
-**11/13 01:46 정정·추가 진단(라이브 B 읽기전용)**: 제목의 "에이전트 큐 가득 참"은 문자 그대로 Wazuh 기본 룰 **203 "Agent event queue is full. Events may be lost."**(level 9)다. B 자체 에이전트(groot-siem-host, v4.14.8)에서 **약 12시간 간격**으로 반복된다(11/8 22:21 ~ 11/13 01:43, 11건). A(groot-sec)는 10/29~11/5에 108건이 있었으나 원인은 미확인이다. B 에이전트 로그로 원인을 직접 확인했다. **rootcheck 스캔(주기 43200초) 시작 15초 뒤 클라이언트 버퍼(queue_size 20000·1000 eps)가 90%→가득 참이 됐고 약 7초 뒤 회복**했다. 같은 주기의 SCA·FIM에서는 버퍼 경고가 없었다. 매번 일부 이벤트 유실 가능성이 있고, 경보마다 컨트롤러 사건 1건(단일 슬롯 조사 최대 ~300초)이 생긴다. 아래 컨트롤러 적체 분석은 별개의 유효한 병목으로 유지한다. 개선(버퍼 queue_size 상향 또는 rootcheck 범위·주기 조정)은 에이전트 설정 변경·재시작이라 **승인 후 별도 진행**한다(미실행). [진단 이력](archive/DIAGNOSTIC_HISTORY.md).
+**rule 203(에이전트 버퍼 가득 참) 근본 원인·후보(11/13 02:00, 라이브 B 읽기전용·후보 미적용)**: 제목의 "에이전트 큐 가득 참"은 Wazuh 기본 룰 203 "Agent event queue is full. Events may be lost."다. 11/10에 이를 B 버퍼 포화로 파악해 버퍼를 5000/500에서 20000/1000으로 키웠지만([11/10 분석](infra/hermes/latency-and-queue-20261110.md)), **11/11 06:45·11/12 13:38·11/13 01:43에 재발해 효과가 없었다**. 11/13 근본 원인을 확인했다. 12시간 주기 rootcheck가 스캔마다 **24,488건**을 보고하는데, 전부 컨테이너 이미지 계층(`/var/lib/docker/rootfs` 17,105·`/var/lib/docker/containerd` 7,373)의 world-writable 파일이다. B Docker는 containerd 이미지 저장소(`io.containerd.snapshotter.v1`)를 쓰는데 패키지 기본 제외(`/var/lib/containerd`·`overlay2`)에 이 두 경로가 없다. 그 결과 버퍼가 약 15초 만에 넘치고, 현 기동 이후 최소 약 10,400건이 전송되지 못했다. **후보**: 기존 `tune-buffer`와 같은 안전 흐름(영수증 검증·백업·4데몬 `-t`·재시작·연결 확인·영수증 재결속·실패 시 복원)을 공유하는 `siem_host_agent.py tune-rootcheck`로 두 경로만 rootcheck 제외에 추가한다(새 설치 후보에도 반영). rootcheck·check_sys·호스트 경로·named volume 검사는 유지하며 잔여 대상은 약 20건으로 추정된다. 로컬 테스트 19/19. 라이브 드라이런: 영수증 SHA 일치, 변경은 ignore 2줄뿐, 임시 사본 문법검사 통과(modulesd는 `-c` 미지원으로 적용 시 제자리 검사), 라이브 불변. **함께 드러난 사항(조치 미실행)**: 노이즈에 묻혀 있던 B의 **누구나 쓰기 가능한 Wazuh 인덱서 보안설정 백업 10개**(`secbak-20260926-121235/`, 내용 미열람)와 기타 o+w 파일. A의 203(10/29·11/2·11/5, 각 2~3분)은 rootcheck와 무관하며 시험 트래픽 시 센서 로그 폭주로 추정한다. A 버퍼는 기본 5000/500이고 수집 가드 고정 SHA와 함께 바꿔야 해 별도 후보다. 아래 컨트롤러 적체 분석(11/12)은 이와 별개의 유효한 병목이다. [후보·근거](infra/validation/rule203/README.md)·[진단 이력](archive/DIAGNOSTIC_HISTORY.md).
 
 B(관리자231 경유) 읽기전용 관측으로 "큐 가득 참"의 **구조적 원인**을 규명했다. **지금 큐는 비어 있다**(due_backlog 0·실행 중 0·inbox 처리 완료) — 상시가 아니라 경보 급증(DDoS) 구간의 부하 현상이다.
 
@@ -69,7 +69,7 @@ B(관리자231 경유) 읽기전용 관측으로 "큐 가득 참"의 **구조적
 
 - **LLM 룰-조회 반영**: `get_security_rules`는 라이브 룰을 읽으므로 플러드 룰을 **이미 인지**(11/10 `matched_count:1` 확인, 이번에 라이브 1000090/1000091 존재 재확인). 룰변경 베이스라인(`get_rule_change_target`)도 라이브 기준이라 정합. 컨테인먼트 EXCLUDED_SIDS에 플러드 SID 미포함=공격으로 차단 적격(정상).
 - **구분**: 이번 작업은 **설치기 소스의 관리상태 동기화**(재현성)이며, 플러드 룰의 실제 적용은 11/10 완료분이다. 룰의 탐지→상관→LLM 인지 **재재생 E2E**는 관리자 승인 경로의 후속 과제로 남는다(미실행). 라이브 대조 원문 `대화기록/검증/2026-11-12-flood-sync/`(로컬).
-- **후속 정정(11/13 01:45, 테스트만)**: 이 동기화(`7bfa704`)로 Suricata 소스가 14→**17**개(커스텀 15+ET 재정의 2)가 됐는데, 이 소스를 고정 입력으로 쓰는 회귀(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`·`test_completion.py`)가 옛 14개 기대값으로 남아 실패하던 것을 발견해 17개(SID 1000020·1000090·1000091 포함)로 갱신했다. 렌더러·집계 코드는 바꾸지 않았다. 같은 점검에서 #5 Unit 1~3의 Harness² 도구가 **B 전용**이 된 뒤 갱신되지 않은 경계 회귀 `test_rule_readonly_boundary`도 호스트별 **정확한 도구 집합**(A 읽기5/쓰기4·B 읽기6/쓰기6, 읽기∩쓰기 없음)으로 갱신했다. 결과: query-completion 408 통과, mcp 708 중 23 오류는 모두 기존 `test_soc_management_events`의 macOS 임시경로 환경 오류(`outbox_parent_not_directory`, 이번 변경과 무관)다.
+- **후속 정정(11/13 01:45, 테스트만)**: 이 동기화(`7bfa704`)로 Suricata 소스가 14→**17**개(커스텀 15+ET 재정의 2)가 됐는데, 이 소스를 고정 입력으로 쓰는 회귀(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`·`test_completion.py`)가 옛 14개 기대값으로 남아 실패하던 것을 발견해 17개(SID 1000020·1000090·1000091 포함)로 갱신했다. 렌더러·집계 코드는 바꾸지 않았다. 같은 점검에서 #5 Unit 1~3의 Harness² 도구가 **B 전용**이 된 뒤 갱신되지 않은 경계 회귀 `test_rule_readonly_boundary`도 호스트별 **정확한 도구 집합**(A 읽기5/쓰기4·B 읽기6/쓰기6, 읽기∩쓰기 없음)으로 갱신했다. 결과: query-completion 408 통과, mcp 708 중 23 오류는 모두 기존 `test_soc_management_events`의 macOS 임시경로 환경 오류(`outbox_parent_not_directory`, 이번 변경과 무관)다. 02:05에는 같은 원인으로 남아 있던 설치기 회귀 `deployment/tests/test_soc_management.py`의 도구 개수 기대값도 정확한 호스트별 집합으로 갱신했다. deployment 322개 중 실패는 다른 작업의 미추적 파일 `test_firewall_nat` 1건뿐이다.
 
 ## 현재 작업: 전원복귀(콜드부트) 복구 — outer 타임아웃·Vector 로테이션 (11/12 21:16, 라이브 A/B/C)
 

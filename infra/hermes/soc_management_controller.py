@@ -633,6 +633,60 @@ def missing_sca_policy_query(name, arguments, output):
     return None
 
 
+# A containment call is refused for two distinct reasons. One is that the target
+# is simply not an eligible subject for an emergency block: no server-verified
+# recent attack flow, a protected/never_block/local/DNS/SSH address, or a
+# non-canonical address. The helper decides this deterministically and the
+# investigation prompt tells the model to accept such a refusal and continue —
+# it is an expected outcome, not a tool failure. The other reason is that the
+# containment evidence or firewall machinery is broken (sensor log missing,
+# unexpected set representation, mutation lock); those remain genuine tool
+# errors. Only the exact eligibility messages below are treated as expected, so
+# any future or infrastructure message falls back to the tool-error path.
+CONTAINMENT_NOT_ELIGIBLE = frozenset((
+    "source must be a canonical public or RFC1918 IPv4",
+    "protected, special-use, or non-canonical source address",
+    "no recent inbound severity-1/2 attack flow observed by the trusted sensor",
+    "no verified recent Suricata attack flow or WAF attack denial; containment refused",
+    "source is in the live never_block set",
+    "source is a local address or gateway",
+    "source is a configured DNS resolver",
+    "source is an active SSH or outgoing service endpoint",
+))
+
+
+def containment_not_eligible(name, output):
+    """Return the exact refusal reason when a temporary-containment call was
+    refused because the target is not eligible for a block; None otherwise.
+
+    Only the temporary-containment tool is considered, and only the fixed
+    eligibility messages match. Evidence/firewall infrastructure failures are
+    deliberately excluded so they still surface as tool errors for review."""
+    if name != "mcp__rule_write_a__temporarily_contain_ip":
+        return None
+    for _ in range(8):
+        if isinstance(output, str):
+            try:
+                output = json.loads(output)
+                continue
+            except ValueError:
+                break
+        if not isinstance(output, dict):
+            return None
+        if isinstance(output.get("error"), str):
+            output = output["error"]
+        elif set(output) == {"result"}:
+            output = output["result"]
+        elif (isinstance(output.get("content"), list) and len(output["content"]) == 1
+              and isinstance(output["content"][0], dict) and output["content"][0].get("type") == "text"):
+            output = output["content"][0].get("text")
+        else:
+            return None
+    if isinstance(output, str) and output in CONTAINMENT_NOT_ELIGIBLE:
+        return output
+    return None
+
+
 def healthy_observation(value):
     return (isinstance(value, dict) and value.get("running") is True
             and value.get("health") in ("healthy", "none", "not_reported")
@@ -986,6 +1040,7 @@ class Trace:
         self.bundle_impact_receipts = set()
         self.bundle_sensor_receipts = set()
         self.unblocks_pending_readback = set()
+        self.expected_containment_refusals = set()
 
     def record_sensor_read(self,name,arguments,payload):
         source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
@@ -1048,12 +1103,20 @@ class Trace:
             recoverable = missing_sca_policy_query(name, self.arguments[pending[0]["ordinal"]], event.get("output")) if error else None
             recoverable_time = event_time_query_scope(name, self.arguments[pending[0]["ordinal"]], event.get("output")) if error else None
             recoverable_scope=required_sensor_scope_error(name,event.get('output'),self.required_sensor_reads) if error else None
+            containment_refusal = containment_not_eligible(name, event.get("output")) if error else None
             if recoverable:
                 self.pending_sca_argument_errors.add(recoverable)
             elif recoverable_time and self.sensor_requirements:
                 self.pending_event_time_errors.add(recoverable_time)
             elif recoverable_scope:
                 self.pending_required_sensor_errors.add(recoverable_scope)
+            elif containment_refusal:
+                # A deterministic containment-eligibility refusal is an expected
+                # outcome, not a tool failure: the prompt directs the model to
+                # accept the refusal and keep investigating. Record it for the
+                # run trace but leave self.tool_error unset so the run is not
+                # forced into model_tool_failure review.
+                self.expected_containment_refusals.add(containment_refusal)
             else:
                 self.tool_error |= error
             with db:

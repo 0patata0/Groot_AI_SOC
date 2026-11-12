@@ -2,6 +2,15 @@
 
 이 문서는 과거 기록입니다. 현재 상태는 [STATUS](../STATUS.md), 실행 계획은 [PLAN](../PLAN.md)을 따릅니다. 같은 내용을 반복한 부분은 하나의 본문으로 연결했습니다. 서로 다른 날짜·판단·실패·정정은 합쳐 단정하지 않습니다. [정리·복원 안내](README.md).
 
+## chatproxy 단일 파일 bind-mount stale — 설정 변경은 reload가 아닌 재시작 필요 (2026-11-12)
+
+라이브에서 직접 확인한 사실. A의 chatproxy 컨테이너는 `/home/groot_a/capstone/chatproxy/nginx.conf`를 **단일 파일 bind-mount(ro)**로 `/etc/nginx/nginx.conf`에 올린다. 이 호스트 파일을 원자적 rename(`os.replace`/`mv`)으로 교체하면 호스트 경로는 새 inode를 가리키지만, 컨테이너의 파일 bind-mount는 **마지막 컨테이너 시작 시점의 옛 inode에 고정**된다. 그 결과 `nginx -t`·`nginx -s reload`는 전부 옛 설정만 보고, 호스트 파일 수정이 라이브에 전혀 반영되지 않는다.
+
+- 증거: 호스트 파일 inode 1442122(수정 mtime 11/12 16:50) ↔ 컨테이너 `/etc/nginx/nginx.conf` inode 1441919(mtime 11/4 02:37, 옛 내용). 마운트 선언은 존재하나 내용·mtime·inode가 서로 다름.
+- 영향: 과거 "대시보드 임시 개방 시도가 게이트를 제거했는데도 403 지속"의 **실제 원인**. ACL/시간창 문제가 아니라 reload 미반영이었다.
+- 올바른 절차: ① 호스트 파일은 **제자리 기록**(truncate+write, inode 보존)으로 수정 → ② 적용 전 임시 `--rm` 컨테이너로 문법 검증(현재 파일을 새로 마운트하므로 라이브는 재시작 전까지 영향 없음) → ③ `docker restart chatproxy`로 마운트를 현재 inode에 재결속 → ④ 재시작 후에는 제자리 기록 + reload로 추가 변경 반영 가능. rename 교체를 쓰지 않는다.
+- 구분: 이 항목은 운영 교훈이다. 실제 공격·탐지·대응 E2E나 소스 동기화 완료를 뜻하지 않는다. 임시 개방은 TTL 원복으로 복귀하며 기준 설정(게이트 유지)은 소스와 동일하다.
+
 | 원문 마지막 Git 기록(KST) | 보존한 문서 |
 |---|---|
 | 2026-11-07T00:42:48+09:00 | [diagnostic-navigation-common41-20261107.md](#source-f629bdb3b39925b3) |

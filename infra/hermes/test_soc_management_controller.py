@@ -835,6 +835,64 @@ class ControllerTests(unittest.TestCase):
         self.tool(trace,name,payload,{'agent_id':'001','policy_id':'cis','title_contains':'HostbasedAuthentication'})
         self.result(trace);self.assertEqual(trace.finish(0)['state'],'needs_review')
 
+    CONTAIN='mcp__rule_write_a__temporarily_contain_ip'
+
+    def containment_trace(self, tag):
+        event=self.alert(tag,'2026-10-26T12:00:00Z',rule='100112')
+        event.update(src_ip='203.0.113.50',location='/logs/suricata/eve.json')
+        self.alerts(event)
+        return self.trace()
+
+    def test_containment_eligibility_refusal_is_expected_not_a_tool_failure(self):
+        # The helper deterministically refuses containment when the target is not
+        # an eligible subject; the prompt tells the model to accept that and keep
+        # investigating, so the refusal must not force model_tool_failure review.
+        trace=self.containment_trace('contain-elig')
+        reasons=['no verified recent Suricata attack flow or WAF attack denial; containment refused',
+                 'no recent inbound severity-1/2 attack flow observed by the trusted sensor',
+                 'source is in the live never_block set',
+                 'source is a local address or gateway',
+                 'source is a configured DNS resolver',
+                 'source is an active SSH or outgoing service endpoint',
+                 'protected, special-use, or non-canonical source address',
+                 'source must be a canonical public or RFC1918 IPv4']
+        for reason in reasons:
+            self.tool(trace,self.CONTAIN,{'error':reason},{'ip':'203.0.113.50','reason':'invest'},error=True)
+            self.assertIn(reason, trace.expected_containment_refusals, reason)
+        self.assertFalse(trace.tool_error)  # no eligibility refusal marks the run a tool failure
+        # Every refused attempt is still preserved in the audit trail.
+        self.assertEqual(self.store.db.execute(
+            'select count(*) from tool_calls where run_id=? and is_error=1',(trace.run_id,)).fetchone()[0], len(reasons))
+
+    def test_containment_infrastructure_error_still_requires_review(self):
+        # Evidence/firewall failures are genuine tool errors, never swallowed.
+        trace=self.containment_trace('contain-infra')
+        for reason in ('live Suricata evidence log is unavailable',
+                       'managed sensor evidence unavailable or insufficient; no legacy fallback',
+                       'unexpected firewall set representation',
+                       'evidence source is not a regular sensor log'):
+            self.tool(trace,self.CONTAIN,{'error':reason},{'ip':'203.0.113.50','reason':'invest'},error=True)
+            self.assertTrue(trace.tool_error, reason)
+            self.assertNotIn(reason, trace.expected_containment_refusals)
+        self.assertFalse(trace.expected_containment_refusals)  # no infra error was ever treated as expected
+
+    def test_containment_not_eligible_scope_and_envelope_shapes(self):
+        reason='no verified recent Suricata attack flow or WAF attack denial; containment refused'
+        env=json.dumps({'content':[{'type':'text','text':json.dumps({'error':reason})}],'isError':True})
+        self.assertEqual(m.containment_not_eligible(self.CONTAIN, env), reason)
+        # The same eligibility text on any other tool never matches.
+        self.assertIsNone(m.containment_not_eligible('mcp__rule_write_b__propose_rule_edit', env))
+        self.assertIsNone(m.containment_not_eligible('mcp__security_events__get_wazuh_sca_checks', env))
+        # An infrastructure error is never treated as an expected refusal.
+        infra=json.dumps({'content':[{'type':'text','text':json.dumps({'error':'live Suricata evidence log is unavailable'})}],'isError':True})
+        self.assertIsNone(m.containment_not_eligible(self.CONTAIN, infra))
+        # Nested {"result": ...} envelope unwraps the same way.
+        nested=json.dumps({'result':json.dumps({'error':reason})})
+        self.assertEqual(m.containment_not_eligible(self.CONTAIN, nested), reason)
+        # A non-refusal success payload does not match.
+        ok=json.dumps({'content':[{'type':'text','text':json.dumps({'request_id':'abc','status':'pending'})}],'isError':False})
+        self.assertIsNone(m.containment_not_eligible(self.CONTAIN, ok))
+
     def test_broker_signature_is_bound_to_nonce_status_body_and_query(self):
         good = m.Broker("x" * 32, opener=Opener(), clock=lambda: 1000)
         self.assertEqual(good.get("/management/events?after=0&limit=100")["events"], [])

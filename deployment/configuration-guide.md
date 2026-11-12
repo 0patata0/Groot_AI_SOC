@@ -76,6 +76,7 @@ LAB_PUBLIC_ORIGIN=https://lab.example.org
 LAB_HTTPS_PORT=443
 LAB_ALLOWED_CIDRS=192.168.10.0/24
 LAB_PROXY_SUBNET=172.30.247.0/29
+CHAT_SUBNET=172.30.248.0/28
 LAB_GATEWAY_PORT=18091
 LAB_WHEEL_DIR=/opt/capstone-prereqs/wheels
 LAB_MANIFEST=/opt/capstone-prereqs/cve_list.json
@@ -99,6 +100,7 @@ LLM_MODEL=qwen3.6:35b
 | `LAB_PUBLIC_ORIGIN`, `LAB_HTTPS_PORT` | 필수 HTTPS DNS origin과 같은 포트. path·사용자정보·query 금지. 기본443은 origin에 생략 |
 | `LAB_ALLOWED_CIDRS` | 쉼표로 구분한 1~32개 고유 RFC1918 IPv4 CIDR, 또는 모든 출발지의 실습 웹 접근을 명시하는 단독 값 `all`. `all`과 CIDR 혼합·`0.0.0.0/0`은 거절. SSH·Wazuh·MCP 접근 정책과 별개 |
 | `LAB_PROXY_SUBNET` | security 전용 프록시의 사설 /29. 호스트 route·기존 Docker·클라이언트 CIDR과 충돌 금지 |
+| `CHAT_SUBNET` | SIEM 채팅 네트워크(Mattermost·Postgres·Hermes)의 사설 /24~/29. 두 번째 주소=Mattermost, 세 번째=Postgres, 네 번째=Hermes로 고정한다. 승인 브로커는 Mattermost 주소 하나만 카드 콜백 출처로 신뢰한다. 고정하지 않으면 재부팅 때 시작 순서로 주소가 바뀌어 카드 승인이 거부된다(2026-11-12 B 실제 사례). 호스트 route·기존 Docker와 충돌 금지(설치기가 검사). 기본 `172.30.248.0/28` |
 | `LAB_GATEWAY_PORT` | service 내부 gateway 포트, 기본18091. security와 service loopback만 허용하며 사용자 공개 주소가 아님 |
 | `LAB_WHEEL_DIR` | service의 Python3.12 amd64용 전체 고정 wheel 목록. 설치기는 인터넷 대신 이 입력으로 콘솔 환경 준비 |
 | `LAB_MANIFEST` | service의 고정 6항목 카탈로그. Java/Apache2개는 정확한 로컬 image ID, Redis/Samba/sudo는 고정 managed-terminal3개; sudo는 별도 rootless 런타임 |

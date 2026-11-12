@@ -23,6 +23,10 @@ LLM = os.environ.get('LLM_BASE_URL', '')
 MODEL = os.environ.get('LLM_MODEL', '')
 TUNNEL_CONFIG = os.environ.get('LLM_TUNNEL_CONFIG', '')
 SSH_PORT = os.environ.get('SSH_PORT', '22')
+# Dedicated chat network with fixed container addresses. The approval broker
+# trusts exactly the Mattermost address for button callbacks; a dynamic
+# address can swap with Postgres on reboot (B, 2026-11-12), refusing every card.
+CHAT_SUBNET = os.environ.get('CHAT_SUBNET', '172.30.248.0/28')
 MCP_USER, HERMES_USER = 'capstone-mcp', 'capstone-hermes'
 NAMES = {'wazuh.manager': 'capstone-wazuh-manager', 'wazuh.indexer': 'capstone-wazuh-indexer',
          'wazuh.dashboard': 'capstone-wazuh-dashboard', 'postgres': 'capstone-postgres',
@@ -99,6 +103,38 @@ def run(argv, timeout=30, data=None):
             publish(p, r.stderr[:2*1024*1024])
         raise Refused('command_failed_' + pathlib.Path(argv[0]).name + '_rc_' + str(r.returncode))
     return r.stdout
+def chat_addresses(value=None):
+    try:
+        net = ipaddress.IPv4Network(value or CHAT_SUBNET, strict=True)
+    except ValueError:
+        raise Refused('invalid_CHAT_SUBNET') from None
+    need(net.is_private and 24 <= net.prefixlen <= 29, 'CHAT_SUBNET_private_24_to_29_required')
+    need(not IP or ipaddress.IPv4Address(IP) not in net, 'SIEM_HOST_overlaps_CHAT_SUBNET')
+    hosts = list(net.hosts())
+    return {'subnet': str(net), 'gateway': str(hosts[0]), 'mattermost': str(hosts[1]),
+            'postgres': str(hosts[2]), 'hermes': str(hosts[3])}
+def chat_conflicts(addresses):
+    # Same rules as deployment/offline_security.py conflicts(): only this
+    # project's own chat network may already use the subnet.
+    wanted = ipaddress.ip_network(addresses['subnet']); ignored = set()
+    for nid in run(['docker', 'network', 'ls', '-q', '--no-trunc']).decode().split():
+        network = parse(run(['docker', 'network', 'inspect', nid]))[0]
+        for entry in (network.get('IPAM') or {}).get('Config') or []:
+            if not entry.get('Subnet'): continue
+            subnet = ipaddress.ip_network(entry['Subnet'])
+            if subnet.version == 4 and subnet.overlaps(wanted):
+                need(network['Name'] == PROJECT + '_chat' and subnet == wanted, 'CHAT_SUBNET_docker_conflict')
+                ignored.add((network.get('Options') or {}).get('com.docker.network.bridge.name', 'br-' + nid[:12]))
+    for row in parse(run(['ip', '-j', 'address', 'show'])):
+        for a in row.get('addr_info', []):
+            if a.get('family') == 'inet':
+                actual = ipaddress.ip_network(a['local'] + '/' + str(a['prefixlen']), strict=False)
+                need(not actual.overlaps(wanted) or row.get('ifname') in ignored, 'CHAT_SUBNET_interface_conflict')
+    for route in parse(run(['ip', '-j', 'route', 'show', 'table', 'all'])):
+        dst = route.get('dst', 'default')
+        if dst == 'default' or ':' in dst: continue
+        need(not ipaddress.ip_network(dst, strict=False).overlaps(wanted) or route.get('dev') in ignored,
+             'CHAT_SUBNET_route_conflict')
 def compose_args(file):
     return ['docker', 'compose', '--project-name', PROJECT, '--project-directory', str(file.parent), '-f', str(file)]
 def log_pipeline(action):
@@ -291,6 +327,7 @@ def preflight():
     need(int(pathlib.Path('/proc/sys/vm/max_map_count').read_text()) >= 262144, 'manual_vm_max_map_count_262144_required')
     address = parse(run(['ip', '-j', '-4', 'address', 'show']))
     need(any(v.get('local') == IP for row in address for v in row.get('addr_info', [])), 'SIEM_HOST_not_local')
+    chat_conflicts(chat_addresses())
     cfg = parse(read(PRE/'siem.json', 16384, True))
     need(set(cfg) == KEYS and cfg['schema_version'] == 1, 'siem_json_exact_schema_required')
     for k in KEYS - {'schema_version'}:
@@ -503,11 +540,12 @@ def write_compose(c, images):
                             'target':'/wazuh-config-mount/'+target,'read_only':True})
     m.setdefault('environment', {})['TZ'] = 'Asia/Seoul'
     c.setdefault('volumes', {})['capstone_postgres'] = {'name':PROJECT+'_postgres'}
-    c.setdefault('networks', {})['chat'] = {'name':PROJECT+'_chat'}
+    chat = chat_addresses()
+    c.setdefault('networks', {})['chat'] = {'name':PROJECT+'_chat','ipam':{'config':[{'subnet':chat['subnet'],'gateway':chat['gateway']}]}}
     c['services']['postgres'] = {'image':images['postgres'],'pull_policy':'never','container_name':NAMES['postgres'],
         'restart':'unless-stopped','environment':{'POSTGRES_USER':'mattermost','POSTGRES_DB':'mattermost',
         'POSTGRES_PASSWORD':cfg['postgres_password']},'volumes':[{'type':'volume','source':'capstone_postgres','target':'/var/lib/postgresql/data'}],
-        'networks':['chat'],'healthcheck':{'test':['CMD-SHELL','pg_isready -U mattermost -d mattermost'],'interval':'5s','timeout':'3s','retries':40}}
+        'networks':{'chat':{'ipv4_address':chat['postgres']}},'healthcheck':{'test':['CMD-SHELL','pg_isready -U mattermost -d mattermost'],'interval':'5s','timeout':'3s','retries':40}}
     mm = {'MM_SQLSETTINGS_DRIVERNAME':'postgres','MM_SQLSETTINGS_DATASOURCE':
           'postgres://mattermost:'+urllib.parse.quote(cfg['postgres_password'],safe='')+'@postgres:5432/mattermost?sslmode=disable&connect_timeout=10',
           'MM_SERVICESETTINGS_SITEURL':'https://'+IP+':8444','MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION':'true',
@@ -519,7 +557,7 @@ def write_compose(c, images):
         mmvol.append({'type':'bind','source':str(target),'target':'/mattermost/'+name})
     c['services']['mattermost'] = {'image':images['mattermost'],'pull_policy':'never','container_name':NAMES['mattermost'],
         'restart':'unless-stopped','depends_on':{'postgres':{'condition':'service_healthy'}},'environment':mm,
-        'networks':['chat'],'ports':[{'target':8065,'published':'8065','host_ip':IP,'protocol':'tcp'}],'volumes':mmvol}
+        'networks':{'chat':{'ipv4_address':chat['mattermost']}},'ports':[{'target':8065,'published':'8065','host_ip':IP,'protocol':'tcp'}],'volumes':mmvol}
     publish(DEST/'compose.core.json', canonical(c))
     return c
 def prepare_files(c, snap, images):
@@ -705,7 +743,7 @@ os.execve(args[0],args,env)
     c['services']['hermes']={'image':images['hermes'],'pull_policy':'never','container_name':NAMES['hermes'],
         'restart':'unless-stopped','environment':{'HERMES_UID':str(hu.pw_uid),'HERMES_GID':str(hu.pw_gid),
             'UV_OFFLINE':'1','PIP_NO_INDEX':'1','TZ':'Asia/Seoul'},'volumes':[{'type':'bind','source':str(data),'target':'/opt/data'}],
-        'command':['gateway','run'],'networks':['chat']}
+        'command':['gateway','run'],'networks':{'chat':{'ipv4_address':chat_addresses()['hermes']}}}
     publish(DEST/'compose.json',canonical(c))
     return hu
 def image_probe(image):

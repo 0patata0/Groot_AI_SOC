@@ -1223,6 +1223,41 @@ class ControllerTests(unittest.TestCase):
         self.alerts(self.alert("three", rule="100111"))
         self.assertEqual(self.store.db.execute("SELECT count(*) FROM cases").fetchone()[0], 2)
 
+    def test_many_source_flood_joins_one_case_only_for_configured_rules(self):
+        def at(aid, ip, rule):
+            a = self.alert(aid, "2026-10-15T00:00:10Z", rule); a["src_ip"] = ip; return a
+        # Default (not configured): per-source grouping is unchanged.
+        self.alerts(at("a1", "198.51.100.1", "100112"), at("a2", "198.51.100.2", "100112"))
+        self.assertEqual(self.store.db.execute("SELECT count(*) FROM cases").fetchone()[0], 2)
+        # Operator marks 100112 as a volumetric-flood rule: many sources -> one case,
+        # every alert still preserved as evidence.
+        self.store.set_meta("flood_rule_ids", "100112, bad-id")
+        self.assertEqual(self.store.flood_rule_ids(), frozenset({"100112"}))
+        self.alerts(*[at("f%d" % i, "203.0.113.%d" % i, "100112") for i in range(1, 6)])
+        flood_cases = {r[0] for r in self.store.db.execute(
+            "SELECT case_id FROM inbox WHERE event_key IN (SELECT event_key FROM inbox) AND payload LIKE '%203.0.113.%'")}
+        self.assertEqual(len(flood_cases), 1)
+        self.assertEqual(self.store.db.execute(
+            "SELECT count(*) FROM inbox WHERE payload LIKE '%203.0.113.%'").fetchone()[0], 5)
+        # A rule outside the configured set keeps per-source cases.
+        self.alerts(at("o1", "192.0.2.1", "100110"), at("o2", "192.0.2.2", "100110"))
+        other = {r[0] for r in self.store.db.execute(
+            "SELECT case_id FROM inbox WHERE payload LIKE '%192.0.2.%'")}
+        self.assertEqual(len(other), 2)
+
+    def test_truncated_poll_records_overflow_volume(self):
+        self.assertIsNone(self.store.summary()["alert_overflow_last"])
+        self.store.ingest_alerts({"alerts": [self.alert("x")], "total": 742,
+                                  "total_relation": "eq", "truncated": True})
+        overflow = self.store.summary()["alert_overflow_last"]
+        self.assertEqual((overflow["total"], overflow["included"], overflow["dropped_at_least"]), (742, 1, 741))
+        self.assertEqual(overflow["poll_limit"], 500)
+        # A later fully-covered poll keeps the last overflow as history.
+        self.now += 60
+        self.alerts(self.alert("y"))
+        self.assertFalse(self.store.summary()["alert_truncated"])
+        self.assertEqual(self.store.summary()["alert_overflow_last"]["total"], 742)
+
     def test_incident_and_alert_share_batch_without_same_indexer_id(self):
         self.events(self.incident())
         self.alerts(self.alert("unrelated-index-id", "2026-10-15T00:00:30+00:00"))

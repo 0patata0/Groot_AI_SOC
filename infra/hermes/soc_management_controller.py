@@ -263,8 +263,14 @@ class Store:
         return digest(canonical([str(p) for p in pieces])) if all(p not in (None, "") for p in pieces) else None
 
     @staticmethod
-    def batch_identity(payload, kind):
-        """Transport batching only; the LLM still judges every preserved event."""
+    def batch_identity(payload, kind, flood_ids=frozenset()):
+        """Transport batching only; the LLM still judges every preserved event.
+
+        flood_ids: operator-configured rule IDs that detect volumetric floods.
+        For those rules only, the source address is left out of the grouping
+        signature so a many-source flood joins one investigation; every alert
+        (with its own source) is still preserved as evidence in that case.
+        Empty by default -> unchanged per-source grouping."""
         if kind not in ("incident", "alert"):
             return None
         agent = payload.get("agent_id") if kind == "incident" else (payload.get("agent") or {}).get("id")
@@ -280,8 +286,16 @@ class Store:
             ip = str(ipaddress.ip_address(payload["src_ip"]))
         except (ValueError, TypeError, KeyError, OverflowError):
             return None
-        signature = digest(canonical([str(agent), str(rule), ip]))
+        source_key = "volumetric_flood" if str(rule) in flood_ids else ip
+        signature = digest(canonical([str(agent), str(rule), source_key]))
         return digest(canonical([signature, int(observed // 60)])), signature, observed
+
+    def flood_rule_ids(self):
+        """Operator-set volumetric-flood rule IDs (meta 'flood_rule_ids', comma
+        separated digits). Unset/invalid -> empty, i.e. no flood aggregation."""
+        raw = self.meta("flood_rule_ids", "")
+        ids = {part.strip() for part in raw.split(",") if part.strip()}
+        return frozenset(i for i in ids if re.fullmatch(r"[0-9]{1,10}", i))
 
     def add_evidence(self, key, kind, payload, seq=None, at=None):
         existing = self.db.execute("SELECT case_id FROM inbox WHERE event_key=?", (key,)).fetchone()
@@ -294,7 +308,7 @@ class Store:
         linked = self.db.execute("SELECT case_id FROM proposals WHERE id=?", (proposal,)).fetchone() if proposal else None
         identity = self.incident_identity(payload, kind) if kind in ("incident", "alert") else None
         matched = self.db.execute("SELECT case_id FROM identities WHERE identity=?", (identity,)).fetchone() if identity else None
-        batch = self.batch_identity(payload, kind)
+        batch = self.batch_identity(payload, kind, self.flood_rule_ids())
         grouped = None
         if batch and not (linked or matched):
             grouped = self.db.execute("SELECT case_id FROM batches WHERE batch_key=?", (batch[0],)).fetchone()
@@ -388,6 +402,14 @@ class Store:
             if truncated:
                 self.set_meta("alert_truncation_at", now)
                 self.set_meta("alert_truncation_last_kst", datetime.fromtimestamp(now, kst).isoformat())
+                # Make the overflow visible, not silently lost: record the volume
+                # that exceeded this poll's window cap so an operator can see how
+                # much coverage the current window missed.
+                self.set_meta("alert_overflow_last", canonical({
+                    "kst": datetime.fromtimestamp(now, kst).isoformat(),
+                    "total_relation": response["total_relation"], "total": response["total"],
+                    "included": len(alerts), "dropped_at_least": max(0, response["total"] - len(alerts)),
+                    "window_minutes": 5, "poll_limit": 500}))
             else:
                 self.set_meta("alert_truncation_at", "0")
             for alert in alerts:
@@ -520,7 +542,8 @@ class Store:
                 "alert_coverage_gap": self.meta("alert_coverage_gap_since") != "0",
                 "alert_truncated": self.meta("alert_truncation_at") != "0",
                 "alert_coverage_gap_last_kst": self.meta("alert_coverage_gap_last_kst", "") or None,
-                "alert_truncation_last_kst": self.meta("alert_truncation_last_kst", "") or None}
+                "alert_truncation_last_kst": self.meta("alert_truncation_last_kst", "") or None,
+                "alert_overflow_last": json.loads(self.meta("alert_overflow_last", "") or "null")}
 
 
 def tool_payload(output):

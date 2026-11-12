@@ -12,9 +12,9 @@
 | A(sec) | ✅ 방화벽·Suricata·WAF·Wazuh에이전트·containment 증거(active.jsonl 최신) 정상. ⚠️ Vector 정규화 로테이션만 미완 |
 
 - **outer 타임아웃 수정(완료)**: 컨트롤러 command_for의 모델 스트림 **outer deadline 240→300s**(소스 c11ee53, deploy111 리터럴패치 라이브 eeae57da, 30분 원복 취소·확정). deploy110의 280s 서브프로세스 타임아웃을 240s outer가 먼저 잘라 무력화하던 걸 해소 → 모델 조사가 full 280s 창 사용. 실증: 18:36 조사 188s 완료. **이것이 "관제가 안 됨"의 직접 원인(모델 조사 240s 중단) 해결.**
-- **Vector 정규화 파이프라인(부분)**: 전원차단으로 세대 로테이션이 `publish_pending`/`old_closed`에서 중단. careful 복구(타이머 정지→Vector 정지→에이전트 EOF 대기→백그라운드 maintenance)로 **로테이션 phase는 `active`로 reconcile**. 그러나 maintenance `reader_at_eof`의 **`sha1sum(정규화파일)==logcollector 저장 해시` 불일치**(actual 54f6d9b5… ≠ stored 1c93b158…)로 `resume.pending`을 못 지우고 Vector down 유지. **복구 중 Vector 반복 재시작이 파일 재기록으로 해시 불일치를 유발했을 가능성.** 가드가 손상은 방지(stuck-but-safe). 해시 재동기화는 에이전트 재시작이 필요하나 **처음부터 재읽기→B 중복 유입 위험**으로 미실행 → **콘솔 핸즈온 권장**.
-- **영향 구분**: 탐지·피드·containment 증거·모델 조사는 Vector와 무관하게 정상(핵심 SOC 작동). Vector는 정규화→B 보조 인덱스(2차)만 degraded.
-- **콜드부트 자동화(미구현)**: 사용자 요청. "중단 로테이션 + 리더 해시 재동기화"를 부팅 시 안전 복구하는 절차가 아직 수렴 안 해(원격 한계), 복구 절차 확정 후 부팅 유닛 자동화 예정.
+- **Vector 정규화 파이프라인(복구 완료, 전부 원격)**: 전원차단으로 세대 로테이션이 `publish_pending`/`old_closed` 중단. 2단계 게이트를 원격으로 통과시켜 복구. ①reader 게이트: maintenance `reader_at_eof`의 `sha1sum(정규화파일)==logcollector 저장 해시` 불일치(복구 중 Vector 재시작이 파일 재기록으로 유발). file_status.json 백업 후 ready/evidence/canary 해시만 현재 sha1로 재동기화(offset 유지→**중복 유입 없음**)→reader 통과. ②telemetry 게이트: `collection_telemetry_invalid`(Vector <180s 가동이라 현재 invocation의 fresh telemetry 부재). maintenance 타이머 일시 정지→Vector 무중단 가동→+210s 자동 maintenance 1회→**전 게이트 통과**. 결과(21:32): resume.pending **해제**, Vector **active(up 423s·재시작0)**, phase **active**, 로테이션 정상, maintenance 타이머 재가동. 가드가 전 과정 손상 방지(stuck-but-safe).
+- **영향 구분**: 탐지·피드·containment 증거·모델 조사는 Vector 무관하게 정상(핵심 SOC). Vector 정규화→B 인덱스도 이제 복구. 복구 과정의 반복 개입은 가드로 손상 없음.
+- **콜드부트 자동화(요청·설계가능)**: 이제 복구 절차가 확립됨 — 부팅 시 ①중단 로테이션 감지→reader 해시 재동기화(필요 시)→②Vector 무중단 180s+ 가동 후 maintenance finalize를 안전 복구하는 부팅 유닛을 후보로 작성 예정(가드 기반, 중복 유입 없이).
 
 [실측 원문](대화기록/검증/2026-11-10-ddos-inspect/)(로컬, a_*·b_* 다수). 구현/배포와 실제 운영 검증, 완료와 부분복구를 구분한다.
 

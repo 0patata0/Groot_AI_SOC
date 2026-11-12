@@ -2,6 +2,19 @@
 
 이 문서는 과거 기록입니다. 현재 상태는 [STATUS](../STATUS.md), 실행 계획은 [PLAN](../PLAN.md)을 따릅니다. 같은 내용을 반복한 부분은 하나의 본문으로 연결했습니다. 서로 다른 날짜·판단·실패·정정은 합쳐 단정하지 않습니다. [정리·복원 안내](README.md).
 
+## 에이전트 큐/병목 — 단일 추론 슬롯·경보 절단·분산 플러드 (2026-11-12 23:07, 라이브 B 읽기전용)
+
+작업 #7. B(관리자231 경유)에서 컨트롤러 DB·systemctl·Ollama 터널·journal을 읽기전용으로 관측한 사실. **지금은 큐가 비어 있다**(due_backlog 0·실행 중 run 0·inbox 처리 완료 event_cursor 773=maxseq). 즉 "큐 가득 참"은 상시가 아니라 **경보 급증(DDoS) 구간의 부하 현상**이며, 그때 쌓인 케이스가 배수되며 비정상 종료로 남았다.
+
+증거:
+- 케이스 527건: needs_review 199 + outcome_unknown 152(=66%) + completed 176(33%). run 932건 중 outcome_unknown 168. 최근 3h run 4건 avg 182s·max 284s·timeout 1, 24h run 25건 avg 153s·timeout 4.
+- **단일 추론 슬롯**: Thor Ollama `/api/ps`에 모델 인스턴스 1개(soc-qwen36 35B Q4_K_M, 22.4GB VRAM, ctx 65536, llamacpp). 컨트롤러 `once()`는 타이머 틱당 케이스 **1건**만 처리하고 모델 조사는 최대 280s 블로킹 → 사실상 직렬. 처리량 상한 ≈ 1케이스/약 3분.
+- **배치는 버그 아님(의도적 보수성)**: `batch_identity`는 (agent, rule_id, src_ip) 서명 + 분 단위로만 묶고 무관한 출발지는 합치지 않는다. **분산 DDoS는 출발지가 많아** 서명이 전부 달라 케이스가 다수 생성(배치 391키 각 1케이스). 단일 슬롯 × 다수 케이스 = 부하 시 큐 적체.
+- **경보 수집 절단**: 컨트롤러는 `/management/alerts?minutes=5&limit=500`으로 폴링(브로커 계약에 limit=500 고정, 소스 line 92). 5분 창에 level≥9 경보가 500 초과면 `truncated`→`alert_truncation_at` 기록, 초과분은 그 폴에서 누락.
+- **sticky 플래그**: `alert_coverage_gap_since`(폴링 공백>300s일 때=전원차단 유래)와 `alert_truncation_at`은 타임스탬프로 set 후 **리셋 경로가 없다**(소스에 "0" 복원 없음). 그래서 복구·소진 이후에도 매 틱 리포트가 `alert_coverage_gap:true`·`alert_truncated:true`를 계속 표시(모니터링 신호 오염). 다만 "과거 커버리지 손실" 정직 경고 의미도 있어 단순 clear는 주의가 필요.
+
+구분: 구조적 병목(①단일 슬롯 ②분산 플러드 출발지별 케이스 ③500/5분 절단)의 유효 해결은 ①Thor 추론 병렬화(GPU/VRAM·운영 결정) ②플러드 상관 1케이스 집약(기능, #11/#8 중첩) ③절단 시 요약 케이스/한도 상향(브로커 계약 변경) 중 선택이며 모두 보호된 변경/승인·GPU 결정이 필요하다. 이 기록은 원인 분석이고 실제 해결·배포는 별도다. [라이브 원문](../대화기록/검증/2026-11-12-queue-diag/)(로컬).
+
 ## chatproxy 단일 파일 bind-mount stale — 설정 변경은 reload가 아닌 재시작 필요 (2026-11-12)
 
 라이브에서 직접 확인한 사실. A의 chatproxy 컨테이너는 `/home/groot_a/capstone/chatproxy/nginx.conf`를 **단일 파일 bind-mount(ro)**로 `/etc/nginx/nginx.conf`에 올린다. 이 호스트 파일을 원자적 rename(`os.replace`/`mv`)으로 교체하면 호스트 경로는 새 inode를 가리키지만, 컨테이너의 파일 bind-mount는 **마지막 컨테이너 시작 시점의 옛 inode에 고정**된다. 그 결과 `nginx -t`·`nginx -s reload`는 전부 옛 설정만 보고, 호스트 파일 수정이 라이브에 전혀 반영되지 않는다.

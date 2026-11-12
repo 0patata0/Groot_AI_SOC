@@ -1,0 +1,11 @@
+{
+  "target": "b:wazuh-local-rules",
+  "base_sha256": "5301922c17fae6729dc0f29eb3884f01ddacce3c40a79effc5a63654596f03bc",
+  "edits": [
+    {
+      "old_text": "  <rule id=\"100112\" level=\"12\" frequency=\"8\" timeframe=\"120\">\n    <if_matched_group>capstone_ids_burst_candidate</if_matched_group>\n    <same_field>src_ip</same_field>\n    <description>Suricata IDS: 8+ eligible alerts from $(src_ip) within 2 min (reviewed A resolver informational DNS excluded; investigation required)</description>\n  </rule>\n",
+      "new_text": "  <rule id=\"100113\" level=\"10\">\n    <if_sid>100111</if_sid>\n    <field name=\"alert.signature_id\" type=\"pcre2\">^100009[01]$</field>\n    <description>Suricata volumetric flood: $(alert.signature) $(src_ip) -> $(dest_ip):$(dest_port) [SID $(alert.signature_id)]</description>\n    <mitre><id>T1498</id></mitre>\n    <group>capstone_ids_burst_candidate,capstone_volumetric_flood,</group>\n  </rule>\n  <rule id=\"100112\" level=\"12\" frequency=\"8\" timeframe=\"120\">\n    <if_matched_group>capstone_ids_burst_candidate</if_matched_group>\n    <same_field>src_ip</same_field>\n    <description>Suricata IDS: 8+ eligible alerts from $(src_ip) within 2 min (reviewed A resolver informational DNS excluded; investigation required)</description>\n  </rule>\n"
+    }
+  ],
+  "reason": "Add dedicated level-10 Wazuh rule 100113 for Suricata volumetric flood SIDs 1000090/1000091 so the controller receives and can correlate them (was 100111 level 6)."
+}

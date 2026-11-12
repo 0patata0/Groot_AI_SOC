@@ -10,8 +10,8 @@ import test_rule_change_executor as executor_fixtures
 MOD = executor_fixtures.MOD
 ROOT = Path(__file__).resolve().parents[2]
 WAF_IDS = [10100, 10101, 10200, 10300, 10400, 10500, 10501, 10600, 10601, 10602]
-SURICATA_IDS = [1000000, 1000001, 1000002, 1000010, 1000030, 1000031, 1000032,
-                1000033, 1000050, 1000051, 1000070, 1000071, 2034802, 2034806]
+SURICATA_IDS = [1000000, 1000001, 1000002, 1000010, 1000020, 1000030, 1000031, 1000032,
+                1000033, 1000050, 1000051, 1000070, 1000071, 1000090, 1000091, 2034802, 2034806]
 WAZUH_IDS = [100100, 100101, 100102, 100103, 100110, 100111, 100112, 100114, 100115,
              100120, 100121, 100122, 100123, 100124, 100125, 100126,
              100127, 100128, 100129, 100130, 100131]
@@ -64,10 +64,10 @@ class InventoryTests(unittest.TestCase):
         self.assertNotIn(10010, result['ids'])
         self.assertEqual(result['duplicate_ids'], [])
 
-    def test_actual_suricata_is_twelve_local_plus_two_et_overrides(self):
+    def test_actual_suricata_is_fifteen_local_plus_two_et_overrides(self):
         data = (ROOT / 'new_rule/GROOT_A_local.rules').read_bytes()
         result = self.complete('suricata', data, SURICATA_IDS)
-        self.assertEqual(result['details']['local_sid_count'], 12)
+        self.assertEqual(result['details']['local_sid_count'], 15)
         self.assertEqual(result['details']['et_override_count'], 2)
         self.assertEqual(result['details']['other_sid_count'], 0)
         self.assertEqual(result['details']['noalert_count'], 1)

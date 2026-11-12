@@ -1,0 +1,71 @@
+{
+  "subject": "Wazuh rule 100113 candidate: Suricata volumetric flood SIDs 1000090/1000091 -> level 10 (controller-visible)",
+  "observed_kst": "2026-11-13T01:26:51+09:00/2026-11-13T01:33:52+09:00",
+  "status": "candidate_validated_not_applied",
+  "target": "b:wazuh-local-rules",
+  "base_sha256": "5301922c17fae6729dc0f29eb3884f01ddacce3c40a79effc5a63654596f03bc",
+  "base_equals_live": true,
+  "candidate_rule_sha256": "36df508d3abd2dcaf40a603f43e2830b22b366c191277a0fd28fa47b8dcda5f8",
+  "candidate_full_file_sha256": "efdbffafb4aa6a6c21e36239b15ce54d18cfce67131711dc4ca3739ea18299a7",
+  "edit_json_sha256": "55ba3d340f201f0c53b639b623c8c035fa107f8850388838d375073db021c0c2",
+  "placement": "immediately before rule 100112 (after parent 100111)",
+  "live_preconditions": {
+    "rule_id_100113_free": true,
+    "anchor_100112_block_count": 1,
+    "level_based_active_response": false,
+    "sid_decoded_field": "alert.signature_id"
+  },
+  "suricata_source_rate_limit": "threshold type both, track by_dst: SID 1000090 count 500/5s, SID 1000091 count 100/5s (at most 1 alert per SID per destination per 5 s)",
+  "logtest_client": {
+    "path": "/var/ossec/framework/scripts/wazuh_logtest.py",
+    "sha256": "59fb8b25a9315f3007aaea3bd572a8e5098012ca12046617b9615ce367672414"
+  },
+  "engines": {
+    "before": {
+      "where": "production manager container, read-only logtest sessions (no alert injection, every session removed)",
+      "observed_kst": "2026-11-13T01:33:26+09:00",
+      "passed": 9,
+      "count": 9
+    },
+    "candidate_v1_rejected": {
+      "placement": "after rule 100112",
+      "full_file_sha256_prefix": "117efadd7ab46325",
+      "where": "isolated --network none container from the same manager image (id prefix f845c782483d6b43) over a 0700 temporary copy of the etc volume",
+      "observed_kst": "2026-11-13T01:31:29+09:00",
+      "analysisd_t_rc": 0,
+      "passed": 7,
+      "count": 8,
+      "failure": "same-source 8x flood ended as 100113 x8; per-source burst 100112 no longer fired (if_matched_group correlation only links group members defined before it)"
+    },
+    "candidate_v2": {
+      "placement": "before rule 100112",
+      "where": "isolated --network none container, same image, temporary etc copy",
+      "observed_kst": "2026-11-13T01:33:52+09:00",
+      "analysisd_t_rc": 0,
+      "passed": 9,
+      "count": 9
+    }
+  },
+  "cases": {
+    "flood_icmp_single": "before 100111 L6 -> candidate 100113 L10 T1498",
+    "flood_syn_single": "before 100111 L6 -> candidate 100113 L10 T1498",
+    "medium_other_sid_unchanged": "100111 both",
+    "high_other_sid_unchanged": "100110 both",
+    "near_miss_sid_not_flood": "SID 1000092 -> 100111 both",
+    "flood_sid_with_severity1_goes_high": "100110 both",
+    "same_source_flood_burst_still_100112": "before 100111x7+100112 -> candidate 100113x7+100112 (burst at 8 kept)",
+    "mixed_same_source_flood_and_other_burst": "burst 100112 at 8 both; flood events 100113 in candidate",
+    "two_sources_flood_no_per_source_burst": "before 100111x8 -> candidate 100113x8, no burst"
+  },
+  "cleanup": {
+    "isolated_container_removed": true,
+    "temporary_etc_copy_removed": true,
+    "production_manager_started_at_unchanged": "2026-11-12T04:34:47Z"
+  },
+  "not_done": [
+    "governed propose_rule_edit approval card and apply (wazuh-analysisd -t, manager restart, read-back)",
+    "controller T4 deploy of flood correlation and meta flood_rule_ids=100113 (must precede the rule apply)",
+    "sync of infra/groot-b/local_rules.xml and its fixture tests after an approved apply",
+    "real Kali flood E2E (attacks remain paused)"
+  ]
+}

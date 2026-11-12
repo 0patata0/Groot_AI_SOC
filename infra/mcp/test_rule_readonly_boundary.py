@@ -24,10 +24,20 @@ executor = load('rule_change_executor')
 
 class ReadonlyBoundaryTests(unittest.TestCase):
     def test_each_operation_has_one_owner_and_only_local_targets(self):
+        # Harness² self-audit tools exist only on the SIEM host b (#5 Units 1-3);
+        # containment exists only on host a. Exact per-host sets, not just counts.
+        harness_read = {'get_harness_check_status'}
+        harness_write = {'request_harness_check', 'request_harness_skill_resync', 'acknowledge_harness_finding'}
+        common_write = {'propose_rule_change', 'propose_rule_edit', 'propose_service_action'}
+        expected = {
+            'a': (transport.READ_TOOLS - harness_read, common_write | {'temporarily_contain_ip'}),
+            'b': (transport.READ_TOOLS, common_write | harness_write),
+        }
         for host in ('a', 'b'):
             read, write = transport.tool_list('read', host), transport.tool_list('write', host)
-            self.assertEqual({t['name'] for t in read}, transport.READ_TOOLS)
-            self.assertEqual(len(write), 4 if host == 'a' else 3)
+            self.assertEqual({t['name'] for t in read}, expected[host][0])
+            self.assertEqual({t['name'] for t in write}, expected[host][1])
+            self.assertEqual(len(write), len(expected[host][1]))
             self.assertFalse({t['name'] for t in read} & {t['name'] for t in write})
             for tool in read + write:
                 targets = tool['inputSchema']['properties'].get('target', {}).get('enum', [])

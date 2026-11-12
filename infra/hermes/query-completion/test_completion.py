@@ -1067,7 +1067,7 @@ class FirstRequestGroundingTests(unittest.TestCase):
                                               native_exchanges())
         self.assertEqual(result['tool_choice'], 'none')
         self.assertEqual(result['tools'], [])
-        self.assertIn('14개', h.agent._capstone_query_completion_local_format[1])
+        self.assertIn('17개', h.agent._capstone_query_completion_local_format[1])  # live A local.rules (#11 sync)
         self.assertEqual(seen[0], original)
 
     def test_partial_current_inventory_cannot_skip_provider_execution(self):

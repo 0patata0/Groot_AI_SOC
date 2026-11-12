@@ -2,7 +2,7 @@
 # GROOT_A_local.rules  --  Suricata local custom signatures (lab-specific)
 # -----------------------------------------------------------------------------
 # Engine   : Suricata 8.0.6 (jasonish/suricata) on groot-sec, passive -i ens192
-# Owner    : GROOT security team   Version 1.0.2 (2026-10-13)
+# Owner    : GROOT security team   Version 1.0.3 (2026-11-10)
 # Basis    : new_rule/GROOT_A_IPS_SURICATA_개선점(검증).md  IPS-06 (local sigs = 0)
 # Maps to  : scenarios/ground-truth.json  (S1 recon/web, S2 Log4Shell, S3 privesc)
 #
@@ -54,11 +54,13 @@
 #   2034802/2034806 exact guarded ET overrides only; original SID retained
 #   1000001-1000009  recon / scanning              (S1  T1595/T1046)
 #   1000010-1000019  web attack surface, CLEARTEXT (S1  T1190; WAF owns HTTPS)
+#   1000020-1000029  test rules                    (TEST)
 #   1000030-1000049  Log4Shell JNDI inbound        (S2  T1190 / CVE-2021-44228)
 #   1000050-1000069  2nd-stage egress callback     (S2  T1071.001 / T1041)
 #   1000070-1000089  post-exploit / reverse shell  (S2/S3  T1059.004 / T1068)
 #   metadata carries: mitre_technique_id, groot_scenario, groot_layer ips
 # =============================================================================
+
 
 
 # --- 1000000  Observed Ollama API transport; NOT a global allowlist ---------
@@ -114,6 +116,17 @@ alert http any any -> any any ( \
     classtype:web-application-attack; \
     metadata:mitre_technique_id T1190, groot_scenario S1, groot_layer ips; \
     sid:1000010; rev:1;)
+
+
+# --- 1000020-1000029  TEST rules -------------------------------------------------
+# Test rule for HTTP URI /etc/passwd path detection.
+alert http any any -> any any ( \
+    msg:"TEST /etc/passwd path detected in URI"; \
+    flow:to_server,established; \
+    http.uri; content:"/etc/passwd"; nocase; \
+    classtype:web-application-attack; \
+    metadata:groot_scenario TEST, groot_layer ips; \
+    sid:1000020; rev:1;)
 
 
 # --- 1000030-1000049  Log4Shell JNDI inbound  (S2 step 2.2, CVE-2021-44228) --
@@ -215,7 +228,12 @@ alert tcp any any -> any any ( \
 # content/PCRE, classification, metadata and SID remain otherwise unchanged.
 # This does not authenticate the NAT-origin process or restrict the API URI.
 # Other ET and local signatures continue inspecting this flow. Never use pass.
-# ET updates MUST revalidate these copies against the new vendor definitions;
+# ET updates MUST revalidate these overrides against the new vendor definitions;
 # an equal/newer vendor revision requires a freshly reviewed override.
 alert tcp $HOME_NET any -> any any (msg:"ET EXPLOIT Possible Apache log4j RCE Attempt - 2021/12/13 Obfuscation Observed (tcp) (Outbound) (CVE-2021-44228)"; flow:established,to_server; content:"|24 7b|"; pcre:"/^(j|\x24\x7b(lower|upper)\x3aj\x7d|\x24\x7b\x3a\x3a\-j\x7d)(n|\x24\x7b(lower|upper)\x3an\x7d|\x24\x7b\x3a\x3a\-n\x7d)/Ri"; content:"|3a|"; distance:0; content:"|24 7b|env|3a|"; distance:0; reference:cve,2021-44228; classtype:attempted-admin; flowbits:isnotset,groot_llm_api; sid:2034806; rev:3; metadata:attack_target Server, created_at 2021_12_18, cve CVE_2021_44228, deployment Perimeter, deployment Internal, confidence Medium, signature_severity Major, tag Exploit, tag CISA_KEV, updated_at 2021_12_18, mitre_tactic_id TA0001, mitre_tactic_name Initial_Access, mitre_technique_id T1190, mitre_technique_name Exploit_Public_Facing_Application;)
 alert tcp $HOME_NET any -> any any (msg:"ET HUNTING Possible Apache log4j RCE Attempt - Any Protocol (lower TCP Bypass) (Outbound) (CVE-2021-44228)"; flow:established,to_server; content:"|24 7b|jndi|3a|"; nocase; fast_pattern; content:"|24 7b|lower|3a|"; distance:0; reference:cve,2021-44228; classtype:misc-activity; flowbits:isnotset,groot_llm_api; sid:2034802; rev:3; metadata:attack_target Server, created_at 2021_12_18, cve CVE_2021_44228, deployment Perimeter, deployment Internal, confidence Medium, signature_severity Major, tag Exploit, tag CISA_KEV, updated_at 2021_12_18, mitre_tactic_id TA0001, mitre_tactic_name Initial_Access, mitre_technique_id T1190, mitre_technique_name Exploit_Public_Facing_Application;)
+
+# --- Volumetric DDoS detection (scenario 4, 2026-11-10) -----------------------
+# Threshold alerts for ICMP echo flood and SYN flood to the A gateway. passive.
+alert icmp any any -> $HOME_NET any (msg:"GROOT-LOCAL ICMP flood to gateway (volumetric)"; itype:8; threshold:type both, track by_dst, count 500, seconds 5; classtype:attempted-dos; metadata:groot_scenario S4, groot_layer ids; sid:1000090; rev:1;)
+alert tcp any any -> $HOME_NET 80 (msg:"GROOT-LOCAL SYN flood to web port (volumetric)"; flags:S; flow:to_server; threshold:type both, track by_dst, count 100, seconds 5; classtype:attempted-dos; metadata:groot_scenario S4, groot_layer ids; sid:1000091; rev:1;)

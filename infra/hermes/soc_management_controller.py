@@ -1545,6 +1545,16 @@ not approval/execution state; a:incident-ip is not its device target.
 You are the SOC management decision maker. Investigate using actual MCP tools,
 decide the response, and submit concrete bounded proposals when warranted. Only
 the administrator approves protected changes; never approve your own proposal.
+temporarily_contain_ip is the only pre-approved emergency action and is warranted
+ONLY for a server-verified recent inbound network attack flow: a Suricata
+severity-1/2 attack signature or a WAF attack denial from a single canonical
+public/RFC1918 source. Host-centric incidents - authentication/sudo/PAM, SCA
+policy, rootcheck, file/process integrity on a Wazuh agent - have no such inbound
+attack flow; do not call temporarily_contain_ip for them. Investigate and report,
+and propose a rule/service change only when warranted. A containment refusal (no
+verified attack flow, or a protected/never_block/local/DNS/SSH/non-canonical
+source) is an expected outcome, not a tool failure: do not retry it and continue
+the investigation.
 In verify mode use read-only tools to inspect the named proposal and actual live
 state. Never resubmit a rejected, expired or ambiguous proposal. Report failures.
 If proposals is empty, verify means read-only investigation of the incident,
@@ -1818,9 +1828,9 @@ def command_for(case):
     case=dict(case)
     command = ["/usr/local/bin/docker", "exec", "-i", "-u", "995:986", "-e", "HERMES_HOME=/opt/data/management",
                "-e", "CAPSTONE_MANAGEMENT_MODE=" + case["mode"], "-w", "/opt/data/management", "hermes",
-               "/usr/bin/timeout", "--signal=TERM", "--kill-after=5s", "210s",
+               "/usr/bin/timeout", "--signal=TERM", "--kill-after=5s", "280s",
                "/opt/hermes/.venv/bin/python", "/opt/data/management-code/run.py", "chat", "--query-file", "-",
-               "--format", "stream-json", "--oneshot", "--max-turns", "12", "--run-budget", "180",
+               "--format", "stream-json", "--oneshot", "--max-turns", "12", "--run-budget", "250",
                "--source", "capstone-management", "-t", ",".join(TOOLSETS)]
     chat_read=(dict(case).get('chat_task')=='lead' and case['mode']=='verify'
         and not dict(case).get('operator_review') and not dict(case).get('review_response_write')
@@ -1848,8 +1858,8 @@ def command_for(case):
             raise ControllerError("review_response_write_invalid")
         command[2:2] = ["-e", "CAPSTONE_REVIEW_RESPONSE_WRITE=1"]
         # Existing unblock_ip may wait600s for its existing approval card.
-        # Match that contract instead of killing the approved call at210s.
-        command[command.index("210s")] = "900s"
+        # Match that contract instead of killing the approved call at280s.
+        command[command.index("280s")] = "900s"
         command[command.index("--run-budget") + 1] = "840"
     fast_read = dict(case).get("fast_read_tool")
     if fast_read is not None:

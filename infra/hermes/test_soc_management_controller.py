@@ -1439,7 +1439,8 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(trace.finish(0)["state"], "needs_review")
         self.assertEqual(self.store.db.execute("SELECT detail FROM cases").fetchone()[0], "model_tool_failure_requires_review")
         text = self.store.db.execute("SELECT final_text FROM cases").fetchone()[0]
-        self.assertEqual(text, m.incomplete_report("model_tool_failure_requires_review"))
+        self.assertEqual(text, m.incomplete_report("model_tool_failure_requires_review", trace.case["id"]))
+        self.assertIn("case_id `" + trace.case["id"] + "`", text)  # delivered report carries the identity
         self.assertNotIn("MANAGEMENT_STATUS: resolved", text)
 
     def test_manage_successful_diagnostic_read_can_resolve(self):
@@ -1482,6 +1483,23 @@ class ControllerTests(unittest.TestCase):
         s = self.store.summary()
         self.assertFalse(s["alert_truncated"])
         self.assertTrue(s["alert_truncation_last_kst"])
+
+    def test_incomplete_report_carries_case_identity_for_triage(self):
+        cid = "a" * 32
+        # Timeout/failure report now prepends the case identity for channel triage.
+        r = m.incomplete_report("model_subprocess_timeout_requires_review", cid)
+        self.assertIn("case_id `" + cid + "`", r)
+        self.assertIn("자동 조사를 완료하지 못해", r)          # original body preserved
+        # Backward compatible: omitted with no/invalid case_id.
+        self.assertNotIn("case_id", m.incomplete_report("model_subprocess_timeout_requires_review"))
+        self.assertNotIn("case_id", m.incomplete_report("model_subprocess_timeout_requires_review", "not-hex!"))
+        # The two structured-detail templates also carry the identity.
+        r2 = m.incomplete_report("incident_impact_verification_missing", cid)
+        self.assertIn("case_id `" + cid + "`", r2)
+        self.assertIn("사건 종결의 근거가 부족", r2)
+        # It is triage metadata, never a verdict line.
+        self.assertNotIn("resolved", r)
+        self.assertNotIn("정상", r.split("\n\n", 1)[0])
 
     def test_process_lock_excludes_concurrent_controller(self):
         other = m.Store(self.temp.name)

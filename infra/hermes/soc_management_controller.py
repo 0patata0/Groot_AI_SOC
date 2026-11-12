@@ -407,7 +407,7 @@ class Store:
             self.db.execute("UPDATE cases SET state='outcome_unknown',detail='interrupted_run_requires_review',updated=? WHERE state='running'", (self.clock(),))
             self.db.execute("UPDATE runs SET state='outcome_unknown',detail='interrupted_run_requires_review',finished=? WHERE state='running'", (self.clock(),))
             for row in interrupted:
-                self.queue_report(row["id"], row["case_id"], "outcome_unknown", incomplete_report("interrupted_run_requires_review"))
+                self.queue_report(row["id"], row["case_id"], "outcome_unknown", incomplete_report("interrupted_run_requires_review", row["case_id"]))
 
     def next_case(self):
         now = self.clock()
@@ -1264,7 +1264,7 @@ class Trace:
             # A review state must not publish the model's contradictory
             # "resolved/no further action" text after a failed tool call.
             # Preserve its original output only in the private run trace.
-            text = incomplete_report(detail)
+            text = incomplete_report(detail, self.case["id"])
         else:
             proposals = self.store.case_proposals(self.case["id"])
             pending = any((p["result_status"] or p["status"]) not in TERMINAL for p in proposals)
@@ -1291,17 +1291,17 @@ class Trace:
                 for p in proposals)
             if self.unblocks_pending_readback:
                 state, detail, due = "needs_review", "unblock_live_verification_missing", now
-                text = incomplete_report(detail)
+                text = incomplete_report(detail, self.case["id"])
             elif missing_reference_read:
                 state, detail, due = "needs_review", "shared_containment_verification_missing", now
-                text = incomplete_report(detail)
+                text = incomplete_report(detail, self.case["id"])
             elif decision_error in ('incident_disposition_evidence_missing', 'incident_disposition_invalid',
                                      'incident_closure_with_unknown_impact'):
                 state, detail, due = "needs_review", decision_error, now
                 # A review label cannot legitimize fabricated citations. The
                 # native wrapper gets one evidence-driven correction first;
                 # keep any residual invalid report only in the private trace.
-                text = incomplete_report(detail)
+                text = incomplete_report(detail, self.case["id"])
             elif self.case["mode"] == "verify" and (not verified or missing_bound_read):
                 state, detail, due = "needs_review", "live_verification_missing", now
             elif pending and self.case["run_count"] >= 8:
@@ -1317,7 +1317,7 @@ class Trace:
             elif (disposition == "resolved" and self.sensor_requirements and
                   sensor_impact_verification_missing(text,self.sensor_requirements,self.impact_receipts,bool(proposals),self.bundle_impact_receipts)):
                 state, detail, due = "needs_review", "incident_impact_verification_missing", now
-                text = incomplete_report(detail)
+                text = incomplete_report(detail, self.case["id"])
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
                 state, detail, due = "needs_review", "live_investigation_missing", now
             elif disposition == "monitor" and self.case["monitor_count"] < 3:
@@ -1330,7 +1330,7 @@ class Trace:
             db.execute("UPDATE runs SET state=?,finished=?,detail=? WHERE id=?", ("completed" if success else "outcome_unknown", now, detail, self.run_id))
             db.execute("UPDATE cases SET state=?,updated=?,due=?,detail=?,final_text=?,delivered=0,monitor_count=monitor_count+?,mode=CASE WHEN ?='waiting_approval' OR (?='monitor' AND EXISTS(SELECT 1 FROM proposals WHERE case_id=cases.id)) THEN 'verify' ELSE mode END WHERE id=?",
                        (state, now, due, detail, text if success else "", int(state == "monitor"), state, state, self.case["id"]))
-            self.store.queue_report(self.run_id, self.case["id"], state, text if success else incomplete_report(detail))
+            self.store.queue_report(self.run_id, self.case["id"], state, text if success else incomplete_report(detail, self.case["id"]))
         return {"run_id": self.run_id, "case_id": self.case["id"], "state": state, "completed": success, "text": text if success else ""}
 
 
@@ -2058,20 +2058,27 @@ def run_hermes(store, case, prompt):
     return trace.finish(returncode, error)
 
 
-def incomplete_report(detail):
+def incomplete_report(detail, case_id=None):
+    # Prepend a case-identity line so an operator can correlate an incomplete
+    # (e.g. model-timeout) report with the incident alert in the channel. It is
+    # bounded metadata for triage, never a verdict about the incident.
+    correlation = ("대상 사건: case_id `%s` (상태 채널의 해당 사건 알림과 대조하세요)\n\n" % case_id
+                   if isinstance(case_id, str) and re.fullmatch(r"[0-9a-f]{16,64}", case_id) else "")
     if detail == 'incident_closure_with_unknown_impact':
-        return ("보고 내용과 종결 판단이 일치하지 않아 추가 검토로 남겼습니다.\n\n"
+        body = ("보고 내용과 종결 판단이 일치하지 않아 추가 검토로 남겼습니다.\n\n"
                 "| 확인 항목 | 검증 결과 | 다음 조치 |\n|---|---|---|\n"
                 "| 사건 영향 | 모델 보고에서 영향·대응 결과를 미확인으로 명시 | 실제 근거로 다시 판단 |\n"
                 "| 종결 상태 | 해결됨 판정을 채택하지 않음 | 영향 확인과 차단 해제 여부를 구분 |\n"
                 "| 조회 기록 | 기존 조회·실패 보고 원문 보존 | 앱·호스트 근거와 한계를 대조 |")
-    if detail == 'incident_impact_verification_missing':
-        return ("사건 종결의 근거가 부족해 추가 검토가 필요합니다. 종결·정상 판정은 채택하지 않았습니다.\n\n"
+    elif detail == 'incident_impact_verification_missing':
+        body = ("사건 종결의 근거가 부족해 추가 검토가 필요합니다. 종결·정상 판정은 채택하지 않았습니다.\n\n"
                 "| 확인 항목 | 검증 결과 | 미확인·다음 조치 |\n|---|---|---|\n"
                 "| 센서·대응 조회 | 조회 이력은 보존됨 | 경보 매칭·403·만료만으로 침해 해소를 판단할 수 없음 |\n"
                 "| 보호 대상 영향 | 사건 구간의 자산별 경보 조회·인용 미충족 | 실제 목적지 자산과 앱·호스트 근거 추가 조사 |\n"
                 "| 사건 상태 | 추가 검토 | 조회 성공·반환0건을 정상·종결로 바꾸지 않음 |")
-    return output_contract().incident_failure(detail)
+    else:
+        body = output_contract().incident_failure(detail)
+    return correlation + body
 
 
 def deliver(webhook, text, case_id, state, report_id=None):

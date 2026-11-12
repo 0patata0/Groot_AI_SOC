@@ -1,0 +1,25 @@
+[Unit]
+Description=Capstone cold-boot safe recovery for an interrupted Vector rotation
+Documentation=file:/usr/local/sbin/capstone-vector-coldboot-recovery.sh
+# Run after the log pipeline, its agent and docker are up, so raw-operations
+# state and the logcollector are observable. The script re-checks and no-ops if
+# state is not yet readable, so ordering is best-effort, not a hard contract.
+After=network-online.target docker.service wazuh-agent.service capstone-vector.service capstone-inference-tunnel.service
+Wants=network-online.target
+# Only meaningful once; it detects and no-ops when the pipeline is healthy.
+ConditionPathExists=/usr/local/sbin/capstone-vector-coldboot-recovery.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/local/sbin/capstone-vector-coldboot-recovery.sh
+# The script bounds its own wait (~360s) and always restores the maintenance
+# timer via a trap; give systemd generous headroom above that.
+TimeoutStartSec=480
+# No sandboxing: this invokes capstone-vector-maintenance, which runs docker,
+# systemctl and user-switching. Extra confinement (NoNewPrivileges/ProtectSystem)
+# would break that invoked path -- same failure class as the harness2 runuser
+# regression -- so it runs as a plain root one-shot like the maintenance unit.
+
+[Install]
+WantedBy=multi-user.target

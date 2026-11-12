@@ -30,9 +30,9 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 
-# Flip only after the operator approves the reviewed plan; the plan binds the
-# controller SHA, so flipping requires a fresh prepare.
-APPLY_REVIEWED = False
+# Operator approval 2026-11-13 ("A 버퍼 적용해줘"). The plan binds the
+# controller SHA, so this value is fixed before prepare.
+APPLY_REVIEWED = True
 MID = '096e90b6243e438aa8a7b392be754732'
 BASE = Path('/var/backups/capstone-agent-buffer-20261113')
 RAW = Path('/var/lib/capstone-raw-operations')

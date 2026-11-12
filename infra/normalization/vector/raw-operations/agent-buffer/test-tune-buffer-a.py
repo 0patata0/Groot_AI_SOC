@@ -97,8 +97,8 @@ class State(unittest.TestCase):
 
 class Gate(unittest.TestCase):
     def test_apply_blocked_before_any_action(self):
-        self.assertFalse(m.APPLY_REVIEWED)  # candidate: flip only after operator approval
-        with patch.object(m, 'command') as command, patch.object(m, 'load_plan') as load:
+        with patch.object(m, 'APPLY_REVIEWED', False), patch.object(m, 'command') as command, \
+                patch.object(m, 'load_plan') as load:
             with self.assertRaisesRegex(m.Refused, 'apply_review_pending'): m.apply('a' * 64)
             command.assert_not_called(); load.assert_not_called()
 

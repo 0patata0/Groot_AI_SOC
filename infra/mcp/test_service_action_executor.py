@@ -514,5 +514,116 @@ class HarnessCheckTests(unittest.TestCase):
             svc_a.propose("not allowed on a")
 
 
+class HarnessReviewTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name).resolve()
+        self.now = time.time()
+        self.broker = BrokerAdapter()
+        self.engine = helper.Engine("b", self.broker, self.base / "state", clock=lambda: self.now)
+        self.roots = {}
+        for surface in service.HARNESS_SURFACES:
+            d = self.base / surface
+            d.mkdir()
+            self.roots[surface] = str(d)
+        self.addCleanup(mock.patch.stopall)
+        mock.patch.object(service, "HARNESS_SURFACE_ROOTS", self.roots).start()
+        self.report_sha = "d" * 64
+        latest = self.base / "latest.json"
+        latest.write_text(json.dumps({"schema_version": 1, "report": "r.json", "sha256": self.report_sha,
+                                      "observed_at_kst": "2026-11-12T03:00:00+09:00"}))
+        mock.patch.object(service, "HARNESS_REPORTS", str(latest)).start()
+        self.svc = service.HarnessReviewService(self.engine)
+
+    def _write(self, skill, surface, content):
+        Path(service._skill_path(skill, surface)).write_bytes(content)
+
+    def _resync(self, skill="soc-query", src="management", tgt="sdk", report=None):
+        return self.svc.propose_resync(skill, src, tgt, report or self.report_sha, "교차본 드리프트 정본 재동기화")
+
+    def test_resync_overwrites_target_with_canonical_bytes_exactly_once(self):
+        self._write("soc-query", "management", b"canonical body\n")
+        self._write("soc-query", "sdk", b"drifted body\n")
+        created = self._resync()
+        self.assertEqual(created["status"], "pending")
+        card = self.broker.cards[-1]["attachments"][0]
+        self.assertEqual(card["title"], "Harness² 점검 결과 조치 승인 요청")
+        self.assertIn("재동기화", card["text"])
+        self.broker.decide(created["request_id"], "approve")
+        self.svc.worker_once()
+        record = self.svc._load(created["request_id"])
+        self.assertEqual(record["status"], "applied")
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"canonical body\n")
+        self.assertEqual(Path(service._skill_path("soc-query", "management")).read_bytes(), b"canonical body\n")
+        backup = self.svc.state_dir / (created["request_id"] + ".target.bak")
+        self.assertEqual(backup.read_bytes(), b"drifted body\n")
+        # No replay: a second pass only re-posts the result.
+        self.svc.worker_once()
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"canonical body\n")
+
+    def test_resync_refuses_when_no_drift_or_wrong_report(self):
+        self._write("soc-query", "management", b"same\n")
+        self._write("soc-query", "sdk", b"same\n")
+        with self.assertRaises(helper.RuleChangeError):
+            self._resync()  # identical copies -> no drift
+        self.assertFalse(self.broker.cards)
+        self._write("soc-query", "sdk", b"different\n")
+        with self.assertRaises(helper.RuleChangeError):
+            self._resync(report="e" * 64)  # report hash not current
+        self.assertFalse(self.broker.cards)
+
+    def test_resync_aborts_without_write_if_target_changes_before_consume(self):
+        self._write("soc-query", "management", b"canonical\n")
+        self._write("soc-query", "sdk", b"drifted\n")
+        created = self._resync()
+        self.broker.decide(created["request_id"], "approve")
+        # Operator edits the target out-of-band after approval, before the worker runs.
+        self._write("soc-query", "sdk", b"operator edited\n")
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(created["request_id"])["status"], "aborted")
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"operator edited\n")
+        self.assertEqual(self.broker.consumes, 0)
+
+    def test_interrupted_executing_never_overwrites_again(self):
+        self._write("soc-query", "management", b"canonical\n")
+        self._write("soc-query", "sdk", b"drifted\n")
+        created = self._resync()
+        record = self.svc._load(created["request_id"])
+        record["status"] = "executing"  # simulate a crash after durable intent
+        self.svc._save(record)
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(created["request_id"])["status"], "failed")
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"drifted\n")
+
+    def test_denied_resync_changes_nothing(self):
+        self._write("soc-query", "management", b"canonical\n")
+        self._write("soc-query", "sdk", b"drifted\n")
+        created = self._resync()
+        self.broker.decide(created["request_id"], "deny")
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(created["request_id"])["status"], "denied")
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"drifted\n")
+
+    def test_acknowledge_records_decision_without_touching_files(self):
+        self._write("soc-query", "management", b"canonical\n")
+        self._write("soc-query", "sdk", b"drifted\n")
+        created = self.svc.propose_acknowledge("review_structural_findings", "soc-change", self.report_sha, "확인")
+        self.assertEqual(created["status"], "pending")
+        self.broker.decide(created["request_id"], "approve")
+        self.svc.worker_once()
+        self.assertEqual(self.svc._load(created["request_id"])["status"], "applied")
+        # No skill file changed by an acknowledge.
+        self.assertEqual(Path(service._skill_path("soc-query", "sdk")).read_bytes(), b"drifted\n")
+
+    def test_host_a_refuses_harness_review(self):
+        engine_a = helper.Engine("a", self.broker, self.base / "state-a", clock=lambda: self.now)
+        svc_a = service.HarnessReviewService(engine_a)
+        with self.assertRaises(helper.RuleChangeError):
+            svc_a.propose_resync("soc-query", "management", "sdk", self.report_sha, "x")
+        with self.assertRaises(helper.RuleChangeError):
+            svc_a.propose_acknowledge("review_skill_drift", "soc-query", self.report_sha, "x")
+
+
 if __name__ == "__main__":
     unittest.main()

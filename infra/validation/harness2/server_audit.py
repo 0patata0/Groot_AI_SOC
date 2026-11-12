@@ -779,7 +779,10 @@ def run_audit(config, origin="manual", *, policy=None, now=None):
 
 
 def get_latest(reports_dir=REPORTS_DIR, *, policy=None):
-    """Read-only bounded summary for a future MCP tool; never initiates an audit.
+    """Read-only bounded summary for the read-only MCP tool; never initiates an audit.
+
+    Exposed to chat via `server_audit.py --latest` -> the rule-change executor's
+    read-only `harness-status` op -> the `get_harness_check_status` MCP tool.
 
     Raises on missing/corrupt/unsafe evidence. It does not claim a stored report
     is current; observed_at_kst is always returned. No source bodies or metadata

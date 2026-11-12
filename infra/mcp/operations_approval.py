@@ -57,6 +57,13 @@ CONTAINMENT_DISPLAY_FIELDS = frozenset(('reason', 'evidence_summary'))
 HARNESS_TARGET = "b:harness2-audit"
 HARNESS_UNIT = "capstone-harness2-audit.service"
 HARNESS_PLAN_FIELDS = frozenset(("action", "unit", "host", "reason"))
+HARNESS_REVIEW_TARGET = "b:harness2-review"
+HARNESS_SKILLS = frozenset(("soc-output", "soc-query", "soc-investigate", "soc-change", "soc-recover"))
+HARNESS_SURFACES = frozenset(("native", "sdk", "management"))
+HARNESS_REVIEW_DRAFT_KINDS = frozenset(("review_structural_findings", "review_possible_duplicate", "review_skill_drift"))
+HARNESS_RESYNC_FIELDS = frozenset(("mode", "skill", "source_surface", "target_surface", "source_path",
+                                   "target_path", "source_sha256", "before_observation_sha256", "report_sha256", "reason"))
+HARNESS_ACK_FIELDS = frozenset(("mode", "draft_kind", "reference", "report_sha256", "reason"))
 KST = timezone(timedelta(hours=9), "KST")
 
 
@@ -87,6 +94,14 @@ def _text(value, max_chars=200, max_bytes=500):
     return (isinstance(value, str) and 1 <= len(value) <= max_chars and
             len(value.encode("utf-8")) <= max_bytes and
             not any(unicodedata.category(c) in ("Cc", "Cf", "Zl", "Zp", "Cs") for c in value))
+
+
+def _escape_card(value):
+    """Neutralize Mattermost markdown/mention injection in model-supplied text."""
+    value = html.escape(str(value), quote=False)
+    for old, new in (("|", "&#124;"), ("`", "&#96;"), ("@", "&#64;"), ("[", "&#91;"), ("]", "&#93;")):
+        value = value.replace(old, new)
+    return value
 
 
 class OperationsBroker:
@@ -151,6 +166,29 @@ class OperationsBroker:
             if (set(plan) != HARNESS_PLAN_FIELDS or plan.get("action") != "run_structural_audit_once"
                     or plan.get("unit") != HARNESS_UNIT or plan.get("host") != "b" or not _text(plan.get("reason"))):
                 raise ValueError("invalid harness check plan")
+        elif req["kind"] == "harness_review":
+            # Act on ONE Harness2 review finding. Only skill-drift re-sync is a
+            # deterministic, hash-bound byte copy between two existing managed
+            # copies (no model content); structural/duplicate findings are
+            # acknowledge-only (no file change here).
+            if req["target"] != HARNESS_REVIEW_TARGET:
+                raise ValueError("harness review target is not allowlisted")
+            mode = plan.get("mode")
+            if mode == "resync":
+                if (set(plan) != HARNESS_RESYNC_FIELDS or plan["skill"] not in HARNESS_SKILLS
+                        or plan["source_surface"] not in HARNESS_SURFACES or plan["target_surface"] not in HARNESS_SURFACES
+                        or plan["source_surface"] == plan["target_surface"]
+                        or not _text(plan["source_path"], 400, 1000) or not _text(plan["target_path"], 400, 1000)
+                        or not _hash(plan["source_sha256"]) or not _hash(plan["before_observation_sha256"])
+                        or not _hash(plan["report_sha256"]) or not _text(plan["reason"])
+                        or plan["source_sha256"] == plan["before_observation_sha256"]):
+                    raise ValueError("invalid harness skill re-sync plan")
+            elif mode == "acknowledge":
+                if (set(plan) != HARNESS_ACK_FIELDS or plan["draft_kind"] not in HARNESS_REVIEW_DRAFT_KINDS
+                        or not _text(plan["reference"]) or not _hash(plan["report_sha256"]) or not _text(plan["reason"])):
+                    raise ValueError("invalid harness acknowledge plan")
+            else:
+                raise ValueError("invalid harness review mode")
         else:
             raise ValueError("invalid operation kind")
         return digest(req)
@@ -206,6 +244,23 @@ class OperationsBroker:
                     "구조 점검 통과는 런타임 정확도의 증거가 아니며, 점검이 제안하는 개선안은 **별도 승인 카드**로만 적용됩니다.\n"
                     "사유:\n\n    %s\n\n지정된 이 점검 1회만 승인합니다. 결과는 읽기 도구로 확인합니다." %
                     (plan["action"], plan["unit"], plan["reason"]))
+        if rec["kind"] == "harness_review":
+            base = ("요청 ID: `%s`\n종류: `%s`\n대상: `%s`\n요청자: `%s`\n제안 SHA-256: `%s`\n"
+                    "작업 계획 SHA-256: `%s`\n점검 보고 SHA-256: `%s`\n만료: `%s`" %
+                    (rec["request_id"], rec["kind"], rec["target"], rec["requested_by"], rec["proposal_digest"],
+                     rec["plan_sha256"], plan["report_sha256"], expiry))
+            if plan["mode"] == "resync":
+                return (base + "\n\n작업: Harness² 스킬 교차본 **재동기화**(정본 바이트 복사, 모델 생성 내용 없음)\n"
+                        "스킬: `%s`\n정본(복사 원본): `%s` → `%s`\n대상(덮어쓸 드리프트 복사본): `%s` → `%s`\n"
+                        "워커는 적용 직전 두 파일의 SHA-256이 위와 같은지 확인하고, 대상을 백업한 뒤 정본 바이트로 "
+                        "**정확히 1회** 덮어쓰고 결과 SHA-256이 정본과 같은지 검증합니다. 다른 파일·내용은 변경하지 않습니다.\n"
+                        "사유:\n\n    %s\n\n이 한 건의 재동기화만 승인합니다." %
+                        (plan["skill"], plan["source_surface"], plan["source_sha256"],
+                         plan["target_surface"], plan["before_observation_sha256"], plan["reason"]))
+            return (base + "\n\n작업: Harness² 점검 결과 **확인(acknowledge)** — 파일 변경 없음\n"
+                    "항목 종류: `%s`\n참조: `%s`\n이 승인은 해당 finding의 확인만 기록합니다. 실제 수정은 기존 "
+                    "거버넌스 변경 경로(룰·서비스 승인 등)로 별도 제출합니다.\n사유:\n\n    %s" %
+                    (plan["draft_kind"], _escape_card(plan["reference"]), plan["reason"]))
         header = ("요청 ID: `%s`\n종류: `%s`\n대상: `%s`\n요청자: `%s`\n"
                   "제안 SHA-256: `%s`\n작업 계획 SHA-256: `%s`\n변경 전 관찰 SHA-256: `%s`\n만료: `%s`" %
                   (rec["request_id"], rec["kind"], rec["target"], rec["requested_by"], rec["proposal_digest"],
@@ -274,7 +329,7 @@ class OperationsBroker:
             if len(rec["card_text"].encode("utf-8")) > 8000:
                 return {"error": "operation card too large"}, 400
             self.records[oid] = rec
-        choices = (("승인", "approve"), ("거부", "deny")) if rec["kind"] in ("service", "harness_check") else \
+        choices = (("승인", "approve"), ("거부", "deny")) if rec["kind"] in ("service", "harness_check", "harness_review") else \
                   (("60분 유지", "keep"), ("해제 요청", "release"))
         actions = [{"id": decision, "name": label, "style": "primary" if index == 0 else "danger",
                     "integration": {"url": self.action_url() + "/operation-actions", "context": {
@@ -284,6 +339,7 @@ class OperationsBroker:
         payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800",
                    "title": ("서비스 작업 승인 요청" if rec["kind"] == "service" else
                              "Harness² 구조 점검 실행 승인 요청" if rec["kind"] == "harness_check" else
+                             "Harness² 점검 결과 조치 승인 요청" if rec["kind"] == "harness_review" else
                              "임시 IP 차단 · 시험 여부 확인 및 유지/해제"),
                    "text": rec["card_text"], "actions": actions, "footer": "capstone operations HITL", "ts": int(time.time())}]}
         posted, _ = self.post_card(rec, payload)
@@ -319,7 +375,7 @@ class OperationsBroker:
             rec = self.records.get(oid)
             if not rec or rec["status"] != "pending":
                 return {"ephemeral_text": "처리되었거나 만료된 작업입니다."}
-            choices = ("approve", "deny") if rec["kind"] in ("service", "harness_check") else ("keep", "release")
+            choices = ("approve", "deny") if rec["kind"] in ("service", "harness_check", "harness_review") else ("keep", "release")
             if (ctx.get("kind") != rec["kind"] or ctx.get("decision") not in choices or
                     not isinstance(ctx.get("nonce"), str) or not isinstance(ctx.get("proposal_digest"), str) or
                     not secrets.compare_digest(ctx["nonce"], rec["nonce"]) or
@@ -345,7 +401,7 @@ class OperationsBroker:
                 return {"error": "operation not found"}, 404
             if not secrets.compare_digest(req["proposal_digest"], rec["proposal_digest"]):
                 return {"error": "proposal digest mismatch"}, 409
-            allowed = ("approved",) if rec["kind"] in ("service", "harness_check") else ("approved", "denied", "expired")
+            allowed = ("approved",) if rec["kind"] in ("service", "harness_check", "harness_review") else ("approved", "denied", "expired")
             if rec["status"] not in allowed:
                 return {"error": "operation cannot be consumed"}, 409
             if not self.card_state("protect", rec):
@@ -372,7 +428,7 @@ class OperationsBroker:
                 return {"error": "operation not found"}, 404
             if not secrets.compare_digest(req["proposal_digest"], rec["proposal_digest"]):
                 return {"error": "proposal digest mismatch"}, 409
-            allowed = ("applied", "failed", "aborted") if rec["kind"] in ("service", "harness_check") else \
+            allowed = ("applied", "failed", "aborted") if rec["kind"] in ("service", "harness_check", "harness_review") else \
                       (("kept", "released", "failed") if rec["consumed_decision"] == "keep" else ("released", "expired", "failed"))
             if not isinstance(req["status"], str) or req["status"] not in allowed:
                 return {"error": "result is incompatible with operation decision"}, 409
@@ -381,7 +437,7 @@ class OperationsBroker:
                 return {"error": "result differs from first report"}, 409
             if rec["result_posted"]:
                 return self._public(rec), 200
-            abort_before_consume = (rec["kind"] in ("service", "harness_check") and req["status"] == "aborted" and
+            abort_before_consume = (rec["kind"] in ("service", "harness_check", "harness_review") and req["status"] == "aborted" and
                                     rec["status"] in ("pending", "approved", "denied", "expired"))
             if rec["status"] not in ("consumed", "report_error") and not abort_before_consume:
                 return {"error": "operation has not been consumed or result is in progress"}, 409

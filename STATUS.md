@@ -1,8 +1,8 @@
-# 인프라 현황 — 2026-11-12 22:40 KST
+# 인프라 현황 — 2026-11-12 22:54 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 발표**이며 미완료다. 정확성이 속도보다 우선이다. 최신 균형1,220건 학습본을 운영하면서 보완한다. 학습본 사용과 독립적인 정확도 우위는 구분한다. [활성 계획](PLAN.md) · [직전 상세 상태·실패 이력](archive/STATUS_HISTORY.md#source-a961b1d1c0e72743).
 
-## 현재 작업: 채팅 Harness² 점검 거버넌스(#5) — Unit 1 읽기·Unit 2 요청카드 후보 (11/12 22:40, 로컬 구현·테스트)
+## 현재 작업: 채팅 Harness² 점검 거버넌스(#5) — Unit 1·2·3 후보 완료 (11/12 23:05, 로컬 구현·테스트)
 
 작업 #5는 **채팅에서 Harness² 점검을 관리자 승인 카드로 요청·적용**하는 거버넌스 기능이다. 사용자 지정 범위 = **전체 경로 둘 다**: (a) 점검 요청→카드→승인→워커가 수동 점검 실행→결과 읽기, (b) 점검의 `review_drafts`(개선안)→카드→승인→워커가 개선 적용→검증. 안전민감(브로커 카드 종류·루트 워커·스킬/설정 변경)이라 **후보(코드+테스트)로 단위별 구현**하고 거버넌스 배포·실제 채팅 검증은 분리한다.
 
@@ -10,10 +10,10 @@
 |---|---|---|
 | **Unit 1: 읽기 도구(읽기전용, 저위험)** | 읽기전용 MCP에 `get_harness_check_status` 추가. 비루트 MCP(`capstone-mcp`/`ruleview`)는 harness2 reports(root 0700) 직접 불가 → 기존 **sudo 읽기전용 헬퍼** 경로 재사용: `rule_change_executor`에 읽기 연산 `harness-status` 추가(루트가 고정 경로 `server_audit.py --latest`를 격리 실행·소유권/모드·크기·형태 검증 후 중계; `ruleview`만, `rulechg` 거부). `server_audit.py`에 `--latest`(감사 미개시, `get_latest()` 요약) 추가. 도구 설명에 `automatic_adoption:false`·승인 필요·구조통과≠런타임정확 명시 | ✅ **후보 구현·로컬 테스트 완료(미배포)** |
 | **Unit 2: 점검 요청 카드(중민감도)** | B 전용 쓰기 도구 `request_harness_check(reason)` → **비변경 operation 하위종류 `harness_check`** 브로커 카드(상위 종류·cleanup KINDS 불변) → 관리자 승인 → 워커가 `capstone-harness2-audit.service`를 **정확히 1회** 실행. 서비스 작업과 동일 durable exactly-once·중단 시 미재실행 규율(상태해시/preflight는 비변경이라 제거). 진행상황은 기존 `get_operation_status`로 추적 | ✅ **후보 구현·로컬 테스트 완료(미배포)** |
-| Unit 3: 개선 적용 카드 | `review_drafts`→카드→승인→워커 개선 적용→검증(최고 민감도) | ⏳ 예정(후보) |
+| **Unit 3: 개선 적용 카드(최고 민감도)** | 범위=**승인+결정론 재동기화**(사용자 선택). `review_drafts`는 설계상 자동적용 불가(`apply:False`)라 **임의 자동 적용 안 함**. 유일한 안전·결정론 변환인 **skill-drift 재동기화**만 적용: `request_harness_skill_resync`(B 쓰기)→`harness_review`(mode=resync) 카드→승인→워커가 **정본 surface 복사본의 정확한 바이트**로 드리프트 복사본을 1회 덮어쓰기(전/후 SHA CAS·백업·검증, 모델 생성 내용 0). 구조이상·중복의심은 `acknowledge_harness_finding`→카드→승인=**확인 기록만(파일 변경 0)**, 실제 수정은 기존 거버넌스 경로. `report_sha256`는 현재 점검 보고와 일치해야 함(공급출처 결속) | ✅ **후보 구현·로컬 테스트 완료(미배포)** |
 
-- **회귀(로컬)**: Unit 1 — `test_rule_change_mcp`(읽기도구), `test_rule_change_executor`(읽기전용 중계·fail-closed), `test_server_audit`(`--latest`). Unit 2 — `test_operations_approval` **18**(harness_check 카드 비변경·approve/consume/applied·잘못된 plan/target 400), `test_service_action_executor` **30**(HarnessCheckService: 1회 실행·멱등·거부/중단/만료/systemctl 실패 미재실행·host a 거부), `test_rule_change_executor` **72**(디스패치 host-b 가드·`_operation_services` host-b), `test_rule_change_mcp` **15**(쓰기도구 host b·인자거부·읽기MCP 미노출). `test_incident_containment` **46**·`test_approval_card_cleanup` **39** 회귀 통과. 권한·승인·보호 정책 **불변**: 점검은 비변경 1회 실행이며 일반 sudo/Docker·컨테이너 재구성 위임 없음.
-- **미완**: Unit 3 구현, 거버넌스 배포(관리자231 경유), 실제 카드 클릭·실행 E2E 채팅 검증. 구현/정적 통과와 실제 운영 검증을 구분한다.
+- **회귀(로컬)**: Unit 1 — `test_rule_change_mcp`·`test_rule_change_executor`·`test_server_audit`. Unit 2·3 합산 — `test_operations_approval` **21**(harness_check/harness_review 카드·approve/consume/applied·잘못된 plan/target/mode 400), `test_service_action_executor` **37**(HarnessCheckService 7: 1회 실행·멱등·거부/중단/만료/실패; HarnessReviewService 7: 정본 바이트 재동기화·멱등·드리프트없음/보고불일치 거부·승인후 대상변경 abort·중단 미재실행·deny·acknowledge 무변경·host a 거부), `test_rule_change_executor` **73**(디스패치 host-b 가드·`_operation_services` host-b 2워커), `test_rule_change_mcp` **17**(쓰기도구 host b·인자거부·읽기MCP 미노출). `test_incident_containment` **46**·`test_approval_card_cleanup` **39** 회귀 통과. 권한·승인·보호 정책 **불변**: 재동기화는 기존 관리 파일 2개 사이의 해시결속 바이트 복사뿐이며 LLM 임의 패치·일반 sudo/Docker·컨테이너 재구성 위임 **없음**.
+- **미완·배포 전제**: 거버넌스 배포(관리자231 경유)와 **실제 카드 클릭→워커 실행 E2E** 미검증. **재동기화 배포 전 반드시 라이브에서 확인**: ① 3 surface 스킬 파일 경로가 실제 런타임 로드 파일인지(소유자·모드), ② 덮어쓰기 후 봇이 재로드하는지(또는 재시작 필요), ③ 어느 surface가 정본인지는 관리자 판단. 후보는 server_audit 고정 경로맵을 권위로 사용. 구현/정적 통과와 실제 운영 검증을 구분한다.
 
 [MCP 도구](infra/mcp/rule_change_mcp.py)·[실행기/워커](infra/mcp/rule_change_executor.py)·[운영 실행기 HarnessCheckService](infra/mcp/service_action_executor.py)·[승인 브로커](infra/mcp/operations_approval.py)·[감사 CLI](infra/validation/harness2/server_audit.py)·[프로토콜 문서](infra/mcp/approved-operations.md). 로컬 세션 기록은 Git 제외.
 

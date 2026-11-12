@@ -151,6 +151,29 @@ TOOLS.extend([
                         "required": ["reason"]},
         "annotations": {"title": "Request admin-approved Harness² check", "readOnlyHint": False, "destructiveHint": False, "idempotentHint": False},
     },
+    {
+        "name": "request_harness_skill_resync",
+        "description": "Request admin approval to fix ONE Harness²-detected SOC-skill cross-copy DRIFT by re-syncing the drifted copy to a canonical copy's EXACT bytes. This only posts an approval card; nothing changes until an admin approves. The worker then overwrites the target surface's copy of the skill with the source surface's exact bytes (a deterministic byte copy - never model-authored content), after verifying both copies' SHA-256 still match the approved plan, keeping a backup, and verifying the result. It touches only that one skill file. report_sha256 must be the sha256 from get_harness_check_status (ties the fix to the current audit). source and target surface must differ. Use only when get_harness_check_status reported findings and you have established which surface is canonical; structural or possible-duplicate findings must use acknowledge_harness_finding instead.",
+        "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
+            "skill": {"type": "string", "enum": ["soc-output", "soc-query", "soc-investigate", "soc-change", "soc-recover"]},
+            "source_surface": {"type": "string", "enum": ["native", "sdk", "management"], "description": "The surface whose copy is canonical (bytes to copy FROM)"},
+            "target_surface": {"type": "string", "enum": ["native", "sdk", "management"], "description": "The drifted surface whose copy will be overwritten"},
+            "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256 from get_harness_check_status"},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 200}},
+            "required": ["skill", "source_surface", "target_surface", "report_sha256", "reason"]},
+        "annotations": {"title": "Request admin-approved skill-drift re-sync", "readOnlyHint": False, "destructiveHint": True, "idempotentHint": False},
+    },
+    {
+        "name": "acknowledge_harness_finding",
+        "description": "Request admin acknowledgement of ONE Harness² review finding that has no safe automatic fix (structural findings, or possible-duplicate candidates, or a skill drift you are NOT re-syncing). This posts an approval card that only RECORDS the admin's acknowledgement - it changes no file, skill, config, rule, service or firewall. Any actual change must be submitted separately through the normal governed change path (e.g. propose_rule_edit/propose_service_action or an operator edit). report_sha256 must be the sha256 from get_harness_check_status.",
+        "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
+            "draft_kind": {"type": "string", "enum": ["review_structural_findings", "review_possible_duplicate", "review_skill_drift"]},
+            "reference": {"type": "string", "minLength": 1, "maxLength": 200, "description": "Which finding: e.g. the skill name or a short finding reference"},
+            "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256 from get_harness_check_status"},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 200}},
+            "required": ["draft_kind", "reference", "report_sha256", "reason"]},
+        "annotations": {"title": "Acknowledge Harness² finding (no change)", "readOnlyHint": False, "destructiveHint": False, "idempotentHint": False},
+    },
 ])
 
 
@@ -168,7 +191,8 @@ def tool_list(access, host):
             continue
         if original["name"] == "temporarily_contain_ip" and host != "a":
             continue
-        if original["name"] in ("get_harness_check_status", "request_harness_check") and host != "b":
+        if original["name"] in ("get_harness_check_status", "request_harness_check",
+                                "request_harness_skill_resync", "acknowledge_harness_finding") and host != "b":
             continue
         tool = copy.deepcopy(original)
         target = tool["inputSchema"]["properties"].get("target")
@@ -185,7 +209,7 @@ def _call_helper(payload, readonly=False):
     try:
         proc = subprocess.run(
             ["/usr/bin/sudo", "-n", HELPER] + (["--read-only"] if readonly else []), input=request, capture_output=True,
-            timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get", "harness-check-request"} else 45, check=False,
+            timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get", "harness-check-request", "harness-review-resync", "harness-review-ack"} else 45, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
         return _result({"error": "rule-change helper unavailable"}, True)
@@ -318,6 +342,12 @@ def handle(message, access="write", host="a"):
             result = call_helper({"operation": "harness-status"}) if not args else _result({"error": "required/unsupported arguments"}, True)
         elif name == "request_harness_check":
             result = call_helper({"operation": "harness-check-request", **args}) if set(args) == {"reason"} else _result({"error": "required/unsupported arguments"}, True)
+        elif name == "request_harness_skill_resync":
+            result = call_helper({"operation": "harness-review-resync", **args}) if set(args) == {
+                "skill", "source_surface", "target_surface", "report_sha256", "reason"} else _result({"error": "required/unsupported arguments"}, True)
+        elif name == "acknowledge_harness_finding":
+            result = call_helper({"operation": "harness-review-ack", **args}) if set(args) == {
+                "draft_kind", "reference", "report_sha256", "reason"} else _result({"error": "required/unsupported arguments"}, True)
         elif name in {"get_service_action_target", "propose_service_action", "temporarily_contain_ip", "get_operation_status"}:
             operation, required = {
                 "get_service_action_target": ("service-get", {"target"}),

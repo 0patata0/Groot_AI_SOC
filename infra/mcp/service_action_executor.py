@@ -931,3 +931,327 @@ class HarnessCheckService:
             self._save(record)  # Same id and exact payload survive a lost POST response.
             self._post(record)
             return self._public(record)
+
+
+HARNESS_REVIEW_TARGET = "b:harness2-review"
+HARNESS_SKILLS = ("soc-output", "soc-query", "soc-investigate", "soc-change", "soc-recover")
+HARNESS_SURFACES = ("native", "sdk", "management")
+# Must mirror server_audit.default_component_paths() exactly; these are the only
+# paths a re-sync may ever read or overwrite, derived from skill+surface, never
+# from model input.
+HARNESS_SURFACE_ROOTS = {"native": "/opt/hermes-data/plugins/groot-query-completion",
+                         "sdk": "/opt/capstone-ollama-trial", "management": "/opt/capstone-management"}
+HARNESS_REVIEW_DRAFT_KINDS = ("review_structural_findings", "review_possible_duplicate", "review_skill_drift")
+HARNESS_REPORTS = "/var/lib/capstone-harness2/reports/latest.json"
+MAX_SKILL_BYTES = 256 * 1024
+SHA_BYTES = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _skill_path(skill, surface):
+    filename = "SKILL.md" if skill == "soc-output" else "skill-" + skill + ".md"
+    return HARNESS_SURFACE_ROOTS[surface] + "/" + filename
+
+
+def _bytes_sha256(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+class HarnessReviewService:
+    """Approval-bound action on ONE Harness2 review finding, on host b only.
+
+    review_drafts are human-review findings (apply:False by design), so there is
+    no generic auto-apply. The only deterministic, safe change is a skill-drift
+    *re-sync*: overwrite one existing managed skill copy with the exact bytes of
+    another existing managed copy the admin designates canonical - a hash-bound
+    byte copy with no model-authored content. Structural/duplicate findings are
+    acknowledge-only (no file change here; the real fix goes through the normal
+    governed change path). Same durable exactly-once discipline as service
+    actions: an interrupted dispatch is never replayed.
+    """
+
+    def __init__(self, engine):
+        self.engine = engine
+        self.helper = sys.modules[type(engine).__module__]
+        self.error = self.helper.RuleChangeError
+        self.state_dir = engine.state_dir / "harness-reviews"
+        if not getattr(engine, "read_only", False):
+            self.state_dir.mkdir(mode=0o700, exist_ok=True)
+        st = self.state_dir.lstat()
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.geteuid() or stat.S_IMODE(st.st_mode) != 0o700:
+            raise self.error("harness review state directory must be owned by executor and mode 0700")
+
+    def _path(self, request_id):
+        if not isinstance(request_id, str) or not REQUEST_ID.fullmatch(request_id):
+            raise self.error("invalid operation request ID")
+        return self.state_dir / (request_id + ".json")
+
+    def _save(self, record):
+        data = canonical(record)
+        if len(data) > MAX_STATE:
+            raise self.error("harness review state too large")
+        self.helper._atomic_bytes(self._path(record["request_id"]), data, mode=0o600)
+
+    def _load(self, request_id):
+        data, _ = self.helper._read_regular(self._path(request_id), MAX_STATE)
+        record = json.loads(data)
+        if record.get("request_id") != request_id:
+            raise self.error("harness review state identity mismatch")
+        return record
+
+    def _public(self, record):
+        return {key: record[key] for key in
+                ("request_id", "target", "status", "plan_sha256", "proposal_digest", "result", "result_posted")}
+
+    def _binding(self, record, answer):
+        for key, expected in (("request_id", record["request_id"]), ("plan_sha256", record["plan_sha256"]),
+                              ("proposal_digest", record["proposal_digest"]),
+                              ("kind", "harness_review"), ("target", HARNESS_REVIEW_TARGET),
+                              ("expires_at", record["proposal"]["expires_at"])):
+            if answer.get(key) != expected:
+                raise self.error("harness review broker binding mismatch")
+
+    def _validate_record(self, record):
+        proposal = record["proposal"]
+        plan = proposal["plan"]
+        if (proposal["request_id"] != record["request_id"] or proposal["kind"] != "harness_review" or
+                proposal["target"] != HARNESS_REVIEW_TARGET or proposal["plan_sha256"] != record["plan_sha256"] or
+                digest(proposal) != record["proposal_digest"] or digest(plan) != record["plan_sha256"]):
+            raise self.error("harness review plan or executor binding changed")
+        if plan.get("mode") == "resync":
+            if (plan["skill"] not in HARNESS_SKILLS or plan["source_surface"] not in HARNESS_SURFACES or
+                    plan["target_surface"] not in HARNESS_SURFACES or plan["source_surface"] == plan["target_surface"] or
+                    plan["source_path"] != _skill_path(plan["skill"], plan["source_surface"]) or
+                    plan["target_path"] != _skill_path(plan["skill"], plan["target_surface"]) or
+                    not SHA_BYTES.fullmatch(plan["source_sha256"]) or
+                    not SHA_BYTES.fullmatch(plan["before_observation_sha256"]) or
+                    plan["source_sha256"] == plan["before_observation_sha256"]):
+                raise self.error("harness re-sync plan is not a valid managed drift")
+        elif plan.get("mode") != "acknowledge" or plan.get("draft_kind") not in HARNESS_REVIEW_DRAFT_KINDS:
+            raise self.error("harness review mode is invalid")
+
+    def _verify_report(self, report_sha256):
+        """Tie the action to the CURRENT stored audit, so a stale or fabricated
+        report hash is refused. Read-only; never starts an audit."""
+        try:
+            data, _ = self.helper._read_regular(Path(HARNESS_REPORTS), 4096)
+            pointer = json.loads(data)
+            current = pointer.get("sha256")
+        except (OSError, ValueError):
+            raise self.error("current Harness2 report is unavailable; run a check first")
+        if not isinstance(current, str) or not SHA_BYTES.fullmatch(current) or current != report_sha256:
+            raise self.error("report_sha256 does not match the current Harness2 report")
+
+    def _post(self, record):
+        answer = self.engine.broker.request("POST", "/operations", record["proposal"])
+        self._binding(record, answer)
+        if not answer.get("posted"):
+            raise self.error("harness review approval card was not posted")
+        record["status"] = "pending"
+        self._save(record)
+
+    def _decision(self, record):
+        self._validate_record(record)
+        answer = self.engine.broker.request("GET", "/operations/" + record["request_id"])
+        self._binding(record, answer)
+        if answer.get("kind") != "harness_review" or answer.get("target") != HARNESS_REVIEW_TARGET:
+            raise self.error("operation kind or target binding mismatch")
+        if answer.get("status") not in ("pending", "approved", "denied", "expired", "consumed", "applied", "failed", "aborted"):
+            raise self.error("invalid operation decision")
+        return answer
+
+    def _post_result(self, record):
+        if record["result_posted"]:
+            return
+        try:
+            answer = self.engine.broker.request("POST", "/operations/" + record["request_id"] + "/result",
+                                                record["result_payload"])
+            self._binding(record, answer)
+            if (not answer.get("result_posted") or answer.get("status") != record["status"] or
+                    answer.get("after_observation_sha256") != record["result_payload"]["after_observation_sha256"]):
+                raise self.error("harness review result was not posted")
+            record["result_posted"] = True
+            self._save(record)
+        except (self.error, OSError):
+            pass  # Retry reporting only. The file action is never repeated.
+
+    def _finish(self, record, status, detail, after_sha=None):
+        record["status"], record["result"] = status, detail
+        after_sha = after_sha or _bytes_sha256(canonical({"status": status, "detail": detail}))
+        record["result_payload"] = {"proposal_digest": record["proposal_digest"], "status": status,
+                                    "after_observation_sha256": after_sha, "detail": detail}
+        self._save(record)
+        self._post_result(record)
+
+    def _cas(self, plan):
+        src, _ = self.helper._read_regular(Path(plan["source_path"]), MAX_SKILL_BYTES)
+        tgt, tgt_st = self.helper._read_regular(Path(plan["target_path"]), MAX_SKILL_BYTES)
+        if _bytes_sha256(src) != plan["source_sha256"]:
+            raise self.error("canonical source copy changed since approval")
+        if _bytes_sha256(tgt) != plan["before_observation_sha256"]:
+            raise self.error("target copy changed since approval")
+        if src == tgt:
+            raise self.error("copies are already identical; nothing to re-sync")
+        return src, tgt, tgt_st
+
+    def _execute(self, record):
+        plan = record["proposal"]["plan"]
+        try:
+            self._validate_record(record)
+            if int(self.engine.clock()) >= record["proposal"]["expires_at"]:
+                raise self.error("approval expired before dispatch")
+            if plan["mode"] == "resync":
+                self._cas(plan)  # pre-consume CAS: abort cleanly if drift is gone
+        except Exception:
+            self._finish(record, "aborted", "Approved harness-review preconditions changed; nothing was modified")
+            return
+        record["status"] = "prepared"
+        self._save(record)
+        answer = self.engine.broker.request("POST", "/operations/" + record["request_id"] + "/consume",
+                                            {"proposal_digest": record["proposal_digest"]})
+        self._binding(record, answer)
+        if answer.get("status") != "consumed" or answer.get("consumed_decision") != "approve":
+            raise self.error("harness review approval consume was not confirmed")
+        record["status"] = "executing"
+        record["dispatch_started_at"] = self.engine.clock()
+        self._save(record)  # Durable intent before exactly one change.
+        if plan["mode"] == "acknowledge":
+            self._finish(record, "applied",
+                         "Finding acknowledged; no file changed. Submit any real change through the governed change path")
+            return
+        try:
+            src, _tgt, tgt_st = self._cas(plan)  # re-CAS after approval consumption
+            backup = self.state_dir / (record["request_id"] + ".target.bak")
+            self.helper._atomic_bytes(backup, _tgt, mode=0o600)
+            self.helper._atomic_bytes(Path(plan["target_path"]), src, old_stat=tgt_st)
+            after, _ = self.helper._read_regular(Path(plan["target_path"]), MAX_SKILL_BYTES)
+            if _bytes_sha256(after) != plan["source_sha256"]:
+                raise self.error("post-write verification did not match the canonical bytes")
+        except Exception:
+            self._finish(record, "failed",
+                         "Skill re-sync write or verification failed; any backup was kept. No automatic retry")
+            return
+        self._finish(record, "applied",
+                     "Skill copy re-synced once to the canonical bytes and verified", after_sha=plan["source_sha256"])
+
+    def worker_once(self):
+        results = []
+        with self.engine.locked():
+            for path in sorted(self.state_dir.glob("*.json")):
+                record = self._load(path.stem)
+                try:
+                    if record["status"] in ("applied", "failed", "aborted"):
+                        self._post_result(record)
+                        continue
+                    if record["status"] in ("denied", "expired"):
+                        continue
+                    expired = int(self.engine.clock()) >= record["proposal"]["expires_at"]
+                    if record["status"] in ("posting", "pending") and expired:
+                        record["status"] = "expired"
+                        record["result"] = "Local approval deadline elapsed; nothing was modified"
+                        self._save(record)
+                    elif record["status"] == "prepared" and expired:
+                        self._finish(record, "failed",
+                                     "Approval consumption outcome could not be confirmed before expiry; no change or replay")
+                    elif record["status"] == "executing":
+                        self._finish(record, "failed",
+                                     "Interrupted harness-review dispatch outcome is uncertain; no automatic replay")
+                    elif record["status"] == "posting":
+                        self._post(record)
+                    else:
+                        decision = self._decision(record)
+                        if decision["status"] in ("denied", "expired"):
+                            record["status"] = decision["status"]
+                            self._save(record)
+                        elif decision["status"] == "consumed":
+                            self._finish(record, "failed", "Approval was already consumed; no automatic change or replay")
+                        elif decision["status"] == "approved":
+                            if int(self.engine.clock()) >= record["proposal"]["expires_at"]:
+                                self._finish(record, "aborted", "Approval expired; nothing was modified")
+                            else:
+                                self._execute(record)
+                except (self.error, OSError, KeyError, ValueError):
+                    record["result"] = "Operation validation or broker unavailable; no additional change dispatched"
+                    self._save(record)
+                results.append(self._public(record))
+        return results
+
+    def status(self, request_id):
+        with self.engine.locked():
+            record = self._load(request_id)
+            out = self._public(record)
+            if record["status"] in ("pending", "prepared"):
+                try:
+                    out["approval_status"] = self._decision(record)["status"]
+                except self.error:
+                    out["approval_status"] = "unavailable"
+            return out
+
+    def _reason_ok(self, reason):
+        return (isinstance(reason, str) and 1 <= len(reason.strip()) <= 200 and len(reason.encode("utf-8")) <= 500 and
+                not any(unicodedata.category(c) in ("Cc", "Cf", "Zl", "Zp", "Cs") for c in reason))
+
+    def _active_or_dedup(self, plan):
+        active = 0
+        for path in self.state_dir.glob("*.json"):
+            old = self._load(path.stem)
+            if old["status"] in ("posting", "pending", "prepared", "executing"):
+                active += 1
+                if old["proposal"]["plan"] == plan:
+                    if old["status"] == "posting":
+                        self._post(old)
+                    return self._public(old)
+        if active >= 8:
+            raise self.error("too many active harness review requests")
+        return None
+
+    def _submit(self, plan):
+        request_id = secrets.token_hex(16)
+        proposal = {"request_id": request_id, "kind": "harness_review", "target": HARNESS_REVIEW_TARGET, "plan": plan,
+                    "plan_sha256": digest(plan), "requested_by": "hermes-harness-review",
+                    "expires_at": int(self.engine.clock()) + 600}
+        record = {"request_id": request_id, "target": HARNESS_REVIEW_TARGET, "proposal": proposal,
+                  "plan_sha256": proposal["plan_sha256"], "proposal_digest": digest(proposal),
+                  "status": "posting", "result": "", "result_posted": False}
+        self._save(record)
+        self._post(record)
+        return self._public(record)
+
+    def propose_resync(self, skill, source_surface, target_surface, report_sha256, reason):
+        if self.engine.host != "b":
+            raise self.error("harness review is available only on host b")
+        if not self._reason_ok(reason):
+            raise self.error("reason must be 1..200 printable characters")
+        if skill not in HARNESS_SKILLS or source_surface not in HARNESS_SURFACES or target_surface not in HARNESS_SURFACES:
+            raise self.error("unknown skill or surface")
+        if source_surface == target_surface:
+            raise self.error("source and target surface must differ")
+        if not isinstance(report_sha256, str) or not SHA_BYTES.fullmatch(report_sha256):
+            raise self.error("report_sha256 must be the sha256 from get_harness_check_status")
+        with self.engine.locked():
+            self._verify_report(report_sha256)
+            source_path, target_path = _skill_path(skill, source_surface), _skill_path(skill, target_surface)
+            src, _ = self.helper._read_regular(Path(source_path), MAX_SKILL_BYTES)
+            tgt, _ = self.helper._read_regular(Path(target_path), MAX_SKILL_BYTES)
+            source_sha, target_sha = _bytes_sha256(src), _bytes_sha256(tgt)
+            if source_sha == target_sha:
+                raise self.error("the two copies are already identical; there is no drift to re-sync")
+            plan = {"mode": "resync", "skill": skill, "source_surface": source_surface,
+                    "target_surface": target_surface, "source_path": source_path, "target_path": target_path,
+                    "source_sha256": source_sha, "before_observation_sha256": target_sha,
+                    "report_sha256": report_sha256, "reason": reason.strip()}
+            return self._active_or_dedup(plan) or self._submit(plan)
+
+    def propose_acknowledge(self, draft_kind, reference, report_sha256, reason):
+        if self.engine.host != "b":
+            raise self.error("harness review is available only on host b")
+        if not self._reason_ok(reason) or not self._reason_ok(reference):
+            raise self.error("reason and reference must be 1..200 printable characters")
+        if draft_kind not in HARNESS_REVIEW_DRAFT_KINDS:
+            raise self.error("unknown review draft kind")
+        if not isinstance(report_sha256, str) or not SHA_BYTES.fullmatch(report_sha256):
+            raise self.error("report_sha256 must be the sha256 from get_harness_check_status")
+        with self.engine.locked():
+            self._verify_report(report_sha256)
+            plan = {"mode": "acknowledge", "draft_kind": draft_kind, "reference": reference.strip(),
+                    "report_sha256": report_sha256, "reason": reason.strip()}
+            return self._active_or_dedup(plan) or self._submit(plan)

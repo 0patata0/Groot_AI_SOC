@@ -148,8 +148,42 @@ class RuleChangeTransportTests(unittest.TestCase):
             mcp._call_helper({'operation': 'harness-check-request', 'reason': 'x'})
         self.assertEqual(run.call_args.kwargs['timeout'], 360)
 
+    def test_harness_review_tools_are_write_tools_on_siem_host_only(self):
+        write_b = {t['name'] for t in mcp.tool_list('write', 'b')}
+        for name in ('request_harness_skill_resync', 'acknowledge_harness_finding'):
+            self.assertIn(name, write_b)
+            self.assertNotIn(name, mcp.READ_TOOLS)
+            for access, host in (('read', 'b'), ('write', 'a')):
+                self.assertNotIn(name, {t['name'] for t in mcp.tool_list(access, host)})
+        resync = next(t for t in mcp.TOOLS if t['name'] == 'request_harness_skill_resync')
+        self.assertTrue(resync['annotations']['destructiveHint'])
+        self.assertEqual(resync['inputSchema']['properties']['skill']['enum'],
+                         ['soc-output', 'soc-query', 'soc-investigate', 'soc-change', 'soc-recover'])
+        self.assertEqual(set(resync['inputSchema']['required']),
+                         {'skill', 'source_surface', 'target_surface', 'report_sha256', 'reason'})
+
+    def test_harness_review_tools_dispatch_exact_operations(self):
+        resync_args = {'skill': 'soc-query', 'source_surface': 'management', 'target_surface': 'sdk',
+                       'report_sha256': 'a' * 64, 'reason': '교차본 드리프트 정본 재동기화'}
+        ack_args = {'draft_kind': 'review_structural_findings', 'reference': 'soc-change',
+                    'report_sha256': 'b' * 64, 'reason': '확인 기록'}
+        for name, op, args in (('request_harness_skill_resync', 'harness-review-resync', resync_args),
+                               ('acknowledge_harness_finding', 'harness-review-ack', ack_args)):
+            msg = {'id': 1, 'method': 'tools/call', 'params': {'name': name, 'arguments': args}}
+            with patch.object(mcp, '_call_helper', return_value=mcp._result({'status': 'posting'})) as call:
+                self.assertFalse(mcp.handle(msg, 'write', 'b')['result']['isError'])
+                call.assert_called_once_with({'operation': op, **args}, readonly=False)
+            # extra/arbitrary field rejected before the helper runs
+            with patch.object(mcp, '_call_helper') as call:
+                msg['params']['arguments'] = {**args, 'path': '/etc/evil'}
+                self.assertTrue(mcp.handle(msg, 'write', 'b')['result']['isError'])
+                call.assert_not_called()
+            # not advertised on the read MCP
+            msg['params']['arguments'] = args
+            self.assertEqual(mcp.handle(msg, 'read', 'b')['error']['code'], -32602)
+
     def test_operation_schemas_expose_no_arbitrary_install_or_container_tool(self):
-        self.assertEqual(len(mcp.TOOLS), 11)
+        self.assertEqual(len(mcp.TOOLS), 13)
         for tool in mcp.TOOLS:
             self.assertFalse(tool['inputSchema']['additionalProperties'])
         tool = next(t for t in mcp.TOOLS if t['name']=='propose_service_action')

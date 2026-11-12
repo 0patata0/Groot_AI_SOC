@@ -27,11 +27,23 @@ def operation(kind="service"):
     elif kind == "harness_check":
         target = ops.HARNESS_TARGET
         plan = {"action": "run_structural_audit_once", "unit": ops.HARNESS_UNIT, "host": "b", "reason": "정기 구조 점검"}
+    elif kind == "harness_review":
+        target = ops.HARNESS_REVIEW_TARGET
+        plan = {"mode": "resync", "skill": "soc-query", "source_surface": "management", "target_surface": "sdk",
+                "source_path": "/opt/capstone-management/skill-soc-query.md",
+                "target_path": "/opt/capstone-ollama-trial/skill-soc-query.md",
+                "source_sha256": "a" * 64, "before_observation_sha256": "b" * 64,
+                "report_sha256": "c" * 64, "reason": "정본 바이트로 재동기화"}
+    elif kind == "harness_ack":
+        target = ops.HARNESS_REVIEW_TARGET
+        plan = {"mode": "acknowledge", "draft_kind": "review_structural_findings",
+                "reference": "soc-change", "report_sha256": "c" * 64, "reason": "확인"}
     else:
         target = "a:incident-ip"
         plan = {"ip": "8.8.4.4", "action": "temporary_block", "temporary_expires_at": expiry,
                 "keep_seconds": 3600, "before_observation_sha256": "1" * 64, "evidence_sha256": "3" * 64}
-    return {"request_id": secrets.token_hex(16), "kind": kind, "target": target, "plan": plan,
+    req_kind = "harness_review" if kind == "harness_ack" else kind
+    return {"request_id": secrets.token_hex(16), "kind": req_kind, "target": target, "plan": plan,
             "plan_sha256": ops.digest(plan), "expires_at": expiry, "requested_by": "hermes"}
 
 
@@ -70,6 +82,47 @@ class OperationsTest(unittest.TestCase):
         res, code = self.broker.result(created["operation_id"], {"proposal_digest": created["proposal_digest"],
             "status": "applied", "after_observation_sha256": ops.digest(after), "detail": "완료"})
         self.assertEqual((code, res["result_status"]), (200, "applied"))
+
+    def test_harness_review_resync_card_binds_copies_and_runs_approve_consume_result(self):
+        created = self.create(operation("harness_review"))
+        att = self.cards[-1]["attachments"][0]
+        self.assertEqual(att["title"], "Harness² 점검 결과 조치 승인 요청")
+        self.assertEqual([a["id"] for a in att["actions"]], ["approve", "deny"])
+        for value in ("재동기화", "soc-query", "a" * 64, "b" * 64):
+            self.assertIn(value, att["text"])
+        self.assertEqual(created["before_observation_sha256"], "b" * 64)
+        self.click("approve")
+        self.assertEqual(self.broker.get(created["operation_id"])[0]["status"], "approved")
+        consumed, code = self.consume(created)
+        self.assertEqual((code, consumed["status"], consumed["consumed_decision"]), (200, "consumed", "approve"))
+        after = {"status": "applied", "detail": "done"}
+        res, code = self.broker.result(created["operation_id"], {"proposal_digest": created["proposal_digest"],
+            "status": "applied", "after_observation_sha256": ops.digest(after), "detail": "완료"})
+        self.assertEqual((code, res["result_status"]), (200, "applied"))
+
+    def test_harness_review_acknowledge_is_non_mutating(self):
+        created = self.create(operation("harness_ack"))
+        att = self.cards[-1]["attachments"][0]
+        self.assertIn("확인(acknowledge)", att["text"])
+        self.assertIn("파일 변경 없음", att["text"])
+        self.assertEqual(created["before_observation_sha256"], "")
+
+    def test_harness_review_rejects_malformed_plans(self):
+        mutations = [
+            lambda p: p.update(target_surface="management"),       # source == target
+            lambda p: p.update(source_sha256="b" * 64),            # source == before (no drift)
+            lambda p: p.update(mode="apply"),                      # invalid mode
+            lambda p: p.update(skill="not-a-skill"),               # unknown skill
+            lambda p: p.pop("report_sha256"),                      # wrong field set
+        ]
+        for mutate in mutations:
+            req = operation("harness_review")
+            mutate(req["plan"])
+            req["plan_sha256"] = ops.digest(req["plan"])
+            self.assertEqual(self.broker.create(req)[1], 400)
+        req = operation("harness_review")
+        req["target"] = "a:harness2-review"
+        self.assertEqual(self.broker.create(req)[1], 400)
 
     def test_harness_check_rejects_malformed_plan_or_target(self):
         for mutate in (lambda p: p.update(action="x"), lambda p: p.update(unit="evil.service"),

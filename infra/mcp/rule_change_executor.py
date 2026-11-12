@@ -1528,7 +1528,9 @@ def _operation_services(engine):
     if engine.host == "a":
         services.append(_load_extension("incident_containment").ContainmentService(engine))
     if engine.host == "b":
-        services.append(_load_extension("service_action_executor").HarnessCheckService(engine))
+        module = _load_extension("service_action_executor")
+        services.append(module.HarnessCheckService(engine))
+        services.append(module.HarnessReviewService(engine))
     return services
 
 
@@ -1709,8 +1711,9 @@ def main(argv=None):
         result["processed"] = engine.worker_once()
         result["operations"].extend(services[0].worker_once())
         if engine.host == "b":
-            # services[1] on host b is the non-mutating Harness2 check worker.
-            result["operations"].extend(services[1].worker_once())
+            # services[1:] on host b are the Harness2 check and review workers.
+            for svc in services[1:]:
+                result["operations"].extend(svc.worker_once())
     elif readonly or not argv:
         if request.get("operation") == "inventory":
             try:
@@ -1744,6 +1747,19 @@ def main(argv=None):
             if engine.host != "b":
                 raise RuleChangeError("harness check request is available only on host b")
             result = _load_extension("service_action_executor").HarnessCheckService(engine).propose(request["reason"])
+        elif request.get("operation") == "harness-review-resync" and set(request) == {
+                "operation", "skill", "source_surface", "target_surface", "report_sha256", "reason"}:
+            if engine.host != "b":
+                raise RuleChangeError("harness review is available only on host b")
+            result = _load_extension("service_action_executor").HarnessReviewService(engine).propose_resync(
+                request["skill"], request["source_surface"], request["target_surface"],
+                request["report_sha256"], request["reason"])
+        elif request.get("operation") == "harness-review-ack" and set(request) == {
+                "operation", "draft_kind", "reference", "report_sha256", "reason"}:
+            if engine.host != "b":
+                raise RuleChangeError("harness review is available only on host b")
+            result = _load_extension("service_action_executor").HarnessReviewService(engine).propose_acknowledge(
+                request["draft_kind"], request["reference"], request["report_sha256"], request["reason"])
         else:
             raise RuleChangeError("unsupported operation or arguments")
     else:

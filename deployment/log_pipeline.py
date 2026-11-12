@@ -80,6 +80,11 @@ EXTRA = (V+'raw-operations/zz-capstone-evidence-v2.conf', V+'raw-operations/suri
          W+'capstone_vector_rules.xml', W+'agent-localfile.xml', W+'indexer-native/window-v2/monitor.json',
          W+'indexer-native/deploy-monitor-b.py',
          'infra/groot-a/logrotate-capstone-secstack', 'deployment/log_pipeline.py')
+# Sensor-host agent buffer. The package default (5000 events, 500/s) overflowed
+# during attack traffic (Wazuh rule 203 on A: 2026-10-29, 11-02, 11-05), dropping
+# IDS/WAF evidence. Same values as the existing-install controller
+# infra/normalization/vector/raw-operations/agent-buffer/tune-buffer-a.py.
+AGENT_BUFFER = {'queue_size': '100000', 'events_per_second': '1000'}
 LOGTESTS = ('test-installed-manager.sh','test-correlation-manager.sh','test-health-manager.sh','test-evidence-manager.sh')
 FIXTURES = ('positive-suricata','positive-nftables','positive-modsecurity','wrong-schema','wrong-pipeline','wrong-source')
 TIMERS = ('capstone-raw-operations@suricata.timer','capstone-raw-operations@modsecurity.timer',
@@ -514,6 +519,18 @@ done
 '''
 
 
+def agent_buffer(raw):
+    blocks=re.findall(rb'<client_buffer>.*?</client_buffer>',raw,re.S)
+    need(len(blocks)==1,'agent_buffer_ambiguous')
+    block=blocks[0]
+    need(re.search(rb'<disabled>\s*no\s*</disabled>',block) is not None,'agent_buffer_disabled')
+    for key,value in AGENT_BUFFER.items():
+        tag=key.encode()
+        block,count=re.subn(rb'<'+tag+rb'>\s*\d+\s*</'+tag+rb'>',b'<'+tag+b'>'+value.encode()+b'</'+tag+b'>',block)
+        need(count==1,'agent_buffer_field_missing')
+    return raw.replace(blocks[0],block,1)
+
+
 def agent_configuration(raw, localfiles):
     need(b'<!DOCTYPE' not in raw and b'<!ENTITY' not in raw, 'agent_xml_declaration')
     root=ET.fromstring(b'<config>'+raw+b'</config>')
@@ -523,7 +540,7 @@ def agent_configuration(raw, localfiles):
         need(node.text not in paths,'normalized_localfile_already_present')
     # Storage health is an existing JSON-formatted command emitted by the
     # maintenance wrapper's logger; retain journal/syslog agent defaults.
-    result=raw.rstrip()+b'\n'+localfiles+b'\n'
+    result=agent_buffer(raw.rstrip())+b'\n'+localfiles+b'\n'
     ET.fromstring(b'<config>'+result+b'</config>')
     return result
 

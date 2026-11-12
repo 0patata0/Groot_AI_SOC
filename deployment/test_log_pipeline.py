@@ -148,11 +148,21 @@ class Pipeline(unittest.TestCase):
         with self.assertRaises(lp.Refused):lp.suricata_config(source+source)
 
     def test_agent_config_preserves_raw_and_AR(self):
-        original=b'<ossec_config><client><disable-active-response>no</disable-active-response></client><localfile><location>/raw/eve.json</location><log_format>json</log_format></localfile></ossec_config>\n'
+        original=b'<ossec_config><client><disable-active-response>no</disable-active-response></client><client_buffer><disabled>no</disabled><queue_size>5000</queue_size><events_per_second>500</events_per_second></client_buffer><localfile><location>/raw/eve.json</location><log_format>json</log_format></localfile></ossec_config>\n'
         result=lp.agent_configuration(original,FILES[lp.W+'agent-localfile.xml'])
-        self.assertTrue(result.startswith(original));self.assertEqual(result.count(b'/raw/eve.json'),1)
+        tuned=original.replace(b'<queue_size>5000</queue_size><events_per_second>500</events_per_second>',
+                               b'<queue_size>100000</queue_size><events_per_second>1000</events_per_second>')
+        self.assertTrue(result.startswith(tuned.rstrip()));self.assertEqual(result.count(b'/raw/eve.json'),1)
         self.assertIn(b'<disable-active-response>no</disable-active-response>',result)
         with self.assertRaises(lp.Refused):lp.agent_configuration(result,FILES[lp.W+'agent-localfile.xml'])
+
+    def test_agent_buffer_sized_for_sensor_bursts_and_fails_closed(self):
+        base=b'<ossec_config><client_buffer><disabled>no</disabled><queue_size>5000</queue_size><events_per_second>500</events_per_second></client_buffer></ossec_config>'
+        self.assertIn(b'<queue_size>100000</queue_size><events_per_second>1000</events_per_second>',lp.agent_buffer(base))
+        self.assertEqual(lp.agent_buffer(lp.agent_buffer(base)),lp.agent_buffer(base))
+        for bad in (base.replace(b'client_buffer',b'x'),base+base,base.replace(b'<disabled>no',b'<disabled>yes'),
+                    base.replace(b'<queue_size>5000</queue_size>',b'')):
+            with self.subTest(bad=bad[:50]),self.assertRaises(lp.Refused):lp.agent_buffer(bad)
 
     def test_agent_DTD_rejected(self):
         with self.assertRaises(lp.Refused):lp.agent_configuration(b'<!DOCTYPE x><ossec_config/>',b'')

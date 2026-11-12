@@ -31,7 +31,7 @@
 | `prepare siem` | B core compose 생성 후 manager 기동 전에 규칙 bind와 분석 worker 순서를 설정. 호출자는 변경한 core compose를 다시 읽어 후속 compose 생성에 사용 |
 | `verify-base security` | 준비 파일과 실제 writer의 전체 mount·image·command·entrypoint·환경변수를 비교. 알 수 없는 추가 mount도 거절. 최종 정제 활성화는 요구하지 않음 |
 | `activate siem` | manager 기동 후 버전·규칙 syntax·실제 복사 SHA와 native 합성 logtest를 확인. 아직 monitor 미완료 |
-| `activate security` | agent 등록과 **SOC의 마지막 ossec.conf 변경 이후**에 실행. 기존 raw localfile/AR 설정을 보존하고 정제 localfile을 추가한 후 최종 XML SHA에 원본 gate를 결속. reader·timer 기동 및 첫 checkpoint 검사 |
+| `activate security` | agent 등록과 **SOC의 마지막 ossec.conf 변경 이후**에 실행. 기존 raw localfile/AR 설정을 보존하고 정제 localfile을 추가한다. 에이전트 버퍼는 `client_buffer` 100000건·1000건/초로 맞춘다(2026-11-13 추가, rule 203 대응). 그 후 최종 XML SHA에 원본 gate를 결속. reader·timer 기동 및 첫 checkpoint 검사 |
 | `monitor siem` | A agent 등록 이후, 현재 `capstone-security`의 유일한 Active agent ID를 조회해 관측 모니터 생성. disabled 생성→readback→revision CAS 활성화→재검증 |
 | `verify security\|siem` | 최종 receipt·파일·runtime identity·reader gate 또는 monitor의 실제 상태 확인. 중간 상태는 완료로 인정하지 않음 |
 

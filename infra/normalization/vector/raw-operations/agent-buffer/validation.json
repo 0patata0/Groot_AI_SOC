@@ -1,0 +1,42 @@
+{
+  "subject": "A (groot-sec) Wazuh agent client_buffer 5000/500 -> 100000/1000 with raw-state pin CAS",
+  "status": "candidate_dry_run_not_applied",
+  "observed_kst": "2026-11-13T02:21:47+09:00/2026-11-13T02:27:25+09:00",
+  "evidence": {
+    "rule_203_by_day": {"2026-10-29": 47, "2026-10-31": 1, "2026-11-02": 37, "2026-11-05": 23},
+    "full_duration_seconds_estimate": {"2026-10-29": 94, "2026-11-02": 74, "2026-11-05": 46},
+    "alerts_in_window": {"2026-10-29": 283, "2026-11-02": 6505, "2026-11-05": 167},
+    "peak_alerts_per_second_2026_11_02": 303,
+    "rootcheck_results_a": 19,
+    "memory_available_mb": 4582,
+    "avg_line_bytes": {"suricata_eve": 1594, "vector_ready": 1171, "vector_evidence": 1212}
+  },
+  "candidate": {
+    "controller": "infra/normalization/vector/raw-operations/agent-buffer/tune-buffer-a.py",
+    "controller_sha256_prefix": "bb37ea6dc5a3da35",
+    "based_on": "infra/normalization/vector/raw-operations/checkpoint-diagnosis/fix-stats-ignore-a.py (applied on A 2026-10-15)",
+    "apply_reviewed": false,
+    "config_sha256_prefix": {"before": "d65f9da4a3270e57", "after": "e4f25140425f8d87"},
+    "buffer_before": {"queue_size": "5000", "events_per_second": "500"},
+    "buffer_after": {"queue_size": "100000", "events_per_second": "1000"},
+    "fresh_install": "deployment/log_pipeline.py agent_buffer() in agent_configuration()"
+  },
+  "verification": {
+    "controller_tests": {"passed": 16, "count": 16},
+    "original_controller_tests": {"passed": 30, "count": 30},
+    "log_pipeline_tests": {"passed": 40, "count": 40},
+    "live_dry_run": {
+      "runtime_9_files_match": true,
+      "config_diff_lines": 2,
+      "state_jq": {"suricata": [152, 153, 0], "modsecurity": [114, 115, 0]},
+      "syntax_temp_copy": {"wazuh-agentd": 0, "wazuh-logcollector": 0},
+      "barriers_absent": true, "services_active": true, "timers_active_enabled": true,
+      "logcollector_single": true, "guard_ready": true, "evidence_dir_absent": true,
+      "live_unchanged": true, "temp_removed": true
+    }
+  },
+  "not_done": [
+    "operator approval, APPLY_REVIEWED=True commit, prepare/apply/verify on A",
+    "burst absorption check during the next attack test (attacks paused)"
+  ]
+}

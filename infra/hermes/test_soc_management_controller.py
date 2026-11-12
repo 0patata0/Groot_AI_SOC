@@ -1460,15 +1460,28 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(trace.finish(0)["state"], "waiting_approval")
         self.assertEqual(self.store.db.execute("SELECT status FROM proposals WHERE id=?", (proposal,)).fetchone()[0], "pending")
 
-    def test_coverage_loss_is_visible_not_normalized_to_zero(self):
-        response = {"alerts": [], "total": 0, "total_relation": "eq", "truncated": False}
-        self.store.ingest_alerts(response)
+    def test_coverage_loss_is_current_state_with_history_preserved(self):
+        clean = {"alerts": [], "total": 0, "total_relation": "eq", "truncated": False}
+        self.store.ingest_alerts(clean)                         # first poll: clean
+        self.assertFalse(self.store.summary()["alert_coverage_gap"])
         self.now += 301
-        self.store.ingest_alerts(response)
-        response.update(total=501, truncated=True)
-        self.store.ingest_alerts(response)
-        self.assertTrue(self.store.summary()["alert_coverage_gap"])
-        self.assertTrue(self.store.summary()["alert_truncated"])
+        self.store.ingest_alerts(clean)                         # polling gap -> currently gapping
+        s = self.store.summary()
+        self.assertTrue(s["alert_coverage_gap"])
+        self.assertTrue(s["alert_coverage_gap_last_kst"])       # gap window recorded
+        # A timely but truncated poll: the gap is no longer current, truncation is,
+        # and the past gap stays visible as history (not normalized to zero).
+        self.store.ingest_alerts({"alerts": [], "total": 501, "total_relation": "eq", "truncated": True})
+        s = self.store.summary()
+        self.assertFalse(s["alert_coverage_gap"])               # current coverage caught up
+        self.assertTrue(s["alert_coverage_gap_last_kst"])       # history preserved -> loss still visible
+        self.assertTrue(s["alert_truncated"])                   # latest poll truncated
+        self.assertTrue(s["alert_truncation_last_kst"])
+        # A timely, fully-covered poll clears the current truncation flag; history stays.
+        self.store.ingest_alerts(clean)
+        s = self.store.summary()
+        self.assertFalse(s["alert_truncated"])
+        self.assertTrue(s["alert_truncation_last_kst"])
 
     def test_process_lock_excludes_concurrent_controller(self):
         other = m.Store(self.temp.name)

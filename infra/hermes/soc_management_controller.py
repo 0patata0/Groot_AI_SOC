@@ -370,11 +370,26 @@ class Store:
             or response.get("total_relation") not in ("eq", "gte") or not isinstance(response.get("truncated"), bool)):
             raise ControllerError("alerts_shape_invalid")
         now, previous = self.clock(), float(self.meta("alert_poll_at"))
+        kst = timezone(timedelta(hours=9))
+        gap = bool(previous and now - previous > 300)
+        truncated = bool(response["truncated"] or response["total_relation"] != "eq" or response["total"] > len(alerts))
         with self.db:
-            if previous and now - previous > 300:
+            # The coverage/truncation flags report the CURRENT state: set on a
+            # gapping or truncated poll, and cleared once a timely, fully-covered
+            # poll confirms coverage is current again. A past gap/truncation is
+            # never hidden -- its window is preserved in the *_last_kst metas (and
+            # the audit journal) so coverage loss stays visible as history.
+            if gap:
                 self.set_meta("alert_coverage_gap_since", previous)
-            if response["truncated"] or response["total_relation"] != "eq" or response["total"] > len(alerts):
+                self.set_meta("alert_coverage_gap_last_kst", datetime.fromtimestamp(previous, kst).isoformat()
+                              + "/" + datetime.fromtimestamp(now, kst).isoformat())
+            else:
+                self.set_meta("alert_coverage_gap_since", "0")
+            if truncated:
                 self.set_meta("alert_truncation_at", now)
+                self.set_meta("alert_truncation_last_kst", datetime.fromtimestamp(now, kst).isoformat())
+            else:
+                self.set_meta("alert_truncation_at", "0")
             for alert in alerts:
                 if (not isinstance(alert, dict) or not isinstance(alert.get("_index"), str) or not alert["_index"]
                     or not isinstance(alert.get("_id"), str) or not alert["_id"] or len(canonical(alert)) > 65536):
@@ -503,7 +518,9 @@ class Store:
         return {"cases": states, "event_cursor": int(self.meta("event_cursor")),
                 "pending_reports": self.db.execute("SELECT count(*) FROM report_outbox WHERE delivery_state='pending'").fetchone()[0],
                 "alert_coverage_gap": self.meta("alert_coverage_gap_since") != "0",
-                "alert_truncated": self.meta("alert_truncation_at") != "0"}
+                "alert_truncated": self.meta("alert_truncation_at") != "0",
+                "alert_coverage_gap_last_kst": self.meta("alert_coverage_gap_last_kst", "") or None,
+                "alert_truncation_last_kst": self.meta("alert_truncation_last_kst", "") or None}
 
 
 def tool_payload(output):

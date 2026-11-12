@@ -119,6 +119,21 @@ class Gate(unittest.TestCase):
         self.assertEqual(o.replace("'.stats-ignore-'", "'.agent-buffer-'").rstrip(), p.rstrip())
 
 
+class AgentState(unittest.TestCase):
+    def test_wazuh_owned_run_directory_is_readable_for_status(self):
+        # Regression for 2026-11-13 07:08: the strict root-parent reader refused
+        # /var/ossec/var/run (wazuh-owned) after the change had been applied.
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory) / 'wazuh-agentd.state'
+            state.write_text("status='connected'\n")
+            with patch.object(m, 'parents', side_effect=AssertionError('strict parent check must not run')):
+                m.agent_connected(state)
+            state.write_text("status='pending'\n")
+            with self.assertRaisesRegex(m.Refused, 'agent_not_connected'): m.agent_connected(state)
+            link = Path(directory) / 'link'; link.symlink_to(state)
+            with self.assertRaises(OSError): m.agent_connected(link)
+
+
 class PrivateCAS(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='capstone-agent-buffer-test.')

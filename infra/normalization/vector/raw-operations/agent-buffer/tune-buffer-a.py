@@ -341,8 +341,22 @@ def buffer_values(raw):
     return {key: nodes[0].findtext(key) for key in BUFFER_AFTER}
 
 
-def agent_connected():
-    raw, _ = read(Path('/var/ossec/var/run/wazuh-agentd.state'), 8192)
+AGENT_STATE = Path('/var/ossec/var/run/wazuh-agentd.state')
+
+
+def agent_connected(path=AGENT_STATE):
+    """Status display only, not a trust anchor. /var/ossec/var/run is owned by
+    wazuh, so the strict root-parent read() must not be used here: on
+    2026-11-13 07:08 that refused the post-start check after the config/state
+    CAS and the one Wazuh start had already completed (parent_not_root_protected)."""
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        s = os.fstat(fd)
+        need(stat.S_ISREG(s.st_mode) and s.st_size <= 8192, 'agent_state_metadata_invalid')
+        with os.fdopen(fd, 'rb', closefd=False) as f:
+            raw = f.read(8193)
+    finally:
+        os.close(fd)
     need(b"status='connected'" in raw, 'agent_not_connected')
 
 

@@ -2,6 +2,10 @@
 
 이 문서는 과거 기록입니다. 현재 상태는 [STATUS](../STATUS.md), 실행 계획은 [PLAN](../PLAN.md)을 따릅니다. 같은 내용을 반복한 부분은 하나의 본문으로 연결했습니다. 서로 다른 날짜·판단·실패·정정은 합쳐 단정하지 않습니다. [정리·복원 안내](README.md).
 
+## A 버퍼 적용 중 사후 확인 코드 결함으로 컨트롤러 정지 (2026-11-13 07:08, A)
+
+10/15 적용된 3파일 CAS 컨트롤러를 이식한 `tune-buffer-a.py`가 설정·상태 CAS와 Wazuh 시작 1회를 마친 뒤, 사후 확인에서 멈췄다(`poststart_verification_failed_parent_not_root_protected`). 원인은 이식하면서 새로 넣은 `agent_connected()`다. 이 함수가 상태 파일 `/var/ossec/var/run/wazuh-agentd.state`를 신뢰 경로용 엄격 읽기(모든 상위 디렉터리 root 소유 요구)로 읽었는데, 그 디렉터리는 wazuh 소유다. 로컬 테스트는 이 함수를 실제 경로로 호출하지 않아 잡지 못했고, 라이브 드라이런도 이 함수를 부르지 않았다. 컨트롤러는 설계대로 자동 재시도·원복 없이 멈췄다. 읽기전용 점검으로 적용 상태를 확인한 뒤 남은 복원 2단계를 같은 코드로 마무리했다. 교훈은 두 가지다. ① 엄격 읽기는 신뢰 대상 파일에만 쓰고 상태 표시 파일에는 쓰지 않는다. ② 이식한 컨트롤러에 **새로 추가한 함수**는 실제 대상 경로의 소유·권한으로 드라이런에 포함한다. 수정과 회귀 테스트는 리포에 반영했다. [A 버퍼 기록](../infra/normalization/vector/raw-operations/agent-buffer/README.md).
+
 ## "에이전트 큐 가득 참" = Wazuh rule 203, B 에이전트 12시간 주기 rootcheck 버스트 (2026-11-13 01:46, 라이브 B 읽기전용)
 
 작업 #7의 제목 표현은 문자 그대로 Wazuh 기본 룰 203 "Agent event queue is full. Events may be lost."(level 9, `agent_flooding` 그룹, `0016-wazuh_rules.xml`)였다. 앞선 #7 진단(11/12 23:07)은 이를 컨트롤러 사건 적체로 해석했는데, 그 분석 자체는 유효하지만 이 경보의 원인과는 다른 문제다. 정정해 함께 남긴다.

@@ -1,6 +1,6 @@
 # A(센서) Wazuh 에이전트 버퍼 확대 후보
 
-2026-11-13 KST. **후보·라이브 읽기전용 드라이런까지이며 운영에는 미적용**이다. 컨트롤러의 `APPLY_REVIEWED=False`라 apply는 막혀 있다. 사용자 승인 후 이 값을 바꿔 커밋하고, 그 소스로 `prepare`→`apply`→`verify`를 관리자231 경유로 실행한다. [rule 203 전체 경과](../../../../validation/rule203/README.md) · [작은 원장](validation.json) · [현황](../../../../../STATUS.md).
+2026-11-13 KST. **07:07~07:13 사용자 승인("A 버퍼 적용해줘")으로 A에 적용·검증했다.** 적용 중 사후 확인 코드 결함으로 컨트롤러가 마지막 복원 직전에 멈췄다. 남은 복원 단계를 같은 코드로 마무리했고, 아래에 그대로 기록한다. 버퍼가 버스트를 실제로 흡수하는지는 다음 공격 시험에서 확인한다. [rule 203 전체 경과](../../../../validation/rule203/README.md) · [작은 원장](validation.json) · [현황](../../../../../STATUS.md).
 
 ## 왜
 
@@ -38,6 +38,20 @@ A의 `ossec.conf` SHA는 raw 상태 2개(`/var/lib/capstone-raw-operations/{suri
 | 원 컨트롤러 테스트 | 30/30(무회귀) |
 | 설치기 `deployment/test_log_pipeline.py` | 40/40(버퍼 적용·멱등·거부 추가, 기존 AR/raw 보존 테스트 갱신) |
 | A 라이브 읽기전용 드라이런(02:27) | 런타임 9파일 SHA 일치. 설정 diff **2줄**(5000→100000, 500→1000), 후보 SHA `e4f25140…`. 상태 후보 suricata rev 152→153·modsecurity 114→115 모두 `state.jq` 통과. 임시 사본 `wazuh-agentd`·`wazuh-logcollector -t -c` 0. 시작 차단 drop-in 없음, 서비스·타이머 정상, logcollector 1개, 가드 ready, 증거 디렉터리 없음, 라이브 설정 불변, 임시 사본 삭제 |
+
+## 적용 결과 (11/13 07:07~07:13, 관리자231 경유)
+
+| 단계 | 결과 |
+|---|---|
+| 승인 소스 | `APPLY_REVIEWED=True` 커밋 `a0af728`(컨트롤러 SHA `0fd83b02…`). A의 `/var/lib/capstone-agent-buffer-controller/tune-buffer-a.py`(root 0500)에 설치 |
+| prepare(07:07:18) | plan `878071c0…`, 운영 변경 없음, 설정 문법검사 로그 비어 있음(통과) |
+| apply(07:07:44 `systemd-run` 분리 실행, 1회) | 타이머 정지 → 시작 차단 → Wazuh 정지 1회 → 가드 → **3파일 CAS 완료**(설정 `d65f9da4`→`e4f25140`, 상태 suricata·modsecurity revision+1, 원본은 history 보관) → 차단 해제 → **Wazuh 시작 1회**(07:08:04) |
+| **중단** | 사후 확인의 `agent_connected()`가 `/var/ossec/var/run/wazuh-agentd.state`를 엄격 읽기(상위 디렉터리 root 소유 요구)로 읽었다. 그 디렉터리는 wazuh 소유라 `parent_not_root_protected`로 거부됐다. **설정 적용 실패가 아니라 확인 코드 결함**이며, 이 함수는 후보 단계에 새로 추가한 부분이다. 컨트롤러는 설계대로 자동 재시도·원복 없이 멈췄고, 유닛 정책·타이머 복원 2단계가 남았다 |
+| 점검(07:09:03, 읽기전용) | 계획된 변경 후 SHA·`state.jq`·런타임 일치, Vector 불변, Wazuh 새 기동·연결·미전송 없음, 버퍼 100000/1000, 가드 ready. 남은 것은 임시 drop-in(`Restart=no`)과 정지된 타이머 3개 |
+| 남은 단계 완료(07:09:29~32) | 공유 잠금 아래 컨트롤러 코드 그대로 실행: drop-in 바이트 확인 → 제거 → daemon-reload → `Restart=on-failure` 복원 확인 → 타이머 3개 `enable --now`·active 확인. 직후 추가로 넣은 가드 호출이 1회 비정상 종료했으나(원 흐름에 없는 호출), 07:09:47 직접 재실행에서 두 리더 모두 ready였다 |
+| 최종 확인(07:13:05) | 3파일·런타임·`state.jq`, 리더 active, Vector 불변, Wazuh 새 기동, 버퍼 값, 연결(생성 1,861/전송 1,877, 미전송 없음), 재시작 후 **버퍼 경고 0**, 가드, drop-in 없음, 정책 복원. 타이머 3개 active/enabled이고 **복원 후 각 1회 정상 실행**(07:10·07:11·07:13 success). 증거 디렉터리에 `manual-completion.json` 기록 |
+
+후속으로 리포 컨트롤러의 `agent_connected()`를 상태 표시 전용 읽기(심볼릭 링크 거부·정규 파일·크기 제한)로 고치고 회귀 테스트를 추가했다(17/17). A에 설치된 실행본은 계획 SHA와 결속된 감사용으로 그대로 둔다. 이 결함 수정은 이후 재사용을 위한 것이며 이번 적용을 다시 실행하지 않는다.
 
 ## 적용 시 유의
 

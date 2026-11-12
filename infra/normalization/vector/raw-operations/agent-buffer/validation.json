@@ -1,42 +1,143 @@
 {
   "subject": "A (groot-sec) Wazuh agent client_buffer 5000/500 -> 100000/1000 with raw-state pin CAS",
-  "status": "candidate_dry_run_not_applied",
+  "status": "applied_verified_burst_absorption_pending",
   "observed_kst": "2026-11-13T02:21:47+09:00/2026-11-13T02:27:25+09:00",
   "evidence": {
-    "rule_203_by_day": {"2026-10-29": 47, "2026-10-31": 1, "2026-11-02": 37, "2026-11-05": 23},
-    "full_duration_seconds_estimate": {"2026-10-29": 94, "2026-11-02": 74, "2026-11-05": 46},
-    "alerts_in_window": {"2026-10-29": 283, "2026-11-02": 6505, "2026-11-05": 167},
+    "rule_203_by_day": {
+      "2026-10-29": 47,
+      "2026-10-31": 1,
+      "2026-11-02": 37,
+      "2026-11-05": 23
+    },
+    "full_duration_seconds_estimate": {
+      "2026-10-29": 94,
+      "2026-11-02": 74,
+      "2026-11-05": 46
+    },
+    "alerts_in_window": {
+      "2026-10-29": 283,
+      "2026-11-02": 6505,
+      "2026-11-05": 167
+    },
     "peak_alerts_per_second_2026_11_02": 303,
     "rootcheck_results_a": 19,
     "memory_available_mb": 4582,
-    "avg_line_bytes": {"suricata_eve": 1594, "vector_ready": 1171, "vector_evidence": 1212}
+    "avg_line_bytes": {
+      "suricata_eve": 1594,
+      "vector_ready": 1171,
+      "vector_evidence": 1212
+    }
   },
   "candidate": {
     "controller": "infra/normalization/vector/raw-operations/agent-buffer/tune-buffer-a.py",
-    "controller_sha256_prefix": "bb37ea6dc5a3da35",
+    "controller_sha256_prefix": "0fd83b020de4168c (applied); repo later fixed agent_connected()",
     "based_on": "infra/normalization/vector/raw-operations/checkpoint-diagnosis/fix-stats-ignore-a.py (applied on A 2026-10-15)",
-    "apply_reviewed": false,
-    "config_sha256_prefix": {"before": "d65f9da4a3270e57", "after": "e4f25140425f8d87"},
-    "buffer_before": {"queue_size": "5000", "events_per_second": "500"},
-    "buffer_after": {"queue_size": "100000", "events_per_second": "1000"},
+    "apply_reviewed": true,
+    "config_sha256_prefix": {
+      "before": "d65f9da4a3270e57",
+      "after": "e4f25140425f8d87"
+    },
+    "buffer_before": {
+      "queue_size": "5000",
+      "events_per_second": "500"
+    },
+    "buffer_after": {
+      "queue_size": "100000",
+      "events_per_second": "1000"
+    },
     "fresh_install": "deployment/log_pipeline.py agent_buffer() in agent_configuration()"
   },
   "verification": {
-    "controller_tests": {"passed": 16, "count": 16},
-    "original_controller_tests": {"passed": 30, "count": 30},
-    "log_pipeline_tests": {"passed": 40, "count": 40},
+    "controller_tests": {
+      "passed": 16,
+      "count": 16
+    },
+    "original_controller_tests": {
+      "passed": 30,
+      "count": 30
+    },
+    "log_pipeline_tests": {
+      "passed": 40,
+      "count": 40
+    },
     "live_dry_run": {
       "runtime_9_files_match": true,
       "config_diff_lines": 2,
-      "state_jq": {"suricata": [152, 153, 0], "modsecurity": [114, 115, 0]},
-      "syntax_temp_copy": {"wazuh-agentd": 0, "wazuh-logcollector": 0},
-      "barriers_absent": true, "services_active": true, "timers_active_enabled": true,
-      "logcollector_single": true, "guard_ready": true, "evidence_dir_absent": true,
-      "live_unchanged": true, "temp_removed": true
+      "state_jq": {
+        "suricata": [
+          152,
+          153,
+          0
+        ],
+        "modsecurity": [
+          114,
+          115,
+          0
+        ]
+      },
+      "syntax_temp_copy": {
+        "wazuh-agentd": 0,
+        "wazuh-logcollector": 0
+      },
+      "barriers_absent": true,
+      "services_active": true,
+      "timers_active_enabled": true,
+      "logcollector_single": true,
+      "guard_ready": true,
+      "evidence_dir_absent": true,
+      "live_unchanged": true,
+      "temp_removed": true
     }
   },
   "not_done": [
-    "operator approval, APPLY_REVIEWED=True commit, prepare/apply/verify on A",
     "burst absorption check during the next attack test (attacks paused)"
-  ]
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: A 버퍼 적용해줘",
+    "source_commit": "a0af728",
+    "installed": "/var/lib/capstone-agent-buffer-controller/tune-buffer-a.py (root 0500)",
+    "plan_sha256": "878071c02f9d3202a998b8cc76834c198dc672b25e8910c14cdb1edadeff7628",
+    "prepare_kst": "2026-11-13T07:07:18+09:00",
+    "apply_started_kst": "2026-11-13T07:07:44+09:00",
+    "controller_outcome": {
+      "status": "refused",
+      "phase": "start_once",
+      "reason": "poststart_verification_failed_parent_not_root_protected",
+      "cause": "agent_connected() used strict root-parent read() on wazuh-owned /var/ossec/var/run",
+      "completed_changes": [
+        "ossec.conf",
+        "suricata state",
+        "modsecurity state",
+        "2 barrier files -> START_ONCE"
+      ],
+      "wazuh_stop_calls": 1,
+      "wazuh_start_calls": 1
+    },
+    "manual_completion": {
+      "window_kst": "07:09:29/07:09:32",
+      "steps": [
+        "restore_unit_policy",
+        "restore_timers"
+      ],
+      "under_shared_locks": true,
+      "extra_guard_call_nonzero_once": true,
+      "guard_recheck_07_09_47": "ready"
+    },
+    "final_verify_kst": "2026-11-13T07:13:05+09:00",
+    "final": {
+      "config_sha256_prefix": "e4f25140425f8d87",
+      "buffer": {
+        "queue_size": "100000",
+        "events_per_second": "1000"
+      },
+      "agent_msg_count": 1861,
+      "agent_msg_sent_incl_control": 1877,
+      "buffer_warnings_since_restart": 0,
+      "vector_unchanged": true,
+      "restart_policy_restored": true,
+      "timers_active_enabled_and_ran_once": true,
+      "guard_ready": true,
+      "barriers_absent": true
+    }
+  }
 }

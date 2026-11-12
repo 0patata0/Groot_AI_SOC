@@ -1979,7 +1979,7 @@ def run_hermes(store, case, prompt):
             selector.register(proc.stdin, selectors.EVENT_WRITE, "stdin")
             selector.register(proc.stdout, selectors.EVENT_READ, "stdout")
             selector.register(proc.stderr, selectors.EVENT_READ, "stderr")
-            sent, total, buffer, deadline = 0, 0, b"", time.monotonic() + (940 if dict(case).get("review_response_write") else 240)
+            sent, total, buffer, deadline = 0, 0, b"", time.monotonic() + (940 if dict(case).get("review_response_write") else 300)
             try:
                 while selector.get_map():
                     if time.monotonic() > deadline:

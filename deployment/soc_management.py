@@ -96,6 +96,28 @@ def read(path, limit=4 * 1024 * 1024, secret=False):
         os.close(fd)
 
 
+# Controller grouping for the dedicated volumetric-flood Wazuh rule 100113
+# (infra/groot-b/local_rules.xml, applied 2026-11-13). Seeded once on a fresh
+# state; an operator-set value (including an explicit empty one) is kept.
+CONTROLLER_META_DEFAULTS = {"flood_rule_ids": "100113"}
+
+
+def seed_controller_meta(state=Path("/var/lib/capstone-management")):
+    import sqlite3
+    mkdir(str(state))
+    path = state / "state.sqlite3"
+    need(not path.is_symlink(), "controller_state_symlink")
+    db = sqlite3.connect(path, timeout=5)
+    try:
+        os.chmod(path, 0o600)
+        with db:
+            db.execute("CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+            for key, value in CONTROLLER_META_DEFAULTS.items():
+                db.execute("INSERT OR IGNORE INTO meta VALUES(?,?)", (key, value))
+    finally:
+        db.close()
+
+
 def mkdir(path, mode=0o700, uid=0, gid=0):
     p = Path(path)
     if p.exists() or p.is_symlink():
@@ -514,6 +536,7 @@ def prepare_siem(s):
     write("/opt/capstone-management/chat_markdown.py", bundle["chat_markdown.py"], 0o644)
     write("/opt/capstone-management/SKILL.md", bundle["SKILL.md"], 0o644)
     write("/etc/capstone-management/controller.env", ("RULE_BROKER_TOKEN=" + share["rule_token"] + "\nMM_WEBHOOK=" + webhook + "\n").encode())
+    seed_controller_meta()
     for name in ("capstone-management.service.example", "capstone-management.timer.example"):
         write(Path("/etc/systemd/system") / name.removesuffix(".example"), read(s["source"] / "infra/hermes" / name), 0o644)
     run(["sshd", "-t"]); run(["systemctl", "reload", "ssh"])

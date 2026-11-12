@@ -35,7 +35,7 @@ EXPECTED_IDS = {
     WAF: [10100, 10101, 10200, 10300, 10400, 10500, 10501, 10600, 10601, 10602],
     SURICATA: [1000000, 1000001, 1000002, 1000010, 1000020, 1000030, 1000031, 1000032,
                1000033, 1000050, 1000051, 1000070, 1000071, 1000090, 1000091, 2034802, 2034806],
-    WAZUH: [100100, 100101, 100102, 100103, 100110, 100111, 100112, 100114, 100115,
+    WAZUH: [100100, 100101, 100102, 100103, 100110, 100111, 100112, 100113, 100114, 100115,
             100120, 100121, 100122, 100123, 100124, 100125, 100126,
             100127, 100128, 100129, 100130, 100131],
 }
@@ -147,7 +147,7 @@ class InventoryIntentTests(unittest.TestCase):
                     self.assertEqual(len(lines), 5)
                     self.assertIn('10 / 10', lines[2])
                     self.assertIn('17 / 17', lines[3])
-                    self.assertIn('21 / 21', lines[4])
+                    self.assertIn('22 / 22', lines[4])
 
     def test_device_table_with_only_other_read_results_is_not_a_rule_inventory(self):
         rows = [{'role': 'assistant', 'tool_calls': [{'id': 'read', 'function': {
@@ -165,7 +165,7 @@ class InventoryIntentTests(unittest.TestCase):
 
 
 class InventoryContentTests(unittest.TestCase):
-    def test_actual_files_render_ten_seventeen_twenty_one_exact_sparse_ids(self):
+    def test_actual_files_render_ten_seventeen_twenty_two_exact_sparse_ids(self):
         answer = render(all_exchanges())
         for target, expected in EXPECTED_IDS.items():
             with self.subTest(target=target):
@@ -176,7 +176,7 @@ class InventoryContentTests(unittest.TestCase):
         self.assertIn("noalert 표식 1개 포함", answer)
         self.assertIn("level 0 규칙 2개 포함", answer)
         self.assertNotIn("100104", answer)
-        self.assertNotIn("100113", answer)
+        self.assertNotIn("100116", answer)
         self.assertNotIn("1000099", answer)
         self.assertNotIn("SecRuleEngine", answer)
         self.assertNotIn("SecRule ARGS", answer)
@@ -564,7 +564,7 @@ class NativePersistenceBoundaryTests(unittest.TestCase):
         self.assertIn('앞선 턴', result.final_response)
         self.assertIn('새로 조회하지 않았습니다', result.final_response)
         self.assertNotIn('999', result.final_response)
-        for count in (10, 17, 21):self.assertIn(f'{count} / {count}', result.final_response)
+        for count in (10, 17, 22):self.assertIn(f'{count} / {count}', result.final_response)
         self.assertEqual(h.flushes[-1]['content'], result.final_response)
         self.assertIsNone(PLUGIN.render_prior_inventory('현재 장비별로 표로 보여줘', rows, len(rows)))
 
@@ -586,7 +586,7 @@ class NativePersistenceBoundaryTests(unittest.TestCase):
         h.kw['messages'].extend(exchange(SURICATA, 'suricata'))
         second = h.call(api_call_count=2, codex_ack_continuations=1)
         self.assertEqual(second.action, 'break')
-        for count in (10, 17, 21):
+        for count in (10, 17, 22):
             self.assertIn(f'**{count}개**', second.final_response)
         self.assertEqual(second.final_response, h.flushes[-1]['content'])
 

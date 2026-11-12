@@ -1,6 +1,6 @@
 # 볼류메트릭 플러드 전용 Wazuh 룰 100113 후보
 
-2026-11-13 KST. **후보·격리 검증까지이며 운영 룰에는 미적용**이다(컨트롤러 측 전제 1·2단계는 완료). 적용은 룰변경 승인 경로(`propose_rule_edit` → 관리자 카드 → `wazuh-analysisd -t`·매니저 재시작·읽기 확인)로만 한다. [현황 #7](../../../STATUS.md) · [작은 원장](validation.json) · [후보 룰](candidate-100113.xml) · [편집안](edit.json).
+2026-11-13 KST. **07:37 관리자 승인 카드로 운영에 적용했다**(proposal `29f4194c…`). 운영 엔진 9/9를 확인했고 리포 기준본·픽스처·설치기 기본값도 동기화했다. 첫 카드는 승인 버튼 콜백이 거부돼 만료됐다(아래). 적용은 룰변경 승인 경로(`propose_rule_edit` → 관리자 카드 → `wazuh-analysisd -t`·매니저 재시작·읽기 확인)로만 한다. [현황 #7](../../../STATUS.md) · [작은 원장](validation.json) · [후보 룰](candidate-100113.xml) · [편집안](edit.json).
 
 ## 왜 필요한가
 
@@ -38,6 +38,8 @@
 | 같은 출발지 플러드·기타 혼합 8건 | 100111×7+100112 | 100111/100113 교대+**100112** |
 | 두 출발지 플러드 8건 | 100111×8 | 100113×8, 버스트 없음 |
 
+**적용 후 운영 엔진(07:38, 읽기전용 logtest)**: 9/9, 매니저 07:37:28 재시작·데몬 정상·에이전트 4개 Active.
+
 이는 합성 EVE 줄의 룰 판정 시험이다. 실제 Kali 플러드·센서·수집·컨트롤러 E2E가 아니다(공격 중단 유지).
 
 ## 적용 순서와 전제
@@ -46,8 +48,8 @@ Suricata 룰이 `threshold: type both, track by_dst`라 경보는 **SID·목적�
 
 1. 컨트롤러 ②③ 운영 배포(T4, 관리자231 경유 리터럴패치). **완료(11/13 01:43 배포, 01:48 확정, 라이브 `178c8dbb`)**
 2. 메타 `flood_rule_ids=100113` 지정. 룰이 아직 없으면 효과가 없어 안전하다. **완료(11/13 01:48:53, 컨트롤러 잠금 획득 후 지정, 감사 로그 기록)**
-3. 이 편집안으로 `propose_rule_edit`를 제출하고 관리자 카드 승인 후 적용한다(`base_sha256` 불일치 시 거부).
-4. 적용 후 `infra/groot-b/local_rules.xml`을 운영과 동기화하고 해당 픽스처 테스트(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`)를 갱신한다. 그 전까지 이 파일은 운영과 같은 기준본으로 두며 후보를 넣지 않는다. 새 서버 설치 경로가 이 메타를 기본값으로 지정하도록 하는 작업도 이때 함께 반영한다(현재 설치기는 메타를 지정하지 않음).
+3. 이 편집안으로 `propose_rule_edit`를 제출하고 관리자 카드 승인 후 적용한다(`base_sha256` 불일치 시 거부). **완료**: 봇과 같은 경로(rulechg 쓰기 MCP → sudo 실행기)로 제출했다. 첫 카드 `b7fe247a…`(07:29)는 버튼을 눌러도 "허용되지 않은 콜백 출처입니다"로 거부됐다. 원인은 브로커의 콜백 허용값(172.19.0.3, 재부팅 뒤 DB 컨테이너 IP)과 실제 Mattermost IP(172.19.0.2)의 불일치였다. 허용값을 즉시 수정(07:35)하고 재제출한 `29f4194c…`가 07:37 승인·적용됐다(실행기: analysisd 시험·매니저 재시작·읽기 확인).
+4. 적용 후 `infra/groot-b/local_rules.xml`을 운영과 동기화하고 해당 픽스처 테스트(`infra/mcp/test_rule_inventory.py`·`infra/hermes/query-completion/test_inventory_render.py`)를 갱신한다. **완료**: 운영 SHA `efdbffaf…`와 동일하다. 적용 전 기준본은 `base-5301922c-local_rules.xml`로 보존해 후보 테스트에 쓴다. 새 설치는 `deployment/soc_management.py`의 `seed_controller_meta()`가 `flood_rule_ids=100113`을 넣는다(운영자 값은 유지). 그 전까지 이 파일은 운영과 같은 기준본으로 두며 후보를 넣지 않는다. 새 서버 설치 경로가 이 메타를 기본값으로 지정하도록 하는 작업도 이때 함께 반영한다(현재 설치기는 메타를 지정하지 않음).
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -I -m unittest discover -s infra/validation/flood-rule -p 'test_*.py'

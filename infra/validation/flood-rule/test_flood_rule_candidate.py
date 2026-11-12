@@ -17,7 +17,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 EXECUTOR = SourceFileLoader("flood_rule_executor", str(ROOT / "infra/mcp/rule_change_executor.py")).load_module()
 REGRESSION = SourceFileLoader("flood_rule_regression", str(HERE / "flood_rule_regression.py")).load_module()
-BASE = (ROOT / "infra/groot-b/local_rules.xml").read_text(encoding="utf-8")
+BASE = (HERE / "base-5301922c-local_rules.xml").read_text(encoding="utf-8")  # pre-apply live baseline
+LIVE_SYNCED = (ROOT / "infra/groot-b/local_rules.xml").read_text(encoding="utf-8")  # = applied 2026-11-13 07:37
 EDIT = json.loads((HERE / "edit.json").read_text(encoding="utf-8"))
 RULE = (HERE / "candidate-100113.xml").read_text(encoding="utf-8")
 
@@ -81,6 +82,12 @@ class FloodRuleCandidateTests(unittest.TestCase):
     def test_no_new_active_response_or_command_elements(self):
         for tag in ("active-response", "command", "options"):
             self.assertIsNone(self.rules["100113"].find(tag))
+
+    def test_repo_baseline_equals_the_applied_candidate(self):
+        # Applied through the admin card (proposal 29f4194c..., 2026-11-13 07:37 KST).
+        self.assertEqual(LIVE_SYNCED, self.candidate)
+        self.assertEqual(hashlib.sha256(LIVE_SYNCED.encode()).hexdigest(),
+                         'efdbffafb4aa6a6c21e36239b15ce54d18cfce67131711dc4ca3739ea18299a7')
 
     def test_regression_cases_are_consistent(self):
         names = [c["name"] for c in REGRESSION.CASES]

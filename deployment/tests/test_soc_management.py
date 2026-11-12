@@ -50,6 +50,49 @@ def module(name, role="a"):
     return m
 
 
+class ControllerMetaSeedTests(unittest.TestCase):
+    """Fresh installs group the dedicated flood rule 100113 into one case."""
+    def seed(self, directory, existing=None):
+        import sqlite3
+        state = Path(directory) / "state"
+        state.mkdir(mode=0o700)
+        if existing is not None:
+            db = sqlite3.connect(state / "state.sqlite3")
+            with db:
+                db.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+                db.execute("INSERT INTO meta VALUES('flood_rule_ids', ?)", (existing,))
+            db.close()
+        with mock.patch.object(install, "mkdir"):
+            install.seed_controller_meta(state)
+        db = sqlite3.connect(state / "state.sqlite3")
+        try:
+            return db.execute("SELECT value FROM meta WHERE key='flood_rule_ids'").fetchone()[0], \
+                oct((state / "state.sqlite3").stat().st_mode & 0o777)
+        finally:
+            db.close()
+
+    def test_fresh_state_gets_flood_rule_100113(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(self.seed(directory), ("100113", "0o600"))
+
+    def test_operator_value_including_empty_is_kept(self):
+        for value in ("", "100113,100114"):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                self.assertEqual(self.seed(directory, value)[0], value)
+
+    def test_seed_value_matches_the_applied_wazuh_rule(self):
+        rules = (Path(__file__).parents[2] / "infra/groot-b/local_rules.xml").read_text()
+        self.assertIn('<rule id="100113" level="10">', rules)
+        self.assertEqual(install.CONTROLLER_META_DEFAULTS, {"flood_rule_ids": "100113"})
+
+    def test_symlinked_state_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory) / "state"; state.mkdir()
+            (state / "state.sqlite3").symlink_to(Path(directory) / "elsewhere")
+            with mock.patch.object(install, "mkdir"), self.assertRaises(Exception):
+                install.seed_controller_meta(state)
+
+
 class BindingTests(unittest.TestCase):
     def test_rendered_controller_defers_only_actual_timer_lock_contention(self):
         m = module('soc_management_controller.py', 'b')

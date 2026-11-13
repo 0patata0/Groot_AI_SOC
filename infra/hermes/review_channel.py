@@ -365,7 +365,7 @@ class Dispatcher:
             if future.done():
                 report = future.result()
                 # Retain bounded audit facts, without exposing raw tool bodies in chat.
-                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'peer_attempts', 'peer_validation_errors', 'peer_error_code', 'structured_scope_complete', 'scope_resolution', 'unqueried', 'total_seconds', 'native_seconds', 'model_calls') if k in report}
+                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'peer_attempts', 'peer_validation_errors', 'peer_validation_details', 'peer_error_code', 'structured_scope_complete', 'scope_resolution', 'unqueried', 'total_seconds', 'native_seconds', 'model_calls') if k in report}
                 summary['calls'] = [{k: c[k] for k in ('server', 'name', 'seconds', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
                 summary['worker_seconds'] = max(0, time.monotonic()-self.progress_clock.get(jid,time.monotonic()))
                 with self.db:

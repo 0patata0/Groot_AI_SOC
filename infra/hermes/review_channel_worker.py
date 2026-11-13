@@ -83,6 +83,51 @@ def display_excerpt_path(path):
     return bool(keys) and keys[-1] in PEER_DISPLAY_EXCERPT_KEYS
 
 
+class PeerClaimRefused(ValueError):
+    """A refusal bound to one claim. str() stays the bare code, so callers and
+    peer_error_code are unchanged; detail says which claim and evidence failed."""
+    def __init__(self, code, index, claim, path=None, quote=None):
+        super().__init__(code)
+        claim = claim if isinstance(claim, dict) else {}
+        self.detail = {'code': code, 'claim_index': index, 'kind': str(claim.get('kind', ''))[:20],
+                       'evidence_path': str(path or '')[:120], 'evidence_quote': str(quote or '')[:120],
+                       'text': str(claim.get('text', ''))[:160]}
+
+
+# Why a claim was refused and what an acceptable correction is. Diagnosis only:
+# the checks themselves are unchanged (11-14 01:49 the peer repeated a refused
+# claim because the correction named only the code).
+PEER_REFUSAL_REASONS = {
+    'peer_query_scope_mismatch': ('이 근거는 검토자 자신의 요청 조건이거나 한도에 닿은 조회의 건수라 상대 조회·표본을 확인하거나 반박하지 못합니다',
+                                  '같은 범위의 관측 근거(경보 내용 필드 등)가 없으면 kind를 unverified로 바꾸세요'),
+    'peer_filter_scope_mismatch': ('이 근거는 질문에 없는 필터로 좁힌 조회입니다', 'kind를 unverified로 바꾸세요'),
+    'peer_zero_sample_dissent': ('반환 표본 0건은 상대 관측이나 전체 건수를 반박하지 못합니다', '이견 대신 unverified로 쓰세요'),
+    'peer_display_excerpt_scope': ('not_shown_* 값은 표시용 발췌에서 뺀 수라 어느 답변의 근거도 아닙니다', '다른 관측 근거를 고르거나 unverified로 쓰세요'),
+    'peer_snapshot_scope_mismatch': ('새 스냅샷의 관측 시각은 과거 관측의 오류 증거가 아닙니다', '시각 차이만으로는 unverified로 남기세요'),
+    'peer_component_scope_mismatch': ('indexer 클러스터 상태는 manager 클러스터의 증거가 아닙니다', 'kind를 unverified로 바꾸세요'),
+    'peer_source_ref_invalid': ('source_ref가 제공된 answers 식별자가 아닙니다', 'answers에 있는 식별자를 고르거나 비워 두고 unverified로 쓰세요'),
+    'peer_evidence_ref_invalid': ('evidence_ref가 제공된 evidence 식별자가 아닙니다', 'evidence에 있는 식별자를 고르세요'),
+    'peer_quote_not_in_answer': ('일치·이견에는 상대 답변의 실제 문장(source_ref)이 필요합니다', '그 문장을 가리키는 source_ref를 고르거나 unverified로 쓰세요'),
+    'peer_omission_not_established': ('누락은 상대 원문 전체에 없는 정확한 필드명에만 쓸 수 있습니다', '누락 대신 unverified로 쓰세요'),
+    'peer_evidence_quote_not_in_result': ('근거 인용이 조회 결과와 연결되지 않습니다', 'evidence에 있는 식별자를 고르세요'),
+    'peer_claim_kind': ('kind는 agree·disagree·omission·unverified 중 하나여야 합니다', 'kind를 그중 하나로 쓰세요'),
+    'peer_claim_text': ('text는 줄바꿈 없는 1~400자 한 줄이어야 합니다', 'text를 한 줄로 줄이세요'),
+}
+
+
+def peer_refusal_diagnosis(detail):
+    """The refused claim in the model's own words plus the rule it hit."""
+    if not isinstance(detail, dict) or detail.get('code') not in PEER_REFUSAL_REASONS:
+        return ''
+    reason, fix = PEER_REFUSAL_REASONS[detail['code']]
+    where = ('근거 ' + detail['evidence_path'] + (' = ' + detail['evidence_quote'] if detail.get('evidence_quote') else '')
+             if detail.get('evidence_path') else '')
+    return ('\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다): '
+            + str(int(detail.get('claim_index', 0)) + 1) + '번째 주장(' + (detail.get('kind') or '?') + ') '
+            + json.dumps(detail.get('text', ''), ensure_ascii=False) + (' · ' + where if where else '')
+            + '. 이유: ' + reason + '. 고칠 방법: ' + fix + '. 나머지 주장은 그대로 두어도 됩니다.')
+
+
 def peer_error_code(exc):
     if isinstance(exc, json.JSONDecodeError): return 'peer_json_invalid'
     return str(exc) if isinstance(exc, ValueError) and str(exc) in PEER_OUTPUT_ERRORS else type(exc).__name__
@@ -410,27 +455,27 @@ def validate_peer_claims(value, source, observed):
         raise ValueError('peer_claims_shape')
     lines = []
     labels = {'agree': '일치', 'disagree': '이견', 'omission': '누락', 'unverified': '미확인'}
-    for claim in claims:
+    for n, claim in enumerate(claims):
         if not isinstance(claim, dict) or claim.get('kind') not in labels:
-            raise ValueError('peer_claim_kind')
+            raise PeerClaimRefused('peer_claim_kind', n, claim)
         kind, text = claim['kind'], claim.get('text')
         quote, field = claim.get('other_quote'), claim.get('missing_field', '')
         if not isinstance(text, str) or not 1 <= len(text) <= 400 or '\n' in text:
-            raise ValueError('peer_claim_text')
+            raise PeerClaimRefused('peer_claim_text', n, claim)
         if kind in ('agree', 'disagree') or quote:
             if not isinstance(quote, str) or not quote.strip() or quote not in source['other_agent_answer']:
-                raise ValueError('peer_quote_not_in_answer')
+                raise PeerClaimRefused('peer_quote_not_in_answer', n, claim)
         if kind == 'omission':
             # Natural-language absence and truncated answers cannot prove omission.
             if (source.get('other_answer_truncated') or not isinstance(field, str)
                     or not re.fullmatch(r'[A-Za-z0-9_:.\-/]{3,100}', field)
                     or field.casefold() in source['other_agent_answer'].casefold()):
-                raise ValueError('peer_omission_not_established')
+                raise PeerClaimRefused('peer_omission_not_established', n, claim)
         index, evidence = claim.get('call_index'), claim.get('evidence_quote')
         if (type(index) is not int or not 0 <= index < len(observed)
                 or not isinstance(evidence, str) or not 1 <= len(evidence.strip()) <= 240
                 or evidence not in compact_peer_result(observed[index].get('result', ''))):
-            raise ValueError('peer_evidence_quote_not_in_result')
+            raise PeerClaimRefused('peer_evidence_quote_not_in_result', n, claim, quote=evidence)
         lines.append('- **' + labels[kind] + '**: ' + text)
     return '\n'.join(lines)
 
@@ -486,14 +531,16 @@ def bind_peer_references(value, catalog):
     answers={r['id']:r['quote'] for r in catalog['answers']}
     evidence={r['id']:r for r in catalog['evidence']}
     bound=[]
-    for claim in claims:
+    for n,claim in enumerate(claims):
         if not isinstance(claim,dict):raise ValueError('peer_claims_shape')
         source_ref,proof_ref=claim.get('source_ref'),claim.get('evidence_ref')
         if not isinstance(source_ref,str) or source_ref and source_ref not in answers:
-            raise ValueError('peer_source_ref_invalid')
+            raise PeerClaimRefused('peer_source_ref_invalid',n,claim)
         if not isinstance(proof_ref,str) or proof_ref not in evidence:
-            raise ValueError('peer_evidence_ref_invalid')
+            raise PeerClaimRefused('peer_evidence_ref_invalid',n,claim)
         proof=evidence[proof_ref]
+        def refuse(code):
+            return PeerClaimRefused(code,n,claim,proof.get('path'),proof.get('quote'))
         quote=answers.get(source_ref,'')
         freshness = proof['path'] in (
                 'result.observed_at','result.observed_at_kst','result.age_seconds',
@@ -502,34 +549,34 @@ def bind_peer_references(value, catalog):
                 r'신뢰할\s*수\s*없습니다|부정확합니다|잘못됐|시각\s*오류\s*:',str(claim.get('text','')))):
             # A new snapshot timestamp is not a receipt for the older answer's
             # observation/event. It cannot prove that older timestamp wrong.
-            raise ValueError('peer_snapshot_scope_mismatch')
+            raise refuse('peer_snapshot_scope_mismatch')
         if claim.get('kind') in ('agree','disagree') and request_echo_path(proof['path']):
             # The reviewer's own request conditions are not a receipt for the
             # other answer's query (11-13 21:55: Hermes' real limit 50 was
             # "contradicted" by the reviewer's own limit 10).
-            raise ValueError('peer_query_scope_mismatch')
+            raise refuse('peer_query_scope_mismatch')
         if (claim.get('kind') in ('agree','disagree') and proof.get('reviewer_limit_reached')
                 and limit_bound_count_path(proof['path'])):
             # A count from a read that hit the reviewer's own limit is that limit,
             # not a receipt for the other answer's sample (11-14 01:21).
-            raise ValueError('peer_query_scope_mismatch')
+            raise refuse('peer_query_scope_mismatch')
         if claim.get('kind') in ('agree','disagree') and display_excerpt_path(proof['path']):
             # How much of the reviewer's own result this excerpt leaves out says
             # nothing about either answer (11-14 01:38).
-            raise ValueError('peer_display_excerpt_scope')
+            raise refuse('peer_display_excerpt_scope')
         if claim.get('kind') in ('agree','disagree') and proof.get('filters_outside_question'):
             # A read narrowed by a filter the question never named cannot judge
             # an answer about the question's scope (11-13 22:22: an unasked
             # program_name='systemd' read "refuted" an unfiltered sample of 10).
-            raise ValueError('peer_filter_scope_mismatch')
+            raise refuse('peer_filter_scope_mismatch')
         if claim.get('kind')=='disagree' and zero_sample_proof(proof):
             # 11-13 22:22: returned_count 0 was read as "0 in the whole window".
-            raise ValueError('peer_zero_sample_dissent')
+            raise refuse('peer_zero_sample_dissent')
         target=(proof.get('arguments') or {}).get('target','')
         if (claim.get('kind') in ('agree','disagree') and target.endswith(':wazuh-indexer')
                 and proof['path']=='result.metrics.cluster_status'
                 and re.search(r'cluster is not enabled|(?:manager|매니저|Wazuh).{0,30}클러스터.{0,40}비활성',quote,re.I)):
-            raise ValueError('peer_component_scope_mismatch')
+            raise refuse('peer_component_scope_mismatch')
         bound.append({'kind':claim.get('kind'),'text':claim.get('text'),
             'other_quote':quote,'missing_field':claim.get('missing_field',''),
             'call_index':proof['call_index'],'evidence_quote':proof['quote']})
@@ -637,6 +684,13 @@ async def review_answer(config, request, report):
             except (ValueError, TypeError) as exc:
                 code = peer_error_code(exc)
                 report['peer_validation_errors'].append(code)
+                detail = getattr(exc, 'detail', None)
+                if detail:
+                    # Stored audit says which rule hit which evidence path. The
+                    # refused claim text and the tool quote stay in this prompt
+                    # only: rejected drafts and tool bodies are never stored.
+                    report.setdefault('peer_validation_details', []).append(
+                        {**{k: detail[k] for k in ('code', 'claim_index', 'kind', 'evidence_path')}, 'attempt': attempt + 1})
                 if attempt or code not in PEER_OUTPUT_ERRORS or time.monotonic() >= deadline:
                     raise
                 # Pure synthesis correction only: the same bound answer and
@@ -653,7 +707,7 @@ async def review_answer(config, request, report):
                     '반환 표본 0건은 상대 주장의 반박 근거가 아닙니다. '
                     '이렇게 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
                     '미확인은 부정이 아니며 상대가 쓰지 않은 보장을 만들어 반박하지 마세요. '
-                    '')]
+                    + peer_refusal_diagnosis(detail))]
         report['peer_review'] = 'source_bound_claims'
         report['peer_claims'] = claims['claims']
         if any(c['kind']=='unverified' for c in claims['claims']):

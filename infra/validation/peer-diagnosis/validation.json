@@ -1,0 +1,101 @@
+{
+  "subject": "Peer refusal diagnosis (claim, evidence path, reason, acceptable fix) in the correction message and a path-only refusal audit in the joint-channel queue",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T01:49+09:00",
+    "post": "yrm5pj51eb8rppqfpu1i7pz93c",
+    "peer_review": "synthesis_failed",
+    "peer_validation_errors": [
+      "peer_query_scope_mismatch",
+      "peer_query_scope_mismatch"
+    ],
+    "causes": [
+      "the correction message named only the code",
+      "refused evidence paths were not recorded (ValueError carried only the code; the dispatcher stores a fixed summary)"
+    ]
+  },
+  "change": {
+    "review_channel_worker.py": {
+      "PeerClaimRefused": "claim-bound refusal (index, kind, evidence path/quote, text); str() stays the code",
+      "PEER_REFUSAL_REASONS": "reason + acceptable fix per claim-level code",
+      "peer_refusal_diagnosis": "appended to the single correction message",
+      "peer_validation_details": "code, claim_index, kind, evidence_path, attempt (no claim text, no tool quote)"
+    },
+    "review_channel.py": "summary keeps peer_validation_details",
+    "unchanged": [
+      "checks and refusal codes",
+      "attempt limit 2",
+      "no rewriting of model output",
+      "Ollama and management copies"
+    ]
+  },
+  "sha256": {
+    "infra/hermes/review_channel_worker.py": {
+      "base": "da7e3a3de93a92b7e6cd5e528595c819779cca49b410ba6d31d779dfd8f84275",
+      "candidate": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002"
+    },
+    "infra/hermes/review_channel.py": {
+      "base": "4e2383284bcb8c76a24e02e60379dc24fbe858c1776500866890d89946438eb5",
+      "candidate": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217"
+    },
+    "infra/hermes/test_review_channel.py": "54a836dbf9b2db8b38072f94c6a02639cb4e3a623c0b4dec6946663b3347afe5",
+    "infra/validation/peer-diagnosis/apply_b.py": "f667444cb1a0ac745a7cf7029148615441c82a5d56b1b96215f4d89155316a51"
+  },
+  "tests": {
+    "new": {
+      "test_peer_correction_names_the_refused_claim_and_records_only_its_path": "pass; errors on HEAD"
+    },
+    "related": "test_review_channel + test_workflow_contract 98 OK",
+    "bundles_vs_head": {
+      "hermes_all": "1295 (base 1294), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, base-only flaky 2",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-peer-diagnosis-032632/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py",
+      "scripts/channel_controller.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "worker + dispatcher + review-chat receipt (2 entries, others kept), dispatcher restarted",
+    "rollback": "3 files + dispatcher restart after the queue is idle",
+    "restart_pending_when_busy": true,
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "review_receipt_not_baseline_no_change"
+    ]
+  },
+  "installer": "deployment/review_chat.py hashes repo sources at install time; no pin update needed",
+  "live_precondition": {
+    "observed_kst": "2026-11-14T03:29:08+09:00",
+    "worker": "da7e3a3de93a92b7",
+    "dispatcher": "4e2383284bcb8c76",
+    "receipt": "both entries at base",
+    "deploy_dir_free": true,
+    "dispatcher_running_since": "2026-11-12 13:35:59 KST"
+  },
+  "open_outside_scope": [
+    "unverified claim text reasoning from the reviewer's limit",
+    "conditional read as absolute",
+    "agree text presenting a zero sample as absence"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

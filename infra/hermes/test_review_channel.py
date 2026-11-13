@@ -406,6 +406,51 @@ class Tests(unittest.TestCase):
         self.assertIn('미확인',result['final_response']);self.assertNotIn('실제는 limit 10',result['final_response'])
         self.assertIn('검토자 자신의 요청 조건',calls[0][0][1]);self.assertIn('검토자 자신의 요청 조건',calls[1][-1][1])
 
+    def test_peer_correction_names_the_refused_claim_and_records_only_its_path(self):
+        """11-14 01:49: both attempts were refused with the bare code and the
+        peer repeated the claim; the correction now says which claim, which
+        evidence, why and how to fix it, and the stored audit keeps the rule
+        and evidence path without the rejected claim text or tool quote."""
+        import asyncio
+        _,_,_,_,_,ids=self.query_scope_fixture([{}])
+        bad={'claims':[{'kind':'agree','text':'반환 0건 일치','source_ref':'a0','missing_field':'','evidence_ref':ids['result.returned_count']},
+                       {'kind':'disagree','text':'REFUSED_CLAIM_TEXT 상대 limit 50과 다름','source_ref':'a0','missing_field':'',
+                        'evidence_ref':ids['result.limit']}]}
+        good={'claims':[bad['claims'][0],{'kind':'unverified','text':'상대 조회 한도는 검토자 조회로 확인할 수 없어 미확인','source_ref':'a0',
+                         'missing_field':'','evidence_ref':ids['result.limit']}]}
+        llm,h,report,request,calls,_=self.query_scope_fixture([bad,good])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['peer_review'],'source_bound_claims');self.assertEqual(result['peer_attempts'],2)
+        self.assertEqual(result['peer_validation_details'],[{'code':'peer_query_scope_mismatch','claim_index':1,'kind':'disagree',
+                                                             'evidence_path':'result.limit','attempt':1}])
+        correction=calls[1][-1][1]
+        for needle in ('이번 정정에서 고칠 곳','2번째 주장(disagree)','REFUSED_CLAIM_TEXT','result.limit = "limit": 10',
+                       '검토자 자신의 요청 조건이거나 한도에 닿은 조회의 건수','kind를 unverified로 바꾸세요','나머지 주장은 그대로'):
+            self.assertIn(needle,correction)
+        # The refusal is still the same bare code for every existing caller.
+        with self.assertRaises(ValueError) as caught:
+            w.bind_peer_references(bad,w.peer_reference_catalog(w.peer_source_answer(request['question']),report['calls']))
+        self.assertEqual(str(caught.exception),'peer_query_scope_mismatch')
+        self.assertEqual(w.peer_error_code(caught.exception),'peer_query_scope_mismatch')
+        self.assertEqual(w.peer_refusal_diagnosis(None),'');self.assertEqual(w.peer_refusal_diagnosis({'code':'unknown'}),'')
+        self.assertTrue(set(w.PEER_REFUSAL_REASONS) <= w.PEER_OUTPUT_ERRORS)
+        # validate_peer_claims refusals are claim-bound too.
+        with self.assertRaises(ValueError) as caught:
+            w.validate_peer_claims({'claims':[{'kind':'agree','text':'t','other_quote':'not in answer','call_index':0,'evidence_quote':'x'}]},
+                                   {'other_agent_answer':'원문','other_answer_truncated':False},report['calls'])
+        self.assertEqual((str(caught.exception),caught.exception.detail['claim_index']),('peer_quote_not_in_answer',0))
+        # The dispatcher stores the path-only audit and never the refused text.
+        self.post['message']='출발지 192.0.2.4 최근 30분 ModSecurity 경보 조사';self.d.add(self.post)
+        job=self.job();self.d.placeholder(job)
+        future=concurrent.futures.Future();future.set_result({'status':'partial','final_response':'교차 검토','calls':[],
+            'peer_review':'source_bound_claims','peer_validation_errors':['peer_query_scope_mismatch'],
+            'peer_validation_details':result['peer_validation_details']})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        stored=json.loads(self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0])
+        self.assertEqual(stored['peer_validation_details'][0]['evidence_path'],'result.limit')
+        self.assertNotIn('REFUSED_CLAIM_TEXT',json.dumps(stored,ensure_ascii=False))
+
     def test_peer_repeated_false_query_dissent_is_not_posted(self):
         import asyncio
         _,_,_,_,_,ids=self.query_scope_fixture([{}])

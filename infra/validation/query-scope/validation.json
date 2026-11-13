@@ -1,6 +1,6 @@
 {
   "subject": "Query scope: a first read is never narrower than the question, and peer agree/disagree evidence must be inside the question's scope",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed_rules_not_exercised_live",
   "incident_2026_11_13_2222": {
     "peer_false_dissent": [
       "returned_count 0 read as whole-window zero (indexed_window_total_count null)",
@@ -94,8 +94,73 @@
     "Hermes may still choose an off-scope tool; it can no longer fail on an invented firewall snapshot in the first read"
   ],
   "not_done": [
-    "apply on B after approval",
-    "real chat: peer reads without unasked filters, no zero/out-of-scope dissent posted, Hermes first read without snapshot (model output varies)",
-    "confirm or let the 45-minute rollback run"
+    "live occurrence of peer_filter_scope_mismatch / peer_zero_sample_dissent / first-read snapshot drop not yet observed (regression-only)"
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: 조회 범위 수정 적용해줘",
+    "at_kst": "2026-11-13T22:46:28+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-query-scope",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 22:51:35"
+    ],
+    "installed": {
+      "runner x4 + gate": "bc19115d5c524a55",
+      "query x2": "3847d9c8bf37ce29",
+      "runtime": "026a2cf950a3c5ed",
+      "worker": "f4f426c74a0eae37"
+    },
+    "ollama_restart": "rc 0, active, websocket 22:46:30, log errors 0",
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "tick_errors": 0,
+      "review_receipt_all_match": true,
+      "live_shared_function": {
+        "wazuh_program_name_offered": false,
+        "wazuh_lookback_enum": [
+          30
+        ],
+        "fw_first_read": [
+          "limit",
+          "offset(0)"
+        ]
+      }
+    },
+    "real_chat": {
+      "post_kst": "22:47:28",
+      "hermes": {
+        "first_selection": [
+          "get_wazuh_cluster_nodes {limit 20, node_type 'any', offset 0} -> Wazuh API 400",
+          "search_modsecurity_alerts {lookback 30, limit 10}"
+        ],
+        "then": [
+          "search_wazuh_alerts {lookback 30, limit 20}",
+          "search_suricata_alerts {lookback 30, limit 10}"
+        ],
+        "event_filters": "none",
+        "fw_read": "none (snapshot rule not exercised)",
+        "result": "tool-failure fallback (off-scope cluster-nodes read)"
+      },
+      "peer": {
+        "model_calls": 4,
+        "reads": [
+          "search_modsecurity_alerts",
+          "search_suricata_alerts",
+          "get_wazuh_agents"
+        ],
+        "peer_validation_errors": [],
+        "claims": "agree x3, disagree 0",
+        "issue": "read wazuh agents instead of wazuh alerts; agreement 'agents ACTIVE so collection healthy' is an overclaim"
+      },
+      "new_rules_fired": false
+    },
+    "rollback_timer": "stopped (inactive)"
+  },
+  "next_candidate": [
+    "investigation questions naming devices/alert kinds: bind first-read tools to that scope (shared tool_scope) for Hermes and the Ollama peer",
+    "an off-scope read failure should not turn an otherwise answered in-scope investigation into a failure fallback (review the verdict)",
+    "peer: 'agents ACTIVE' cannot support 'collection healthy'"
   ]
 }

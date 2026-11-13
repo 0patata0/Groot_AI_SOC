@@ -25,7 +25,17 @@ PROTECTED_TOOLS = {
     'resp': {'block_ip', 'unblock_ip'},
 }
 PARITY_TOOLS = {**READ_TOOLS, **PROTECTED_TOOLS, 'resp': {'list_blocks', 'get_firewall_rules', 'block_ip', 'unblock_ip'}}
-PROFILES = {'rule-a': ['rule-a'], 'rule-b': ['rule-b'],
+# The exact tool set each MCP server advertises (fail-closed contract) is
+# separate from what this agent may use. B's rule servers also advertise the
+# Harness² governance tools (11/13): a status read and three approval-request
+# writes for Hermes' administrator cards. They are acknowledged here so any
+# other drift still stops the run, but no Ollama mode exposes them.
+HARNESS_GOVERNANCE_B = {
+    'rule-b': {'get_harness_check_status'},
+    'rule-write-b': {'request_harness_check', 'request_harness_skill_resync', 'acknowledge_harness_finding'},
+}
+CATALOG_TOOLS = {server: tools | HARNESS_GOVERNANCE_B.get(server, set()) for server, tools in PARITY_TOOLS.items()}
+PROFILES ={'rule-a': ['rule-a'], 'rule-b': ['rule-b'],
             'rule-write-a': ['rule-write-a'], 'rule-write-b': ['rule-write-b'], 'resp': ['resp-a'],
             'security-events': ['mcp-b', 'security-events'],
             'system-diagnostics': ['mcp-b', 'system-diagnostics'], 'wazuh-ro': ['mcp-b']}
@@ -42,7 +52,7 @@ def protected(server, name):
 
 def filter_catalog(server, tools, mode):
     require(server in capabilities(mode), 'server_not_authorized')
-    require({t.name for t in tools} == PARITY_TOOLS[server], 'server_tool_contract_changed')
+    require({t.name for t in tools} == CATALOG_TOOLS[server], 'server_tool_contract_changed')
     return [t for t in tools if t.name in capabilities(mode)[server]]
 
 

@@ -1,0 +1,105 @@
+{
+  "subject": "Ollama MCP catalog contract: acknowledge B's Harness² governance tools without exposing them (joint-channel peer ValueError)",
+  "status": "candidate_tested_not_applied",
+  "symptom": {
+    "peer_failures_kst": [
+      "17:23",
+      "20:17",
+      "20:44",
+      "21:27"
+    ],
+    "result": "partial, error_type ValueError, 0 model calls, 0 tool calls (~7 s)",
+    "queue_state": "done (state only; earlier 20:42 record called it normal - corrected)"
+  },
+  "cause": {
+    "trace_kst": "2026-11-13T21:43:21+09:00",
+    "first_value_error": "server_tool_contract_changed",
+    "frames": [
+      "policy.py:require",
+      "policy.py:filter_catalog",
+      "runtime.py:create_all",
+      "mcp_use mcpagent.initialize",
+      "runtime.py:run"
+    ],
+    "catalog_kst": "2026-11-13T21:44:49+09:00",
+    "extra_live_tools": {
+      "rule-b": [
+        "get_harness_check_status"
+      ],
+      "rule-write-b": [
+        "acknowledge_harness_finding",
+        "request_harness_check",
+        "request_harness_skill_resync"
+      ]
+    },
+    "other_servers_equal": [
+      "rule-a",
+      "security-events",
+      "system-diagnostics",
+      "wazuh-ro",
+      "resp",
+      "rule-write-a"
+    ],
+    "origin": "task #5 Harness² approval-card tools deployed 2026-11-13 00:34 (T2); Ollama policy list not updated",
+    "access_mode": "hermes-parity (peer forces read-only)"
+  },
+  "change": {
+    "policy.py": "CATALOG_TOOLS (exact advertised set) = PARITY_TOOLS + HARNESS_GOVERNANCE_B; filter_catalog checks CATALOG_TOOLS; READ_TOOLS/PARITY_TOOLS unchanged; the four tools are never exposed and alias() refuses them",
+    "test_policy.py": "CatalogContract: MCP source (rule_change_mcp.tool_list per host, security-events tools/list) equals the contract; live B catalogs accepted without exposure; other drift and host-scope drift still fail; read pool and counts unchanged"
+  },
+  "sha256": {
+    "infra/ollama-trial/policy.py": {
+      "base": "7716bdd32495dd547072cc1070d6c13a07d4fb9e5ca1a594aba152b63cdf496b",
+      "candidate": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b"
+    },
+    "infra/ollama-trial/test_policy.py": "4f14aa373aed1e71a355d9c053913116a9513e0ce233dbfa0672c8d2eac7d250",
+    "infra/validation/catalog-contract/apply_b.py": "65056a3b0534974ff5cc6431a476cc880d7bb82a87ad29b4e897f53d1751c7c5"
+  },
+  "tests": {
+    "catalog_contract": {
+      "candidate": "5/5",
+      "base_policy": "5/5 fail"
+    },
+    "test_policy": "17/17",
+    "bundles_vs_head": {
+      "ollama_trial": "368 OK (base 363)",
+      "query_completion": "408 OK",
+      "hermes_all": "1250, same known failures (base has 1 extra: uncommitted pin of other work)",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332); 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-catalog-contract-214758/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/sdk_authority.py (infra/ollama-trial/policy.py)"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "policy+receipt replaced, markers/backup/rollback written",
+    "rollback": "both restored",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "candidate_changed"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T21:44:49+09:00",
+    "/opt/capstone-ollama-trial/policy.py": "7716bdd32495dd54",
+    "receipt sources.policy.py": "7716bdd32495dd54",
+    "prereqs_copy_preexisting_drift": "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/policy.py c3701c921eb48378 (10/31), not changed by this candidate"
+  },
+  "not_done": [
+    "apply on B (apply_b.py) after approval",
+    "real chats: joint-channel peer completes an independent read and comparison; Ollama-direct investigation reaches the model",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

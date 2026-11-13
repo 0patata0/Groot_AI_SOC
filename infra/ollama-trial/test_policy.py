@@ -140,5 +140,67 @@ class JsonProtocol(unittest.TestCase):
         run.assert_not_called()
 
 
+class CatalogContract(unittest.TestCase):
+    """2026-11-13: B's rule servers gained the Harness² governance tools (11/13
+    00:34) and every Ollama run that connected to rule-b stopped with
+    server_tool_contract_changed (joint-channel peer reviews 17:23, 20:17,
+    20:44, 21:27). The contract is checked against the MCP sources so a new
+    server tool fails here first, not in a live chat."""
+
+    @staticmethod
+    def _load(name, path):
+        spec = importlib.util.spec_from_file_location(name, HERE.parents[1] / path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+        return module
+
+    def test_rule_server_catalogs_match_the_mcp_source(self):
+        mcp = self._load('_catalog_rule_change_mcp', 'infra/mcp/rule_change_mcp.py')
+        for server, access, host in (('rule-a', 'read', 'a'), ('rule-b', 'read', 'b'),
+                                     ('rule-write-a', 'write', 'a'), ('rule-write-b', 'write', 'b')):
+            with self.subTest(server=server):
+                self.assertEqual({t['name'] for t in mcp.tool_list(access, host)}, policy.CATALOG_TOOLS[server])
+
+    def test_security_events_catalog_matches_the_mcp_source(self):
+        server = self._load('_catalog_security_events_mcp', 'infra/mcp/security-events-mcp.py')
+        incident = self._load('_catalog_incident_evidence', 'infra/mcp/incident_evidence.py')
+        # The advertised list is TOOLS plus the incident bundle tool; only the
+        # root-owned path check of the fixed loader is replaced here.
+        with patch.object(server, 'fixed_module', return_value=incident):
+            listed = server.handle({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/list'})['result']['tools']
+        self.assertEqual({t['name'] for t in listed}, policy.CATALOG_TOOLS['security-events'])
+
+    def test_live_b_catalogs_are_accepted_without_exposing_governance_tools(self):
+        def tools(names): return [SimpleNamespace(name=n) for n in sorted(names)]
+        read_b = tools(policy.RULE_READS | {'get_harness_check_status'})
+        write_b = tools(policy.PROTECTED_TOOLS['rule-write-b'] | policy.HARNESS_GOVERNANCE_B['rule-write-b'])
+        for mode in ('read-only', 'hermes-parity'):
+            self.assertEqual({t.name for t in policy.filter_catalog('rule-b', read_b, mode)}, policy.RULE_READS)
+        self.assertEqual({t.name for t in policy.filter_catalog('rule-write-b', write_b, 'hermes-parity')},
+                         policy.PROTECTED_TOOLS['rule-write-b'])
+        with self.assertRaisesRegex(ValueError, 'server_not_authorized'):
+            policy.filter_catalog('rule-write-b', write_b, 'read-only')
+        for name in ('get_harness_check_status', 'request_harness_check'):
+            for server in ('rule-b', 'rule-write-b'):
+                with self.assertRaisesRegex(ValueError, 'tool_not_allowed'):
+                    policy.alias(server, name)
+
+    def test_other_drift_still_fails_closed(self):
+        base = policy.RULE_READS | {'get_harness_check_status'}
+        for names in (policy.RULE_READS, base | {'shell'}, base - {'get_security_rules'}):
+            with self.subTest(n=len(names)), self.assertRaisesRegex(ValueError, 'server_tool_contract_changed'):
+                policy.filter_catalog('rule-b', [SimpleNamespace(name=n) for n in names], 'read-only')
+        # Host scope: the B-only tools are drift on A.
+        with self.assertRaisesRegex(ValueError, 'server_tool_contract_changed'):
+            policy.filter_catalog('rule-a', [SimpleNamespace(name=n) for n in base], 'read-only')
+
+    def test_capabilities_and_read_pool_are_unchanged(self):
+        import read_pool
+        self.assertEqual(policy.READ_TOOLS['rule-b'], policy.RULE_READS)
+        self.assertEqual(policy.PARITY_TOOLS['rule-write-b'], {'propose_rule_edit', 'propose_rule_change', 'propose_service_action'})
+        self.assertTrue(read_pool.eligible({'rule-b': {}}, [policy.alias('rule-b', 'get_security_rules')]))
+
+
 if __name__ == '__main__':
     unittest.main()

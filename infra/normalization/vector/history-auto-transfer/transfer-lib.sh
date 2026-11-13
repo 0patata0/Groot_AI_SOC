@@ -49,9 +49,10 @@ PINS
 hat_capacity() {
     local reserve=$1 listing entries bytes available
     [[ $reserve =~ ^[0-9]+$ ]] || return 65
-    listing=$(find "$HAT_ROOT" "$HAT_RECEIPTS" -xdev -printf '%y %s %U\n' | head -n 8193) || return 65
+    # 1024 receipts x 5 entries + one 1024-batch catalog (2 per batch) + kept failed attempts.
+    listing=$(find "$HAT_ROOT" "$HAT_RECEIPTS" -xdev -printf '%y %s %U\n' | head -n 16385) || return 65
     entries=$(printf '%s\n' "$listing" | wc -l)
-    (( entries <= 8192 )) || return 65
+    (( entries <= 16384 )) || return 65
     printf '%s\n' "$listing" | awk 'NF!=3 || $1!~/^[df]$/ || $2!~/^[0-9]+$/ || $3!=0 {exit 1}' || return 65
     bytes=$(printf '%s\n' "$listing" | awk '{n+=$2} END{printf "%.0f",n}')
     (( bytes + reserve <= HAT_QUOTA )) || return 65
@@ -148,8 +149,9 @@ hat_cleanup_work() {
     local path=$1 inventory
     [[ $path == "$HAT_ROOT"/work/run-* ]] || return 65
     hat_dir "$path" || return 65
-    inventory=$(find "$path" -xdev -printf '%y %U %G %m %n\n' | head -n 2049) || return 65
-    (( $(printf '%s\n' "$inventory" | wc -l) <= 2048 )) || return 65
+    # A 1024-batch catalog alone is 2 entries per batch plus the run files.
+    inventory=$(find "$path" -xdev -printf '%y %U %G %m %n\n' | head -n 4097) || return 65
+    (( $(printf '%s\n' "$inventory" | wc -l) <= 4096 )) || return 65
     printf '%s\n' "$inventory" | awk '
       NF!=5 || $2!=0 || $3!=0 {exit 1}
       $1=="d" {if($4!=700)exit 1;next}

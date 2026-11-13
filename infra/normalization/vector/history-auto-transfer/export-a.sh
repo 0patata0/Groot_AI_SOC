@@ -18,9 +18,11 @@ ha_store() {
     local root=$1 listing rows bytes batches
     ha_dir "$root" || return 65
     # pipefail rejects a truncated/unreadable inventory; stdout never receives it.
-    listing=$(find "$root" -xdev -printf '%y %s %U %G %m %n\n' | head -n 4097) || return 65
+    # Same bounds as the A history-auto store it reads (AUTO_MAX_STORE_ENTRIES /
+    # AUTO_MAX_BATCH_DIRS in history-auto/auto-lib.sh); test-native.sh checks they match.
+    listing=$(find "$root" -xdev -printf '%y %s %U %G %m %n\n' | head -n 16385) || return 65
     rows=$(printf '%s\n' "$listing" | wc -l) || return 65
-    (( rows <= 4096 )) || return 65
+    (( rows <= 16384 )) || return 65
     printf '%s\n' "$listing" | awk '
       NF!=6 || $2!~/^[0-9]+$/ || $3!=0 || $4!=0 {exit 1}
       $1=="d" {if($5!=700)exit 1; next}
@@ -29,7 +31,7 @@ ha_store() {
     bytes=$(printf '%s\n' "$listing" | awk '{n+=$2} END{printf "%.0f",n}') || return 65
     (( bytes <= 1073741824 )) || return 65
     batches=$(find "$root" -mindepth 1 -maxdepth 1 -type d -name 'batch-*' -printf '.\n' | wc -l) || return 65
-    (( batches <= 256 )) || return 65
+    (( batches <= 1024 )) || return 65
     # rrsync checks this relative to its initial cwd before entering its root.
     [[ ! -e $root/rrsync.log && ! -L $root/rrsync.log ]]
 }

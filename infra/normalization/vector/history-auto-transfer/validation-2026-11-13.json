@@ -1,0 +1,108 @@
+{
+  "subject": "Sync A->B history transfer bounds with the A history-auto store bounds",
+  "status": "candidate_tested_not_applied",
+  "observed_kst": "2026-11-13T17:30:00+09:00/2026-11-13T17:38:00+09:00",
+  "incident": {
+    "cause": "A store bounds raised 09:37 (dirs 1024) and 15:55 (entries 16384) without the transfer bounds",
+    "first_deferred_kst": "2026-11-13T09:44:50+09:00",
+    "last_success_kst": "2026-11-13T09:29:49+09:00",
+    "symptom": "B capstone-history-auto-transfer.service exit 12 (rsync; A exporter refused) at manifest_pull every run",
+    "a_store": {
+      "batch_dirs": 316,
+      "find_rows": 4384,
+      "bytes": 168327547
+    },
+    "b": {
+      "receipt_batches": 258,
+      "receipt_entries": 1558,
+      "receipt_bytes": 135484918,
+      "kept_failed_work_dirs": 33
+    },
+    "data_loss": false
+  },
+  "changes": {
+    "export-a.sh": {
+      "rows": [
+        4096,
+        16384
+      ],
+      "batches": [
+        256,
+        1024
+      ]
+    },
+    "worker-b.sh": {
+      "batches": [
+        256,
+        1024
+      ]
+    },
+    "transfer-lib.sh": {
+      "hat_capacity_entries": [
+        8192,
+        16384
+      ],
+      "hat_cleanup_work_entries": [
+        2048,
+        4096
+      ]
+    },
+    "unchanged": [
+      "1 GiB logical bytes",
+      "40 MiB reserve",
+      "600 s run limit",
+      "no retry loop",
+      "no deletion of A data or B receipts"
+    ]
+  },
+  "sha256": {
+    "export-a.sh": "fd1e7769f8da6828da31aac101fc29a3ea343a2ff1c57301b27f09483f80355e",
+    "worker-b.sh": "6781b8fd74546f36e1b8bad3ddbcddb7055c5e7a5625acb914dd885d1c5304b5",
+    "transfer-lib.sh": "52dbb82b0cb31ce8fc2e29257b56c43b46ead47afbb9c02a6b2e4385eff251d4",
+    "runtime.sha256": "9a62534a4e2d320206fc4f44d218ea57e8a507cc97bce1313b8434aec975c64e",
+    "test-native.sh": "47c650fbb28e9a76bc3cd3d0f5e0e59dffc22338b56663bf24a7827d9196d437",
+    "apply-cap-sync-a.py": "eb7ac82d925624aa84c74008d0142a72b8cda6f5ae2423e2a90a1741b7cffd86",
+    "apply-cap-sync-b.py": "3d8190d3b5b21337f4500d8d5e7da3fe1cd8408f985ffb679f7f6e7630cdbda9"
+  },
+  "live_baseline": {
+    "a_exporter": "dc4fc243116d27702b99613630a5488969a95033a7674d79eee137336fd00725",
+    "a_sudoers_pins_exporter": true,
+    "b_worker": "7e783365",
+    "b_transfer_lib": "012411c7",
+    "b_runtime": "14136491",
+    "b_ssh": "7ea52f7d"
+  },
+  "tests": {
+    "b_isolated_transfer": {
+      "passed": 38,
+      "count": 38,
+      "new": [
+        "coupled_limits",
+        "export_batch_cap",
+        "export_row_cap",
+        "b_entry_cap",
+        "work_cleanup_cap"
+      ]
+    },
+    "b_isolated_installer": {
+      "passed": 20,
+      "count": 20
+    },
+    "negative_morning_state": "coupled_limits fails (guard catches one-sided bound changes)",
+    "local_apply_pins": {
+      "passed": 4,
+      "count": 4
+    },
+    "temp_removed": true
+  },
+  "apply_order": [
+    "A apply-cap-sync-a.py (exporter + sudoers digest, visudo)",
+    "B apply-cap-sync-b.py (3 runtime files under transfer lock)",
+    "one manual transfer run, check status.json, reset-failed"
+  ],
+  "not_done": [
+    "apply on A and B",
+    "first run after apply",
+    "review of 33 kept failed work dirs"
+  ]
+}

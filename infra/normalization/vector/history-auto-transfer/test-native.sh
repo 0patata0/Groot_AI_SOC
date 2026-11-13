@@ -130,4 +130,40 @@ rejected hat_capacity 0; ok
 case_name=metadata_no_raw
 ! grep -Eq 'SYNTHETIC_RAW|SYNTHETIC_CURSOR|__CURSOR|MESSAGE' "$stage/result.json" "$stage/error" "$stage/target/status.json"
 ok
+# Bounds shared with the A history-auto store (2026-11-13: raising only the store
+# bounds stopped this transfer at 257 batches). All four places must agree.
+case_name=coupled_limits
+auto=$directory/../history-auto/auto-lib.sh
+store_dirs=$(sed -n 's/.*AUTO_MAX_BATCH_DIRS=\([0-9]*\).*/\1/p' "$auto")
+store_entries=$(sed -n 's/.*AUTO_MAX_STORE_ENTRIES=\([0-9]*\).*/\1/p' "$auto")
+export_batches=$(sed -n 's/.*(( batches <= \([0-9]*\) )).*/\1/p' "$directory/export-a.sh")
+export_rows=$(sed -n 's/.*(( rows <= \([0-9]*\) )).*/\1/p' "$directory/export-a.sh")
+worker_batches=$(sed -n 's/.*(( ${#batches\[@\]} <= \([0-9]*\) )).*/\1/p' "$directory/worker-b.sh")
+b_entries=$(sed -n 's/.*(( entries <= \([0-9]*\) )).*/\1/p' "$directory/transfer-lib.sh")
+cleanup=$(sed -n "s/.*wc -l) <= \([0-9]*\) )).*/\1/p" "$directory/transfer-lib.sh")
+[[ -n $store_dirs && $store_dirs == "$export_batches" && $store_dirs == "$worker_batches" ]]
+[[ -n $store_entries && $store_entries == "$export_rows" ]]
+(( cleanup >= 2 * worker_batches + 8 && b_entries >= 7 * worker_batches + 64 )); ok
+make_files() { local dir=$1 count=$2 i; for ((i = 0; i < count; i++)); do : > "$dir/f$i"; done; }
+case_name=export_batch_cap
+mkdir -m 700 "$stage/cap"; : > "$stage/cap/.lock"; chmod 600 "$stage/cap/.lock"
+for ((i = 1; i <= export_batches; i++)); do mkdir -m 700 "$stage/cap/batch-$i"; done
+ha_store "$stage/cap"; mkdir -m 700 "$stage/cap/batch-extra"; rejected ha_store "$stage/cap"; ok
+case_name=export_row_cap
+rm -rf -- "$stage/cap"; mkdir -m 700 "$stage/cap"; : > "$stage/cap/.lock"; chmod 600 "$stage/cap/.lock"
+make_files "$stage/cap" "$((export_rows - 2))"
+ha_store "$stage/cap"; : > "$stage/cap/extra"; rejected ha_store "$stage/cap"; ok
+rm -rf -- "$stage/cap"
+case_name=b_entry_cap
+HAT_QUOTA=1073741824
+mkdir -m 700 "$stage/cap-root" "$stage/cap-receipts"
+HAT_ROOT=$stage/cap-root HAT_RECEIPTS=$stage/cap-receipts
+make_files "$stage/cap-receipts" "$((b_entries - 2))"
+hat_capacity 0; : > "$stage/cap-receipts/extra"; rejected hat_capacity 0; ok
+case_name=work_cleanup_cap
+mkdir -m 700 "$stage/cap-root/work" "$stage/cap-root/work/run-big"
+make_files "$stage/cap-root/work/run-big" "$((cleanup - 1))"
+hat_cleanup_work "$stage/cap-root/work/run-big"; [[ ! -e $stage/cap-root/work/run-big ]]
+mkdir -m 700 "$stage/cap-root/work/run-over"; make_files "$stage/cap-root/work/run-over" "$cleanup"
+rejected hat_cleanup_work "$stage/cap-root/work/run-over"; [[ -d $stage/cap-root/work/run-over ]]; ok
 printf '{"status":"passed","cases":%s,"operational_paths_used":false,"ssh_calls":0,"source_changes":false}\n' "$passed"

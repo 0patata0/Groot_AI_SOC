@@ -40,7 +40,7 @@ phase=manifest_pull
 hat_fetch_manifests "$work/catalog"
 shopt -s nullglob dotglob
 batches=("$work/catalog"/*)
-(( ${#batches[@]} <= 256 ))
+(( ${#batches[@]} <= 1024 ))  # = A store/exporter batch bound (test-native.sh coupled_limits)
 : > "$work/receipts.jsonl"
 for batch in "${batches[@]}"; do
     phase=manifest_validation

@@ -51,8 +51,8 @@ B에는 기존 receiver 5개를 현재 정확 SHA/권한으로 유지한다. `tr
 
 ## 상한·실패·재시도
 
-- 완료 배치 조회 최대256개, A inventory 최대4096개 항목/1GiB, 파일 최대32MiB·manifest64KiB, 기존 receiver 최대1000행을 유지한다.
-- B receipt+작업 저장소 합계와 예약 복사량을 합쳐 논리적 1GiB를 넘으면 중단한다. 디렉터리 항목8192개, 최소 여유40MiB에 이번 복사 예약량을 더해 검사한다. 이는 전용 워크플로의 용량 검사이며 filesystem quota나 별도 root 수동 쓰기까지 차단하는 기능은 아니다.
+- 완료 배치 조회 최대256개, A inventory 최대4096개 항목/1GiB(**2026-11-13 후보: A 보존소와 같은 1024개·16,384항목으로 동기화, 운영 미적용 — 아래 절**), 파일 최대32MiB·manifest64KiB, 기존 receiver 최대1000행을 유지한다.
+- B receipt+작업 저장소 합계와 예약 복사량을 합쳐 논리적 1GiB를 넘으면 중단한다. 디렉터리 항목8192개(후보 16,384개, 작업 폴더 정리 2,048→4,096), 최소 여유40MiB에 이번 복사 예약량을 더해 검사한다. 이는 전용 워크플로의 용량 검사이며 filesystem quota나 별도 root 수동 쓰기까지 차단하는 기능은 아니다.
 - rsync당65초, A sender60초, 네트워크 유휴30초·SSH connect5초, 전체600초+강제정리10초, unit620초, 메모리512MiB. 재접속/전송 재시도 loop는 없다. timer는 부팅3분 후, 실행 종료15분 후다.
 - 자동 삭제 대상은 **해당 성공 호출이 만든 B transient incoming과 작업 디렉터리**뿐이다. 최초 수신기의 원자 commit+fsync 영수증 이후만 제거한다. 기존/manual incoming, B 완료 배치/영수증, A 파일은 삭제하지 않는다.
 - 실패 작업은 B root0700 `work/run-*`에 남고 고정 phase/exit metadata만 출력한다. 자동 정리하거나 partial을 완료로 취급하지 않는다. 반복 실패가 저장소 상한에 닿으면 운영자 확인까지 중단된다. 다음 timer의 같은 ID 재조회는 기존 수신기의 멱등 검증을 사용한다.
@@ -63,3 +63,34 @@ B에는 기존 receiver 5개를 현재 정확 SHA/권한으로 유지한다. `tr
 `test-native.sh`는 Linux root의 별도 `/var/tmp/capstone-history-pull-test.*`만 사용한다. SHA가 고정된 기존 receiver fixture 생성 함수를 재사용하고 private 복사본의 machine/store/source 경로만 바꾼다. 실제 SSH/계정/키/운영 store 호출은 없다. manifest 거절, 같은 ID 충돌, 첫 commit와 stable receipt 재사용, 수신 후 transient 정리, 용량 거절, raw 출력 차단을 검사한다. 함수의 조건문 호출에서도 검사 실패가 명시 전파되도록 A gate를 시험한다.
 
 native33+20 이후 실제 SSH를 거친 초기18배치 보존·A 원본 불변·재실행 `new_receipts=0`·최초 저장 영수증 SHA 불변·타이머 첫 자동 실행까지 완료했다. 호출별 catalog는 `reused`가 false→true로 바뀌므로 첫/두 번째 catalog 전체 SHA가 다르며, 이 차이를 저장 canonical receipt 변경으로 해석하지 않는다. 남은 확인은 이후15분 자연 주기 및 최종 증거 영구 보관·정리다. 이 결과도 A 자동 ACK나 Wazuh/Indexer 전달 ACK를 뜻하지 않는다.
+
+## 2026-11-13 전송 상한 동기화 후보 (운영 미적용, 승인 대기)
+
+**무엇이 멈췄나(라이브 읽기전용, 17:30~17:38)**: 같은 날 09:37·15:55에 A history-auto 보존소의 상한을 올렸다(폴더 256→1024, 항목 4,096→16,384). 이 전송 경로의 상한은 그대로였다. 09:41에 A 배치가 257개가 됐고, **09:44부터** A 관문(`export-a.sh`, 배치 ≤256)이 목록 요청을 거부했다. 이후 B 실행은 매번 `manifest_pull`에서 rsync 종료 12(deferred)로 끝나 failed 유닛이 됐다. 17:38 관측값은 A 배치 316개·항목 4,384개·168 MB, B 영수증 258개(5항목씩)·1,558항목·135 MB였다. 마지막 성공은 09:29(256개 재사용, 91초)였고, 실패한 시도의 작업 폴더 33개가 남아 있다(정책상 자동 삭제 없음). A 원본과 B 영수증은 삭제·손실되지 않았다.
+
+**후보**: 상한만 바꾸고 동작·바이트·시간 제한·재시도 없음은 그대로 둔다.
+
+| 위치 | 현재 | 후보 | 근거 |
+|---|---|---|---|
+| `export-a.sh` A 관문 | 항목 ≤4,096·배치 ≤256 | 항목 ≤16,384·배치 ≤1,024 | A 보존소 `AUTO_MAX_STORE_ENTRIES`·`AUTO_MAX_BATCH_DIRS`와 같음(같은 `find` 행 계산) |
+| `worker-b.sh` B 목록 | 배치 ≤256 | 배치 ≤1,024 | A와 같음 |
+| `transfer-lib.sh` `hat_capacity` | 항목 ≤8,192 | 항목 ≤16,384 | 영수증 1024×5 + 1024배치 목록 2,048 + 남은 실패 시도 |
+| `transfer-lib.sh` `hat_cleanup_work` | 작업 폴더 ≤2,048 | ≤4,096 | 1024배치 목록만 약 2,052항목이라 정리 단계에서 다시 멈출 자리였다 |
+
+`runtime.sha256`(`9a62534a4e2d3202…`)과 `deploy/source-pins.sha256`을 갱신했다. A sudoers는 관문 SHA로 고정돼 있어 적용 때 같은 digest 한 줄만 바꾼다. B 1 GiB 논리 용량은 그대로 둔다(1024배치 추정 약 540 MB). 600초 실행 제한도 그대로 둔다(기존 배치 재확인 약 0.35초/배치 → 1024개 약 360초). 한 번에 새 배치가 많아 시간을 넘기면 그 실행은 보류되지만, 완료된 영수증은 남아 다음 실행이 이어서 처리한다.
+
+**검증**
+
+| 항목 | 결과 |
+|---|---|
+| B 격리 합성 시험(`/var/tmp` 임시, 운영 경로·SSH 미사용, 종료 후 삭제) | 전송 **38/38**(기존 33 + 신규 5: `coupled_limits`, `export_batch_cap`, `export_row_cap`, `b_entry_cap`, `work_cleanup_cap`), 설치기 20/20 |
+| 사고 재현 | 오늘 오전 상태(전송 원본은 기준본, A 보존소 상한만 1024/16,384)에 새 시험을 돌리면 `coupled_limits`에서 실패한다. 같은 일이 다시 생기면 시험이 잡는다 |
+| 로컬 `test_apply_cap_sync.py` | 4/4: 적용 스크립트의 기준·후보 SHA, runtime·source 고정값, 런타임 원본은 상한 숫자만 바뀜 |
+
+| 파일 | SHA256 |
+|---|---|
+| `export-a.sh` | `fd1e7769f8da6828da31aac101fc29a3ea343a2ff1c57301b27f09483f80355e` (운영 `dc4fc243…`) |
+| `worker-b.sh` | `6781b8fd74546f36e1b8bad3ddbcddb7055c5e7a5625acb914dd885d1c5304b5` (운영 `7e783365…`) |
+| `transfer-lib.sh` | `52dbb82b0cb31ce8fc2e29257b56c43b46ead47afbb9c02a6b2e4385eff251d4` (운영 `012411c7…`) |
+
+**적용 순서(승인 후, 관리자231 경유)**: (1) A `apply-cap-sync-a.py <export-a.sh>`. 관문과 sudoers digest를 함께 바꾸고 `visudo`로 검사하며, 실패하면 둘 다 되돌린다. (2) B `apply-cap-sync-b.py <worker> <lib> <runtime>`. 전송 잠금 아래 3개 파일을 교체하고 runtime을 확인한다. (3) B 전송 유닛을 수동 1회 실행하고 `status.json`(발견 배치 316개 이상, 신규 약 58개)과 영수증 수를 확인한 뒤 failed 상태를 해제한다. 어느 쪽을 먼저 적용해도 중간 실행은 보류만 되고 데이터에 영향이 없다. 남은 실패 시도 폴더 33개의 정리는 별도 검토 대상이다.

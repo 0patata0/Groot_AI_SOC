@@ -111,4 +111,4 @@ ansible-playbook -i ../../../automation/ansible/inventory/local-a.ini install-a.
 
 ## 2026-11-13 정정: 보존소 상한 변경이 A→B 전송을 멈춤
 
-09:37(폴더 256→1024)과 15:55(항목 4,096→16,384) 변경 뒤에도 A→B 전송 경로의 상한은 그대로였다. A 내보내기 관문 `history-auto-transfer/export-a.sh`는 항목 ≤4,096·배치 ≤256, B 작업자 `worker-b.sh`는 배치 ≤256이다. 그래서 A 배치가 256개를 넘은 09:44부터 B `capstone-history-auto-transfer.service`가 `manifest_pull`에서 exit 12(deferred)로 실패한다. A의 보존은 계속되고 삭제는 없다. 전송 상한을 같은 값으로 맞추는 후보(고정 SHA·합성 시험·A/B 적용)가 필요하며 승인 대상이다. [현황](../../../../STATUS.md).
+09:37(폴더 256→1024)과 15:55(항목 4,096→16,384) 변경 뒤에도 A→B 전송 경로의 상한은 그대로였다. A 내보내기 관문 `history-auto-transfer/export-a.sh`는 항목 ≤4,096·배치 ≤256, B 작업자 `worker-b.sh`는 배치 ≤256이다. 그래서 A 배치가 256개를 넘은 09:44부터 B `capstone-history-auto-transfer.service`가 `manifest_pull`에서 exit 12(deferred)로 실패한다. A의 보존은 계속되고 삭제는 없다. 전송 상한을 같은 값으로 맞추는 후보를 만들었다(B 격리 시험 38/38, 결합 상한 검사 추가, 운영 미적용). [전송 후보](../history-auto-transfer/README.md#2026-11-13-전송-상한-동기화-후보-운영-미적용-승인-대기). [현황](../../../../STATUS.md).

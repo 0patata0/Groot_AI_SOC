@@ -1,6 +1,7 @@
 import concurrent.futures
 import io
 import json
+import re
 from pathlib import Path
 import tempfile
 import sys
@@ -450,6 +451,36 @@ class Tests(unittest.TestCase):
         stored=json.loads(self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0])
         self.assertEqual(stored['peer_validation_details'][0]['evidence_path'],'result.limit')
         self.assertNotIn('REFUSED_CLAIM_TEXT',json.dumps(stored,ensure_ascii=False))
+
+    def test_reference_ids_are_removed_even_before_korean_particles(self):
+        """11-14 04:17 "증거 e9에 따라" and 00:01 "e70으로 확인됩니다" were posted:
+        the old pattern ended in \\b, which Python does not see before a Hangul
+        particle, and bare ids were not handled."""
+        A=['a0','a1'];E=['e%d'%i for i in range(80)]
+        for src,want in (('증거 e9에 따라 이는 부재를 입증하지 못합니다','증거에 따라 이는'),
+                         ("'인증 성공' 관측 자체는 e70으로 확인됩니다",'조회 근거로 확인됩니다'),
+                         ('상대 답변(근거 e3)과 일치','상대 답변과 일치'),('표본 수가 같습니다 (e9, e32).','표본 수가 같습니다.'),
+                         ('근거 e9, e32에 따라 미확인','근거에 따라 미확인'),('e9에 따라 미확인','조회 근거에 따라'),
+                         ('e28을 보면','조회 근거를 보면'),('a1와 다름','상대 답변과 다름'),
+                         ('현재 독립 조회(e3~e4: 23:21~23:51)와 다릅니다','현재 독립 조회(조회 근거: 23:21~23:51)와')):
+            with self.subTest(src=src):
+                got=w.strip_reference_ids(src,A,E)
+                self.assertIn(want,got)
+                self.assertEqual(re.findall(r'(?<![A-Za-z0-9_:./\-])[ae][0-9]+(?![A-Za-z0-9_./\-]|:\S)',got),[])
+        keep='해시 e3b0c442, MAC a0:1b:2c, IPv6 fe80::a0, 카탈로그 밖 e100, 규칙 5715'
+        self.assertEqual(w.strip_reference_ids(keep,A,E),keep)
+        # End to end: the posted peer text carries no catalog id.
+        import asyncio
+        _,_,_,_,_,ids=self.query_scope_fixture([{}])
+        ref=ids['result.limit']
+        good={'claims':[{'kind':'unverified','text':'증거 '+ref+'에 따라 상대 조회 한도는 검토자 조회로 확인할 수 없음','source_ref':'a0',
+                         'missing_field':'','evidence_ref':ref}]}
+        llm,h,report,request,calls,_=self.query_scope_fixture([good])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['peer_review'],'source_bound_claims')
+        self.assertIn('증거에 따라 상대 조회 한도',result['final_response'])
+        self.assertNotRegex(result['final_response'],r'(?<![A-Za-z0-9_:./\-])'+ref+r'(?![A-Za-z0-9_:./\-])')
 
     def test_peer_repeated_false_query_dissent_is_not_posted(self):
         import asyncio

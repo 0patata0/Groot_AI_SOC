@@ -1,0 +1,92 @@
+{
+  "subject": "Peer text: catalog ids stripped as standalone ASCII tokens (before Korean particles, in lists/ranges, bare ids replaced by a neutral word)",
+  "status": "candidate_tested_not_applied",
+  "incidents": [
+    {
+      "at_kst": "2026-11-13T23:50",
+      "text": "(e3~e4: 23:21~23:51)"
+    },
+    {
+      "at_kst": "2026-11-14T00:04",
+      "text": "e70으로 확인됩니다"
+    },
+    {
+      "at_kst": "2026-11-14T04:17",
+      "text": "증거 e9에 따라"
+    }
+  ],
+  "cause": "(근거|증거|evidence)\\s+eN\\b fails before Hangul (Python Unicode \\b); bare ids, lists and ranges were not handled",
+  "change": {
+    "review_channel_worker.py": "strip_reference_ids(text, answer_ids, evidence_ids): parenthesized runs removed, label + run -> label, bare e-ids -> 조회 근거 / a-ids -> 상대 답변 with particle agreement, ASCII edges (colon only as a label when a space follows)",
+    "unchanged": [
+      "model instruction",
+      "checks",
+      "dispatcher",
+      "other copies"
+    ]
+  },
+  "sha256": {
+    "infra/hermes/review_channel_worker.py": {
+      "base": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+      "candidate": "679cd99237684a6ca42e6e0b9e0acd1329ed77d63ca4c39b0d7f8fe9f8bcb428"
+    },
+    "infra/hermes/test_review_channel.py": "48e6b31814edb1d725646c5169a9ea0ac5d270f1d7e4be09204c6ca249193b26",
+    "infra/validation/peer-ids/apply_b.py": "8aa60fbf2cbf96b9e0ac5d6ed1d81397ee7abb950b7acdf1fcbf59c2f477f843"
+  },
+  "tests": {
+    "new": {
+      "test_reference_ids_are_removed_even_before_korean_particles": "pass; errors on HEAD (no function)"
+    },
+    "related": "99 OK",
+    "bundles_vs_head": {
+      "hermes_all": "1298 (base 1297), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, base-only flaky 1",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "live_replay_b": {
+    "observed_kst": "2026-11-14T04:39:57+09:00",
+    "scope": "joint-channel queue peer final_response since 11-12",
+    "peer_posts": 17,
+    "with_ids_before": 3,
+    "with_ids_after": 0,
+    "first_pass_note": "the first replay left 'e4' in '(e3~e4: ...)'; colon-with-space labels and the ~ separator were added, then 0 left",
+    "candidate_temp_removed": true
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-peer-ids-044140/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "worker + review-chat receipt entry (others kept), no restart",
+    "rollback": "2 files, no restart",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "review_receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T04:41:59+09:00",
+    "worker": "1cff48cc325f5fac",
+    "receipt": "at base",
+    "deploy_dir_free": true
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

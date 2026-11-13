@@ -128,6 +128,46 @@ def peer_refusal_diagnosis(detail):
             + '. 이유: ' + reason + '. 고칠 방법: ' + fix + '. 나머지 주장은 그대로 두어도 됩니다.')
 
 
+# Particles that change with the final consonant of the word put in place of
+# a bare reference id: "조회 근거" ends in a vowel, "상대 답변" in a consonant.
+_AFTER_VOWEL = {'으로': '로', '을': '를', '이': '가', '은': '는', '과': '와'}
+_AFTER_CONSONANT = {'로': '으로', '를': '을', '가': '이', '는': '은', '와': '과'}
+
+
+def strip_reference_ids(text, answer_ids, evidence_ids):
+    """Remove the catalog's internal ids (a0, e9) from the posted peer text.
+
+    11-14 04:17 "증거 e9에 따라" and 00:01 "e70으로 확인됩니다" were posted: the old
+    pattern ended in \\b, which Python does not see between "e9" and a Hangul
+    particle, and bare ids were not handled. An id is a standalone ASCII token
+    (no letter, digit, _ : . - / around it), so hashes, MAC/IPv6 addresses and
+    ids outside the catalog are left alone.
+    """
+    if not isinstance(text, str):
+        return text
+    # A colon right after an id is a label ("e4: 23:21") unless a non-space
+    # follows it (MAC "a0:1b"); before an id it is always an address ("fe80::a0").
+    edge_l, edge_r = r'(?<![A-Za-z0-9_:./\-])', r'(?![A-Za-z0-9_./\-]|:\S)'
+    def token(ids):
+        return edge_l + '(?:' + '|'.join(sorted(map(re.escape, ids), key=len, reverse=True)) + ')' + edge_r
+    ids = [i for i in list(answer_ids) + list(evidence_ids) if isinstance(i, str) and i]
+    if not ids:
+        return text
+    any_id = token(ids); run = any_id + r'(?:\s*[,，·/~]\s*' + any_id + r')*'
+    label = r'(?:근거|증거|evidence|참조)'
+    text = re.sub(r'\s*[(\[]\s*(?:' + label + r'\s*[:：]?\s*)?' + run + r'\s*[)\]]', '', text)
+    text = re.sub(r'(' + label + r')\s*[:：]?\s*' + run, r'\1', text)
+    for group, word, particles in ((evidence_ids, '조회 근거', _AFTER_VOWEL), (answer_ids, '상대 답변', _AFTER_CONSONANT)):
+        group = [i for i in group if isinstance(i, str) and i]
+        if group:
+            one = token(group)
+            text = re.sub(one + r'(?:\s*[,，·/~]\s*' + one + r')*(으로|로|을|를|이|가|은|는|과|와)?(?=[^가-힣]|$)',
+                          lambda m: word + particles.get(m.group(1) or '', m.group(1) or ''), text)
+            # Any id left is followed by another particle or word ("e9에 따라").
+            text = re.sub(one + r'(?:\s*[,，·/~]\s*' + one + r')*', word, text)
+    return text
+
+
 def peer_error_code(exc):
     if isinstance(exc, json.JSONDecodeError): return 'peer_json_invalid'
     return str(exc) if isinstance(exc, ValueError) and str(exc) in PEER_OUTPUT_ERRORS else type(exc).__name__
@@ -712,9 +752,7 @@ async def review_answer(config, request, report):
         report['peer_claims'] = claims['claims']
         if any(c['kind']=='unverified' for c in claims['claims']):
             report['status'] = 'partial'
-        for ref in [x['id'] for x in catalog['answers']+catalog['evidence']]:
-            text=re.sub(r'\((?:(?:근거|증거|evidence)\s*)?'+re.escape(ref)+r'\)', '', text)
-            text=re.sub(r'(근거|증거|evidence)\s+'+re.escape(ref)+r'\b',r'\1',text)
+        text = strip_reference_ids(text, [x['id'] for x in catalog['answers']], [x['id'] for x in catalog['evidence']])
         report['final_response'] = harness.EVIDENCE.kst_display(text)
     except Exception as exc:
         report['status'], report['peer_review'], report['error_type'] = 'partial', 'synthesis_failed', type(exc).__name__

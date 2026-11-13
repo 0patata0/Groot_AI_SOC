@@ -1,6 +1,6 @@
 {
   "subject": "Raise the published receipt-catalog bound of the A->B history transfer to the 1024-batch bound",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_transfer_resumed",
   "incident": {
     "first_failure_kst": "2026-11-13T23:54:05+09:00",
     "reproduced_kst": "2026-11-14T00:11:29+09:00",
@@ -98,9 +98,61 @@
     "check the next natural cycle"
   ],
   "not_done": [
-    "apply on B after approval",
-    "manual run and next cycle",
-    "cleanup review of 42 kept failed work dirs"
+    "cleanup review of 43 kept failed work dirs (39 morning incident, 1 from 10/24, 3 from 23:54/00:11/00:28)"
   ],
-  "residual_risk": "each run re-verifies every receipt: 390 batches took ~143 s, so 1024 batches ~375 s of the 600 s limit"
+  "residual_risk": "each run re-verifies every receipt: 390 batches took ~143 s, so 1024 batches ~375 s of the 600 s limit",
+  "applied": {
+    "approval": "user 2026-11-14: 이력 전송 게시 상한 적용해줘",
+    "path": "Mac -> admin231 -> A -> B (root)",
+    "waited_for_timer_run": {
+      "started": "00:26:31",
+      "ended": "00:28:57",
+      "result": "finalize exit 65 (last failure before apply)"
+    },
+    "at_kst": "2026-11-14T00:29:13+09:00",
+    "installed": {
+      "transfer-lib.sh": "0ed5bbe69829a9d7",
+      "runtime.sha256": "abdd7d6748228e09",
+      "worker-b.sh": "6781b8fd74546f36 (unchanged)",
+      "ssh-b.sh": "7ea52f7d15e77a24 (unchanged)"
+    },
+    "manifest_ok": true,
+    "metadata": "0:0:0400:1",
+    "backup": "/var/backups/capstone-history-transfer-publishcap-20261114T002913-1jouk8x0",
+    "b_temp_removed": true,
+    "manual_run": {
+      "start": "00:29:13",
+      "end": "00:31:36",
+      "result": "success",
+      "discovered_batches": 397,
+      "new_receipts": 1,
+      "reused_receipts": 396,
+      "records": 390820,
+      "bytes": 210681350,
+      "latest_batches_jsonl": {
+        "bytes": 269848,
+        "lines": 397,
+        "note": "first publish above the old 262144 bound"
+      },
+      "failed_units": 0
+    },
+    "kept_failed_work_dirs": 43,
+    "natural_cycle": {
+      "start": "00:46:36",
+      "end": "00:49:02",
+      "result": "success",
+      "accepted_existing_catalog_bytes": 269848,
+      "discovered_batches": 400,
+      "new_receipts": 3,
+      "reused_receipts": 397,
+      "records": 393820,
+      "bytes": 212324161,
+      "latest_batches_jsonl": {
+        "bytes": 271890,
+        "lines": 400
+      },
+      "kept_failed_work_dirs": 43,
+      "failed_units": 0
+    }
+  }
 }

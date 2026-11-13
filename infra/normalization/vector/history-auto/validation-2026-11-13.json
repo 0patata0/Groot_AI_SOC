@@ -1,6 +1,6 @@
 {
   "subject": "history-auto batch-directory cap 256 -> 1024 (A)",
-  "status": "candidate_not_applied",
+  "status": "applied_verified_completion_pending",
   "observed_kst": "2026-11-13T09:27:39+09:00/2026-11-13T09:29:57+09:00",
   "live": {
     "jobs": 14,
@@ -45,10 +45,29 @@
     "candidate_runtime_manifest_check": "manifest_ok"
   },
   "not_done": [
-    "approved apply on A",
-    "next timer run batch_preserved and service success",
     "completion of boot 5c8d076c",
     "SPOOF log volume reduction (separate FW change)",
     "retention/B-transfer review worker"
-  ]
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: history-auto 상한 적용해줘",
+    "at_kst": "2026-11-13T09:37:19+09:00",
+    "backup": "/var/backups/capstone-history-auto-cap1024-20261113T093719",
+    "installed": {
+      "auto-lib.sh": "3d05677ec17851a6",
+      "runtime.sha256": "af89c0f013973f72"
+    },
+    "inspect_ok": true,
+    "service_restarted": false,
+    "next_run": {
+      "observed_kst": "2026-11-13T09:41:30+09:00",
+      "outcome": "batch_preserved",
+      "batches": 32,
+      "records": 32000,
+      "store_dirs": 257,
+      "service_result": "success",
+      "failed_units": 0
+    },
+    "remaining_estimate": "~163 batches, ~13-14 h at one batch per 5 min"
+  }
 }

@@ -1614,3 +1614,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 22:46 KST — 조회 범위 일치 적용 (B, 관리자231 경유)
 
 사용자 승인("조회 범위 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 8곳을 교체했다(관리 실행기 `cf6124ad`→`bc19115d` ×4, query-completion `accf2b07`→`3847d9c8` ×2, Ollama 런타임 `1e7aefa6`→`026a2cf9`, 공동 채널 작업자 `47811503`→`f4f426c7`). 컨트롤러 내장본, Ollama 영수증 3항목, 공동 채널 영수증도 갱신했다. Ollama 봇만 재시작했다. 사후 점검은 정상이었다. 같은 질문의 실제 채팅에서는 이전 상황이 재현되지 않아 새 규칙이 발동하지 않았다. 22:51:35에 확정했다. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-query-scope`에 있다. 같은 채팅에서 Hermes의 질문 밖 클러스터 노드 조회 실패(잘못된 `node_type`)와 교차 검토의 범위 밖 조회·과장된 일치가 드러나, 조사형 질문의 첫 조회 도구 범위 제한을 다음 후보로 남겼다. [기록](../infra/validation/query-scope/README.md).
+
+## 2026-11-13 23:11 KST — 조사 첫 조회 도구 범위 + 교차 검토 원칙 스킬 통합 적용 (B, 관리자231 경유)
+
+사용자 승인("조사 도구 범위 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 16곳을 교체했다. 대상은 관리 실행기 `bc19115d`→`6b605668` ×4, query-completion `3847d9c8`→`fb935f63` ×2, 하네스 `5d79bb9d`→`dba169a1` ×2, Ollama 런타임 `026a2cf9`→`75a8ffe1`, 공동 채널 작업자 `f4f426c7`→`2c4b46f8`, `workflow_contract.py` `d7884003`→`de984aca` ×3, `skill-soc-investigate.md` `f3306812`→`24fc9e24` ×3이다. 컨트롤러 내장본, Ollama 영수증 6항목, 공동 채널 영수증도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 Hermes 첫 선택과 Ollama 교차 검토가 모두 질문이 지정한 두 경보만 조회했다(오류 0). 23:16:05에 확정했다. 사용자 지시("되도록 스킬로 묶어 관리")를 반영해, 교차 검토 판단 원칙은 공동 채널 작업자 코드에서 `soc-investigate`의 교차 검토 단계 전용 절로 옮겼다. [기록](../infra/validation/investigation-scope/README.md).

@@ -1,6 +1,6 @@
 {
   "subject": "Investigation first-read tool scope (shared harness) and peer comparison principles consolidated into the soc-investigate skill",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed_verified_live",
   "user_directive_2026_11_13_2300": "되도록이면 스킬로 묶을 수 있는 부분은 묶어서 관리하자 (enforced boundaries stay in code; model guidance goes to shared skills)",
   "incident_2026_11_13_2247": {
     "hermes": "first selection added off-scope get_wazuh_cluster_nodes {node_type: any} -> Wazuh API 400 -> tool-failure answer",
@@ -105,9 +105,67 @@
     "ollama_receipt": "6 keys at base",
     "review_receipt_worker": "f4f426c74a0eae37"
   },
-  "not_done": [
-    "apply on B after approval",
-    "real chat: Hermes first selection only ModSecurity/Wazuh alerts, peer reads both alerts, skill section in peer prompt",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-13: 조사 도구 범위 적용해줘",
+    "at_kst": "2026-11-13T23:11:18+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-investigation-scope",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 23:16:05"
+    ],
+    "installed": {
+      "runner x4 + gate": "6b60566819fb5a6d",
+      "query x2": "fb935f63084af5d0",
+      "harness x2": "dba169a13203bf10",
+      "runtime": "75a8ffe15c36ebb6",
+      "worker": "2c4b46f8445399cd",
+      "workflow_contract x3": "de984acab1a6ad59",
+      "skill-soc-investigate x3": "24fc9e24b32c344b"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "tick_errors": 0,
+      "review_receipt_all_match": true,
+      "live_skill_copies_3": "body has new line, excludes peer section; section loads",
+      "live_scope_function": [
+        "search_modsecurity_alerts",
+        "search_wazuh_alerts"
+      ]
+    },
+    "real_chat": {
+      "post_kst": "23:12:24",
+      "hermes_first_selection": {
+        "search_modsecurity_alerts": {
+          "lookback_minutes": 30,
+          "limit": 10
+        },
+        "search_wazuh_alerts": {
+          "lookback_minutes": 30,
+          "limit": 10
+        }
+      },
+      "hermes_tool_errors": 0,
+      "hermes_result": "judgment fallback after 2 repairs (sample_zero_presented_as_absence, missing_or_invalid_management_status) - pre-existing type",
+      "peer": {
+        "reads": [
+          "search_modsecurity_alerts",
+          "search_wazuh_alerts"
+        ],
+        "model_calls": 4,
+        "peer_review": "source_bound_claims",
+        "peer_validation_errors": [],
+        "claims": "agree 2 (valid), disagree 1 (a reviewer judgment labelled as dissent)",
+        "skill_section": "loaded (indirect: synthesis completed)"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 19
+  },
+  "open_unrelated": [
+    "Hermes report repeatedly fails sample_zero_presented_as_absence and management-status checks",
+    "peer labels its own judgment as a disagreement"
   ]
 }

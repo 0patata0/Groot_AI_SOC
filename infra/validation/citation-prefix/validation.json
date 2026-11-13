@@ -1,6 +1,6 @@
 {
   "subject": "Keep the investigation runner's prompt prefix stable: citation hint as in-process notes instead of a growing system suffix",
-  "status": "applied_then_rolled_back_pending_accuracy_ab",
+  "status": "rolled_back_then_ab_evaluated_not_worse_reapply_pending_approval",
   "observed_kst": "2026-11-13T16:24:00+09:00/2026-11-13T16:54:17+09:00",
   "evidence": {
     "thor_calls_50h_ge_3k_tokens": 134,
@@ -143,8 +143,7 @@
     ]
   },
   "not_done": [
-    "A/B real-generation accuracy evaluation at real decision points",
-    "re-apply only after evaluation and approval",
+    "re-apply only after user approval, with monitoring of malformed/status-repair/citation-repair rates",
     "report stage tool removal and selection prompt cost",
     "Ollama bot per-question schema narrowing"
   ],
@@ -194,5 +193,50 @@
     "chat2_final": "tool failure fallback: first selection until_kst 1 s ahead of server clock rejected (pre-existing)",
     "rolled_back_kst": "2026-11-13T17:26:19+09:00",
     "rollback": "all 8 files back to baseline SHA; timer stopped; ticks ok; gate verified"
+  },
+  "ab_evaluation": {
+    "window_kst": "2026-11-13T19:39:28+09:00/2026-11-13T20:09:06+09:00",
+    "points": 5,
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "samples_per_arm": 15,
+    "params": {
+      "max_tokens": 4096,
+      "reasoning_effort": "medium",
+      "tools": 36,
+      "order": "A/B alternated per seed"
+    },
+    "A_current": {
+      "malformed": 0,
+      "tool_call": 4,
+      "clean_final": 7,
+      "missing_status_or_disposition": 2,
+      "unobserved_citation": 2,
+      "errors": 4
+    },
+    "B_notes": {
+      "malformed": 0,
+      "tool_call": 5,
+      "clean_final": 8,
+      "missing_status_or_disposition": 2,
+      "unobserved_citation": 0,
+      "errors": 2
+    },
+    "paired": {
+      "A_only_error": 4,
+      "B_only_error": 2,
+      "significant": false
+    },
+    "p1_malformed_reproduced": false,
+    "classifier": "infra/validation/citation-prefix/eval_classify.py",
+    "thor_temp_removed": true,
+    "limits": [
+      "5 points x 3 seeds",
+      "single generation step only",
+      "risk judgement not human-reviewed"
+    ]
   }
 }

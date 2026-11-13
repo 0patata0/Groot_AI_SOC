@@ -141,9 +141,14 @@ export_rows=$(sed -n 's/.*(( rows <= \([0-9]*\) )).*/\1/p' "$directory/export-a.
 worker_batches=$(sed -n 's/.*(( ${#batches\[@\]} <= \([0-9]*\) )).*/\1/p' "$directory/worker-b.sh")
 b_entries=$(sed -n 's/.*(( entries <= \([0-9]*\) )).*/\1/p' "$directory/transfer-lib.sh")
 cleanup=$(sed -n "s/.*wc -l) <= \([0-9]*\) )).*/\1/p" "$directory/transfer-lib.sh")
+# 2026-11-14: the published catalog holds one receipt per batch; its bound was
+# a fixed 256 KiB and stopped every finalize at 386 batches.
+publish_max=$(sed -n 's/^HAT_PUBLISH_MAX=\([0-9]*\)$/\1/p' "$directory/transfer-lib.sh")
+receipt_max=$(awk '/^hat_receipt\(\)/{on=1} on && /hat_file "\$path" 600 [0-9]+/{match($0, /600 [0-9]+/); print substr($0, RSTART + 4, RLENGTH - 4); exit}' "$directory/transfer-lib.sh")
 [[ -n $store_dirs && $store_dirs == "$export_batches" && $store_dirs == "$worker_batches" ]]
 [[ -n $store_entries && $store_entries == "$export_rows" ]]
-(( cleanup >= 2 * worker_batches + 8 && b_entries >= 7 * worker_batches + 64 )); ok
+[[ -n $publish_max && -n $receipt_max ]]
+(( cleanup >= 2 * worker_batches + 8 && b_entries >= 7 * worker_batches + 64 && publish_max >= worker_batches * receipt_max )); ok
 make_files() { local dir=$1 count=$2 i; for ((i = 0; i < count; i++)); do : > "$dir/f$i"; done; }
 case_name=export_batch_cap
 mkdir -m 700 "$stage/cap"; : > "$stage/cap/.lock"; chmod 600 "$stage/cap/.lock"
@@ -166,4 +171,17 @@ make_files "$stage/cap-root/work/run-big" "$((cleanup - 1))"
 hat_cleanup_work "$stage/cap-root/work/run-big"; [[ ! -e $stage/cap-root/work/run-big ]]
 mkdir -m 700 "$stage/cap-root/work/run-over"; make_files "$stage/cap-root/work/run-over" "$cleanup"
 rejected hat_cleanup_work "$stage/cap-root/work/run-over"; [[ -d $stage/cap-root/work/run-over ]]; ok
+size() { stat -c %s -- "$1"; }
+case_name=publish_incident_catalog
+# 2026-11-13 23:36 catalog: 386 receipts, 262,370 bytes; the next run refused it.
+mkdir -m 700 "$stage/pub"; HAT_ROOT=$stage/pub
+head -c 262370 /dev/zero > "$stage/pub/latest"; printf 'n\n' > "$stage/pub/new"
+hat_publish "$stage/pub/new" "$stage/pub/latest"; [[ $(size "$stage/pub/latest") == 2 && ! -e $stage/pub/new ]]; ok
+case_name=publish_cap
+head -c "$publish_max" /dev/zero > "$stage/pub/latest"; head -c "$publish_max" /dev/zero > "$stage/pub/new"
+hat_publish "$stage/pub/new" "$stage/pub/latest"; [[ $(size "$stage/pub/latest") == "$publish_max" && ! -e $stage/pub/new ]]
+head -c "$((publish_max + 1))" /dev/zero > "$stage/pub/new"
+rejected hat_publish "$stage/pub/new" "$stage/pub/latest"; [[ $(size "$stage/pub/latest") == "$publish_max" && -e $stage/pub/new ]]
+head -c "$((publish_max + 1))" /dev/zero > "$stage/pub/over"; printf 'n\n' > "$stage/pub/new"
+rejected hat_publish "$stage/pub/new" "$stage/pub/over"; [[ $(size "$stage/pub/over") == "$((publish_max + 1))" && -e $stage/pub/new ]]; ok
 printf '{"status":"passed","cases":%s,"operational_paths_used":false,"ssh_calls":0,"source_changes":false}\n' "$passed"

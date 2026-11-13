@@ -6,6 +6,8 @@ HAT_RECEIPTS=/var/lib/capstone-history-receipts
 HAT_RECEIVER=/opt/capstone-automation/project/infra/normalization/vector/history-transfer
 HAT_CONFIG=/etc/capstone-history-transfer
 HAT_QUOTA=1073741824
+# Published receipt catalog: worker batch bound (1024) x hat_receipt bound (4096).
+HAT_PUBLISH_MAX=4194304
 hat_sha() { sha256sum -- "$1" | cut -d ' ' -f1; }
 hat_dir() {
     [[ -d $1 && ! -L $1 && $(stat -c '%u:%g:%a' -- "$1") == 0:0:700 ]]
@@ -138,7 +140,11 @@ hat_receipt() {
 }
 hat_publish() {
     local source=$1 destination=$2
-    if [[ -e $destination || -L $destination ]]; then hat_file "$destination" 600 262144 || return 65; fi
+    # 2026-11-14: a fixed 256 KiB bound here stopped every finalize after 386
+    # batches once the batch bound became 1024. Check the new file as well, so
+    # a catalog the next run would refuse is never published.
+    [[ -f $source && ! -L $source ]] && (( $(stat -c %s -- "$source") <= HAT_PUBLISH_MAX )) || return 65
+    if [[ -e $destination || -L $destination ]]; then hat_file "$destination" 600 "$HAT_PUBLISH_MAX" || return 65; fi
     [[ $(stat -c %d "$source") == "$(stat -c %d "$HAT_ROOT")" ]] || return 65
     chmod 600 "$source" || return 65
     sync -- "$source" || return 65

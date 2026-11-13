@@ -1,0 +1,106 @@
+{
+  "subject": "Raise the published receipt-catalog bound of the A->B history transfer to the 1024-batch bound",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "first_failure_kst": "2026-11-13T23:54:05+09:00",
+    "reproduced_kst": "2026-11-14T00:11:29+09:00",
+    "symptom": "B capstone-history-auto-transfer.service exit 65 (deferred) at phase finalize every run",
+    "cause": "hat_publish refuses an existing published file over a fixed 262144 bytes; the 23:36 latest-batches.jsonl is 262370 bytes (386 receipts x ~680 B); the 11-13 19:31 batch-bound sync (256 -> 1024) missed this bound",
+    "ruled_out": {
+      "entries": "3274/16384",
+      "bytes": "215577514/1073741824",
+      "free": "102107709440",
+      "rsync_pin": true
+    },
+    "data_loss": false,
+    "note": "receipts are still committed before finalize; latest-batches.jsonl and status.json stay at 23:36; kept failed work dirs grow ~785 entries per run (entry bound reached around 04:30-05:00 if unfixed)",
+    "kept_failed_work_dirs": 42
+  },
+  "changes": {
+    "transfer-lib.sh": {
+      "HAT_PUBLISH_MAX": 4194304,
+      "hat_publish_destination_bound": [
+        262144,
+        "HAT_PUBLISH_MAX"
+      ],
+      "hat_publish_source_check": "regular, not symlink, <= HAT_PUBLISH_MAX"
+    },
+    "test-native.sh": {
+      "coupled_limits": "publish_max >= worker_batches * receipt_max",
+      "new_cases": [
+        "publish_incident_catalog",
+        "publish_cap"
+      ]
+    },
+    "unchanged": [
+      "worker-b.sh",
+      "A exporter/sudoers",
+      "1 GiB quota",
+      "40 MiB reserve",
+      "600 s run limit",
+      "no retry loop",
+      "no deletion of A data, receipts or kept work dirs"
+    ]
+  },
+  "sha256": {
+    "transfer-lib.sh": "0ed5bbe69829a9d7dc3671241872da82590982f5ecd97167c2e05c0c8006cb2d",
+    "runtime.sha256": "abdd7d6748228e090770fa8f1f329551fda9c076ef8d184f7b54b7eed13eede8",
+    "test-native.sh": "d3bcd3f77c26a45bbe4add79ac747f9ec843a46c8cd580ca43fa4d371c5c2636",
+    "apply-publish-cap-b.py": "2fd262f4be1e76dcb097481db0b9cf363f419f859b826924ac26d785c70528a7",
+    "test_apply_publish_cap.py": "9061f4af6f0275deeab539757a151137a01ea08a2473c38da4aa8a9937810c79",
+    "test_apply_cap_sync.py": "43d39c213d55f81bbb5263726673dd961b0bc54a084f5a4fa1b7990465970427",
+    "deploy/source-pins.sha256": "5ebdb82e8a9871d28cb8a0697657519cabaa3183af3f86085094db65883f942d"
+  },
+  "live_baseline": {
+    "observed_kst": "2026-11-14T00:19:18+09:00",
+    "transfer-lib.sh": "52dbb82b0cb31ce8",
+    "runtime.sha256": "9a62534a4e2d3202",
+    "worker-b.sh": "6781b8fd74546f36",
+    "ssh-b.sh": "7ea52f7d15e77a24",
+    "metadata": "0:0:0400:1 all",
+    "unit": "failed"
+  },
+  "tests": {
+    "b_isolated_transfer": {
+      "passed": 40,
+      "count": 40,
+      "new": [
+        "publish_incident_catalog",
+        "publish_cap"
+      ],
+      "coupled_limits_extended": true
+    },
+    "b_isolated_installer": {
+      "passed": 20,
+      "count": 20
+    },
+    "negative_live_library": "new test fails at coupled_limits on 52dbb82b (live)",
+    "apply_script_isolated_b": {
+      "applied": true,
+      "refusals": [
+        "installed_runtime_differs_no_change",
+        "candidate_changed",
+        "installed_worker_differs_no_change",
+        "transfer_lock_busy_no_change"
+      ],
+      "manifest_failure_restores_both": true,
+      "first_attempt_note": "restore case first collided with a same-second backup directory name (no change); backup now uses mkdtemp"
+    },
+    "local_pins": {
+      "test_apply_publish_cap": "4/4",
+      "test_apply_cap_sync": "4/4 (now pinned to its own commit 3f30d52)"
+    },
+    "temp_removed": true
+  },
+  "apply_order": [
+    "B apply-publish-cap-b.py <transfer-lib.sh> <runtime.sha256> under the transfer lock",
+    "start the transfer unit once; check status.json (new time, >= 391 batches), new latest-batches.jsonl, Result=success",
+    "check the next natural cycle"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "manual run and next cycle",
+    "cleanup review of 42 kept failed work dirs"
+  ],
+  "residual_risk": "each run re-verifies every receipt: 390 batches took ~143 s, so 1024 batches ~375 s of the 600 s limit"
+}

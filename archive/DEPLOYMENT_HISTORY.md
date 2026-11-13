@@ -1582,3 +1582,7 @@ raw 수집 경로에서 앞서 `publish_pending` / `reader_restart_guard_failed`
 ## 2026-11-08 23:18 KST — 공개 진단 코드 표시
 
 A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0a62180683aef1b5c796b193a8628ba1d278a6269f28e3c25fd48bd4`에서 `8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc`로 변경했다. 기존 비밀 마스킹 우선순위를 유지하고 공개 사유85종 및 숫자 종료값/짧은 상태명을 보존한다. reader 재시작3회·봇/수집기 재시작0, 독립15분 원복 준비→A23:18:26/B23:18:35/C23:18:42 확정·noop·타이머 해제. 복구본은 각 서버 `/var/lib/capstone-diagnostics/journal-redaction-20261108`; 과거 설치 영수증은 덮어쓰지 않고 증분 원장 추가. 원본은 위 SHA와 직전 Git `0ceb3686bfe334548af7e908becd5058a75a67dd`에서 복구 가능하다. [실제 MCP·채팅·한계](../infra/mcp/journal-excerpts.md). 복합108 하네스 후보는 운영 미적용이다.
+
+## 2026-11-13 17:06~17:26 KST — 사건 조사 인용 안내 위치 후보 적용 후 원복 (B, 관리자231 경유)
+
+사용자 승인("인용 안내 후보 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래(0.05초) 8개 파일을 원자 교체했다. 실행 사본 4곳은 `96876e4e`→`d6de30da`, 플러그인 2곳은 `28ef2a73`→`7bb48edb`로 바꿨고, 컨트롤러 내장 실행기 상수(`178c8dbb`→`a3218877`)와 Ollama 영수증도 갱신했다. 백업과 45분 원복 타이머는 `/var/lib/capstone-service-grounding/20261113-citation-prefix/`에 있다. 컨트롤러 자체 내장본 검증과 틱 정상을 확인했다. 공동 채널 실제 조사에서 판단 호출 3번의 캐시 재사용(7.8/3.5/1.1초)을 확인했다. 그러나 메모가 처음 들어간 호출에서 과거에 없던 깨진 출력이 나와 17:26:19에 원복했다(8개 기준 SHA 복귀, 타이머 정지, 틱·내장본 검증 정상). Hermes 컨테이너와 봇은 재시작하지 않았다. [후보·결과](../infra/validation/citation-prefix/README.md).

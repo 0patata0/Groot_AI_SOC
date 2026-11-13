@@ -108,3 +108,7 @@ ansible-playbook -i ../../../automation/ansible/inventory/local-a.ini install-a.
 ```
 
 합성 시험은 형제 `history/`의 5개 의존 파일과 `history-auto/{auto-worker.sh,auto-lib.sh,state.jq,test-native.sh}`를 함께 반입해 `bash history-auto/test-native.sh`로 실행한다. 실제 journalctl·운영 wrapper·systemctl을 호출하지 않는다. 실제 EOF 후속 배치, 부팅 변경 뒤 완료 자료 재사용, timeout 중단 후 partial 보존, cursor 누락/nearest, 빈 원천/손상 JSON, 목록의 과대·중복·현재 boot 누락, 동시 실행, 용량·partial 상한, head 손상·unsafe state를 검사한다. 완료 자료의 재fsync 실패 시 head가 그대로인지와 재시도 복구, payload·JSON 의미가 같은 manifest 공백 변조의 SHA 거절도 포함한다. private fixture만 만들고 정리하며 원문은 stdout에 출력하지 않는다.
+
+## 2026-11-13 정정: 보존소 상한 변경이 A→B 전송을 멈춤
+
+09:37(폴더 256→1024)과 15:55(항목 4,096→16,384) 변경 뒤에도 A→B 전송 경로의 상한은 그대로였다. A 내보내기 관문 `history-auto-transfer/export-a.sh`는 항목 ≤4,096·배치 ≤256, B 작업자 `worker-b.sh`는 배치 ≤256이다. 그래서 A 배치가 256개를 넘은 09:44부터 B `capstone-history-auto-transfer.service`가 `manifest_pull`에서 exit 12(deferred)로 실패한다. A의 보존은 계속되고 삭제는 없다. 전송 상한을 같은 값으로 맞추는 후보(고정 SHA·합성 시험·A/B 적용)가 필요하며 승인 대상이다. [현황](../../../../STATUS.md).

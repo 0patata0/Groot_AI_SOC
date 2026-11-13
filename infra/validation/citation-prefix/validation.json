@@ -1,13 +1,29 @@
 {
   "subject": "Keep the investigation runner's prompt prefix stable: citation hint as in-process notes instead of a growing system suffix",
-  "status": "candidate_regressed_replay_measured_not_applied",
+  "status": "applied_then_rolled_back_pending_accuracy_ab",
   "observed_kst": "2026-11-13T16:24:00+09:00/2026-11-13T16:54:17+09:00",
   "evidence": {
     "thor_calls_50h_ge_3k_tokens": 134,
-    "prompt_seconds": {"total": 1832.1, "full_reprocess": {"calls": 21, "seconds": 675.3}, "large_partial_static_prefix_only": {"calls": 14, "seconds": 506.7}},
+    "prompt_seconds": {
+      "total": 1832.1,
+      "full_reprocess": {
+        "calls": 21,
+        "seconds": 675.3
+      },
+      "large_partial_static_prefix_only": {
+        "calls": 14,
+        "seconds": 506.7
+      }
+    },
     "hermes_chat_last_message_kst": "2026-11-10T21:02:31+09:00",
     "reprocess_sessions": "capstone-management (controller investigations)",
-    "representative_session": {"id_suffix": "5a43b3", "window_kst": "2026-11-12T21:52/22:02", "thor_calls": 8, "full_reprocess": 6, "prompt_seconds": 296},
+    "representative_session": {
+      "id_suffix": "5a43b3",
+      "window_kst": "2026-11-12T21:52/22:02",
+      "thor_calls": 8,
+      "full_reprocess": 6,
+      "prompt_seconds": 296
+    },
     "cause": "completed_citation_request appended the growing successful-read list to the system message; the hybrid model resumes only at an earlier prompt end"
   },
   "live_baseline": {
@@ -22,20 +38,68 @@
     "infra/hermes/soc_management_run.py": "d6de30da4005bd18a7bb0973ad52d9502ea28c3c0ca90954f43f7a95554713b0",
     "infra/hermes/query-completion/__init__.py": "7bb48edb69e7c34b5e35112c04f8b3c9d038a88bba525cca801d4310c288bed3",
     "infra/hermes/test_soc_management_repair.py": "648f411ff65cfb5b13abeb10fd7443dffa18aa2015e439578182d66f88345a05",
-    "unchanged": ["hint text and filters", "pending/selection stage", "tool lists", "dispatch validation", "approval boundary"]
+    "unchanged": [
+      "hint text and filters",
+      "pending/selection stage",
+      "tool lists",
+      "dispatch validation",
+      "approval boundary"
+    ]
   },
   "replay": {
     "model": "soc-qwen36:35b-balanced-q4km-20261108",
     "inputs": "real session system prompt (25,901 chars), real messages, live MCP schemas (36 verify tools); output 1 token",
     "window_kst": "2026-11-13T16:49:32+09:00/2026-11-13T16:54:17+09:00",
     "seconds": {
-      "A_current": [31.85, 34.93, 50.75, 50.93],
-      "B_candidate_in_process_notes": [32.23, 4.31, 19.86, 1.26],
-      "C_persisted_notes": [32.2, 4.18, 16.8, 1.25],
-      "production_observed": [31.7, 34.8, 50.8, 51.1]
+      "A_current": [
+        31.85,
+        34.93,
+        50.75,
+        50.93
+      ],
+      "B_candidate_in_process_notes": [
+        32.23,
+        4.31,
+        19.86,
+        1.26
+      ],
+      "C_persisted_notes": [
+        32.2,
+        4.18,
+        16.8,
+        1.25
+      ],
+      "production_observed": [
+        31.7,
+        34.8,
+        50.8,
+        51.1
+      ]
     },
-    "totals": {"A": 168.5, "B": 57.7, "C": 54.4, "production": 168.4},
-    "A_prompt_tokens_vs_production": [[32933, 33164], [35822, 36053], [49919, 50377], [50050, 50508]],
+    "totals": {
+      "A": 168.5,
+      "B": 57.7,
+      "C": 54.4,
+      "production": 168.4
+    },
+    "A_prompt_tokens_vs_production": [
+      [
+        32933,
+        33164
+      ],
+      [
+        35822,
+        36053
+      ],
+      [
+        49919,
+        50377
+      ],
+      [
+        50050,
+        50508
+      ]
+    ],
     "B_equals_implemented_function_output": true,
     "choice": "B (C saves 3 s more but leaves earlier runs' hints in persisted history)",
     "thor_temp_removed": true
@@ -43,16 +107,92 @@
   "harness2": {
     "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
     "report": "G_Harness2/runs/2026-11-13-citation-prefix-165531/REPORT.json (Git-excluded)",
-    "census": {"components": 25, "skills": 5, "scripts": 18, "sub_agents": 0, "always_on_chars": 16848, "always_on_char_delta": 0},
-    "changed": ["scripts/evidence_gate.py", "scripts/native_query.py"],
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "scripts": 18,
+      "sub_agents": 0,
+      "always_on_chars": 16848,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py"
+    ],
     "note": "audit.py pins both files as immutable context; the same official core ran with them as the editable surface"
   },
   "regression": {
-    "hermes_management": {"count": 496, "new": 2, "failures": ["test_model_can_repair_missing_status_once_without_another_forced_read (pre-existing at HEAD)"]},
-    "suites_vs_head": {"hermes_other": 544, "query_completion": 408, "ollama_trial": 362, "mcp_report": 9, "deployment": 343},
+    "hermes_management": {
+      "count": 496,
+      "new": 2,
+      "failures": [
+        "test_model_can_repair_missing_status_once_without_another_forced_read (pre-existing at HEAD)"
+      ]
+    },
+    "suites_vs_head": {
+      "hermes_other": 544,
+      "query_completion": 408,
+      "ollama_trial": 362,
+      "mcp_report": 9,
+      "deployment": 343
+    },
     "new_failures": 0,
-    "differences_not_from_candidate": ["hermes-prestart pin test fails only in the HEAD archive (uncommitted pin update by other work)", "untracked test_firewall_nat error in the working tree (other work)"]
+    "differences_not_from_candidate": [
+      "hermes-prestart pin test fails only in the HEAD archive (uncommitted pin update by other work)",
+      "untracked test_firewall_nat error in the working tree (other work)"
+    ]
   },
-  "not_done": ["deploy to B (six copies incl. controller-embedded gate)", "real investigation run: reuse, duration, citation-error rates", "report stage tool removal and selection prompt cost", "Ollama bot per-question schema narrowing"],
-  "side_findings": ["capstone-ollama-trial discover_only fails as root with ValueError", "B Harness2 03:00 context 2026-11-13: discovery_unavailable"]
+  "not_done": [
+    "A/B real-generation accuracy evaluation at real decision points",
+    "re-apply only after evaluation and approval",
+    "report stage tool removal and selection prompt cost",
+    "Ollama bot per-question schema narrowing"
+  ],
+  "side_findings": [
+    "capstone-ollama-trial discover_only fails as root with ValueError",
+    "B Harness2 03:00 context 2026-11-13: discovery_unavailable",
+    "compound chat request scoped to diagnostics only (block list dropped)",
+    "selection until_kst can be ahead of the server clock (MCP rejects)"
+  ],
+  "production": {
+    "approval": "user 2026-11-13: 인용 안내 후보 적용해줘",
+    "applied_kst": "2026-11-13T17:06:52+09:00",
+    "lock_seconds": 0.05,
+    "after": {
+      "runner_copies": "d6de30da",
+      "plugin_copies": "7bb48edb",
+      "controller": "a32188772f3684c9",
+      "receipt": "0a6f9746e115cb9a"
+    },
+    "postcheck": {
+      "controller_gate_verified": true,
+      "pins_ok": 2,
+      "ticks_ok": 4,
+      "hermes_restart": false
+    },
+    "chat1_kst": "17:09:03",
+    "chat1": "fast lookup path, changed path not exercised; answer missed the block list (pre-existing scope selection, reproduced with live-SHA harness)",
+    "chat2_kst": "17:20:59",
+    "chat2_cache": [
+      {
+        "prompt": 35720,
+        "processed": 6743,
+        "seconds": 7.8
+      },
+      {
+        "prompt": 38574,
+        "processed": 2858,
+        "seconds": 3.5
+      },
+      {
+        "prompt": 39124,
+        "processed": 554,
+        "seconds": 1.1
+      }
+    ],
+    "accuracy_signal": "first note-bearing decision call produced malformed '{\"calls\": ... </parameter>' content -> one extra status repair; before: 1 of 291 sessions with malformed output, no '</parameter>' form",
+    "chat2_final": "tool failure fallback: first selection until_kst 1 s ahead of server clock rejected (pre-existing)",
+    "rolled_back_kst": "2026-11-13T17:26:19+09:00",
+    "rollback": "all 8 files back to baseline SHA; timer stopped; ticks ok; gate verified"
+  }
 }

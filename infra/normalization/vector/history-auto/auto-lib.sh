@@ -2,10 +2,11 @@
 # Sourced only by the fixed root worker or the private native fixture.
 AUTO_POLICY=bounded-previous-kernel-auto-v1
 AUTO_MAX_JOBS=64 AUTO_MAX_BYTES=1073741824 AUTO_RESERVE_BYTES=41943040
-# 2026-11-13: 256 -> 1024. A 18-day boot (mostly nft SPOOF kernel lines) needs about
-# 420 batch directories while the store held 134 MB of its 1 GiB; the directory cap,
-# not bytes, stopped preservation. 1024 x 3 entries stays under the 4096-entry cap.
-AUTO_MAX_BATCH_DIRS=1024 AUTO_MAX_STORE_ENTRIES=4096
+# 2026-11-13: directories 256 -> 1024 (an 18-day boot, mostly nft SPOOF kernel lines,
+# needs ~420 while bytes were at 13%). Entries 4096 -> 16384: a live batch directory
+# holds 14 entries (dir + 13 files), not 3, so 1024 x 14 = 14336 needs room; the
+# first raise stopped again at 4096 entries after 71 batches.
+AUTO_MAX_BATCH_DIRS=1024 AUTO_MAX_STORE_ENTRIES=16384
 auto_report() {
     jq -nc --arg outcome "$1" --arg reason "$2" --arg boot "${3:-}" \
       '{policy:"bounded-previous-kernel-auto-v1",outcome:$outcome,reason:$reason,
@@ -126,11 +127,11 @@ auto_block() {
 auto_store_capacity() {
     local rc entries bytes dirs
     set +e
-    find "$AUTO_ROOT/store" -xdev -printf '%y %s\n' 2>/dev/null | head -n 4097 > "$AUTO_WORK/store-size.txt"
+    find "$AUTO_ROOT/store" -xdev -printf '%y %s\n' 2>/dev/null | head -n "$((AUTO_MAX_STORE_ENTRIES + 1))" > "$AUTO_WORK/store-size.txt"
     rc=("${PIPESTATUS[@]}")
     set -e
     entries=$(wc -l < "$AUTO_WORK/store-size.txt")
-    (( entries < 4097 )) || auto_refuse store_entry_limit
+    (( entries <= AUTO_MAX_STORE_ENTRIES )) || auto_refuse store_entry_limit
     (( rc[0]==0 && rc[1]==0 )) || auto_refuse store_measurement_failed
     awk 'NF!=2 || $1!~/^[df]$/ || $2!~/^[0-9]+$/ {exit 1}' "$AUTO_WORK/store-size.txt" || auto_refuse unsafe_store_entry
     bytes=$(awk '{n+=$2} END{printf "%.0f",n}' "$AUTO_WORK/store-size.txt")

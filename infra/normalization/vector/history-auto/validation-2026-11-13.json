@@ -91,5 +91,26 @@
     "code_note": "entry check hardcodes 4097 instead of AUTO_MAX_STORE_ENTRIES",
     "needed_for_1024_dirs": 14336,
     "next": "entry-cap correction candidate (e.g. 16384, use the variable); needs approval"
+  },
+  "entry_cap_candidate": {
+    "status": "candidate_not_applied",
+    "entries_cap": 16384,
+    "hardcoded_4097_replaced": true,
+    "auto_lib_sha256": "a210fd64d0cb6f4e6e8be0697be51f0c06896fb42c0cf59f698e3ef275ad5ba5",
+    "runtime_manifest_sha256": "258ccfde07a75b153618060aa4bfde5af3b32c4a23e83a711d71d051678a2246",
+    "basis": {
+      "entries_per_batch_dir": 14,
+      "dirs_cap": 1024,
+      "needed": 14336,
+      "bytes_estimate_mb": 544
+    },
+    "native_synthetic_on_a": {
+      "passed": 36,
+      "failed": 0,
+      "observed_kst": "2026-11-13T15:51:18+09:00"
+    },
+    "installed_is_previous_apply": true,
+    "candidate_runtime_manifest_check": "manifest_ok",
+    "apply_script": "infra/normalization/vector/history-auto/apply-entry-cap-a.py"
   }
 }

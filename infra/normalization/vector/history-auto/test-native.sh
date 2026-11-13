@@ -181,6 +181,13 @@ before=$(wc -l < "$stage/calls"); run 65
 newroot partial_quota
 for n in $(seq 1 1024); do mkdir -m 700 "$root/store/partial-fixture-$n"; done
 run 65; [[ $(find "$root/store" -mindepth 1 -maxdepth 1 -type d | wc -l) == 1024 ]]; ok
+newroot entries_under_new_cap
+mkdir -m 700 "$root/store/partial-fixture-entries"; (cd "$root/store/partial-fixture-entries" && seq -f 'e%g' 1 5000 | xargs touch)
+run 0; job '.status=="ready"'; ok
+newroot entry_quota
+mkdir -m 700 "$root/store/partial-fixture-entries"; (cd "$root/store/partial-fixture-entries" && seq -f 'e%g' 1 16384 | xargs touch)
+before=$(wc -l < "$stage/calls"); run 65
+[[ $(wc -l < "$stage/calls") == "$before" ]]; job '.status=="ready"'; ok
 newroot partial_under_cap
 for n in $(seq 1 300); do mkdir -m 700 "$root/store/partial-fixture-$n"; done
 run 0; job '.status=="ready"'; [[ $(find "$root/store" -mindepth 1 -maxdepth 1 -type d -name 'batch-*' | wc -l) == 1 ]]; ok

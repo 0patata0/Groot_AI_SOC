@@ -1,6 +1,6 @@
 {
   "subject": "Peer refusal diagnosis (claim, evidence path, reason, acceptable fix) in the correction message and a path-only refusal audit in the joint-channel queue",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T01:49+09:00",
     "post": "yrm5pj51eb8rppqfpu1i7pz93c",
@@ -93,9 +93,59 @@
     "conditional read as absolute",
     "agree text presenting a zero sample as absence"
   ],
-  "not_done": [
-    "apply on B after approval",
-    "real chat",
-    "confirm or let the 45-minute rollback run"
-  ]
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 교차 검토 정정 진단 적용해줘",
+    "at_kst": "2026-11-14T03:34:19+09:00",
+    "source_commit": "69e163c",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-peer-diagnosis",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 03:39:20"
+    ],
+    "installed": {
+      "review_channel_worker.py": "1cff48cc325f5fac",
+      "review_channel.py": "f52ec1a267da3b82"
+    },
+    "dispatcher_restart": {
+      "at": "03:34:19",
+      "previous_start": "2026-11-12 13:35:59",
+      "first_poll_after": "03:35:01",
+      "log_errors": 0
+    },
+    "postcheck": {
+      "receipt": true,
+      "live_worker_refusal_detail": {
+        "code": "peer_query_scope_mismatch",
+        "evidence_path": "result.returned_count",
+        "diagnosis_has_fix": true
+      },
+      "dispatcher_field": true,
+      "bots_active": true,
+      "failed_units": 0
+    },
+    "real_chat": {
+      "post_kst": "03:35:02",
+      "post": "q5pepmg56bdx3gau3xo5hcs6jy",
+      "peer": {
+        "attempt1_refusal": {
+          "code": "peer_query_scope_mismatch",
+          "claim_index": 1,
+          "kind": "agree",
+          "evidence_path": "result.returned_count"
+        },
+        "attempt2": "refused claim corrected to unverified; posted (1 agree, 1 unverified)",
+        "stored_detail_in_queue": true,
+        "claim_text_stored": false
+      },
+      "hermes": {
+        "drafts": 3,
+        "final": "posted (unresolved + needs_review)",
+        "false_positive_found": "\"더 많은 경보 가능성을 배제할 수 없으며\" flagged sample_zero_presented_as_absence (connective 없으며 in a modal 할 수 없- clause)"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 3
+  },
+  "next_candidate": "exclude modal inability (할 수 없-, 배제할 수 없-) from absence endings in the zero-sample check; the class predates the connective endings (할 수 없음/없다)"
 }

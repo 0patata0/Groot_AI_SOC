@@ -101,7 +101,6 @@
     "one manual transfer run, check status.json, reset-failed"
   ],
   "not_done": [
-    "natural 15-min cycle observation",
     "review of kept failed work dirs (40)",
     "fresh full install test"
   ],
@@ -138,6 +137,14 @@
     },
     "kept_failed_work_dirs": 40,
     "next_natural_run_kst": "2026-11-13T19:49:45+09:00",
-    "temp_removed": true
+    "temp_removed": true,
+    "natural_run": {
+      "window_kst": "19:49:48/19:51:54",
+      "result": "success",
+      "discovered_batches": 342,
+      "new_receipts": 4,
+      "reused_receipts": 338,
+      "records": 335820
+    }
   }
 }

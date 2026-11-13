@@ -163,5 +163,6 @@
     "peer false dissent from its own scanned/scan_capped (request-limit echo not in PEER_REQUEST_ECHO_KEYS)",
     "peer reads a conditional as an absolute claim",
     "quote cut at a period between a digit and a letter (10.x)"
-  ]
+  ],
+  "correction_2026_11_14_0355": "the connective endings also matched epistemic '-ㄹ 수 없-' (배제할 수 없으며, 03:36); the class predates them ('알 수 없음'). Fixed in infra/validation/zero-modal."
 }

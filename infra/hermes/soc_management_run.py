@@ -1187,6 +1187,11 @@ def closure_uncertainty_violations(text):
     return []
 
 
+# "-ㄹ 수 없-" after a verb of judging or knowing: an uncertainty statement.
+EPISTEMIC_INABILITY = (r'(?:알|판단할|배제할|단정할|확정할|확인할|보장할|말할|단언할|추정할|평가할|예단할|장담할|구분할|특정할|규정할|입증할|증명할|'
+                       r'결론\s*(?:내릴|지을))\s*수\s*없[가-힣]*')
+
+
 def claim_sentences(text):
     """Sentences as separate claims, each with the qualifier scope that belongs to it.
 
@@ -1253,6 +1258,11 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                 '',scope_line)
             # "(10건 중)" is not "0건": the zero count needs a digit boundary
             # (11-13 23:13 two corrected reports failed on a table heading).
+            # "Cannot judge/rule out/confirm" is not an absence claim: 11-14 03:36
+            # "경보 가능성을 배제할 수 없으며" and "공격 여부는 알 수 없음" were read
+            # as absence. Remove only such epistemic verb phrases; "찾을/발견할/볼
+            # 수 없음", "있을 수 없다" and "경보 수 없음" stay claims.
+            scope_line = re.sub(EPISTEMIC_INABILITY, '', scope_line)
             # Connective endings are absence claims too: 11-14 01:02 "WAF의 경우
             # 경보가 없으며" passed while only its qualified table rows failed.
             if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:(?<![0-9])0\s*건|없(?:었|습|음|다|는|으며|고|어|으므로|으나)|전혀\s*없)', scope_line) and

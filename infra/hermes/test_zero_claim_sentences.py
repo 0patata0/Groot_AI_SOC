@@ -55,6 +55,23 @@ class ConnectiveEndings(unittest.TestCase):
         self.assertFalse(rejected('경보가 없으나 반환 표본 0건이라 전체는 미확인'))
 
 
+class EpistemicInability(unittest.TestCase):
+    """11-14 03:36: "더 많은 경보 가능성을 배제할 수 없으며" (cannot rule out) was read as
+    an absence claim; "알/판단할/확정할 수 없-" are uncertainty statements."""
+
+    def test_cannot_judge_is_not_absence(self):
+        for text in ('수집/색인 지연 및 더 많은 경보 가능성을 배제할 수 없으며 추가 조사 필요', '공격 여부는 알 수 없음',
+                     '경보 원인은 판단할 수없습니다', '공격 여부를 확정할 수 없다', '경보 발생 여부는 결론 내릴 수 없음'):
+            with self.subTest(text=text):
+                self.assertFalse(rejected(text))
+
+    def test_real_absence_stays_a_claim(self):
+        for text in ('경보를 찾을 수 없음', '경보를 발견할 수 없었다', '공격이 있을 수 없다', '경보 수 없음',
+                     '공격은 없고 판단할 수 없음', '공격 경보가 없으며 정상', 'ModSecurity 경보 0건'):
+            with self.subTest(text=text):
+                self.assertTrue(rejected(text))
+
+
 class SentenceSplit(unittest.TestCase):
     def test_periods_between_digits_do_not_end_a_sentence(self):
         sentences = [s for s, _ in m.claim_sentences('| 22:22:30.915 | 172.17.0.2 | 공격성 없음. | 다음. 끝')]

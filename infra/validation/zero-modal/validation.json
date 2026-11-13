@@ -1,0 +1,103 @@
+{
+  "subject": "Zero-sample check: epistemic 'cannot judge' phrases (알/판단할/배제할/확정할 ... 수 없-) are not absence claims",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T03:36:57+09:00",
+    "post": "q5pepmg56bdx3gau3xo5hcs6jy",
+    "line": "수집/색인 지연 및 더 많은 경보 가능성을 배제할 수 없으며 추가 조사 필요",
+    "class": "the absence regex ignored the modal -ㄹ 수 없-; the 01:19 connective endings widened it; '알 수 없음' and '판단할 수 없습니다' were already false positives"
+  },
+  "change": {
+    "soc_management_run.py": "EPISTEMIC_INABILITY (verbs of judging/knowing + 수 없-) removed from the sentence before the absence check, like the existing caution removal",
+    "kept_as_claims": [
+      "찾을/발견할/볼 수 없음",
+      "있을 수 없다",
+      "경보 수 없음",
+      "a separate absence in the same sentence"
+    ],
+    "rejected_drafts": [
+      "lookbehind on 수 (dropped '경보 수 없음')",
+      "any -ㄹ 수 없- (dropped '찾을 수 없음')"
+    ],
+    "query-completion/__init__.py": "runner pin"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "88896285a6e908447fc3e3ac4a57a856cd8dbe911e49e6883812f9550b14c7bf",
+      "candidate": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "ce1ba9378b675f73a1d7087b20360846eaaeac4c21544c58d89da1b5d7ca8755",
+      "candidate": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9"
+    },
+    "infra/hermes/test_zero_claim_sentences.py": "519c389eafaaa65d29cd154ca52f6c8e5c3f05f27be1689d3237ce6110464bf5",
+    "infra/validation/zero-modal/apply_b.py": "bbf42fdd7ffbddf0a0f226a93ab03ae8c0211b12170bd1772ef21f13f95ce4d0"
+  },
+  "tests": {
+    "new": {
+      "EpistemicInability": "2/2; on the HEAD runner 4 judging phrases fail (the absence cases pass on both)"
+    },
+    "related": "31 OK",
+    "bundles_vs_head": {
+      "hermes_all": "1297 (base 1295), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, base-only flaky 1",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "live_replay_b": {
+    "observed_kst": "2026-11-14T03:49:17+09:00",
+    "sessions": 40,
+    "drafts": 82,
+    "drafts_with_phrase": 13,
+    "changed": [
+      {
+        "at": "11-14T03:36:57",
+        "old": [
+          "sample_zero_presented_as_absence"
+        ],
+        "new": []
+      }
+    ],
+    "new_issues": 0,
+    "candidate_temp_removed": true
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-zero-modal-035059/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "6 copies + gate + Ollama receipt (2 keys, other keys kept)",
+    "rollback": "8 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T03:51:29+09:00",
+    "copies": "6/6 at base",
+    "embedded_gate": "88896285a6e90844",
+    "ollama_receipt": "2 keys at base",
+    "deploy_dir_free": true
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

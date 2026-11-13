@@ -246,6 +246,9 @@ class Tests(unittest.TestCase):
         # 2026-11-13: comparison principles come from the shared skill section.
         self.assertIn('## 교차 검토 대조',prompts[0][1]);self.assertIn('SOC_WORKFLOW_INVESTIGATE_V1',prompts[0][1])
         self.assertIn('검토자 자신의 요청 조건',prompts[0][1]);self.assertIn('경보 수집·색인 정상',prompts[0][1])
+        # 2026-11-14: the excerpt format is explained, not "check omitted_items".
+        self.assertIn('not_shown_in_excerpt(이 발췌에 싣지 않은 나머지 수)',prompts[0][1])
+        self.assertIn('조회에서 빠지거나 생략된 경보·데이터가 아니라',prompts[0][1]);self.assertNotIn('omitted_items',prompts[0][1])
 
     def test_peer_rejects_false_omission_and_invented_quotes(self):
         source={'other_agent_answer':'runtime_load_verified: false; ID 10100','other_answer_truncated':False}
@@ -270,7 +273,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(value['runtime']['engine_mode'],'DetectionOnly')
         self.assertFalse(value['runtime_load_verified'])
         self.assertEqual(value['exclusions']['returned_items'],60)
-        self.assertEqual(value['exclusions']['omitted_items'],57)
+        self.assertEqual(value['exclusions']['not_shown_in_excerpt'],57)
 
     def test_reference_scope_rejects_cross_component_and_snapshot_disagreement(self):
         source={'other_agent_answer':'Wazuh 매니저 클러스터 비활성: cluster is not enabled','other_answer_truncated':False}
@@ -325,7 +328,7 @@ class Tests(unittest.TestCase):
                   'indexed_window_total_count':None,'limit':50,'scanned':50,'scan_capped':True,'alerts':alerts}
         observed = [{'name':'search_wazuh_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(capped)}]
         catalog = w.peer_reference_catalog(source,observed); paths = {e['path']:e['id'] for e in catalog['evidence']}
-        for path in ('result.scanned','result.returned_count','result.alerts.returned_items','result.alerts.omitted_items'):
+        for path in ('result.scanned','result.returned_count','result.alerts.returned_items'):
             for kind in ('disagree','agree'):
                 with self.subTest(path=path,kind=kind):
                     claim = {'kind':kind,'text':'표본 크기 비교','source_ref':'a0','evidence_ref':paths[path],'missing_field':''}
@@ -349,6 +352,34 @@ class Tests(unittest.TestCase):
         section = contract.workflow_policy(('soc-investigate',),section='peer-review')
         self.assertIn('scan_capped true', section)
         self.assertIn('한도에 닿지 않은 조회의 건수만 관측값으로 대조', section)
+
+    def test_excerpt_counts_are_display_not_missing_alerts(self):
+        """11-14 01:38: the reviewer read the excerpt's "omitted_items: 7" (10
+        returned, 3 shown) as seven alerts its limit had dropped."""
+        answer = '| Wazuh | 제한 표본 15건 | 반환 15건 |'
+        source = {'user_question':'최근 30분 Wazuh 경보 조사','other_agent_answer':answer,'other_answer_truncated':False}
+        alerts = [{'agent':'groot-sec','source_ip':'10.200.10.10','message':'x'*2000}] + [{'agent':'groot-sec','source_ip':'10.200.10.10'}]*9
+        for capped in (True, False):
+            result = {'source':'wazuh','returned_count':10,'limit':10 if capped else 50,'scanned':10,'scan_capped':capped,'alerts':alerts}
+            compact = json.loads(w.compact_peer_result(json.dumps(result)))
+            self.assertEqual((compact['alerts']['returned_items'], compact['alerts']['not_shown_in_excerpt']), (10, 7))
+            self.assertEqual(compact['alerts']['sample'][0]['message']['not_shown_characters'], 200)
+            self.assertNotIn('omitted', w.compact_peer_result(json.dumps(result)))
+            observed = [{'name':'search_wazuh_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(result)}]
+            catalog = w.peer_reference_catalog(source,observed); paths = {e['path']:e['id'] for e in catalog['evidence']}
+            for path in ('result.alerts.not_shown_in_excerpt','result.alerts.sample[0].message.not_shown_characters'):
+                for kind in ('disagree','agree'):
+                    with self.subTest(capped=capped,path=path,kind=kind):
+                        claim = {'kind':kind,'text':'생략 건수 비교','source_ref':'a0','evidence_ref':paths[path],'missing_field':''}
+                        with self.assertRaisesRegex(ValueError,'peer_display_excerpt_scope'):w.bind_peer_references({'claims':[claim]},catalog)
+            claim = {'kind':'unverified','text':'발췌에 일부만 보여 상대 표본 내용은 미확인','source_ref':'a0',
+                     'evidence_ref':paths['result.alerts.not_shown_in_excerpt'],'missing_field':''}
+            self.assertIn('미확인',w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed))
+        self.assertIn('peer_display_excerpt_scope',w.PEER_OUTPUT_ERRORS)
+        self.assertNotIn('omitted_items',w.PEER_LIMIT_BOUND_KEYS)
+        section = contract.workflow_policy(('soc-investigate',),section='peer-review')
+        self.assertIn('표시용 발췌에서 뺀 수이며 조회에서 빠진 경보가 아닙니다', section)
+        self.assertNotIn('omitted_items', section)
 
     def query_scope_fixture(self,replies):
         llm,h,report,request,calls=self.peer_fixture(replies)

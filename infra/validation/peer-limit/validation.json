@@ -135,5 +135,6 @@
     "unverified claim text still reasons from the reviewer limit (not checked)",
     "compact omitted_items read as read omission",
     "agree text presents a zero sample as absence"
-  ]
+  ],
+  "correction_2026_11_14_0150": "omitted_items is a display omission of the worker's excerpt (array length - shown), not equal to the reviewer's limit; it was wrongly listed with the limit-bound counts in the code list, correction message and skill sentence. Fixed in infra/validation/peer-excerpt."
 }

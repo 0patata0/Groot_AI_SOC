@@ -1,0 +1,99 @@
+{
+  "subject": "Peer review: self-describing excerpt keys (not_shown_*), the excerpt format in the reviewer instruction, display-excerpt evidence refused; correction of the 01:35 omitted_items wording",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T01:38+09:00",
+    "post": "juycno8cibbhz8aujgzfjxubbr",
+    "claim": "제한 10건에 도달(scan_capped true)해 7건이 생략 / 누락된 7건의 경보에 공격 징후가 있을 수 있어 (unverified claims)",
+    "fact": "omitted_items 7 = 10 returned - 3 shown in the worker's excerpt; not alerts missing from the read"
+  },
+  "correction_of_0135": "the 01:35 skill sentence and correction message listed omitted_items among limit-bound counts and called it equal to the reviewer's limit; it is a display omission unrelated to the limit, and the reviewer's '한도 10에 도달해 7건 생략' follows that wrong link",
+  "change": {
+    "review_channel_worker.py": {
+      "compact_keys": {
+        "omitted_items": "not_shown_in_excerpt",
+        "omitted_characters": "not_shown_characters",
+        "omitted": "not_shown"
+      },
+      "instruction": "excerpt format described; not_shown_* are display omissions, not missing alerts; tool truncated read as is",
+      "bind": "agree/disagree on not_shown_* refused with peer_display_excerpt_scope (capped or not); unverified allowed",
+      "PEER_LIMIT_BOUND_KEYS": "omitted_items removed",
+      "correction_message": "omitted_items removed; display note added"
+    },
+    "skills/soc-investigate/SKILL.md": "omitted_items removed from the limit sentence; display-excerpt principle added (section-only)",
+    "unchanged": [
+      "runner",
+      "checker",
+      "harness",
+      "original tool receipts"
+    ]
+  },
+  "limitation": "the misreading was in unverified claim text, which is not checked deterministically; the effect depends on names, instruction and skill",
+  "sha256": {
+    "infra/hermes/review_channel_worker.py": {
+      "base": "923db59416ec1a7a0d68ce8c3c794aa995876974b90754bb2161c5ff589accf2",
+      "candidate": "da7e3a3de93a92b7e6cd5e528595c819779cca49b410ba6d31d779dfd8f84275"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "125ed453d237d273092e23413b1ab4b1f1a9bbec61647edded8fc1ec1b56e372",
+      "candidate": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40"
+    },
+    "infra/hermes/test_review_channel.py": "881438725293b65ed18967c658679147b9a16a68e85cbcd0dcbd95a8456f7a80",
+    "infra/validation/peer-excerpt/apply_b.py": "3b15abb5f433718a6e06b4e7ad8015202bad46f178f35adf1414c7515e7c0f4b"
+  },
+  "tests": {
+    "new": {
+      "test_excerpt_counts_are_display_not_missing_alerts": "pass; errors on HEAD (no not_shown_in_excerpt)"
+    },
+    "updated": [
+      "compact key name",
+      "01:35 limit test path list",
+      "peer prompt asserts the format text and no omitted_items"
+    ],
+    "related": "test_review_channel + test_workflow_contract 97 OK",
+    "bundles_vs_head": {
+      "hermes_all": "1294 (base 1293), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, base-only flaky 2",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-peer-excerpt-014459/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "worker x1 + skill x3, both receipt entries (others kept)",
+    "rollback": "6 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "receipt_not_baseline_no_change",
+      "review_receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T01:45:20+09:00",
+    "worker": "923db59416ec1a7a",
+    "skill_copies": "3/3 at 125ed453d237d273",
+    "receipts": "both at base",
+    "deploy_dir_free": true
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat: no 'N건 생략/누락' reading of the excerpt",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

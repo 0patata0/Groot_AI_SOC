@@ -16,7 +16,8 @@ PEER_OUTPUT_ERRORS = frozenset({'peer_claims_shape', 'peer_claim_kind', 'peer_cl
     'peer_quote_not_in_answer', 'peer_omission_not_established', 'peer_evidence_quote_not_in_result',
     'peer_json_invalid', 'empty_peer_review', 'peer_source_ref_invalid', 'peer_evidence_ref_invalid',
     'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch', 'peer_diagnostic_claim_mismatch',
-    'peer_query_scope_mismatch', 'peer_filter_scope_mismatch', 'peer_zero_sample_dissent'})
+    'peer_query_scope_mismatch', 'peer_filter_scope_mismatch', 'peer_zero_sample_dissent',
+    'peer_display_excerpt_scope'})
 PEER_SAMPLE_COUNT_KEYS = frozenset({'returned_count', 'returned_items'})
 
 
@@ -59,7 +60,9 @@ def request_echo_path(path):
 # observations and stay comparable; when the read hit its own limit they equal
 # that limit (11-14 01:21: the reviewer's limit-50 read, scanned=50 and
 # scan_capped=true, "refuted" the other answer's sample of 15).
-PEER_LIMIT_BOUND_KEYS = frozenset({'scanned', 'returned_count', 'returned_items', 'omitted_items'})
+PEER_LIMIT_BOUND_KEYS = frozenset({'scanned', 'returned_count', 'returned_items'})
+# What compact_peer_result leaves out of the excerpt shown to the reviewer.
+PEER_DISPLAY_EXCERPT_KEYS = frozenset({'not_shown_in_excerpt', 'not_shown_characters', 'not_shown'})
 
 
 def reviewer_limit_reached(raw):
@@ -73,6 +76,11 @@ def reviewer_limit_reached(raw):
 def limit_bound_count_path(path):
     keys = re.findall(r'\.([A-Za-z_][A-Za-z0-9_]*)', str(path))
     return bool(keys) and keys[-1] in PEER_LIMIT_BOUND_KEYS
+
+
+def display_excerpt_path(path):
+    keys = re.findall(r'\.([A-Za-z_][A-Za-z0-9_]*)', str(path))
+    return bool(keys) and keys[-1] in PEER_DISPLAY_EXCERPT_KEYS
 
 
 def peer_error_code(exc):
@@ -368,6 +376,9 @@ def compact_peer_result(raw):
     """Keep metadata across the entire result instead of cutting off its tail.
 
     Excerpts are explicitly bounded; original tool receipts remain unchanged.
+    The not_shown_* keys count what this excerpt leaves out, never what the
+    read missed (11-14 01:38 the reviewer read "omitted_items 7" as seven
+    alerts lost to its limit).
     """
     try:
         value = json.loads(raw)
@@ -375,7 +386,7 @@ def compact_peer_result(raw):
         return raw[:12000]
     def trim(v, depth=0, key=''):
         if depth > 9:
-            return {'omitted': 'depth_limit'}
+            return {'not_shown': 'depth_limit'}
         if isinstance(v, dict):
             return {k:trim(x,depth+1,k) for k,x in v.items()}
         if isinstance(v, list):
@@ -383,11 +394,11 @@ def compact_peer_result(raw):
                 fields=('id','sid','origin','source','source_file','path','enabled','description')
                 return {'returned_items':len(v),'sample':[
                     {k:trim(x[k],depth+1,k) for k in fields if k in x} if isinstance(x,dict) else trim(x,depth+1)
-                    for x in v[:50]],'omitted_items':max(0,len(v)-50)}
+                    for x in v[:50]],'not_shown_in_excerpt':max(0,len(v)-50)}
             return {'returned_items':len(v),'sample':[trim(x,depth+1) for x in v[:3]],
-                    'omitted_items':max(0,len(v)-3)}
+                    'not_shown_in_excerpt':max(0,len(v)-3)}
         if isinstance(v,str) and len(v)>1800:
-            return {'excerpt':v[:1800],'omitted_characters':len(v)-1800}
+            return {'excerpt':v[:1800],'not_shown_characters':len(v)-1800}
         return v
     return json.dumps(trim(value),ensure_ascii=False)
 
@@ -502,6 +513,10 @@ def bind_peer_references(value, catalog):
             # A count from a read that hit the reviewer's own limit is that limit,
             # not a receipt for the other answer's sample (11-14 01:21).
             raise ValueError('peer_query_scope_mismatch')
+        if claim.get('kind') in ('agree','disagree') and display_excerpt_path(proof['path']):
+            # How much of the reviewer's own result this excerpt leaves out says
+            # nothing about either answer (11-14 01:38).
+            raise ValueError('peer_display_excerpt_scope')
         if claim.get('kind') in ('agree','disagree') and proof.get('filters_outside_question'):
             # A read narrowed by a filter the question never named cannot judge
             # an answer about the question's scope (11-13 22:22: an unasked
@@ -596,7 +611,9 @@ async def review_answer(config, request, report):
     instruction += ('\nJSON claims만 반환하세요. 각 주장은 제공된 answers의 source_ref와 evidence의 evidence_ref 식별자를 선택하세요. '
                     '인용문을 재작성하지 마세요. 실제 원문 인용은 선택한 식별자에서 연결하고 별도로 검증합니다. '
                     'text에는 a0/e0 같은 내부 식별자를 노출하지 말고 실제 대상·관측값과 판단 근거를 간결하게 설명하세요. '
-                    'returned_items는 해당 반환 배열의 길이이고 전체 건수가 아닙니다. omitted_items·truncated를 확인하세요. JSON 인용의 공백과 구두점도 그대로 보존하세요. text는 사용자에게 보이는 짧은 한국어 설명입니다. '
+                    '검토자 조회 결과는 표시용 발췌로 줄였습니다. 배열은 returned_items(실제 반환된 배열 길이)·sample(앞쪽 일부)·not_shown_in_excerpt(이 발췌에 싣지 않은 나머지 수)로, '
+                    '긴 문자열은 excerpt·not_shown_characters로 표시합니다. not_shown_* 값은 조회에서 빠지거나 생략된 경보·데이터가 아니라 이 표시에서만 뺀 양입니다. '
+                    'returned_items도 반환 배열의 길이일 뿐 요청 구간 전체 건수가 아닙니다. 도구 결과 자체의 truncated 표시는 원문 그대로 읽으세요. JSON 인용의 공백과 구두점도 그대로 보존하세요. text는 사용자에게 보이는 짧은 한국어 설명입니다. '
                     '누락 판정은 상대 원문 전체에 실제로 없는 정확한 필드/ID missing_field에만 허용합니다. '
                     '상대가 명시한 미검증/ID를 누락했다고 주장하지 마세요. 단일 파일과 전체 프로젝트 범위를 먼저 대조하세요. '
                     'source_ref가 비어 있으면 일치/이견 판정을 할 수 없습니다. '
@@ -631,8 +648,8 @@ async def review_answer(config, request, report):
                     '실제 조회 범위를 인용한 unverified로 남기세요. 독립 스냅샷의 관측 시각 차이는 과거 관측의 오류 증거가 아니고, '
                     'indexer의 cluster_status는 manager 클러스터 활성 여부의 증거가 아닙니다. '
                     '새 조회 결과의 limit·lookback_minutes·요청 구간·applied_filters·scan_capped는 검토자 자신의 요청 조건이라 '
-                    '상대 조회 조건의 증거가 아닙니다. 한도에 닿은(scan_capped true) 조회의 scanned·returned_count·returned_items·omitted_items도 '
-                    '검토자 자신의 한도이며 상대 표본 크기의 증거가 아닙니다. 질문에 없는 필터로 좁힌 조회(filters_outside_question)와 '
+                    '상대 조회 조건의 증거가 아닙니다. 한도에 닿은(scan_capped true) 조회의 scanned·returned_count·returned_items도 '
+                    '검토자 자신의 한도이며 상대 표본 크기의 증거가 아닙니다. not_shown_* 값은 표시용 발췌에서 뺀 양이라 어느 답변의 근거도 아닙니다. 질문에 없는 필터로 좁힌 조회(filters_outside_question)와 '
                     '반환 표본 0건은 상대 주장의 반박 근거가 아닙니다. '
                     '이렇게 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
                     '미확인은 부정이 아니며 상대가 쓰지 않은 보장을 만들어 반박하지 마세요. '

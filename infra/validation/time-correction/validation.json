@@ -1,6 +1,6 @@
 {
   "subject": "Future until_kst refusal with its real cause, and corrected read-time refusals no longer reported as tool failure",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_verified_normal_path",
   "incident": {
     "run_kst": "2026-11-13T17:21",
     "requested_at_kst": "2026-11-13T17:21:00.929562+09:00",
@@ -63,8 +63,26 @@
   },
   "apply": "infra/validation/time-correction/apply_b.py (4 copies + Ollama receipt, restart capstone-ollama-chat when idle)",
   "not_done": [
-    "apply on B",
-    "real chat check after apply",
+    "observe a live tool_input_time_future or corrected refusal",
     "relative-window ('최근 N분') resolution from requested_at_kst"
-  ]
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: 조회 끝 시각 수정 적용해줘",
+    "window_kst": "20:42:12/20:42:17",
+    "backup": "/var/backups/capstone-time-correction-20261113T204212",
+    "installed": {
+      "review_channel_worker.py": "9973fbf18762bd13",
+      "chat_contract.py": "2cae4b65c553dc44 x3"
+    },
+    "ollama_restart": "rc 0, active, websocket 20:42:14, log errors 0",
+    "real_chat": {
+      "post_kst": "20:42:42",
+      "selection_until_kst": "2026-11-13T20:42:43.139666+09:00 (= requested time)",
+      "tool_errors": 0,
+      "posted": "real investigation report, not failure fallback",
+      "repairs": 1,
+      "ollama_peer": "done"
+    },
+    "fix_path_exercised_live": false
+  }
 }

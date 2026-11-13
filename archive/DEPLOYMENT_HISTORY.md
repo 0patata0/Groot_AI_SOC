@@ -1594,3 +1594,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 20:14~20:18 KST — 사건 조사 인용 안내 위치 재적용·확정 (B, 관리자231 경유)
 
 실제 생성 A/B 평가(30회, 오류 A 4·B 2, 깨진 출력 0/0) 뒤 사용자 승인("인용 안내 후보 재적용해줘")에 따라 재적용했다. 같은 8개 파일을 교체했고(컨트롤러 `a3218877`, 실행 사본 `d6de30da`, 플러그인 `7bb48edb`), 백업과 원복 스크립트는 `/var/lib/capstone-service-grounding/20261113-citation-prefix-r2/`에 있다. 내장본 자체 검증과 틱 정상을 확인했다. 공동 채널 실제 조사 1건이 정상 완료(깨진 출력·도구 오류 0)된 것을 보고 20:18:57에 확정하고 원복 타이머를 해제했다. Hermes 컨테이너와 봇은 재시작하지 않았다. [기록](../infra/validation/citation-prefix/README.md#재적용과-확정-2026-11-13-20142018-사용자-승인-인용-안내-후보-재적용해줘).
+
+## 2026-11-13 20:42 KST — 조회 끝 시각 미래 오류 수정 적용 (B, 관리자231 경유)
+
+사용자 승인("조회 끝 시각 수정 적용해줘")에 따라 적용했다. 공동 채널 작업자 `review_channel_worker.py`(`bba9a951`→`9973fbf1`)와 공통 계약 `chat_contract.py` 3곳(`4ef328b6`→`2cae4b65`)을 교체했고, Ollama 영수증을 갱신했다. 대기열이 비어 있어 `capstone-ollama-chat`만 재시작했다. 백업은 `/var/backups/capstone-time-correction-20261113T204212`에 있다. 실제 채팅에서 정상 경로(조회 오류 0, 실제 보고서 게시, 교차 검토 정상)를 확인했다. 수정 경로(미래 시각 거절, 정정된 거부의 실패 미판정)는 회귀 시험으로 확인했다. [기록](../infra/validation/time-correction/README.md).

@@ -1,6 +1,6 @@
 {
   "subject": "Report repair says what failed: zero-count digit boundary, exact status-line problem and rejected lines in the repair message, control-line order in the skill",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed_partially_effective",
   "incident_2026_11_13_2312": {
     "reads": "ModSecurity + Wazuh, 0 errors",
     "result": "judgment fallback after 2 repairs",
@@ -104,9 +104,63 @@
     "embedded_gate": "6b60566819fb5a6d",
     "ollama_receipt": "4 keys at base"
   },
-  "not_done": [
-    "apply on B after approval",
-    "real chat: diagnosis reaches the repair, report posted without fallback, control-line order correct (model output varies)",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-13: 보고서 근거 검사 수정 적용해줘",
+    "at_kst": "2026-11-13T23:34:29+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-report-repair",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 23:40:04"
+    ],
+    "installed": {
+      "runner x4 + gate": "76bd1e09a84fb316",
+      "query x2": "18a04801c2949c94",
+      "harness x2": "7b427f362e86e3d6",
+      "skill-soc-investigate x3": "acab349c8f1a5ae2"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "tick_errors": 0,
+      "live_runner": {
+        "heading_false_positive_gone": true,
+        "real_absence_still_rejected": true,
+        "order_diagnosis": true,
+        "valid_order_passes": true
+      },
+      "skill_order_line_3_copies": true
+    },
+    "real_chat": {
+      "post_kst": "23:35:31",
+      "reads": {
+        "search_modsecurity_alerts": {
+          "lookback_minutes": 30,
+          "limit": 20
+        },
+        "search_wazuh_alerts": {
+          "lookback_minutes": 30,
+          "limit": 20
+        }
+      },
+      "tool_errors": 0,
+      "repair_diagnosis_delivered": true,
+      "draft2_order_correct": true,
+      "remaining_failure": "both drafts wrapped control lines in backticks ('`MANAGEMENT_STATUS`: monitor', '`MANAGEMENT_STATUS: needs_review`') -> not recognised -> fallback",
+      "diagnosis_gap": "said 'line missing' instead of naming the formatting",
+      "peer": {
+        "peer_validation_errors": [
+          "peer_zero_sample_dissent"
+        ],
+        "result": "corrected once; posted agree 2 / unverified 1, no false dissent"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 13
+  },
+  "next_candidate": [
+    "diagnosis recognises formatted control lines (backticks/bold/quotes) and says 'no formatting, start of line'",
+    "same principle in the soc-investigate control-line sentence; exact syntax kept"
   ]
 }

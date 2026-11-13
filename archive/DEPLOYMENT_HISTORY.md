@@ -1618,3 +1618,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 23:11 KST — 조사 첫 조회 도구 범위 + 교차 검토 원칙 스킬 통합 적용 (B, 관리자231 경유)
 
 사용자 승인("조사 도구 범위 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 16곳을 교체했다. 대상은 관리 실행기 `bc19115d`→`6b605668` ×4, query-completion `3847d9c8`→`fb935f63` ×2, 하네스 `5d79bb9d`→`dba169a1` ×2, Ollama 런타임 `026a2cf9`→`75a8ffe1`, 공동 채널 작업자 `f4f426c7`→`2c4b46f8`, `workflow_contract.py` `d7884003`→`de984aca` ×3, `skill-soc-investigate.md` `f3306812`→`24fc9e24` ×3이다. 컨트롤러 내장본, Ollama 영수증 6항목, 공동 채널 영수증도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 Hermes 첫 선택과 Ollama 교차 검토가 모두 질문이 지정한 두 경보만 조회했다(오류 0). 23:16:05에 확정했다. 사용자 지시("되도록 스킬로 묶어 관리")를 반영해, 교차 검토 판단 원칙은 공동 채널 작업자 코드에서 `soc-investigate`의 교차 검토 단계 전용 절로 옮겼다. [기록](../infra/validation/investigation-scope/README.md).
+
+## 2026-11-13 23:34 KST — 보고서 정정 진단·0건 숫자 경계·제어 줄 순서 적용 (B, 관리자231 경유)
+
+사용자 승인("보고서 근거 검사 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 11곳을 교체했다. 대상은 관리 실행기 `6b605668`→`76bd1e09` ×4, query-completion `fb935f63`→`18a04801` ×2, 하네스 `dba169a1`→`7b427f36` ×2, `skill-soc-investigate.md` `24fc9e24`→`acab349c` ×3이다. 컨트롤러 내장본과 Ollama 영수증 4항목도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 진단 전달과 제어 줄 순서 정정, 교차 검토의 0건 이견 거절이 실제로 동작했다. 다만 모델이 제어 줄을 백틱으로 감싸 보고서는 여전히 대체 문구로 끝났다(다음 후보). 23:40:04에 확정했다. [기록](../infra/validation/report-repair/README.md).

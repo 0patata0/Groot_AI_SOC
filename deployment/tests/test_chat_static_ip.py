@@ -113,7 +113,8 @@ class Wiring(unittest.TestCase):
 
 
 class GrootCandidate(unittest.TestCase):
-    CURRENT = (ROOT / 'infra/groot-b/mattermost-compose.yml').read_text()
+    CURRENT = (ROOT / 'infra/validation/chat-static-ip/mattermost-compose.before.yml').read_text()  # pre-apply live
+    LIVE_SYNCED = (ROOT / 'infra/groot-b/mattermost-compose.yml').read_text()  # applied 2026-11-13 09:17
     CANDIDATE = (ROOT / 'infra/validation/chat-static-ip/mattermost-compose.candidate.yml').read_text()
 
     def test_pins_current_live_addresses_and_keeps_gateway(self):
@@ -135,6 +136,9 @@ class GrootCandidate(unittest.TestCase):
         c = c[:c.index('    ipam:\n')] if c.rstrip().endswith('ip_range: 172.19.128.0/17') else c
         self.assertEqual(c, self.CURRENT)
 
+
+    def test_repo_compose_equals_the_applied_candidate(self):
+        self.assertEqual(self.LIVE_SYNCED, self.CANDIDATE)
 
     def test_apply_script_pins_the_reviewed_files_and_addresses(self):
         import hashlib, re

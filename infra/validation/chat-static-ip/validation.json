@@ -1,11 +1,16 @@
 {
   "subject": "Fixed chat-network addresses so the approval broker's card-callback source survives reboots",
-  "status": "candidate_dry_run_not_applied",
+  "status": "applied_b_verified_reboot_and_card_click_pending",
   "observed_kst": "2026-11-13T08:07:26+09:00/2026-11-13T08:07:51+09:00",
   "incident": {
     "reboot_kst": "2026-11-12T13:32:00+09:00",
-    "before_reboot": {"mm-app": "172.19.0.3"},
-    "after_reboot": {"mm-app": "172.19.0.2", "mm-postgres": "172.19.0.3"},
+    "before_reboot": {
+      "mm-app": "172.19.0.3"
+    },
+    "after_reboot": {
+      "mm-app": "172.19.0.2",
+      "mm-postgres": "172.19.0.3"
+    },
     "broker_rule_mm_source_cidrs": "172.19.0.3/32 -> 172.19.0.2/32 (immediate fix 2026-11-13T07:35:58+09:00)",
     "symptom": "every card button: 허용되지 않은 콜백 출처입니다"
   },
@@ -14,19 +19,87 @@
     "live_equals_repo": true,
     "candidate": "infra/validation/chat-static-ip/mattermost-compose.candidate.yml",
     "candidate_sha256": "9fe147887eaea6a7d211492dca0f66614f3bafc999de7f9eb28d35f166ec3573",
-    "network": {"subnet": "172.19.0.0/16", "gateway": "172.19.0.1", "ip_range": "172.19.128.0/17"},
-    "fixed": {"mm-app": "172.19.0.2", "mm-postgres": "172.19.0.3"},
-    "dry_run": {"config_quiet_rc": 0,
-                "plan": ["stop mm-app, mm-postgres", "remove and recreate mattermost_mm-net", "recreate and start both containers"],
-                "current_compose_plan": "no change", "containers_untouched": true, "temp_removed": true},
+    "network": {
+      "subnet": "172.19.0.0/16",
+      "gateway": "172.19.0.1",
+      "ip_range": "172.19.128.0/17"
+    },
+    "fixed": {
+      "mm-app": "172.19.0.2",
+      "mm-postgres": "172.19.0.3"
+    },
+    "dry_run": {
+      "config_quiet_rc": 0,
+      "plan": [
+        "stop mm-app, mm-postgres",
+        "remove and recreate mattermost_mm-net",
+        "recreate and start both containers"
+      ],
+      "current_compose_plan": "no change",
+      "containers_untouched": true,
+      "temp_removed": true
+    },
     "apply_script": "infra/validation/chat-static-ip/apply_b.py"
   },
   "fresh_installer": {
     "setting": "CHAT_SUBNET (default 172.30.248.0/28, private /24-/29)",
-    "layout": {"gateway": "first host", "mattermost": "second host", "postgres": "third host", "hermes": "fourth host"},
-    "conflict_checks": ["SIEM_HOST inside subnet", "other Docker networks", "host interfaces", "routes"],
-    "files": ["deployment/roles/siem.sh", "deploy.sh", "deployment/config.example.conf", "deployment/configuration-guide.md"]
+    "layout": {
+      "gateway": "first host",
+      "mattermost": "second host",
+      "postgres": "third host",
+      "hermes": "fourth host"
+    },
+    "conflict_checks": [
+      "SIEM_HOST inside subnet",
+      "other Docker networks",
+      "host interfaces",
+      "routes"
+    ],
+    "files": [
+      "deployment/roles/siem.sh",
+      "deploy.sh",
+      "deployment/config.example.conf",
+      "deployment/configuration-guide.md"
+    ]
   },
-  "tests": {"test_chat_static_ip": {"passed": 11, "count": 11}, "deployment_suite": {"count": 337, "unrelated_failures": ["test_firewall_nat (untracked, other work)"]}},
-  "not_done": ["approved apply on B (chat recreate ~1 min)", "callback check with a card after apply", "address persistence across the next reboot", "fresh full install test"]
+  "tests": {
+    "test_chat_static_ip": {
+      "passed": 12,
+      "count": 12
+    },
+    "deployment_suite": {
+      "count": 337,
+      "unrelated_failures": [
+        "test_firewall_nat (untracked, other work)"
+      ]
+    }
+  },
+  "not_done": [
+    "callback click on a card under the pinned addresses",
+    "address persistence across the next reboot",
+    "fresh full install test"
+  ],
+  "applied_b": {
+    "approval": "user 2026-11-13: 고정 IP 적용해줘",
+    "window_kst": "09:16:29/09:17:11",
+    "backup": "/home/groot_b/capstone/mattermost/docker-compose.yml.bak-staticip-20261113T091629",
+    "compose_sha256": "9fe147887eaea6a7d211492dca0f66614f3bafc999de7f9eb28d35f166ec3573",
+    "ipam_config_pinned": {
+      "mm-app": "172.19.0.2",
+      "mm-postgres": "172.19.0.3"
+    },
+    "network_ipam": {
+      "subnet": "172.19.0.0/16",
+      "gateway": "172.19.0.1",
+      "ip_range": "172.19.128.0/17"
+    },
+    "mm_healthy_ping_ok": true,
+    "broker_env_unchanged": true,
+    "failed_units": 0,
+    "bots_reconnected": {
+      "ollama": "09:16:55 websocket_connected",
+      "review_chat": "no errors after 09:16:54",
+      "hermes": "no errors after 09:16:54, 2 connections to 8065"
+    }
+  }
 }

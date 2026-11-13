@@ -13,7 +13,9 @@ services:
       POSTGRES_DB: mattermost
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data
-    networks: [mm-net]
+    networks:
+      mm-net:
+        ipv4_address: 172.19.0.3
 
   mattermost:
     image: mattermost/mattermost-team-edition:11.11.1
@@ -40,8 +42,19 @@ services:
       - ./volumes/mm/logs:/mattermost/logs
       - ./volumes/mm/plugins:/mattermost/plugins
       - ./volumes/mm/client-plugins:/mattermost/client/plugins
-    networks: [mm-net]
+    networks:
+      mm-net:
+        # 승인 브로커가 버튼 콜백 출처로 이 주소 하나만 허용한다(RULE_MM_SOURCE_CIDRS=172.19.0.2/32).
+        # 고정하지 않으면 재부팅 때 시작 순서에 따라 DB와 주소가 바뀐다(2026-11-12 실제 발생).
+        ipv4_address: 172.19.0.2
 
 networks:
   mm-net:
     driver: bridge
+    ipam:
+      config:
+        # 현재 운영 서브넷·게이트웨이 그대로(콜백 URL 172.19.0.1:8090, SSRF 예외 172.19.0.1 유지).
+        # 고정 주소(.2/.3)는 동적 할당 범위 밖에 두어 새 컨테이너가 차지하지 못하게 한다.
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+          ip_range: 172.19.128.0/17

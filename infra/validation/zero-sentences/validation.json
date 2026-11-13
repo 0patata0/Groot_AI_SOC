@@ -1,0 +1,111 @@
+{
+  "subject": "Zero-sample claims judged per sentence with the qualifier attached to it; connective absence endings; repair quotes the failing sentence",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T01:02:57+09:00",
+    "post": "ycdmeyoiufyspcwmo3y1csjcaa",
+    "observed": {
+      "rows_with_parenthetical_qualifier_rejected": 2,
+      "unqualified_conclusion_missed": "WAF의 경우 경보가 없으며 (connective ending not matched)",
+      "repair_quote": "whole table rows including their qualifiers"
+    }
+  },
+  "change": {
+    "soc_management_run.py": {
+      "claim_sentences": "sentences split at . ! ? ; and line ends (not a period between digits); a parenthetical directly after a sentence on the same line belongs to it",
+      "zero_check": "qualifier searched in the sentence's own scope",
+      "absence_endings_added": [
+        "없으며",
+        "없고",
+        "없어",
+        "없으므로",
+        "없으나"
+      ],
+      "rejected_report_lines": "a multi-sentence line quotes the sentence that alone reproduces the issue; a one-sentence line keeps the line"
+    },
+    "query-completion/__init__.py": "runner pin",
+    "skills": "unchanged"
+  },
+  "not_adopted": {
+    "table_cell_units": "loses keyword/number split across cells and changes verdicts in both directions",
+    "whole_line_units": "a qualifier in another sentence would cover a separate absence claim"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "ee848f915819563fed8299071bafb39df3969b59706068825f2d618a833715aa",
+      "candidate": "88896285a6e908447fc3e3ac4a57a856cd8dbe911e49e6883812f9550b14c7bf"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "fab84467f7d554fd367a1bafc7a03b776d53a02f18b102614aa9edc38ca83387",
+      "candidate": "ce1ba9378b675f73a1d7087b20360846eaaeac4c21544c58d89da1b5d7ca8755"
+    },
+    "infra/hermes/test_zero_claim_sentences.py": "126063fb85961d96dcdb128670b7c2dfdca56733c2b3d4058c013f5834f5cbf2",
+    "infra/validation/zero-sentences/apply_b.py": "819778224fed74b29390615ba0a7c7c02252cc8f0bd95b6c88f9f4e3ee77570e"
+  },
+  "tests": {
+    "new": {
+      "test_zero_claim_sentences": "6/6; on the HEAD runner 5 fail (1 non-regression check passes on both)"
+    },
+    "related": "29 incl. test_report_repair_diagnosis and test_sensor_abbreviation_boundary",
+    "bundles_vs_head": {
+      "hermes_all": "1292 (base 1286), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, base-only flaky 2",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "live_replay_b": {
+    "observed_kst": "2026-11-14T01:12:28+09:00",
+    "scope": "state.db drafts since 11-12 00:00 with facts rebuilt from stored tool results",
+    "sessions": 36,
+    "drafts": 73,
+    "verdict_changes": 0,
+    "quotes_narrowed": 20,
+    "draft_0102_1": "still sample_zero; now from the unqualified conclusion sentence, the qualified rows pass",
+    "candidate_temp_removed": true,
+    "first_pass_note": "a timestamp split at its decimal point produced a quote starting '915 |'; periods between digits no longer end a sentence"
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-zero-sentences-011435/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "6 copies + gate + Ollama receipt (2 keys, other keys kept)",
+    "rollback": "8 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T01:15:04+09:00",
+    "copies": "6/6 at base",
+    "embedded_gate": "ee848f915819563f",
+    "ollama_receipt": "2 keys at base",
+    "deploy_dir_free": true
+  },
+  "open_outside_scope": [
+    "resolved without INCIDENT_DISPOSITION in the joint-channel path",
+    "conclusion widened beyond the asked devices",
+    "peer over-cautious, catalog ids exposed"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

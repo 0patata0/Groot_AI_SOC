@@ -1187,6 +1187,25 @@ def closure_uncertainty_violations(text):
     return []
 
 
+def claim_sentences(text):
+    """Sentences as separate claims, each with the qualifier scope that belongs to it.
+
+    A sentence ends at . ! ? ; or a line end, so a qualifier in another sentence
+    does not excuse an absence claim. A parenthetical that directly follows the
+    sentence on the same line belongs to it: 11-14 01:02 "공격 또는 오류 경보 없음.
+    (반환 10건, 제한 반환)" was rejected only because of the period.
+    A period between digits (22:22:30.915, 172.17.0.2, 1.5) does not end one.
+    Yields (sentence, sentence plus its attached parenthetical).
+    """
+    parts = re.split(r'([\n!?;]|\.(?![0-9])|(?<![0-9])\.|[。！？])', text)
+    sentences, ends = parts[0::2], parts[1::2]
+    for i, sentence in enumerate(sentences):
+        attached = None
+        if i < len(ends) and ends[i] != '\n' and i + 1 < len(sentences):
+            attached = re.match(r'\s*([(（][^()（）\n]*[)）])', sentences[i + 1])
+        yield sentence, sentence + (' ' + attached.group(1) if attached else '')
+
+
 def evidence_claim_violations(text, facts, successful_reads=None):
     """Narrow checks of known evidence limits; no incident classification rules."""
     if not isinstance(text, str):
@@ -1219,7 +1238,7 @@ def evidence_claim_violations(text, facts, successful_reads=None):
             negated = re.match(r'\s*(?:인지|인지는|으로|이라고|라고)?\s*(?:단정.{0,8}(?:않|없)|미확인|확인.{0,5}못)', after)
             if not re.search(r'표본|반환|검색\s*결과', before) and not negated:
                 issues.add('unknown_window_total_claimed')
-        for line in re.split(r'[\n.!?;]|[。！？]', text):
+        for line, scope in claim_sentences(text):
             # "시간 밖 경보 혼입 오류가 없음" describes selection integrity,
             # not absence of security events. Remove only that proposition;
             # an additional "공격 없음" on the same line must still be checked.
@@ -1234,8 +1253,10 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                 '',scope_line)
             # "(10건 중)" is not "0건": the zero count needs a digit boundary
             # (11-13 23:13 two corrected reports failed on a table heading).
-            if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:(?<![0-9])0\s*건|없(?:었|습|음|다|는)|전혀\s*없)', scope_line) and
-                    not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', line)):
+            # Connective endings are absence claims too: 11-14 01:02 "WAF의 경우
+            # 경보가 없으며" passed while only its qualified table rows failed.
+            if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:(?<![0-9])0\s*건|없(?:었|습|음|다|는|으며|고|어|으므로|으나)|전혀\s*없)', scope_line) and
+                    not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', scope)):
                 issues.add('sample_zero_presented_as_absence')
     if unknown:
         for line in text.splitlines():
@@ -1809,7 +1830,12 @@ def rejected_report_lines(text, facts, successful_reads, issues, limit=4):
             continue
         hit = sorted(wanted & set(evidence_claim_violations(line, facts or [], successful_reads)))
         if hit:
-            rows.append({'issues': hit, 'line': line[:240]})
+            # Quote the sentence the check rejected, not the whole row: the
+            # qualifier elsewhere in the row hid what failed (11-14 01:02).
+            units = [(x.strip(' |'), scope) for x, scope in claim_sentences(line) if x.strip(' |')]
+            quote = next((x for x, scope in units if len(units) > 1 and set(hit) <= set(
+                evidence_claim_violations(scope, facts or [], successful_reads))), line)
+            rows.append({'issues': hit, 'line': quote[:240]})
             if len(rows) >= limit:
                 break
     return rows

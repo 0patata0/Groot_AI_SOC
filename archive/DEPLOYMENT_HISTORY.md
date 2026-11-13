@@ -1626,3 +1626,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 23:47 KST — 제어 줄 서식 진단 보강 적용 (B, 관리자231 경유)
 
 사용자 승인("제어 줄 서식 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 9곳을 교체했다. 대상은 관리 실행기 `76bd1e09`→`b32ea4c6` ×4, query-completion `18a04801`→`576736f4` ×2, `skill-soc-investigate.md` `acab349c`→`eeb28a8d` ×3이다. 컨트롤러 내장본과 Ollama 영수증 3항목도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 제어 줄 서식은 해결됐고, 정정 진단과 순서 정정도 동작했다. 남은 실패는 판단 `unresolved`와 상태 `resolved`의 모순으로, 이 규칙을 컨트롤러가 실행 후에만 검사해 생긴다(다음 후보). 23:53:06에 확정했다. [기록](../infra/validation/control-format/README.md).
+
+## 2026-11-14 00:00 KST — 판단·상태 모순 정정 단계 검사·코드 블록 진단 적용 (B, 관리자231 경유)
+
+사용자 승인("판단·상태 모순 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 9곳을 교체했다. 대상은 관리 실행기 `b32ea4c6`→`f6556563` ×4, query-completion `576736f4`→`53b54682` ×2, `skill-soc-investigate.md` `eeb28a8d`→`3345bcc9` ×3이다. 컨트롤러 내장본과 Ollama 영수증 3항목도 갱신했고, Ollama 봇만 재시작했다. 사후 점검은 정상이었다. 실제 채팅의 두 초안은 제어 줄 순서와 서식이 맞았고 코드 블록이 없었으며, 판단과 상태도 일관됐다. 그래서 새 검사는 발동하지 않았다(회귀로만 확인). 보고서는 검사기 오탐으로 대체 문구가 됐다. `sensor_rule_ids`의 "ids"를 IDS 언급으로 읽은 것이며, 다음 후보로 넘겼다. 00:07:53에 확정했다. [기록](../infra/validation/disposition-status/README.md).

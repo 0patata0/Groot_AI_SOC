@@ -1,6 +1,6 @@
 {
   "subject": "Disposition/status consistency (unresolved cannot be resolved) checked in the repair loop with an exact diagnosis; code-block diagnosis; skill sentence",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "correction_of_2355_report": "the 23:48 fallback came from the runner's final guard, not the controller: the draft was wrapped in a code block (closing fence after the status line -> status invalid) and cited an uncalled Suricata; the unresolved+resolved contradiction was present but only the controller's sensor-incident path checks it, and that path changes the state without replacing the text",
   "change": {
     "soc_management_run.py": "disposition_status_conflict; repair issue unresolved_disposition_marked_resolved (in LITERAL_REPAIR_ISSUES) with a diagnosis that does not steer to closure; code-fence diagnosis in management_status_problem; final guard unchanged",
@@ -74,11 +74,74 @@
   },
   "open_outside_scope": [
     "Hermes drafts include a peer-review style section",
-    "peer exposes catalog ids and marks everything unverified on time difference alone"
+    "peer exposes catalog ids and marks everything unverified on time difference alone",
+    "peer still exposes catalog ids (e70)"
   ],
-  "not_done": [
-    "apply on B after approval",
-    "real chat: code block/conflict diagnosed or absent, report posted without fallback",
-    "confirm or let the 45-minute rollback run"
-  ]
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 판단·상태 모순 수정 적용해줘",
+    "at_kst": "2026-11-14T00:00:46+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-disposition-status",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 00:07:53"
+    ],
+    "installed": {
+      "runner x4 + gate": "f65565637ed14a90",
+      "query x2": "53b54682a304c02f",
+      "skill-soc-investigate x3": "3345bcc9c8587d67"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "live_conflict_and_fence_diagnosis": true,
+      "literal_repair_registration": true,
+      "skill_sentence_3_copies": true
+    },
+    "real_chat": {
+      "post_kst": "00:01:47",
+      "reads": [
+        "search_wazuh_alerts 30m limit 10",
+        "search_modsecurity_alerts 30m limit 10"
+      ],
+      "read_errors": 0,
+      "draft1": {
+        "control_lines": "order and format correct, no code block",
+        "disposition_status": "benign + monitor (consistent)",
+        "issues": [
+          "sample_zero_presented_as_absence",
+          "unobserved_event_source:suricata"
+        ],
+        "diagnosis": "3 rejected lines quoted exactly"
+      },
+      "draft2": {
+        "control_lines": "order and format correct, no code block",
+        "disposition_status": "unresolved + needs_review (consistent)",
+        "issues": [
+          "unobserved_event_source:suricata"
+        ],
+        "cause": "checker false positive: case-insensitive IDS matched inside the field name sensor_rule_ids"
+      },
+      "new_checks_fired": false,
+      "final": "runner final guard fallback (one non-literal unobserved_* issue left; no second literal repair by design)",
+      "peer": {
+        "peer_validation_errors": [
+          "peer_zero_sample_dissent"
+        ],
+        "claims": "3 agree, no false dissent",
+        "internal_id_exposed": "e70"
+      }
+    },
+    "replay_on_b": "live runner copy + facts rebuilt from the state.db tool results reproduced the live repair issues for draft1 exactly; draft2 -> only unobserved_event_source:suricata from two sensor_rule_ids lines",
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 11
+  },
+  "next_candidate": {
+    "checker_boundary": "ASCII boundary for latin abbreviations in the unobserved-source check (IDS not inside rule_ids); keep rejecting real Suricata/IDS absence claims; audit the other checker regexes for the same boundary class (10건 -> 0건 at 23:12, rule_ids at 00:01)",
+    "quality_not_checked": [
+      "correction narrative in headings (정정 완료, 교정된 상세 검증 결과)",
+      "claim that the question included Suricata"
+    ]
+  }
 }

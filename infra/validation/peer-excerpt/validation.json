@@ -1,6 +1,6 @@
 {
   "subject": "Peer review: self-describing excerpt keys (not_shown_*), the excerpt format in the reviewer instruction, display-excerpt evidence refused; correction of the 01:35 omitted_items wording",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T01:38+09:00",
     "post": "juycno8cibbhz8aujgzfjxubbr",
@@ -91,9 +91,60 @@
     "receipts": "both at base",
     "deploy_dir_free": true
   },
-  "not_done": [
-    "apply on B after approval",
-    "real chat: no 'N건 생략/누락' reading of the excerpt",
-    "confirm or let the 45-minute rollback run"
-  ]
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 교차 검토 발췌 수정 적용해줘",
+    "at_kst": "2026-11-14T01:48:03+09:00",
+    "source_commit": "a8ab3a7",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-peer-excerpt",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 01:52:51"
+    ],
+    "installed": {
+      "review_channel_worker.py": "da7e3a3de93a92b7",
+      "skill-soc-investigate x3": "50825f277ea03491"
+    },
+    "postcheck": {
+      "receipts": true,
+      "skill_sentence_3_copies_no_omitted_items": true,
+      "ticks": 3,
+      "failed_units": 0,
+      "live_worker": {
+        "compact": [
+          10,
+          7,
+          "no omitted"
+        ],
+        "excerpt_count_disagree": "peer_display_excerpt_scope",
+        "excerpt_count_unverified": "accepted",
+        "capped_scanned_disagree": "peer_query_scope_mismatch"
+      }
+    },
+    "real_chat": {
+      "post_kst": "01:49:00",
+      "post": "yrm5pj51eb8rppqfpu1i7pz93c",
+      "hermes": {
+        "drafts": 1,
+        "repairs": 0,
+        "final": "posted on the first draft (benign + resolved, completed), third clean post in a row"
+      },
+      "peer": {
+        "reviewer_wazuh_limit": 10,
+        "lead_wazuh_limit": 20,
+        "peer_review": "synthesis_failed",
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "new_rule_fired": false,
+        "cause": "request-echo (22:15) or capped-count (01:35) rule; refused evidence paths are not stored, so which one is unknown",
+        "target_check": "not evaluable (no peer text posted)"
+      }
+    },
+    "confirm_reason": "no evidence this deploy caused the failure; rollback would restore the wrong 01:35 omitted_items wording",
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 6
+  },
+  "next": "peer correction message should name the refused claim, its evidence path and an acceptable fix (unverified); record refused paths in the report"
 }

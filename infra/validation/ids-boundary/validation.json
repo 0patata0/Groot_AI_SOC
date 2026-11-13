@@ -1,0 +1,105 @@
+{
+  "subject": "Latin sensor abbreviations (IDS, NIDS, WAF, SID, TLS) as standalone tokens in the evidence checker",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T00:04:16+09:00",
+    "post": "urrkqrag63dg8qpipgnfrtofkh",
+    "cause": "draft 2 (unresolved + needs_review, format correct) fell back on unobserved_event_source:suricata alone: case-insensitive unbounded 'IDS' matched inside the Wazuh field name sensor_rule_ids; unobserved_* issues get no second literal repair"
+  },
+  "same_class_audit": {
+    "evidence_claim_violations unobserved source": "Suricata|IDS, WAF|ModSecurity (re.I) -> rule_ids, HIDS, 'rule ids' read as Suricata",
+    "event_field_violations wazuh_rule_mislabelled_as_sensor": "Suricata|IDS|SID + number -> 'wazuh_rule_ids: 86601' read as an IDS rule",
+    "redetection_violations named source": "WAF|ModSecurity|IDS|Suricata -> rule_ids sets source suricata",
+    "event_field_violations modsecurity_rule_id_mislabelled_as_sid": "\\bSID\\b misses 'SID가' (Unicode \\b); exclusion IDS suppressed by rule_ids",
+    "evidence_claim_violations runtime SID/TLS": "SID substring, \\bTLS\\b misses 'TLS가'",
+    "zero_count": "no unbounded 0건 left after 11-13 23:34"
+  },
+  "change": {
+    "soc_management_run.py": "ascii_token(); IDS_TERM (N?IDS, uppercase only), WAF_TERM, SID_TERM (SIDs?), TLS_TERM; applied at the five sites; criteria, issue codes, repair flow and final guard unchanged",
+    "query-completion/__init__.py": "runner pin",
+    "skills": "unchanged (deterministic checker defect, not model guidance)"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "f65565637ed14a9026258641e4e6997a7caa47534d96602b41b77f3625979b3c",
+      "candidate": "ee848f915819563fed8299071bafb39df3969b59706068825f2d618a833715aa"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "53b54682a304c02fdc655d8087189abbb4bc19ed1324833aaafcd30d675ba079",
+      "candidate": "fab84467f7d554fd367a1bafc7a03b776d53a02f18b102614aa9edc38ca83387"
+    },
+    "infra/hermes/test_sensor_abbreviation_boundary.py": "b902d8bccc39352a0f19309ed9ecf2338f9eba9a6c85b588410bf0f2b6ae0881",
+    "infra/validation/ids-boundary/apply_b.py": "ad4b75d1180f46acc66cb39c95070c2d409e8e211b1c80bc62d7c480634b4c1c"
+  },
+  "tests": {
+    "new": {
+      "test_sensor_abbreviation_boundary": "8/8; on the HEAD runner 6 fail (2 non-regression checks pass on both)"
+    },
+    "bundles_vs_head": {
+      "hermes_all": "1286 (base 1278), same known failures (base-only uncommitted-pin failure)",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "live_replay_b": {
+    "observed_kst": "2026-11-14T00:57:39+09:00",
+    "scope": "state.db drafts since 11-13 00:00 with facts rebuilt from stored tool results",
+    "sessions": 18,
+    "drafts": 40,
+    "changed": [
+      {
+        "at": "11-14T00:04:16",
+        "old": [
+          "unobserved_event_source:suricata"
+        ],
+        "new": []
+      }
+    ],
+    "unchanged_drafts": 39,
+    "new_issues": 0,
+    "candidate_temp_removed": true
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-ids-boundary-005602/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "6 copies + gate + Ollama receipt (2 keys, other keys kept)",
+    "rollback": "8 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T00:56:50+09:00",
+    "copies": "6/6 at base",
+    "embedded_gate": "f65565637ed14a90",
+    "ollama_receipt": "2 keys at base",
+    "deploy_dir_free": true
+  },
+  "open_outside_scope": [
+    "correction narrative and an untrue sentence in draft 2 are not checked",
+    "peer exposes catalog ids (e70)"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

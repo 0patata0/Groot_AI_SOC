@@ -846,6 +846,28 @@ def incident_binding_violations(text, facts):
     return sorted(issues)
 
 
+def ascii_token(names, case_sensitive=False):
+    """A latin sensor abbreviation as a standalone token, never part of an identifier.
+
+    Python's Unicode \\b treats Hangul as a word character, so "SID가" or "TLS가"
+    has no boundary; an unbounded "IDS" matches "sensor_rule_ids" and "HIDS".
+    11-14 00:01: a corrected report fell back only because "sensor_rule_ids"
+    was read as an uncalled IDS. Korean particles may follow the token.
+    """
+    body = '(?-i:' + names + ')' if case_sensitive else names
+    return r'(?<![A-Za-z0-9_])(?:' + body + r')(?![A-Za-z0-9_])'
+
+
+# Lowercase "ids" is a plural of id (rule ids, agent_ids); NIDS is network IDS,
+# HIDS is Wazuh's host IDS and never Suricata.
+IDS_TERM = ascii_token('N?IDS', case_sensitive=True)
+WAF_TERM = ascii_token('WAF')
+SID_TERM = ascii_token('SIDs?')
+TLS_TERM = ascii_token('TLS')
+SURICATA_NAMES = 'Suricata|' + IDS_TERM
+MODSECURITY_NAMES = WAF_TERM + '|ModSecurity'
+
+
 def event_field_violations(text, facts):
     'Check explicit field/namespace claims, not attack or benign judgments.'
     events = [f for f in facts if f.get('kind') == 'events']
@@ -858,10 +880,10 @@ def event_field_violations(text, facts):
         correction = re.search(r'아니|아님|아닙|오표기|오답|잘못|존재하지|필드.{0,5}없', clean)
         if (not correction and not line.lstrip().startswith('>') and
                 any(f.get('source')=='modsecurity' for f in events) and
-                re.search(r'(?:WAF|ModSecurity)[^|\n]{0,35}\bSID\b',clean,re.I) and
-                not re.search(r'Suricata|IDS|원문|인용',clean,re.I)):
+                re.search(r'(?:' + MODSECURITY_NAMES + r')[^|\n]{0,35}' + SID_TERM, clean, re.I) and
+                not re.search(SURICATA_NAMES + r'|원문|인용', clean, re.I)):
             issues.add('modsecurity_rule_id_mislabelled_as_sid')
-        for source, names in (('modsecurity', r'WAF|ModSecurity'), ('suricata', r'Suricata|IDS|SID')):
+        for source, names in (('modsecurity', MODSECURITY_NAMES), ('suricata', SURICATA_NAMES + '|' + SID_TERM)):
             rows = [f for f in events if f.get('source') == source]
             sensor = {v for f in rows for v in f.get('sensor_rule_ids', [])}
             wazuh = {v for f in rows for v in f.get('wazuh_rule_ids', [])}
@@ -1139,7 +1161,7 @@ def redetection_violations(text, facts):
         denial+=r'|추가(?:적인)?\s*(?:(?:공격|경보|탐지)\s*)?(?:표본|경보|탐지)(?:\s*또는\s*장애)?(?:는|가|이|도)?\s*(?:없(?:음|다|었|습)|관측되지|확인되지)'
         for match in re.finditer(denial,line):
             if re.match(r'.{0,12}(?:단정|판단|보지|아니)',line[match.end():]):continue
-            named=list(re.finditer(r'WAF|ModSecurity|IDS|Suricata',line[:match.start()],re.I))
+            named=list(re.finditer(MODSECURITY_NAMES+'|'+SURICATA_NAMES,line[:match.start()],re.I))
             source=(('modsecurity' if named[-1].group().lower() in ('waf','modsecurity') else 'suricata') if named else None)
             if any((not ips or ip in ips) and (not source or source==sensor) for ip,sensor in positives):
                 return ['observed_redetection_reported_unknown']
@@ -1175,7 +1197,7 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                  brief_kst_violations(text, facts) + waf_action_violations(text, facts) + web_evidence_violations(text,facts) +
                  snapshot_health_violations(text,facts) + redetection_violations(text,facts) + closure_uncertainty_violations(text))
     observed_event_sources = {x.get('source') for x in facts if x.get('kind') == 'events'}
-    for source, names in (('suricata', r'Suricata|IDS'), ('modsecurity', r'WAF|ModSecurity')):
+    for source, names in (('suricata', SURICATA_NAMES), ('modsecurity', MODSECURITY_NAMES)):
         if source in observed_event_sources:
             continue
         for line in text.splitlines():
@@ -1282,9 +1304,9 @@ def evidence_claim_violations(text, facts, successful_reads=None):
             issues.add('combined_bytes_are_not_engine_load_proof')
         if runtime and re.search(r'-S\s+/rules/suricata\.rules', line) and not negated:
             issues.add('current_rule_source_mismatch')
-        if runtime and re.search(r'(?:SID|로컬).{0,60}(?:로딩|적재|로드).{0,15}(?:확인|증명|입증)', line, re.I) and not negated:
+        if runtime and re.search(r'(?:' + SID_TERM + r'|로컬).{0,60}(?:로딩|적재|로드).{0,15}(?:확인|증명|입증)', line, re.I) and not negated:
             issues.add('historical_hit_is_not_current_engine_proof')
-        if runtime and re.search(r'경보|이벤트|SID|통신|탐지', line) and re.search(r'\bTLS\b', line) and not re.search(r'가능|일반|가정|미확인|확인.{0,5}못|추가', line):
+        if runtime and re.search(r'경보|이벤트|SID|통신|탐지', line) and re.search(TLS_TERM, line) and not re.search(r'가능|일반|가정|미확인|확인.{0,5}못|추가', line):
             issues.add('tls_not_in_current_evidence')
         for row in runtime:
             started = parse_instant(row.get('started_at'))

@@ -1,6 +1,6 @@
 {
   "subject": "Wazuh rule 203 (agent event queue full) on B: rootcheck ignore for the containerd image store",
-  "status": "applied_initial_scan_verified_final_pending",
+  "status": "applied_resolved",
   "observed_kst": "2026-11-13T01:46:19+09:00/2026-11-13T01:59:57+09:00",
   "prior_fix": {
     "date_kst": "2026-11-10T18:44:51+09:00",
@@ -68,7 +68,6 @@
     "A: rule 203 bursts 10-29 17:02, 11-02 14:42, 11-05 17:54 (sensor log bursts presumed; buffer 5000/500; collection-guard pinned config sha must change together)"
   ],
   "not_done": [
-    "next 12-hourly rootcheck (~2026-11-13 14:15 KST) without rule 203",
     "A buffer candidate",
     "permission remediation of world-writable files"
   ],
@@ -91,5 +90,14 @@
       "agent_msg_sent_incl_control": 1001,
       "agents_active": 3
     }
+  },
+  "final_check": {
+    "observed_kst": "2026-11-13T15:40:14+09:00",
+    "rootcheck": "14:16:26-14:17:19",
+    "buffer_warning": false,
+    "agent_msg_count": 100593,
+    "agent_msg_sent_incl_control": 103011,
+    "rule_202_205_alerts_since_apply": 0,
+    "controller_203_cases_since_apply": 0
   }
 }

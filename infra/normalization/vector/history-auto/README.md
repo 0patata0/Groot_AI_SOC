@@ -33,6 +33,8 @@
 
 **적용(09:37:19, 사용자 승인, 관리자231 경유)**: 검토 파일 3개를 root 전용(`/var/lib/capstone-history-auto-cap`)에 SHA를 확인해 배치하고 `apply-cap-1024-a.py`를 `systemd-run`으로 1회 실행했다. job 잠금 아래 두 파일을 교체해 `3d05677e…`·`af89c0f0…`가 됐다(root 0400). 원본은 `/var/backups/capstone-history-auto-cap1024-20261113T093719`, `inspect` 정상(CLI 런타임 검증 통과). 서비스 재시작은 없었다. **다음 주기(09:41)**: `batch_preserved`, 진행 boot 배치 31→32(32,000건), 폴더 257개, 서비스 Result=success·실패 유닛 0(systemd failure 해소), 전체 250,820건·134.2MB. 5분마다 1배치라 남은 약 163배치는 13~14시간 걸릴 것으로 추정한다(완료 미확인).
 
+**정정(15:41, 라이브 읽기전용)**: 배치 32→71까지 진행한 뒤 13:03부터 `store_entry_limit`(exit 65)로 다시 보류했다. 후보의 "1024×3항목" 추정은 틀렸다. 실제 배치 폴더는 **14항목**(폴더 1+파일 13: json·jsonl·overflow-count)이다(296폴더·4,104항목). 또 `auto_store_capacity`는 항목 검사를 `AUTO_MAX_STORE_ENTRIES` 변수가 아니라 `4097` 하드코딩으로 한다. 1024폴더에는 약 14,336항목이 필요하므로 항목 상한 보정(예: 16,384, 하드코딩→변수)이 남았다(미적용).
+
 한계: 상한을 올려도 큰 부팅이 반복되면 다시 찰 수 있다(항목 상한 기준 약 1,360배치). 근본적으로는 ①nft `SPOOF` 로그량 축소(FW 보호 변경. 원인은 한 기기의 DHCP 브로드캐스트이며 [후보](../../../validation/spoof-dhcp/README.md) 작성, 미적용) ②B 전송·검토 기반 보관 수명(storage-retention 검토 worker, 미구현)이 필요하다.
 
 ## 현재 운영 자료와의 관계

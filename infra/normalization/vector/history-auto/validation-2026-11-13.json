@@ -1,6 +1,6 @@
 {
   "subject": "history-auto batch-directory cap 256 -> 1024 (A)",
-  "status": "applied_verified_completion_pending",
+  "status": "applied_dir_cap_entry_cap_blocked",
   "observed_kst": "2026-11-13T09:27:39+09:00/2026-11-13T09:29:57+09:00",
   "live": {
     "jobs": 14,
@@ -45,8 +45,9 @@
     "candidate_runtime_manifest_check": "manifest_ok"
   },
   "not_done": [
+    "entry-cap correction",
     "completion of boot 5c8d076c",
-    "SPOOF log volume reduction (separate FW change)",
+    "SPOOF log volume reduction (candidate written)",
     "retention/B-transfer review worker"
   ],
   "applied": {
@@ -69,5 +70,26 @@
       "failed_units": 0
     },
     "remaining_estimate": "~163 batches, ~13-14 h at one batch per 5 min"
+  },
+  "correction_1541": {
+    "progress": "batches 32 -> 71, then store_entry_limit from 2026-11-13T13:03:53+09:00 (exit 65, systemd failure again)",
+    "store": {
+      "dirs": 296,
+      "entries": 4104,
+      "bytes": 157290193
+    },
+    "entries_per_batch_dir": {
+      "14": 282,
+      "11": 14
+    },
+    "file_kinds": {
+      "json": 1466,
+      "jsonl": 1170,
+      "overflow-count": 1170
+    },
+    "wrong_assumption": "3 entries per batch (actual 14)",
+    "code_note": "entry check hardcodes 4097 instead of AUTO_MAX_STORE_ENTRIES",
+    "needed_for_1024_dirs": 14336,
+    "next": "entry-cap correction candidate (e.g. 16384, use the variable); needs approval"
   }
 }

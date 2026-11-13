@@ -1,6 +1,6 @@
 {
   "subject": "Zero-sample claims judged per sentence with the qualifier attached to it; connective absence endings; repair quotes the failing sentence",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T01:02:57+09:00",
     "post": "ycdmeyoiufyspcwmo3y1csjcaa",
@@ -103,9 +103,65 @@
     "conclusion widened beyond the asked devices",
     "peer over-cautious, catalog ids exposed"
   ],
-  "not_done": [
-    "apply on B after approval",
-    "real chat",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 0건 검사 수정 적용해줘",
+    "at_kst": "2026-11-14T01:19:11+09:00",
+    "source_commit": "cee82e2",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-zero-sentences",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 01:23:27"
+    ],
+    "installed": {
+      "runner x4 + gate": "88896285a6e90844",
+      "query x2": "ce1ba9378b675f73"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "live_checks": {
+        "attached_parenthetical_passes": true,
+        "other_sentence_qualifier_rejected": true,
+        "connective_rejected": true,
+        "quotes_failing_sentence": true
+      },
+      "receipts": true,
+      "failed_units": 0
+    },
+    "real_chat": {
+      "post_kst": "01:20:09",
+      "post": "3pzuep4xgfd8xm63aijc1yznbo",
+      "reads": [
+        "search_modsecurity_alerts 30m limit 15",
+        "search_wazuh_alerts 30m limit 15"
+      ],
+      "read_errors": 0,
+      "draft1": {
+        "issues": [
+          "sample_zero_presented_as_absence",
+          "unknown_window_total_claimed"
+        ],
+        "new_connective_rule_fired": "이벤트가 없으며",
+        "quotes": "failing sentences only"
+      },
+      "draft2": {
+        "issues": [],
+        "disposition_status": "unresolved + monitor"
+      },
+      "final": "model report posted without fallback (first time today for this question)",
+      "peer": {
+        "peer_validation_errors": [],
+        "claims": "1 agree, 2 dissent; both dissents false: own scanned/scan_capped (limit 50) vs lead limit 15; conditional \"null인 경우\" read as \"all null\""
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 8
+  },
+  "open_after_apply": [
+    "peer false dissent from its own scanned/scan_capped (request-limit echo not in PEER_REQUEST_ECHO_KEYS)",
+    "peer reads a conditional as an absolute claim",
+    "quote cut at a period between a digit and a letter (10.x)"
   ]
 }

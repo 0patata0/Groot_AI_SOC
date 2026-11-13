@@ -54,3 +54,7 @@
 ## 정정 (2026-11-13 21:30)
 
 위 '운영 적용' 표의 "Ollama 교차 검토도 정상 종료됐다"는 틀렸다. 대기열의 작업 상태(`done`)만 보고 썼다. 실제 결과는 `partial`이었고 Ollama 런타임이 모델 호출 전에 `ValueError`로 중단됐다(도구 호출 0). 같은 실패가 17:23·20:17·21:27에도 있었다. 이 결함은 이번 수정과 무관하며 [상대 시각 구간 기록](../relative-window/README.md)에 미해결로 남겼다.
+
+## 정정 2 (2026-11-13 22:05)
+
+이 적용은 Ollama 영수증만 갱신했고, 공동 채널 설치기 영수증(`/etc/capstone-review-chat/receipt.json`)의 작업자 항목을 `bba9a951…`에 남겨 두었다. 그 결과 설치기 점검(`deployment/review_chat.py verify`)이 `review_source_drift`로 실패하는 상태가 됐다. 운영 동작에는 영향이 없다(작업자는 영수증을 읽지 않는다). [교차 검토 거짓 이견 후보](../peer-query-scope/README.md)의 적용 스크립트가 이 항목을 바로잡는다.

@@ -85,5 +85,6 @@
     },
     "fix_path_exercised_live": false
   },
-  "correction_2026_11_13_2130": "real_chat.ollama_peer 'done' was the queue state only; the result was partial with ValueError before any model call (pre-existing, also 17:23/20:17/21:27)"
+  "correction_2026_11_13_2130": "real_chat.ollama_peer 'done' was the queue state only; the result was partial with ValueError before any model call (pre-existing, also 17:23/20:17/21:27)",
+  "correction_2026_11_13_2205": "review-chat installer receipt worker entry left at bba9a951 (only the Ollama receipt was updated); verify() would report review_source_drift; repaired by infra/validation/peer-query-scope/apply_b.py"
 }

@@ -284,6 +284,70 @@ class Tests(unittest.TestCase):
             bound=w.bind_peer_references({'claims':[claim]},catalog)
             self.assertIn('미확인',w.validate_peer_claims(bound,source,observed))
 
+    QUERY_SOURCE = '`search_modsecurity_alerts`lookback 30분, limit 50 → 반환 0건'
+    QUERY_RESULT = {'source':'modsecurity','lookback_minutes':30,'applied_filters':{'source_ip':'192.0.2.4'},
+                    'window_mode':'lookback','requested_since_kst':'2026-11-13T21:25:07+09:00',
+                    'requested_until_kst':'2026-11-13T21:55:07+09:00','returned_count':0,'limit':10,
+                    'scanned':0,'scan_capped':False,'alerts':[]}
+
+    def test_reviewer_request_conditions_are_not_receipts_for_the_other_query(self):
+        """11-13 21:55: Hermes really read ModSecurity with limit 50 and said so;
+        the peer "disagreed" citing the limit 10 echoed in its OWN result."""
+        source={'other_agent_answer':self.QUERY_SOURCE,'other_answer_truncated':False}
+        observed=[{'name':'search_modsecurity_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(self.QUERY_RESULT)}]
+        catalog=w.peer_reference_catalog(source,observed);paths={p['path']:p['id'] for p in catalog['evidence']}
+        for path in ('result.limit','result.lookback_minutes','result.window_mode','result.requested_since_kst',
+                     'result.requested_until_kst','result.scan_capped','result.applied_filters.source_ip'):
+            for kind in ('disagree','agree'):
+                with self.subTest(path=path,kind=kind):
+                    claim={'kind':kind,'text':'상대 조회 한도와 비교','source_ref':'a0','evidence_ref':paths[path],'missing_field':''}
+                    with self.assertRaisesRegex(ValueError,'peer_query_scope_mismatch'):w.bind_peer_references({'claims':[claim]},catalog)
+            claim={'kind':'unverified','text':'검토자 조회는 limit 10 표본이라 상대의 limit 50 조회는 미확인','source_ref':'a0',
+                   'evidence_ref':paths[path],'missing_field':''}
+            self.assertIn('미확인',w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed))
+        # Observations stay usable: the returned sample count can still be compared.
+        claim={'kind':'agree','text':'반환 0건 일치','source_ref':'a0','evidence_ref':paths['result.returned_count'],'missing_field':''}
+        self.assertIn('일치',w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed))
+        self.assertFalse(w.request_echo_path('result.alerts.returned_items'))
+        self.assertFalse(w.request_echo_path('result.scanned'))
+        self.assertIn('peer_query_scope_mismatch',w.PEER_OUTPUT_ERRORS)
+
+    def query_scope_fixture(self,replies):
+        llm,h,report,request,calls=self.peer_fixture(replies)
+        report['calls']=[{'server':'security-events','name':'search_modsecurity_alerts','arguments':{'lookback_minutes':30},
+                          'result':json.dumps(self.QUERY_RESULT),'is_error':False}]
+        request['question']=p.peer_question('최근 30분 ModSecurity 경보 조사',{'final_response':self.QUERY_SOURCE})
+        request['current_question']='최근 30분 ModSecurity 경보 조사'
+        source=w.peer_source_answer(request['question'])
+        catalog=w.peer_reference_catalog(source,[c for c in report['calls']])
+        return llm,h,report,request,calls,{q['path']:q['id'] for q in catalog['evidence']}
+
+    def test_peer_false_query_dissent_is_corrected_once_to_unverified(self):
+        import asyncio
+        _,_,_,_,_,ids=self.query_scope_fixture([{}])
+        bad={'claims':[{'kind':'disagree','text':'상대는 limit 50이라 했으나 실제는 limit 10','source_ref':'a0',
+                        'missing_field':'','evidence_ref':ids['result.limit']}]}
+        good={'claims':[{'kind':'unverified','text':'검토자 조회 limit 10과 상대 조회 limit 50은 다른 호출이라 미확인','source_ref':'a0',
+                         'missing_field':'','evidence_ref':ids['result.limit']}]}
+        llm,h,report,request,calls,_=self.query_scope_fixture([bad,good])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['peer_validation_errors'],['peer_query_scope_mismatch']);self.assertEqual(result['peer_attempts'],2)
+        self.assertEqual(result['peer_review'],'source_bound_claims');self.assertEqual(result['status'],'partial')
+        self.assertIn('미확인',result['final_response']);self.assertNotIn('실제는 limit 10',result['final_response'])
+        self.assertIn('검토자 자신의 요청 조건',calls[0][0][1]);self.assertIn('검토자 자신의 요청 조건',calls[1][-1][1])
+
+    def test_peer_repeated_false_query_dissent_is_not_posted(self):
+        import asyncio
+        _,_,_,_,_,ids=self.query_scope_fixture([{}])
+        bad={'claims':[{'kind':'disagree','text':'상대는 limit 50이라 했으나 실제는 limit 10','source_ref':'a0',
+                        'missing_field':'','evidence_ref':ids['result.limit']}]}
+        llm,h,report,request,calls,_=self.query_scope_fixture([bad])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['peer_error_code'],'peer_query_scope_mismatch');self.assertEqual(result['peer_review'],'synthesis_failed')
+        self.assertEqual(result['status'],'partial');self.assertNotIn('실제는 limit 10',result['final_response']);self.assertEqual(len(calls),2)
+
     def test_reference_catalog_keeps_metadata_and_every_quote_is_literal(self):
         source={'other_agent_answer':'요청 대상 42\n지금 관측한 상태만 확인','other_answer_truncated':False}
         call={'name':'get_security_rules','arguments':{'target':'a:waf'},'result':json.dumps({

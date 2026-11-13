@@ -15,7 +15,17 @@ from collections import Counter
 PEER_OUTPUT_ERRORS = frozenset({'peer_claims_shape', 'peer_claim_kind', 'peer_claim_text',
     'peer_quote_not_in_answer', 'peer_omission_not_established', 'peer_evidence_quote_not_in_result',
     'peer_json_invalid', 'empty_peer_review', 'peer_source_ref_invalid', 'peer_evidence_ref_invalid',
-    'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch', 'peer_diagnostic_claim_mismatch'})
+    'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch', 'peer_diagnostic_claim_mismatch',
+    'peer_query_scope_mismatch'})
+# Request conditions a read tool echoes back in its own result (limit, window,
+# filters, the scan bound they imply). They describe the reviewer's call only.
+PEER_REQUEST_ECHO_KEYS = frozenset({'limit', 'lookback_minutes', 'window_mode', 'requested_since_kst',
+                                    'requested_until_kst', 'scan_capped'})
+
+
+def request_echo_path(path):
+    keys = re.findall(r'\.([A-Za-z_][A-Za-z0-9_]*)', str(path))
+    return bool(keys) and (keys[-1] in PEER_REQUEST_ECHO_KEYS or 'applied_filters' in keys[:-1])
 
 
 def peer_error_code(exc):
@@ -431,6 +441,11 @@ def bind_peer_references(value, catalog):
             # A new snapshot timestamp is not a receipt for the older answer's
             # observation/event. It cannot prove that older timestamp wrong.
             raise ValueError('peer_snapshot_scope_mismatch')
+        if claim.get('kind') in ('agree','disagree') and request_echo_path(proof['path']):
+            # The reviewer's own request conditions are not a receipt for the
+            # other answer's query (11-13 21:55: Hermes' real limit 50 was
+            # "contradicted" by the reviewer's own limit 10).
+            raise ValueError('peer_query_scope_mismatch')
         target=(proof.get('arguments') or {}).get('target','')
         if (claim.get('kind') in ('agree','disagree') and target.endswith(':wazuh-indexer')
                 and proof['path']=='result.metrics.cluster_status'
@@ -522,6 +537,9 @@ async def review_answer(config, request, report):
     instruction += ('\nother_read_context는 상대 답변 당시에 연결된 과거 영수증 요약이며 현재 상태의 근거가 아닙니다. '
                     '상대 답변의 시각이 그 당시 영수증과 일치하면 현재 새 조회 시각과 달라도 오류나 신뢰 불가라고 쓰지 마세요. '
                     '과거 영수증이 없더라도 새 스냅샷 하나만으로 과거 시각의 오류를 단정할 수 없습니다.')
+    instruction += ('\n새 조회 결과의 limit·lookback_minutes·window_mode·requested_since_kst·requested_until_kst·'
+                    'applied_filters·scan_capped는 검토자 자신의 요청 조건입니다. 상대 답변이 밝힌 상대 조회의 조건(한도·구간·필터)을 '
+                    '이 값으로 일치/이견 판정하지 마세요. 상대 조회 조건은 상대 영수증으로만 확인되며, 없으면 unverified입니다.')
     instruction += '\n두 스냅샷의 상태가 같다는 사실로 그 사이의 연속 가동이나 로그 무손실을 추정하지 마세요.'
     instruction += ('\n이견(disagree)은 상대가 실제로 주장한 명제의 반대가 같은 범위의 근거로 확인된 경우에만 씁니다. '
                     '미확인/근거 부족/정상이라는 뜻은 아님은 비정상이라는 주장이 아닙니다. '
@@ -569,7 +587,9 @@ async def review_answer(config, request, report):
                     '지적을 삭제하거나 이견을 일치로 바꿔 통과시키지 마세요. 범위가 달라 판단할 수 없는 주장은 '
                     '실제 조회 범위를 인용한 unverified로 남기세요. 독립 스냅샷의 관측 시각 차이는 과거 관측의 오류 증거가 아니고, '
                     'indexer의 cluster_status는 manager 클러스터 활성 여부의 증거가 아닙니다. '
-                    '이 두 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
+                    '새 조회 결과의 limit·lookback_minutes·요청 구간·applied_filters·scan_capped는 검토자 자신의 요청 조건이라 '
+                    '상대 조회 조건의 증거가 아닙니다. '
+                    '이렇게 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
                     '미확인은 부정이 아니며 상대가 쓰지 않은 보장을 만들어 반박하지 마세요. '
                     '')]
         report['peer_review'] = 'source_bound_claims'

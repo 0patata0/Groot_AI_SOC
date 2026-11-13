@@ -1,0 +1,84 @@
+{
+  "subject": "Peer review: the reviewer's own request conditions (limit, window, filters) cannot confirm or refute the other answer's query",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "kst": "2026-11-13T21:55",
+    "hermes_call": {
+      "search_modsecurity_alerts": {
+        "lookback_minutes": 30,
+        "limit": 50
+      }
+    },
+    "hermes_answer": "lookback 30분, limit 50 → 반환 0건 (true)",
+    "peer_claim": "disagree: other said limit 50 but the real call was limit 10",
+    "cause": "10 was echoed by the reviewer's own call result; other_read_context was empty (Hermes investigation answers pass no evidence)"
+  },
+  "change": {
+    "review_channel_worker.py": "bind_peer_references refuses agree/disagree whose evidence path is a request-echo field (limit, lookback_minutes, window_mode, requested_since_kst, requested_until_kst, scan_capped, applied_filters.*) with peer_query_scope_mismatch; added to PEER_OUTPUT_ERRORS (one correction, then not posted); instruction and correction text state the rule; unverified and observation fields (returned_count etc.) unchanged",
+    "test_review_channel.py": "3 tests: binding table, review_answer correction to unverified, repeated mismatch not posted"
+  },
+  "receipt_repair": {
+    "path": "/etc/capstone-review-chat/receipt.json",
+    "worker_entry_live_2205": "bba9a951405324c8",
+    "worker_live": "9973fbf18762bd13",
+    "cause": "2026-11-13 20:42 time-correction deploy updated only the Ollama receipt",
+    "effect": "deployment/review_chat.py verify -> review_source_drift",
+    "fix": "apply_b.py sets the worker entry to the new SHA only if it is exactly the stale or the current value"
+  },
+  "sha256": {
+    "infra/hermes/review_channel_worker.py": {
+      "base": "9973fbf18762bd13cfed89982b84c7281da07bb415c4ac5f6788710d8db8e048",
+      "candidate": "478115037de133511f728609ac40823c382b0e0003da1635050356840332105b"
+    },
+    "infra/hermes/test_review_channel.py": "2e3057dab3cab0b8e73f1e7185d92d44ef9b24e2a70f5d6df3aceeab80ada4ee",
+    "infra/validation/peer-query-scope/apply_b.py": "21e7dc7b935dc4a2f6bf5896eb8a288004a2799785f18e91db2d937d0ace0980"
+  },
+  "tests": {
+    "new": {
+      "candidate": "3/3",
+      "base_worker": "3/3 fail (15 subtest failures, 2 errors)"
+    },
+    "bundles_vs_head": {
+      "hermes_all": "1253 (base 1250), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "368 OK",
+      "mcp": "708, same known errors (base has 1 flaky extra)",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-peer-query-scope-220628/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py (infra/hermes/review_channel_worker.py)"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": [
+      "receipt entry stale",
+      "receipt entry current"
+    ],
+    "rollback": "both restored",
+    "refusals": [
+      "review_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "receipt_not_baseline_no_change",
+      "candidate_changed"
+    ]
+  },
+  "limits": [
+    "a question-vs-window disagreement citing the reviewer's own lookback becomes unverified",
+    "the other agent's receipts with query conditions are still not passed to the reviewer (next candidate)"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat: no request-condition dissent posted (model output varies; may not reproduce)",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

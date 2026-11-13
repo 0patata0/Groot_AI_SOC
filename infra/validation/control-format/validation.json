@@ -1,0 +1,91 @@
+{
+  "subject": "Formatted control lines (backticks/bold/quotes) are named in the repair diagnosis; skill states the order without formatted names",
+  "status": "candidate_tested_not_applied",
+  "incident_2026_11_13_2335": {
+    "drafts": [
+      "'`MANAGEMENT_STATUS`: monitor'",
+      "'`INCIDENT_DISPOSITION: {...}`' and '`MANAGEMENT_STATUS: needs_review`'"
+    ],
+    "effect": "not recognised (exact start-of-line syntax) -> fallback",
+    "diagnosis_gap": "said 'line missing'",
+    "possible_contributor": "the 23:30 skill sentence wrote both control names in backticks (estimated, not proven)"
+  },
+  "change": {
+    "soc_management_run.py": "formatted_control_line; management_status_problem names formatted status lines with the model's own value as the example; disposition_line_problem; both in the repair diagnosis; exact syntax unchanged",
+    "skills/soc-investigate/SKILL.md": "order sentence without backticked names + 'no backticks/bold/quotes/list marks, start of line'; peer section: no correction narrative in corrected claims",
+    "query-completion/__init__.py": "runner pin"
+  },
+  "not_changed": [
+    "soc-output control-line sentence (also uses backticked names; outside this copy set)",
+    "no check relaxed"
+  ],
+  "local_replay_2335": {
+    "draft1": "status formatting named, example 'MANAGEMENT_STATUS: monitor'",
+    "draft2": "status (example needs_review) and disposition formatting both named"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "76bd1e09a84fb316557e851cf92b9d2ee3051dee6a71da0e8b73690b7d7bc141",
+      "candidate": "b32ea4c6e425064707c8755193f35506099ef0b6db32527648ea9122b363a868"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "18a04801c2949c94ca36484391c0d0b0948c2c4e804e0e298151cac9d962232e",
+      "candidate": "576736f44ed7bb3617f85a5cb6917c2ca0d96b34ea548339db7bd9b99a6d70c2"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "acab349c8f1a5ae2015d13af7d80a7bc603af8a08b9c8175d7cca49791758115",
+      "candidate": "eeb28a8d21efdaf872b2ffb651281612828e451b24c0a7c53768cb7669eda1aa"
+    },
+    "infra/hermes/test_report_repair_diagnosis.py": "a5ec0b55e67a414a014d8861c629b20d40a9854b408709e930942b75c412602b",
+    "infra/validation/control-format/apply_b.py": "3cbc56f4448847b40ec55684850b43e8b0238cef92705402ea8f20cfb6c5558d"
+  },
+  "tests": {
+    "new": {
+      "FormattedControlLines": "5/5 (fail on the old runner: 6 subtest failures, 2 errors)"
+    },
+    "bundles_vs_head": {
+      "hermes_all": "1273 (base 1268), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, same known errors (base has 1 flaky extra)",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-control-format-234424/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "9 copies + gate + Ollama receipt (3 keys)",
+    "rollback": "11 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change (skill copy)",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T23:45:02+09:00",
+    "copies": "9/9 at base",
+    "embedded_gate": "76bd1e09a84fb316",
+    "ollama_receipt": "3 keys at base"
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat: control lines unformatted and report posted without fallback, or the diagnosis names the formatting",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

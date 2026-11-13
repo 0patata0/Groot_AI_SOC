@@ -1706,15 +1706,57 @@ def management_status_problem(text):
         return None
     matches = list(re.finditer(r'^MANAGEMENT_STATUS:[^\r\n]*$', text, re.M))
     if not matches:
+        formatted = formatted_control_line(text, 'MANAGEMENT_STATUS')
+        if formatted:
+            # Show the model's own value without marks; never suggest a status.
+            bare = CONTROL_LINE_FORMATTING.sub('', formatted).strip().lstrip('>-').strip()
+            bare = re.sub(r'^MANAGEMENT_STATUS\s*:\s*', 'MANAGEMENT_STATUS: ', bare)
+            example = (bare if re.fullmatch(r'MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)', bare)
+                       else 'MANAGEMENT_STATUS: 뒤에 resolved·monitor·needs_review·awaiting_approval 중 실제 판단 하나')
+            return ('MANAGEMENT_STATUS 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: '
+                    + json.dumps(formatted, ensure_ascii=False) + '. 서식 없이 줄 맨 앞부터 ' + example + ' 형식으로 쓰세요.')
         return 'MANAGEMENT_STATUS 줄이 없습니다.'
     if len(matches) > 1:
         return 'MANAGEMENT_STATUS 줄이 ' + str(len(matches)) + '개입니다. 하나만 쓰세요.'
     if not re.fullmatch(r'MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)[ \t]*', matches[0].group()):
         return 'MANAGEMENT_STATUS 값이 resolved·monitor·needs_review·awaiting_approval 중 하나가 아닙니다.'
     after = text[matches[0].end():].strip().splitlines()[0]
-    what = 'INCIDENT_DISPOSITION 줄' if after.startswith('INCIDENT_DISPOSITION') else '다른 내용'
+    what = ('INCIDENT_DISPOSITION 줄' if CONTROL_LINE_FORMATTING.sub('', after).strip().startswith('INCIDENT_DISPOSITION')
+            else '다른 내용')
     return ('MANAGEMENT_STATUS 줄 뒤에 ' + what + '이 있습니다. INCIDENT_DISPOSITION 줄은 MANAGEMENT_STATUS 줄 앞에 두고, '
             'MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 쓰세요.')
+
+
+CONTROL_LINE_FORMATTING = re.compile(r'[`*"“”‘’]')
+
+
+def formatted_control_line(text, key):
+    """A control line the parser cannot see because of Markdown/quote marks.
+
+    11-13 23:35: both drafts wrote "`MANAGEMENT_STATUS`: monitor" and
+    "`MANAGEMENT_STATUS: needs_review`"; the exact syntax stays required.
+    """
+    if not isinstance(text, str):
+        return None
+    for line in text.splitlines():
+        if key not in line or line.startswith(key + ':'):
+            continue
+        bare = CONTROL_LINE_FORMATTING.sub('', line).strip().lstrip('>-').strip()
+        if bare.startswith(key + ':'):
+            return line.strip()[:160]
+    return None
+
+
+def disposition_line_problem(text):
+    """Say why an INCIDENT_DISPOSITION line was not read (formatting only)."""
+    if not isinstance(text, str) or len(re.findall(r'^INCIDENT_DISPOSITION: [^\r\n]+$', text, re.M)) == 1:
+        return None
+    formatted = formatted_control_line(text, 'INCIDENT_DISPOSITION')
+    if not formatted:
+        return None
+    return ('INCIDENT_DISPOSITION 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: '
+            + json.dumps(formatted[:80] + ('…' if len(formatted) > 80 else ''), ensure_ascii=False)
+            + '. 서식 없이 줄 맨 앞부터 INCIDENT_DISPOSITION: 다음에 JSON 한 줄로 쓰세요.')
 
 
 def rejected_report_lines(text, facts, successful_reads, issues, limit=4):
@@ -2658,11 +2700,13 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             # Say what failed: the code alone left the model guessing (11-13
             # 23:13 two corrections failed on the same two points).
             problem = management_status_problem(content) if 'missing_or_invalid_management_status' in issues else None
+            disposition = disposition_line_problem(content)
             rejected = rejected_report_lines(content, facts, successful_reads,
                                              [i for i in issues if i != 'missing_or_invalid_management_status'])
-            if problem or rejected:
+            if problem or disposition or rejected:
                 nudge += ('\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):'
                           + ('\n- ' + problem if problem else '')
+                          + ('\n- ' + disposition if disposition else '')
                           + ''.join('\n- 거절된 초안 문장(' + ','.join(r['issues']) + '): '
                                     + json.dumps(r['line'], ensure_ascii=False) for r in rejected)
                           + '\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.')

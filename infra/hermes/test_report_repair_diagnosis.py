@@ -75,5 +75,52 @@ class RepairMessage(unittest.TestCase):
         self.assertIn('정정 경위나 오류 코드 설명 없이', nudge)
 
 
+
+class FormattedControlLines(unittest.TestCase):
+    """11-13 23:35: both drafts wrapped the control lines in backticks and the
+    diagnosis said only "line missing". Exact syntax stays required."""
+
+    def test_formatted_status_line_is_named(self):
+        body = '보고서 본문입니다.'
+        for line in ('`MANAGEMENT_STATUS`: monitor', '`MANAGEMENT_STATUS: needs_review`', '**MANAGEMENT_STATUS: resolved**',
+                     '> MANAGEMENT_STATUS: monitor', '"MANAGEMENT_STATUS: monitor"'):
+            with self.subTest(line=line):
+                text = body + '\n' + DISP + '\n' + line
+                self.assertIsNone(m.management_status(text))
+                problem = m.management_status_problem(text)
+                self.assertIn('서식', problem); self.assertIn(json.dumps(line.strip(), ensure_ascii=False), problem); self.assertIn('줄 맨 앞부터', problem)
+        self.assertIn('뒤에 INCIDENT_DISPOSITION 줄', m.management_status_problem(body + '\nMANAGEMENT_STATUS: monitor\n`' + DISP + '`'))
+
+    def test_example_keeps_the_models_own_status_value(self):
+        problem = m.management_status_problem('본문\n' + DISP + '\n`MANAGEMENT_STATUS: needs_review`')
+        self.assertIn('줄 맨 앞부터 MANAGEMENT_STATUS: needs_review 형식', problem)
+        self.assertNotIn('monitor 형식', problem)
+        self.assertIn('중 실제 판단 하나', m.management_status_problem('본문\n`MANAGEMENT_STATUS: ok`'))
+
+    def test_formatted_disposition_line_is_named(self):
+        self.assertIn('서식', m.disposition_line_problem('본문\n`' + DISP + '`\nMANAGEMENT_STATUS: monitor'))
+        self.assertIsNone(m.disposition_line_problem('본문\n' + DISP + '\nMANAGEMENT_STATUS: monitor'))
+        self.assertIsNone(m.disposition_line_problem('본문\nMANAGEMENT_STATUS: monitor'))
+        self.assertIsNone(m.disposition_line_problem(None))
+
+    def test_repair_names_both_formatted_lines(self):
+        draft = ('## 결과\nWAF 반환 표본 0건(전체 구간 건수 미확인)\n\n`' + DISP + '`\n\n`MANAGEMENT_STATUS: needs_review`')
+        h = grounding_fixtures.Grounding(); h.setUp(); h.completed.append('search_wazuh_alerts')
+        h.kw['assistant_message'].content = draft
+        call = m.grounding_wrapper(lambda agent, **kw: 'original', types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),
+                                   lambda rows, row: rows.append(row), lambda rows, user: 0, h.completed, FACTS,
+                                   successful_reads={'mcp__security_events__search_wazuh_alerts'})
+        call(h.agent, **h.kw)
+        nudge = h.kw['messages'][-1]['content'].split('이번 정정에서 고칠 곳', 1)[1]
+        self.assertIn('MANAGEMENT_STATUS 줄에 서식', nudge)
+        self.assertIn('INCIDENT_DISPOSITION 줄에 서식', nudge)
+
+    def test_skill_states_the_rule_without_formatting_the_names(self):
+        import workflow_contract
+        body = workflow_contract.policy(('soc-investigate',))
+        line = next(l for l in body.splitlines() if '제어 줄이 모두 필요하면' in l)
+        self.assertNotIn('`INCIDENT_DISPOSITION`', line); self.assertNotIn('`MANAGEMENT_STATUS`', line)
+        self.assertIn('백틱', line); self.assertIn('줄 맨 앞부터', line)
+
 if __name__ == '__main__':
     unittest.main()

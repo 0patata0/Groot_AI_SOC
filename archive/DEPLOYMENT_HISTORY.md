@@ -1602,3 +1602,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 21:22 KST — 상대 시각 구간("최근 N분") 고정 적용 (B, 관리자231 경유)
 
 사용자 승인("상대 시각 구간 적용해줘")에 따라 적용했다. 사본 11곳을 교체했다(관리 실행기 `d6de30da`→`cf6124ad` ×4, query-completion `7bb48edb`→`accf2b07` ×2, 공통 계약 `2cae4b65`→`43fdbb1f` ×3, Ollama 하네스 `5cbdb9fc`→`5d79bb9d` ×2). 컨트롤러 내장본(`a3218877`→`6ecc3fd0`)과 Ollama 영수증도 갱신했다. 원복 타이머 45분을 건 상태에서 Ollama 봇만 재시작했다. 사후 점검은 오류 0이었다. 실제 채팅에서 Hermes 조사(첫 조회 `lookback_minutes: 30`)와 Ollama 단순 목록(30분 1회 조회)을 확인하고 21:30:38에 확정했다. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-relative-window`에 있다. 같은 채팅의 Ollama 교차 검토 `ValueError`는 적용 전부터 있던 결함이라 별도로 남겼다. 20:42 '조회 끝 시각' 적용 기록의 "교차 검토 정상"도 같은 이유로 정정했다. [기록](../infra/validation/relative-window/README.md).
+
+## 2026-11-13 21:51 KST — Ollama 도구 목록 계약 수정 적용 (B, 관리자231 경유)
+
+사용자 승인("교차 검토 수정 적용해줘")에 따라 적용했다. `/opt/capstone-ollama-trial/policy.py`와 영수증 `sources.policy.py`를 `7716bdd3`→`832d8c69`로 바꿨다. 두 대기열이 비어 있을 때 적용했고 45분 원복 타이머를 걸었으며, Ollama 봇만 재시작했다. 사후 점검에서 8개 서버가 모두 통과했고, Harness² 도구 노출은 0이었다. 실제 채팅에서 공동 채널 교차 검토(모델 3회·독립 읽기 3회·대조 게시)와 Ollama 단독 조사형 질문(MCP 8개 연결·모델 3회)을 확인하고 21:59:51에 확정했다. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-catalog-contract`에 있다. 새로 드러난 교차 검토 품질 문제(거짓 이견 1건, 범위 밖 읽기)와 단독 판단 미완료는 별도로 남겼다. [기록](../infra/validation/catalog-contract/README.md).

@@ -72,9 +72,7 @@
     "embedded_gate_equal": true,
     "receipt_equal": true
   },
-  "not_done": [
-    "root-cause the Ollama peer ValueError in the joint channel"
-  ],
+  "not_done": [],
   "applied": {
     "approval": "user 2026-11-13: 상대 시각 구간 적용해줘",
     "window_kst": "21:22:49/21:22:50",
@@ -134,5 +132,6 @@
   },
   "unrelated_open": {
     "ollama_peer_valueerror": "joint-channel Ollama peer stops with ValueError before any model call (0 model calls, 0 tool calls); same at 17:23, 20:17, 20:44 before this apply and 21:27 after - pre-existing, not a regression"
-  }
+  },
+  "followup_2026_11_13_2159": "ollama_peer_valueerror root-caused (catalog contract) and fixed: infra/validation/catalog-contract (applied 21:51, confirmed 21:59)"
 }

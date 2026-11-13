@@ -1,6 +1,6 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-> **2026-11-13 도구 목록 계약(후보, 운영 미적용):** 11/13 00:34 B 규칙 MCP에 Harness² 도구 4개가 추가된 뒤, `rule-b`·`rule-write-b`에 연결하는 Ollama 실행이 모델 호출 전에 `server_tool_contract_changed`로 멈췄다(공동 채널 교차 검토 4회 모두 실패). `policy.py`에서 서버가 광고하는 정확한 도구 집합(`CATALOG_TOOLS`)과 사용 권한을 분리했다. 4개 도구는 계약에만 등록하고 어떤 모드에서도 노출하지 않는다. 그 밖의 목록 변화는 계속 차단하며, MCP 원본과 계약을 대조하는 회귀를 추가했다. [원인·수정·검증](../validation/catalog-contract/README.md).
+> **2026-11-13 도구 목록 계약(21:51 B 적용·21:59 확정, 교차 검토·단독 조사형 실채팅 확인):** 11/13 00:34 B 규칙 MCP에 Harness² 도구 4개가 추가된 뒤, `rule-b`·`rule-write-b`에 연결하는 Ollama 실행이 모델 호출 전에 `server_tool_contract_changed`로 멈췄다(공동 채널 교차 검토 4회 모두 실패). `policy.py`에서 서버가 광고하는 정확한 도구 집합(`CATALOG_TOOLS`)과 사용 권한을 분리했다. 4개 도구는 계약에만 등록하고 어떤 모드에서도 노출하지 않는다. 그 밖의 목록 변화는 계속 차단하며, MCP 원본과 계약을 대조하는 회귀를 추가했다. [원인·수정·검증](../validation/catalog-contract/README.md).
 
 현재 query1.19.86/common1.5.41은 명시 서비스의 현재·과거 필수 읽기, 전체 진단 감사 영수증, 서비스 조회에 한정한 낮은 추론을 적용했다. 실제 새 채팅은 Hermes74.516초/Ollama66.520초로 줄었으나 둘 다 보고 해석 오류가 남아partial이며 **정확한 원인 조사60초는 미완료**다. Native의 두 읽기 범위·SHA/기간/신선도·쓰기0은 독립 확인했다. 고유1,143검사 PASS/skip0, B18SHA/보호8/양봇 연결/3서비스/독립원복 확인. 모델·권한·FW/TTL은 유지하며 기존 단일deploy.sh 복사 경로를 사용한다. 새OS 전체 설치·UI 전수·평균/p95는 미검증. [수정·실측·한계](../hermes/diagnostic-navigation.md).
 

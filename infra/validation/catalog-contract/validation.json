@@ -1,6 +1,6 @@
 {
   "subject": "Ollama MCP catalog contract: acknowledge B's Harness² governance tools without exposing them (joint-channel peer ValueError)",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed",
   "symptom": {
     "peer_failures_kst": [
       "17:23",
@@ -97,9 +97,76 @@
     "receipt sources.policy.py": "7716bdd32495dd54",
     "prereqs_copy_preexisting_drift": "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/policy.py c3701c921eb48378 (10/31), not changed by this candidate"
   },
-  "not_done": [
-    "apply on B (apply_b.py) after approval",
-    "real chats: joint-channel peer completes an independent read and comparison; Ollama-direct investigation reaches the model",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-13: 교차 검토 수정 적용해줘",
+    "at_kst": "2026-11-13T21:51:53+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-catalog-contract",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 21:59:51"
+    ],
+    "installed": {
+      "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b4",
+      "receipt sources.policy.py": "832d8c691a9721b4"
+    },
+    "ollama_restart": "rc 0, active, websocket 21:51:54, log errors 0",
+    "postcheck": {
+      "servers_pass": 8,
+      "exposed": {
+        "rule-b": "5/6",
+        "rule-write-b": "3/6 (hermes-parity)"
+      },
+      "governance_exposed": 0,
+      "read_only_exposed_total": 36
+    },
+    "real_chat": [
+      {
+        "post_kst": "21:54:24",
+        "channel": "joint",
+        "peer": {
+          "error": null,
+          "model_calls": 3,
+          "reads": [
+            "search_modsecurity_alerts",
+            "search_suricata_alerts",
+            "search_wazuh_alerts"
+          ],
+          "peer_review": "source_bound_claims",
+          "claims": "3 disagree (1 false: compared its own limit 10 with Hermes' real limit 50)",
+          "seconds": 65.5
+        },
+        "hermes_selection": {
+          "search_modsecurity_alerts": {
+            "lookback_minutes": 30,
+            "limit": 50
+          },
+          "search_wazuh_alerts": {
+            "lookback_minutes": 30,
+            "limit": 10
+          }
+        }
+      },
+      {
+        "post_kst": "21:57:43",
+        "channel": "ollama",
+        "mcp_sessions": 8,
+        "error": null,
+        "model_calls": 3,
+        "read": {
+          "search_wazuh_alerts": {
+            "lookback_minutes": 60
+          }
+        },
+        "result": "partial (judgment not verified; pre-existing type)",
+        "seconds": 72.2
+      }
+    ],
+    "rollback_timer": "stopped (inactive)"
+  },
+  "new_open": [
+    "peer false dissent: compares its own call arguments with the other agent's receipts",
+    "peer reads tools outside the question (Suricata)",
+    "Ollama-direct investigation judgment unverified (partial, pre-existing type)"
   ]
 }

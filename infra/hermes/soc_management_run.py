@@ -1808,22 +1808,61 @@ def citation_name_repair(text, successful_reads, catalog):
         return False
 
 
-def completed_citation_request(request, successful_reads):
-    """Model-only exact citation names from this run's real successful receipts."""
-    if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or not isinstance(request, dict):
-        return request
+def citation_note_text(successful_reads):
+    """The exact-citation hint for this run's real successful receipts, or None."""
+    if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
+        return None
     names = sorted({name for name in successful_reads if isinstance(name, str) and allowed(name, 'verify')})
-    rows = request.get('messages')
-    if not names or len(names) > 64 or not isinstance(rows, list):
+    if not names or len(names) > 64:
+        return None
+    return ('현재 실행의 실제 성공 읽기 도구 이름(판단·영향 확인의 증명은 아님): ' +
+        json.dumps(names, ensure_ascii=False) +
+        '\nINCIDENT_DISPOSITION.evidence_tools에는 인용한 실제 근거의 이름을 이 목록에서 정확히 복사하세요. '
+        '구분자나 서버 이름을 바꾸지 마세요. 추가 근거가 필요하면 실제 조회한 뒤 인용하세요.')
+
+
+def _rows_digest(rows):
+    return hashlib.sha256(json.dumps(rows, ensure_ascii=False, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def completed_citation_request(request, successful_reads, notes=None):
+    """Model-only exact citation names from this run's real successful receipts.
+
+    The system message stays byte-identical for the whole run. Appending the
+    growing name list to it changed the first prompt tokens on every call, and
+    the hybrid model on the inference server can only resume at the end of an
+    earlier prompt, so each call re-read the full 30-65k-token prompt (Thor log
+    and session replay, 2026-11-13). Instead each changed list is shown once as
+    a user-role note at the conversation point where it became true, and later
+    requests of the same process repeat earlier notes at the same points, so a
+    request extends the previous one. The latest note is the current list. Notes
+    live only in this process's API requests: never persisted, never dispatched.
+    `notes` is the caller-owned per-process list of (anchor, prefix digest, text).
+    """
+    if not isinstance(request, dict):
         return request
-    for i, row in enumerate(rows):
-        if isinstance(row, dict) and row.get('role') == 'system' and isinstance(row.get('content'), str):
-            note = ('\n현재 실행의 실제 성공 읽기 도구 이름(판단·영향 확인의 증명은 아님): ' +
-                json.dumps(names, ensure_ascii=False) +
-                '\nINCIDENT_DISPOSITION.evidence_tools에는 인용한 실제 근거의 이름을 이 목록에서 정확히 복사하세요. '
-                '구분자나 서버 이름을 바꾸지 마세요. 추가 근거가 필요하면 실제 조회한 뒤 인용하세요.')
-            return {**request, 'messages': [*rows[:i], {**row, 'content': row['content'] + note}, *rows[i+1:]]}
-    return request
+    rows = request.get('messages')
+    text = citation_note_text(successful_reads)
+    notes = [] if notes is None else notes
+    if not isinstance(rows, list) or (text is None and not notes):
+        return request
+    kept = []
+    for anchor, digest, note in notes:  # A rewritten history drops later notes.
+        if anchor > len(rows) or _rows_digest(rows[:anchor]) != digest:
+            break
+        kept.append((anchor, digest, note))
+    notes[:] = kept
+    if text is not None and (not notes or notes[-1][2] != text):
+        notes.append((len(rows), _rows_digest(rows), text))
+    if not notes:
+        return request
+    shown, queue = [], list(notes)
+    for index, row in enumerate(rows):
+        while queue and queue[0][0] == index:
+            shown.append({'role': 'user', 'content': queue.pop(0)[2]})
+        shown.append(row)
+    shown.extend({'role': 'user', 'content': note[2]} for note in queue)
+    return {**request, 'messages': shown}
 
 
 def completed_web_review_request(request, agent, successful_reads, *, requirements_complete=False, component_reads=()):
@@ -3595,6 +3634,7 @@ def main():
     evidence = []
     completed_wire_calls = []
     successful_read_names = set()  # Includes successful protected receipts, not tool availability.
+    citation_notes = []  # Per-process (anchor, prefix digest, text); see completed_citation_request.
     read_facts = []
     current_receipts=[]
     receipts_complete=True
@@ -3756,7 +3796,7 @@ def main():
         self._capstone_management_pending_read=(getattr(self,'_current_turn_id',None),pending)
         self._capstone_management_report=None
         if pending:return management_reasoning(value,self,required_read_phase=True)
-        cited=completed_citation_request(value,successful_read_names)
+        cited=completed_citation_request(value,successful_read_names,citation_notes)
         result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements),component_reads=component_read_names)
         chat=chat_read_context()
         service_reads={t['function']['name'] for t in scope_catalog if allowed(t['function']['name'],'verify')}

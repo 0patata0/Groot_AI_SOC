@@ -126,13 +126,53 @@ class LiteralRepair(unittest.TestCase):
         before=copy.deepcopy(request)
         shown=m.completed_citation_request(request,[good,good,'arbitrary','mcp__rule_write_a__propose_rule_edit'])
         self.assertEqual(request,before)
-        self.assertEqual(shown['messages'][0]['content'].count(good),1)
-        self.assertNotIn('arbitrary',shown['messages'][0]['content'])
-        self.assertNotIn('propose_rule_edit',shown['messages'][0]['content'])
-        self.assertEqual(shown['messages'][1],before['messages'][1])
+        # The system message is never changed; the hint is a trailing user-role note.
+        self.assertEqual(shown['messages'][:2],before['messages'])
+        note=shown['messages'][-1]
+        self.assertEqual((note['role'],len(shown['messages'])),('user',3))
+        self.assertEqual(note['content'].count(good),1)
+        self.assertNotIn('arbitrary',note['content'])
+        self.assertNotIn('propose_rule_edit',note['content'])
         with patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
             self.assertIs(m.completed_citation_request(request,[good]),request)
         self.assertIs(m.completed_citation_request(request,[]),request)
+
+    def test_citation_notes_keep_each_request_a_prefix_extension_of_the_previous(self):
+        # A changing system suffix forced the inference server to re-read the whole
+        # prompt on every call (Thor log + session replay 2026-11-13).
+        good='mcp__security_events__search_suricata_alerts'
+        other='mcp__wazuh_ro__get_wazuh_alert_summary'
+        system={'role':'system','content':'관제 지시'}
+        user={'role':'user','content':'사건 조사'}
+        call1={'role':'assistant','content':'','tool_calls':[{'id':'a','type':'function','function':{'name':good,'arguments':'{}'}}]}
+        res1={'role':'tool','tool_call_id':'a','content':'r1'}
+        call2={'role':'assistant','content':'','tool_calls':[{'id':'b','type':'function','function':{'name':other,'arguments':'{}'}}]}
+        res2={'role':'tool','tool_call_id':'b','content':'r2'}
+        notes=[]
+        first=m.completed_citation_request({'messages':[system,user,call1,res1]},[good],notes)
+        second=m.completed_citation_request({'messages':[system,user,call1,res1,call2,res2]},[good,other],notes)
+        third=m.completed_citation_request({'messages':[system,user,call1,res1,call2,res2]},[good,other],notes)
+        a,b,c=first['messages'],second['messages'],third['messages']
+        self.assertEqual(a[0],system)
+        self.assertEqual(b[0],system)
+        self.assertEqual(b[:len(a)],a)            # each request extends the previous one
+        self.assertEqual(c,b)                     # unchanged names add no new note
+        self.assertEqual([r['role'] for r in b],['system','user','assistant','tool','user','assistant','tool','user'])
+        self.assertNotIn(other,b[4]['content'])   # the earlier note is kept as it was
+        self.assertIn(other,b[-1]['content'])     # the latest note is the current list
+        self.assertEqual(len(notes),2)
+
+    def test_citation_notes_drop_when_history_is_rewritten(self):
+        good='mcp__security_events__search_suricata_alerts'
+        system={'role':'system','content':'관제 지시'}
+        notes=[]
+        m.completed_citation_request({'messages':[system,{'role':'user','content':'A'},{'role':'tool','content':'r'}]},[good],notes)
+        rewritten={'messages':[system,{'role':'user','content':'B'},{'role':'tool','content':'r'}]}
+        shown=m.completed_citation_request(rewritten,[good],notes)
+        self.assertEqual(len(notes),1)
+        self.assertEqual(shown['messages'][:3],rewritten['messages'])
+        self.assertEqual(shown['messages'][-1]['role'],'user')
+        self.assertEqual(sum(r['role']=='user' and '실제 성공 읽기' in r['content'] for r in shown['messages']),1)
 
     def test_complete_web_review_uses_lower_thinking_without_changing_tools_or_judgment(self):
         reads=['mcp__security_events__'+n for n in ('get_web_service_target','search_wazuh_alerts','search_web_access')]

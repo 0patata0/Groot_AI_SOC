@@ -1,6 +1,6 @@
 {
   "subject": "Peer review: the reviewer's own request conditions (limit, window, filters) cannot confirm or refute the other answer's query",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed_check_not_exercised_live",
   "incident": {
     "kst": "2026-11-13T21:55",
     "hermes_call": {
@@ -77,8 +77,55 @@
     "the other agent's receipts with query conditions are still not passed to the reviewer (next candidate)"
   ],
   "not_done": [
-    "apply on B after approval",
-    "real chat: no request-condition dissent posted (model output varies; may not reproduce)",
-    "confirm or let the 45-minute rollback run"
+    "live occurrence of peer_query_scope_mismatch not yet observed (regression-only)"
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: 거짓 이견 수정 적용해줘",
+    "at_kst": "2026-11-13T22:22:08+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-peer-query-scope",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 22:27:18"
+    ],
+    "installed": {
+      "/opt/capstone-review-chat/review_channel_worker.py": "478115037de13351",
+      "receipt worker entry": "bba9a951405324c8 -> 478115037de13351"
+    },
+    "installer_receipt_all_match": true,
+    "restart": "none (per-job worker)",
+    "real_chat": {
+      "post_kst": "22:22:22",
+      "peer": {
+        "model_calls": 3,
+        "reads": [
+          "search_modsecurity_alerts",
+          "search_suricata_alerts",
+          "search_wazuh_alerts"
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_validation_errors": [],
+        "seconds": 64.6
+      },
+      "new_check_fired": false,
+      "posted_false_dissent": [
+        "returned_count 0 read as whole-window 0 (indexed_window_total_count null)",
+        "own wazuh read with invented program_name='systemd' filter compared with Hermes' unfiltered sample of 10"
+      ],
+      "hermes": {
+        "reads": [
+          "get_firewall_rules x2 (off-scope, invented snapshot d41d8cd9..., FileNotFoundError)",
+          "search_modsecurity_alerts {lookback 30}",
+          "search_wazuh_alerts {lookback 30}"
+        ],
+        "result": "tool-failure fallback, judgment incomplete"
+      }
+    },
+    "rollback_timer": "stopped (inactive)"
+  },
+  "next_candidate": [
+    "Ollama investigation first read: optional filters only when named in the question (shared with Hermes initial_event_filter_schema)",
+    "peer binding: refuse agree/disagree whose evidence call has applied_filters not in the question",
+    "peer binding: refuse disagreement that asserts a total from returned_count when indexed_window_total_count is null",
+    "Hermes get_firewall_rules snapshot only from a prior firewall read result"
   ]
 }

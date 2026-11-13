@@ -1606,3 +1606,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 21:51 KST — Ollama 도구 목록 계약 수정 적용 (B, 관리자231 경유)
 
 사용자 승인("교차 검토 수정 적용해줘")에 따라 적용했다. `/opt/capstone-ollama-trial/policy.py`와 영수증 `sources.policy.py`를 `7716bdd3`→`832d8c69`로 바꿨다. 두 대기열이 비어 있을 때 적용했고 45분 원복 타이머를 걸었으며, Ollama 봇만 재시작했다. 사후 점검에서 8개 서버가 모두 통과했고, Harness² 도구 노출은 0이었다. 실제 채팅에서 공동 채널 교차 검토(모델 3회·독립 읽기 3회·대조 게시)와 Ollama 단독 조사형 질문(MCP 8개 연결·모델 3회)을 확인하고 21:59:51에 확정했다. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-catalog-contract`에 있다. 새로 드러난 교차 검토 품질 문제(거짓 이견 1건, 범위 밖 읽기)와 단독 판단 미완료는 별도로 남겼다. [기록](../infra/validation/catalog-contract/README.md).
+
+## 2026-11-13 22:22 KST — 교차 검토 요청 조건 근거 거절 적용 (B, 관리자231 경유)
+
+사용자 승인("거짓 이견 수정 적용해줘")에 따라 공동 채널 작업자 `review_channel_worker.py`를 `9973fbf1`→`47811503`으로 바꿨다. 공동 채널 설치기 영수증의 작업자 항목은 20:42 배포가 남긴 `bba9a951`에서 새 SHA로 고쳤다. 서비스는 재시작하지 않았다(작업마다 새 프로세스). 설치기 영수증 5항목이 모두 일치한다. 실제 채팅에서 교차 검토는 정상 완료됐지만, 새 검사는 발동하지 않았다. 대신 다른 종류의 거짓 이견 2건(표본/전체 혼동, 질문에 없는 필터로 좁힌 조회와 비교)과 Hermes의 범위 밖 방화벽 조회 실패가 드러났다. 22:27:18 확정. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-peer-query-scope`에 있다. [기록](../infra/validation/peer-query-scope/README.md).

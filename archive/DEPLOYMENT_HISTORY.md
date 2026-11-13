@@ -1598,3 +1598,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 20:42 KST — 조회 끝 시각 미래 오류 수정 적용 (B, 관리자231 경유)
 
 사용자 승인("조회 끝 시각 수정 적용해줘")에 따라 적용했다. 공동 채널 작업자 `review_channel_worker.py`(`bba9a951`→`9973fbf1`)와 공통 계약 `chat_contract.py` 3곳(`4ef328b6`→`2cae4b65`)을 교체했고, Ollama 영수증을 갱신했다. 대기열이 비어 있어 `capstone-ollama-chat`만 재시작했다. 백업은 `/var/backups/capstone-time-correction-20261113T204212`에 있다. 실제 채팅에서 정상 경로(조회 오류 0, 실제 보고서 게시, 교차 검토 정상)를 확인했다. 수정 경로(미래 시각 거절, 정정된 거부의 실패 미판정)는 회귀 시험으로 확인했다. [기록](../infra/validation/time-correction/README.md).
+
+## 2026-11-13 21:22 KST — 상대 시각 구간("최근 N분") 고정 적용 (B, 관리자231 경유)
+
+사용자 승인("상대 시각 구간 적용해줘")에 따라 적용했다. 사본 11곳을 교체했다(관리 실행기 `d6de30da`→`cf6124ad` ×4, query-completion `7bb48edb`→`accf2b07` ×2, 공통 계약 `2cae4b65`→`43fdbb1f` ×3, Ollama 하네스 `5cbdb9fc`→`5d79bb9d` ×2). 컨트롤러 내장본(`a3218877`→`6ecc3fd0`)과 Ollama 영수증도 갱신했다. 원복 타이머 45분을 건 상태에서 Ollama 봇만 재시작했다. 사후 점검은 오류 0이었다. 실제 채팅에서 Hermes 조사(첫 조회 `lookback_minutes: 30`)와 Ollama 단순 목록(30분 1회 조회)을 확인하고 21:30:38에 확정했다. 표식·백업은 `/var/lib/capstone-service-grounding/20261113-relative-window`에 있다. 같은 채팅의 Ollama 교차 검토 `ValueError`는 적용 전부터 있던 결함이라 별도로 남겼다. 20:42 '조회 끝 시각' 적용 기록의 "교차 검토 정상"도 같은 이유로 정정했다. [기록](../infra/validation/relative-window/README.md).

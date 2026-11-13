@@ -84,5 +84,6 @@
       "ollama_peer": "done"
     },
     "fix_path_exercised_live": false
-  }
+  },
+  "correction_2026_11_13_2130": "real_chat.ollama_peer 'done' was the queue state only; the result was partial with ValueError before any model call (pre-existing, also 17:23/20:17/21:27)"
 }

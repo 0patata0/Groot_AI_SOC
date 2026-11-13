@@ -1,6 +1,6 @@
 {
   "subject": "Pin an explicit recent window ('최근 N분') from the question for both bots instead of model-computed times",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed",
   "incidents": {
     "17:21": "computed end 26 s ahead refused",
     "20:16": "'최근 30분' read with a 60-minute lookback",
@@ -73,8 +73,66 @@
     "receipt_equal": true
   },
   "not_done": [
-    "apply on B (apply_b.py)",
-    "real chat checks: '최근 30분' investigation and listing",
-    "confirm or let the 45-minute rollback run"
-  ]
+    "root-cause the Ollama peer ValueError in the joint channel"
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: 상대 시각 구간 적용해줘",
+    "window_kst": "21:22:49/21:22:50",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-relative-window",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 21:30:38"
+    ],
+    "installed": {
+      "soc_management_run.py": "cf6124ad51fcb8ae x4",
+      "query-completion __init__": "accf2b07d2133719 x2",
+      "chat_contract.py": "43fdbb1f98efc5c7 x3",
+      "harness.py": "5d79bb9dbee62b73 x2",
+      "controller": "6ecc3fd008f52c1d",
+      "receipt": "5773b8e18df8c70e"
+    },
+    "ollama_restart": "rc 0, active, websocket 21:22:51, log errors 0",
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 15,
+      "tick_errors": 0,
+      "failed_units": 0
+    },
+    "real_chat": [
+      {
+        "post_kst": "21:26:34",
+        "channel": "joint",
+        "question": "최근 30분 ModSecurity와 Wazuh 경보 조사",
+        "selection": {
+          "search_modsecurity_alerts": {
+            "lookback_minutes": 30
+          },
+          "search_wazuh_alerts": {
+            "lookback_minutes": 30
+          }
+        },
+        "window_kst": "20:56/21:26",
+        "posted": "real investigation report"
+      },
+      {
+        "post_kst": "21:29:57",
+        "channel": "ollama",
+        "question": "최근 30분 Wazuh 경보 보여줘",
+        "call": {
+          "search_wazuh_alerts": {
+            "lookback_minutes": 30,
+            "limit": 10
+          }
+        },
+        "window_kst": "21:00:12/21:30:12",
+        "seconds": 15.7,
+        "path": "deterministic listing"
+      }
+    ],
+    "rollback_timer": "stopped (inactive)"
+  },
+  "unrelated_open": {
+    "ollama_peer_valueerror": "joint-channel Ollama peer stops with ValueError before any model call (0 model calls, 0 tool calls); same at 17:23, 20:17, 20:44 before this apply and 21:27 after - pre-existing, not a regression"
+  }
 }

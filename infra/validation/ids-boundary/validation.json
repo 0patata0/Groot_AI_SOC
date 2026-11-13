@@ -1,6 +1,6 @@
 {
   "subject": "Latin sensor abbreviations (IDS, NIDS, WAF, SID, TLS) as standalone tokens in the evidence checker",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T00:04:16+09:00",
     "post": "urrkqrag63dg8qpipgnfrtofkh",
@@ -97,9 +97,69 @@
     "correction narrative and an untrue sentence in draft 2 are not checked",
     "peer exposes catalog ids (e70)"
   ],
-  "not_done": [
-    "apply on B after approval",
-    "real chat",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: IDS 검사기 수정 적용해줘",
+    "at_kst": "2026-11-14T01:01:19+09:00",
+    "source_commit": "94dae26",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-ids-boundary",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 01:05:57"
+    ],
+    "installed": {
+      "runner x4 + gate": "ee848f915819563f",
+      "query x2": "fab84467f7d554fd"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "live_checks": {
+        "field_name_not_ids": true,
+        "hids_not_suricata": true,
+        "real_claims_rejected": true,
+        "sid_with_particle": true
+      },
+      "receipts": true,
+      "failed_units": 0
+    },
+    "real_chat": {
+      "post_kst": "01:02:19",
+      "post": "ycdmeyoiufyspcwmo3y1csjcaa",
+      "reads": [
+        "search_modsecurity_alerts 30m",
+        "search_wazuh_alerts 30m"
+      ],
+      "read_errors": 0,
+      "draft1": {
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ],
+        "diagnosis": "2 rejected lines quoted"
+      },
+      "draft2": {
+        "issues": [
+          "unobserved_event_source:suricata"
+        ],
+        "line": "WAF/IDS 공격 ... 경보가 관측되지 않았습니다",
+        "verdict": "true positive (uncalled IDS claimed), confirmed by replay on the live runner"
+      },
+      "field_name_path_fired": false,
+      "final": "fallback by the final guard (one non-literal unobserved_* issue)",
+      "peer": {
+        "peer_validation_errors": [
+          "peer_zero_sample_dissent"
+        ],
+        "claims": "1 agree, 4 unverified (over-cautious)"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 8
+  },
+  "open_after_apply": [
+    "sentence-level zero-sample check vs line-level diagnosis (qualifier in the next sentence of the same line)",
+    "MANAGEMENT_STATUS resolved without INCIDENT_DISPOSITION in the joint-channel investigation path",
+    "conclusion widened to WAF/IDS beyond the asked devices"
   ]
 }

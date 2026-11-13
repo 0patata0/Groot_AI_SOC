@@ -1,6 +1,6 @@
 {
   "subject": "history-auto batch-directory cap 256 -> 1024 (A)",
-  "status": "applied_dir_cap_entry_cap_blocked",
+  "status": "applied_dir_and_entry_caps_verified_completion_pending",
   "observed_kst": "2026-11-13T09:27:39+09:00/2026-11-13T09:29:57+09:00",
   "live": {
     "jobs": 14,
@@ -45,7 +45,6 @@
     "candidate_runtime_manifest_check": "manifest_ok"
   },
   "not_done": [
-    "entry-cap correction",
     "completion of boot 5c8d076c",
     "SPOOF log volume reduction (candidate written)",
     "retention/B-transfer review worker"
@@ -93,7 +92,7 @@
     "next": "entry-cap correction candidate (e.g. 16384, use the variable); needs approval"
   },
   "entry_cap_candidate": {
-    "status": "candidate_not_applied",
+    "status": "applied",
     "entries_cap": 16384,
     "hardcoded_4097_replaced": true,
     "auto_lib_sha256": "a210fd64d0cb6f4e6e8be0697be51f0c06896fb42c0cf59f698e3ef275ad5ba5",
@@ -112,5 +111,22 @@
     "installed_is_previous_apply": true,
     "candidate_runtime_manifest_check": "manifest_ok",
     "apply_script": "infra/normalization/vector/history-auto/apply-entry-cap-a.py"
+  },
+  "entry_cap_applied": {
+    "at_kst": "2026-11-13T15:55:42+09:00",
+    "backup": "/var/backups/capstone-history-auto-entrycap-20261113T155542",
+    "installed": {
+      "auto-lib.sh": "a210fd64d0cb6f4e",
+      "runtime.sha256": "258ccfde07a75b15"
+    },
+    "next_run": {
+      "observed_kst": "2026-11-13T16:00:43+09:00",
+      "outcome": "batch_preserved",
+      "batches": 72,
+      "store_entries": 4118,
+      "store_dirs": 297,
+      "service_result": "success",
+      "failed_units": 0
+    }
   }
 }

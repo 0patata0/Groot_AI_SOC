@@ -78,7 +78,7 @@ A의 라이브 `never_block`과 영구 설정 `/etc/nftables.d/capstone-fw.nft`�
 | P2 | 내부→외부 egress 허용목록(`EGRESS_ALLOW`: DGX .110/.111:11434, DNS) — **B/C 임시 NIC 제거 후 효력** | `capstone-nat.sh` |
 | P3 | A 자신 output 체인 — **섀도(로그만)** 기본, `--enforce-output` 으로 강제 | `capstone-fw.nft` output |
 | P4 | ens192 SSH 출발지 `mgmt_src`(VPN·학과망 2개·ESXi) + 신규연결 6/min(버스트 10) 레이트리밋(`FW_SSH_RATE`) | `capstone-fw.nft` input |
-| P5 | 안티스푸핑: ens192 에서 내부/루프백/0.0.0.0/8/멀티캐스트/자기IP 출발지 drop, ens160 에서 비내부 drop(`SPOOF` 로그) + sysctl rp_filter=1·send_redirects=0·log_martians=1 | `capstone-fw.nft` prerouting_block, sysctl |
+| P5 | 안티스푸핑: ens192 에서 내부/루프백/0.0.0.0/8/멀티캐스트/자기IP 출발지 drop, ens160 에서 비내부 drop(`SPOOF` 로그) + sysctl rp_filter=1·send_redirects=0·log_martians=1. 2026-11-13 후보(미적용): SPOOF 로그의 100%였던 DHCP 클라이언트 브로드캐스트(0.0.0.0:68→255.255.255.255:67)만 로그 없이 drop([후보](../../validation/spoof-dhcp/README.md)) | `capstone-fw.nft` prerouting_block, sysctl |
 | P7 | IPv6 input/output drop + ens192/ens160 disable_ipv6 | nft, sysctl |
 | P8 | 컨테이너 east-west: WAF→C:80, chatproxy→B:8065/443 만(`EASTWEST_ALLOW`) | `capstone-nat.sh` |
 | P9 | forward drop 로그 `FW_DROP_FWD `(5/min) → Wazuh 측면이동 신호. output 섀도 `FW_SHADOW_OUT ` | nat, nft |

@@ -33,7 +33,7 @@
 
 **적용(09:37:19, 사용자 승인, 관리자231 경유)**: 검토 파일 3개를 root 전용(`/var/lib/capstone-history-auto-cap`)에 SHA를 확인해 배치하고 `apply-cap-1024-a.py`를 `systemd-run`으로 1회 실행했다. job 잠금 아래 두 파일을 교체해 `3d05677e…`·`af89c0f0…`가 됐다(root 0400). 원본은 `/var/backups/capstone-history-auto-cap1024-20261113T093719`, `inspect` 정상(CLI 런타임 검증 통과). 서비스 재시작은 없었다. **다음 주기(09:41)**: `batch_preserved`, 진행 boot 배치 31→32(32,000건), 폴더 257개, 서비스 Result=success·실패 유닛 0(systemd failure 해소), 전체 250,820건·134.2MB. 5분마다 1배치라 남은 약 163배치는 13~14시간 걸릴 것으로 추정한다(완료 미확인).
 
-한계: 상한을 올려도 큰 부팅이 반복되면 다시 찰 수 있다(항목 상한 기준 약 1,360배치). 근본적으로는 ①nft `SPOOF` 로그량 축소(FW 보호 변경, 별도) ②B 전송·검토 기반 보관 수명(storage-retention 검토 worker, 미구현)이 필요하다.
+한계: 상한을 올려도 큰 부팅이 반복되면 다시 찰 수 있다(항목 상한 기준 약 1,360배치). 근본적으로는 ①nft `SPOOF` 로그량 축소(FW 보호 변경. 원인은 한 기기의 DHCP 브로드캐스트이며 [후보](../../../validation/spoof-dhcp/README.md) 작성, 미적용) ②B 전송·검토 기반 보관 수명(storage-retention 검토 worker, 미구현)이 필요하다.
 
 ## 현재 운영 자료와의 관계
 

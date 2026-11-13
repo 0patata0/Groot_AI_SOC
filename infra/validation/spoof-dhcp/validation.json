@@ -1,0 +1,47 @@
+{
+  "subject": "A anti-spoof: drop DHCP client broadcasts (0.0.0.0:68 -> 255.255.255.255:67) without SPOOF log",
+  "status": "candidate_not_applied",
+  "observed_kst": "2026-11-13T15:35:38+09:00/2026-11-13T15:38:21+09:00",
+  "live": {
+    "current_boot_spoof_lines": 9278,
+    "all_dhcp_broadcast": true,
+    "dhcp_sport_68": 9278,
+    "distinct_src_macs": 1,
+    "previous_boot_sample": {
+      "lines": 60000,
+      "dhcp_broadcast": 59999,
+      "igmp_0_to_224_0_0_1": 1
+    },
+    "per_day_estimate": 8600,
+    "wazuh": "no SPOOF rule; base 4100 level 0 only",
+    "live_file_sha256": "f820c798320979788a37f9574fd625ac34fa93971ea6893d226b4f70ad18c9cb",
+    "live_equals_repo": true,
+    "spoof_log_handle": 14,
+    "chain_rules": 13
+  },
+  "candidate": {
+    "file": "infra/validation/spoof-dhcp/capstone-fw.candidate.nft",
+    "sha256": "da3dd8523b2e0ea8a7a4c878ea0b44b0d00cddbf31b30d8c9d4a0ab8d1b816ac",
+    "rule": "iifname ens192 ip saddr 0.0.0.0 ip daddr 255.255.255.255 udp sport 68 udp dport 67 counter drop (no log)",
+    "still_logged": [
+      "other spoof_src_ext sources on ens192",
+      "non-internal sources on ens160"
+    ],
+    "apply_script": "infra/validation/spoof-dhcp/apply_a.py",
+    "table_reload": false
+  },
+  "verification": {
+    "tests": {
+      "passed": 5,
+      "count": 5
+    },
+    "nft_check_full_file_transaction": 0,
+    "nft_check_single_insert": 0,
+    "live_rule_count_unchanged": 13
+  },
+  "not_done": [
+    "approved apply on A",
+    "post-apply SPOOF line stop and counter check",
+    "repo fw-v2 file sync after apply"
+  ]
+}

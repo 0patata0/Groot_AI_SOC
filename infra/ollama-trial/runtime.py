@@ -71,6 +71,15 @@ def question_scope_schema(request, name, schema, current, at_kst):
     return harness.EVIDENCE.initial_event_filter_schema(name, schema, current, at_kst)
 
 
+def question_scope_tools(request, current):
+    """Peer review reads the alert sensors the question names (shared rule with
+    Hermes' first selection); None keeps the existing catalog."""
+    if not request.get('question_scope_reads'):
+        return None
+    scope = harness.investigation_first_scope(current)
+    return sorted(scope) if scope else None
+
+
 async def run(config, request, *, on_protected_start=None, connection_pool=None, on_progress=None):
     started = time.perf_counter()
     report = {'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
@@ -133,6 +142,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
         scope = harness.tool_scope(current)
         if scope:
             chosen = sorted(scope)
+        else:
+            chosen = question_scope_tools(request, current)
     if chosen is not None:
         require(isinstance(chosen, list) and len(chosen) == len(set(chosen)) and
                 set(chosen) <= {alias(s, t) for s, names in available.items() for t in names},

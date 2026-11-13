@@ -320,6 +320,13 @@ class QuestionScope(unittest.TestCase):
         named=runtime.question_scope_schema(peer,'mcp__security_events__search_wazuh_alerts',self.WAZUH,'systemd 서비스 실패 경보 조사',self.AT)
         self.assertEqual(named['properties']['program_name']['enum'],['systemd'])
 
+    def test_peer_reads_start_from_the_named_alert_sensors(self):
+        """2026-11-13 22:47: the peer read agents instead of the named alerts."""
+        self.assertEqual(runtime.question_scope_tools({'question_scope_reads':True},self.Q),
+                         ['mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_wazuh_alerts'])
+        self.assertIsNone(runtime.question_scope_tools({},self.Q))
+        self.assertIsNone(runtime.question_scope_tools({'question_scope_reads':True},'IDS 경보와 방화벽 차단 상태를 조사해줘'))
+
     def test_direct_chat_keeps_registered_schemas(self):
         for request in ({},{'question_scope_reads':False}):
             self.assertIs(runtime.question_scope_schema(request,'mcp__security_events__search_wazuh_alerts',self.WAZUH,self.Q,self.AT),self.WAZUH)

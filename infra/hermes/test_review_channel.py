@@ -171,7 +171,7 @@ class Tests(unittest.TestCase):
         h=SimpleNamespace(CONTRACT=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'role',
             SERVICE_STATE_GUIDANCE=contract.SERVICE_STATE_GUIDANCE,
             diagnostic_exit_claim_violations=contract.diagnostic_exit_claim_violations,
-            snapshot_health_violations=contract.snapshot_health_violations),facts_for=lambda _:[],
+            snapshot_health_violations=contract.snapshot_health_violations,workflow_policy=contract.workflow_policy),facts_for=lambda _:[],
             READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda _:None,
             EVIDENCE=SimpleNamespace(kst_display=lambda x:x),guidance=lambda _:'')
         report={'status':'completed','calls':[{'server':'system-diagnostics','name':'get_system_diagnostics',
@@ -234,7 +234,7 @@ class Tests(unittest.TestCase):
                 return SimpleNamespace(content=json.dumps({'claims':[{'kind':'agree','text':'정책 일치','source_ref':'a0','missing_field':'','evidence_ref':'e0'}]}))
         fake_contract=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'SOC_ACTIVE_ROLE: '+kw['agent_role'],
             diagnostic_exit_claim_violations=contract.diagnostic_exit_claim_violations,
-            snapshot_health_violations=contract.snapshot_health_violations)
+            snapshot_health_violations=contract.snapshot_health_violations,workflow_policy=contract.workflow_policy)
         h=SimpleNamespace(CONTRACT=fake_contract,READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda *a:None,
             EVIDENCE=SimpleNamespace(literal_evidence_summary=lambda x:'facts',kst_display=lambda x:x),facts_for=lambda x:[],guidance=lambda x:'')
         report={'status':'completed','calls':[{'name':'get_firewall_rules','arguments':{},'result':'policy drop'}],'final_response':'현재 FW 근거'}
@@ -243,6 +243,9 @@ class Tests(unittest.TestCase):
                 {'question':p.peer_question('FW 룰',{'final_response':'정책 drop'}),'current_question':'FW 룰'},report))
         self.assertIn('SOC_ACTIVE_ROLE: ollama',prompts[0][1]);self.assertIn('get_firewall_rules',prompts[0][1])
         self.assertIn('전문 분야는 우선 담당',prompts[0][1]);self.assertEqual(result['peer_review'],'source_bound_claims')
+        # 2026-11-13: comparison principles come from the shared skill section.
+        self.assertIn('## 교차 검토 대조',prompts[0][1]);self.assertIn('SOC_WORKFLOW_INVESTIGATE_V1',prompts[0][1])
+        self.assertIn('검토자 자신의 요청 조건',prompts[0][1]);self.assertIn('경보 수집·색인 정상',prompts[0][1])
 
     def test_peer_rejects_false_omission_and_invented_quotes(self):
         source={'other_agent_answer':'runtime_load_verified: false; ID 10100','other_answer_truncated':False}

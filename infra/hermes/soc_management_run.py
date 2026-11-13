@@ -3002,6 +3002,15 @@ def management_read_request(request, agent, *, pending=False):
     overview=bool(chat and chat['tools'] and chat_lookup_harness().soc_overview_request(chat['request']))
     shared_scope=chat_lookup_harness().tool_scope(chat['request']) if (
         current or ids_policy or security or events or host_inventory or overview) else None
+    # An alert investigation that names its sensors starts with those sensors'
+    # alert reads; later evidence-driven reads keep the full catalog (shared
+    # rule with the SDK peer; 11-13 22:47 an unasked cluster-node read with an
+    # invalid value failed the whole answer).
+    first_scope=None
+    if chat and shared_scope is None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
+        first_scope=getattr(chat_lookup_harness(),'investigation_first_scope',lambda _:None)(chat['request'])
+        offered={(t.get('function') or {}).get('name') for t in tools if isinstance(t,dict)}
+        if first_scope is not None and not set(first_scope)<=offered:first_scope=None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -3010,6 +3019,7 @@ def management_read_request(request, agent, *, pending=False):
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
         if shared_scope is not None and name not in shared_scope:continue
+        if first_scope is not None and name not in first_scope:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:

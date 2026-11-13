@@ -37,6 +37,25 @@ class Conditions(unittest.TestCase):
                 elif 'web_access' in n:args['target']='c:dvwa'
                 with self.subTest(tool=n,args=args):self.assertEqual(V(s).is_valid(args),V(schema).is_valid({'request_nonce':lease['nonce'],'calls':[{'tool':n,'arguments':args}]}))
         self.assertEqual(self.r,before)
+    def test_named_alert_investigation_binds_only_the_first_selection(self):
+        """2026-11-13 22:47: an unasked get_wazuh_cluster_nodes read with an
+        invalid value failed the whole answer; the first selection now offers
+        only the alert reads the question names."""
+        q='최근 30분 ModSecurity와 Wazuh 경보를 조사해서 지금 대응이 필요한 위험이 있는지 근거와 함께 판단해줘. 설정은 바꾸지 마.'
+        env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps({'request':q,'background':'','tools':None,'requested_at_kst':'2026-11-13T22:47:28+09:00'}))
+        def offered(agent):
+            original=lambda a,**kw:Prepared('fallthrough',self.r,self.r['messages'],copy.deepcopy(self.r))
+            with patch.dict(w.os.environ,env,clear=True):out=w.management_selection_request_wrapper(original)(agent,turn_id='one')
+            schema=out.api_kwargs['response_format']['json_schema']['schema']
+            return {b['properties']['tool']['const'] for b in schema['properties']['calls']['items']['anyOf']}
+        first=copy.copy(self.a)
+        self.assertEqual(offered(first),{'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_wazuh_alerts'})
+        later=copy.copy(self.a);later._capstone_chat_selection_turn='one'
+        self.assertTrue({'mcp__system_diagnostics__get_system_diagnostics','mcp__security_events__search_suricata_alerts'}<=offered(later))
+        other=copy.copy(self.a)
+        env['CAPSTONE_CHAT_READ_JSON']=json.dumps({'request':'IDS 경보와 방화벽 차단 상태를 조사해줘','background':'','tools':None,'requested_at_kst':'2026-11-13T22:47:28+09:00'})
+        self.assertIn('mcp__system_diagnostics__get_system_diagnostics',offered(other))
+
     def test_api_target_narrowing_extra_condition_and_tool_set_preserved(self):
         self.r['tools']=self.r['tools'][:1];t=self.r['tools'][0]['function'];t['parameters']['properties']['target']['enum']=['b:systemd'];t['parameters']['allOf']=[{'required':['limit']}]
         out=w.restore_registered_read_conditions(self.r,self.a);p=out['tools'][0]['function']['parameters']

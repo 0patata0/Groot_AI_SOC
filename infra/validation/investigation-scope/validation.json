@@ -1,0 +1,113 @@
+{
+  "subject": "Investigation first-read tool scope (shared harness) and peer comparison principles consolidated into the soc-investigate skill",
+  "status": "candidate_tested_not_applied",
+  "user_directive_2026_11_13_2300": "되도록이면 스킬로 묶을 수 있는 부분은 묶어서 관리하자 (enforced boundaries stay in code; model guidance goes to shared skills)",
+  "incident_2026_11_13_2247": {
+    "hermes": "first selection added off-scope get_wazuh_cluster_nodes {node_type: any} -> Wazuh API 400 -> tool-failure answer",
+    "peer": "read get_wazuh_agents instead of wazuh alerts; agreement 'agents ACTIVE so collection healthy' overclaimed",
+    "cause": "tool_scope deliberately empty for investigation questions, even when sensors are named"
+  },
+  "change": {
+    "harness.py": "investigation_first_scope: named alert sensors (WAF/ModSecurity, IDS/IPS/Suricata, Wazuh) with no other subject -> those search_*_alerts tools; else None",
+    "soc_management_run.py": "chat first selection only: offer just investigation_first_scope tools when shared_scope is None and all are in the catalog",
+    "runtime.py": "question_scope_tools: peer reads use the same scope",
+    "review_channel_worker.py": "6 peer comparison paragraphs moved verbatim to the skill section; Ollama synthesis and Hermes peer both load workflow_policy(('soc-investigate',), section='peer-review')",
+    "workflow_contract.py": "SECTIONS peer-review + SECTION_ONLY: section loaded only by section_policy; full policy body excludes it",
+    "skills/soc-investigate/SKILL.md": "one first-read principle line + '## 교차 검토 대조' section (moved paragraphs + agent-state principle)",
+    "query-completion/__init__.py": "runner pin"
+  },
+  "not_changed": [
+    "off-scope read failure verdict (kept conservative; first-selection scope removes the observed case)",
+    "Ollama direct chat tool set"
+  ],
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "bc19115d5c524a55b5b114442dfab4f4bcefb49c5adde697425e0585244f3326",
+      "candidate": "6b60566819fb5a6d9c1278bbb891d3ef5a104aec70603bdcc5a04ca73646592a"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "3847d9c8bf37ce299acc832fd73f646f990f639cd1624a31d13f845e20c750cb",
+      "candidate": "fb935f63084af5d0d8953ad4785a49435e2ed876a1c23111197fb7399e89aa12"
+    },
+    "infra/ollama-trial/harness.py": {
+      "base": "5d79bb9dbee62b736f797382c1f5cb3c89790f4f5e55df9b744ed43c801e7f4a",
+      "candidate": "dba169a13203bf10754781ef52e217d88fd62b8436a66a44f616673ccee1afb0"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "base": "026a2cf950a3c5ed64eff4f43bfb202a7f039541606085c703bcedd372ffc622",
+      "candidate": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540"
+    },
+    "infra/hermes/review_channel_worker.py": {
+      "base": "f4f426c74a0eae3720bc5567bdeeaeb5e62ea2e061de9a8637785bee75e258fa",
+      "candidate": "2c4b46f8445399cd006a01bac4bc4ad050c71029a14ac39a9a3a0b4e420f0b9b"
+    },
+    "infra/hermes/workflow_contract.py": {
+      "base": "d788400327de19c083e8c1da832424b1a57b2862a4b9bc387c398860cbf8c5e9",
+      "candidate": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "f330681272911db96594e4fe900a2a1f10985cac396f02d3099428af6d0dba42",
+      "candidate": "24fc9e24b32c344bbd48fe9ff019680e2ff7854686e7421fc95794ec68a1fa3f"
+    },
+    "infra/validation/investigation-scope/apply_b.py": "53f6864a768057674254cfb32fbc308050381e9208a487d24b45dd1cb830eaf0"
+  },
+  "tests": {
+    "new": {
+      "ollama_test_investigation_scope": 3,
+      "hermes_chat_scope_first_selection": 1,
+      "workflow_contract_section_only": 1,
+      "ollama_runtime_peer_tools": 1
+    },
+    "fixture_updates": "peer tests use the real workflow_policy and assert the skill section reaches the prompt",
+    "investigation_prompt_invariance": "policy(('soc-investigate',)) == old body + one line (exact)",
+    "bundles_vs_head": {
+      "hermes_all": "1263 (base 1261), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK (base 370)",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-investigation-scope-230255/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "scripts/sdk_harness.py",
+      "scripts/sdk_runtime.py",
+      "scripts/channel_worker.py",
+      "scripts/workflow_contract.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "16 copies + gate + Ollama receipt (6 keys) + review-chat receipt",
+    "rollback": "19 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change (skill copy)",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T23:04:24+09:00",
+    "copies": "16/16 at base, nlink 1, regular files",
+    "embedded_gate": "bc19115d5c524a55",
+    "ollama_receipt": "6 keys at base",
+    "review_receipt_worker": "f4f426c74a0eae37"
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat: Hermes first selection only ModSecurity/Wazuh alerts, peer reads both alerts, skill section in peer prompt",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

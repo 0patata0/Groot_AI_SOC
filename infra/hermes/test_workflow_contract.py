@@ -27,6 +27,21 @@ class WorkflowContract(unittest.TestCase):
         self.assertIn(text.split('\n',2)[2],w.policy(('soc-investigate',)))
         with self.assertRaises(ValueError):w.section_policy(('soc-query',),'service-investigation')
 
+    def test_peer_review_section_is_loaded_only_by_its_phase(self):
+        """2026-11-13: peer comparison principles moved from the worker into the
+        shared skill; investigation/query prompts keep their body without it."""
+        section=w.section_policy(('soc-investigate',),'peer-review')
+        for phrase in ('검토자 자신의 요청 조건','filters_outside_question','반환 표본 0건','경보 수집·색인 정상',
+                       '이견(disagree)은 상대가 실제로 주장한 명제의 반대가'):
+            self.assertIn(phrase,section)
+        for names in (('soc-investigate',),('soc-query','soc-investigate','soc-change')):
+            body=w.policy(names)
+            self.assertNotIn('## 교차 검토 대조',body);self.assertNotIn('filters_outside_question',body)
+        self.assertIn('## 서비스 원인 조사',w.policy(('soc-investigate',)))
+        self.assertNotIn('교차 검토 대조',w.section_policy(('soc-investigate',),'service-investigation'))
+        self.assertIn('질문이 장비·경보 종류를 지정한 조사는',w.policy(('soc-investigate',)))
+        with self.assertRaises(ValueError):w.section_policy(('soc-query',),'peer-review')
+
     def test_service_section_missing_or_duplicate_is_not_silently_omitted(self):
         raw=(Path(w.__file__).parent/'skills/soc-investigate/SKILL.md').read_text()
         for value in (raw.replace('## 서비스 원인 조사','## 다른 절차'),raw+'\n## 서비스 원인 조사\n중복'):

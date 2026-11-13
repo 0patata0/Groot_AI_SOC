@@ -2630,6 +2630,33 @@ def diagnostic_observations(calls):
     return latest
 
 
+INVESTIGATION_ALERT_TOOLS = (
+    (r'(?<![A-Za-z])(?:WAF|ModSecurity)(?![A-Za-z])', 'mcp__security_events__search_modsecurity_alerts'),
+    (r'(?<![A-Za-z])(?:IDS|IPS|Suricata)(?![A-Za-z])|수리카타', 'mcp__security_events__search_suricata_alerts'),
+    (r'(?<![A-Za-z])Wazuh(?![A-Za-z])|와주', 'mcp__security_events__search_wazuh_alerts'))
+INVESTIGATION_OTHER_SUBJECTS = (
+    r'방화벽|(?<![A-Za-z])(?:FW|nftables)(?![A-Za-z])|차단\s*목록|서비스|systemd|에이전트|(?<![A-Za-z])agents?(?![A-Za-z])|'
+    r'클러스터|cluster|노드|웹\s*(?:접근|로그)|access\s*log|취약|(?<![A-Za-z])SCA(?![A-Za-z])|프로세스|포트|'
+    r'인덱서|indexer|매니저|manager|수집|journal|진단|(?:룰|규칙)\s*(?:파일|변경|목록|내용)')
+
+
+def investigation_first_scope(question):
+    """First read of an alert investigation that names its sensors.
+
+    Only the first selection is bound; later evidence-driven reads keep the
+    full catalog. Any other named subject keeps the broader investigation
+    (2026-11-13 22:47: an unasked cluster-node read with an invalid value
+    failed the whole answer, and the peer read agents instead of alerts).
+    """
+    text = normalized(question)
+    if (not EVIDENCE.incident_investigation_request(text) or READ.wants_write(text)
+            or not re.search(r'경보|로그|이벤트|alerts?', text, re.I)
+            or re.search(INVESTIGATION_OTHER_SUBJECTS, text, re.I)):
+        return None
+    scope = frozenset(tool for pattern, tool in INVESTIGATION_ALERT_TOOLS if re.search(pattern, text, re.I))
+    return scope or None
+
+
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
     if soc_overview_request(question): return set(SOC_OVERVIEW_CALLS)

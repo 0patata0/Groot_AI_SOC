@@ -9,7 +9,11 @@ MARKERS={
     'soc-change':'SOC_WORKFLOW_CHANGE_V1',
     'soc-recover':'SOC_WORKFLOW_RECOVER_V1',
 }
-SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사')}
+SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사'),
+          'peer-review':('soc-investigate','## 교차 검토 대조')}
+# Loaded only by their own phase (the peer review), never in the full
+# workflow body of an investigation or query prompt.
+SECTION_ONLY=frozenset({'peer-review'})
 
 def policy_text(name,raw):
     if name not in MARKERS:raise ValueError('soc_workflow_unknown')
@@ -23,7 +27,7 @@ def policy_text(name,raw):
     return body
 
 @lru_cache(maxsize=16)
-def policy(names,directory=None):
+def _blocks(names,directory=None):
     if not isinstance(names,tuple) or len(names)!=len(set(names)) or any(n not in MARKERS for n in names):
         raise ValueError('soc_workflow_selection')
     here=Path(__file__).resolve().parent if directory is None else Path(directory)
@@ -37,14 +41,27 @@ def policy(names,directory=None):
         if len(paths)!=1:raise ValueError('soc_workflow_missing_or_ambiguous')
         path=paths[0]
         blocks.append(policy_text(name,path.read_bytes()))
-    return '\n\n'.join(blocks)
+    return tuple(blocks)
+
+
+def _without_section_only(name,block):
+    for section in SECTION_ONLY:
+        skill,heading=SECTIONS[section]
+        if skill==name:
+            block=re.sub(r'^'+re.escape(heading)+r'\s*$.*?(?=^#{1,2} |\Z)','',block,flags=re.M|re.S).rstrip()
+    return block
+
+
+def policy(names,directory=None):
+    blocks=_blocks(names,directory)
+    return '\n\n'.join(_without_section_only(n,b) for n,b in zip(names,blocks))
 
 
 def section_policy(names, section, directory=None):
     """Load one explicit part of a validated skill for a focused model phase."""
     if section not in SECTIONS or names!=(SECTIONS[section][0],):
         raise ValueError('soc_workflow_section_selection')
-    name,heading=SECTIONS[section];body=policy(names,directory)
+    name,heading=SECTIONS[section];body='\n\n'.join(_blocks(names,directory))
     matches=list(re.finditer(r'^'+re.escape(heading)+r'\s*$',body,re.M))
     if len(matches)!=1:raise ValueError('soc_workflow_section_missing_or_duplicate')
     rest=body[matches[0].end():]

@@ -1,6 +1,6 @@
 {
   "subject": "Sync A->B history transfer bounds with the A history-auto store bounds",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_a_b_transfer_resumed",
   "observed_kst": "2026-11-13T17:30:00+09:00/2026-11-13T17:38:00+09:00",
   "incident": {
     "cause": "A store bounds raised 09:37 (dirs 1024) and 15:55 (entries 16384) without the transfer bounds",
@@ -101,8 +101,43 @@
     "one manual transfer run, check status.json, reset-failed"
   ],
   "not_done": [
-    "apply on A and B",
-    "first run after apply",
-    "review of 33 kept failed work dirs"
-  ]
+    "natural 15-min cycle observation",
+    "review of kept failed work dirs (40)",
+    "fresh full install test"
+  ],
+  "applied": {
+    "approval": "user 2026-11-13: history 전송 상한 적용해줘",
+    "a": {
+      "at_kst": "2026-11-13T19:31:16+09:00",
+      "exporter": "fd1e7769f8da6828",
+      "sudoers_digest": "fd1e7769f8da6828",
+      "visudo_tree_rc": 0,
+      "backup": "/var/backups/capstone-history-transfer-capsync-20261113T193116"
+    },
+    "b": {
+      "at_kst": "2026-11-13T19:31:28+09:00",
+      "installed": {
+        "worker-b.sh": "6781b8fd74546f36",
+        "transfer-lib.sh": "52dbb82b0cb31ce8",
+        "runtime.sha256": "9a62534a4e2d3202"
+      },
+      "backup": "/var/backups/capstone-history-transfer-capsync-20261113T193128"
+    },
+    "manual_run": {
+      "window_kst": "19:31:28/19:34:45",
+      "result": "success",
+      "discovered_batches": 338,
+      "new_receipts": 82,
+      "reused_receipts": 256,
+      "records": 331820,
+      "bytes": 178363508
+    },
+    "failed_units_after": {
+      "a": 0,
+      "b": 0
+    },
+    "kept_failed_work_dirs": 40,
+    "next_natural_run_kst": "2026-11-13T19:49:45+09:00",
+    "temp_removed": true
+  }
 }

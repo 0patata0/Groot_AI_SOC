@@ -1586,3 +1586,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 17:06~17:26 KST — 사건 조사 인용 안내 위치 후보 적용 후 원복 (B, 관리자231 경유)
 
 사용자 승인("인용 안내 후보 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래(0.05초) 8개 파일을 원자 교체했다. 실행 사본 4곳은 `96876e4e`→`d6de30da`, 플러그인 2곳은 `28ef2a73`→`7bb48edb`로 바꿨고, 컨트롤러 내장 실행기 상수(`178c8dbb`→`a3218877`)와 Ollama 영수증도 갱신했다. 백업과 45분 원복 타이머는 `/var/lib/capstone-service-grounding/20261113-citation-prefix/`에 있다. 컨트롤러 자체 내장본 검증과 틱 정상을 확인했다. 공동 채널 실제 조사에서 판단 호출 3번의 캐시 재사용(7.8/3.5/1.1초)을 확인했다. 그러나 메모가 처음 들어간 호출에서 과거에 없던 깨진 출력이 나와 17:26:19에 원복했다(8개 기준 SHA 복귀, 타이머 정지, 틱·내장본 검증 정상). Hermes 컨테이너와 봇은 재시작하지 않았다. [후보·결과](../infra/validation/citation-prefix/README.md).
+
+## 2026-11-13 19:31 KST — history-auto A→B 전송 상한 동기화 (A·B, 관리자231 경유)
+
+사용자 승인("history 전송 상한 적용해줘")에 따라 적용했다. A(19:31:16)에서는 관문을 `dc4fc243`→`fd1e7769`로 바꾸고, sudoers digest 한 줄을 같은 값으로 바꿨다(후보·전체 `visudo` 통과). B(19:31:28)에서는 전송 잠금 아래 `worker-b.sh`·`transfer-lib.sh`·`runtime.sha256`을 교체하고 runtime 검사를 통과했다. 원본은 각 호스트의 `/var/backups/capstone-history-transfer-capsync-*`에 있다. 수동 전송 1회(3분 17초)에서 338배치를 확인했다(신규 82). 09:44부터 이어진 B 실패가 해소됐고 A·B 실패 유닛은 0이다. 원인은 같은 날 A 보존소 상한만 올린 변경(DIAGNOSTIC_HISTORY 참고)이다. [적용 기록](../infra/normalization/vector/history-auto-transfer/README.md).

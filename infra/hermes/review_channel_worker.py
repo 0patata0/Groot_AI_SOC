@@ -16,7 +16,34 @@ PEER_OUTPUT_ERRORS = frozenset({'peer_claims_shape', 'peer_claim_kind', 'peer_cl
     'peer_quote_not_in_answer', 'peer_omission_not_established', 'peer_evidence_quote_not_in_result',
     'peer_json_invalid', 'empty_peer_review', 'peer_source_ref_invalid', 'peer_evidence_ref_invalid',
     'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch', 'peer_diagnostic_claim_mismatch',
-    'peer_query_scope_mismatch'})
+    'peer_query_scope_mismatch', 'peer_filter_scope_mismatch', 'peer_zero_sample_dissent'})
+PEER_SAMPLE_COUNT_KEYS = frozenset({'returned_count', 'returned_items'})
+
+
+def filters_outside_question(raw, question):
+    """Applied filter values the user question never named (a narrower read)."""
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        return []
+    filters = data.get('applied_filters') if isinstance(data, dict) else None
+    if not isinstance(filters, dict):
+        return []
+    asked = str(question or '').casefold()
+    return [str(k) + '=' + str(v) for k, v in sorted(filters.items()) if str(v).casefold() not in asked]
+
+
+def zero_sample_proof(proof):
+    """A returned sample count of zero refutes nothing (indexing delay, limits,
+    other windows); it can only be reported as unverified or agreement."""
+    keys = re.findall(r'\.([A-Za-z_][A-Za-z0-9_]*)', str(proof.get('path', '')))
+    if not keys or keys[-1] not in PEER_SAMPLE_COUNT_KEYS:
+        return False
+    try:
+        value = json.loads('{' + str(proof.get('quote', '')) + '}')
+    except (TypeError, ValueError):
+        return False
+    return isinstance(value, dict) and list(value.values()) == [0]
 # Request conditions a read tool echoes back in its own result (limit, window,
 # filters, the scan bound they imply). They describe the reviewer's call only.
 PEER_REQUEST_ECHO_KEYS = frozenset({'limit', 'lookback_minutes', 'window_mode', 'requested_since_kst',
@@ -388,6 +415,7 @@ def peer_reference_catalog(source, observed):
     proofs, omitted = [], 0
     per_call = max(12, 128//len(observed))
     for i,call in enumerate(observed):
+        outside = filters_outside_question(call.get('result',''), source.get('user_question',''))
         raw = compact_peer_result(call.get('result',''))
         candidates = []
         try:
@@ -414,7 +442,8 @@ def peer_reference_catalog(source, observed):
         omitted += max(0,len(candidates)-per_call)
         for item in candidates[:per_call]:
             proofs.append({'id':'e'+str(len(proofs)),'call_index':i,
-                'name':call.get('name'),'arguments':call.get('arguments'),**item})
+                'name':call.get('name'),'arguments':call.get('arguments'),**item,
+                **({'filters_outside_question':outside} if outside else {})})
     return {'answers':answers,'evidence':proofs,'omitted_evidence_refs':omitted}
 
 
@@ -446,6 +475,14 @@ def bind_peer_references(value, catalog):
             # other answer's query (11-13 21:55: Hermes' real limit 50 was
             # "contradicted" by the reviewer's own limit 10).
             raise ValueError('peer_query_scope_mismatch')
+        if claim.get('kind') in ('agree','disagree') and proof.get('filters_outside_question'):
+            # A read narrowed by a filter the question never named cannot judge
+            # an answer about the question's scope (11-13 22:22: an unasked
+            # program_name='systemd' read "refuted" an unfiltered sample of 10).
+            raise ValueError('peer_filter_scope_mismatch')
+        if claim.get('kind')=='disagree' and zero_sample_proof(proof):
+            # 11-13 22:22: returned_count 0 was read as "0 in the whole window".
+            raise ValueError('peer_zero_sample_dissent')
         target=(proof.get('arguments') or {}).get('target','')
         if (claim.get('kind') in ('agree','disagree') and target.endswith(':wazuh-indexer')
                 and proof['path']=='result.metrics.cluster_status'
@@ -539,7 +576,9 @@ async def review_answer(config, request, report):
                     '과거 영수증이 없더라도 새 스냅샷 하나만으로 과거 시각의 오류를 단정할 수 없습니다.')
     instruction += ('\n새 조회 결과의 limit·lookback_minutes·window_mode·requested_since_kst·requested_until_kst·'
                     'applied_filters·scan_capped는 검토자 자신의 요청 조건입니다. 상대 답변이 밝힌 상대 조회의 조건(한도·구간·필터)을 '
-                    '이 값으로 일치/이견 판정하지 마세요. 상대 조회 조건은 상대 영수증으로만 확인되며, 없으면 unverified입니다.')
+                    '이 값으로 일치/이견 판정하지 마세요. 상대 조회 조건은 상대 영수증으로만 확인되며, 없으면 unverified입니다. '
+                    'filters_outside_question이 있는 근거는 질문보다 좁은 조회이므로 일치/이견 근거가 아닙니다. '
+                    'returned_count·returned_items 0은 반환 표본 0건일 뿐이며 상대 관측이나 전체 건수를 반박하지 못합니다.')
     instruction += '\n두 스냅샷의 상태가 같다는 사실로 그 사이의 연속 가동이나 로그 무손실을 추정하지 마세요.'
     instruction += ('\n이견(disagree)은 상대가 실제로 주장한 명제의 반대가 같은 범위의 근거로 확인된 경우에만 씁니다. '
                     '미확인/근거 부족/정상이라는 뜻은 아님은 비정상이라는 주장이 아닙니다. '
@@ -588,7 +627,8 @@ async def review_answer(config, request, report):
                     '실제 조회 범위를 인용한 unverified로 남기세요. 독립 스냅샷의 관측 시각 차이는 과거 관측의 오류 증거가 아니고, '
                     'indexer의 cluster_status는 manager 클러스터 활성 여부의 증거가 아닙니다. '
                     '새 조회 결과의 limit·lookback_minutes·요청 구간·applied_filters·scan_capped는 검토자 자신의 요청 조건이라 '
-                    '상대 조회 조건의 증거가 아닙니다. '
+                    '상대 조회 조건의 증거가 아닙니다. 질문에 없는 필터로 좁힌 조회(filters_outside_question)와 '
+                    '반환 표본 0건은 상대 주장의 반박 근거가 아닙니다. '
                     '이렇게 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
                     '미확인은 부정이 아니며 상대가 쓰지 않은 보장을 만들어 반박하지 마세요. '
                     '')]
@@ -644,7 +684,8 @@ def main():
             # the other bot's prose in the separate review_answer stage.
             read_question = request.get('current_question', request['question']) if request['phase'] == 'peer' else request['question']
             report = asyncio.run(runtime.run(config, {'question': read_question,
-                'current_question': request.get('current_question', request['question'])}))
+                'current_question': request.get('current_question', request['question']),
+                'question_scope_reads': request['phase'] == 'peer'}))
             import harness
             current = request.get('current_question', request['question'])
             report['structured_scope_complete'] = bool(report.get('status') == 'completed'

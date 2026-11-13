@@ -293,7 +293,7 @@ class Tests(unittest.TestCase):
     def test_reviewer_request_conditions_are_not_receipts_for_the_other_query(self):
         """11-13 21:55: Hermes really read ModSecurity with limit 50 and said so;
         the peer "disagreed" citing the limit 10 echoed in its OWN result."""
-        source={'other_agent_answer':self.QUERY_SOURCE,'other_answer_truncated':False}
+        source={'user_question':'출발지 192.0.2.4 최근 30분 ModSecurity 경보 조사','other_agent_answer':self.QUERY_SOURCE,'other_answer_truncated':False}
         observed=[{'name':'search_modsecurity_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(self.QUERY_RESULT)}]
         catalog=w.peer_reference_catalog(source,observed);paths={p['path']:p['id'] for p in catalog['evidence']}
         for path in ('result.limit','result.lookback_minutes','result.window_mode','result.requested_since_kst',
@@ -316,8 +316,8 @@ class Tests(unittest.TestCase):
         llm,h,report,request,calls=self.peer_fixture(replies)
         report['calls']=[{'server':'security-events','name':'search_modsecurity_alerts','arguments':{'lookback_minutes':30},
                           'result':json.dumps(self.QUERY_RESULT),'is_error':False}]
-        request['question']=p.peer_question('최근 30분 ModSecurity 경보 조사',{'final_response':self.QUERY_SOURCE})
-        request['current_question']='최근 30분 ModSecurity 경보 조사'
+        request['question']=p.peer_question('출발지 192.0.2.4 최근 30분 ModSecurity 경보 조사',{'final_response':self.QUERY_SOURCE})
+        request['current_question']='출발지 192.0.2.4 최근 30분 ModSecurity 경보 조사'
         source=w.peer_source_answer(request['question'])
         catalog=w.peer_reference_catalog(source,[c for c in report['calls']])
         return llm,h,report,request,calls,{q['path']:q['id'] for q in catalog['evidence']}
@@ -347,6 +347,67 @@ class Tests(unittest.TestCase):
             result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
         self.assertEqual(result['peer_error_code'],'peer_query_scope_mismatch');self.assertEqual(result['peer_review'],'synthesis_failed')
         self.assertEqual(result['status'],'partial');self.assertNotIn('실제는 limit 10',result['final_response']);self.assertEqual(len(calls),2)
+
+    def scope_catalog(self, result, question='최근 30분 ModSecurity와 Wazuh 경보 조사'):
+        source={'user_question':question,'other_agent_answer':'Wazuh 반환 표본 10건 · 전체 건수 미확인','other_answer_truncated':False}
+        observed=[{'name':'search_wazuh_alerts','arguments':{},'result':json.dumps(result)}]
+        catalog=w.peer_reference_catalog(source,observed)
+        return source,observed,catalog,{p['path']:p for p in catalog['evidence']}
+
+    def test_read_narrowed_by_an_unasked_filter_cannot_judge(self):
+        """11-13 22:22: the peer's own read carried program_name='systemd' (never
+        asked) and its 0 "refuted" Hermes' unfiltered sample of 10."""
+        source,observed,catalog,paths=self.scope_catalog({'source':'wazuh','applied_filters':{'program_name':'systemd'},
+            'returned_count':0,'indexed_window_total_count':None,'alerts':[]})
+        self.assertTrue(all(p.get('filters_outside_question')==['program_name=systemd'] for p in catalog['evidence']))
+        for kind in ('disagree','agree'):
+            claim={'kind':kind,'text':'범위 비교','source_ref':'a0','evidence_ref':paths['result.source']['id'],'missing_field':''}
+            with self.assertRaisesRegex(ValueError,'peer_filter_scope_mismatch'):w.bind_peer_references({'claims':[claim]},catalog)
+        claim={'kind':'unverified','text':'검토자 조회는 systemd 필터라 질문 범위의 표본은 미확인','source_ref':'a0',
+               'evidence_ref':paths['result.source']['id'],'missing_field':''}
+        self.assertIn('미확인',w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed))
+        # A filter the question names keeps the evidence in scope.
+        _,_,named,_=self.scope_catalog({'source':'wazuh','applied_filters':{'source_ip':'192.0.2.4'},'returned_count':2,'alerts':[]},
+                                       question='출발지 192.0.2.4 Wazuh 경보 조사')
+        self.assertFalse(any('filters_outside_question' in p for p in named['evidence']))
+        self.assertIn('peer_filter_scope_mismatch',w.PEER_OUTPUT_ERRORS)
+
+    def test_zero_sample_cannot_refute(self):
+        """11-13 22:22: returned_count 0 was read as "0 in the whole window"."""
+        source,observed,catalog,paths=self.scope_catalog({'source':'wazuh','applied_filters':{},'returned_count':0,
+            'indexed_window_total_count':None,'alerts':[]})
+        claim={'kind':'disagree','text':'전체 0건','source_ref':'a0','evidence_ref':paths['result.returned_count']['id'],'missing_field':''}
+        with self.assertRaisesRegex(ValueError,'peer_zero_sample_dissent'):w.bind_peer_references({'claims':[claim]},catalog)
+        for kind in ('agree','unverified'):
+            claim.update(kind=kind,text='반환 표본 0건')
+            w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed)
+        rows=[{'rule':'5501'},{'rule':'5715'},{'rule':'5402'},{'rule':'5502'}]
+        source,observed,catalog,paths=self.scope_catalog({'source':'wazuh','returned_count':4,'alerts':rows})
+        claim={'kind':'disagree','text':'상대가 경보 없음이라 했으나 표본 4건','source_ref':'a0',
+               'evidence_ref':paths['result.returned_count']['id'],'missing_field':''}
+        w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed)
+        empty=[p for p in catalog['evidence'] if p['path']=='result.alerts.returned_items']
+        self.assertFalse(w.zero_sample_proof(empty[0]) if empty else False)
+        self.assertTrue(w.zero_sample_proof({'path':'result.alerts.returned_items','quote':'"returned_items": 0'}))
+        self.assertIn('peer_zero_sample_dissent',w.PEER_OUTPUT_ERRORS)
+
+    def test_ollama_peer_reads_the_question_scope_and_direct_chat_does_not(self):
+        import asyncio,io
+        seen=[]
+        async def run(config,request):
+            seen.append(request);return {'status':'completed','calls':[],'final_response':'x','protected_calls':0}
+        harness=SimpleNamespace(scope_notice=lambda q:None,structured_read=lambda q:False,missing_reads=lambda *a:[])
+        runtime=SimpleNamespace(load_config=lambda p:{'mcpServers':{'security-events':{}}},run=run)
+        policy=SimpleNamespace(capabilities=lambda mode:{'security-events':set()})
+        for phase,expected in (('peer',True),('lead',False)):
+            request={'id':'a'*32,'phase':phase,'question':'최근 30분 Wazuh 경보 조사','current_question':'최근 30분 Wazuh 경보 조사','direct':True}
+            with mock.patch.dict(sys.modules,{'harness':harness,'runtime':runtime,'policy':policy}), \
+                    mock.patch.object(w,'review_answer',side_effect=lambda c,r,rep:rep), \
+                    mock.patch.object(w.os,'geteuid',return_value=1000), mock.patch.object(sys,'argv',['w','ollama']), \
+                    mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+                    mock.patch('sys.stdout',new_callable=io.StringIO):
+                w.main()
+            self.assertIs(seen[-1]['question_scope_reads'],expected)
 
     def test_reference_catalog_keeps_metadata_and_every_quote_is_literal(self):
         source={'other_agent_answer':'요청 대상 42\n지금 관측한 상태만 확인','other_answer_truncated':False}
@@ -433,7 +494,8 @@ class Tests(unittest.TestCase):
              mock.patch.object(w.Path,'read_text',return_value='{"mcpServers":{}}'), \
              mock.patch.object(w,'review_answer',side_effect=review):
             w.main()
-        self.assertEqual(captured,[{'question':'B host agent ID and status','current_question':'B host agent ID and status'}])
+        # 2026-11-13: the peer's independent read keeps the question's own scope.
+        self.assertEqual(captured,[{'question':'B host agent ID and status','current_question':'B host agent ID and status','question_scope_reads':True}])
 
     def test_fw_only_hermes_lead_uses_verify_and_native_read_first_without_actions(self):
         from contextlib import nullcontext

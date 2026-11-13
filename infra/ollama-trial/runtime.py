@@ -62,6 +62,15 @@ def load_config(path):
     return c
 
 
+def question_scope_schema(request, name, schema, current, at_kst):
+    """Peer review re-reads the question's own scope: no unasked filter or
+    paging token (the shared first-read rule, the same function Hermes uses).
+    A direct chat keeps its registered schemas for evidence-driven follow-ups."""
+    if not request.get('question_scope_reads'):
+        return schema
+    return harness.EVIDENCE.initial_event_filter_schema(name, schema, current, at_kst)
+
+
 async def run(config, request, *, on_protected_start=None, connection_pool=None, on_progress=None):
     started = time.perf_counter()
     report = {'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
@@ -198,6 +207,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     schema = harness.EVIDENCE.tool_input_schema(name, schema)
                     if name == 'mcp__rule_a__get_service_action_target':
                         schema = service_read_schema(current, schema)
+                    schema = question_scope_schema(request, name, schema, current, report['at_kst'])
 
                     def make_call(backend, bare_name, connection, input_schema):
                         async def call(**arguments):

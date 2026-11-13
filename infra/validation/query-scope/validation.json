@@ -1,0 +1,101 @@
+{
+  "subject": "Query scope: a first read is never narrower than the question, and peer agree/disagree evidence must be inside the question's scope",
+  "status": "candidate_tested_not_applied",
+  "incident_2026_11_13_2222": {
+    "peer_false_dissent": [
+      "returned_count 0 read as whole-window zero (indexed_window_total_count null)",
+      "own wazuh read with unasked program_name='systemd' vs Hermes' unfiltered sample of 10"
+    ],
+    "hermes": "off-scope get_firewall_rules with invented snapshot d41d8cd9... -> FileNotFoundError -> tool-failure answer",
+    "found": "initial_event_filter_schema restricted IPs/rule/agent IDs only (not program_name or firewall paging); Ollama peer reads did not use it; 'systemd' came from the schema example text, not harness injection"
+  },
+  "change": {
+    "soc_management_run.py": "initial_event_filter_schema: program_name only when labelled or for systemd/service-failure questions; first get_firewall_rules read drops snapshot and pins offset to 0; required parameters untouched",
+    "query-completion/__init__.py": "EVIDENCE_SOURCE_SHA256 follows the runner",
+    "runtime.py": "question_scope_schema applies the shared first-read rule to tool schemas when request.question_scope_reads (peer only)",
+    "review_channel_worker.py": "peer passes question_scope_reads; catalog marks filters_outside_question; bind refuses agree/disagree on such evidence (peer_filter_scope_mismatch) and disagree on a zero sample count (peer_zero_sample_dissent); both in PEER_OUTPUT_ERRORS; instruction/correction text"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "cf6124ad51fcb8aeea66e69de4cfec2461d3a520ee8ddad38c2305e9a311f592",
+      "candidate": "bc19115d5c524a55b5b114442dfab4f4bcefb49c5adde697425e0585244f3326"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "accf2b07d2133719a5757f736b62571736c134cc284056d5909c1c7c5d5525ef",
+      "candidate": "3847d9c8bf37ce299acc832fd73f646f990f639cd1624a31d13f845e20c750cb"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "base": "1e7aefa6993ef668e14dc257992765ec2da5e0bc416e316d1d447dfa6b795822",
+      "candidate": "026a2cf950a3c5ed64eff4f43bfb202a7f039541606085c703bcedd372ffc622"
+    },
+    "infra/hermes/review_channel_worker.py": {
+      "base": "478115037de133511f728609ac40823c382b0e0003da1635050356840332105b",
+      "candidate": "f4f426c74a0eae3720bc5567bdeeaeb5e62ea2e061de9a8637785bee75e258fa"
+    },
+    "infra/validation/query-scope/apply_b.py": "560adf80e262e60df049aa22053f820860c363e783c5cbf636207339a585ca92"
+  },
+  "tests": {
+    "new": {
+      "hermes_test_query_scope": 5,
+      "test_review_channel": 3,
+      "ollama_test_runtime": 2
+    },
+    "intended_expectation_changes": [
+      "21:55 query-condition fixture gets a question naming its filter",
+      "peer runtime request now carries question_scope_reads: True"
+    ],
+    "first_candidate_failure_fixed": "dropping offset broke the SDK first-page test; offset pinned to 0 instead",
+    "bundles_vs_head_final": {
+      "hermes_all": "1261 (base 1253), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "370 OK (base 368)",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-query-scope-223915/REPORT.json (final; -223722 first candidate; Git-excluded)",
+    "census": {
+      "components": 25,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "scripts/sdk_runtime.py",
+      "scripts/channel_worker.py"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "8 copies + embedded gate + Ollama receipt (3 keys) + review-chat receipt",
+    "rollback": "11 files restored",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change",
+      "review_receipt_not_baseline_no_change"
+    ],
+    "final_sha_retest": "passed"
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T22:39:28+09:00",
+    "copies": "8/8 at base",
+    "embedded_gate": "cf6124ad51fcb8ae",
+    "ollama_receipt": "grounding/query_grounding/runtime at base",
+    "review_receipt_worker": "478115037de13351"
+  },
+  "limits": [
+    "unlabelled program questions read without a program filter (broader, never narrower)",
+    "a zero sample cannot support any disagreement",
+    "Hermes may still choose an off-scope tool; it can no longer fail on an invented firewall snapshot in the first read"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat: peer reads without unasked filters, no zero/out-of-scope dissent posted, Hermes first read without snapshot (model output varies)",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

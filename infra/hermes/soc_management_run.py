@@ -2884,7 +2884,19 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
 
     This only narrows the initial model choice. Controller-required parameters
     and subsequent evidence-driven searches retain their registered schemas.
+    A first read is never narrower than the question: a filter value must be
+    named in it (2026-11-13 22:22: an unasked program_name='systemd' narrowed a
+    review read, and an invented firewall snapshot failed the whole answer).
     """
+    if str(name).endswith('__get_firewall_rules'):
+        # A first firewall read is a fresh live snapshot. Paging tokens exist
+        # only in a previous page's result, never in the question.
+        # The first page starts at offset 0 (same as the SDK's first-page rule).
+        result=copy.deepcopy(schema)
+        props,required=result.get('properties',{}),result.get('required',[])
+        if 'snapshot' in props and 'snapshot' not in required:props.pop('snapshot')
+        if 'offset' in props and 'offset' not in required:props['offset']={**props['offset'],'enum':[0]}
+        return result
     if name not in {'mcp__security_events__'+n for n in
             ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}:
         return schema
@@ -2894,9 +2906,16 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
             'rule_id':r'(?:rule_id|rule|룰|규칙)',
             'agent_id':r'(?:agent[_ ]?id|에이전트\s*ID)'}
     result=copy.deepcopy(schema)
-    for key in ('source_ip','wazuh_rule_id','signature_id','rule_id','agent_id'):
+    for key in ('source_ip','wazuh_rule_id','signature_id','rule_id','agent_id','program_name'):
         if key not in result.get('properties',{}) or key in result.get('required',[]):continue
-        if key=='source_ip':
+        if key=='program_name':
+            # Only an explicitly labelled program, or systemd for a named
+            # systemd/service-failure question (the documented use).
+            values=list(dict.fromkeys(re.findall(r'(?i)(?:program_name|program|프로그램)\s*[:=]?\s*[`\'"]?'
+                                                 r'([A-Za-z0-9_][A-Za-z0-9_.@-]{0,63})',question)))
+            if re.search(r'systemd|서비스\s*(?:실패|장애|중단|오류)|failed\s+units?',question,re.I):values.append('systemd')
+            values=list(dict.fromkeys(values))
+        elif key=='source_ip':
             values=[]
             for token in re.findall(r'[0-9a-fA-F:.]+',question):
                 try:

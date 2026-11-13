@@ -299,4 +299,30 @@ class PreparationLoop(unittest.TestCase):
         self.assertTrue(report['write_progress']['complete'])
 
 
+class QuestionScope(unittest.TestCase):
+    """2026-11-13 22:22: the peer's own Wazuh read added an unasked
+    program_name='systemd'; peer reads now use the shared first-read rule."""
+    WAZUH={'type':'object','additionalProperties':False,'properties':{
+        'lookback_minutes':{'type':'integer','minimum':1,'maximum':1440},'limit':{'type':'integer','minimum':1,'maximum':50},
+        'program_name':{'type':'string','pattern':'^[A-Za-z0-9_][A-Za-z0-9_.@-]{0,63}$'}}}
+    FW={'type':'object','additionalProperties':False,'properties':{
+        'snapshot':{'type':'string','pattern':'^[0-9a-f]{32}$'},'offset':{'type':'integer','minimum':0},'limit':{'type':'integer','minimum':1}}}
+    Q='최근 30분 ModSecurity와 Wazuh 경보를 조사해서 지금 대응이 필요한 위험이 있는지 판단해줘'
+    AT='2026-11-13T22:22:22+09:00'
+
+    def test_peer_reads_drop_unasked_filters_and_paging(self):
+        peer={'question_scope_reads':True}
+        out=runtime.question_scope_schema(peer,'mcp__security_events__search_wazuh_alerts',self.WAZUH,self.Q,self.AT)
+        self.assertNotIn('program_name',out['properties'])
+        self.assertEqual(out['properties']['lookback_minutes']['enum'],[30])
+        fw=runtime.question_scope_schema(peer,'mcp__resp__get_firewall_rules',self.FW,self.Q,self.AT)
+        self.assertEqual(set(fw['properties']),{'offset','limit'});self.assertEqual(fw['properties']['offset']['enum'],[0])
+        named=runtime.question_scope_schema(peer,'mcp__security_events__search_wazuh_alerts',self.WAZUH,'systemd 서비스 실패 경보 조사',self.AT)
+        self.assertEqual(named['properties']['program_name']['enum'],['systemd'])
+
+    def test_direct_chat_keeps_registered_schemas(self):
+        for request in ({},{'question_scope_reads':False}):
+            self.assertIs(runtime.question_scope_schema(request,'mcp__security_events__search_wazuh_alerts',self.WAZUH,self.Q,self.AT),self.WAZUH)
+
+
 if __name__=='__main__':unittest.main()

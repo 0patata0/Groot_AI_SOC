@@ -1,0 +1,112 @@
+{
+  "subject": "Report repair says what failed: zero-count digit boundary, exact status-line problem and rejected lines in the repair message, control-line order in the skill",
+  "status": "candidate_tested_not_applied",
+  "incident_2026_11_13_2312": {
+    "reads": "ModSecurity + Wazuh, 0 errors",
+    "result": "judgment fallback after 2 repairs",
+    "drafts": {
+      "1": [
+        "real: 'WAF … 경보가 없었음', disposition basis '경보 0건'",
+        "false positive: '### Wazuh 경보 내용 (10건 중)'"
+      ],
+      "2": [
+        "false positive only: '### Wazuh 경보 상세 (10건 중)'"
+      ],
+      "3": [
+        "real: meta preface restating the error",
+        "false positive: same heading"
+      ],
+      "all": "MANAGEMENT_STATUS followed by INCIDENT_DISPOSITION -> status not last -> invalid"
+    },
+    "causes": [
+      "regex 0\\s*건 without digit boundary",
+      "repair listed codes only; rejected sentences computed but not sent",
+      "SDK guidance 'after the public report' vs controller 'before MANAGEMENT_STATUS'; no order rule in skills"
+    ]
+  },
+  "change": {
+    "soc_management_run.py": "(?<![0-9])0\\s*건; management_status_problem; rejected_report_lines; repair message appends the diagnosis and 'rewrite only the corrected report'",
+    "skills/soc-investigate/SKILL.md": "control-line order: INCIDENT_DISPOSITION first, MANAGEMENT_STATUS as the very last line",
+    "harness.py": "SDK guidance: INCIDENT_DISPOSITION after the report and right before MANAGEMENT_STATUS when present",
+    "query-completion/__init__.py": "runner pin"
+  },
+  "not_changed": [
+    "no check relaxed; real absence claims and invalid status lines are still rejected",
+    "the runner does not reorder model output"
+  ],
+  "local_replay": {
+    "draft2_after_fix": "only the order problem remains, named exactly in the repair",
+    "draft3_without_preface_and_reordered": "passes all checks",
+    "draft1": "both real violating lines quoted"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "6b60566819fb5a6d9c1278bbb891d3ef5a104aec70603bdcc5a04ca73646592a",
+      "candidate": "76bd1e09a84fb316557e851cf92b9d2ee3051dee6a71da0e8b73690b7d7bc141"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "fb935f63084af5d0d8953ad4785a49435e2ed876a1c23111197fb7399e89aa12",
+      "candidate": "18a04801c2949c94ca36484391c0d0b0948c2c4e804e0e298151cac9d962232e"
+    },
+    "infra/ollama-trial/harness.py": {
+      "base": "dba169a13203bf10754781ef52e217d88fd62b8436a66a44f616673ccee1afb0",
+      "candidate": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "24fc9e24b32c344bbd48fe9ff019680e2ff7854686e7421fc95794ec68a1fa3f",
+      "candidate": "acab349c8f1a5ae2015d13af7d80a7bc603af8a08b9c8175d7cca49791758115"
+    },
+    "infra/hermes/test_report_repair_diagnosis.py": "6f554dd6755c74f0fd4156ca3e257aee8dd14acec2fc9742d042771e5e1e6fbe",
+    "infra/validation/report-repair/apply_b.py": "c3f499feeefa558fb593779041ad7c53ee0e8de95492f28ac54e8e791c5864aa"
+  },
+  "tests": {
+    "new": {
+      "test_report_repair_diagnosis": "5/5 (5/5 fail on the old runner)"
+    },
+    "bundles_vs_head": {
+      "hermes_all": "1268 (base 1263), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-report-repair-232253/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "scripts/sdk_harness.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "11 copies + gate + Ollama receipt (4 keys)",
+    "rollback": "13 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change (skill copy)",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T23:23:59+09:00",
+    "copies": "11/11 at base",
+    "embedded_gate": "6b60566819fb5a6d",
+    "ollama_receipt": "4 keys at base"
+  },
+  "not_done": [
+    "apply on B after approval",
+    "real chat: diagnosis reaches the repair, report posted without fallback, control-line order correct (model output varies)",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

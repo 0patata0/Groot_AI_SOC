@@ -2117,7 +2117,7 @@ def guidance(question, *, include_workflows=True):
         if workflows:result+='\n'+CONTRACT.workflow_policy(workflows)
     if EVIDENCE.incident_investigation_request(text):
         result += '\n사건의 실제 경보부터 조회한 뒤 위험·대응 필요성을 판단하세요. 현재 규칙 파일 목록만으로 조사를 대신하지 마세요.'
-        result += ('\n실제 센서 사건의 최종 판단은 공개 보고 뒤에 INCIDENT_DISPOSITION: {"assessment":"benign 또는 remediated 또는 unresolved 중 하나","basis":"실제 근거와 한계를 설명하는 20~2000자","evidence_tools":["실제로 성공한 mcp__서버__도구"]} 한 줄로 기록하세요. '
+        result += ('\n실제 센서 사건의 최종 판단은 공개 보고 뒤(실행기의 MANAGEMENT_STATUS 줄이 있으면 그 바로 앞)에 INCIDENT_DISPOSITION: {"assessment":"benign 또는 remediated 또는 unresolved 중 하나","basis":"실제 근거와 한계를 설명하는 20~2000자","evidence_tools":["실제로 성공한 mcp__서버__도구"]} 한 줄로 기록하세요. '
                    '이 내부 감사 줄은 채팅 표시에서 제외됩니다. 위험 해소나 대응이 연결된 센서 사건의 종결은 보호 자산의 agent_id+명시적 사건 구간을 search_wazuh_alerts로 실제 읽고 인용해야 합니다. '
                    '미확인 사건을 형식 충족 때문에 정상/위험 해소로 바꾸지 말고 unresolved와 필요한 다음 조사를 보고하세요.')
     if firewall_request(question):

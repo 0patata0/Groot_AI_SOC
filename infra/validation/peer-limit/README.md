@@ -1,0 +1,48 @@
+# 교차 검토: 자기 조회 한도에 닿은 건수로 상대 표본을 판정하지 않기 후보
+
+2026-11-14 KST. **수정·회귀·구조 점검까지이며 운영 B에는 적용하지 않았다.** 적용은 사용자 승인 뒤 관리자231 경유로 [`apply_b.py`](apply_b.py)를 1회 실행한다. [현황](../../../STATUS.md) · [작은 원장](validation.json) · [발견 기록: 0건 문장 단위 적용](../zero-sentences/README.md) · [공통 스킬](../../hermes/workflow-skills.md).
+
+## 문제 (11/14 01:21 공동 채널 Ollama 교차 검토)
+
+Hermes는 Wazuh를 `limit 15`로 조회했고 "제한 표본 내 정상 활동 15건, scanned=15(최대 표본 한계)"라고 썼다. 검토자(Ollama)는 `limit 50`으로 독립 조회했다. 그러고는 "제한 표본 15건이 아닌 최대 한계 50건을 모두 반환(scanned=50, scan_capped=true)"이라며 **이견**을 냈다. 두 숫자는 각자 정한 한도일 뿐이라 서로를 반박하지 못한다. 그래서 이 이견은 거짓 이견이다.
+
+| 확인 | 내용 |
+|---|---|
+| 조회 결과 구조(B 대화 DB의 실제 Hermes 결과) | `limit 15`, `scanned 15`, `scan_capped true`, `returned_count 15`, `alerts` 15개 |
+| MCP 계산(`security-events-mcp.py`) | `scanned = len(hits)`이고 hits는 한도에 묶인다. `scan_capped = len(hits) >= size`. 한도에 닿지 않았다면(`scan_capped false`) 건수는 그 구간에서 실제로 찾은 수, 즉 관측값이다 |
+| 기존 차단(22:15 수정) | `limit`·구간·필터·`scan_capped`(요청 조건 메아리)는 막았다. `scanned`와 `returned_count`는 "관측값은 계속 대조 가능"하도록 일부러 열어 두었다(시험 `assertFalse(request_echo_path('result.scanned'))`) |
+| 빈틈 | 한도에 닿은 조회에서는 이 건수들이 관측값이 아니라 검토자 자신의 한도다. 이 경우를 구분하지 않았다 |
+| 기록 한계 | 공동 채널 대기열은 교차 검토 주장의 근거 경로(`peer_claims`)를 저장하지 않는다. 그래서 실제로 고른 근거 필드는 기록으로 확인할 수 없다. 이견 문구("scanned=50, scan_capped=true")와 결과 구조로 특정했다 |
+
+## 수정 (강제 경계는 코드, 원칙은 스킬)
+
+| 층 | 위치 | 변경 |
+|---|---|---|
+| 강제 경계 | 공동 채널 작업자 `peer_reference_catalog` | 검토자의 조회 결과가 `scan_capped: true`이면 그 호출의 근거에 `reviewer_limit_reached` 표시를 붙인다 |
+| 강제 경계 | `bind_peer_references` | 표시된 근거 중 경로가 `scanned`·`returned_count`·`returned_items`·`omitted_items`(압축된 배열 길이·생략 수 포함)이면 일치·이견을 `peer_query_scope_mismatch`로 거절한다. 미확인(unverified)은 허용한다. 한도에 닿지 않은 조회의 건수와 경보 내용 필드(출발지 등)는 그대로 대조할 수 있다 |
+| 정정 요청 | 작업자의 1회 정정 문구 | 같은 내용을 한 문장 더했다(한도에 닿은 조회의 건수 4종은 검토자 자신의 한도) |
+| 판단 원칙(스킬) | `soc-investigate`의 `## 교차 검토 대조` 절 | 같은 원칙 한 문장. 이 절은 교차 검토 단계에서만 불러오므로 일반 프롬프트는 바뀌지 않는다(Harness² 상시 문구 변화 0) |
+
+실행기·검사기·하네스는 바꾸지 않았다.
+
+## 검증
+
+| 항목 | 결과 |
+|---|---|
+| 새 회귀(`test_review_channel.py`) | 01:21 상황 재현: 한도 50에 닿은 Wazuh 조회의 `scanned`·`returned_count`·`alerts.returned_items`·`alerts.omitted_items`로 낸 이견과 일치는 거절되고 미확인은 허용된다. 같은 조회의 경보 필드(출발지) 일치는 허용된다. 한도에 닿지 않은 조회(7건)는 표시가 없고 건수 이견이 허용된다. 스킬 절에 원칙 문장이 있다. **이번 수정 전 HEAD 코드로는 실패**한다(`scanned`·`returned_count` 근거 판정이 통과) |
+| 관련 시험 | `test_review_channel`·`test_workflow_contract` 96건 통과(기존 22:15 요청 조건 시험 포함) |
+| 관련 묶음(현재본 대 HEAD 기준본) | Hermes 1,293(신규 1)·query-completion 408·Ollama 374·MCP 708·설치기 343. 새 실패 0. 차이 2건은 무관하다(다른 작업의 미커밋 핀 때문에 기준본에서만 나는 실패, 다른 작업의 미추적 방화벽 NAT 시험) |
+| 공식 Harness² core(`6868817`) | 25구성, 스킬 5, 하위 에이전트 0, 상시 문구 변화 0, 변경 2구성요소(`channel_worker`·`skills/soc-investigate`). 보고서는 Git 제외 `G_Harness2/runs/2026-11-14-peer-limit-012941/` |
+| 적용 스크립트 격리 시험(Mac 임시 공간) | 적용(작업자 1·스킬 3, Ollama 영수증 스킬 항목·공동 채널 영수증 작업자 항목, 다른 항목 보존), 원복(6파일), 거절 4종(대기열 사용 중·사본 불일치·Ollama 영수증 불일치·공동 채널 영수증 불일치 시 변경 없음) |
+| 운영 전제(B 01:31 읽기 전용) | 작업자 `2c4b46f8…`·스킬 사본 3곳 `3345bcc9…`(모두 단일 링크·실파일), 두 영수증 항목이 기준값과 같고 배포 폴더 이름이 비어 있다 |
+
+| 파일 | 기준(운영) | 후보 | 사본 |
+|---|---|---|---|
+| `review_channel_worker.py` | `2c4b46f8…` | `923db594…` | 1 + 공동 채널 영수증 |
+| `skills/soc-investigate/SKILL.md` | `3345bcc9…` | `125ed453…` | 3 + Ollama 영수증 항목 |
+
+**이번 범위 밖**: 같은 실행의 두 번째 거짓 이견(Hermes의 조건문 "source_ip가 null인 경우"를 "모든 IP가 null"로 읽음)은 의미 해석 문제라 이번 결정적 경계로 막지 않았다. 교차 검토 근거 경로(`peer_claims`)를 대기열에 남기지 않는 기록 한계도 별도 과제다.
+
+## 적용 방법(승인 후, 미실행)
+
+`apply_b.py <review_channel_worker.py> <SKILL.md>`를 B root로 1회 실행한다. 직전 배포와 같은 절차다(컨트롤러 잠금, 두 대기열이 빈 상태, 45분 원복 타이머, Ollama 대기열이 비면 Ollama 봇만 재시작). 작업자는 작업마다 새로 실행되므로 재시작이 필요 없다. 적용 뒤 같은 질문으로 실제 채팅을 확인한다. 검토자 한도가 Hermes와 다를 때 건수 이견이 나오지 않는지가 확인 항목이다. 모델 출력은 매번 달라서 같은 근거를 다시 고르지 않으면 이 경로는 회귀로만 확인된다.

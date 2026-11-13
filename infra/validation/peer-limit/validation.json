@@ -1,0 +1,88 @@
+{
+  "subject": "Peer review: counts of the reviewer's own read that hit its limit (scan_capped true) cannot agree with or refute the other answer's sample",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "at_kst": "2026-11-14T01:21+09:00",
+    "post": "3pzuep4xgfd8xm63aijc1yznbo",
+    "claim": "Wazuh: not a 15-row sample but the 50 maximum returned (scanned=50, scan_capped=true)",
+    "fact": "lead read limit 15 (scanned 15, scan_capped true); reviewer read limit 50; each count is its own limit",
+    "record_gap": "the joint-channel queue does not store peer_claims evidence paths; the field was identified from the claim text and the result shape"
+  },
+  "mcp_semantics": "scanned = len(hits) bounded by the request size; scan_capped = len(hits) >= size; uncapped counts are observations",
+  "change": {
+    "review_channel_worker.py": "PEER_LIMIT_BOUND_KEYS {scanned, returned_count, returned_items, omitted_items}; catalog marks proofs of a scan_capped read (reviewer_limit_reached); bind refuses agree/disagree on those counts with peer_query_scope_mismatch; unverified allowed; uncapped counts and alert fields unchanged; one sentence added to the correction message",
+    "skills/soc-investigate/SKILL.md": "same principle, one sentence in the section-only '## 교차 검토 대조'",
+    "unchanged": [
+      "runner",
+      "checker",
+      "harness",
+      "controller gate"
+    ]
+  },
+  "sha256": {
+    "infra/hermes/review_channel_worker.py": {
+      "base": "2c4b46f8445399cd006a01bac4bc4ad050c71029a14ac39a9a3a0b4e420f0b9b",
+      "candidate": "923db59416ec1a7a0d68ce8c3c794aa995876974b90754bb2161c5ff589accf2"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "3345bcc9c8587d67d51b8384416a5ac67e39945796abe3fb49064f724d4e395b",
+      "candidate": "125ed453d237d273092e23413b1ab4b1f1a9bbec61647edded8fc1ec1b56e372"
+    },
+    "infra/hermes/test_review_channel.py": "aa5278638e8b78e26828afca98225e21ea650b3a4341aba6b695ff5e15b24080",
+    "infra/validation/peer-limit/apply_b.py": "c2d77d3c4ff0a2a0a719d9d625e86215b46ce925b74d8bcb0520565e78382534"
+  },
+  "tests": {
+    "new": {
+      "test_counts_of_a_read_that_hit_the_reviewers_own_limit_are_not_receipts": "pass; fails on HEAD (scanned/returned_count verdicts accepted)"
+    },
+    "related": "test_review_channel + test_workflow_contract 96 OK",
+    "bundles_vs_head": {
+      "hermes_all": "1293 (base 1292), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, same known errors",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-14-peer-limit-012941/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "worker x1 + skill x3, Ollama receipt skill key, review-chat receipt worker entry (other entries kept)",
+    "rollback": "6 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "receipt_not_baseline_no_change",
+      "review_receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-14T01:31:22+09:00",
+    "worker": "2c4b46f8445399cd",
+    "skill_copies": "3/3 at 3345bcc9c8587d67",
+    "receipts": "both at base",
+    "deploy_dir_free": true
+  },
+  "open_outside_scope": [
+    "peer read a conditional ('null인 경우') as an absolute claim",
+    "peer_claims evidence paths are not stored in the joint-channel queue"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

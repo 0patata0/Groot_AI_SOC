@@ -55,6 +55,26 @@ def request_echo_path(path):
     return bool(keys) and (keys[-1] in PEER_REQUEST_ECHO_KEYS or 'applied_filters' in keys[:-1])
 
 
+# Counts of the reviewer's own read. Unbounded (scan_capped false) they are
+# observations and stay comparable; when the read hit its own limit they equal
+# that limit (11-14 01:21: the reviewer's limit-50 read, scanned=50 and
+# scan_capped=true, "refuted" the other answer's sample of 15).
+PEER_LIMIT_BOUND_KEYS = frozenset({'scanned', 'returned_count', 'returned_items', 'omitted_items'})
+
+
+def reviewer_limit_reached(raw):
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        return False
+    return isinstance(data, dict) and data.get('scan_capped') is True
+
+
+def limit_bound_count_path(path):
+    keys = re.findall(r'\.([A-Za-z_][A-Za-z0-9_]*)', str(path))
+    return bool(keys) and keys[-1] in PEER_LIMIT_BOUND_KEYS
+
+
 def peer_error_code(exc):
     if isinstance(exc, json.JSONDecodeError): return 'peer_json_invalid'
     return str(exc) if isinstance(exc, ValueError) and str(exc) in PEER_OUTPUT_ERRORS else type(exc).__name__
@@ -416,6 +436,7 @@ def peer_reference_catalog(source, observed):
     per_call = max(12, 128//len(observed))
     for i,call in enumerate(observed):
         outside = filters_outside_question(call.get('result',''), source.get('user_question',''))
+        capped = reviewer_limit_reached(call.get('result',''))
         raw = compact_peer_result(call.get('result',''))
         candidates = []
         try:
@@ -443,7 +464,8 @@ def peer_reference_catalog(source, observed):
         for item in candidates[:per_call]:
             proofs.append({'id':'e'+str(len(proofs)),'call_index':i,
                 'name':call.get('name'),'arguments':call.get('arguments'),**item,
-                **({'filters_outside_question':outside} if outside else {})})
+                **({'filters_outside_question':outside} if outside else {}),
+                **({'reviewer_limit_reached':True} if capped else {})})
     return {'answers':answers,'evidence':proofs,'omitted_evidence_refs':omitted}
 
 
@@ -474,6 +496,11 @@ def bind_peer_references(value, catalog):
             # The reviewer's own request conditions are not a receipt for the
             # other answer's query (11-13 21:55: Hermes' real limit 50 was
             # "contradicted" by the reviewer's own limit 10).
+            raise ValueError('peer_query_scope_mismatch')
+        if (claim.get('kind') in ('agree','disagree') and proof.get('reviewer_limit_reached')
+                and limit_bound_count_path(proof['path'])):
+            # A count from a read that hit the reviewer's own limit is that limit,
+            # not a receipt for the other answer's sample (11-14 01:21).
             raise ValueError('peer_query_scope_mismatch')
         if claim.get('kind') in ('agree','disagree') and proof.get('filters_outside_question'):
             # A read narrowed by a filter the question never named cannot judge
@@ -604,7 +631,8 @@ async def review_answer(config, request, report):
                     '실제 조회 범위를 인용한 unverified로 남기세요. 독립 스냅샷의 관측 시각 차이는 과거 관측의 오류 증거가 아니고, '
                     'indexer의 cluster_status는 manager 클러스터 활성 여부의 증거가 아닙니다. '
                     '새 조회 결과의 limit·lookback_minutes·요청 구간·applied_filters·scan_capped는 검토자 자신의 요청 조건이라 '
-                    '상대 조회 조건의 증거가 아닙니다. 질문에 없는 필터로 좁힌 조회(filters_outside_question)와 '
+                    '상대 조회 조건의 증거가 아닙니다. 한도에 닿은(scan_capped true) 조회의 scanned·returned_count·returned_items·omitted_items도 '
+                    '검토자 자신의 한도이며 상대 표본 크기의 증거가 아닙니다. 질문에 없는 필터로 좁힌 조회(filters_outside_question)와 '
                     '반환 표본 0건은 상대 주장의 반박 근거가 아닙니다. '
                     '이렇게 범위를 잘못 연결한 이견은 확인 못한 부분으로 정정하세요. 모든 주장과 누락은 동일한 검사를 다시 통과해야 합니다. '
                     '미확인은 부정이 아니며 상대가 쓰지 않은 보장을 만들어 반박하지 마세요. '

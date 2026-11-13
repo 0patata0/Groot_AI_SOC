@@ -315,6 +315,41 @@ class Tests(unittest.TestCase):
         self.assertFalse(w.request_echo_path('result.scanned'))
         self.assertIn('peer_query_scope_mismatch',w.PEER_OUTPUT_ERRORS)
 
+    def test_counts_of_a_read_that_hit_the_reviewers_own_limit_are_not_receipts(self):
+        """11-14 01:21: Hermes read Wazuh with limit 15 (scanned 15, capped); the
+        peer read with limit 50 and "disagreed" citing its own scanned=50."""
+        answer = '| **Wazuh 경보 수집** | 제한 표본 내 정상 활동 15건 | scanned=15 (최대 표본 한계). |'
+        source = {'user_question':'최근 30분 ModSecurity와 Wazuh 경보 조사','other_agent_answer':answer,'other_answer_truncated':False}
+        alerts = [{'agent':'groot-sec','source_ip':'10.200.10.10','wazuh_rule_id':'5715'} for _ in range(50)]
+        capped = {'source':'wazuh','lookback_minutes':30,'applied_filters':{},'window_mode':'lookback','returned_count':50,
+                  'indexed_window_total_count':None,'limit':50,'scanned':50,'scan_capped':True,'alerts':alerts}
+        observed = [{'name':'search_wazuh_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(capped)}]
+        catalog = w.peer_reference_catalog(source,observed); paths = {e['path']:e['id'] for e in catalog['evidence']}
+        for path in ('result.scanned','result.returned_count','result.alerts.returned_items','result.alerts.omitted_items'):
+            for kind in ('disagree','agree'):
+                with self.subTest(path=path,kind=kind):
+                    claim = {'kind':kind,'text':'표본 크기 비교','source_ref':'a0','evidence_ref':paths[path],'missing_field':''}
+                    with self.assertRaisesRegex(ValueError,'peer_query_scope_mismatch'):w.bind_peer_references({'claims':[claim]},catalog)
+            claim = {'kind':'unverified','text':'검토자 조회는 자기 한도 50에 닿아 상대 15건 표본은 확인할 수 없음','source_ref':'a0',
+                     'evidence_ref':paths[path],'missing_field':''}
+            self.assertIn('미확인',w.validate_peer_claims(w.bind_peer_references({'claims':[claim]},catalog),source,observed))
+        # A recorded alert field is still an observation, capped or not.
+        sample = next(e for e in catalog['evidence'] if e['path'].endswith('.source_ip'))
+        claim = {'kind':'agree','text':'출발지 기록 일치','source_ref':'a0','evidence_ref':sample['id'],'missing_field':''}
+        w.bind_peer_references({'claims':[claim]},catalog)
+        # An unbounded read (scan_capped false) keeps its counts comparable.
+        free = dict(capped,returned_count=7,scanned=7,scan_capped=False,alerts=alerts[:7])
+        observed = [{'name':'search_wazuh_alerts','arguments':{'lookback_minutes':30},'result':json.dumps(free)}]
+        catalog = w.peer_reference_catalog(source,observed); paths = {e['path']:e['id'] for e in catalog['evidence']}
+        self.assertFalse(any(e.get('reviewer_limit_reached') for e in catalog['evidence']))
+        for path in ('result.scanned','result.returned_count'):
+            claim = {'kind':'disagree','text':'한도 미도달 조회 7건','source_ref':'a0','evidence_ref':paths[path],'missing_field':''}
+            w.bind_peer_references({'claims':[claim]},catalog)
+        # The shared skill section states the same principle.
+        section = contract.workflow_policy(('soc-investigate',),section='peer-review')
+        self.assertIn('scan_capped true', section)
+        self.assertIn('한도에 닿지 않은 조회의 건수만 관측값으로 대조', section)
+
     def query_scope_fixture(self,replies):
         llm,h,report,request,calls=self.peer_fixture(replies)
         report['calls']=[{'server':'security-events','name':'search_modsecurity_alerts','arguments':{'lookback_minutes':30},

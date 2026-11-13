@@ -18,6 +18,8 @@
 
 사용자 지시("되도록이면 스킬로 묶을 수 있는 부분은 묶어서 관리하자")에 따라, 공동 채널 작업자 코드에 흩어져 있던 교차 검토 판단 원칙을 `soc-investigate`의 `## 교차 검토 대조` 절로 옮겼다(문구 그대로, 에이전트 상태 원칙 1줄 추가). `workflow_contract.SECTION_ONLY`에 등록된 절은 해당 단계에서만 `section_policy`로 불러오고, 일반 조사·조회 프롬프트의 전체 본문에서는 빠진다. Ollama 교차 검토 합성과 Hermes 교차 검토가 같은 절을 쓴다. 조사 본문에는 "지정 장비 경보 조회로 시작" 원칙 한 줄을 더했다. 도구 범위·인자 제한은 스킬이 아니라 하네스·실행기 코드가 강제한다. [후보](../validation/investigation-scope/README.md).
 
+이후 이 절에 더한 원칙(11/14): 검토자 자신의 조회가 한도에 닿았으면(`scan_capped` true) `scanned`·`returned_count`·`returned_items`·`omitted_items`는 그 한도와 같은 값이라 상대 표본 크기를 확인하거나 반박하지 못한다. 같은 경계는 작업자 코드(`bind_peer_references`)가 `peer_query_scope_mismatch`로 강제한다. [후보](../validation/peer-limit/README.md).
+
 ## 실제 연결
 
 `workflow_contract.py`는 고정된 네 이름만 허용한다. 각 SKILL의 이름·설명·고유 마커·크기와 파일 경로를 확인하며 누락·중복·심볼릭 링크를 조용히 무시하지 않는다. 원본 정의는 위 네 폴더에 하나씩 둔다. 설치된 세 프로필의 `skill-soc-*.md`는 같은 원본 바이트의 배포 복사본이다. flat 이름으로 기존 파일별 백업/원복과 충돌 없는 초기 반입을 유지한다.

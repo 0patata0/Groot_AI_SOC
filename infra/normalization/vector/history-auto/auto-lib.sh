@@ -2,7 +2,10 @@
 # Sourced only by the fixed root worker or the private native fixture.
 AUTO_POLICY=bounded-previous-kernel-auto-v1
 AUTO_MAX_JOBS=64 AUTO_MAX_BYTES=1073741824 AUTO_RESERVE_BYTES=41943040
-AUTO_MAX_BATCH_DIRS=256 AUTO_MAX_STORE_ENTRIES=4096
+# 2026-11-13: 256 -> 1024. A 18-day boot (mostly nft SPOOF kernel lines) needs about
+# 420 batch directories while the store held 134 MB of its 1 GiB; the directory cap,
+# not bytes, stopped preservation. 1024 x 3 entries stays under the 4096-entry cap.
+AUTO_MAX_BATCH_DIRS=1024 AUTO_MAX_STORE_ENTRIES=4096
 auto_report() {
     jq -nc --arg outcome "$1" --arg reason "$2" --arg boot "${3:-}" \
       '{policy:"bounded-previous-kernel-auto-v1",outcome:$outcome,reason:$reason,

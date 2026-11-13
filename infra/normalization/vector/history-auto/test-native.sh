@@ -179,8 +179,11 @@ truncate -s 1073741824 "$root/store/quota-fixture"
 before=$(wc -l < "$stage/calls"); run 65
 [[ $(wc -l < "$stage/calls") == "$before" ]]; job '.status=="ready"'; ok
 newroot partial_quota
-for n in $(seq 1 256); do mkdir -m 700 "$root/store/partial-fixture-$n"; done
-run 65; [[ $(find "$root/store" -mindepth 1 -maxdepth 1 -type d | wc -l) == 256 ]]; ok
+for n in $(seq 1 1024); do mkdir -m 700 "$root/store/partial-fixture-$n"; done
+run 65; [[ $(find "$root/store" -mindepth 1 -maxdepth 1 -type d | wc -l) == 1024 ]]; ok
+newroot partial_under_cap
+for n in $(seq 1 300); do mkdir -m 700 "$root/store/partial-fixture-$n"; done
+run 0; job '.status=="ready"'; [[ $(find "$root/store" -mindepth 1 -maxdepth 1 -type d -name 'batch-*' | wc -l) == 1 ]]; ok
 newroot tampered_head; run 0
 id=$(jq -r .head.batch_id "$root/jobs/$boot.json")
 chmod 600 "$root/store/batch-$id/kernel.jsonl"; printf x >> "$root/store/batch-$id/kernel.jsonl"; chmod 400 "$root/store/batch-$id/kernel.jsonl"

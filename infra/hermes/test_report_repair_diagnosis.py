@@ -122,5 +122,58 @@ class FormattedControlLines(unittest.TestCase):
         self.assertNotIn('`INCIDENT_DISPOSITION`', line); self.assertNotIn('`MANAGEMENT_STATUS`', line)
         self.assertIn('백틱', line); self.assertIn('줄 맨 앞부터', line)
 
+
+class DispositionStatusConflict(unittest.TestCase):
+    """11-13 23:50: assessment unresolved with MANAGEMENT_STATUS resolved; the
+    controller checks this only after a sensor-incident run, so the model never
+    got a chance to fix it. The draft was also wrapped in a code block."""
+
+    @staticmethod
+    def report(assessment, status):
+        disp = 'INCIDENT_DISPOSITION: ' + json.dumps({'assessment': assessment, 'basis': '반환 표본 기준 판단이며 전체 건수는 미확인입니다.',
+                                                      'evidence_tools': ['mcp__security_events__search_wazuh_alerts']}, ensure_ascii=False)
+        return '보고서 본문입니다.\n' + disp + '\nMANAGEMENT_STATUS: ' + status
+
+    def test_only_unresolved_with_resolved_conflicts(self):
+        self.assertTrue(m.disposition_status_conflict(self.report('unresolved', 'resolved')))
+        for assessment, status in (('unresolved', 'monitor'), ('unresolved', 'needs_review'), ('benign', 'resolved'), ('remediated', 'resolved')):
+            with self.subTest(assessment=assessment, status=status):
+                self.assertFalse(m.disposition_status_conflict(self.report(assessment, status)))
+        self.assertFalse(m.disposition_status_conflict('본문\nMANAGEMENT_STATUS: resolved'))
+        self.assertIn('unresolved_disposition_marked_resolved', m.LITERAL_REPAIR_ISSUES)
+
+    def test_code_block_wrapping_is_named(self):
+        fenced = '```text\n' + self.report('unresolved', 'resolved') + '\n```'
+        self.assertIn('코드 블록', m.management_status_problem(fenced))
+        self.assertFalse(m.disposition_status_conflict(fenced))
+
+    def test_repair_names_the_conflict(self):
+        h = grounding_fixtures.Grounding(); h.setUp(); h.completed.append('search_wazuh_alerts')
+        h.kw['assistant_message'].content = self.report('unresolved', 'resolved')
+        call = m.grounding_wrapper(lambda agent, **kw: 'original', types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),
+                                   lambda rows, row: rows.append(row), lambda rows, user: 0, h.completed, FACTS,
+                                   successful_reads={'mcp__security_events__search_wazuh_alerts'})
+        result = call(h.agent, **h.kw)
+        self.assertEqual(result.action, 'continue')
+        nudge = h.kw['messages'][-1]['content']
+        self.assertIn('unresolved_disposition_marked_resolved', nudge)
+        self.assertIn('assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved', nudge)
+        self.assertIn('실제 근거가 있어야', nudge)
+
+    def test_consistent_report_is_not_repaired_for_this(self):
+        h = grounding_fixtures.Grounding(); h.setUp(); h.completed.append('search_wazuh_alerts')
+        h.kw['assistant_message'].content = self.report('unresolved', 'needs_review')
+        call = m.grounding_wrapper(lambda agent, **kw: 'original', types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),
+                                   lambda rows, row: rows.append(row), lambda rows, user: 0, h.completed, FACTS,
+                                   successful_reads={'mcp__security_events__search_wazuh_alerts'})
+        call(h.agent, **h.kw)
+        self.assertFalse(any('unresolved_disposition_marked_resolved' in str(x.get('content', '')) for x in h.kw['messages']))
+
+    def test_skill_states_both_rules(self):
+        import workflow_contract
+        line = next(l for l in workflow_contract.policy(('soc-investigate',)).splitlines() if '제어 줄이 모두 필요하면' in l)
+        self.assertIn('코드 블록으로 감싸지 않는다', line)
+        self.assertIn('unresolved이면 MANAGEMENT_STATUS를 resolved로 쓰지 않는다', line)
+
 if __name__ == '__main__':
     unittest.main()

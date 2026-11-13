@@ -1721,6 +1721,9 @@ def management_status_problem(text):
     if not re.fullmatch(r'MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)[ \t]*', matches[0].group()):
         return 'MANAGEMENT_STATUS 값이 resolved·monitor·needs_review·awaiting_approval 중 하나가 아닙니다.'
     after = text[matches[0].end():].strip().splitlines()[0]
+    if after.startswith('```'):
+        return ('MANAGEMENT_STATUS 줄 뒤에 코드 블록 닫는 표시(```)가 있습니다. 보고서나 제어 줄을 코드 블록으로 감싸지 말고 '
+                'MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 쓰세요.')
     what = ('INCIDENT_DISPOSITION 줄' if CONTROL_LINE_FORMATTING.sub('', after).strip().startswith('INCIDENT_DISPOSITION')
             else '다른 내용')
     return ('MANAGEMENT_STATUS 줄 뒤에 ' + what + '이 있습니다. INCIDENT_DISPOSITION 줄은 MANAGEMENT_STATUS 줄 앞에 두고, '
@@ -1757,6 +1760,20 @@ def disposition_line_problem(text):
     return ('INCIDENT_DISPOSITION 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: '
             + json.dumps(formatted[:80] + ('…' if len(formatted) > 80 else ''), ensure_ascii=False)
             + '. 서식 없이 줄 맨 앞부터 INCIDENT_DISPOSITION: 다음에 JSON 한 줄로 쓰세요.')
+
+
+def disposition_status_conflict(text):
+    """resolved cannot close an incident the same report calls unresolved.
+
+    The controller applies this only after a sensor-incident run
+    (incident_disposition_unresolved), so the model never got a chance to
+    fix it (11-13 23:50: assessment unresolved + MANAGEMENT_STATUS resolved).
+    Only a report that carries a disposition line is checked.
+    """
+    if management_status(text) != 'resolved':
+        return False
+    value, error = parse_incident_disposition(text)
+    return error is None and value.get('assessment') == 'unresolved'
 
 
 def rejected_report_lines(text, facts, successful_reads, issues, limit=4):
@@ -1859,6 +1876,7 @@ LITERAL_REPAIR_ISSUES = frozenset({
     'containment_time_role_mismatch', 'containment_time_role_requires_kst',
     'sample_zero_presented_as_absence', 'sample_count_presented_as_window_total',
     'unknown_window_total_claimed', 'missing_or_invalid_management_status',
+    'unresolved_disposition_marked_resolved',
     'invalid_disposition_tool_names',
     'web_continuity_unverified_is_not_outage',
     'diagnostic_snapshot_is_not_functional_health',
@@ -2580,6 +2598,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             issues.append('service_invalid_read_time')
         if completed_calls and management_status(content) is None:
             issues.append('missing_or_invalid_management_status')
+        if completed_calls and disposition_status_conflict(content):
+            issues.append('unresolved_disposition_marked_resolved')
         verify=os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
         pending_status=[r for r in status_requirements if not any(f.get('kind')=='proposal_status' and
             f.get('proposal_id')==r['proposal_id'] and f.get('target')==r['target'] for f in status_receipts)] if verify else []
@@ -2701,12 +2721,16 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             # 23:13 two corrections failed on the same two points).
             problem = management_status_problem(content) if 'missing_or_invalid_management_status' in issues else None
             disposition = disposition_line_problem(content)
+            conflict = ('INCIDENT_DISPOSITION의 assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved입니다. 두 값은 같은 판단이어야 합니다. '
+                        '미해결이면 resolved를 쓰지 말고 실제 판단에 맞는 상태를 쓰세요. assessment를 바꾸려면 그 판단을 뒷받침하는 실제 근거가 있어야 합니다.'
+                        if 'unresolved_disposition_marked_resolved' in issues else None)
             rejected = rejected_report_lines(content, facts, successful_reads,
-                                             [i for i in issues if i != 'missing_or_invalid_management_status'])
-            if problem or disposition or rejected:
+                                             [i for i in issues if i not in ('missing_or_invalid_management_status', 'unresolved_disposition_marked_resolved')])
+            if problem or disposition or conflict or rejected:
                 nudge += ('\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):'
                           + ('\n- ' + problem if problem else '')
                           + ('\n- ' + disposition if disposition else '')
+                          + ('\n- ' + conflict if conflict else '')
                           + ''.join('\n- 거절된 초안 문장(' + ','.join(r['issues']) + '): '
                                     + json.dumps(r['line'], ensure_ascii=False) for r in rejected)
                           + '\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.')

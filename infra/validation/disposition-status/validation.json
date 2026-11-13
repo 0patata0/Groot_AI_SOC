@@ -1,0 +1,84 @@
+{
+  "subject": "Disposition/status consistency (unresolved cannot be resolved) checked in the repair loop with an exact diagnosis; code-block diagnosis; skill sentence",
+  "status": "candidate_tested_not_applied",
+  "correction_of_2355_report": "the 23:48 fallback came from the runner's final guard, not the controller: the draft was wrapped in a code block (closing fence after the status line -> status invalid) and cited an uncalled Suricata; the unresolved+resolved contradiction was present but only the controller's sensor-incident path checks it, and that path changes the state without replacing the text",
+  "change": {
+    "soc_management_run.py": "disposition_status_conflict; repair issue unresolved_disposition_marked_resolved (in LITERAL_REPAIR_ISSUES) with a diagnosis that does not steer to closure; code-fence diagnosis in management_status_problem; final guard unchanged",
+    "skills/soc-investigate/SKILL.md": "no code block around the report/control lines; unresolved assessment never with MANAGEMENT_STATUS resolved",
+    "query-completion/__init__.py": "runner pin"
+  },
+  "local_replay_2348_draft2": {
+    "as_is": "code-fence diagnosis + Suricata sentence quoted",
+    "fence_removed": "conflict detected"
+  },
+  "sha256": {
+    "infra/hermes/soc_management_run.py": {
+      "base": "b32ea4c6e425064707c8755193f35506099ef0b6db32527648ea9122b363a868",
+      "candidate": "f65565637ed14a9026258641e4e6997a7caa47534d96602b41b77f3625979b3c"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "base": "576736f44ed7bb3617f85a5cb6917c2ca0d96b34ea548339db7bd9b99a6d70c2",
+      "candidate": "53b54682a304c02fdc655d8087189abbb4bc19ed1324833aaafcd30d675ba079"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "base": "eeb28a8d21efdaf872b2ffb651281612828e451b24c0a7c53768cb7669eda1aa",
+      "candidate": "3345bcc9c8587d67d51b8384416a5ac67e39945796abe3fb49064f724d4e395b"
+    },
+    "infra/hermes/test_report_repair_diagnosis.py": "6ab693ab9b3a2f11dc63ec1f3a2a5593db27780cdad26b23274dd5905bc98f34",
+    "infra/validation/disposition-status/apply_b.py": "094b2e04aafd3075fc5bb6ceb62b093d7325aa62ecbc3fc4ddaee5a0a09f6275"
+  },
+  "tests": {
+    "new": {
+      "DispositionStatusConflict": "5/5 (3 behaviour tests fail on the old runner; 2 non-regression/skill checks pass on both)"
+    },
+    "pre_existing_failure_same_on_head": "test_soc_management_evidence.LiteralEvidence.test_model_can_repair_missing_status_once_without_another_forced_read",
+    "bundles_vs_head": {
+      "hermes_all": "1278 (base 1273), same known failures",
+      "query_completion": "408 OK",
+      "ollama_trial": "374 OK",
+      "mcp": "708, same known errors (base has 1 flaky extra)",
+      "deployment": "343 (base 332), 1 error in untracked other-task test_firewall_nat.py"
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-disposition-status-235809/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "skills/soc-investigate/SKILL.md"
+    ]
+  },
+  "apply_script_isolated_test": {
+    "apply": "9 copies + gate + Ollama receipt (3 keys)",
+    "rollback": "11 files",
+    "refusals": [
+      "chat_queue_busy_no_change",
+      "target_not_baseline_no_change",
+      "controller_gate_not_baseline_no_change",
+      "receipt_not_baseline_no_change"
+    ]
+  },
+  "live_precondition": {
+    "observed_kst": "2026-11-13T23:58:33+09:00",
+    "copies": "9/9 at base",
+    "embedded_gate": "b32ea4c6e4250647",
+    "ollama_receipt": "3 keys at base"
+  },
+  "open_outside_scope": [
+    "Hermes drafts include a peer-review style section",
+    "peer exposes catalog ids and marks everything unverified on time difference alone"
+  ],
+  "not_done": [
+    "apply on B after approval",
+    "real chat: code block/conflict diagnosed or absent, report posted without fallback",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

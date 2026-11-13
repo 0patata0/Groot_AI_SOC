@@ -1,6 +1,6 @@
 {
   "subject": "Keep the investigation runner's prompt prefix stable: citation hint as in-process notes instead of a growing system suffix",
-  "status": "rolled_back_then_ab_evaluated_not_worse_reapply_pending_approval",
+  "status": "reapplied_confirmed_monitoring",
   "observed_kst": "2026-11-13T16:24:00+09:00/2026-11-13T16:54:17+09:00",
   "evidence": {
     "thor_calls_50h_ge_3k_tokens": 134,
@@ -143,7 +143,7 @@
     ]
   },
   "not_done": [
-    "re-apply only after user approval, with monitoring of malformed/status-repair/citation-repair rates",
+    "monitor malformed / status-repair / citation-repair rates vs 291-session baseline",
     "report stage tool removal and selection prompt cost",
     "Ollama bot per-question schema narrowing"
   ],
@@ -238,5 +238,40 @@
       "single generation step only",
       "risk judgement not human-reviewed"
     ]
+  },
+  "reapply": {
+    "approval": "user 2026-11-13: 인용 안내 후보 재적용해줘",
+    "applied_kst": "2026-11-13T20:14:53+09:00",
+    "lock_seconds": 0.03,
+    "deploy_dir": "/var/lib/capstone-service-grounding/20261113-citation-prefix-r2",
+    "after": {
+      "controller": "a32188772f3684c9",
+      "runner_copies": "d6de30da",
+      "plugin_copies": "7bb48edb",
+      "receipt": "d5a0887b3313024e"
+    },
+    "postcheck": {
+      "gate_verified": true,
+      "pins_ok": 2,
+      "ticks_ok": 3,
+      "failed_units": 0
+    },
+    "real_investigation": {
+      "post_kst": "20:16:01",
+      "session": "d699b0",
+      "result": "model_completed_investigation",
+      "malformed": false,
+      "tool_errors": 0,
+      "repairs": 1,
+      "cache_followup": {
+        "prompt": 31616,
+        "restored": 29304,
+        "processed": 2312,
+        "seconds": 2.8
+      },
+      "discriminating": false
+    },
+    "confirmed_kst": "2026-11-13T20:18:57+09:00",
+    "rollback_timer": "stopped"
   }
 }

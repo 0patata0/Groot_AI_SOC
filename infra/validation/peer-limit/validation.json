@@ -1,6 +1,6 @@
 {
   "subject": "Peer review: counts of the reviewer's own read that hit its limit (scan_capped true) cannot agree with or refute the other answer's sample",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T01:21+09:00",
     "post": "3pzuep4xgfd8xm63aijc1yznbo",
@@ -80,9 +80,60 @@
     "peer read a conditional ('null인 경우') as an absolute claim",
     "peer_claims evidence paths are not stored in the joint-channel queue"
   ],
-  "not_done": [
-    "apply on B after approval",
-    "real chat",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 교차 검토 한도 수정 적용해줘",
+    "at_kst": "2026-11-14T01:35:04+09:00",
+    "source_commit": "d1b85f4",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-peer-limit",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 01:40:04"
+    ],
+    "installed": {
+      "review_channel_worker.py": "923db59416ec1a7a",
+      "skill-soc-investigate x3": "125ed453d237d273"
+    },
+    "postcheck": {
+      "receipts": true,
+      "skill_sentence_3_copies": true,
+      "ticks": 4,
+      "bots_active": true,
+      "failed_units": 0,
+      "live_worker": {
+        "capped_scanned_disagree": "peer_query_scope_mismatch",
+        "capped_returned_count_disagree": "peer_query_scope_mismatch",
+        "uncapped_scanned_disagree": "accepted"
+      }
+    },
+    "real_chat": {
+      "post_kst": "01:36:05",
+      "post": "juycno8cibbhz8aujgzfjxubbr",
+      "hermes": {
+        "drafts": 3,
+        "repairs": [
+          "missing status",
+          "missing status + one quoted zero-as-absence sentence"
+        ],
+        "final": "posted without fallback (benign + monitor), second in a row"
+      },
+      "peer": {
+        "reviewer_wazuh_limit": 10,
+        "capped": true,
+        "peer_validation_errors": [
+          "peer_zero_sample_dissent"
+        ],
+        "claims": "1 agree, 2 unverified, 0 dissent",
+        "new_rule_fired": false,
+        "note": "no count dissent this time; the reviewer chose unverified itself after one correction"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 6
+  },
+  "open_after_apply": [
+    "unverified claim text still reasons from the reviewer limit (not checked)",
+    "compact omitted_items read as read omission",
+    "agree text presents a zero sample as absence"
   ]
 }

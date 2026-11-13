@@ -1,0 +1,80 @@
+{
+  "subject": "Pin an explicit recent window ('최근 N분') from the question for both bots instead of model-computed times",
+  "status": "candidate_tested_not_applied",
+  "incidents": {
+    "17:21": "computed end 26 s ahead refused",
+    "20:16": "'최근 30분' read with a 60-minute lookback",
+    "sdk": "non-today listings fixed at 60; explicit windows excluded from plain listing"
+  },
+  "changes": {
+    "chat_contract.py": "relative_lookback_minutes, without_relative_window (shared)",
+    "soc_management_run.py": "initial_event_filter_schema pins lookback_minutes=N, drops since/until (controller-bound intervals untouched)",
+    "query-completion/__init__.py": "EVIDENCE_SOURCE_SHA256 follows the runner",
+    "harness.py": "plain listing accepts one explicit window; schema window N (else 60); receipt must match N"
+  },
+  "sha256": {
+    "soc_management_run.py": {
+      "base": "d6de30da4005bd18",
+      "candidate": "cf6124ad51fcb8aeea66e69de4cfec2461d3a520ee8ddad38c2305e9a311f592"
+    },
+    "query-completion/__init__.py": {
+      "base": "7bb48edb69e7c34b",
+      "candidate": "accf2b07d2133719a5757f736b62571736c134cc284056d5909c1c7c5d5525ef"
+    },
+    "chat_contract.py": {
+      "base": "2cae4b65c553dc44",
+      "candidate": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e"
+    },
+    "harness.py": {
+      "base": "5cbdb9fc64f5ba37",
+      "candidate": "5d79bb9dbee62b736f797382c1f5cb3c89790f4f5e55df9b744ed43c801e7f4a"
+    },
+    "apply_b.py": "b512ccf362a853a0229aa8e33b80441a60c174b5dce340d86643debd6ff40336"
+  },
+  "tests": {
+    "test_relative_window": {
+      "passed": 6,
+      "count": 6
+    },
+    "test_event_lookup": {
+      "passed": 16,
+      "count": 16,
+      "new": 1
+    },
+    "changed_expectation": "test_soc_management_chat_scope: '오늘 최근 1시간' now pinned to 60 minutes (intended)",
+    "suites_vs_head": {
+      "hermes": 1250,
+      "query_completion": 408,
+      "ollama_trial": 363,
+      "mcp": 708,
+      "deployment": 343
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-relative-window-211723/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "always_on_char_delta": 0,
+      "sub_agents": 0
+    },
+    "changed": [
+      "scripts/chat_contract.py",
+      "scripts/evidence_gate.py",
+      "scripts/native_query.py",
+      "scripts/sdk_harness.py"
+    ]
+  },
+  "live_precondition_kst": "2026-11-13T21:15",
+  "live": {
+    "copies_equal_base": 11,
+    "embedded_gate_equal": true,
+    "receipt_equal": true
+  },
+  "not_done": [
+    "apply on B (apply_b.py)",
+    "real chat checks: '최근 30분' investigation and listing",
+    "confirm or let the 45-minute rollback run"
+  ]
+}

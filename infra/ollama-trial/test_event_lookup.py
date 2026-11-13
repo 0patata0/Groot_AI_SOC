@@ -182,6 +182,26 @@ class EventLookup(unittest.TestCase):
         self.assertIsNone(worker.lookup_read_scope(h,q,'peer'))
         self.assertEqual(h.lookup_report(q,[receipt()]),h.event_report(q,[receipt()]))
 
+    def test_explicit_recent_window_is_a_listing_bound_in_schema_and_receipt(self):
+        # 2026-11-13 20:16: "최근 30분" was read with a 60-minute window.
+        q='최근 30분 Wazuh 경보 보여줘';name='mcp__security_events__search_wazuh_alerts'
+        self.assertEqual(h.event_lookup_scope(q),{name})
+        schema={name:{'type':'object','properties':{
+            'since_kst':{'type':'string'},'until_kst':{'type':'string'},
+            'lookback_minutes':{'type':'integer','minimum':1,'maximum':1440},
+            'limit':{'type':'integer','minimum':1,'maximum':50}}}}
+        selected=h.refine_read_schemas(q,schema,[])[name]
+        self.assertEqual(set(selected['properties']),{'lookback_minutes','limit'})
+        self.assertEqual(selected['properties']['lookback_minutes']['enum'],[30])
+        def window(minutes):
+            end='2026-11-08T12:59:30+09:00';start=(datetime.fromisoformat(end)-__import__('datetime').timedelta(minutes=minutes)).isoformat()
+            r=receipt('wazuh',requested_since_kst=start,requested_until_kst=end,window_mode='lookback')
+            r['arguments']={'lookback_minutes':minutes,'limit':50};return r
+        self.assertEqual(h.missing_reads(q,[window(30)]),[])
+        self.assertTrue(h.missing_reads(q,[window(60)]))
+        for other in ('1시간 전 Wazuh 경보 보여줘','30분 간격 Wazuh 경보 보여줘','최근 30분 경보 조사해서 위험 판단해줘'):
+            with self.subTest(other=other):self.assertIsNone(h.event_lookup_scope(other))
+
     def test_recent_listing_cannot_select_a_future_absolute_window(self):
         name='mcp__security_events__search_wazuh_alerts'
         schema={name:{'type':'object','properties':{

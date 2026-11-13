@@ -2932,6 +2932,21 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
                     result['properties'][key]['enum']=[value]
                 result['properties'].pop('lookback_minutes')
                 result['required']=list(dict.fromkeys(result.get('required',[])+['since_kst','until_kst']))
+                return result
+    # One explicit recent window ("최근 30분") ends at the query itself: pin its
+    # length and drop the absolute ends, so the model computes no time (a
+    # computed end 26 s ahead was refused, and "최근 30분" was read as 60
+    # minutes, 2026-11-13). Shared parser with the SDK; a controller-bound
+    # interval is never overwritten.
+    minutes=diagnostic_contract().relative_lookback_minutes(question)
+    lookback=result.get('properties',{}).get('lookback_minutes')
+    if (minutes and isinstance(lookback,dict)
+            and not {'since_kst','until_kst','lookback_minutes'} & set(result.get('required',[]))
+            and 'const' not in lookback and minutes in lookback.get('enum',[minutes])
+            and lookback.get('minimum',1)<=minutes<=lookback.get('maximum',1440)):
+        for key in ('since_kst','until_kst'):result['properties'].pop(key,None)
+        result['properties']['lookback_minutes']={**lookback,'enum':[minutes]}
+        result['required']=list(dict.fromkeys(result.get('required',[])+['lookback_minutes']))
     return result
 
 

@@ -973,6 +973,55 @@ def service_report_context(request, question, requested_at, receipts, *, now=Non
     return value
 
 
+_RELATIVE_WORD_NUMBERS = {'한': 1, '두': 2, '세': 3, '네': 4, '다섯': 5, '여섯': 6, '열두': 12}
+_RELATIVE_NUMBER = r'([0-9]{1,4}|한|두|세|네|다섯|여섯|열두|반)'
+_RELATIVE_WINDOW_PATTERNS = (r'(?:최근|지난|직전)\s*' + _RELATIVE_NUMBER + r'\s*(분|시간)',
+                             _RELATIVE_NUMBER + r'\s*(분|시간)\s*(?:동안|간(?!격)|이내)')
+
+
+def relative_lookback_minutes(question):
+    """Minutes of one explicit recent window ending now, or None.
+
+    Accepts a single duration such as "최근 30분", "지난 2시간", "직전 10분",
+    "한 시간 동안", "30분간". Both bots pin their first event read to it instead
+    of letting the model compute absolute times (2026-11-13: a computed end 26 s
+    ahead was refused; "최근 30분" was read as 60 minutes). A clock time, date,
+    explicit start/end, a point in time ("1시간 전"), several durations or more
+    than 24 hours is left to the existing paths unchanged.
+    """
+    if not isinstance(question, str):
+        return None
+    text = re.sub(r'\s+', ' ', question)
+    if re.search(r'어제|그제|그저께|내일|모레|부터|까지|이후|이전|사이|[0-9]\s*시\s*[0-9]*\s*분|[0-9]{1,2}:[0-9]{2}|'
+                 r'[0-9]+\s*(?:일|주|개월|달|년)\s*(?:간|동안|전|이내)?(?![가-힣])|'
+                 r'(?:[0-9]+|한|두|세|네|반)\s*(?:분|시간)\s*(?:전|뒤|후)|[0-9]+\s*시간\s*[0-9]+\s*분|간격|마다', text):
+        return None
+    values = set()
+    for pattern in _RELATIVE_WINDOW_PATTERNS:
+        for amount, unit in re.findall(pattern, text):
+            if amount == '반':
+                minutes = 30 if unit == '시간' else None
+            else:
+                value = int(amount) if amount.isdigit() else _RELATIVE_WORD_NUMBERS[amount]
+                minutes = value * (60 if unit == '시간' else 1)
+            if minutes is None:
+                return None
+            values.add(minutes)
+    if len(values) != 1:
+        return None
+    minutes = values.pop()
+    return minutes if 1 <= minutes <= 1440 else None
+
+
+def without_relative_window(text):
+    """The text without its one explicit recent window, when relative_lookback_minutes accepts it."""
+    if not isinstance(text, str) or relative_lookback_minutes(text) is None:
+        return text
+    for pattern in _RELATIVE_WINDOW_PATTERNS:
+        text = re.sub(pattern, ' ', re.sub(r'\s+', ' ', text))
+    return text
+
+
 def read_time_input_rejection(arguments, schema, now=None):
     """Validate a registered KST interval before dispatch, never swap endpoints.
 

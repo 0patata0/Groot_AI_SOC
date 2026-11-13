@@ -1002,7 +1002,8 @@ def _event_lookup_request(question):
     # These event searches do not attest a Suricata drop or a Wazuh response.
     # Keep requests for those actions in investigation, not listing completion.
     if '차단' in text and devices != {'modsecurity'}: return None
-    rest = re.sub(r'WAF|ModSecurity|IDS|IPS|Suricata|수리카타|Wazuh|와주', '', text, flags=re.I)
+    # One explicit recent window ("최근 30분") is a listing bound, not an unknown filter.
+    rest = re.sub(r'WAF|ModSecurity|IDS|IPS|Suricata|수리카타|Wazuh|와주', '', CONTRACT.without_relative_window(text), flags=re.I)
     if counts: rest = re.sub(r'[0-9]+\s*(?:개|건)', '', rest)
     rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|정리(?:해서|해줘)?|'
                   r'조회(?:해줘|해주세요)?|오늘|금일|최근|지금|현재|올라온|차단|보안|로그|경보|이벤트|'
@@ -1057,6 +1058,9 @@ def event_lookup_missing(question, calls):
                              and ('until_kst' not in args or EVIDENCE.parse_instant(args['until_kst']) == end))
                 if re.search(r'오늘|금일', normalized(question)):
                     valid = valid and start == now.replace(hour=0,minute=0,second=0,microsecond=0)
+                window = CONTRACT.relative_lookback_minutes(question)
+                if window:  # "최근 30분" is complete only with a 30-minute read.
+                    valid = valid and abs((end-start).total_seconds()-window*60) < 1
                 for row in rows:
                     if not isinstance(row,dict):
                         valid = False
@@ -2839,17 +2843,20 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
                 schema['properties'].pop('lookback_minutes',None)
                 schema['required'] = list(dict.fromkeys([*schema.get('required',[]),'since_kst','until_kst']))
             else:
-                # Unspecified recent listings use the registered rolling window;
+                # Recent listings use a rolling window ending at the query:
                 # asking the model to calculate absolute times produced a future
-                # interval in a real chat. Do not expand the catalog's bounds.
+                # interval in a real chat. An explicit "최근 30분" keeps its own
+                # length (shared parser with Native); otherwise the registered
+                # 60 minutes. Do not expand the catalog's bounds.
+                window = CONTRACT.relative_lookback_minutes(question) or 60
                 minutes = props.get('lookback_minutes',{})
                 if (set(schema.get('required',[])) & {'since_kst','until_kst'}
                         or minutes.get('type') != 'integer'
-                        or minutes.get('minimum',1) > 60 or minutes.get('maximum',1440) < 60
-                        or 60 not in minutes.get('enum',[60])):
+                        or minutes.get('minimum',1) > window or minutes.get('maximum',1440) < window
+                        or window not in minutes.get('enum',[window])):
                     result.pop(name); continue
                 for key in ('since_kst','until_kst'):schema['properties'].pop(key,None)
-                schema['properties']['lookback_minutes'] = {**minutes,'enum':[60]}
+                schema['properties']['lookback_minutes'] = {**minutes,'enum':[window]}
                 schema['required'] = list(dict.fromkeys([*schema.get('required',[]),'lookback_minutes']))
         return result
     if ids_policy_question(question) and any(c.get('server')=='rule-a' and c.get('name')=='get_service_action_target'

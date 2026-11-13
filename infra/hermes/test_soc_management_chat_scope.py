@@ -80,9 +80,12 @@ class Conditions(unittest.TestCase):
         self.assertTrue(V(out).is_valid(valid));self.assertFalse(V(out).is_valid({}))
         for changes in ({'since_kst':'2026-11-06T11:00:00+09:00'},{'lookback_minutes':60},{'until_kst':'2026-11-06T19:00:00+09:00'}):
             self.assertFalse(V(out).is_valid(dict(valid,**changes)))
-        for q in ('오늘 최근 1시간','오늘 11시부터','어제부터 오늘까지','오늘 10:30 이후'):
+        for q in ('오늘 11시부터','어제부터 오늘까지','오늘 10:30 이후'):
             other=w.initial_event_filter_schema(n,s,q,now)
             self.assertIn('lookback_minutes',other['properties']);self.assertNotIn('enum',other['properties']['since_kst'])
+        # 2026-11-13: an explicit recent window is pinned to its own length, not to today.
+        other=w.initial_event_filter_schema(n,s,'오늘 최근 1시간',now)
+        self.assertEqual(other['properties']['lookback_minutes']['enum'],[60]);self.assertNotIn('since_kst',other['properties'])
         for now2 in (None,'2026-11-06T11:00:00Z','invalid'):
             other=w.initial_event_filter_schema(n,s,'오늘 경보',now2)
             self.assertIn('lookback_minutes',other['properties'])

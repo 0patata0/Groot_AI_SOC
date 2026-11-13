@@ -1,6 +1,6 @@
 {
   "subject": "Zero-sample check: epistemic 'cannot judge' phrases (알/판단할/배제할/확정할 ... 수 없-) are not absence claims",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_confirmed_on_b",
   "incident": {
     "at_kst": "2026-11-14T03:36:57+09:00",
     "post": "q5pepmg56bdx3gau3xo5hcs6jy",
@@ -95,9 +95,52 @@
     "ollama_receipt": "2 keys at base",
     "deploy_dir_free": true
   },
-  "not_done": [
-    "apply on B after approval",
-    "real chat",
-    "confirm or let the 45-minute rollback run"
-  ]
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-14: 0건 검사 판단 구문 수정 적용해줘",
+    "at_kst": "2026-11-14T04:16:12+09:00",
+    "source_commit": "ca4e690",
+    "state_dir": "/var/lib/capstone-service-grounding/20261114-zero-modal",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 04:19:44"
+    ],
+    "installed": {
+      "runner x4 + gate": "795af33e90b13669",
+      "query x2": "eb56d14a7edbe23b"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 3,
+      "receipts": true,
+      "failed_units": 0,
+      "live_checks": {
+        "cannot_rule_out_passes": true,
+        "cannot_know_passes": true,
+        "cannot_find_rejected": true,
+        "connective_absence_rejected": true
+      }
+    },
+    "real_chat": {
+      "post_kst": "04:17:09",
+      "post": "qtny9cwcs3f4u8zo9uqkpxh66w",
+      "hermes": {
+        "drafts": 1,
+        "final": "posted on the first draft (unresolved + monitor), fourth clean post since 01:20",
+        "epistemic_path_fired": false
+      },
+      "peer": {
+        "attempts": 1,
+        "claims": "3 dissent (2 repeat limits the lead already stated)",
+        "internal_ids_exposed": [
+          "e9",
+          "e32"
+        ]
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 8
+  },
+  "next_candidate": "peer text id stripping uses (근거|증거|evidence)\\s+e9\\b; Python's Unicode \\b fails before Korean particles ('e9에'), and bare ids ('e70으로') are not handled"
 }

@@ -1622,3 +1622,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-13 23:34 KST — 보고서 정정 진단·0건 숫자 경계·제어 줄 순서 적용 (B, 관리자231 경유)
 
 사용자 승인("보고서 근거 검사 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 11곳을 교체했다. 대상은 관리 실행기 `6b605668`→`76bd1e09` ×4, query-completion `fb935f63`→`18a04801` ×2, 하네스 `dba169a1`→`7b427f36` ×2, `skill-soc-investigate.md` `24fc9e24`→`acab349c` ×3이다. 컨트롤러 내장본과 Ollama 영수증 4항목도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 진단 전달과 제어 줄 순서 정정, 교차 검토의 0건 이견 거절이 실제로 동작했다. 다만 모델이 제어 줄을 백틱으로 감싸 보고서는 여전히 대체 문구로 끝났다(다음 후보). 23:40:04에 확정했다. [기록](../infra/validation/report-repair/README.md).
+
+## 2026-11-13 23:47 KST — 제어 줄 서식 진단 보강 적용 (B, 관리자231 경유)
+
+사용자 승인("제어 줄 서식 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 9곳을 교체했다. 대상은 관리 실행기 `76bd1e09`→`b32ea4c6` ×4, query-completion `18a04801`→`576736f4` ×2, `skill-soc-investigate.md` `acab349c`→`eeb28a8d` ×3이다. 컨트롤러 내장본과 Ollama 영수증 3항목도 갱신하고 Ollama 봇만 재시작했다. 실제 채팅에서 제어 줄 서식은 해결됐고, 정정 진단과 순서 정정도 동작했다. 남은 실패는 판단 `unresolved`와 상태 `resolved`의 모순으로, 이 규칙을 컨트롤러가 실행 후에만 검사해 생긴다(다음 후보). 23:53:06에 확정했다. [기록](../infra/validation/control-format/README.md).

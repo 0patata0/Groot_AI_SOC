@@ -1,6 +1,6 @@
 {
   "subject": "Formatted control lines (backticks/bold/quotes) are named in the repair diagnosis; skill states the order without formatted names",
-  "status": "candidate_tested_not_applied",
+  "status": "applied_b_confirmed_formatting_resolved",
   "incident_2026_11_13_2335": {
     "drafts": [
       "'`MANAGEMENT_STATUS`: monitor'",
@@ -83,9 +83,45 @@
     "embedded_gate": "76bd1e09a84fb316",
     "ollama_receipt": "3 keys at base"
   },
-  "not_done": [
-    "apply on B after approval",
-    "real chat: control lines unformatted and report posted without fallback, or the diagnosis names the formatting",
-    "confirm or let the 45-minute rollback run"
+  "not_done": [],
+  "applied": {
+    "approval": "user 2026-11-13: 제어 줄 서식 수정 적용해줘",
+    "at_kst": "2026-11-13T23:47:36+09:00",
+    "state_dir": "/var/lib/capstone-service-grounding/20261113-control-format",
+    "markers": [
+      "APPLIED",
+      "CONFIRMED 23:53:06"
+    ],
+    "installed": {
+      "runner x4 + gate": "b32ea4c6e4250647",
+      "query x2": "576736f44ed7bb36",
+      "skill-soc-investigate x3": "eeb28a8d21efdaf8"
+    },
+    "postcheck": {
+      "pins": true,
+      "embedded_gate": true,
+      "ticks": 4,
+      "live_format_diagnosis": true,
+      "skill_sentence_3_copies": true
+    },
+    "real_chat": {
+      "post_kst": "23:48:35",
+      "control_lines_unformatted": "both drafts",
+      "draft1": "order wrong, disposition JSON malformed, zero sample phrasing - all named by the diagnosis",
+      "draft2": "order and formatting correct; assessment unresolved with MANAGEMENT_STATUS resolved",
+      "final": "controller rejected incident_disposition_unresolved after the run -> fallback",
+      "peer": {
+        "peer_validation_errors": [
+          "peer_zero_sample_dissent"
+        ],
+        "claims": "3 unverified (over-cautious), internal ids exposed in text"
+      }
+    },
+    "rollback_timer": "stopped (inactive)",
+    "replaced_files_kept": 11
+  },
+  "next_candidate": [
+    "check the controller's disposition/status consistency (unresolved cannot be resolved) inside the repair loop with an exact diagnosis; rule unchanged",
+    "peer: do not expose catalog ids in claim text; snapshot-time difference alone is not a reason for unverified"
   ]
 }

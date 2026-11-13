@@ -218,6 +218,35 @@ def read_trace_calls(store, run_id, *, partial=False):
     return calls
 
 
+TIME_ARGUMENTS = ('since_kst', 'until_kst', 'lookback_minutes', 'limit')
+
+
+def uncorrected_tool_failure(controller, receipts):
+    """True while any tool error of this run is still unresolved at its end.
+
+    A read-time validation refusal (the controller's own event_time_query_scope:
+    "until_kst must be in the past 90 days") that the same run later repeated
+    successfully with the same tool and the same non-time filters was a corrected
+    input, not a tool failure. 2026-11-13 17:21: a model-rounded end time one
+    second ahead of the clock was refused, the model re-read successfully, and
+    the chat still showed "tool lookup failed". Every other error, a refusal with
+    no later success, or a refusal after the last success still counts.
+    """
+    open_refusals = set()
+    for call in receipts:
+        name = 'mcp__%s__%s' % (str(call.get('server', '')).replace('-', '_'), call.get('name', ''))
+        arguments = call.get('arguments') if isinstance(call.get('arguments'), dict) else {}
+        if call.get('is_error'):
+            key = controller.event_time_query_scope(name, arguments, call.get('result'))
+            if key is None:
+                return True
+            open_refusals.add(key)
+        else:
+            open_refusals.discard((name, controller.canonical(
+                {k: v for k, v in arguments.items() if k not in TIME_ARGUMENTS})))
+    return bool(open_refusals)
+
+
 def native_failure_evidence(harness, store, run_id, calls, *, tool_failure=False):
     """Keep actual read receipts when final generation fails; never complete/cache.
 
@@ -679,6 +708,11 @@ def main():
             scope_complete = False
             peer_review = None
             tool_failure=any(c['completed'] and c['is_error'] for c in calls)
+            if tool_failure and result['completed']:
+                try:  # A corrected read-time refusal is not a failure; any doubt keeps the failure verdict.
+                    tool_failure=uncorrected_tool_failure(m, read_trace_calls(store, result['run_id']))
+                except (ValueError, KeyError, TypeError, OSError, AttributeError):
+                    tool_failure=True
             failed_evidence=(native_failure_evidence(harness,store,result['run_id'],calls,tool_failure=tool_failure)
                              if not result['completed'] or tool_failure else None)
             if failed_evidence:text=failed_evidence['text']

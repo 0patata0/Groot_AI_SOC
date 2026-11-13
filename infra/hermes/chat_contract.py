@@ -973,14 +973,29 @@ def service_report_context(request, question, requested_at, receipts, *, now=Non
     return value
 
 
-def read_time_input_rejection(arguments, schema):
-    """Validate a registered KST interval before dispatch, never swap endpoints."""
-    keys={'since_kst','until_kst'}
+def read_time_input_rejection(arguments, schema, now=None):
+    """Validate a registered KST interval before dispatch, never swap endpoints.
+
+    A future until_kst is refused here with its real cause. The event MCP refuses
+    it too, but only as "must be in the past 90 days", which named the wrong
+    cause; a model-rounded end only seconds ahead of the clock made a whole chat
+    lookup fall back to "tool failure" (2026-11-13 17:21). Inputs are never
+    rewritten: the model corrects the time itself.
+    """
     if (not isinstance(arguments,dict) or not isinstance(schema,dict)
-            or not keys<=set(arguments) or not keys<=set(schema.get('properties',{}))):return None
-    since,until=(_diagnostic_instant(arguments[k]) for k in ('since_kst','until_kst'))
-    error=('tool_input_time_invalid' if since is None or until is None else
-           'tool_input_time_order_invalid' if since>=until else None)
+            or 'until_kst' not in arguments or 'until_kst' not in schema.get('properties',{})):return None
+    until=_diagnostic_instant(arguments['until_kst'])
+    paired='since_kst' in arguments and 'since_kst' in schema.get('properties',{})
+    since=_diagnostic_instant(arguments['since_kst']) if paired else None
+    now=now or datetime.now(timezone(timedelta(hours=9)))
+    error=('tool_input_time_invalid' if until is None or paired and since is None else
+           'tool_input_time_order_invalid' if paired and since>=until else
+           'tool_input_time_future' if until>now else None)
+    if error=='tool_input_time_future':
+        return {'error':error,'executed':False,'mcp_executed':False,'stage':'before_mcp',
+            'until_kst':arguments['until_kst'],'checked_at_kst':now.isoformat(),
+            'detail':'조회 종료 시각(until_kst)이 현재 시각보다 미래라 조회하지 않았습니다. 요청 시각(requested_at_kst) 이하의 '
+                     'KST 시각으로 정정하세요. 인자는 자동 변경하지 않았습니다.'}
     if error:return {'error':error,'executed':False,'mcp_executed':False,'stage':'before_mcp',
         'detail':'조회 시작·종료를 유효한 KST 시각으로 지정하고 시작이 종료보다 이르게 정정하세요. 인자는 자동 변경하지 않았습니다.'}
     return None

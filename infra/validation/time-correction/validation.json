@@ -1,0 +1,70 @@
+{
+  "subject": "Future until_kst refusal with its real cause, and corrected read-time refusals no longer reported as tool failure",
+  "status": "candidate_tested_not_applied",
+  "incident": {
+    "run_kst": "2026-11-13T17:21",
+    "requested_at_kst": "2026-11-13T17:21:00.929562+09:00",
+    "model_until_kst": "2026-11-13T17:21:27+09:00",
+    "executed_kst": "2026-11-13T17:21:26",
+    "mcp_error": "until_kst must be in the past 90 days",
+    "corrected_read": "lookback_minutes=60 succeeded",
+    "posted": "도구 조회가 실패해 최종 판단은 미완료 (worker tool_failure=any error)"
+  },
+  "changes": {
+    "infra/hermes/chat_contract.py": "read_time_input_rejection: tool_input_time_future before MCP; until-only reads checked; inputs never rewritten",
+    "infra/hermes/review_channel_worker.py": "uncorrected_tool_failure: a read-time refusal repeated successfully with same tool and non-time filters is not a failure; any doubt keeps failure"
+  },
+  "sha256": {
+    "review_channel_worker.py": {
+      "base": "bba9a951405324c8",
+      "candidate": "9973fbf18762bd13cfed89982b84c7281da07bb415c4ac5f6788710d8db8e048"
+    },
+    "chat_contract.py": {
+      "base": "4ef328b644c0bdf6",
+      "candidate": "2cae4b65c553dc445b6d503dbf888b187a4656e95d10920dba7a21946e2eca96"
+    },
+    "test_review_time_correction.py": "b507bc6f7dba9d60da98b2afbb7148e2daaf11077bef4d9628217dd9721fa9e4"
+  },
+  "tests": {
+    "new": {
+      "passed": 7,
+      "count": 7
+    },
+    "suites_vs_head": {
+      "hermes": 1244,
+      "query_completion": 408,
+      "ollama_trial": 362,
+      "mcp": 708,
+      "deployment": 343
+    },
+    "new_failures": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "report": "G_Harness2/runs/2026-11-13-time-correction-203228/REPORT.json (Git-excluded)",
+    "census": {
+      "components": 25,
+      "skills": 5,
+      "scripts": 18,
+      "sub_agents": 0,
+      "always_on_char_delta": 0
+    },
+    "changed": [
+      "scripts/channel_worker.py",
+      "scripts/chat_contract.py"
+    ]
+  },
+  "live_precondition_kst": "2026-11-13T20:31",
+  "live": {
+    "controller_has_functions": true,
+    "real_refusal_recognized": true,
+    "copies_equal_base": 4,
+    "ollama_receipt_equal": true
+  },
+  "apply": "infra/validation/time-correction/apply_b.py (4 copies + Ollama receipt, restart capstone-ollama-chat when idle)",
+  "not_done": [
+    "apply on B",
+    "real chat check after apply",
+    "relative-window ('최근 N분') resolution from requested_at_kst"
+  ]
+}

@@ -306,3 +306,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-14T22:48:39.353793+09:00 정정 프로필 강제와 불완전한 합성 완료 이벤트 정정
 
 직전helper는2질문모두true/6144를강제했으나기존상태/서식정정은none/2048이었다. 이번builder6전제검사·함수AST동일로확인해새최적화라쓰지않음. 첫post-model재처리의Emitter.tool.completed누락은가짜시험절차오류였고모델6원문그대로wire+successEmitter로재처리(모델/MCP추가0). Mac489는fixture35중복수집으로고쳐454. 최초결과/정정모두보존. [입출력·분모·한계](../infra/validation/judgment-format/README.md).
+
+## 상태 후보 비교의 시험 입력 정정 (2026-11-14)
+
+첫8 API 시도에서 이전 후보4건이 생성 전HTTP500이었다. 합성 도구의properties 누락을 원형/보충2시도로 확인하고 시험 입력만 고쳐 양군8생성을 다시 비교했다. 총18시도/13생성/생성 전 시험 오류5이며 첫 비교는 품질 판단에서 제외한다. 최초 more_evidence prefix 측정도 메시지 추가 이후 비교한 오류여서 새 비교는 요청 직전에 측정했다. [모든 출력·분모](../infra/validation/control-status/model-results.json). 초기 설치의 오래된 assertion1실패는 기존96KiB 규칙에 시험만 맞춘 뒤 Mac/B46통과했다. 최초 경계 시험의CRLF 제어 줄과금지된0 root flag는 fixture를 기존 문법에 맞췄으며 parser/권한을 완화하지 않았다.

@@ -1,0 +1,1195 @@
+{
+  "scope": "four targeted development cases with synthetic current MCP receipts, actual installed Hermes nonstreaming API helper through B tunnel and trained-model API, native decoder; not full CLI, real MCP, chat or independent accuracy",
+  "case_count": 4,
+  "normalized_generations": 8,
+  "actual_api_attempts_total": 18,
+  "successful_provider_generations_total": 13,
+  "initial_comparison": {
+    "valid_for_comparative_quality": false,
+    "attempts": 8,
+    "provider_completions": 4,
+    "http_500_before_generation": 4,
+    "reason": "Synthetic tool fixtures omitted parameters.properties. Candidate removed tools for status choice; R2 hit the invalid schema. These are test setup errors, not operating model failures.",
+    "prefix_metric_invalid_for_more_evidence": true
+  },
+  "fixture_diagnosis": {
+    "api_attempts": 2,
+    "original_http_500": 1,
+    "original_error": "JSON schema error at #: properties must be an object",
+    "normalized_provider_completion": 1,
+    "fix": "Only test fixture schemas receive properties={}; no production schema change."
+  },
+  "normalized_protocol": {
+    "api_attempts": 8,
+    "failures": 0,
+    "temperature_and_seed": "not explicitly set; existing backend defaults",
+    "order": "R2 then candidate for each case",
+    "max_tokens": 2048,
+    "reasoning_effort": "none; existing format-repair profile",
+    "new_model_optimization": false
+  },
+  "rows": [
+    {
+      "arm": "r2",
+      "case": "enum-confusion",
+      "seconds": 1.997279,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 92,
+        "prompt_tokens": 1722,
+        "total_tokens": 1814,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1718
+        }
+      },
+      "provider_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: unresolved",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: unresolved",
+      "source_draft_sha256": "a92eac9ccc245aa0ab1e6e98cc22b27aca1805918c926be92207bb6c8e702d6c",
+      "structured_request": false,
+      "response_format": null,
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": false,
+      "judgment_error": null,
+      "management_status": null,
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 4.791311
+    },
+    {
+      "arm": "candidate",
+      "case": "enum-confusion",
+      "seconds": 2.392837,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 52,
+        "prompt_tokens": 1778,
+        "total_tokens": 1830,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1072
+        }
+      },
+      "provider_content": "{\"more_evidence\": false, \"request_nonce\": \"a1d148d29b3c462d9c28ff87461d1949\", \"status\": \"needs_review\"}",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "source_draft_sha256": "a92eac9ccc245aa0ab1e6e98cc22b27aca1805918c926be92207bb6c8e702d6c",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "a1d148d29b3c462d9c28ff87461d1949"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "a1d148d29b3c462d9c28ff87461d1949"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": true,
+      "judgment_error": null,
+      "management_status": "needs_review",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.163016,
+      "all_non_status_bytes_preserved": true
+    },
+    {
+      "arm": "r2",
+      "case": "missing-state",
+      "seconds": 3.15106,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 93,
+        "prompt_tokens": 1714,
+        "total_tokens": 1807,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 676
+        }
+      },
+      "provider_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "source_draft_sha256": "2f0349c5fb2ed1e021d3af5a545683a57065e7e8961b648bfb125505ff32a30e",
+      "structured_request": false,
+      "response_format": null,
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": false,
+      "judgment_error": null,
+      "management_status": "needs_review",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.885625
+    },
+    {
+      "arm": "candidate",
+      "case": "missing-state",
+      "seconds": 2.277804,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 1773,
+        "total_tokens": 1821,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1064
+        }
+      },
+      "provider_content": "{\"more_evidence\": false, \"request_nonce\": \"8d4bcbb8a6e14227bbb5c163c580f903\", \"status\": \"monitor\"}",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "source_draft_sha256": "2f0349c5fb2ed1e021d3af5a545683a57065e7e8961b648bfb125505ff32a30e",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "8d4bcbb8a6e14227bbb5c163c580f903"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "8d4bcbb8a6e14227bbb5c163c580f903"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": true,
+      "judgment_error": null,
+      "management_status": "monitor",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 4.993062,
+      "all_non_status_bytes_preserved": true
+    },
+    {
+      "arm": "r2",
+      "case": "formatted-state",
+      "seconds": 3.255259,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 92,
+        "prompt_tokens": 1776,
+        "total_tokens": 1868,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 676
+        }
+      },
+      "provider_content": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nMANAGEMENT_STATUS: unresolved",
+      "decoded_content": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nMANAGEMENT_STATUS: unresolved",
+      "source_draft_sha256": "bddfa565826455a1b454e240efaa7f7ea2b9c56fe9bfd996790af322c2e992ea",
+      "structured_request": false,
+      "response_format": null,
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": false,
+      "judgment_error": null,
+      "management_status": null,
+      "guarded_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.887663
+    },
+    {
+      "arm": "candidate",
+      "case": "formatted-state",
+      "seconds": 2.431069,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 59,
+        "prompt_tokens": 1829,
+        "total_tokens": 1888,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1126
+        }
+      },
+      "provider_content": "{\n  \"more_evidence\": false,\n  \"request_nonce\": \"7792a9662c2e4a0cbf9d3470c7cc4b8a\",\n  \"status\": \"monitor\"\n}",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "source_draft_sha256": "bddfa565826455a1b454e240efaa7f7ea2b9c56fe9bfd996790af322c2e992ea",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "7792a9662c2e4a0cbf9d3470c7cc4b8a"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "7792a9662c2e4a0cbf9d3470c7cc4b8a"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "bound_judgment_unchanged": true,
+      "judgment_error": null,
+      "management_status": "monitor",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.033775,
+      "all_non_status_bytes_preserved": true
+    },
+    {
+      "arm": "r2",
+      "case": "needs-more-evidence",
+      "seconds": 4.613015,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 145,
+        "prompt_tokens": 1960,
+        "total_tokens": 2105,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 676
+        }
+      },
+      "provider_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n| 사건 원인 및 영향 | 불확실 (현재 단계: 원인 분석) |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"호스트 목록 조회(mcp__wazuh_ro__get_wazuh_agents)는 완료되었으나, 요청된 '사건 원인'은 아직 조사되지 않았습니다. 현재 상태는 정보 수집(Read-Only) 수준이며, 추가적인 심층 분석이 필요합니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n| 사건 원인 및 영향 | 불확실 (현재 단계: 원인 분석) |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"호스트 목록 조회(mcp__wazuh_ro__get_wazuh_agents)는 완료되었으나, 요청된 '사건 원인'은 아직 조사되지 않았습니다. 현재 상태는 정보 수집(Read-Only) 수준이며, 추가적인 심층 분석이 필요합니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "source_draft_sha256": "ca45878b6d77e1e7cae8d748c7c98cb1b5ff2756278827e3efc91b59d3691e60",
+      "structured_request": false,
+      "response_format": null,
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": false,
+      "bound_judgment_unchanged": false,
+      "judgment_error": null,
+      "management_status": "needs_review",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n| 사건 원인 및 영향 | 불확실 (현재 단계: 원인 분석) |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"호스트 목록 조회(mcp__wazuh_ro__get_wazuh_agents)는 완료되었으나, 요청된 '사건 원인'은 아직 조사되지 않았습니다. 현재 상태는 정보 수집(Read-Only) 수준이며, 추가적인 심층 분석이 필요합니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 7.284045
+    },
+    {
+      "arm": "candidate",
+      "case": "needs-more-evidence",
+      "seconds": 2.403623,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 46,
+        "prompt_tokens": 2030,
+        "total_tokens": 2076,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 1310
+        }
+      },
+      "provider_content": "{\"more_evidence\":true,\"request_nonce\":\"070f5f5bc495427a9f2851cff800d895\",\"status\":null}",
+      "decoded_content": "추가 근거가 필요하므로 등록된 읽기 도구로 조사를 이어가겠습니다.",
+      "source_draft_sha256": "ca45878b6d77e1e7cae8d748c7c98cb1b5ff2756278827e3efc91b59d3691e60",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "070f5f5bc495427a9f2851cff800d895"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "070f5f5bc495427a9f2851cff800d895"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": true,
+      "inquiry_action": "continue",
+      "next_requires_read": true,
+      "parsed_assessment": null,
+      "judgment_preserved": null,
+      "bound_judgment_unchanged": true,
+      "judgment_error": "incident_disposition_missing",
+      "management_status": null,
+      "guarded_final": null,
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_api_attempts": 1,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.161913,
+      "final_report_created": false
+    }
+  ],
+  "controller_replay": [
+    {
+      "arm": "r2",
+      "case": "enum-confusion",
+      "state": "needs_review",
+      "detail": "model_needs_review",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "candidate",
+      "case": "enum-confusion",
+      "state": "needs_review",
+      "detail": "model_needs_review",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "r2",
+      "case": "missing-state",
+      "state": "needs_review",
+      "detail": "model_needs_review",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "candidate",
+      "case": "missing-state",
+      "state": "monitor",
+      "detail": "model_requested_followup",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "r2",
+      "case": "formatted-state",
+      "state": "needs_review",
+      "detail": "model_needs_review",
+      "stored_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "candidate",
+      "case": "formatted-state",
+      "state": "monitor",
+      "detail": "model_requested_followup",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "r2",
+      "case": "needs-more-evidence",
+      "state": "needs_review",
+      "detail": "model_needs_review",
+      "stored_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n| 사건 원인 및 영향 | 불확실 (현재 단계: 원인 분석) |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"호스트 목록 조회(mcp__wazuh_ro__get_wazuh_agents)는 완료되었으나, 요청된 '사건 원인'은 아직 조사되지 않았습니다. 현재 상태는 정보 수집(Read-Only) 수준이며, 추가적인 심층 분석이 필요합니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: needs_review",
+      "final_report_created": true,
+      "mcp_calls": 0,
+      "operating_db_changes": 0
+    },
+    {
+      "arm": "candidate",
+      "case": "needs-more-evidence",
+      "state": "continued_read_required",
+      "final_report_created": false
+    }
+  ],
+  "initial_rows": [
+    {
+      "arm": "r2",
+      "case": "enum-confusion",
+      "error_class": "InternalServerError",
+      "actual_mcp_calls": 0,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "observer_seconds": 3.180716
+    },
+    {
+      "arm": "candidate",
+      "case": "enum-confusion",
+      "seconds": 3.447213,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 1774,
+        "total_tokens": 1822,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "provider_content": "{\"more_evidence\": true, \"request_nonce\": \"2718bf0ea4d54484a3753c9c7ab235b6\", \"status\": null}",
+      "decoded_content": "추가 근거가 필요하므로 등록된 읽기 도구로 조사를 이어가겠습니다.",
+      "source_draft_sha256": "a92eac9ccc245aa0ab1e6e98cc22b27aca1805918c926be92207bb6c8e702d6c",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "2718bf0ea4d54484a3753c9c7ab235b6"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "2718bf0ea4d54484a3753c9c7ab235b6"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": false,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": true,
+      "inquiry_action": "continue",
+      "next_requires_read": true,
+      "parsed_assessment": null,
+      "judgment_preserved": false,
+      "judgment_error": "incident_disposition_missing",
+      "management_status": null,
+      "guarded_final": null,
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 6.067325
+    },
+    {
+      "arm": "r2",
+      "case": "missing-state",
+      "error_class": "InternalServerError",
+      "actual_mcp_calls": 0,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "observer_seconds": 2.995251
+    },
+    {
+      "arm": "candidate",
+      "case": "missing-state",
+      "seconds": 3.229948,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 1773,
+        "total_tokens": 1817,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 33
+        }
+      },
+      "provider_content": "{\"more_evidence\":true,\"request_nonce\":\"a4da1f321af049ef81dc26429d999936\",\"status\":null}",
+      "decoded_content": "추가 근거가 필요하므로 등록된 읽기 도구로 조사를 이어가겠습니다.",
+      "source_draft_sha256": "2f0349c5fb2ed1e021d3af5a545683a57065e7e8961b648bfb125505ff32a30e",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "a4da1f321af049ef81dc26429d999936"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "a4da1f321af049ef81dc26429d999936"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": false,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": true,
+      "inquiry_action": "continue",
+      "next_requires_read": true,
+      "parsed_assessment": null,
+      "judgment_preserved": false,
+      "judgment_error": "incident_disposition_missing",
+      "management_status": null,
+      "guarded_final": null,
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.978849
+    },
+    {
+      "arm": "r2",
+      "case": "formatted-state",
+      "error_class": "InternalServerError",
+      "actual_mcp_calls": 0,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "observer_seconds": 3.198141
+    },
+    {
+      "arm": "candidate",
+      "case": "formatted-state",
+      "seconds": 3.335781,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 51,
+        "prompt_tokens": 1831,
+        "total_tokens": 1882,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 33
+        }
+      },
+      "provider_content": "{\"more_evidence\": false, \"request_nonce\": \"0161e7858d4440df97c9190d11b7666a\", \"status\": \"monitor\"}",
+      "decoded_content": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "source_draft_sha256": "bddfa565826455a1b454e240efaa7f7ea2b9c56fe9bfd996790af322c2e992ea",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "0161e7858d4440df97c9190d11b7666a"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "0161e7858d4440df97c9190d11b7666a"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": true,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": false,
+      "inquiry_action": null,
+      "next_requires_read": null,
+      "parsed_assessment": "unresolved",
+      "judgment_preserved": true,
+      "judgment_error": null,
+      "management_status": "monitor",
+      "guarded_final": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: monitor",
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 6.009231
+    },
+    {
+      "arm": "r2",
+      "case": "needs-more-evidence",
+      "error_class": "InternalServerError",
+      "actual_mcp_calls": 0,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "observer_seconds": 3.006542
+    },
+    {
+      "arm": "candidate",
+      "case": "needs-more-evidence",
+      "seconds": 3.29862,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 43,
+        "prompt_tokens": 2026,
+        "total_tokens": 2069,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 33
+        }
+      },
+      "provider_content": "{\"more_evidence\":true,\"request_nonce\":\"9ac665a2edf040b98492fd1dddc1509e\",\"status\":null}",
+      "decoded_content": "추가 근거가 필요하므로 등록된 읽기 도구로 조사를 이어가겠습니다.",
+      "source_draft_sha256": "ca45878b6d77e1e7cae8d748c7c98cb1b5ff2756278827e3efc91b59d3691e60",
+      "structured_request": true,
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "soc_control_status",
+          "strict": true,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "9ac665a2edf040b98492fd1dddc1509e"
+                  },
+                  "more_evidence": {
+                    "const": true
+                  },
+                  "status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "request_nonce",
+                  "more_evidence",
+                  "status"
+                ],
+                "properties": {
+                  "request_nonce": {
+                    "type": "string",
+                    "const": "9ac665a2edf040b98492fd1dddc1509e"
+                  },
+                  "more_evidence": {
+                    "const": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "monitor",
+                      "needs_review",
+                      "awaiting_approval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "message_prefix_preserved": false,
+      "native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048
+      },
+      "more_evidence": true,
+      "inquiry_action": "continue",
+      "next_requires_read": true,
+      "parsed_assessment": null,
+      "judgment_preserved": false,
+      "judgment_error": "incident_disposition_missing",
+      "management_status": null,
+      "guarded_final": null,
+      "adapter_dispatched_no_tools": true,
+      "fake_current_reads": {
+        "dispatches": 1,
+        "wire": 1,
+        "tool_completions": 1
+      },
+      "actual_mcp_calls": 0,
+      "actual_model_calls": 1,
+      "operating_changes": 0,
+      "chat_posts": 0,
+      "scope": "Actual installed Hermes nonstreaming API helper through B proxy and decoder; coupled fake dispatcher/wire/emitter. Not full Native CLI or real chat.",
+      "observer_seconds": 5.955862
+    }
+  ],
+  "limits": [
+    "Not SFT/training material",
+    "Not the unused 176-case independent evaluation",
+    "Three final reports and one read continuation do not establish end-to-end incident resolution or general accuracy",
+    "No real MCP, operating DB writes, service restarts, actual chat posts, attacks or new training"
+  ]
+}

@@ -1,6 +1,6 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-[공통 판단 형식 R2](../validation/judgment-format/README.md)는 기존 스킬의 필수 필드 안내를 재사용해 basis 누락을 보완했지만 상태 enum 오류가 남아 격리 상태다. 3개 개발 사례 형식1/3→2/3은 실사용 정확도가 아니다. 정본/설치/운영 harness와 모델·권한·추론 선택 코드는 그대로며,실제 MCP/채팅 검증은 남는다.
+[관리 상태 정정 후보](../validation/control-status/README.md)는 Native 실행기와 기존 공통 SKILL에서 유효 판단·본문 보존 및 추가 읽기 복귀를 검증했다. SDK는 상속된 완료 조건과77회귀 범위이며 동일한 새 상태 decoder를 배포한 것이 아니다. 후보는 patch에만 보존하고 정본/설치/운영 harness·모델·권한은 유지한다.
 
 > **2026-11-13 도구 목록 계약(21:51 B 적용·21:59 확정, 교차 검토·단독 조사형 실채팅 확인):** 11/13 00:34 B 규칙 MCP에 Harness² 도구 4개가 추가된 뒤, `rule-b`·`rule-write-b`에 연결하는 Ollama 실행이 모델 호출 전에 `server_tool_contract_changed`로 멈췄다(공동 채널 교차 검토 4회 모두 실패). `policy.py`에서 서버가 광고하는 정확한 도구 집합(`CATALOG_TOOLS`)과 사용 권한을 분리했다. 4개 도구는 계약에만 등록하고 어떤 모드에서도 노출하지 않는다. 그 밖의 목록 변화는 계속 차단하며, MCP 원본과 계약을 대조하는 회귀를 추가했다. [원인·수정·검증](../validation/catalog-contract/README.md).
 

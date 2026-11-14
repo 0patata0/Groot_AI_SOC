@@ -4,7 +4,7 @@
 
 현재 요약 정리 전의 STATUS·PLAN 상세는 각 통합 원장에 `source-dfc3e2a-status`·`source-dfc3e2a-plan`으로 보존했다. 정확히 같은 절만 기존 본문으로 참조하고, 원본 SHA와 Git 복구 위치를 함께 남겼다.
 
-최근 [공통 판단 형식 검증](../infra/validation/judgment-format/README.md)의 필드 보완·기존 프로필 해석 정정·시험 절차 정정과 미적용 결정을 아래 유형별 이력에 추가했다. 코드 회귀·보조 모델 합성·실제 운영 효과를 구분한다.
+최근 [관리 상태 정정 검증](../infra/validation/control-status/README.md)의 판단·본문 보존·추가 읽기 복귀와 시험 입력/설치 assertion 정정·운영 미적용 범위를 유형별 이력에 추가했다. 이전 형식 후보의 상세 현황은 Git d846553에서 복원할 수 있다. 구조·회귀·실제 API·실제 운영 효과를 구분한다.
 
 ## 유형별 통합 이력
 

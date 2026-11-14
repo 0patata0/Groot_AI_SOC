@@ -12698,3 +12698,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## 2026-11-14T22:48:39.353793+09:00 공통 판단 형식 R2 검증과 미적용
 
 필수 basis 안내를 기존 스킬로 묶어 형식1/3→2/3(동일3개개발사례/양군6생성). Native454·SDK77·query408·installer46·기존Hermes29통과(생략/반복분모 원장),상태unresolved오류·한국어사용자보고미검증으로정본/설치/운영미반영. 이전요약은Git31809b4:STATUS.md로복구가능. [입출력·분모·한계](../infra/validation/judgment-format/README.md).
+
+## 관리 상태 정정의 격리 검증 (2026-11-14)
+
+[후보 원장](../infra/validation/control-status/README.md)에 전체16/증분6패치·SHA와 Native536/SDK77/조회408/설치46·기존Hermes536/생략0을 보존했다. 표적3상태 사례의 유효값은 이전1/3→후보3/3이며 판단·본문을 보존했다. 추가1사례는 기존 읽기로 복귀했으나 실제 추가 MCP·최종 판단은 실행하지 않았다. canonical/초기 설치/운영은137 유지·미적용이다. 직전 현재 요약은 Git d846553ef32a3030f2058ed8cd39471496a9ee37:STATUS.md로 복구한다.

@@ -6297,3 +6297,7 @@ NCSC/NIS 지침은 부분 대조이며 기관 준수 인증을 주장하지 않�
 ## 2026-11-14T22:48:39.353793+09:00 필드 안내 뒤의 공통 상태 형식 제약
 
 basis누락은R2에서보완했고추론코드는그대로다. 이전true/6144강제probe는기존none/2048정정경로재현이아니므로정정했다. 다음은기존nonce/current-turn/structured-request-decoder재사용·판단/본문/인용유지·필요시실제추가읽기복귀·유한상태선택,정확승인/실채팅/독립평가별도. [입출력·분모·한계](../infra/validation/judgment-format/README.md).
+
+## 상태 형식 이후의 적용 준비 (2026-11-14)
+
+기존 판단을 코드가 대체하지 않는 상태 선택·추가 읽기 경로를 [격리 검증](../infra/validation/control-status/README.md)했다. 다음은 현재 프로필의 root controller 내장 gate·전체 사본/영수증·유휴 반영·독립 원복을 구체화한 뒤 정확 승인·새 실제 채팅/MCP다. 교차 검토 의미·미사용176독립평가·OS 임시권한·인라인IPS 등은 여전히 남는다. 직전 PLAN은 Git d846553에서 복구한다.

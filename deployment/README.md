@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[공통 형식 R2](../infra/validation/judgment-format/README.md)는 전체14/부모대비6파일 patch로 보존한 격리 후보다. deploy.sh·초기 설치 입력·운영 사본은 기존 소스를 유지한다. 부모 R1의 controller 미리보기는 옛 gate SHA에 결속돼 있어 새 후보 배포본으로 재사용하지 않는다. 정확 적용/복구 묶음·모든 사본/영수증·유휴 반영·승인·새 실제 채팅은 별도 준비/검증이 필요하다.
+[관리 상태 정정 후보](../infra/validation/control-status/README.md)는 전체16/부모 대비6파일 패치로만 보존한다. 정본·초기 설치·운영은 현재 소스를 유지한다. 설치 회귀46은 통과했으며 오래된 크기 assertion만 기존96KiB 실행 규칙과 일치시켰다. 실제 새 OS 설치나 운영 반영이 아니다. 현재 프로필의 내장 gate·모든 사본/영수증/pin·유휴 반영·독립 원복·정확 승인·새 채팅을 먼저 준비/검증한다.
 
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.
 

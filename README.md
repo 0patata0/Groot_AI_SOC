@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [공통 판단 형식 후보](infra/validation/judgment-format/README.md)는 필수 basis 누락을 보완했고 Native454·SDK77·조회408·설치46과 Hermes환경29 검사를 통과했습니다(생략 수는 원장 참조). 같은 모델3개 개발 사례의 형식1/3→2/3은 일반 정확도가 아니며 상태 값 오류·한국어 실사용 보고 검증이 남아 정본/설치/운영에 반영하지 않았습니다. 직전 보조 시험의 추론 설정 차이도 정정했습니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수는 유지하며 사진/학번은 공란입니다. 실제 채팅·MCP·공격·학습·운영 변경0,아래 날짜별 내용은 당시 기록입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 정정 후보](infra/validation/control-status/README.md)는 기존 판단·본문을 보존하고 모델이 상태 또는 추가 조회를 선택합니다. Native536은 기존 Hermes 환경에서 생략 없이 통과했고 SDK77·조회408·설치46을 확인했습니다. 표적 API 형식3사례는 이전1/3→후보3/3,추가1사례는 읽기로 복귀했으나 실제 채팅·독립 정확도는 미검증입니다. 새1.19.140은 patch에만 보존하며 정본/설치/운영1.19.137은 유지합니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. 아래 날짜별 내용은 당시 기록입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

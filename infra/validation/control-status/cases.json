@@ -1,0 +1,61 @@
+{
+  "kind": "four targeted development cases; not independent accuracy evaluation or training data",
+  "cases": [
+    {
+      "id": "enum-confusion",
+      "question": "그래서 지금 괜찮아?",
+      "draft": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: unresolved",
+      "synthetic_receipt": {
+        "agents": [
+          {
+            "id": "synthetic-host",
+            "status": "active"
+          }
+        ],
+        "scope": "host inventory sample only; not incident-resolution evidence"
+      }
+    },
+    {
+      "id": "missing-state",
+      "question": "이 사건 상태랑 근거만 간단히 알려줘.",
+      "draft": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n",
+      "synthetic_receipt": {
+        "agents": [
+          {
+            "id": "synthetic-host",
+            "status": "active"
+          }
+        ],
+        "scope": "host inventory sample only; not incident-resolution evidence"
+      }
+    },
+    {
+      "id": "formatted-state",
+      "question": "표로 정리해서 보여줘.",
+      "draft": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\n**MANAGEMENT_STATUS: unresolved**",
+      "synthetic_receipt": {
+        "agents": [
+          {
+            "id": "synthetic-host",
+            "status": "active"
+          }
+        ],
+        "scope": "host inventory sample only; not incident-resolution evidence"
+      }
+    },
+    {
+      "id": "needs-more-evidence",
+      "question": "호스트 목록만으로는 원인을 모른다. 등록된 읽기로 사건 원인도 추가 조사해줘.",
+      "draft": "| 확인 항목 | 관측 범위 |\n| --- | --- |\n| 수집 자료 | 호스트 목록 표본 |\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"현재 수집한 자료는 호스트 목록 표본이며 사건 원인과 전체 영향은 아직 확인하지 못했습니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_agents\"]}\nMANAGEMENT_STATUS: resolved",
+      "synthetic_receipt": {
+        "agents": [
+          {
+            "id": "synthetic-host",
+            "status": "active"
+          }
+        ],
+        "scope": "host inventory sample only; not incident-resolution evidence"
+      }
+    }
+  ]
+}

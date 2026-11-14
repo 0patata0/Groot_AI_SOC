@@ -1674,3 +1674,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-14T22:48:39.353793+09:00 R2 격리 보존·운영 적용0
 
 전체14·R1대비6파일patch 실제복원SHA대조·새139는격리pin. 현재137·초기설치입력·운영/영수증유지. R1inlinegate미리보기는R2새runnerSHA용이아니므로재사용금지. 정확적용/복구패키지·운영승인/새실채팅미준비·서비스재시작0.22:44관리자경유20고정SHA/모델/권한/두채팅active/큐0확인후자체임시만제거. [입출력·분모·한계](../infra/validation/judgment-format/README.md).
+
+## 관리 상태 후보의 설치 검증 범위 (2026-11-14)
+
+[후보](../infra/validation/control-status/README.md)는 기존 설치 소스 복사·렌더 경로의46검사를 통과했다. 첫 실패는66265B 내장 gate에 대한 오래된64KiB assertion이었으며 이미 존재한96KiB 상한/실행 회귀에 시험만 맞췄다. production 상한·패키지·포트·권한·진입점 변경0. 전체16/증분6패치이며 canonical/설치 입력/운영은 유지한다. 부모의 옛 gate 렌더·17사본/2영수증 숫자를 그대로 새 적용본으로 쓰지 말고 현재 범위를 재확인한다.

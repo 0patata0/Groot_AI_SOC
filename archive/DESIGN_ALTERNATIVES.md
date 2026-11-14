@@ -563,3 +563,7 @@ MD에서 Chrome PDF와 Pandoc/DOCX를 별도 생성하던 경로는 배치·쪽�
 ## 2026-11-14T22:48:39.353793+09:00 공통 스킬 필드 안내의 개선과 한계
 
 R2는필수3필드/basis20~2000/실제인용/상태관계를기존스킬한절로묶고중복정리. 모델의미해결판단은유지했지만상태enum오류가남아prompt만으로완전한형식보장불가. 다음구조화상태선택은아직구현하지않았으며판단자동선택·alias치환·권한/재시도확대금지. [입출력·분모·한계](../infra/validation/judgment-format/README.md).
+
+## 판단 보존과 상태 선택의 분리 (2026-11-14)
+
+[새 후보](../infra/validation/control-status/README.md)는 유효한 자기 판단과 실제 현재 조회가 결속된 경우에만 상태 형식을 정정한다. root·turn·모델·실제 dispatcher/완료 이벤트 원문을 기존 binder로 검사하고 nonce/enum decoder를 재사용한다. 정상/해결을 코드가 고르지 않으며 추가 근거는 기존 읽기 continuation으로 돌린다. 공통 SKILL의 절은 해당 단계에서만 로딩한다. 기존 none/2048을 새 추론 최적화로 쓰지 않는다. 의미 실험의 R3와 다른 후보다.

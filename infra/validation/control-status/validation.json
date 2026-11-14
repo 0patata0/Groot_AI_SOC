@@ -1,0 +1,398 @@
+{
+  "at_kst": "2026-11-14T23:52:11.197774+09:00",
+  "status": "isolated_candidate_verified; exact operating apply/rollback bundle, approval and fresh chat pending",
+  "canonical_or_operating_changes": 0,
+  "base_commit": "d846553ef32a3030f2058ed8cd39471496a9ee37",
+  "parent": "judgment-format R2",
+  "canonical_query_version": "1.19.137",
+  "candidate_query_version": "1.19.140",
+  "live_snapshot": {
+    "at_kst": "2026-11-14T23:10:05.308251+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "catalog_tools": 45
+  },
+  "framework": {
+    "at_kst": "2026-11-14T23:32:07.935569+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "live_observed_at_kst": "2026-11-14T23:10:05.308251+09:00",
+    "census": {
+      "r2": {
+        "always_on_chars": 16819,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16819,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "r2_to_candidate": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "operating_changes": 0,
+    "quality_evidence": false
+  },
+  "source_patches": {
+    "candidate.patch": {
+      "sha256": "fba12379ba4b93df4b00ee33bdf9eccc567c4b8052d243e18fa0ecc636e8c5cc",
+      "files": [
+        {
+          "path": "deployment/tests/test_soc_management.py",
+          "before_sha256": "1dca91138477d014c33b68b2cdd7edf6a1011b9af28262aab301e96188fd4bac",
+          "after_sha256": "d12831efb6f744949660c08fd921bad0f622b97e9c783304ae0e77ed7d5548ab"
+        },
+        {
+          "path": "infra/hermes/query-completion/__init__.py",
+          "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+          "after_sha256": "ea0b038eff1b9e2b8a178b19e9c61c1100f86a533ef3f2f50529295c7f8e58e7"
+        },
+        {
+          "path": "infra/hermes/review_channel_worker.py",
+          "before_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+          "after_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+        },
+        {
+          "path": "infra/hermes/skills/soc-investigate/SKILL.md",
+          "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf"
+        },
+        {
+          "path": "infra/hermes/soc_management_controller.py",
+          "before_sha256": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+          "after_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af"
+        },
+        {
+          "path": "infra/hermes/soc_management_run.py",
+          "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+          "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894"
+        },
+        {
+          "path": "infra/hermes/test_control_status_repair.py",
+          "before_sha256": null,
+          "after_sha256": "9b2203672f75283fd35f7cca7a8d4b391f6bd86ba8ef893eb29040034a9df5e8"
+        },
+        {
+          "path": "infra/hermes/test_disposition_workflow_contract.py",
+          "before_sha256": null,
+          "after_sha256": "1fa1fc83d7c5fd06b0f26adc05d40c253bb61f6ab837b30b7548c1f9e34e61fa"
+        },
+        {
+          "path": "infra/hermes/test_incident_completion_contract.py",
+          "before_sha256": null,
+          "after_sha256": "c212186f347438efbbeac3393a0df86a4c22dd79ff929cf906b89fe02fba3e04"
+        },
+        {
+          "path": "infra/hermes/test_peer_text_schema.py",
+          "before_sha256": null,
+          "after_sha256": "5ef63a79b3c2689397b2997bb8c5082ed2def332cc6b33f0b35fda55ae46f5e6"
+        },
+        {
+          "path": "infra/hermes/test_report_repair_diagnosis.py",
+          "before_sha256": "6ab693ab9b3a2f11dc63ec1f3a2a5593db27780cdad26b23274dd5905bc98f34",
+          "after_sha256": "711883641d800767deb43a4475059699032928c30537c4dd3118a4217edb80f3"
+        },
+        {
+          "path": "infra/hermes/test_review_channel.py",
+          "before_sha256": "658218fc8278c5856384d02e055165fdb35ecfec155ebedf19c370cdca515148",
+          "after_sha256": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05"
+        },
+        {
+          "path": "infra/hermes/test_soc_management_controller.py",
+          "before_sha256": "36d0b615b8ed60f16fb4341e5111f7f3471e776328dbe8e89f977735b0aab569",
+          "after_sha256": "b31b93224658202bc6cb1cb1a173274c76f61f0b96b0706af007158755e42bdb"
+        },
+        {
+          "path": "infra/hermes/test_soc_management_evidence.py",
+          "before_sha256": "17edb25fd19aa4bf32c6e7ffe72d8574f53a7a869278b097e317c2689addf9f1",
+          "after_sha256": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9"
+        },
+        {
+          "path": "infra/hermes/workflow_contract.py",
+          "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+          "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61"
+        },
+        {
+          "path": "infra/ollama-trial/harness.py",
+          "before_sha256": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+          "after_sha256": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2"
+        }
+      ],
+      "roundtrip": true
+    },
+    "r2-to-r3.patch": {
+      "sha256": "deab76c1b7fad792cdfef1eb988be4479c62c92e8195b69613b2d49cc98e0245",
+      "files": [
+        {
+          "path": "deployment/tests/test_soc_management.py",
+          "before_sha256": "1dca91138477d014c33b68b2cdd7edf6a1011b9af28262aab301e96188fd4bac",
+          "after_sha256": "d12831efb6f744949660c08fd921bad0f622b97e9c783304ae0e77ed7d5548ab"
+        },
+        {
+          "path": "infra/hermes/query-completion/__init__.py",
+          "before_sha256": "f2032182d6b5138dc301c1a6f13dddeee5d9212d4f824da84b2f8981f777d320",
+          "after_sha256": "ea0b038eff1b9e2b8a178b19e9c61c1100f86a533ef3f2f50529295c7f8e58e7"
+        },
+        {
+          "path": "infra/hermes/skills/soc-investigate/SKILL.md",
+          "before_sha256": "33d0f2d5463ebc88da671cfcfc838f9622a611678c57d69df735ff757f2d8dae",
+          "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf"
+        },
+        {
+          "path": "infra/hermes/soc_management_run.py",
+          "before_sha256": "0f40424a8d40d6229132dd82503ffc0a46f9054d457ab11bdc8f7360b466ff03",
+          "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894"
+        },
+        {
+          "path": "infra/hermes/test_control_status_repair.py",
+          "before_sha256": null,
+          "after_sha256": "9b2203672f75283fd35f7cca7a8d4b391f6bd86ba8ef893eb29040034a9df5e8"
+        },
+        {
+          "path": "infra/hermes/workflow_contract.py",
+          "before_sha256": "2b392c72df1031b61321b6bbd9d91347b3996ad45d508bab143b0392bc4ac36d",
+          "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61"
+        }
+      ],
+      "roundtrip": true
+    }
+  },
+  "mac": [
+    {
+      "profile": "native",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 86,
+      "seconds": 5.851,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 0.387,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 2,
+      "seconds": 2.386,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 4.199,
+      "failures": [],
+      "passed": true
+    }
+  ],
+  "b_host_initial": [
+    {
+      "profile": "native",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 72,
+      "seconds": 21.845,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 1.207,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 0,
+      "seconds": 6.896,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "installer",
+      "rc": 1,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 12.916,
+      "failures": [
+        "test_controller_gate_is_embedded_not_from_writable_home (test_soc_management.BindingTests.test_controller_gate_is_embedded_not_from_writable_home)"
+      ],
+      "passed": false
+    }
+  ],
+  "b_recheck_and_existing_hermes": [
+    {
+      "runtime": "Hermes container",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 24.242,
+      "passed": true
+    },
+    {
+      "runtime": "B existing venv",
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 12.863,
+      "passed": true
+    }
+  ],
+  "regression_denominators": "Same 536-test Native suite across runtimes, not independent cases added together. Existing Hermes completes skipped dependency tests. SDK77/query408/installer46 are separate suites.",
+  "initial_failure": {
+    "suite": "installer",
+    "passed": 45,
+    "failed": 1,
+    "reason": "Old 64KiB assertion against 66265-byte rendered gate. Controller already uses 96KiB; existing execution test covers >64KiB and rejects >=96KiB. No production limit change.",
+    "final_installer_tests_passed": 46
+  },
+  "model_scope": {
+    "normalized_cases": 4,
+    "api_attempts": 8,
+    "first_three_status_format": {
+      "r2": 1,
+      "candidate": 3,
+      "denominator": 3
+    },
+    "additional_evidence_case": "candidate chose existing continuation; next request required a registered read. Further real MCP and final judgment not executed.",
+    "first_three_candidate_seconds": [
+      2.392837,
+      2.277804,
+      2.431069
+    ],
+    "independent_accuracy_or_chat_latency": false
+  },
+  "boundaries": {
+    "new_tools": 0,
+    "new_permissions": 0,
+    "new_retry_budget": 0,
+    "automatic_benign_or_remediated": false,
+    "root_scope_and_current_read_binding": true,
+    "model_selects_state": true,
+    "more_evidence_reuses_native_read_path": true
+  },
+  "pending": [
+    "Exact rendered root controller gate and all code/skill copies/receipts",
+    "Idle apply/reload strategy and independent rollback",
+    "Administrator exact-candidate approval",
+    "Fresh real chat/MCP and unused independent evaluation"
+  ],
+  "review": {
+    "method": "defect-first manual review; original review-agent unavailable",
+    "semgrep": "not run; no Mac installation",
+    "secret_scan": {
+      "scanner": "original secret-scanner skill",
+      "scanner_source_sha256": "013a37ce9772587996b8f6412a425805827eef8481a504ddfcb8fd0870e41fc1",
+      "options": "--git /Users/patata/SW/capstone_project --json --redact 0",
+      "coverage": "original scanner --git reads current tracked working-tree files with its default binary/size filters; not Git history or separate staged blobs",
+      "tracked_paths": 2128,
+      "unchanged_preexisting_findings": 5,
+      "new_changed_path_findings": 0,
+      "values_or_snippets_saved": false,
+      "tracked_link_external_credential_preflight": "passed"
+    },
+    "manual_review_record": "local-only REVIEW.md"
+  },
+  "paper": "Existing 43-page MD/PDF/DOCX proof copy unchanged; sidecar evidence updated separately, unadopted candidate not operating outcome",
+  "final_live": {
+    "at_kst": "2026-11-14T23:58:24.417921+09:00",
+    "source_7_unchanged": true,
+    "immutable_15_unchanged": true,
+    "catalog_45_unchanged": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "service": {
+      "MainPID": "3347786",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "queue": [
+      [
+        "cancelled",
+        1
+      ],
+      [
+        "done",
+        568
+      ]
+    ],
+    "operating_changes": 0
+  },
+  "cleanup": {
+    "remote_temp": {
+      "path": "/var/tmp/capstone-control-status-20261114-7rx9eq8k",
+      "files": 1350,
+      "bytes": 20139389,
+      "absent": true
+    },
+    "container_temp": {
+      "path": "/tmp/capstone-control-status-20261114-7rx9eq8k",
+      "files": 1299,
+      "bytes": 19350839,
+      "absent": true
+    },
+    "mac": {
+      "at_kst": "2026-11-15T00:00:21.701258+09:00",
+      "path": "/private/tmp/capstone-control-status-7rx9eq8k",
+      "files": 1987,
+      "bytes": 41710985,
+      "absent": true,
+      "minimal_reproduction_files": 41,
+      "G_Harness2_preserved": true,
+      "packages_installed": 0
+    },
+    "operating_services": {
+      "capstone-review-chat.service": {
+        "MainPID": "3347786",
+        "ActiveState": "active",
+        "SubState": "running"
+      },
+      "capstone-ollama-chat.service": {
+        "MainPID": "3536365",
+        "ActiveState": "active",
+        "SubState": "running"
+      }
+    },
+    "operating_model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "operating_changes": 0
+  },
+  "publication_checks": {
+    "new_markdown_links_checked": 32,
+    "paper_ledger_unchanged": true,
+    "related_staged_files": 20,
+    "unrelated_changes_staged": 0
+  }
+}

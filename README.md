@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 사용자 지정 논문 조건에 맞춰 로컬 전용 MD·PDF·DOCX를 수정했습니다. PDF·DOCX 각43쪽·실제 구현 화면5개·그림7/표24·참고문헌14개, 내용 누락0·목차/캡션91개 쪽수 일치를 검수했습니다. 정장사진·학번은 공란으로 최종 입력이 남습니다. 이번 서버 변경·새 채팅·공격·학습은0입니다. [과거 범위 연결 후보](infra/validation/peer-source-context/README.md)는125회귀·20문맥/160필드 전달 성공에도 답변 생성3/6 동률·의미 오류로 보류했고 기본 소스를 복구한 상태입니다. [읽기 감사 보존113 후보](infra/validation/native-read-audit/README.md)·식별자 제거 승인/운영 적용, Harness² 승인 E2E·독립 평가는 별도 잔여입니다. 아래 날짜별 설명은 당시 검증 범위입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 논문 MD·PDF·DOCX는 제출 조건 반영·PDF/DOCX 각43쪽 전수 검수를 마쳤고 정장사진/학번 입력이 남습니다. [근거 종류·수치 결속 후보](infra/validation/peer-proof-kinds/README.md)는 Mac/B143·144·153회귀와 과거20읽기/160필드·238참조를 확인했으나 같은 학습 모델8개 개발 사례에서 의미 오류가 남아 모두 보류했습니다. 답변 전달6/8·8/8·6/8은 정답률이 아닙니다. 프로젝트 정본·초기 설치·운영에는 미적용이며 서버20:23 마지막 관측에서 학습본·서비스 active/큐0·소스/도구45스키마를 확인했습니다. [읽기 감사 보존113 후보](infra/validation/native-read-audit/README.md)·식별자 수정의 정확 승인/운영 적용, Harness² 승인 E2E·독립 평가는 별도 잔여입니다. 이번 실제 채팅·공격·학습·운영 변경은0입니다. 아래 날짜별 설명은 당시 검증 범위입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

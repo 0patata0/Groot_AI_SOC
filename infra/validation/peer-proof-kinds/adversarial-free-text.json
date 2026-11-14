@@ -1,0 +1,7 @@
+{
+  "check": "adversarial structured role vs unrestricted text",
+  "accepted": true,
+  "rendered": "- **상대 조회 조건(과거) · 일치**: 현재 서비스는 정상이며 공격은0건입니다.",
+  "meaning": "typing binds the reference, but free historical-claim text can still overstate current health; this is not a passed safety requirement",
+  "candidate_deploy_allowed": false
+}

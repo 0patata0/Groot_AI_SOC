@@ -1,0 +1,515 @@
+{
+  "scope": "same trained-model developmental synthesis, synthetic source/fresh receipts, not actual Native generation or live MCP/chat",
+  "prepared_source_commit": "96d8691723c83bdab12f4ba1be05ca6d9eb85eaf",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "cases_sha256": "270b0c2fcad8be8571cc6f28615b27f6ed45681faf404e115f05bfb401d8b0b9",
+  "versions": {
+    "r1": {
+      "candidate_tests": 143,
+      "arms": {
+        "context": {
+          "cases": 8,
+          "delivered_after_validation": 5,
+          "model_generations_including_repair": 13,
+          "median_seconds_noncausal": 11.001000000000001,
+          "explicit_ip_approval_controls": 2
+        },
+        "candidate": {
+          "cases": 8,
+          "delivered_after_validation": 6,
+          "model_generations_including_repair": 14,
+          "median_seconds_noncausal": 17.9435,
+          "explicit_ip_approval_controls": 2
+        }
+      },
+      "status": "held_not_deployed",
+      "output_is_not_accuracy": true,
+      "framework": {
+        "at_kst": "2026-11-14T19:38:24.259313+09:00",
+        "live_preflight_at_kst": "2026-11-14T19:30:35.066342+09:00",
+        "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+        "base_census": {
+          "always_on_chars": 16819,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "candidate_census": {
+          "always_on_chars": 16819,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "diff_from_prepared": {
+          "added": [],
+          "removed": [],
+          "modified": [
+            "scripts/channel_controller.py",
+            "scripts/channel_policy.py",
+            "scripts/channel_worker.py",
+            "skills/soc-investigate/SKILL.md"
+          ],
+          "always_on_char_delta": 0
+        },
+        "diff_from_operating": {
+          "added": [],
+          "removed": [],
+          "modified": [
+            "scripts/channel_controller.py",
+            "scripts/channel_policy.py",
+            "scripts/channel_worker.py",
+            "skills/soc-investigate/SKILL.md"
+          ],
+          "always_on_char_delta": 0
+        },
+        "current_live_source_changes": [],
+        "operating_changes": 0
+      },
+      "frozen_source_sha256": {
+        "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+        "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+        "infra/hermes/review_channel_worker.py": "20d3c0932d44a5bd18e03ff03012baecff063045e93c3d94d0a9575c1d8e24b4",
+        "infra/hermes/skills/soc-investigate/SKILL.md": "057aeb7f81d846232ffad6d049b77e26727c2514e6e3f80b64bdec632b0bee20",
+        "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+        "infra/hermes/test_peer_proof_roles.py": "46ae01c6cb914ba15152e9bea32304f8cbb399cdf4b6c803904269996b1f8239"
+      }
+    },
+    "r2": {
+      "candidate_tests": 144,
+      "arms": {
+        "context": {
+          "cases": 8,
+          "delivered_after_validation": 5,
+          "model_generations_including_repair": 13,
+          "median_seconds_noncausal": 12.115,
+          "explicit_ip_approval_controls": 2
+        },
+        "candidate": {
+          "cases": 8,
+          "delivered_after_validation": 8,
+          "model_generations_including_repair": 14,
+          "median_seconds_noncausal": 13.251000000000001,
+          "explicit_ip_approval_controls": 2
+        }
+      },
+      "status": "held_not_deployed",
+      "output_is_not_accuracy": true,
+      "framework": {
+        "at_kst": "2026-11-14T19:51:03.614123+09:00",
+        "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+        "census": {
+          "always_on_chars": 16819,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "diff_from_prepared": {
+          "added": [],
+          "removed": [],
+          "modified": [
+            "scripts/channel_controller.py",
+            "scripts/channel_policy.py",
+            "scripts/channel_worker.py",
+            "skills/soc-investigate/SKILL.md"
+          ],
+          "always_on_char_delta": 0
+        },
+        "source_sha256": {
+          "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+          "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+          "infra/hermes/review_channel_worker.py": "c7cd6dec8baef3ba8264a08db2c195c8ccce03746d83059933426b52ca0f02e4",
+          "infra/hermes/skills/soc-investigate/SKILL.md": "90b156c6173a832ae0c18ee78e2d9177beb30eacc6855b8db42318e0fd1eb45f",
+          "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+          "infra/hermes/test_peer_proof_roles.py": "8fbce2d894229776e3ef9b13edf659875de298ad9a7d16857a269c2b7ce21f22"
+        },
+        "model_prose_for_source_query_scope": "forbidden, exact selected literal fields only; observation judgment remains LLM text with fresh-reference guard",
+        "operating_changes": 0
+      },
+      "frozen_source_sha256": {
+        "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+        "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+        "infra/hermes/review_channel_worker.py": "c7cd6dec8baef3ba8264a08db2c195c8ccce03746d83059933426b52ca0f02e4",
+        "infra/hermes/skills/soc-investigate/SKILL.md": "90b156c6173a832ae0c18ee78e2d9177beb30eacc6855b8db42318e0fd1eb45f",
+        "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+        "infra/hermes/test_peer_proof_roles.py": "8fbce2d894229776e3ef9b13edf659875de298ad9a7d16857a269c2b7ce21f22"
+      }
+    },
+    "r3": {
+      "candidate_tests": 153,
+      "arms": {
+        "context": {
+          "cases": 8,
+          "delivered_after_validation": 5,
+          "model_generations_including_repair": 13,
+          "median_seconds_noncausal": 10.967,
+          "explicit_ip_approval_controls": 2
+        },
+        "candidate": {
+          "cases": 8,
+          "delivered_after_validation": 6,
+          "model_generations_including_repair": 13,
+          "median_seconds_noncausal": 14.0805,
+          "explicit_ip_approval_controls": 2
+        }
+      },
+      "status": "held_not_deployed",
+      "output_is_not_accuracy": true,
+      "framework": {
+        "at_kst": "2026-11-14T20:07:32.442173+09:00",
+        "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+        "census": {
+          "always_on_chars": 16819,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "diff_from_prepared": {
+          "added": [],
+          "removed": [],
+          "modified": [
+            "scripts/channel_controller.py",
+            "scripts/channel_policy.py",
+            "scripts/channel_worker.py",
+            "skills/soc-investigate/SKILL.md"
+          ],
+          "always_on_char_delta": 0
+        },
+        "source_sha256": {
+          "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+          "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+          "infra/hermes/review_channel_worker.py": "c0ec118463c946eb719d2d4d4c15d9654ae047964b7d0418c8ca114d75dcf212",
+          "infra/hermes/skills/soc-investigate/SKILL.md": "3eea4cd8da1d80fc9b0e1bceeafbbb052e269183ea30f5ed4cfe42da265a90ad",
+          "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+          "infra/hermes/test_peer_proof_roles.py": "df0a02dc8d3f0190f46338acbd9b74bd5b951868244c35a68ce18e114ed5d315",
+          "infra/hermes/test_peer_query_quantities.py": "7d6a69c7704ca5536f118ac7e900c57d12323204fe767e630c6b3ab3eaa7ab28"
+        },
+        "scope": "historical metadata neutral context; original numeric span and receipt numeric equality only, metric selection and incident judgment remain LLM; no operating change"
+      },
+      "frozen_source_sha256": {
+        "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+        "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+        "infra/hermes/review_channel_worker.py": "c0ec118463c946eb719d2d4d4c15d9654ae047964b7d0418c8ca114d75dcf212",
+        "infra/hermes/skills/soc-investigate/SKILL.md": "3eea4cd8da1d80fc9b0e1bceeafbbb052e269183ea30f5ed4cfe42da265a90ad",
+        "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+        "infra/hermes/test_peer_proof_roles.py": "df0a02dc8d3f0190f46338acbd9b74bd5b951868244c35a68ce18e114ed5d315",
+        "infra/hermes/test_peer_query_quantities.py": "7d6a69c7704ca5536f118ac7e900c57d12323204fe767e630c6b3ab3eaa7ab28"
+      }
+    }
+  },
+  "patches": {
+    "r1": {
+      "patch": "r1.patch",
+      "sha256": "bedb4bd008ab34b2346987a98d9108d751926c47bef32cd51b47bff2d9e9a954",
+      "files": {
+        "infra/hermes/review_channel.py": {
+          "base_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+          "candidate_sha256": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28"
+        },
+        "infra/hermes/review_channel_policy.py": {
+          "base_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "candidate_sha256": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c"
+        },
+        "infra/hermes/review_channel_worker.py": {
+          "base_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+          "candidate_sha256": "20d3c0932d44a5bd18e03ff03012baecff063045e93c3d94d0a9575c1d8e24b4"
+        },
+        "infra/hermes/skills/soc-investigate/SKILL.md": {
+          "base_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "candidate_sha256": "057aeb7f81d846232ffad6d049b77e26727c2514e6e3f80b64bdec632b0bee20"
+        },
+        "infra/hermes/test_peer_source_context.py": {
+          "base_sha256": null,
+          "candidate_sha256": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad"
+        },
+        "infra/hermes/test_peer_proof_roles.py": {
+          "base_sha256": null,
+          "candidate_sha256": "46ae01c6cb914ba15152e9bea32304f8cbb399cdf4b6c803904269996b1f8239"
+        }
+      },
+      "roundtrip_verified": true,
+      "previous_context3_sha256": "f00e35926e8f4db49f08f319a24e86277d9b55df353b38d45a55739431fea87e",
+      "encoding": "unified diff zero context; git apply --unidiff-zero"
+    },
+    "r2": {
+      "patch": "r2.patch",
+      "sha256": "a5e0641656815b44f8214ac08a89f10d5a9a665720db686508ba50ddfba95afb",
+      "files": {
+        "infra/hermes/review_channel.py": {
+          "base_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+          "candidate_sha256": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28"
+        },
+        "infra/hermes/review_channel_policy.py": {
+          "base_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "candidate_sha256": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c"
+        },
+        "infra/hermes/review_channel_worker.py": {
+          "base_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+          "candidate_sha256": "c7cd6dec8baef3ba8264a08db2c195c8ccce03746d83059933426b52ca0f02e4"
+        },
+        "infra/hermes/skills/soc-investigate/SKILL.md": {
+          "base_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "candidate_sha256": "90b156c6173a832ae0c18ee78e2d9177beb30eacc6855b8db42318e0fd1eb45f"
+        },
+        "infra/hermes/test_peer_source_context.py": {
+          "base_sha256": null,
+          "candidate_sha256": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad"
+        },
+        "infra/hermes/test_peer_proof_roles.py": {
+          "base_sha256": null,
+          "candidate_sha256": "8fbce2d894229776e3ef9b13edf659875de298ad9a7d16857a269c2b7ce21f22"
+        }
+      },
+      "roundtrip_verified": true,
+      "previous_context3_sha256": "951f9b3446185056c3af728ac2172b12828715b2e6e55825b447007e8ec25971",
+      "encoding": "unified diff zero context; git apply --unidiff-zero"
+    },
+    "r3": {
+      "patch": "r3.patch",
+      "sha256": "bd0de6cf8fa79740313e10eb962eddb47a7d6a926d5418ad201936fd77c82bda",
+      "files": {
+        "infra/hermes/review_channel.py": {
+          "base_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+          "candidate_sha256": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28"
+        },
+        "infra/hermes/review_channel_policy.py": {
+          "base_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "candidate_sha256": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c"
+        },
+        "infra/hermes/review_channel_worker.py": {
+          "base_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+          "candidate_sha256": "c0ec118463c946eb719d2d4d4c15d9654ae047964b7d0418c8ca114d75dcf212"
+        },
+        "infra/hermes/skills/soc-investigate/SKILL.md": {
+          "base_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "candidate_sha256": "3eea4cd8da1d80fc9b0e1bceeafbbb052e269183ea30f5ed4cfe42da265a90ad"
+        },
+        "infra/hermes/test_peer_source_context.py": {
+          "base_sha256": null,
+          "candidate_sha256": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad"
+        },
+        "infra/hermes/test_peer_proof_roles.py": {
+          "base_sha256": null,
+          "candidate_sha256": "df0a02dc8d3f0190f46338acbd9b74bd5b951868244c35a68ce18e114ed5d315"
+        },
+        "infra/hermes/test_peer_query_quantities.py": {
+          "base_sha256": null,
+          "candidate_sha256": "7d6a69c7704ca5536f118ac7e900c57d12323204fe767e630c6b3ab3eaa7ab28"
+        }
+      },
+      "roundtrip_verified": true,
+      "previous_context3_sha256": "74bde00ba4695b02984d79d7dd5b80b34366b7bd26660778ce2703230c8a3957",
+      "encoding": "unified diff zero context; git apply --unidiff-zero"
+    }
+  },
+  "operating_changes": 0,
+  "chat_posts": 0,
+  "new_mcp_calls": 0,
+  "new_training": 0,
+  "independent_176_used": false,
+  "model_direct_framework_call": false,
+  "private_trace_replay": {
+    "runs": 10,
+    "completed_reads": 20,
+    "exact_scope_fields": 160,
+    "historical_refs": 238,
+    "operating_db_read_only": true,
+    "source_raw_arguments_sha_match": true,
+    "historical_reusable": false,
+    "r3_context_rows": 20,
+    "r3_typed_rows": 20,
+    "r1_r2_zero_context_comparator": "oldpolicy.peer_question received evidence=None, distinct from model context arm which received metadata; not a typed-reference benefit"
+  },
+  "tests": {
+    "r1_mac": {
+      "at_kst": "2026-11-14T19:40:53.201337+09:00",
+      "results": [
+        {
+          "arm": "base",
+          "returncode": 0,
+          "tests": 113,
+          "seconds": 4.344,
+          "passed": true
+        },
+        {
+          "arm": "context",
+          "returncode": 0,
+          "tests": 125,
+          "seconds": 5.313,
+          "passed": true
+        },
+        {
+          "arm": "candidate",
+          "returncode": 0,
+          "tests": 143,
+          "seconds": 5.377,
+          "passed": true
+        }
+      ],
+      "candidate_sha256": {
+        "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+        "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+        "infra/hermes/review_channel_worker.py": "20d3c0932d44a5bd18e03ff03012baecff063045e93c3d94d0a9575c1d8e24b4",
+        "infra/hermes/skills/soc-investigate/SKILL.md": "057aeb7f81d846232ffad6d049b77e26727c2514e6e3f80b64bdec632b0bee20",
+        "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+        "infra/hermes/test_peer_proof_roles.py": "46ae01c6cb914ba15152e9bea32304f8cbb399cdf4b6c803904269996b1f8239"
+      }
+    },
+    "r1_linux": [
+      {
+        "arm": "base",
+        "returncode": 0,
+        "tests": 113,
+        "seconds": 14.157,
+        "passed": true
+      },
+      {
+        "arm": "context",
+        "returncode": 0,
+        "tests": 125,
+        "seconds": 16.576,
+        "passed": true
+      },
+      {
+        "arm": "candidate",
+        "returncode": 0,
+        "tests": 143,
+        "seconds": 17.123,
+        "passed": true
+      }
+    ],
+    "r2_mac": {
+      "arm": "candidate-r2",
+      "tests": 144,
+      "seconds": 5.322,
+      "returncode": 0,
+      "passed": true
+    },
+    "r2_linux": [
+      {
+        "arm": "context",
+        "returncode": 0,
+        "tests": 125,
+        "seconds": 16.691,
+        "passed": true
+      },
+      {
+        "arm": "candidate",
+        "returncode": 0,
+        "tests": 144,
+        "seconds": 16.555,
+        "passed": true
+      }
+    ],
+    "r3_mac": {
+      "at_kst": "2026-11-14T20:07:37.765487+09:00",
+      "tests": 153,
+      "passed": true,
+      "returncode": 0,
+      "seconds": 5.323,
+      "source_sha256": {
+        "infra/hermes/review_channel.py": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28",
+        "infra/hermes/review_channel_policy.py": "be347c6a46bcf8383ae03f1afdacccec26ddfadbcc2d135594846b041bb58a4c",
+        "infra/hermes/review_channel_worker.py": "c0ec118463c946eb719d2d4d4c15d9654ae047964b7d0418c8ca114d75dcf212",
+        "infra/hermes/skills/soc-investigate/SKILL.md": "3eea4cd8da1d80fc9b0e1bceeafbbb052e269183ea30f5ed4cfe42da265a90ad",
+        "infra/hermes/test_peer_source_context.py": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad",
+        "infra/hermes/test_peer_proof_roles.py": "df0a02dc8d3f0190f46338acbd9b74bd5b951868244c35a68ce18e114ed5d315",
+        "infra/hermes/test_peer_query_quantities.py": "7d6a69c7704ca5536f118ac7e900c57d12323204fe767e630c6b3ab3eaa7ab28"
+      }
+    },
+    "r3_linux": [
+      {
+        "arm": "context",
+        "returncode": 0,
+        "tests": 125,
+        "seconds": 16.984,
+        "passed": true
+      },
+      {
+        "arm": "candidate",
+        "returncode": 0,
+        "tests": 153,
+        "seconds": 17.021,
+        "passed": true
+      }
+    ]
+  },
+  "decision": "all held: reference role/value binding did not establish complete semantic correctness; no canonical/installer changes",
+  "cleanup": {
+    "remote_directories": 3,
+    "remote_files": 3606,
+    "remote_bytes": 58347604,
+    "remote_absence_verified": true,
+    "mac_files": 2562,
+    "mac_bytes": 78448071,
+    "mac_absence_verified": true,
+    "minimum_reproduction_records": 44,
+    "G_Harness2_preserved": true,
+    "new_packages_installed": 0,
+    "additional_patch_roundtrip_temp_files": 19,
+    "additional_patch_roundtrip_temp_bytes": 491590
+  },
+  "last_live_observation": {
+    "at_kst": "2026-11-14T20:23:30.498269+09:00",
+    "route": "Mac-admin-A-B",
+    "source_sha256": {
+      "infra/hermes/review_channel.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "infra/hermes/review_channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+      "infra/hermes/review_channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "infra/hermes/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40"
+    },
+    "immutable_context_sha256": {
+      "/opt/capstone-ollama-trial/harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "/opt/capstone-ollama-trial/runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+      "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "/opt/capstone-ollama-trial/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "/opt/capstone-ollama-trial/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "/opt/capstone-ollama-trial/query_grounding.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "/opt/capstone-ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "/opt/capstone-ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "/opt/capstone-management/soc_management_run.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "/opt/capstone-management/soc_management_controller.py": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+      "/opt/capstone-management/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/etc/capstone-review-chat/receipt.json": "df9004fc1983210ce12cb316900636009aae81f2b3992712d7a951c36cc7a21f"
+    },
+    "sources_model_policy_unchanged": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "catalog_tools": 45,
+    "catalog_schema_unchanged": true,
+    "exposed_tools": 45,
+    "exposed_multiset_unchanged": true,
+    "exposed_order_changed": true,
+    "exposed_schema_sorted_sha256": "8d810596379e951d72b1e4ca7b778cb2131874151c5db0eccb6dfde5b6dd7522",
+    "service": {
+      "MainPID": "3347786",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "queue": [
+      [
+        "cancelled",
+        1
+      ],
+      [
+        "done",
+        568
+      ]
+    ],
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0,
+    "chat_posts": 0
+  }
+}

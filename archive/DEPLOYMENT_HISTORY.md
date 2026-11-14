@@ -1690,3 +1690,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-15T03:12:45.602561+09:00 최신 평가 계약과 반입 목록
 
 현재45도구 관측본·journal 평가기 호환·개발 결과 메타데이터를 pack.py 명시 소스/문서 목록에 추가했다. 이전44관측본 유지. 실제data pack생성/서버설치/권한/운영하네스/모델변경0·Mac패키지설치0. B의 종료된 자체 시험85파일4,228,173B를 SHA/두PID부재 확인 뒤 제거·부재. 운영 소스7해시 불변·Ollama/review채팅active 관측,서비스조작0. 잘못된Hermes서비스이름을확인하던정리전제오류는정정해원문보존했다. 기존19파일PREPARED후보/복구본은 보존한다.
+
+## 2026-11-15T03:54:33.032918+09:00 journal 후보의 설치 범위
+
+canonical진단모듈은6h분할/기존20초/응답계약보존후보로갱신했다. deploy.sh→soc_diagnostics의기존고정source목록/설치20검사로연결,새패키지/이미지/포트/권한없음. 서버소스/서비스는미변경·정확적용안/A/C대조남음. B자체시험16파일427636B종료·SHA검증후제거. 초기영수증소급수정/새OS전체설치0. [근거](../infra/validation/live-reads/README.md).

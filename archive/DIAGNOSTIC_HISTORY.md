@@ -326,3 +326,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T03:12:45.602561+09:00 평가기 스키마와 무조회 단정 진단
 
 초기3fixture는현재journal5조건/메타데이터를기존평가기가지원하지않아모델전거절. 알려진3/5구조·의존성·대상/상한/알수없는조건거절을유지하며평가기만보완해16/15유효확인. 로컬49/B15·서버표준18반례일치. 최초B시험배치경로오류는모델0에서정정·출력보존. 수집허용목록에supervisor로그가없던2실패와정리기의없는Hermesunit전제오류도원문보존·시험/정리코드만정정. 모델실패와합산하지않았다. [16사례 전체검토](../finetuning/WORKFLOW_DEVELOPMENT.md)는기준밖7미채점/무조회3실제검출·전체채팅미확인이다.
+
+## 2026-11-15T03:54:33.032918+09:00 journal timeout의 원인과 시험 정정
+
+서비스active·감사command_timeout. severityerr약0.06초/고정warninginfo grep12초초과·24h역순도초과. 역순15m오류는추가옵션위치가고정grep식별을깨뜨린시험절차문제·후보에서미사용/원문보존. 새micro경계시험중복keyword fixture오류1건수정·production완화0. 최종134skip0·구간누락/충돌/마감/바이트반례포함. [근거](../infra/validation/live-reads/README.md).

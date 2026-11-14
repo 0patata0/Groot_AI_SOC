@@ -1,5 +1,7 @@
 # 제한된 서비스 journal 조회
 
+**현재 긴 구간 조회:** [실제 읽기 진단](../validation/live-reads/README.md)에서 B rule-worker24시간이 command_timeout으로 실패했다. 권한 거부나 reader 중단은 아니며 [전체 기간 분할 후보](journal-window-slices.md)를 로컬 소스/134검사·격리 실제 읽기까지 검증했다. 운영 reader/MCP·새 채팅은 아직 원형이므로 적용 완료로 표시하지 않는다.
+
 2026-11-08. 기존 `get_system_diagnostics`의 `view="journal"`을 A/B/C 운영에 적용했다. 초기 운영 연결 당시 진단 MCP1.3.0·common1.5.71/query1.19.122였으며 현재 버전은 STATUS를 따른다. 아래 초기 시험은 당시 원본35B 기준이다. 현재는11/8 균형 학습본을 운용하며 최신 상태는 STATUS를 따른다. 초기 격리 시험과 후속 운영 검증은 별도 범위다. [검증 원장](journal-excerpts.validation.json) · [현재 상태](../../STATUS.md).
 
 정제 이력에는 본문이 없어 모델이 오류 원문을 요청해도 실제 근거를 가져오지 못했다. 이 기능은 실제 journal의 메시지를 읽되 비밀 값과 비정상 형식을 처리한 `message_excerpt`를 제공한다. 기존 메타데이터를 원문처럼 재작성하지 않는다.

@@ -1,0 +1,415 @@
+{
+  "schema": "groot-live-read-verification-v1",
+  "summarized_at_kst": "2026-11-15T03:54:32.942825+09:00",
+  "status": "completed_diagnostic_with_remaining_failures_not_acceptance",
+  "started_at_kst": "2026-11-15T03:23:55.742128+09:00",
+  "finished_at_kst": "2026-11-15T03:26:05.436828+09:00",
+  "execution_scope": "Actual installed Ollama runtime, ordinary fresh read requests, real MCPs and current clock; not Mattermost queue/delivery, Hermes or independent model comparison.",
+  "additional_write_interlock": "Only this worker denies protected dispatch before any MCP protected call; installed permissions/config remain unchanged.",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "access_mode": "hermes-parity",
+  "model_manifest_metadata_observed_at_kst": "2026-11-15T03:26:25.172939+09:00",
+  "model_manifest_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "weight_file_rehashed": false,
+  "requests": 6,
+  "read_mcp_calls": 7,
+  "model_completions_recorded": 9,
+  "protected_dispatches": 0,
+  "blocked_protected_attempts": [],
+  "chat_posts": 0,
+  "operating_changes": 0,
+  "service_operations": 0,
+  "new_attacks_or_training": 0,
+  "current_model_policy_tools": 45,
+  "read_only_policy_tools": 36,
+  "protected_policy_tools": 9,
+  "installed_source_and_skill_pins": 19,
+  "installed_sources_sha256": {
+    "/opt/capstone-ollama-trial/channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+    "/opt/capstone-ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+    "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+    "/opt/capstone-ollama-trial/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+    "/opt/capstone-ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+    "/opt/capstone-ollama-trial/gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+    "/opt/capstone-ollama-trial/grounding.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+    "/opt/capstone-ollama-trial/harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+    "/opt/capstone-ollama-trial/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+    "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+    "/opt/capstone-ollama-trial/query_grounding.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+    "/opt/capstone-ollama-trial/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+    "/opt/capstone-ollama-trial/read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+    "/opt/capstone-ollama-trial/runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+    "/opt/capstone-ollama-trial/skill-soc-change.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+    "/opt/capstone-ollama-trial/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+    "/opt/capstone-ollama-trial/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+    "/opt/capstone-ollama-trial/skill-soc-recover.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+    "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa"
+  },
+  "current45schema_hashes_match_public_catalog": true,
+  "catalog_sha256": "31887a414d8df8151e3f630360c67cb6ea3c22e5b3292ddc6de79927a06ae405",
+  "model_or_independent_accuracy_score": null,
+  "chat_latency_measured": false,
+  "actual_peer_or_Hermes_tested": false,
+  "new_training_data_or_gold": false,
+  "same_development_questions_reused": true,
+  "case_reviews": [
+    {
+      "case_id": "clarify",
+      "question": "룰 현황 한번 확인하자.",
+      "runtime_status": "partial",
+      "review_category": "expected_clarification",
+      "review": "Returned scope question without model/MCP.",
+      "seconds": 0.032266263995552436,
+      "model_completions_recorded": 0,
+      "exposed_tools": 0,
+      "calls": [],
+      "remaining_issues": [],
+      "unqueried": [],
+      "final_response_sha256": "cf67dcf51072ed13dbf13e3c9e493a42c77a739336596a2092c20fe9bed1a402",
+      "trace_sha256": "1906a74698b27c3614a7e8e7955031030cbd9edc8e94bf46ff79d11d3b855972"
+    },
+    {
+      "case_id": "firewall",
+      "question": "FW 기본 정책과 적용 룰 같이 봐줘.",
+      "runtime_status": "completed",
+      "review_category": "bounded_read_verified",
+      "review": "Fresh whole-host FW snapshot checked; condensed report explicitly labels omitted detail.",
+      "seconds": 15.002938090008684,
+      "model_completions_recorded": 1,
+      "exposed_tools": 1,
+      "calls": [
+        {
+          "server": "resp",
+          "name": "get_firewall_rules",
+          "arguments": {
+            "limit": 200,
+            "offset": 0
+          },
+          "is_error": false,
+          "result_sha256": "9e110d558753c76abaf3ea7b7ab3c766a29bef8e878fd0e0883c293a3b351da5",
+          "result_bytes": 40468,
+          "seconds": 0.02992579701822251
+        }
+      ],
+      "remaining_issues": [],
+      "unqueried": [],
+      "final_response_sha256": "b2c28ec97cb39f1e3627b8634d4574b32c94fb1fc45acc24b2a47370a9e6186c",
+      "trace_sha256": "17c9f19fbb4acb9472796b6eecdb0e2a4fd1508d3e9ca38a8acd2cc8b1875a82"
+    },
+    {
+      "case_id": "rule-worker",
+      "question": "B rule-worker 오류 원인 확인해.",
+      "runtime_status": "partial",
+      "review_category": "read_failed",
+      "review": "Reader active; audit command_timeout in fixed warning/info grep. No healthy/zero claim.",
+      "seconds": 18.461610886995913,
+      "model_completions_recorded": 1,
+      "exposed_tools": 45,
+      "calls": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:rule-worker",
+            "since_kst": "2026-11-14T03:24:10.795222+09:00",
+            "until_kst": "2026-11-15T03:24:10.795222+09:00",
+            "view": "journal",
+            "limit": 50
+          },
+          "is_error": true,
+          "result_sha256": "e240d489e47fce40488276b3a53bda7f0a3e1e18761a8f93c03f3ecde06d7778",
+          "result_bytes": 92,
+          "seconds": 12.852139287017053
+        }
+      ],
+      "remaining_issues": [],
+      "unqueried": [
+        "b:rule-worker:journal:unavailable"
+      ],
+      "final_response_sha256": "cebf90273a2c7a9686c149d8c287aa8c6627d26aca9b404627363668d6c22dbb",
+      "trace_sha256": "1701bc2865bbd8b0e65d2ce1885b1dee315ed10f93d7bb737be16bf215fea3d6"
+    },
+    {
+      "case_id": "dns",
+      "question": "192.168.16.230 DNS 경보 조사해. 최근 15분, 목적지는 168.126.63.1:53이야.",
+      "runtime_status": "partial",
+      "review_category": "judgment_incomplete",
+      "review": "Correct source/time search, zero returned sample and unknown total retained; destination/port filter unsupported; final incident disposition not completed.",
+      "seconds": 65.40444416101673,
+      "model_completions_recorded": 4,
+      "exposed_tools": 45,
+      "calls": [
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "limit": 50,
+            "lookback_minutes": 15,
+            "source_ip": "192.168.16.230",
+            "until_kst": "2026-11-15T03:24:29.268366+09:00"
+          },
+          "is_error": false,
+          "result_sha256": "c4bf19bc9ac1efa9a4639e33390188bf53d6bf725d74ad76954458dd6b1e95f7",
+          "result_bytes": 1357,
+          "seconds": 0.03374145500129089
+        }
+      ],
+      "remaining_issues": [
+        "incident_disposition_evidence_missing"
+      ],
+      "unqueried": [],
+      "final_response_sha256": "76461ef0eea74544f80f6325612209035328dd9340a3771e5e4915a01d9a2f77",
+      "trace_sha256": "84c0f6daa13fd2c06b0f2447429158eaf39ef2aa1003fc7a479ac36456ae009b"
+    },
+    {
+      "case_id": "systemd",
+      "question": "B systemd 지금 문제 있어?",
+      "runtime_status": "completed",
+      "review_category": "scope_error",
+      "review": "Asked B, queried A/B/C because bare host qualifier not recognized; completed status is not a quality pass.",
+      "seconds": 17.438505059981253,
+      "model_completions_recorded": 2,
+      "exposed_tools": 1,
+      "calls": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          },
+          "is_error": false,
+          "result_sha256": "cd04e0dae21fee7d5976dc816f97ee823fc04613eb509f38642d318bea620a4b",
+          "result_bytes": 592,
+          "seconds": 0.12127177801448852
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "a:systemd"
+          },
+          "is_error": false,
+          "result_sha256": "be9b43d6db23225703114f5c54161e23eab4604f8d69d5ceea9551498d5bcc69",
+          "result_bytes": 592,
+          "seconds": 1.325176398997428
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:systemd"
+          },
+          "is_error": false,
+          "result_sha256": "ac9bb4d481dc32e16fa52bde759edf5b6fc9e1ca74af93f1da392d05d7016288",
+          "result_bytes": 592,
+          "seconds": 0.44825616700109094
+        }
+      ],
+      "remaining_issues": [],
+      "unqueried": [],
+      "final_response_sha256": "e4e0e01e88157544ec7aa95696c4467aecdbf34a490931b48f80fca98dd7ff28",
+      "trace_sha256": "e35613df814e9f864f3bc49a9d8381b1f6464870c5d95a46a1907c936ed77ff3"
+    },
+    {
+      "case_id": "kst",
+      "question": "2026-11-06T01:24:00+09:00 이 시각 정리해줘.",
+      "runtime_status": "completed",
+      "review_category": "unnecessary_calculation",
+      "review": "Preserved source KST but duplicated historical time with now label and generated unnecessary0delta/reference-unknown table.",
+      "seconds": 13.289448512980016,
+      "model_completions_recorded": 1,
+      "exposed_tools": 1,
+      "calls": [
+        {
+          "server": "system-diagnostics",
+          "name": "calculate_time",
+          "arguments": {
+            "timestamps": [
+              {
+                "id": "target",
+                "value": "2026-11-06T01:24:00+09:00"
+              },
+              {
+                "id": "now",
+                "value": "2026-11-06T01:24:00+09:00"
+              }
+            ]
+          },
+          "is_error": false,
+          "result_sha256": "8a95c98db0f073ac0537df0db17fc869cf7ca88f7a9e4a1f765863e3f84ee9bc",
+          "result_bytes": 595,
+          "seconds": 0.004501157003687695
+        }
+      ],
+      "remaining_issues": [],
+      "unqueried": [],
+      "final_response_sha256": "bb2f78dff9dc058fcc40e5b405aed6df8305b7820114a23ae1ef10b216645e43",
+      "trace_sha256": "de5a7e6e78ba3aaf5a3a1228be6a05e093f07677f9c584a8440157865b5933e7"
+    }
+  ],
+  "journal_failure_audit": {
+    "at_kst": "2026-11-15T03:29:54.059180+09:00",
+    "unit": "capstone-journal-reader.service",
+    "state": "MainPID=927\nExecMainStatus=0\nUser=root\nGroup=capstone-diagnostics\nActiveState=active\nSubState=running\n",
+    "audit_rows": [
+      {
+        "event": "bounded_journal_read",
+        "host": "b",
+        "outcome": "unavailable",
+        "reason": "command_timeout",
+        "target": "b:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "uid": 999
+      }
+    ],
+    "ordinary_log_messages_emitted": 0,
+    "modifications": 0
+  },
+  "journal_sliced_reproduction": {
+    "at_kst": "2026-11-15T03:35:31.515519+09:00",
+    "target": "b:rule-worker",
+    "requested_window_hours": 24,
+    "slices": [
+      {
+        "slice": 0,
+        "since_kst": "2026-11-14T21:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "status": "returned",
+        "returned_entries": 0,
+        "has_more": false,
+        "record_sha256": [],
+        "result_sha256": "93df21fc2a18bd5dc1da3019fbd49e8479f5d1357447d8e7d59a87fb72019190",
+        "elapsed_seconds": 3.147403
+      },
+      {
+        "slice": 1,
+        "since_kst": "2026-11-14T15:24:10.795222+09:00",
+        "until_kst": "2026-11-14T21:24:10.795222+09:00",
+        "status": "returned",
+        "returned_entries": 0,
+        "has_more": false,
+        "record_sha256": [],
+        "result_sha256": "fa980e1fc136e095dc214746d8d7fca58d367bd642eb550ae18aff026ca1e37e",
+        "elapsed_seconds": 2.991777
+      },
+      {
+        "slice": 2,
+        "since_kst": "2026-11-14T09:24:10.795222+09:00",
+        "until_kst": "2026-11-14T15:24:10.795222+09:00",
+        "status": "returned",
+        "returned_entries": 0,
+        "has_more": false,
+        "record_sha256": [],
+        "result_sha256": "55a000025dc02a604859ef20720668376c7ccb8fa97f386e4036bbb995e56360",
+        "elapsed_seconds": 3.455804
+      },
+      {
+        "slice": 3,
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-14T09:24:10.795222+09:00",
+        "status": "returned",
+        "returned_entries": 0,
+        "has_more": false,
+        "record_sha256": [],
+        "result_sha256": "a263a5965bcaf7ffc5f0f7e45229dbab9512ab741a5eae7afcef7bfc672b3210",
+        "elapsed_seconds": 3.408793
+      }
+    ],
+    "all_slices_returned": true,
+    "unique_records_returned": 0,
+    "elapsed_seconds": 13.004036,
+    "scope": "Same24h split into4exact6h read windows, existing installed reader outside unit sandbox, no source/config/budget changes; not a deployed optimization or controlled benchmark.",
+    "log_messages_emitted": 0,
+    "installed_changes": 0
+  },
+  "journal_candidate": {
+    "source": "../../mcp/diagnostic_journal.py",
+    "sha256": "e1726ed864c9628c44b6d9f1cefaa2de66dbeac4d8fb7c88227fc4211a819145",
+    "installed_before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+    "elapsed_seconds": 12.638176,
+    "unchanged_validator_passed": true,
+    "full_requested_window_hours": 24,
+    "returned_entries": 0,
+    "requested_window_total_count": null,
+    "retention_verified": false,
+    "deployed": false,
+    "service_sandbox_or_actual_MCP_verified": false,
+    "generation_or_chat_time_included": false,
+    "limits_unchanged": {
+      "command_seconds": 12,
+      "whole_request_seconds": 20,
+      "maximum_request_hours": 24,
+      "maximum_returned_entries": 50
+    },
+    "regression_profiles": [
+      {
+        "profile": "test_diagnostic_journal.py",
+        "rc": 0,
+        "tests": 32,
+        "skipped": 0,
+        "seconds": 0.147
+      },
+      {
+        "profile": "test_system_diagnostics.py",
+        "rc": 0,
+        "tests": 43,
+        "skipped": 0,
+        "seconds": 0.417
+      },
+      {
+        "profile": "test_diagnostic_history.py",
+        "rc": 0,
+        "tests": 24,
+        "skipped": 0,
+        "seconds": 0.132
+      },
+      {
+        "profile": "test_host_inventory.py",
+        "rc": 0,
+        "tests": 15,
+        "skipped": 0,
+        "seconds": 0.078
+      },
+      {
+        "profile": "test_soc_diagnostics.py",
+        "rc": 0,
+        "tests": 20,
+        "skipped": 0,
+        "seconds": 0.082
+      }
+    ],
+    "regression_tests": 134,
+    "initial_added_test_failure": "Duplicate keyword in new test fixture, preserved then corrected; production not relaxed."
+  },
+  "cleanup_b": {
+    "at_kst": "2026-11-15T03:46:29.422323+09:00",
+    "root": "/var/tmp/capstone-live-read-20261115-kwxgjlin",
+    "files_removed": 16,
+    "bytes_removed": 427636,
+    "absent": true,
+    "installed_sources_unchanged": 19,
+    "config_unchanged": true,
+    "units": {
+      "capstone-review-chat.service": "active",
+      "capstone-ollama-chat.service": "active",
+      "capstone-journal-reader.service": "active",
+      "capstone-management.timer": "active"
+    },
+    "operating_changes": 0,
+    "service_operations": 0,
+    "other_candidates_or_backups_removed": 0
+  },
+  "next": [
+    "Prepare exact journal source/install/rollback plan including current A/C copies; administrator approval before server writes/restart.",
+    "Use official Harness2 before correcting shared bare host scope and pure time display; freeze/regress/approve/verify new chat.",
+    "Finish DNS evidence/decision using actual supported scope; unknown sample total is not absence.",
+    "Original19file state candidate remains PREPARED and awaits its exact approval."
+  ],
+  "limits": [
+    "One serial run, shared GPU/cache uncontrolled; current runtime CLI not Mattermost queue/delivery.",
+    "Selected live questions overlap development fixtures and are not unused expert gold or a model pair comparison.",
+    "Candidate journal test executes existing core plus isolated source outside service sandbox, not deployed MCP.",
+    "Do not combine these runtimes with prior raw-model fixture scores or subtract them as a causal speed improvement."
+  ]
+}

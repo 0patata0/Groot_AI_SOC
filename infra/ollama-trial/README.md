@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+**현재 읽기 경로 확인:** [설치 runtime·실제 MCP6요청](../validation/live-reads/README.md)은 FW15.003초/실조회1회를 확인했지만 journal 실패·B의 호스트 범위 확대·DNS판단 미완료·불필요한 시각 계산이 남았다. 현재 허용은 읽기36/동등권한45이며 모델은 학습본 `soc-qwen36:35b-balanced-q4km-20261108`, 전용·공동·경보 채널은 공개다. 소스19/스킬·45스키마·config와 GET메타데이터를 대조했다. 이하 날짜별 수치는 당시 검증 이력이다. 새 journal 후보는 로컬 소스/격리 검증만 했으며 운영에는 미적용이다.
+
 [정확 적용 후보](../validation/control-status/application/README.md)는 기존 공통 완료 조건과 SDK77회귀를 포함한다. Native 전용 상태 decoder를 SDK에 새로 도입한 것은 아니다. SDK 사본/영수증·heartbeat/PID/DB 확인과19파일 원복을 준비했으며 승인 전 운영 변경0이다. 이미 최신인 조회 스킬3사본은 바꾸지 않고 영수증의 오래된 해시만 정정하는 후보를 포함한다.
 
 > **2026-11-13 도구 목록 계약(21:51 B 적용·21:59 확정, 교차 검토·단독 조사형 실채팅 확인):** 11/13 00:34 B 규칙 MCP에 Harness² 도구 4개가 추가된 뒤, `rule-b`·`rule-write-b`에 연결하는 Ollama 실행이 모델 호출 전에 `server_tool_contract_changed`로 멈췄다(공동 채널 교차 검토 4회 모두 실패). `policy.py`에서 서버가 광고하는 정확한 도구 집합(`CATALOG_TOOLS`)과 사용 권한을 분리했다. 4개 도구는 계약에만 등록하고 어떤 모드에서도 노출하지 않는다. 그 밖의 목록 변화는 계속 차단하며, MCP 원본과 계약을 대조하는 회귀를 추가했다. [원인·수정·검증](../validation/catalog-contract/README.md).
@@ -77,12 +79,12 @@ Hermes1.19.4와 같은 공통 하네스로 장비·기본/커스텀·ID·상관 
 
 모델 추론은 기존 DGX Ollama에 두고, B에 `mcp-use 1.7.1` + `langchain-ollama 1.1.0` + 공식 Ollama Python SDK `0.6.3`을 별도 Python 3.12 venv로 설치한다. 이 구성은 **Ollama 클라이언트를 사용하는 에이전트 실행부**다. B에 Ollama 추론 daemon/CLI·모델 가중치를 설치하는 구성은 아니다. 실제 비교 결과와 현재 Git/검증 상태는 [STATUS](../../STATUS.md)를 따른다.
 
-`B soc-ollama → DGX /api/chat → B의 MCP 호출 → DGX 최종 답변` 순서로 실행한다. host 프로세스여서 추가 Docker NIC가 없고 기존 Hermes와 직렬로 연결하지 않는다. 기존 자동 사건 관리 controller는 Hermes가 계속 맡는다. 별도 `ollama` 봇은 전용 채널/DM에서 조사와 승인형 변경안 준비를 수행할 수 있으며, 두 실행부가 같은 보호 MCP·승인 broker를 사용한다. 자동 사건 소비자를 추가해 같은 사건을 중복 처리하지 않는다. 두 라이브러리 환경의 MCP 버전(시험1.30/운영2.0)은 서로 섞지 않는다.
+`B soc-ollama → 설정된 Thor Ollama /api/chat → B의 MCP 호출 → Thor 최종 답변` 순서로 실행한다. host 프로세스여서 추가 Docker NIC가 없고 기존 Hermes와 직렬로 연결하지 않는다. 기존 자동 사건 관리 controller는 Hermes가 계속 맡는다. 별도 `ollama` 봇은 전용 채널/DM에서 조사와 승인형 변경안 준비를 수행할 수 있으며, 두 실행부가 같은 보호 MCP·승인 broker를 사용한다. 자동 사건 소비자를 추가해 같은 사건을 중복 처리하지 않는다. 두 라이브러리 환경의 MCP 버전(시험1.30/운영2.0)은 서로 섞지 않는다.
 
 ## 권한과 범위
 
 - `soc-ollama`: nologin·자체 그룹만, sudo/Docker 권한 없음. 코드는 root 소유이며 계정이 수정할 수 없다. venv는 패키지 분리이며 OS sandbox는 아니다.
-- 기본 설치 `read-only`는 6서버·28읽기다. 사용자가 허용한 현재 라이브 설정 `hermes-parity`는 **8서버·37도구(읽기28·보호9)**이며 Hermes와 이름/JSON Schema SHA가 전부 같다. 조회4종은 rule-a/b, 제안은 rule-write-a/b, 기존 차단/해제·목록은 resp가 담당한다.
+- 현재 `read-only`는6서버·36읽기, 실제 설정 `hermes-parity`는 **8서버·45도구(읽기36·보호9)**다. B가 광고하는 Harness² 관리4도구는 목록 계약에서 확인하지만 Ollama에는 어느 모드에서도 노출하지 않는다. Hermes 전체 허용 목록과 완전히 같다고 표현하지 않는다. 실제 이름/스키마는 [관측 계약](../../finetuning/mcp_contract.20261115.json)과 [policy.py](policy.py)를 따른다. 조회는 rule-a/b, 제안은 rule-write-a/b, 기존 차단/해제·FW/목록은 resp가 담당한다.
 - parity 모드는 Hermes가 사용하는 rulechg/resp의 제한된 SSH 키를 root 소유·전용 그룹 읽기로 연결한다. B 읽기 MCP에는 별도 강제 명령 키를 사용한다. host key 검증·포워딩 금지·기존 서버 강제 명령을 유지하며 일반 관리자 키/쉘/sudo/Docker 권한은 주지 않는다.
 - 보호9개도 기존 정확 후보 승인·증거·보호 주소·임시 TTL 검사를 통과해야 한다. 모델이 승인하거나 서버 검증을 우회할 수 없다. 보호 호출 시작을 먼저 SQLite에 기록하고, 실행 중 재시작되면 결과 미확인으로 전달하며 자동 재실행하지 않는다. 같은 요청 내 동일 보호 인자도 중복 실행하지 않는다.
 - 모델 호출 기본12회(허용1~16), 도구 기본32회(허용1~40). graph의 middleware 단계 예산은 별도로 `8×모델한도+16`이며 모델/도구 한도를 늘리지 않는다. 근거 정정 최대2회도 같은 총 예산을 쓴다. 읽기 MCP90초·보호720초, parity 첫 대화900초·정정180초·gateway1110초 상한이다. 이는 응답 목표 시간이 아닌 실패 상한이며 승인 대기를 포함한다.
@@ -121,11 +123,11 @@ root 소유·그룹/기타 쓰기 금지로 반입한다. 설치기는 추가 �
 
 ```bash
 sudo /usr/local/sbin/capstone-ollama-trial <<'JSON'
-{"question":"현재 IDS 상태를 실제 조회하고 개별 SID 적재 확인 여부를 구분해줘.","tools":["mcp__rule_a__get_service_action_target","mcp__rule_b__get_service_action_target"]}
+{"question":"FW 기본 정책과 적용 룰 같이 봐줘."}
 JSON
 ```
 
-`tools`를 생략하면 root 설정의 권한(현재 parity36개) 안에서 단순 룰/IDS/이벤트/전체 서비스 진단을 해당 읽기 도구로 좁힌다. 변경안 요청에는 기존 보호 도구를 유지하며 분류기가 도구를 대신 호출하거나 사건 조치를 결정하지 않는다. 초기 SDK 비교에는 두 실행부에 동일한5개만 노출했으며 현재 채팅과 조건이 다르다. `{"discover_only":true}`는 모델/보호 호출 없이 선택 모드의 이름/스키마를 확인한다. `calls`에 실제 인자·결과·소요시간, `model_calls`에 생성시간/토큰과 Ollama native 메타데이터, `final_response`에 최종 답변이 나온다. 상세 결과에는 운영 데이터가 있으므로 로컬 전용 검증 기록으로 보관한다.
+`tools`를 생략하면 root 설정의 권한(현재 parity45개) 안에서 단순 룰/IDS/이벤트/전체 서비스 진단을 해당 읽기 도구로 좁힌다. 변경안 요청에는 기존 보호 도구를 유지하며 분류기가 도구를 대신 호출하거나 사건 조치를 결정하지 않는다. 초기 SDK 비교에는 두 실행부에 동일한5개만 노출했으며 현재 채팅과 조건이 다르다. `{"discover_only":true}`는 모델/보호 호출 없이 선택 모드의 이름/스키마를 확인한다. `calls`에 실제 인자·결과·소요시간, `model_calls`에 생성시간/토큰과 Ollama native 메타데이터, `final_response`에 최종 답변이 나온다. 상세 결과에는 운영 데이터가 있으므로 로컬 전용 검증 기록으로 보관한다.
 
 ## 비교 방법과 한계
 
@@ -137,11 +139,11 @@ JSON
 
 ## Mattermost에서 직접 시험
 
-현재 봇 이름은 `ollama`, 채널은 [soc-ollama](https://chat.grootlab.duckdns.org/soc/channels/soc-ollama)다. 기존 `soc-agent`는 ID·이력을 유지한 [soc-hermes](https://chat.grootlab.duckdns.org/soc/channels/soc-hermes)로 변경했다. 새 채널은 기존 관리자와 Ollama 봇만 참여하는 비공개 채널이며 Hermes는 참여하지 않는다. 멘션 없이 질문하고 같은 스레드에서 후속 질문을 이어간다. `ollama`와의 DM도 사용할 수 있다. 현재 관리자 ID만 허용하며 다른 봇·시스템 글·이전 글·다른 채널 요청은 실행하지 않는다.
+현재 봇 이름은 `ollama`, 채널은 [soc-ollama](https://chat.grootlab.duckdns.org/soc/channels/soc-ollama)다. 기존 `soc-agent`는 ID·이력을 유지한 [soc-hermes](https://chat.grootlab.duckdns.org/soc/channels/soc-hermes)로 변경했다. 현재 soc-ollama는 공개 채널이며 표시 이름 접미사 정책으로 Ollama가 참여한다. Hermes의 자동 참여 대상은 -hermes/-agent이며 soc-ollama는 제외한다. 이 GET 확인은 채널 공개 속성만 확인했고 전체 사람/봇 회원을 새로 전수 조사한 것은 아니다. 멘션 없이 질문하고 같은 스레드에서 후속 질문을 이어간다. `ollama`와의 DM도 사용할 수 있다. 설정된 허용 사용자만 처리하며 다른 봇·시스템 글·이전 글·다른 채널 요청은 실행하지 않는다.
 
 `capstone-ollama-chat.service`가 같은 host venv의 [chat.py](chat.py)를 soc-ollama 계정으로 실행한다. 기존 B Mattermost의 호스트 바인딩 주소8065에 HTTP/WebSocket으로 연결하며 새 수신 포트/NIC는 없다. 설치기는 관리자 자격을 보내기 전에 주소가 이 호스트에 할당된 IP인지 검사한다. 봇 토큰은 root 소유0640 설정에서만 읽으며 모델/로그/Git에 전달하지 않는다. 시스템 관리자 역할이나 전체 채널 게시 권한을 주지 않는다. ProtectSystem=strict·NoNewPrivileges·전용 상태 경로 쓰기와1GiB 메모리/128task 제한을 적용한다.
 
-새 요청에는 같은 스레드의 처리 중 답변 하나를 만들고 완료 결과로 갱신한다. 답변 하단에 KST·처리시간을 표시한다. 스레드 또는 DM의 최근10개/8,000자 내 문맥만 사용하고 현재 상태는 다시 조회하도록 지시한다. 새 채널 스레드는 이전 스레드와 섞지 않는다. 현재36도구 권한에서 단순 읽기는 필요한 도구/대상으로 좁히므로 위의5도구 SDK 비교 수치와 실제 채팅 시간이 같다고 단정하지 않는다. 새 스레드 실제 시험은 API 최종게시시각과 WebSocket 수신·실제 MCP 결과를 대조한다.
+새 요청에는 같은 스레드의 처리 중 답변 하나를 만들고 완료 결과로 갱신한다. 답변 하단에 KST·처리시간을 표시한다. 스레드 또는 DM의 최근10개/8,000자 내 문맥만 사용하고 현재 상태는 다시 조회하도록 지시한다. 새 채널 스레드는 이전 스레드와 섞지 않는다. 현재45도구 권한에서 단순 읽기는 필요한 도구/대상으로 좁히므로 위의5도구 SDK 비교 수치와 실제 채팅 시간이 같다고 단정하지 않는다. 새 스레드 실제 시험은 API 최종게시시각과 WebSocket 수신·실제 MCP 결과를 대조한다.
 
 중복 이벤트는 SQLite로 제거하고 모델 완료 결과를 저장한 뒤 전달을 재시도한다. WebSocket 재연결 시 소속 채널/DM의 최근60글을 확인한다. 장시간 단절로60글을 넘는 이력과 신규 DM 재발견의 모든 경우를 보장하지 않는다. POST 응답이 불명확하면 스레드의 원본 요청 ID를 대조하며 무조건 재게시하지 않는다. 불명확한 요청은 로그 확인 후 새로 질문할 수 있다. 그룹 DM·첨부/이미지 분석·메시지 수정에 따른 자동 재생성·전체 세션 이관은 범위 밖이다.
 
@@ -157,7 +159,7 @@ sudo python3 -I -B /opt/capstone-prereqs/ollama-trial/source/deployment/ollama_t
   --hermes-home /opt/hermes-data --access-mode hermes-parity
 ```
 
-설치기는 기존 root 소스/설정·소유권 정보를 `/var/backups/capstone-ollama-*`에 보관하고 새 gateway만 멈춰 갱신·36도구 발견·pip check 후 다시 시작한다. 검증 실패 시 이전 소스/설정/소유권을 복원하고 이번에 생성한 파일만 제거한다. 기존 Hermes 서비스·관리 설정을 변경하지 않는다. 이번 하네스 갱신에는 추가 wheel/deb가 필요 없으며 기존 manifest/lock을 유지한다. 운영 복구 bundle의 source와 receipt도 같이 맞춘다.
+설치기는 기존 root 소스/설정·소유권 정보를 `/var/backups/capstone-ollama-*`에 보관하고 새 gateway만 멈춰 갱신·설정된 모드의 도구 목록 확인·pip check 후 다시 시작한다. 검증 실패 시 이전 소스/설정/소유권을 복원하고 이번에 생성한 파일만 제거한다. 기존 Hermes 서비스·관리 설정을 변경하지 않는다. 이번 하네스 갱신에는 추가 wheel/deb가 필요 없으며 기존 manifest/lock을 유지한다. 운영 복구 bundle의 source와 receipt도 같이 맞춘다.
 
 ## 중지·복구
 

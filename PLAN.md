@@ -10,7 +10,7 @@
 |---|---|---|
 | 1 | 정확 후보 적용과 사건·교차 검토 의미 | [19파일 적용안](infra/validation/control-status/application/README.md) 준비·Native536/query419 Hermes 생략0·SDK77/설치46/운영자37·복제19원복 통과. 정확 승인→최신 대조/유휴 확인→15분 원복 설정→적용/실제 로드→새 채팅/MCP→확정. 의미 오류·기존176회귀·참고와다른새독립운영평가필요 |
 | 2 | 승인 대기 식별자 수정·Harness² 채팅 연결 검증 | Hermes 목록4개·상태 읽기는 확인, 자연어 선택·승인 클릭→고정 worker1회 실행→결과 읽기는 미확인. Ollama4개는 정책에서 제외되므로 별도 권한 후보·정확 승인 검토 |
-| 3 | Hermes 보고 판단과 전송 장기성 | 판단 없는 resolved·질문 밖 장비 확대 보완. [전송 감사](infra/normalization/vector/history-auto-transfer/AUDIT.md)는 A14완료/A·B420일치·실패43메타데이터 보존검토 완료. 현재420재사용80회 p95 152.69초이며1024실부하·보관 수명은 별도 |
+| 3 | journal 가용성·보고 판단과 전송 장기성 | 현재 [journal24시간 분할 후보](infra/mcp/journal-window-slices.md)134검사/격리12.638초·미적용: A/C소스·복구/정확적용안→승인→실MCP/새채팅. B짧은호스트범위·시각표시·DNS판단도 [실제6요청](infra/validation/live-reads/README.md)에서잔여확인,하네스는공식Harness²후정리. 판단 없는 resolved·질문 밖 장비 확대 보완. [전송 감사](infra/normalization/vector/history-auto-transfer/AUDIT.md)는 A14완료/A·B420일치·실패43메타데이터 보존검토 완료. 현재420재사용80회 p95 152.69초이며1024실부하·보관 수명은 별도 |
 | 4 | 독립 사건·모델·승인 평가 | [기존176범위정정](finetuning/EVALUATION_SCOPE.md):소비128포함/workflow0. [개발16진단](finetuning/WORKFLOW_DEVELOPMENT.md)은21응답·무조회단정3개/기존검사검출·다른읽기7개미채점. 동등한추가읽기관측→현재보정/최종게시검증→새출처·사건분리관제평가/동일조건모델비교. 승인형OS회수·감사·복구도 별도 |
 | 5 | 네트워크·혼합 트래픽·설치 인수 | 자체 Suricata 인라인 IPS·검증 룰 drop, WAF/IPS/FW 장비별30사례, 정상 다수와 혼합. 중단된 공격은 명시 재개 후만 실행 |
 | 6 | 논문 제출과 발표 | MD 개정·PDF/DOCX 각43쪽 제출 조건 반영·검수 완료. 정장사진/학번·추가 학교 서식·후속 새 실측 반영, 최종 발표 리허설 |

@@ -91,6 +91,92 @@ class Journal(unittest.TestCase):
         self.assertEqual(result['returned_entries'],1)
         self.assertFalse(result['journal_retention_verified']);self.assertIsNone(result['requested_window_total_count'])
 
+    def windowed_read(self, records, request):
+        calls=[]
+        def run(argv,maximum,seconds):
+            calls.append((argv,maximum,seconds))
+            since=int(next(a.split('@',1)[1] for a in argv if a.startswith('--since=@')))*1000000
+            until=int(next(a.split('@',1)[1] for a in argv if a.startswith('--until=@')))*1000000
+            selected=[r for r in records if since<=int(r['__REALTIME_TIMESTAMP'])<=until]
+            if '--priority=err' in argv:selected=[r for r in selected if int(r['PRIORITY'])<=3]
+            elif any(a.startswith('--grep=') for a in argv):
+                selected=[r for r in selected if 4<=int(r['PRIORITY'])<=6 and re.search(d.ERROR_PATTERN,r['MESSAGE'])]
+            cap=int(next(a.split('=',1)[1] for a in argv if a.startswith('--lines=')))
+            selected=sorted(selected,key=lambda r:int(r['__REALTIME_TIMESTAMP']))[-cap:]
+            return 0,b'\n'.join(d.encode(r).strip() for r in selected)
+        return j.answer(request,'b',NOW,run),calls
+
+    def test_full_day_keeps_older_evidence_and_original_requested_bounds(self):
+        request=dict(args(),since_kst=h.shown((NOW-86400)*1000000),until_kst=h.shown(NOW*1000000),limit=50)
+        records=[row('RuntimeError: fixed sample',at=NOW-age,identity=str(age),priority='3' if n%2 else '6')
+                 for n,age in enumerate((23*3600,17*3600,11*3600,100))]
+        result,calls=self.windowed_read(records,request)
+        self.assertEqual(result['returned_entries'],4)
+        self.assertEqual({r['record_sha256'] for r in result['entries']},{hashlib.sha256(r['__CURSOR'].encode()).hexdigest() for r in records})
+        self.assertEqual(result['requested_since_kst'],request['since_kst'])
+        self.assertEqual(result['requested_until_kst'],request['until_kst'])
+        self.assertEqual(len(calls),8);self.assertFalse(result['has_more'])
+        self.assertIsNone(result['requested_window_total_count']);self.assertFalse(result['journal_retention_verified'])
+
+    def test_slice_boundary_is_deduplicated_without_losing_either_side(self):
+        request=dict(args(),since_kst=h.shown((NOW-12*3600)*1000000),until_kst=h.shown(NOW*1000000))
+        records=[row('RuntimeError: boundary',at=NOW-6*3600+offset,identity=str(offset)) for offset in (-1,0,1)]
+        result,calls=self.windowed_read(records,request)
+        self.assertEqual(result['returned_entries'],3);self.assertEqual(len(calls),4)
+        self.assertEqual(len({r['record_sha256'] for r in result['entries']}),3)
+
+    def test_long_all_priority_request_keeps_debug_and_info_without_error_filter(self):
+        request=dict(args(journal_scope='all'),since_kst=h.shown((NOW-86400)*1000000),until_kst=h.shown(NOW*1000000))
+        records=[row('ordinary activity',at=NOW-age,identity=str(age),priority=priority)
+                 for age,priority in ((23*3600,'7'),(11*3600,'5'),(100,'3'))]
+        result,calls=self.windowed_read(records,request)
+        self.assertEqual(result['returned_entries'],3);self.assertEqual(len(calls),4)
+        self.assertEqual({r['priority'] for r in result['entries']},{3,5,7})
+        self.assertFalse(any(a.startswith('--priority=') or a.startswith('--grep=') for c in calls for a in c[0]))
+
+    def test_rounding_does_not_leak_rows_one_microsecond_outside_original_bounds(self):
+        end=NOW*1000000-123;start=end-86400*1000000
+        request=dict(args(journal_scope='all'),since_kst=h.shown(start),until_kst=h.shown(end))
+        records=[dict(row('ordinary activity',identity=str(at)),__REALTIME_TIMESTAMP=str(at))
+                 for at in (start-1,start,end,end+1)]
+        result,_=self.windowed_read(records,request)
+        self.assertEqual({r['record_sha256'] for r in result['entries']},
+                         {hashlib.sha256(str(at).encode()).hexdigest() for at in (start,end)})
+
+    def test_full_newer_tail_can_stop_without_claiming_complete_count(self):
+        request=dict(args(),since_kst=h.shown((NOW-86400)*1000000),until_kst=h.shown(NOW*1000000),limit=2)
+        records=[row('RuntimeError: recent',at=NOW-age,identity=str(age)) for age in (1,2,3,4,23*3600)]
+        result,calls=self.windowed_read(records,request)
+        self.assertEqual(len(calls),2);self.assertTrue(result['has_more'])
+        self.assertEqual({r['record_sha256'] for r in result['entries']},{hashlib.sha256(str(age).encode()).hexdigest() for age in (1,2)})
+        self.assertEqual(result['requested_since_kst'],request['since_kst'])
+        self.assertIsNone(result['requested_window_total_count'])
+
+    def test_long_query_budget_exhaustion_never_returns_partial_empty_success(self):
+        clock=[100.0];calls=[]
+        def run(argv,maximum,seconds):
+            calls.append(seconds);clock[0]+=7;return 0,b''
+        request=dict(args(),since_kst=h.shown((NOW-86400)*1000000),until_kst=h.shown(NOW*1000000))
+        with patch.object(j.time,'monotonic',side_effect=lambda:clock[0]),self.assertRaisesRegex(ValueError,'journal_query_timeout'):
+            j.answer(request,'b',NOW,run)
+        self.assertEqual(calls,[12,12,6])
+
+    def test_long_query_keeps_old_aggregate_output_bound(self):
+        request=dict(args(),since_kst=h.shown((NOW-86400)*1000000),until_kst=h.shown(NOW*1000000))
+        raw=d.encode(row('x'*300000))
+        with self.assertRaisesRegex(ValueError,'journal_output_total_bound'):
+            j.answer(request,'b',NOW,lambda *_:(0,raw))
+
+    def test_conflicting_cursor_across_slices_is_not_silently_deduplicated(self):
+        request=dict(args(),since_kst=h.shown((NOW-12*3600)*1000000),until_kst=h.shown(NOW*1000000))
+        count=[0]
+        def run(argv,maximum,seconds):
+            count[0]+=1
+            if '--priority=err' not in argv:return 0,b''
+            return 0,d.encode(row('first' if count[0]==1 else 'changed',at=NOW-6*3600,priority='3'))
+        with self.assertRaisesRegex(ValueError,'journal_cursor_conflict'):
+            j.answer(request,'b',NOW,run)
+
     def test_request_never_accepts_arbitrary_host_unit_path_command_filter_or_bounds(self):
         bad=[dict(args(),target='b:systemd'),dict(args(),target='c:apache'),
              dict(args(),target='b:unregistered'),dict(args(),target='../../etc/shadow'),

@@ -27,6 +27,7 @@ COMMAND_TIMEOUT = 12
 QUERY_TIMEOUT = 20
 LOCAL_RESPONSE_TIMEOUT = QUERY_TIMEOUT + 4
 REMOTE_QUERY_TIMEOUT = LOCAL_RESPONSE_TIMEOUT + 12
+QUERY_WINDOW_US = 6 * 3600 * 1000000
 READERS = ('mcp', 'capstone-mcp', 'capstone-diagnostics')
 FIELDS = '__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE'
 SECRET_KEY = r'(?:pass(?:word|wd)?|pwd|token|secret|api[_-]?key|access[_-]?key|private[_-]?key|authorization|cookie|set-cookie|credential|session[_-]?id)'
@@ -186,44 +187,60 @@ def answer(value, host, now=None, runner=None):
     core.need(host in core.ROLE_HOST.values() and target[0] == host, 'journal_host_mismatch')
     unit = core.TARGETS[target]
     runner = core.bounded_command if runner is None else runner
-    # Integer seconds widen the source query only; exact microsecond bounds
-    # are checked again before any row can be returned.
-    prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
-        '--output-fields=' + FIELDS, '--since=@' + str(since // 1000000),
-        '--until=@' + str((until + 999999) // 1000000), '--lines=' + str(limit + 1), '--unit=' + unit]
     filters = ([['--priority=err'], ['--priority=warning..info', '--grep=' + core.ERROR_PATTERN]]
                if scope == 'errors' else [[]])
-    rows, source_limited = {}, False
+    rows, source_limited, read_bytes = {}, False, 0
     deadline = time.monotonic() + QUERY_TIMEOUT
-    for suffix in filters:
-        remaining = deadline - time.monotonic()
-        core.need(remaining > 0, 'journal_query_timeout')
-        code, raw = runner(prefix + suffix, 1048576, min(COMMAND_TIMEOUT, remaining))
-        core.need(code == 0, 'journal_read_unavailable')
-        lines = raw.splitlines()
-        core.need(len(lines) <= limit + 1, 'journal_row_bound')
-        source_limited |= len(lines) == limit + 1
-        for line in lines:
-            item = core.parsed(line)
-            core.need(isinstance(item, dict), 'journal_row_invalid')
-            matches = {item[k] for k in ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT')
-                       if isinstance(item.get(k), str) and item[k] in core.TARGETS.values()}
-            core.need(matches == {unit}, 'journal_unit_mismatch')
-            stamp, cursor, priority = item.get('__REALTIME_TIMESTAMP'), item.get('__CURSOR'), item.get('PRIORITY')
-            core.need(isinstance(stamp, str) and re.fullmatch(r'[0-9]{1,20}', stamp)
-                      and isinstance(cursor, str) and 1 <= len(cursor) <= 2048
-                      and isinstance(priority, str) and priority in tuple('01234567'), 'journal_fields_invalid')
-            at = int(stamp)
-            if not since <= at <= until:
-                continue
-            excerpt, state, sha = redact(item.get('MESSAGE'))
-            row = {'at_kst':core.history_library().shown(at), 'priority':int(priority),
-                'record_sha256':digest(cursor.encode()), 'message_sha256':sha,
-                'message_excerpt':excerpt, 'message_state':state,
-                'excerpt_sha256':digest(excerpt.encode()) if excerpt is not None else None}
-            key = row['record_sha256']
-            core.need(key not in rows or rows[key] == row, 'journal_cursor_conflict')
-            rows[key] = row
+    window_until = until
+    while True:
+        window_since = max(since, window_until - QUERY_WINDOW_US)
+        # Integer seconds widen only this source query. Check exact microsecond
+        # slice bounds again below, including the shared boundary record.
+        prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
+            '--output-fields=' + FIELDS, '--since=@' + str(window_since // 1000000),
+            '--until=@' + str((window_until + 999999) // 1000000),
+            '--lines=' + str(limit + 1), '--unit=' + unit]
+        for suffix in filters:
+            remaining = deadline - time.monotonic()
+            core.need(remaining > 0, 'journal_query_timeout')
+            code, raw = runner(prefix + suffix, 1048576, min(COMMAND_TIMEOUT, remaining))
+            core.need(code == 0, 'journal_read_unavailable')
+            read_bytes += len(raw)
+            # Preserve the old whole-request byte budget, including duplicates.
+            core.need(read_bytes <= 1048576 * len(filters), 'journal_output_total_bound')
+            lines = raw.splitlines()
+            core.need(len(lines) <= limit + 1, 'journal_row_bound')
+            source_limited |= len(lines) == limit + 1
+            for line in lines:
+                item = core.parsed(line)
+                core.need(isinstance(item, dict), 'journal_row_invalid')
+                matches = {item[k] for k in ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT')
+                           if isinstance(item.get(k), str) and item[k] in core.TARGETS.values()}
+                core.need(matches == {unit}, 'journal_unit_mismatch')
+                stamp, cursor, priority = item.get('__REALTIME_TIMESTAMP'), item.get('__CURSOR'), item.get('PRIORITY')
+                core.need(isinstance(stamp, str) and re.fullmatch(r'[0-9]{1,20}', stamp)
+                          and isinstance(cursor, str) and 1 <= len(cursor) <= 2048
+                          and isinstance(priority, str) and priority in tuple('01234567'), 'journal_fields_invalid')
+                at = int(stamp)
+                if not window_since <= at <= window_until:
+                    continue
+                excerpt, state, sha = redact(item.get('MESSAGE'))
+                row = {'at_kst':core.history_library().shown(at), 'priority':int(priority),
+                    'record_sha256':digest(cursor.encode()), 'message_sha256':sha,
+                    'message_excerpt':excerpt, 'message_state':state,
+                    'excerpt_sha256':digest(excerpt.encode()) if excerpt is not None else None}
+                key = row['record_sha256']
+                core.need(key not in rows or rows[key] == row, 'journal_cursor_conflict')
+                rows[key] = row
+        if window_since == since:
+            break
+        # Earlier slices cannot displace this strictly newer, full tail. Keep
+        # has_more true; this is still a bounded sample, never a total count.
+        newest = sorted(rows.values(), key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
+        if len(newest) > limit and newest[limit - 1]['at_kst'] > core.history_library().shown(window_since):
+            source_limited = True
+            break
+        window_until = window_since
     core.need(time.monotonic() <= deadline, 'journal_query_timeout')
     ordered = sorted(rows.values(), key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
     result = {'schema':1, 'kind':'journal_excerpt', 'target':target, 'host':host, 'unit':unit,

@@ -1,0 +1,3191 @@
+{
+  "status": "development_complete_rejected_r3_no_operating_promotion",
+  "at_kst": "2026-11-14T10:11:19.678361+09:00",
+  "base_commit": "4a9318e681812b010319d8c6669c14ab98af9a7f",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "operating_worker_sha256": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+  "skill_sha256": {
+    "base": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+    "r2": "83ea52e24574087b516b747461a6d6f4585a8e697949d423c4b130bc8b266639",
+    "r3": "f8bd6131885de0fc8eff1cad27c658f7ac8caff516f694f37cb2acc89409823e"
+  },
+  "candidate_file": "infra/validation/peer-semantics/candidate-soc-investigate.md",
+  "candidate_arm_after_test": "r2; incomplete, not promoted",
+  "rejected_attempt": {
+    "patch": "infra/validation/peer-semantics/attempt-r3.patch",
+    "patch_sha256": "fe7b590fe141a717708d8510cdaed6166b8cd1a97c2f59df78ba917340c8aabb",
+    "reconstructed_skill_sha256": "f8bd6131885de0fc8eff1cad27c658f7ac8caff516f694f37cb2acc89409823e",
+    "git_apply_roundtrip_verified": true,
+    "apply_option": "--unidiff-zero",
+    "context_only_format_correction": {
+      "prior_patch_sha256": "62f6a93f7409cc2c66b389ad0fe4fa9932f25c4e84b3c38793edc34697fad5c6",
+      "reason": "zero-context form avoids trailing whitespace in patch-file context lines; reconstructed skill bytes unchanged"
+    }
+  },
+  "input_sha256": {
+    "infra/hermes/peer-semantics.cases.json": "7f6d1b934889dea4dd26cdd8b3a425009133eb0b527af8c9f67f5d61a9de6721",
+    "infra/hermes/peer-semantics-generalization.cases.json": "bd7b926260e76c6f2ca8bf55280ac5a9292a1fc31d395713624434c7d1a094b9"
+  },
+  "fixture_correction": {
+    "case": "new-fw-approval-state",
+    "original_input_sha256": "5d800714cc072fa8b1d3648f50417d0ef3df28ec1527a7e6b164bb7882b7ef71",
+    "reason": "original request arguments and result request_id did not match; corrected before rerun",
+    "original_rows_excluded": [
+      {
+        "case": "new-fw-approval-state",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 6.86,
+        "at_kst": "2026-11-14T09:42:06.712504+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.\n- **일치**: 상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": null,
+        "manual_reason": "점수 제외: 합성 입력 request_id와 결과 request_id 불일치. 수정한 동일 사례를 재시험 후 별도 연결"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 4.899,
+        "at_kst": "2026-11-14T09:42:11.614773+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 상대 답변의 '승인 대기' 주장은 evidence e1의 approval_state: awaiting_approval과 일치합니다.\n- **일치**: 상대 답변의 '적용 완료 미확인' 주장은 evidence e2의 applied: false와 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '승인 대기' 주장은 evidence e1의 approval_state: awaiting_approval과 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '적용 완료 미확인' 주장은 evidence e2의 applied: false와 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": null,
+        "manual_reason": "점수 제외: 합성 입력 request_id와 결과 request_id 불일치. 수정한 동일 사례를 재시험 후 별도 연결"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 4.168,
+        "at_kst": "2026-11-14T09:42:15.786402+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 ID fixture-operation-41의 상태가 pending이며 승인 대기 중이므로, 유지 적용 완료 확인은 아직 이루어지지 않았습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 ID fixture-operation-41의 상태가 pending이며 승인 대기 중이므로, 유지 적용 완료 확인은 아직 이루어지지 않았습니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"status\": \"pending\""
+            }
+          ]
+        },
+        "manual_pass": null,
+        "manual_reason": "점수 제외: 합성 입력 request_id와 결과 request_id 불일치. 수정한 동일 사례를 재시험 후 별도 연결"
+      }
+    ],
+    "replacement_rows": [
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "base",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 178,
+            "prompt_eval_count": 3480,
+            "total_duration": 5580333832,
+            "load_duration": 5007768,
+            "prompt_eval_duration": 1947325000,
+            "eval_duration": 3445280000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 5.774,
+        "at_kst": "2026-11-14T09:51:53.332765+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 방화벽 임시차단 요청의 승인 상태가 'awaiting_approval'로 확인되어, 다른 봇의 '승인 대기' 주장과 일치합니다.\n- **일치**: 적용 상태가 'false'로 확인되어, 다른 봇의 '유지 적용이 완료되지 않았다'는 주장과 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "방화벽 임시차단 요청의 승인 상태가 'awaiting_approval'로 확인되어, 다른 봇의 '승인 대기' 주장과 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "적용 상태가 'false'로 확인되어, 다른 봇의 '유지 적용이 완료되지 않았다'는 주장과 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "r2",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 166,
+            "prompt_eval_count": 3819,
+            "total_duration": 5071071273,
+            "load_duration": 6249231,
+            "prompt_eval_duration": 2072942000,
+            "eval_duration": 2938912000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 5.159,
+        "at_kst": "2026-11-14T09:51:58.496325+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 방화벽 임시차단 유지 요청의 승인 상태가 'awaiting_approval'(승인 대기)로 확인되어, 설명이 맞습니다.\n- **일치**: 적용 여부 필드 'applied'가 false로 반환되어, 유지 적용이 완료되지 않았다는 설명도 맞습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "방화벽 임시차단 유지 요청의 승인 상태가 'awaiting_approval'(승인 대기)로 확인되어, 설명이 맞습니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "적용 여부 필드 'applied'가 false로 반환되어, 유지 적용이 완료되지 않았다는 설명도 맞습니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "r3",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 163,
+            "prompt_eval_count": 3772,
+            "total_duration": 3678807281,
+            "load_duration": 6258675,
+            "prompt_eval_duration": 587094000,
+            "eval_duration": 2986318000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 3.747,
+        "at_kst": "2026-11-14T09:52:02.244155+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.\n- **일치**: 상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      }
+    ]
+  },
+  "evaluation": {
+    "input_kind": "synthetic development fixtures; all cases/rubrics fixed before inference, not independent held-out final evaluation",
+    "rater": "Codex author, not independent expert",
+    "design": "original 9 plus predeclared additional 6 synthetic development cases; base/r2/r3 Latin-rotated arm order; one run each; one invalid case replaced by corrected reruns",
+    "reasoning": false,
+    "output_token_budget": 1536,
+    "temperature": 0,
+    "summary": {
+      "base": {
+        "semantic_pass": 10,
+        "cases": 15,
+        "original_pass": 6,
+        "original_cases": 9,
+        "additional_pass": 4,
+        "additional_cases": 6,
+        "true_contradictions_detected": 4,
+        "true_contradiction_cases": 4,
+        "synthesis_failures": 0,
+        "median_seconds": 5.299,
+        "max_seconds": 13.518
+      },
+      "r2": {
+        "semantic_pass": 12,
+        "cases": 15,
+        "original_pass": 7,
+        "original_cases": 9,
+        "additional_pass": 5,
+        "additional_cases": 6,
+        "true_contradictions_detected": 4,
+        "true_contradiction_cases": 4,
+        "synthesis_failures": 1,
+        "median_seconds": 5.262,
+        "max_seconds": 21.301
+      },
+      "r3": {
+        "semantic_pass": 9,
+        "cases": 15,
+        "original_pass": 6,
+        "original_cases": 9,
+        "additional_pass": 3,
+        "additional_cases": 6,
+        "true_contradictions_detected": 4,
+        "true_contradiction_cases": 4,
+        "synthesis_failures": 2,
+        "median_seconds": 4.964,
+        "max_seconds": 18.913
+      }
+    },
+    "rows": [
+      {
+        "case": "conditional-nonmatching",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 6.504,
+        "at_kst": "2026-11-14T09:37:04.238109+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건(sample[0])의 source_ip는 '192.0.2.31'로 null이 아니므로, 출발지 식별이 가능합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건(sample[0])의 source_ip는 '192.0.2.31'로 null이 아니므로, 출발지 식별이 가능합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "조건 밖 IP 표본을 반박으로 쓰지 않음"
+      },
+      {
+        "case": "conditional-nonmatching",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 4.423,
+        "at_kst": "2026-11-14T09:37:08.662207+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 source_ip는 '192.0.2.31'로 null이 아닙니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 source_ip는 '192.0.2.31'로 null이 아닙니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 관측, 거짓 이견 없음"
+      },
+      {
+        "case": "conditional-nonmatching",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 6.832,
+        "at_kst": "2026-11-14T09:37:15.495719+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 source_ip가 null인 경우를 전제로 했으나, 조회된 1건의 경보(sample[0])는 source_ip: '192.0.2.31'을 가지고 있어 출발지 식별이 가능합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 source_ip가 null인 경우를 전제로 했으나, 조회된 1건의 경보(sample[0])는 source_ip: '192.0.2.31'을 가지고 있어 출발지 식별이 가능합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+              "missing_field": "source_ip",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "null 조건 밖의 non-null IP를 이견으로 오독"
+      },
+      {
+        "case": "conditional-contradiction",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 4.445,
+        "at_kst": "2026-11-14T09:37:19.942334+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과는 192.0.2.31로 기록되어 있어 이견입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과(e10)는 192.0.2.31로 기록되어 있어 이견입니다.",
+              "other_quote": "07:00~07:30 KST의 fixture-event-01은 rule 5715인 경우 source_ip가 192.0.2.40으로 기록되어 있습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 .40 주장과 .31 원문 모순 탐지"
+      },
+      {
+        "case": "conditional-contradiction",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 3.464,
+        "at_kst": "2026-11-14T09:37:23.407379+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과는 192.0.2.31입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과(e10)는 192.0.2.31입니다.",
+              "other_quote": "07:00~07:30 KST의 fixture-event-01은 rule 5715인 경우 source_ip가 192.0.2.40으로 기록되어 있습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 .40 주장과 .31 원문 모순 탐지"
+      },
+      {
+        "case": "conditional-contradiction",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 4.078,
+        "at_kst": "2026-11-14T09:37:27.486927+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 다른 봇은 fixture-event-01의 source_ip를 192.0.2.40으로 주장했으나, 실제 조회 결과에서는 192.0.2.31로 기록되어 있어 이견이 있습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "다른 봇은 fixture-event-01의 source_ip를 192.0.2.40으로 주장했으나, 실제 조회 결과(e10)에서는 192.0.2.31로 기록되어 있어 이견이 있습니다.",
+              "other_quote": "07:00~07:30 KST의 fixture-event-01은 rule 5715인 경우 source_ip가 192.0.2.40으로 기록되어 있습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 .40 주장과 .31 원문 모순 탐지"
+      },
+      {
+        "case": "acknowledged-limit",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 4.967,
+        "at_kst": "2026-11-14T09:37:32.455555+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건의 SSH 인증 성공 경보가 확인되어, 상대의 관측 주장과 일치합니다.\n- **일치**: 반환된 경보 건수가 1건으로 제한적이므로, 전체 경보 부재나 공격 없음 주장은 미확인으로 처리한 상대의 설명과 양립합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건의 SSH 인증 성공 경보가 확인되어, 상대의 관측 주장과 일치합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"sshd authentication success\""
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보 건수가 1건으로 제한적이므로, 전체 경보 부재나 공격 없음 주장은 미확인으로 처리한 상대의 설명과 양립합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "인증 성공 표본과 전체 건수 미확인을 양립하게 보고"
+      },
+      {
+        "case": "acknowledged-limit",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 5.27,
+        "at_kst": "2026-11-14T09:37:37.726740+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보는 SSH 인증 성공을 나타냅니다.\n- **일치**: 반환된 경보 건수는 1건으로 제한적이므로, 전체 구간 내 공격 발생 여부나 부재 여부는 확인되지 않았습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보(e0)는 SSH 인증 성공을 나타냅니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"sshd authentication success\""
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보 건수는 1건으로 제한적이므로, 전체 구간 내 공격 발생 여부나 부재 여부는 확인되지 않았습니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "인증 성공 표본과 전체 건수 미확인을 양립하게 보고"
+      },
+      {
+        "case": "acknowledged-limit",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 5.753,
+        "at_kst": "2026-11-14T09:37:43.480946+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 메시지(message)는 'sshd authentication success'로 SSH 인증 성공을 나타냅니다.\n- **일치**: 반환된 경보 건수는 1건으로 제한된 표본이며, 전체 구간 내 총 경보 수나 공격 부재 여부는 확인되지 않았습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 메시지(message)는 'sshd authentication success'로 SSH 인증 성공을 나타냅니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"sshd authentication success\""
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보 건수는 1건으로 제한된 표본이며, 전체 구간 내 총 경보 수나 공격 부재 여부는 확인되지 않았습니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "인증 성공 표본과 전체 건수 미확인을 양립하게 보고"
+      },
+      {
+        "case": "same-event-false-value",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 3.9,
+        "at_kst": "2026-11-14T09:37:47.382055+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 다른 봇은 사건 fixture-event-01의 출발지 IP를 192.0.2.40이라고 주장했으나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "다른 봇은 사건 fixture-event-01의 출발지 IP를 192.0.2.40이라고 주장했으나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 사건 fixture-event-01의 출발지 IP는 192.0.2.40입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 실제 IP 모순 탐지"
+      },
+      {
+        "case": "same-event-false-value",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 4.406,
+        "at_kst": "2026-11-14T09:37:51.789670+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31로 확인됨.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31로 확인됨.",
+              "other_quote": "07:00~07:30 KST Wazuh 사건 fixture-event-01의 출발지 IP는 192.0.2.40입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 실제 IP 모순 탐지"
+      },
+      {
+        "case": "same-event-false-value",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 3.562,
+        "at_kst": "2026-11-14T09:37:55.353337+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 사건 fixture-event-01의 출발지 IP는 192.0.2.40입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "같은 사건의 실제 IP 모순 탐지"
+      },
+      {
+        "case": "zero-sample-boundary",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 9.144,
+        "at_kst": "2026-11-14T09:38:04.498525+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **미확인**: 상대 답변의 시각 범위는 확인 가능하나, 실제 경보 반환 표본(0건)에 대한 근거가 독립 조회 결과와 연결되지 않아 해당 구간 경보 부재 주장은 미확인임.\n- **일치**: 전체 인덱스 건수(indexed_window_total_count=null)가 누락되어 전체 경보 수 및 공격 유무 확인은 불가능함.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "agree",
+              "evidence_path": "result.requested_since_kst",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 시각 범위는 확인 가능하나, 실제 경보 반환 표본(0건)에 대한 근거가 독립 조회 결과와 연결되지 않아 해당 구간 경보 부재 주장은 미확인임.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+            },
+            {
+              "kind": "agree",
+              "text": "전체 인덱스 건수(indexed_window_total_count=null)가 누락되어 전체 경보 수 및 공격 유무 확인은 불가능함.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "전체 부재를 확정하지 않음. base/r2의 범위 미확인 표현은 모호하므로 표시 품질 한계로 별도 유지"
+      },
+      {
+        "case": "zero-sample-boundary",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 4.577,
+        "at_kst": "2026-11-14T09:38:09.077577+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 반환된 경보가 0건임을 확인하여 동의합니다.\n- **일치**: 전체 인덱스 창 총계(indexed_window_total_count)가 null로 반환되어 전체 경보 건수 및 공격 유무 확인이 불가능함을 확인하여 동의합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 조회 결과 반환된 경보가 0건임을 확인하여 동의합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "전체 인덱스 창 총계(indexed_window_total_count)가 null로 반환되어 전체 경보 건수 및 공격 유무 확인이 불가능함을 확인하여 동의합니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "전체 부재를 확정하지 않음. base/r2의 범위 미확인 표현은 모호하므로 표시 품질 한계로 별도 유지"
+      },
+      {
+        "case": "zero-sample-boundary",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 10.114,
+        "at_kst": "2026-11-14T09:38:19.192512+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **미확인**: 상대 답변의 조회 조건과 범위를 검증할 근거가 부족하여 일치/이견 판단 불가.\n- **일치**: 반환 표본 0건에 대한 근거가 명확함.\n- **일치**: 전체 경보 건수(null)에 대한 미확인 주장이 근거와 일치함.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "agree",
+              "evidence_path": "result.requested_since_kst",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 조회 조건과 범위를 검증할 근거가 부족하여 일치/이견 판단 불가.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "반환 표본 0건에 대한 근거가 명확함.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "전체 경보 건수(null)에 대한 미확인 주장이 근거와 일치함.",
+              "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "전체 부재를 확정하지 않음. base/r2의 범위 미확인 표현은 모호하므로 표시 품질 한계로 별도 유지"
+      },
+      {
+        "case": "real-positive-vs-absence",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 3.551,
+        "at_kst": "2026-11-14T09:38:22.745419+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 SQLi 탐지 기록 부재를 주장하나, 조회 결과(event_id: fixture-event-01)에 'SQL injection signature matched' 메시지와 attack_type 'SQLi'가 명확히 관측됨.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 SQLi 탐지 기록 부재를 주장하나, 조회 결과(event_id: fixture-event-01)에 'SQL injection signature matched' 메시지와 attack_type 'SQLi'가 명확히 관측됨.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보에는 SQLi 탐지 기록이 전혀 없습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"SQL injection signature matched\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "실제 SQLi 표본으로 명시 부재 주장 반박, 성공/침해로 확대 안함"
+      },
+      {
+        "case": "real-positive-vs-absence",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 4.113,
+        "at_kst": "2026-11-14T09:38:26.860864+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 다른 봇은 SQLi 탐지 기록이 없다고 주장했으나, 실제 조회 결과(1건)에 'SQL injection signature matched' 메시지와 attack_type: SQLi가 명확히 확인됩니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "다른 봇은 SQLi 탐지 기록이 없다고 주장했으나, 실제 조회 결과(1건)에 'SQL injection signature matched' 메시지와 attack_type: SQLi가 명확히 확인됩니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보에는 SQLi 탐지 기록이 전혀 없습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"SQL injection signature matched\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "실제 SQLi 표본으로 명시 부재 주장 반박, 성공/침해로 확대 안함"
+      },
+      {
+        "case": "real-positive-vs-absence",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 5.262,
+        "at_kst": "2026-11-14T09:38:32.124122+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 요청 구간(07:00~07:30 KST) Wazuh 경보에 SQLi 탐지 기록이 1건 존재합니다. 반환된 경보(event_id: fixture-event-01, timestamp: 2026-11-14T07:10:00+09:00)의 message는 'SQL injection signature matched'이며 attack_type은 'SQLi'입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "요청 구간(07:00~07:30 KST) Wazuh 경보에 SQLi 탐지 기록이 1건 존재합니다. 반환된 경보(event_id: fixture-event-01, timestamp: 2026-11-14T07:10:00+09:00)의 message는 'SQL injection signature matched'이며 attack_type은 'SQLi'입니다.",
+              "other_quote": "07:00~07:30 KST Wazuh 경보에는 SQLi 탐지 기록이 전혀 없습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"SQL injection signature matched\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "실제 SQLi 표본으로 명시 부재 주장 반박, 성공/침해로 확대 안함"
+      },
+      {
+        "case": "table-conditional",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 11.895,
+        "at_kst": "2026-11-14T09:38:44.020458+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **미확인**: 상대 답변의 시각 범위가 실제 경보 수집 구간과 일치하는지 확인 근거가 부족합니다.\n- **이견**: 반환된 rule 5715는 'authentication success'로 정상 인증 기록이며, 공격이나 비정상 접근을 의미하지 않습니다.\n- **이견**: 실제 관측된 source_ip는 '192.0.2.31'로 null이 아니며, 출발지 식별에 문제가 없습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "agree",
+              "evidence_path": "result.requested_until_kst",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 시각 범위가 실제 경보 수집 구간과 일치하는지 확인 근거가 부족합니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+            },
+            {
+              "kind": "disagree",
+              "text": "반환된 rule 5715는 'authentication success'로 정상 인증 기록이며, 공격이나 비정상 접근을 의미하지 않습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+            },
+            {
+              "kind": "disagree",
+              "text": "실제 관측된 source_ip는 '192.0.2.31'로 null이 아니며, 출발지 식별에 문제가 없습니다.",
+              "other_quote": "| 출발지 | source_ip가 null인 경우 이 필드로는 출발자를 식별할 수 없음 | IP가 있는 표본은 값으로 확인 가능 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "조건부 null 설명과 승인되지 않은 정상 인증 판단을 이견으로 오독"
+      },
+      {
+        "case": "table-conditional",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 8.925,
+        "at_kst": "2026-11-14T09:38:52.947281+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 내 Wazuh 경보 2건이 반환되었습니다.\n- **일치**: 반환된 경보 중 rule 5715(인증 성공)가 포함되어 있습니다.\n- **일치**: 반환된 경보 중 rule 5501(PAM 세션 열림)가 포함되어 있습니다.\n- **일치**: 인덱싱된 전체 건수(indexed_window_total_count)는 null로 확인되지 않았습니다.\n- **일치**: 표본의 source_ip는 null이 아닌 192.0.2.31로 확인되었습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST) 내 Wazuh 경보 2건이 반환되었습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 2"
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보 중 rule 5715(인증 성공)가 포함되어 있습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보 중 rule 5501(PAM 세션 열림)가 포함되어 있습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5501\""
+            },
+            {
+              "kind": "agree",
+              "text": "인덱싱된 전체 건수(indexed_window_total_count)는 null로 확인되지 않았습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            },
+            {
+              "kind": "agree",
+              "text": "표본의 source_ip는 null이 아닌 192.0.2.31로 확인되었습니다.",
+              "other_quote": "| 출발지 | source_ip가 null인 경우 이 필드로는 출발자를 식별할 수 없음 | IP가 있는 표본은 값으로 확인 가능 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "거짓 이견 없음. 5항목 장황함은 별도 표시 한계"
+      },
+      {
+        "case": "table-conditional",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 8.021,
+        "at_kst": "2026-11-14T09:39:00.970248+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 구간(07:00~07:30 KST)에서 Wazuh 경보 2건이 반환되었습니다.\n- **일치**: 반환된 표본 중 rule 5715(인증 성공) 경보가 확인되었습니다.\n- **일치**: 반환된 표본 중 rule 5501(세션 열림) 경보가 확인되었습니다.\n- **일치**: 인덱싱된 전체 건수(indexed_window_total_count)는 null로, 전체 범위를 확정할 수 없습니다.\n- **일치**: 표본의 source_ip는 192.0.2.31로, 출발지 식별이 가능합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 구간(07:00~07:30 KST)에서 Wazuh 경보 2건이 반환되었습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 2"
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 표본 중 rule 5715(인증 성공) 경보가 확인되었습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 표본 중 rule 5501(세션 열림) 경보가 확인되었습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5501\""
+            },
+            {
+              "kind": "agree",
+              "text": "인덱싱된 전체 건수(indexed_window_total_count)는 null로, 전체 범위를 확정할 수 없습니다.",
+              "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            },
+            {
+              "kind": "agree",
+              "text": "표본의 source_ip는 192.0.2.31로, 출발지 식별이 가능합니다.",
+              "other_quote": "| 출발지 | source_ip가 null인 경우 이 필드로는 출발자를 식별할 수 없음 | IP가 있는 표본은 값으로 확인 가능 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "거짓 이견 없음. 5항목 장황함은 별도 표시 한계"
+      },
+      {
+        "case": "table-acknowledged-limit",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 21.301,
+        "at_kst": "2026-11-14T09:39:22.273106+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch",
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 1
+            },
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 3,
+              "kind": "agree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 2
+            }
+          ],
+          "peer_review": "synthesis_failed",
+          "error_type": "PeerClaimRefused",
+          "peer_error_code": "peer_query_scope_mismatch"
+        },
+        "manual_pass": false,
+        "manual_reason": "동일 요청 한도 근거 거절2회 후 합성 실패"
+      },
+      {
+        "case": "table-acknowledged-limit",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 18.913,
+        "at_kst": "2026-11-14T09:39:41.188101+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch",
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 1
+            },
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 3,
+              "kind": "agree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 2
+            }
+          ],
+          "peer_review": "synthesis_failed",
+          "error_type": "PeerClaimRefused",
+          "peer_error_code": "peer_query_scope_mismatch"
+        },
+        "manual_pass": false,
+        "manual_reason": "동일 요청 한도 근거 거절2회 후 합성 실패"
+      },
+      {
+        "case": "table-acknowledged-limit",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 13.393,
+        "at_kst": "2026-11-14T09:39:54.583740+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **이견**: 상대 답변은 구간 전체 건수를 미확인이라고 했으나, 내 조회 결과 indexed_window_total_count가 null로 실제 수집된 총계 정보가 제공되지 않았다.\n- **이견**: 상대 답변은 rule 5715 인증 성공을 포함한다고 했으나, 내 조회 sample에는 wazuh_rule_id 5715와 sshd authentication success 메시지가 명확히 관측되었다.\n- **미확인**: 상대 답변의 제한 표본 15건은 내 조회의 scan_capped=true 조건과 직접 비교할 근거가 부족해 미확인으로 남긴다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 구간 전체 건수를 미확인이라고 했으나, 내 조회 결과 indexed_window_total_count가 null로 실제 수집된 총계 정보가 제공되지 않았다.",
+              "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            },
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 rule 5715 인증 성공을 포함한다고 했으나, 내 조회 sample에는 wazuh_rule_id 5715와 sshd authentication success 메시지가 명확히 관측되었다.",
+              "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+            },
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 제한 표본 15건은 내 조회의 scan_capped=true 조건과 직접 비교할 근거가 부족해 미확인으로 남긴다.",
+              "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"scan_capped\": true"
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "같은 미확인/인증 성공을 거짓 이견으로 보고"
+      },
+      {
+        "case": "conditional-recommendation",
+        "group": "regression",
+        "arm": "r3",
+        "seconds": 4.094,
+        "at_kst": "2026-11-14T09:39:58.680185+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대 답변은 '추가 조회를 실행하지 않았다'고 주장하나, 실제 조회 결과 returned_count=1로 07:00~07:30 KST 구간에서 SQLi 경보 1건이 확인됨. e12의 메시지 및 e13의 attack_type가 이를 입증.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대 답변은 '추가 조회를 실행하지 않았다'고 주장하나, 실제 조회 결과 returned_count=1로 07:00~07:30 KST 구간에서 SQLi 경보 1건이 확인됨. e12의 메시지 및 e13의 attack_type가 이를 입증.",
+              "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "상대 미실행과 검토자 새 경보를 서로 반대 주장으로 오독"
+      },
+      {
+        "case": "conditional-recommendation",
+        "group": "regression",
+        "arm": "base",
+        "seconds": 4.537,
+        "at_kst": "2026-11-14T09:40:03.221377+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 다른 봇은 경보가 확인되지 않아 추가 조치를 하지 않았다고 서술했으나, 실제 조회 결과(2026-11-14 07:00~07:30 KST)에 SQLi 탐지 경보 1건(event_id: fixture-event-01)이 반환되었습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "다른 봇은 경보가 확인되지 않아 추가 조치를 하지 않았다고 서술했으나, 실제 조회 결과(2026-11-14 07:00~07:30 KST)에 SQLi 탐지 경보 1건(event_id: fixture-event-01)이 반환되었습니다.",
+              "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "없던 SQLi 미관측 이유를 만들어 반박"
+      },
+      {
+        "case": "conditional-recommendation",
+        "group": "regression",
+        "arm": "r2",
+        "seconds": 6.508,
+        "at_kst": "2026-11-14T09:40:09.732237+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 요청 시각(07:00~07:30 KST) Wazuh 경보 조회 결과, 총 1건의 SQLi 탐지 경보가 반환되었습니다.\n- **일치**: 반환된 경보는 SQL injection signature matched 메시지이며, 공격 유형은 SQLi로 분류됩니다.\n- **일치**: 상대 답변의 'SQLi 탐지 기록 확인' 주장은 실제 경보 데이터와 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "요청 시각(07:00~07:30 KST) Wazuh 경보 조회 결과, 총 1건의 SQLi 탐지 경보가 반환되었습니다.",
+              "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            },
+            {
+              "kind": "agree",
+              "text": "반환된 경보는 SQL injection signature matched 메시지이며, 공격 유형은 SQLi로 분류됩니다.",
+              "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"message\": \"SQL injection signature matched\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 'SQLi 탐지 기록 확인' 주장은 실제 경보 데이터와 일치합니다.",
+              "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"attack_type\": \"SQLi\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "조건부 권고를 실제 SQLi 확인 주장으로 바꿈"
+      },
+      {
+        "case": "new-waf-recommendation",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 8.894,
+        "at_kst": "2026-11-14T09:40:18.629068+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: WAF가 요청을 거부한 것은 맞습니다. 조회 결과 1건의 경보에서 action이 'blocked'이고 http_status가 403으로 확인되었습니다.\n- **일치**: 거래 ID를 통한 대조는 타당한 접근입니다. 해당 경보의 transaction_id는 'fixture-tx-01'로 확인되었습니다.\n- **이견**: 백엔드 접근 로그 대조는 현재 근거가 부족합니다. 제공된 조회 결과에는 WAF 경보만 포함되어 있으며, 백엔드 서버의 접근 로그나 연결 상태에 대한 정보는 확인되지 않았습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "WAF가 요청을 거부한 것은 맞습니다. 조회 결과 1건의 경보에서 action이 'blocked'이고 http_status가 403으로 확인되었습니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"blocked\""
+            },
+            {
+              "kind": "agree",
+              "text": "거래 ID를 통한 대조는 타당한 접근입니다. 해당 경보의 transaction_id는 'fixture-tx-01'로 확인되었습니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"transaction_id\": \"fixture-tx-01\""
+            },
+            {
+              "kind": "disagree",
+              "text": "백엔드 접근 로그 대조는 현재 근거가 부족합니다. 제공된 조회 결과에는 WAF 경보만 포함되어 있으며, 백엔드 서버의 접근 로그나 연결 상태에 대한 정보는 확인되지 않았습니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "백엔드 대조 권고를 완료 주장으로 읽고 근거 부족을 이견으로 냄"
+      },
+      {
+        "case": "new-waf-recommendation",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 4.724,
+        "at_kst": "2026-11-14T09:40:23.355393+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: WAF가 요청을 거부한 것은 사실입니다. 조회 결과(action: blocked, http_status: 403)에 따라 거래 ID(fixture-tx-01)와 백엔드 로그 대조는 타당한 다음 단계입니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "WAF가 요청을 거부한 것은 사실입니다. 조회 결과(action: blocked, http_status: 403)에 따라 거래 ID(fixture-tx-01)와 백엔드 로그 대조는 타당한 다음 단계입니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"blocked\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "실제 새 거부 관측을 근거로 다음 단계 권고로 보고. 상대가 이미 조사 완료했다고 쓰지 않음"
+      },
+      {
+        "case": "new-waf-recommendation",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 7.638,
+        "at_kst": "2026-11-14T09:40:30.995475+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **일치**: WAF가 요청을 거부했다는 관측은 실제 경보(action: blocked, http_status: 403)와 일치합니다.\n- **미확인**: 거래 ID와 백엔드 로그 대조 권고는 타당하나, 현재 조회 결과에는 백엔드 접근 기록이 포함되어 있어 해당 대조 결과는 확인되지 않았습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "WAF가 요청을 거부했다는 관측은 실제 경보(action: blocked, http_status: 403)와 일치합니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"blocked\""
+            },
+            {
+              "kind": "unverified",
+              "text": "거래 ID와 백엔드 로그 대조 권고는 타당하나, 현재 조회 결과에는 백엔드 접근 기록이 포함되어 있어 해당 대조 결과는 확인되지 않았습니다.",
+              "other_quote": "WAF가 요청을 거부한 경우 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 아직 추가 조사나 차단 변경은 하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"transaction_id\": \"fixture-tx-01\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "조건부 권고를 상대의 WAF 관측으로 바꾸고 존재하지 않는 백엔드 기록 포함을 서술"
+      },
+      {
+        "case": "new-ids-recommendation",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 8.111,
+        "at_kst": "2026-11-14T09:40:39.109573+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 최근 30분(SID 2024001) 악성 연결 경보 1건이 확인되어, 해당 세션과 목적지 후속 통신 확인 권고 설명은 맞습니다.\n- **일치**: 해당 경보의 action이 'allowed'로 실제 차단이 수행되지 않았음을 근거로, 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다라는 설명도 맞습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "최근 30분(SID 2024001) 악성 연결 경보 1건이 확인되어, 해당 세션과 목적지 후속 통신 확인 권고 설명은 맞습니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            },
+            {
+              "kind": "agree",
+              "text": "해당 경보의 action이 'allowed'로 실제 차단이 수행되지 않았음을 근거로, 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다라는 설명도 맞습니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"allowed\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "센서 alert action allowed를 봇의 FW/전체 차단 미실행 근거로 확대. 조건부 경보 확인도 관측 주장으로 오독"
+      },
+      {
+        "case": "new-ids-recommendation",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 8.132,
+        "at_kst": "2026-11-14T09:40:47.244334+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 상대 답변의 '악성 연결 경보 확인' 주장은, 최근 30분간 Suricata에서 악성 연결 관련 경보 1건이 반환된 사실과 일치합니다.\n- **일치**: 상대 답변의 '실제 차단은 수행하지 않음' 주장은, 해당 경보의 action이 'allowed'로 기록되어 있어 차단되지 않았다는 사실과 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '악성 연결 경보 확인' 주장은, 최근 30분간 Suricata에서 악성 연결 관련 경보 1건이 반환된 사실과 일치합니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '실제 차단은 수행하지 않음' 주장은, 해당 경보의 action이 'allowed'로 기록되어 있어 차단되지 않았다는 사실과 일치합니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"allowed\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "센서 alert action allowed를 봇의 FW/전체 차단 미실행 근거로 확대. 조건부 경보 확인도 관측 주장으로 오독"
+      },
+      {
+        "case": "new-ids-recommendation",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 5.299,
+        "at_kst": "2026-11-14T09:40:52.545716+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 30분 구간(SID 2024001)에서 악성 연결 경보 1건이 확인되어, 해당 세션과 목적지 후속 통신 확인 권고 설명은 맞습니다.\n- **일치**: 해당 경보의 action이 'allowed'로 기록되어 있어 실제 차단 수행 없이 대응 계획만 설명했다는 주장도 맞습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "30분 구간(SID 2024001)에서 악성 연결 경보 1건이 확인되어, 해당 세션과 목적지 후속 통신 확인 권고 설명은 맞습니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 1"
+            },
+            {
+              "kind": "agree",
+              "text": "해당 경보의 action이 'allowed'로 기록되어 있어 실제 차단 수행 없이 대응 계획만 설명했다는 주장도 맞습니다.",
+              "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"action\": \"allowed\""
+            }
+          ]
+        },
+        "manual_pass": false,
+        "manual_reason": "센서 alert action allowed를 봇의 FW/전체 차단 미실행 근거로 확대. 조건부 경보 확인도 관측 주장으로 오독"
+      },
+      {
+        "case": "new-ids-acknowledged-limit",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 11.781,
+        "at_kst": "2026-11-14T09:41:04.329213+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch",
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.returned_count",
+              "attempt": 1
+            },
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 2,
+              "kind": "agree",
+              "evidence_path": "result.scan_capped",
+              "attempt": 2
+            }
+          ],
+          "peer_review": "synthesis_failed",
+          "error_type": "PeerClaimRefused",
+          "peer_error_code": "peer_query_scope_mismatch"
+        },
+        "manual_pass": false,
+        "manual_reason": "2회 근거 거절 뒤 합성 미완수"
+      },
+      {
+        "case": "new-ids-acknowledged-limit",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 13.518,
+        "at_kst": "2026-11-14T09:41:17.850048+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **일치**: 상대 답변의 '연결 경보 포함' 주장은, 반환된 표본(sample)의 signature 필드가 'fixture connection alert'로 연결(Connection) 관련 경보임을 확인하여 일치합니다.\n- **일치**: 상대 답변의 '전체 건수 확인 불가' 주장은, 조회 결과의 indexed_window_total_count가 null로 반환되어 전체 구간 집계치가 제공되지 않았음을 근거로 일치합니다.\n- **미확인**: 상대 답변의 '표본 중 5건' 수치는, 현재 조회가 반환한 returned_count(15)가 검토자 자신의 한도 조건이므로 상대의 표본 크기를 확인하거나 반박할 근거가 없습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.returned_count",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '연결 경보 포함' 주장은, 반환된 표본(sample)의 signature 필드가 'fixture connection alert'로 연결(Connection) 관련 경보임을 확인하여 일치합니다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"signature\": \"fixture connection alert\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '전체 건수 확인 불가' 주장은, 조회 결과의 indexed_window_total_count가 null로 반환되어 전체 구간 집계치가 제공되지 않았음을 근거로 일치합니다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            },
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 '표본 중 5건' 수치는, 현재 조회가 반환한 returned_count(15)가 검토자 자신의 한도 조건이므로 상대의 표본 크기를 확인하거나 반박할 근거가 없습니다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 15"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "자기 한도15로 상대 표본5를 반박하지 않음"
+      },
+      {
+        "case": "new-ids-acknowledged-limit",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 14.83,
+        "at_kst": "2026-11-14T09:41:32.682992+09:00",
+        "result": {
+          "status": "partial",
+          "final_response": "- **미확인**: 상대 답변의 'IDS 반환 표본 중 5건을 확인했다'는 주장은, 현재 조회 결과가 검토자의 요청 조건에 따른 returned_count(15건)를 보여주므로 상대의 구체적인 표본 수(5건)를 검증하거나 반박할 근거가 부족하다. 다만 e10의 sample은 연결 경보임을 보여준다.\n- **일치**: 상대 답변의 '연결 경보가 포함되어 있습니다'는 사실과 일치한다. 조회된 표본은 signature가 'fixture connection alert'인 연결 관련 경보로 확인된다.\n- **일치**: 상대 답변의 '조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다'는 정확한 진술이다. 조회 결과에서 indexed_window_total_count가 null로 반환되어 전체 인덱스된 건수를 알 수 없으며, 경보 존재만으로 공격 성공을 단정할 수 없다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [
+            "peer_query_scope_mismatch"
+          ],
+          "peer_attempts": 2,
+          "peer_validation_details": [
+            {
+              "code": "peer_query_scope_mismatch",
+              "claim_index": 0,
+              "kind": "disagree",
+              "evidence_path": "result.returned_count",
+              "attempt": 1
+            }
+          ],
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "unverified",
+              "text": "상대 답변의 'IDS 반환 표본 중 5건을 확인했다'는 주장은, 현재 조회 결과(e5)가 검토자의 요청 조건에 따른 returned_count(15건)를 보여주므로 상대의 구체적인 표본 수(5건)를 검증하거나 반박할 근거가 부족하다. 다만 e10의 sample은 연결 경보임을 보여준다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"signature\": \"fixture connection alert\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '연결 경보가 포함되어 있습니다'는 사실과 일치한다. 조회된 표본(e10)은 signature가 'fixture connection alert'인 연결 관련 경보로 확인된다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"signature\": \"fixture connection alert\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대 답변의 '조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다'는 정확한 진술이다. 조회 결과(e3)에서 indexed_window_total_count가 null로 반환되어 전체 인덱스된 건수를 알 수 없으며, 경보 존재만으로 공격 성공을 단정할 수 없다.",
+              "other_quote": "IDS 반환 표본 중 5건을 확인했으며 연결 경보가 포함되어 있습니다. 조회 범위 전체 건수와 공격 성공은 확인하지 못했습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "상대 표본5는 미확인, 연결 관측/전체 미확인 분리. 내부 식별자는 별도 미적용 수정 대상"
+      },
+      {
+        "case": "new-waf-zero-boundary",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 4.886,
+        "at_kst": "2026-11-14T09:41:37.571575+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 실제 조회 결과 returned_count가 0이므로, 최근 30분간 ModSecurity 차단 표본이 없음을 확인했습니다.\n- **일치**: indexed_window_total_count가 null로 반환되어 전체 수집·보관 범위의 정확히 확인되지 않았으므로, 별도 확인 필요하다는 설명과 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "실제 조회 결과 returned_count가 0이므로, 최근 30분간 ModSecurity 차단 표본이 없음을 확인했습니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "indexed_window_total_count가 null로 반환되어 전체 수집·보관 범위의 정확히 확인되지 않았으므로, 별도 확인 필요하다는 설명과 일치합니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "표본0 범위와 전체 건수/공격 유무 미확인 유지"
+      },
+      {
+        "case": "new-waf-zero-boundary",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 4.911,
+        "at_kst": "2026-11-14T09:41:42.485564+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 실제 조회 결과(returned_count: 0)에 따라 WAF 차단 표본이 0건임을 확인합니다.\n- **일치**: 인덱싱된 전체 건수(indexed_window_total_count)가 null이므로 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 한다는 설명도 타당합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "실제 조회 결과(returned_count: 0)에 따라 WAF 차단 표본이 0건임을 확인합니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "인덱싱된 전체 건수(indexed_window_total_count)가 null이므로 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 한다는 설명도 타당합니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "표본0 범위와 전체 건수/공격 유무 미확인 유지"
+      },
+      {
+        "case": "new-waf-zero-boundary",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 4.964,
+        "at_kst": "2026-11-14T09:41:47.453050+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 2026-11-14 08:00~08:30 KST 조회에서 ModSecurity 경보 반환 건수(returned_count)가 0이므로, 해당 기간 WAF 차단 표본 부재 주장과 일치합니다.\n- **일치**: 인덱싱된 전체 경보 수(indexed_window_total_count)가 null이므로, 수집·보관 범위 내 전체 공격 유무 확인이 별도로 필요하다는 설명도 타당합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "2026-11-14 08:00~08:30 KST 조회에서 ModSecurity 경보 반환 건수(returned_count)가 0이므로, 해당 기간 WAF 차단 표본 부재 주장과 일치합니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"returned_count\": 0"
+            },
+            {
+              "kind": "agree",
+              "text": "인덱싱된 전체 경보 수(indexed_window_total_count)가 null이므로, 수집·보관 범위 내 전체 공격 유무 확인이 별도로 필요하다는 설명도 타당합니다.",
+              "other_quote": "WAF 조회에서 반환된 차단 표본은 0건입니다. 수집·보관 범위와 전체 공격 유무는 별도로 확인해야 합니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"indexed_window_total_count\": null"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "표본0 범위와 전체 건수/공격 유무 미확인 유지"
+      },
+      {
+        "case": "new-waf-real-verdict-contradiction",
+        "group": "additional_development",
+        "arm": "r2",
+        "seconds": 4.27,
+        "at_kst": "2026-11-14T09:41:51.725731+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 거래 fixture-tx-42에 대한 WAF 판정은 allowed가 아닌 blocked(403)로 기록되어 있습니다. e10의 action이 'blocked'이고 e11의 http_status가 403임을 확인했습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "거래 fixture-tx-42에 대한 WAF 판정은 allowed가 아닌 blocked(403)로 기록되어 있습니다. e10의 action이 'blocked'이고 e11의 http_status가 403임을 확인했습니다.",
+              "other_quote": "거래 fixture-tx-42의 WAF 판정은 allowed로 기록되어 있습니다. 해당 거래에 WAF 거부는 없었습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"transaction_id\": \"fixture-tx-42\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "동일 거래의 blocked/403과 allowed 주장의 반대 관측 탐지"
+      },
+      {
+        "case": "new-waf-real-verdict-contradiction",
+        "group": "additional_development",
+        "arm": "r3",
+        "seconds": 3.81,
+        "at_kst": "2026-11-14T09:41:55.542842+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 상대는 거래 fixture-tx-42의 WAF 판정이 allowed이며 거부가 없었다고 주장했으나, 실제 조회 근거에 따르면 해당 트랜잭션의 ModSecurity 경보 action은 'blocked'이고 HTTP 상태 코드는 403으로 기록되어 있어 반박됩니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "상대는 거래 fixture-tx-42의 WAF 판정이 allowed이며 거부가 없었다고 주장했으나, 실제 조회 근거(e10)에 따르면 해당 트랜잭션의 ModSecurity 경보 action은 'blocked'이고 HTTP 상태 코드는 403으로 기록되어 있어 반박됩니다.",
+              "other_quote": "거래 fixture-tx-42의 WAF 판정은 allowed로 기록되어 있습니다. 해당 거래에 WAF 거부는 없었습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"event_id\": \"fixture-waf-42\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "동일 거래의 blocked/403과 allowed 주장의 반대 관측 탐지"
+      },
+      {
+        "case": "new-waf-real-verdict-contradiction",
+        "group": "additional_development",
+        "arm": "base",
+        "seconds": 4.304,
+        "at_kst": "2026-11-14T09:41:59.849287+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **이견**: 다른 봇은 거래 fixture-tx-42의 WAF 판정이 allowed라고 주장했으나, 실제 조회 증거에 따르면 해당 트랜잭션의 action은 blocked이며 HTTP 상태 403을 기록하고 있어 거부된 것으로 확인됩니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "disagree",
+              "text": "다른 봇은 거래 fixture-tx-42의 WAF 판정이 allowed라고 주장했으나, 실제 조회 증거(e10)에 따르면 해당 트랜잭션의 action은 blocked이며 HTTP 상태 403을 기록하고 있어 거부된 것으로 확인됩니다.",
+              "other_quote": "거래 fixture-tx-42의 WAF 판정은 allowed로 기록되어 있습니다. 해당 거래에 WAF 거부는 없었습니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"transaction_id\": \"fixture-tx-42\""
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "동일 거래의 blocked/403과 allowed 주장의 반대 관측 탐지"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "base",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 178,
+            "prompt_eval_count": 3480,
+            "total_duration": 5580333832,
+            "load_duration": 5007768,
+            "prompt_eval_duration": 1947325000,
+            "eval_duration": 3445280000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 5.774,
+        "at_kst": "2026-11-14T09:51:53.332765+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 방화벽 임시차단 요청의 승인 상태가 'awaiting_approval'로 확인되어, 다른 봇의 '승인 대기' 주장과 일치합니다.\n- **일치**: 적용 상태가 'false'로 확인되어, 다른 봇의 '유지 적용이 완료되지 않았다'는 주장과 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "방화벽 임시차단 요청의 승인 상태가 'awaiting_approval'로 확인되어, 다른 봇의 '승인 대기' 주장과 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "적용 상태가 'false'로 확인되어, 다른 봇의 '유지 적용이 완료되지 않았다'는 주장과 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "r2",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 166,
+            "prompt_eval_count": 3819,
+            "total_duration": 5071071273,
+            "load_duration": 6249231,
+            "prompt_eval_duration": 2072942000,
+            "eval_duration": 2938912000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 5.159,
+        "at_kst": "2026-11-14T09:51:58.496325+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 방화벽 임시차단 유지 요청의 승인 상태가 'awaiting_approval'(승인 대기)로 확인되어, 설명이 맞습니다.\n- **일치**: 적용 여부 필드 'applied'가 false로 반환되어, 유지 적용이 완료되지 않았다는 설명도 맞습니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "방화벽 임시차단 유지 요청의 승인 상태가 'awaiting_approval'(승인 대기)로 확인되어, 설명이 맞습니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "적용 여부 필드 'applied'가 false로 반환되어, 유지 적용이 완료되지 않았다는 설명도 맞습니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      },
+      {
+        "case": "new-fw-approval-state",
+        "group": "corrected_fixture_retest",
+        "arm": "r3",
+        "reasoning": false,
+        "inference_stats": [
+          {
+            "reasoning_requested": false,
+            "reasoning_chars": 0,
+            "eval_count": 163,
+            "prompt_eval_count": 3772,
+            "total_duration": 3678807281,
+            "load_duration": 6258675,
+            "prompt_eval_duration": 587094000,
+            "eval_duration": 2986318000,
+            "done_reason": "stop"
+          }
+        ],
+        "seconds": 3.747,
+        "at_kst": "2026-11-14T09:52:02.244155+09:00",
+        "result": {
+          "status": "completed",
+          "final_response": "- **일치**: 상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.\n- **일치**: 상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+          "protected_calls": 0,
+          "peer_validation_errors": [],
+          "peer_attempts": 1,
+          "peer_review": "source_bound_claims",
+          "peer_claims": [
+            {
+              "kind": "agree",
+              "text": "상대가 '승인 대기'라고 한 것은 evidence e1의 approval_state가 awaiting_approval이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+            },
+            {
+              "kind": "agree",
+              "text": "상대가 '적용 완료 확인 상태가 아님'이라고 한 것은 evidence e2의 applied가 false이므로 일치합니다.",
+              "other_quote": "방화벽 임시차단 유지 요청은 승인 대기입니다. 유지 적용이 완료되었다고 확인한 상태는 아닙니다.",
+              "missing_field": "",
+              "call_index": 0,
+              "evidence_quote": "\"applied\": false"
+            }
+          ]
+        },
+        "manual_pass": true,
+        "manual_reason": "수정한 동일 request_id 입력에서 승인 대기·미적용 상태 보존; 내부 식별자 표시는 별도 승인 대기 결함",
+        "lineage": "corrected fixture rerun replaces one invalid original row per arm"
+      }
+    ],
+    "general_accuracy_or_sla_claim": false,
+    "latency_limit": "shared model resource, run order and cache not controlled; model synthesis only, not chat/MCP roundtrip"
+  },
+  "reasoning_experiments": {
+    "1536": {
+      "status": "rejected_and_stopped_own_job_after_verified_empty_outputs",
+      "completed_reviews": 4,
+      "expected_reviews": 17,
+      "all_completed_synthesis_failed": true,
+      "rows": [
+        {
+          "case": "conditional-nonmatching",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4836,
+              "eval_count": 1536,
+              "prompt_eval_count": 4498,
+              "total_duration": 27536028715,
+              "load_duration": 5305314,
+              "prompt_eval_duration": 2079862999,
+              "eval_duration": 25357430000,
+              "done_reason": "length"
+            },
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 5907,
+              "eval_count": 1536,
+              "prompt_eval_count": 4811,
+              "total_duration": 27448948594,
+              "load_duration": 9334275,
+              "prompt_eval_duration": 558072000,
+              "eval_duration": 26821522000,
+              "done_reason": "length"
+            }
+          ],
+          "seconds": 55.158,
+          "at_kst": "2026-11-14T09:48:02.783911+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "empty_peer_review",
+              "empty_peer_review"
+            ],
+            "peer_attempts": 2,
+            "peer_review": "synthesis_failed",
+            "error_type": "ValueError",
+            "peer_error_code": "empty_peer_review"
+          }
+        },
+        {
+          "case": "conditional-nonmatching",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r3",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4703,
+              "eval_count": 1536,
+              "prompt_eval_count": 4451,
+              "total_duration": 26233902008,
+              "load_duration": 4776101,
+              "prompt_eval_duration": 1341752000,
+              "eval_duration": 24727489000,
+              "done_reason": "length"
+            },
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 5648,
+              "eval_count": 1536,
+              "prompt_eval_count": 4764,
+              "total_duration": 26907478929,
+              "load_duration": 6919916,
+              "prompt_eval_duration": 532340000,
+              "eval_duration": 26308401000,
+              "done_reason": "length"
+            }
+          ],
+          "seconds": 53.209,
+          "at_kst": "2026-11-14T09:48:55.994111+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "empty_peer_review",
+              "empty_peer_review"
+            ],
+            "peer_attempts": 2,
+            "peer_review": "synthesis_failed",
+            "error_type": "ValueError",
+            "peer_error_code": "empty_peer_review"
+          }
+        },
+        {
+          "case": "conditional-contradiction",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r3",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4407,
+              "eval_count": 1536,
+              "prompt_eval_count": 4441,
+              "total_duration": 25290058627,
+              "load_duration": 6797165,
+              "prompt_eval_duration": 1317468000,
+              "eval_duration": 23913048000,
+              "done_reason": "length"
+            },
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4423,
+              "eval_count": 1536,
+              "prompt_eval_count": 4754,
+              "total_duration": 24865807402,
+              "load_duration": 6929414,
+              "prompt_eval_duration": 533340000,
+              "eval_duration": 24266764000,
+              "done_reason": "length"
+            }
+          ],
+          "seconds": 50.227,
+          "at_kst": "2026-11-14T09:49:46.221988+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "empty_peer_review",
+              "empty_peer_review"
+            ],
+            "peer_attempts": 2,
+            "peer_review": "synthesis_failed",
+            "error_type": "ValueError",
+            "peer_error_code": "empty_peer_review"
+          }
+        },
+        {
+          "case": "conditional-contradiction",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4044,
+              "eval_count": 1536,
+              "prompt_eval_count": 4488,
+              "total_duration": 25894489413,
+              "load_duration": 6621045,
+              "prompt_eval_duration": 1983354000,
+              "eval_duration": 23729881000,
+              "done_reason": "length"
+            },
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 4476,
+              "eval_count": 1536,
+              "prompt_eval_count": 4801,
+              "total_duration": 25110526383,
+              "load_duration": 7142257,
+              "prompt_eval_duration": 537137000,
+              "eval_duration": 24505487000,
+              "done_reason": "length"
+            }
+          ],
+          "seconds": 51.075,
+          "at_kst": "2026-11-14T09:50:37.297972+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "empty_peer_review",
+              "empty_peer_review"
+            ],
+            "peer_attempts": 2,
+            "peer_review": "synthesis_failed",
+            "error_type": "ValueError",
+            "peer_error_code": "empty_peer_review"
+          }
+        }
+      ],
+      "terminal_proof": {
+        "pid": 1091655,
+        "known_failure_gate": true,
+        "completed_runs": 4,
+        "reason": "Thinking exhausted the 1536 token budget and returned no final answer; reject this configuration, stop this development job only.",
+        "stopped": true,
+        "terminal": true,
+        "remaining_process_states": []
+      }
+    },
+    "4096": {
+      "status": "completed_rejected",
+      "completed_reviews": 6,
+      "rows": [
+        {
+          "case": "conditional-nonmatching",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 9325,
+              "eval_count": 3157,
+              "prompt_eval_count": 4498,
+              "total_duration": 53057142650,
+              "load_duration": 5025277,
+              "prompt_eval_duration": 2015570000,
+              "eval_duration": 50929641000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 53.126,
+          "at_kst": "2026-11-14T09:52:55.371828+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "- **미확인**: 다른 봇이 언급한 source_ip null 가정은 현재 조회 구간(07:00~07:30 KST)의 실제 반환 표본 1건(source_ip: 192.0.2.31)에 해당하지 않아 미확인입니다.\n- **일치**: IP 기반 출발지 확인 논리는 실제 표본과 일치하나, 조회 결과의 핵심 관측값(발생 시각 07:10, 규칙 ID 5715, sshd authentication success 메시지)을 누락하여 사건 검토로서 불완전합니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [],
+            "peer_attempts": 1,
+            "peer_review": "source_bound_claims",
+            "peer_claims": [
+              {
+                "kind": "unverified",
+                "text": "다른 봇이 언급한 source_ip null 가정은 현재 조회 구간(07:00~07:30 KST)의 실제 반환 표본 1건(source_ip: 192.0.2.31)에 해당하지 않아 미확인입니다.",
+                "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+                "missing_field": ":source_ip_null_sample",
+                "call_index": 0,
+                "evidence_quote": "\"returned_count\": 1"
+              },
+              {
+                "kind": "agree",
+                "text": "IP 기반 출발지 확인 논리는 실제 표본과 일치하나, 조회 결과의 핵심 관측값(발생 시각 07:10, 규칙 ID 5715, sshd authentication success 메시지)을 누락하여 사건 검토로서 불완전합니다.",
+                "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+                "missing_field": ":alert_details",
+                "call_index": 0,
+                "evidence_quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\""
+              }
+            ]
+          },
+          "targeted_rubric_pass": true,
+          "manual_reason": "조건 밖 표본으로 거짓 이견은 내지 않았으나 원문에 없던 세부 누락 비판을 추가한 표시·범위 한계"
+        },
+        {
+          "case": "conditional-contradiction",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 6928,
+              "eval_count": 2734,
+              "prompt_eval_count": 4488,
+              "total_duration": 44463143835,
+              "load_duration": 4715351,
+              "prompt_eval_duration": 1987436000,
+              "eval_duration": 42278489000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 95.057,
+          "at_kst": "2026-11-14T09:54:30.430269+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "peer_query_scope_mismatch"
+            ],
+            "peer_attempts": 2,
+            "peer_validation_details": [
+              {
+                "code": "peer_query_scope_mismatch",
+                "claim_index": 1,
+                "kind": "agree",
+                "evidence_path": "result.requested_since_kst",
+                "attempt": 1
+              }
+            ],
+            "peer_review": "synthesis_failed",
+            "error_type": "TimeoutError",
+            "peer_error_code": "TimeoutError"
+          },
+          "targeted_rubric_pass": false,
+          "manual_reason": "실제 모순 대조군이 첫 응답의 요청 조건 근거 거절 후 95초 제한으로 미완수"
+        },
+        {
+          "case": "table-acknowledged-limit",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 7844,
+              "eval_count": 2901,
+              "prompt_eval_count": 5666,
+              "total_duration": 50443684990,
+              "load_duration": 5035471,
+              "prompt_eval_duration": 3030590000,
+              "eval_duration": 47262714000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 95.055,
+          "at_kst": "2026-11-14T09:56:05.487324+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [
+              "peer_query_scope_mismatch"
+            ],
+            "peer_attempts": 2,
+            "peer_validation_details": [
+              {
+                "code": "peer_query_scope_mismatch",
+                "claim_index": 0,
+                "kind": "agree",
+                "evidence_path": "result.requested_since_kst",
+                "attempt": 1
+              }
+            ],
+            "peer_review": "synthesis_failed",
+            "error_type": "TimeoutError",
+            "peer_error_code": "TimeoutError"
+          },
+          "targeted_rubric_pass": false,
+          "manual_reason": "요청 조건 근거 거절 후 95초 제한으로 미완수"
+        },
+        {
+          "case": "conditional-recommendation",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 9470,
+              "eval_count": 3488,
+              "prompt_eval_count": 4562,
+              "total_duration": 58333638156,
+              "load_duration": 4980805,
+              "prompt_eval_duration": 2048556000,
+              "eval_duration": 56008968000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 58.4,
+          "at_kst": "2026-11-14T09:57:03.889013+09:00",
+          "result": {
+            "status": "partial",
+            "final_response": "- **이견**: 이견: SQLi 탐지를 조건('확인되는 경우')으로 서술했으나, 실제 조회에서 요청 구간(07:00~07:30 KST) 내 07:10 시각에 경보가 1건 확인됨. 관측 사실로 정정 필요.\n- **미확인**: 누락: 공격원 IP(192.0.2.31)와 이벤트 ID(fixture-event-01)를 미기재함. 대상 식별을 위해 명시 권장.\n- **일치**: 일치: WAF/접근 로그 대조는本次 조회 범위를 벗어났으나 다음 단계 권고로 적절함. 설정 변경 불이행은 요청과 일치함.",
+            "protected_calls": 0,
+            "peer_validation_errors": [],
+            "peer_attempts": 1,
+            "peer_review": "source_bound_claims",
+            "peer_claims": [
+              {
+                "kind": "disagree",
+                "text": "이견: SQLi 탐지를 조건('확인되는 경우')으로 서술했으나, 실제 조회(e13)에서 요청 구간(07:00~07:30 KST) 내 07:10 시각에 경보가 1건 확인됨. 관측 사실로 정정 필요.",
+                "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+                "missing_field": "",
+                "call_index": 0,
+                "evidence_quote": "\"message\": \"SQL injection signature matched\""
+              },
+              {
+                "kind": "unverified",
+                "text": "누락: 공격원 IP(192.0.2.31)와 이벤트 ID(fixture-event-01)를 미기재함. 대상 식별을 위해 명시 권장.",
+                "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+                "missing_field": "",
+                "call_index": 0,
+                "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+              },
+              {
+                "kind": "agree",
+                "text": "일치: WAF/접근 로그 대조는本次 조회 범위를 벗어났으나 다음 단계 권고로 적절함. 설정 변경 불이행은 요청과 일치함.",
+                "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+                "missing_field": "",
+                "call_index": 0,
+                "evidence_quote": "\"source\": \"wazuh\""
+              }
+            ]
+          },
+          "targeted_rubric_pass": false,
+          "manual_reason": "조건부 권고를 실제 관측으로 정정하라고 요구; 불필요한 누락 비판·혼합 언어"
+        },
+        {
+          "case": "new-ids-recommendation",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 6252,
+              "eval_count": 1900,
+              "prompt_eval_count": 4469,
+              "total_duration": 32143320423,
+              "load_duration": 4882045,
+              "prompt_eval_duration": 1628873000,
+              "eval_duration": 30355836000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 32.212,
+          "at_kst": "2026-11-14T09:57:36.102378+09:00",
+          "result": {
+            "status": "completed",
+            "final_response": "- **일치**: 조회 결과(30분)에서 'fixture malicious connection alert' 경보 1건이 확인되었으며, action 필드가 'allowed'로 실제 차단이 수행되지 않았습니다. 다른 봇의 설명이 관측된 경보 존재와 대응 계획임을 정확히 반영하므로 일치합니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [],
+            "peer_attempts": 1,
+            "peer_review": "source_bound_claims",
+            "peer_claims": [
+              {
+                "kind": "agree",
+                "text": "조회 결과(30분)에서 'fixture malicious connection alert' 경보 1건이 확인되었으며, action 필드가 'allowed'로 실제 차단이 수행되지 않았습니다. 다른 봇의 설명이 관측된 경보 존재와 대응 계획임을 정확히 반영하므로 일치합니다.",
+                "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+                "missing_field": "",
+                "call_index": 0,
+                "evidence_quote": "\"returned_count\": 1"
+              }
+            ]
+          },
+          "targeted_rubric_pass": false,
+          "manual_reason": "센서 allowed를 봇/방화벽 차단 미실행의 증거로 확대"
+        },
+        {
+          "case": "new-waf-real-verdict-contradiction",
+          "group": "selected_reasoning_development_probe",
+          "arm": "r2",
+          "reasoning": true,
+          "inference_stats": [
+            {
+              "reasoning_requested": true,
+              "reasoning_chars": 5181,
+              "eval_count": 1717,
+              "prompt_eval_count": 4373,
+              "total_duration": 29378806524,
+              "load_duration": 4754934,
+              "prompt_eval_duration": 2008101000,
+              "eval_duration": 27254027000,
+              "done_reason": "stop"
+            }
+          ],
+          "seconds": 29.447,
+          "at_kst": "2026-11-14T09:58:05.551092+09:00",
+          "result": {
+            "status": "completed",
+            "final_response": "- **이견**: 상대 답변은 거래 fixture-tx-42의 WAF 판정이 allowed이며 거부가 없었다고 하나, 조회 결과(transaction_id: fixture-tx-42)는 action이 blocked이고 http_status가 403으로 기록되어 있어 해당 거래에 WAF 차단(거부)이 실제로 발생했음을 확인합니다.",
+            "protected_calls": 0,
+            "peer_validation_errors": [],
+            "peer_attempts": 1,
+            "peer_review": "source_bound_claims",
+            "peer_claims": [
+              {
+                "kind": "disagree",
+                "text": "상대 답변은 거래 fixture-tx-42의 WAF 판정이 allowed이며 거부가 없었다고 하나, 조회 결과(transaction_id: fixture-tx-42)는 action이 blocked이고 http_status가 403으로 기록되어 있어 해당 거래에 WAF 차단(거부)이 실제로 발생했음을 확인합니다.",
+                "other_quote": "거래 fixture-tx-42의 WAF 판정은 allowed로 기록되어 있습니다. 해당 거래에 WAF 거부는 없었습니다.",
+                "missing_field": "",
+                "call_index": 0,
+                "evidence_quote": "\"transaction_id\": \"fixture-tx-42\""
+              }
+            ]
+          },
+          "targeted_rubric_pass": true,
+          "manual_reason": "동일 거래의 실제 blocked 관측으로 allowed 주장을 반박"
+        }
+      ],
+      "targeted_pass": 2,
+      "cases": 6,
+      "true_contradictions_completed": 1,
+      "true_contradiction_cases": 2,
+      "timeouts": 2,
+      "median_seconds": 55.763,
+      "max_seconds": 95.057,
+      "matched_false_reasoning_development_subset": {
+        "pass": 3,
+        "cases": 6,
+        "median_seconds": 5.476
+      },
+      "limits": "targeted 2/6 includes a response with unrequested omission criticism; not a whole-answer quality pass. 95-second deadline includes correction. False/true runs not a controlled causal speed comparison."
+    },
+    "privacy": "only numeric inference metadata and reasoning character counts retained; no reasoning-content text"
+  },
+  "harness2": {
+    "at_kst": "2026-11-14T09:34:49.682402+09:00",
+    "base_commit": "4a9318e681812b010319d8c6669c14ab98af9a7f",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "live_observed_at_kst": "2026-11-14T09:25:15.010490+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog": [
+      {
+        "server": "resp",
+        "name": "block_ip",
+        "alias": "mcp__resp__block_ip",
+        "schema_sha256": "2db8467344c286662cf6d592861ee6ec816434c13327eaf3d82d2a05f9284bcc"
+      },
+      {
+        "server": "resp",
+        "name": "get_firewall_rules",
+        "alias": "mcp__resp__get_firewall_rules",
+        "schema_sha256": "7fa8b4032b741e4f7304e0e29a295729f784a7fb8bb8ad096a0a7cfce0ffd4b9"
+      },
+      {
+        "server": "resp",
+        "name": "list_blocks",
+        "alias": "mcp__resp__list_blocks",
+        "schema_sha256": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+      },
+      {
+        "server": "resp",
+        "name": "unblock_ip",
+        "alias": "mcp__resp__unblock_ip",
+        "schema_sha256": "d2757c986eb71d19d278ea58f244cde2a18726ded60e703c0b7056f2865f218c"
+      },
+      {
+        "server": "rule-a",
+        "name": "get_operation_status",
+        "alias": "mcp__rule_a__get_operation_status",
+        "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+      },
+      {
+        "server": "rule-a",
+        "name": "get_rule_change_status",
+        "alias": "mcp__rule_a__get_rule_change_status",
+        "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+      },
+      {
+        "server": "rule-a",
+        "name": "get_rule_change_target",
+        "alias": "mcp__rule_a__get_rule_change_target",
+        "schema_sha256": "2a6f8fb87bee70fbfd547caae6c852e2b3732485a5b1cd161880a93e19b4abbc"
+      },
+      {
+        "server": "rule-a",
+        "name": "get_security_rules",
+        "alias": "mcp__rule_a__get_security_rules",
+        "schema_sha256": "b8942e215610f15dacdd690fbbed743e8131710e6374e9449f81a6b6fc3ef569"
+      },
+      {
+        "server": "rule-a",
+        "name": "get_service_action_target",
+        "alias": "mcp__rule_a__get_service_action_target",
+        "schema_sha256": "33ab82fa645d230a4cf9f9c3a528de27085c49b9df7aaf34bf36333b3ef34a29"
+      },
+      {
+        "server": "rule-b",
+        "name": "get_operation_status",
+        "alias": "mcp__rule_b__get_operation_status",
+        "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+      },
+      {
+        "server": "rule-b",
+        "name": "get_rule_change_status",
+        "alias": "mcp__rule_b__get_rule_change_status",
+        "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+      },
+      {
+        "server": "rule-b",
+        "name": "get_rule_change_target",
+        "alias": "mcp__rule_b__get_rule_change_target",
+        "schema_sha256": "30704ddf5e621a2614d0409f799392de3278e18b51d7735212a878a7f65fa3e6"
+      },
+      {
+        "server": "rule-b",
+        "name": "get_security_rules",
+        "alias": "mcp__rule_b__get_security_rules",
+        "schema_sha256": "a119df10763394dd2f070f47642f255e76ac7702b7b15f9c9f2fdb565ad52758"
+      },
+      {
+        "server": "rule-b",
+        "name": "get_service_action_target",
+        "alias": "mcp__rule_b__get_service_action_target",
+        "schema_sha256": "ce8ddc679710991d1eb3ddbebeb420581c736ff4874fe351f2e2ad6fffe9e852"
+      },
+      {
+        "server": "rule-write-a",
+        "name": "propose_rule_change",
+        "alias": "mcp__rule_write_a__propose_rule_change",
+        "schema_sha256": "1f11effc78733c4c873771a73c5f8bee88d02cd8446d58f7bd69c3b67b72d8a7"
+      },
+      {
+        "server": "rule-write-a",
+        "name": "propose_rule_edit",
+        "alias": "mcp__rule_write_a__propose_rule_edit",
+        "schema_sha256": "26f3f9915f39dbe4ca65dbf4880975741e249397bc9472efdd71a12b76e272d2"
+      },
+      {
+        "server": "rule-write-a",
+        "name": "propose_service_action",
+        "alias": "mcp__rule_write_a__propose_service_action",
+        "schema_sha256": "e5a30a54836d7fd4293836a94c6782db1a7803ab205ac093afacfb94e25328e1"
+      },
+      {
+        "server": "rule-write-a",
+        "name": "temporarily_contain_ip",
+        "alias": "mcp__rule_write_a__temporarily_contain_ip",
+        "schema_sha256": "24b48bac70c7d9d10753e766d1f4c4e1ea7a4220baaf78ce57da072c564859f5"
+      },
+      {
+        "server": "rule-write-b",
+        "name": "propose_rule_change",
+        "alias": "mcp__rule_write_b__propose_rule_change",
+        "schema_sha256": "f1b266192a5f044b0d1208cdc8ad61a871ec84ce662b242bf3d7f0e06f647a23"
+      },
+      {
+        "server": "rule-write-b",
+        "name": "propose_rule_edit",
+        "alias": "mcp__rule_write_b__propose_rule_edit",
+        "schema_sha256": "8792ca851742064af6bdbb86f6a16ae9ef777b11b2018cff0e5865b6a3a04ab0"
+      },
+      {
+        "server": "rule-write-b",
+        "name": "propose_service_action",
+        "alias": "mcp__rule_write_b__propose_service_action",
+        "schema_sha256": "54e33dd43f8b235eefcda42ec355b5ee9e142cb831279eeaba8e13ab9e06e2cc"
+      },
+      {
+        "server": "security-events",
+        "name": "collect_incident_evidence",
+        "alias": "mcp__security_events__collect_incident_evidence",
+        "schema_sha256": "42cc9207fd1102663d1544b16a510d2ccff3214e7855440b0929ca8a79999c6e"
+      },
+      {
+        "server": "security-events",
+        "name": "get_wazuh_sca_checks",
+        "alias": "mcp__security_events__get_wazuh_sca_checks",
+        "schema_sha256": "ace06898df3b679080c092dc7ab36d9aa5378f7ab74180f97ff10f3ebacb8465"
+      },
+      {
+        "server": "security-events",
+        "name": "get_web_service_target",
+        "alias": "mcp__security_events__get_web_service_target",
+        "schema_sha256": "5a49221857f37ab059d1bf777639dddb23c409589a9a96d21b8ec0a727bed07f"
+      },
+      {
+        "server": "security-events",
+        "name": "search_modsecurity_alerts",
+        "alias": "mcp__security_events__search_modsecurity_alerts",
+        "schema_sha256": "d297a9bd8776b8d726d2f230fe00f12f69cc7f4be3b75e4fe68e72d7b705e644"
+      },
+      {
+        "server": "security-events",
+        "name": "search_suricata_alerts",
+        "alias": "mcp__security_events__search_suricata_alerts",
+        "schema_sha256": "ae64c793c525cc313e24b8a9bef7029b20913e79bce3a558a00e62159b607695"
+      },
+      {
+        "server": "security-events",
+        "name": "search_wazuh_alerts",
+        "alias": "mcp__security_events__search_wazuh_alerts",
+        "schema_sha256": "c3d595745a1c29cc350d08dca6a378a124434853f8ef1a231261a578cb3fcddd"
+      },
+      {
+        "server": "security-events",
+        "name": "search_web_access",
+        "alias": "mcp__security_events__search_web_access",
+        "schema_sha256": "d9a8ccb011e5390b284e21a6553e7b07f094b7e61d27b33435eb72da7b2e509a"
+      },
+      {
+        "server": "system-diagnostics",
+        "name": "calculate_time",
+        "alias": "mcp__system_diagnostics__calculate_time",
+        "schema_sha256": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd"
+      },
+      {
+        "server": "system-diagnostics",
+        "name": "get_host_inventory",
+        "alias": "mcp__system_diagnostics__get_host_inventory",
+        "schema_sha256": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+      },
+      {
+        "server": "system-diagnostics",
+        "name": "get_system_diagnostics",
+        "alias": "mcp__system_diagnostics__get_system_diagnostics",
+        "schema_sha256": "7b25de939edbe33815850e972b83c864fc847ed688f50b1cf6dc60f01e5c76f6"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_agent_ports",
+        "alias": "mcp__wazuh_ro__get_wazuh_agent_ports",
+        "schema_sha256": "f164d1dc38e74c75cf8479bdae81db180d12b2d3d452f9cb447fd632b632388b"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_agent_processes",
+        "alias": "mcp__wazuh_ro__get_wazuh_agent_processes",
+        "schema_sha256": "d37ade4172205381a042a725d80986549b7f3e1d6caf3a665087e5c811146451"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_agents",
+        "alias": "mcp__wazuh_ro__get_wazuh_agents",
+        "schema_sha256": "9bac6275361289b4ea6da82340fabf7e0b373c929dd3d8302032522163f00b16"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_alert_summary",
+        "alias": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "schema_sha256": "bc38bd71ddf5aaa5d54bfdf5e1a2af72d9a346897b31e553d1ad6fe8fec3af0e"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_cluster_health",
+        "alias": "mcp__wazuh_ro__get_wazuh_cluster_health",
+        "schema_sha256": "2fec25025417b8d71603cb950c3f4676067314d0bcfad2d80ce14509ae65b627"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_cluster_nodes",
+        "alias": "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+        "schema_sha256": "f1962fa4cf4f3ca1ad9533226903112a2343e69f959ea8e27ec2c8dd2410b71c"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_critical_vulnerabilities",
+        "alias": "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+        "schema_sha256": "4f30a9c89d28e39faef2a854ace2fd9da943434c5e13e5cce9b4a6bd3b89ad73"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_log_collector_stats",
+        "alias": "mcp__wazuh_ro__get_wazuh_log_collector_stats",
+        "schema_sha256": "a00dee00abe89f1727e696ad8603edffd4427a3e92eee2aec19fea399c56bc0d"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_manager_error_logs",
+        "alias": "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+        "schema_sha256": "59d25ac259370c9653bf1c4a3fa750e115cc2d0705a6caf3e1e28aeba90d5abb"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_remoted_stats",
+        "alias": "mcp__wazuh_ro__get_wazuh_remoted_stats",
+        "schema_sha256": "aa5d97fc1a8e4b567c56679a5ee8bc6b858b8c5e34fd72af1f795836d1f234fc"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_rules_summary",
+        "alias": "mcp__wazuh_ro__get_wazuh_rules_summary",
+        "schema_sha256": "d1c9c0f4a273b252f3657474cf0aa5356939d870ef2aa618762c67bcfeaac1a3"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_vulnerability_summary",
+        "alias": "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+        "schema_sha256": "1aeb260afe5339a55ec9f0d41ac7ed54b67c7ce987a84ae7262c80d20a1078f5"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_weekly_stats",
+        "alias": "mcp__wazuh_ro__get_wazuh_weekly_stats",
+        "schema_sha256": "1fdb4dc04498135b5c770f1193c8d4db4fbdfbfb727e8fcd9afb7c8241755ac0"
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "search_wazuh_manager_logs",
+        "alias": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "schema_sha256": "2394e43913adbdab776e232ae02c8323324c263ce95d36660ed39371a3d79ff2"
+      }
+    ],
+    "live_sources": {
+      "/opt/capstone-review-chat/review_channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/capstone-management/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "/etc/capstone-review-chat/receipt.json": "df9004fc1983210ce12cb316900636009aae81f2b3992712d7a951c36cc7a21f"
+    },
+    "scope": "official structure only; separate frozen code regression and actual-model semantic comparison follow",
+    "worker_source": "dfc3e2a parent, matches operating SHA; pending identifier patch excluded",
+    "operating_changes": 0,
+    "audit_only_routing_index": true,
+    "arms": {
+      "base": {
+        "skill_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "census": {
+          "always_on_chars": 16842,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "files": {
+          "systemprompt.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+          "scripts/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+          "scripts/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+          "scripts/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "scripts/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+          "scripts/channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "scripts/native_query.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+          "scripts/evidence_gate.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+          "scripts/management_controller.py": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+          "scripts/channel_controller.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+          "scripts/sdk_chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "scripts/sdk_chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "scripts/sdk_authority.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+          "skills/soc-investigate/SKILL.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+          "skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+          "scripts/sdk_harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+          "scripts/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+          "scripts/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+          "skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+          "skills/soc-query/SKILL.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+          "scripts/sdk_runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+          "scripts/native_alignment.py": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+          "scripts/channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+          "tool_descriptions/tool_guidance.md": "162d7b5e2bc8366d05fa4cf3c416816a09fa04bd303f146e46a2d27b59154e0e"
+        }
+      },
+      "r2": {
+        "skill_sha256": "83ea52e24574087b516b747461a6d6f4585a8e697949d423c4b130bc8b266639",
+        "census": {
+          "always_on_chars": 16842,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "files": {
+          "systemprompt.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+          "scripts/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+          "scripts/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+          "scripts/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "scripts/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+          "scripts/channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "scripts/native_query.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+          "scripts/evidence_gate.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+          "scripts/management_controller.py": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+          "scripts/channel_controller.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+          "scripts/sdk_chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "scripts/sdk_chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "scripts/sdk_authority.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+          "skills/soc-investigate/SKILL.md": "83ea52e24574087b516b747461a6d6f4585a8e697949d423c4b130bc8b266639",
+          "skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+          "skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+          "scripts/sdk_harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+          "scripts/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+          "scripts/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+          "skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+          "skills/soc-query/SKILL.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+          "scripts/sdk_runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+          "scripts/native_alignment.py": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+          "scripts/channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+          "tool_descriptions/tool_guidance.md": "162d7b5e2bc8366d05fa4cf3c416816a09fa04bd303f146e46a2d27b59154e0e"
+        }
+      },
+      "r3": {
+        "skill_sha256": "f8bd6131885de0fc8eff1cad27c658f7ac8caff516f694f37cb2acc89409823e",
+        "census": {
+          "always_on_chars": 16842,
+          "n_files": 25,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "files": {
+          "systemprompt.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+          "scripts/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+          "scripts/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+          "scripts/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "scripts/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+          "scripts/channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+          "scripts/native_query.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+          "scripts/evidence_gate.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+          "scripts/management_controller.py": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+          "scripts/channel_controller.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+          "scripts/sdk_chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "scripts/sdk_chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "scripts/sdk_authority.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+          "skills/soc-investigate/SKILL.md": "f8bd6131885de0fc8eff1cad27c658f7ac8caff516f694f37cb2acc89409823e",
+          "skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+          "skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+          "scripts/sdk_harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+          "scripts/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+          "scripts/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+          "skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+          "skills/soc-query/SKILL.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+          "scripts/sdk_runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+          "scripts/native_alignment.py": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+          "scripts/channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+          "tool_descriptions/tool_guidance.md": "162d7b5e2bc8366d05fa4cf3c416816a09fa04bd303f146e46a2d27b59154e0e"
+        }
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    }
+  },
+  "regression": {
+    "mac": {
+      "kind": "same frozen code tests, not model semantic accuracy",
+      "test_modules": [
+        "test_review_channel",
+        "test_workflow_contract",
+        "test_review_time_correction"
+      ],
+      "shared_test_sha256": {
+        "test_review_channel": "54a836dbf9b2db8b38072f94c6a02639cb4e3a623c0b4dec6946663b3347afe5",
+        "test_workflow_contract": "dcb96cd2bfb7ca4aead62b92d1ef85237390376cfc1326a9fd112b168aaabb77",
+        "test_review_time_correction": "b507bc6f7dba9d60da98b2afbb7148e2daaf11077bef4d9628217dd9721fa9e4"
+      },
+      "arms": {
+        "base": {
+          "rc": 0,
+          "tests": 105,
+          "seconds": 4.027,
+          "skips": [],
+          "log_sha256": "cbb2bfbd04e542ba034c0b66a450b5152dc96ea05e800da5419e53bea71000f2",
+          "tail": "checked_too) ... ok\n\n----------------------------------------------------------------------\nRan 105 tests in 3.899s\n\nOK\n"
+        },
+        "r3": {
+          "rc": 0,
+          "tests": 105,
+          "seconds": 4.027,
+          "skips": [],
+          "log_sha256": "086050c910c544e93b48aed514acb5266a06692966c9f227b6219185fee34c26",
+          "tail": "checked_too) ... ok\n\n----------------------------------------------------------------------\nRan 105 tests in 3.900s\n\nOK\n"
+        }
+      }
+    },
+    "linux": {
+      "kind": "existing B Linux runtime, frozen identical tests and installed worker source; no MCP/model/operating mutation",
+      "files": 998,
+      "results": {
+        "base": {
+          "rc": 0,
+          "tests": 105,
+          "seconds": 12.612,
+          "skips": [],
+          "log_sha256": "e3b1f521e04638861696e743dcfe3078af26901121b469d783bbf1e64220a807"
+        },
+        "r3": {
+          "rc": 0,
+          "tests": 105,
+          "seconds": 12.134,
+          "skips": [],
+          "log_sha256": "442d3e87318918904ae815b1c2cea722bb05d98d8d630d60c96fc84f82ee2f70"
+        }
+      }
+    },
+    "head_pending_identifier_compatibility": {
+      "scope": "pending identifier candidate compatibility, not installed worker",
+      "worker_sha256": "679cd99237684a6ca42e6e0b9e0acd1329ed77d63ca4c39b0d7f8fe9f8bcb428",
+      "tests": 106,
+      "rc": 0,
+      "seconds": 3.751,
+      "skips": [],
+      "log_sha256": "0620aff97d0d7f19bb43870540d9f2e2dd416f7860827d2b567e9e6bb58bc41f"
+    },
+    "initial_failures": "HEAD tests against installed pre-identifier worker failed; aligned tests to same installed commit without weakening assertions. Restored generic policy phrases required by unchanged tests; failures retained locally."
+  },
+  "governance_tools": {
+    "transport": "actual Hermes container fixed SSH aliases over administrator route; no language planner invocation",
+    "catalog": {
+      "rule-b": [
+        {
+          "name": "get_harness_check_status",
+          "schema_sha256": "99334726611ccf58a148b0814696bfa6fe08c1b2d027e946beccf5a74331c9aa",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "description": "Read the most recent Harness² structural self-audit summary on the SIEM host: status (passed/findings/incomplete), origin, KST observation time, report file and SHA-256. Read-only: it never starts an audit and never adopts or applies anything. 'automatic_adoption' is always false and 'operational_changes_require_approval' always true - a passed structural check is NOT proof of runtime accuracy, and any skill or config improvement it suggests still needs a separate admin approval card. observed_at_kst reflects when the stored audit ran and may be stale; status 'incomplete' means no valid stored report is available. Takes no arguments."
+        }
+      ],
+      "rule-write-b": [
+        {
+          "name": "request_harness_check",
+          "schema_sha256": "58f6e5ff8579118a1a058f465eb76b1476dddd4cdeb6d35bd6da01075bb82d68",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "description": "Request an administrator-approved run of the official Harness² structural self-audit on the SIEM host. This does NOT run anything by itself: it posts one approval card to the administrators; only after an admin approves does a separate worker start the fixed audit service exactly once. The audit is non-mutating - it changes no skill, config, rule, service or firewall - and a structural pass is not proof of runtime accuracy. Read the outcome afterwards with get_harness_check_status (new observed_at_kst), and track the request with get_operation_status. Any improvement the audit suggests still needs its own separate approval card. Repeated identical requests reuse the same pending card."
+        },
+        {
+          "name": "request_harness_skill_resync",
+          "schema_sha256": "0f437ad59b092c9160acb99556dde4e1e3c0d0aecd438f9b5bfdfe8589424e9f",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "skill": {
+                "type": "string",
+                "enum": [
+                  "soc-output",
+                  "soc-query",
+                  "soc-investigate",
+                  "soc-change",
+                  "soc-recover"
+                ]
+              },
+              "source_surface": {
+                "type": "string",
+                "enum": [
+                  "native",
+                  "sdk",
+                  "management"
+                ],
+                "description": "The surface whose copy is canonical (bytes to copy FROM)"
+              },
+              "target_surface": {
+                "type": "string",
+                "enum": [
+                  "native",
+                  "sdk",
+                  "management"
+                ],
+                "description": "The drifted surface whose copy will be overwritten"
+              },
+              "report_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "sha256 from get_harness_check_status"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "skill",
+              "source_surface",
+              "target_surface",
+              "report_sha256",
+              "reason"
+            ]
+          },
+          "description": "Request admin approval to fix ONE Harness²-detected SOC-skill cross-copy DRIFT by re-syncing the drifted copy to a canonical copy's EXACT bytes. This only posts an approval card; nothing changes until an admin approves. The worker then overwrites the target surface's copy of the skill with the source surface's exact bytes (a deterministic byte copy - never model-authored content), after verifying both copies' SHA-256 still match the approved plan, keeping a backup, and verifying the result. It touches only that one skill file. report_sha256 must be the sha256 from get_harness_check_status (ties the fix to the current audit). source and target surface must differ. Use only when get_harness_check_status reported findings and you have established which surface is canonical; structural or possible-duplicate findings must use acknowledge_harness_finding instead."
+        },
+        {
+          "name": "acknowledge_harness_finding",
+          "schema_sha256": "838a1b6918d4442a59e932ccbb2f750679096d8307674c7f3da6f87f98ac8c8b",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "draft_kind": {
+                "type": "string",
+                "enum": [
+                  "review_structural_findings",
+                  "review_possible_duplicate",
+                  "review_skill_drift"
+                ]
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "description": "Which finding: e.g. the skill name or a short finding reference"
+              },
+              "report_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "sha256 from get_harness_check_status"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "draft_kind",
+              "reference",
+              "report_sha256",
+              "reason"
+            ]
+          },
+          "description": "Request admin acknowledgement of ONE Harness² review finding that has no safe automatic fix (structural findings, or possible-duplicate candidates, or a skill drift you are NOT re-syncing). This posts an approval card that only RECORDS the admin's acknowledgement - it changes no file, skill, config, rule, service or firewall. Any actual change must be submitted separately through the normal governed change path (e.g. propose_rule_edit/propose_service_action or an operator edit). report_sha256 must be the sha256 from get_harness_check_status."
+        }
+      ]
+    },
+    "status_read": {
+      "automatic_adoption": false,
+      "observed_at_kst": "2026-11-14T03:00:16.246279+09:00",
+      "operational_changes_require_approval": true,
+      "origin": "scheduled",
+      "report_file": "20261114T030016246279+0900-09acc3491bf4899c939a28f3a5e57e4ed20408f6c4bced057f542cda216ad2f5.json",
+      "schema_version": 1,
+      "scope": "structural checks",
+      "sha256": "09acc3491bf4899c939a28f3a5e57e4ed20408f6c4bced057f542cda216ad2f5",
+      "status": "passed"
+    },
+    "actual_read_calls": 1,
+    "sdk_catalog_count": 45,
+    "sdk_exposes_governance_four": false,
+    "sdk_reason": "policy.py recognizes server catalog tools but deliberately omits them from filtered READ_TOOLS/PROTECTED_TOOLS",
+    "remaining": "Ollama integration candidate and exact authority review; natural-language request, approval click, single execution, result/rollback E2E not tested"
+  },
+  "operating": {
+    "changes": 0,
+    "model_config_changes": 0,
+    "protected_calls": 0,
+    "mattermost_posts": 0,
+    "new_attacks_or_training": 0,
+    "canonical_skill_promoted": false,
+    "identifier_fix": "dfc3e2a approval pending, excluded from operating comparison",
+    "remote_cleanup": {
+      "at_kst": "2026-11-14T10:09:23.254513+09:00",
+      "scope": "remove only three terminal isolated development jobs; no operating deployment",
+      "removed": [
+        {
+          "path": "/var/tmp/capstone-peer-r3-20261114-hpm9pewp",
+          "pid": 1081632,
+          "terminal_proof": {
+            "terminal": true,
+            "state": "completed",
+            "returncode": 0,
+            "pid": 1081632,
+            "at_kst": "2026-11-14T09:42:16.035488+09:00"
+          },
+          "files": 1012,
+          "absent_after": true
+        },
+        {
+          "path": "/var/tmp/capstone-peer-r3-20261114-hpm9pewp-thinking",
+          "pid": 1091655,
+          "terminal_proof": {
+            "pid": 1091655,
+            "known_failure_gate": true,
+            "completed_runs": 4,
+            "reason": "Thinking exhausted the 1536 token budget and returned no final answer; reject this configuration, stop this development job only.",
+            "stopped": true,
+            "terminal": true,
+            "remaining_process_states": []
+          },
+          "files": 12,
+          "absent_after": true
+        },
+        {
+          "path": "/var/tmp/capstone-peer-r3-20261114-hpm9pewp-thinking4096",
+          "pid": 1124876,
+          "terminal_proof": {
+            "terminal": true,
+            "state": "completed",
+            "returncode": 0,
+            "pid": 1124876,
+            "at_kst": "2026-11-14T09:58:05.771777+09:00"
+          },
+          "files": 13,
+          "absent_after": true
+        }
+      ],
+      "operating_sources": {
+        "/opt/capstone-review-chat/review_channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+        "/opt/capstone-ollama-trial/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "/opt/capstone-management/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+        "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+        "/etc/capstone-review-chat/receipt.json": "df9004fc1983210ce12cb316900636009aae81f2b3992712d7a951c36cc7a21f"
+      },
+      "operating_sources_unchanged": true,
+      "units": "NextElapseUSecRealtime=Sun 2026-11-15 03:00:00 KST\nResult=success\nId=capstone-harness2-audit.timer\nActiveState=active\n\nResult=success\nId=capstone-harness2-audit.service\nActiveState=inactive\n",
+      "operating_changes": 0,
+      "mattermost_posts": 0,
+      "protected_calls": 0
+    }
+  },
+  "next_hypothesis": "source-only clause interpretation before evidence comparison; thinking False, shared SKILL and actor/stage-bound proof checks; not implemented or validated"
+}

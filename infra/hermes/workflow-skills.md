@@ -20,7 +20,7 @@
 
 이후 이 절에 더한 원칙(11/14): 검토자 자신의 조회가 한도에 닿았으면(`scan_capped` true) `scanned`·`returned_count`·`returned_items`·`omitted_items`는 그 한도와 같은 값이라 상대 표본 크기를 확인하거나 반박하지 못한다. 같은 경계는 작업자 코드(`bind_peer_references`)가 `peer_query_scope_mismatch`로 강제한다. [후보](../validation/peer-limit/README.md). 정정(11/14 01:50): 처음 문장은 `omitted_items`도 한도 값으로 묶었으나 틀렸다. 이 값은 작업자의 표시용 발췌에서 뺀 수다. 이름을 `not_shown_in_excerpt`로 바꾸고, 스킬에는 "표시용 발췌에서 뺀 수이며 조회에서 빠진 경보가 아니다"를 두었다. [후보](../validation/peer-excerpt/README.md).
 
-**현재 미승격 후보:** [교차 검토 의미 비교](../validation/peer-semantics/README.md)의 조건·표본·권고 구분 보완은 별도 후보 파일이다. 기존6/9·후보7/9이고 의미 오류가 남아 canonical·운영·초기 설치 스킬에는 반영하지 않았다. 실제 판단 지침 변경과 구조 검사·운영 배포는 구분한다.
+**현재 미승격 후보:** [교차 검토 의미 비교](../validation/peer-semantics/README.md)의 조건·표본·권고 구분은 별도 R2 후보 파일이다. 추가 개발15사례에서 기존10·R2 12·R3 9 통과여서 R3는 기각·패치로 보존하고 R2로 복구했다. 추론 강화도 오류·합성 실패·지연으로 채택하지 않았다. R2 역시 권고의 관측화·센서와 봇 실행 주체 혼동·한도 근거 정정 실패가 남아 canonical·운영·초기 설치 스킬에는 미반영이다. 다음 원문 해석/근거 대조 분리안은 아직 미구현이다. 구조105회귀 통과와 의미 품질·운영 배포를 구분한다.
 
 ## 실제 연결
 

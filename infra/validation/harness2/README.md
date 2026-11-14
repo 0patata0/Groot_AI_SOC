@@ -144,5 +144,7 @@ systemctl start capstone-harness2-audit.service
 
 **원인 분석·수정(11/10 17:36~17:39 KST).** B에서 같은 검증을 읽기 전용으로 재현한 결과, 공식 규칙 "skill이 always-on 문구에 이름이 없으면 호출되지 않는 dead weight"에 `soc-change`·`soc-investigate`·`soc-query`·`soc-recover`가 걸렸다(세 표면 동일). 실제 런타임은 모델이 always-on 문구를 보고 스킬을 호출하지 않고, 코드(`harness.workflow_names`→`workflow_contract.policy`)가 질문별로 스킬 본문을 주입한다. 따라서 실제 죽은 스킬이 아니라 점검 투영의 불일치였다. `server_audit.py`가 `scripts/workflow_contract.py`의 리터럴 `MARKERS` 키만 AST로 읽어 검증용 always-on 색인(`routing_index.md`)을 만들고, 관찰 원본 트리는 바꾸지 않는다. MARKERS에 없는 스킬은 계속 untriggered로 잡히며, 결과에 `routing_projection`(근거 파일·스킬)과 리터럴 없는 `finding_kinds` 분류를 남긴다. 재설치(기존 보고서 보존) 후 17:39 수동 실행: **세 표면 passed**(각 5스킬), 중복0·사본 차이0, 모델/도구/채팅/보호 호출·소스 쓰기0. 사후 48/6 차이0·양봇·큐0. 한계: MARKERS 등록이 각 스킬이 질문 분기에서 실제로 선택된다는 증명은 아니다.
 
-남은 일: 03:00 첫 정기 실행 결과 확인, 관리자 채팅 요청으로 수동 점검을 시작하는 봇 연결과 승인형 개선 경로. 구조 점검 통과를 품질 향상이나 정확도로 표시하지 않는다.
+**후속 실제 확인:** 11/14 09:42 KST Hermes 컨테이너에서 고정 `rule-b` 경로의 `get_harness_check_status`를 읽어 03:00 KST 정기 보고 `passed`(scope `structural checks`, 자동 채택false, 운영 변경 승인 필요)를 확인했다. 10:09 KST 타이머는 active·다음03:00, 서비스 최근 Result는 success였다. 따라서 위 설치 당시의 첫 정기 실행 미확인은 해소했다. `rule-b`의 상태 읽기1개와 `rule-write-b`의 요청/재동기화/확인3개 목록·스키마도 확인했으나, Ollama의 실제45개 허용 목록은 이4개를 정책에서 제외한다. [공개 원장](../peer-semantics/validation-r3.json).
+
+남은 일: Hermes의 관리자 자연어 요청→도구 선택·카드 승인→고정 worker1회 실행→결과 읽기와 재동기화 E2E, Ollama의 승인 경계를 유지한 통합 후보다. 이번 확인은 보호 작업·채팅 게시·운영 배포0이며 구조 점검 통과를 품질 향상이나 정확도로 표시하지 않는다.
 

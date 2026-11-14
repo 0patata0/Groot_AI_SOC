@@ -39,6 +39,8 @@
 - **조치(거버넌스)**: 라이브 핫에디트로 생긴 드리프트는 작업 #5 승인 카드로 처리한다 — 읽기 `get_harness_check_status`, 점검 요청 `request_harness_check`, **드리프트 재동기화** `request_harness_skill_resync`(정본 surface 바이트로 1회 덮어쓰기, 해시결속), 비결정 항목은 `acknowledge_harness_finding`([승인형 운영 작업](../mcp/approved-operations.md)).
 - **회귀(리포)**: [`test_common_operational_settings.py`](test_common_operational_settings.py)가 단일 소스 배선과 공통 불변식(스킬 frontmatter·공통 출력 재사용·버전 마커·배포 소싱)을 점검한다.
 
+**실제 노출 경계 확인:** 관리자231 경유로 Hermes 컨테이너의 고정 `rule-b`/`rule-write-b` 연결에서 위 거버넌스4개 `tools/list`와 스키마 SHA를 확인했고, `get_harness_check_status` 읽기1회는 정기 구조 점검 `passed`를 반환했다. 반면 SDK의 `infra/ollama-trial/policy.py`는 서버 목록에서4개를 인식하되 `READ_TOOLS`/`PROTECTED_TOOLS`에는 넣지 않아 현재45개 목록에 노출하지 않는다. 설치된 서버 도구와 두 봇의 실행 허용 목록은 같지 않다. 이 진단은 자연어 선택·카드 클릭·1회 실행·재동기화 검증을 대신하지 않는다. SDK 통합은 정확한 권한 후보 검토·승인 후 별도로 진행하며 이번에는 정책을 바꾸지 않았다. [노출·실제 읽기 근거](../validation/peer-semantics/validation-r3.json).
+
 ## 4. 범위·한계
 
 - 스킬·프롬프트 **내용 변경은 운영 변경**이다. Harness² 구조 검증과 거버넌스 배포·실제 채팅 검증을 거친다. 이 문서·테스트는 **소스 공통화의 명시·강제**이며 라이브 바이트 일치나 런타임 로드를 증명하지 않는다.

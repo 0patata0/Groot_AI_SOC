@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [교차 검토 의미 후보](infra/validation/peer-semantics/README.md)는 기존6/9·후보7/9의 개발 비교이며 오류가 남아 canonical·운영에 미승격입니다. 내부 식별자 수정도 별도 승인 대기입니다. 논문은 구성·설치·운영·장애 대응 중심의 매뉴얼형 PDF36쪽·DOCX35쪽으로 검수했으며 Word 본문·팀원 표는 편집 가능합니다. 논문 본체와 원문 검증은 로컬 전용입니다. 아래 날짜별 설명은 해당 시점의 검증 범위입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [교차 검토 개발 비교](infra/validation/peer-semantics/README.md)는15사례에서 기존10·R2 12·R3 9 통과로 R3와 추론 강화안을 기각했습니다. R2도 오류가 남아 canonical·운영에 미승격이며 내부 식별자 수정은 별도 승인 대기입니다. Harness² 확장4개는 Hermes 목록·상태 읽기를 확인했지만 Ollama 정책에서 제외돼 있고 자연어·승인 전과정은 미확인입니다. 논문은 매뉴얼형 PDF36쪽·DOCX35쪽 편집본이며 이후 추가 검증의 출력 본체 반영은 후속입니다. 논문·원문 검증은 로컬 전용입니다. 아래 날짜별 설명은 해당 시점의 검증 범위입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

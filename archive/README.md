@@ -4,6 +4,8 @@
 
 현재 요약 정리 전의 STATUS·PLAN 상세는 각 통합 원장에 `source-dfc3e2a-status`·`source-dfc3e2a-plan`으로 보존했다. 정확히 같은 절만 기존 본문으로 참조하고, 원본 SHA와 Git 복구 위치를 함께 남겼다.
 
+최근 [사건 완료 조건 검증](../infra/validation/incident-completion/README.md)의 결과·계획·진단 실패·미채택 대안·렌더링 준비를 아래 유형별 이력에 추가했다. 코드 회귀 성공과 모델 정정 실패·운영 미적용을 구분한다.
+
 ## 유형별 통합 이력
 
 | 찾는 내용 | 통합 문서 | 합친 기존 문서 |

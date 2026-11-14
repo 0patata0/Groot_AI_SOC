@@ -1666,3 +1666,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 역사 문맥 연결 후보 — 미적용·canonical 복구
 
 기준61733a1 대비 전달기/정책/SKILL3개와 전용12검사를 후보로 작성·동결했다. 운영 대비에는 이전 작업자 수정도 남아 있다. 후보 전송/회귀 성공과 모델 의미 미완료를 분리해 패치로 보존하고 canonical/초기 설치 입력을 기준 커밋으로 복구했다. 운영 적용·서비스 재시작·새 채팅0.13:44 KST 관리231 경유8경로 SHA·학습본·서비스active·큐0 재확인. [검증](../infra/validation/peer-source-context/README.md).
+
+## 2026-11-14T21:48:17.722062+09:00 완료 조건의 읽기 대조·renderer 미리보기,적용0
+
+운영 코드/스킬17사본·영수증2개를 읽기 대조했다. controller는 정본 대비 command_for와 추가 zlib import 차이를 보존하고 검토4정의만 바꾼 preview를 만들었다. 내장 runner SHA·UID/container/profile·71866<98304·평상시/사건 플래그 차이 검증. 모델 정정 실패로 정확 적용 승인 요청·배포/원복 실행기·서비스 재시작·운영쓰기0. 초기 설치 입력/가중치/복구본 유지. [후보·분모·한계](../infra/validation/incident-completion/README.md).

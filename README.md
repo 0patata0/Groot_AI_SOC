@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 논문 MD·PDF·DOCX는 제출 조건 반영·PDF/DOCX 각43쪽 전수 검수를 마쳤고 정장사진/학번 입력이 남습니다. [근거 종류·수치 결속 후보](infra/validation/peer-proof-kinds/README.md)는 Mac/B143·144·153회귀와 과거20읽기/160필드·238참조를 확인했으나 같은 학습 모델8개 개발 사례에서 의미 오류가 남아 모두 보류했습니다. 답변 전달6/8·8/8·6/8은 정답률이 아닙니다. 프로젝트 정본·초기 설치·운영에는 미적용이며 서버20:23 마지막 관측에서 학습본·서비스 active/큐0·소스/도구45스키마를 확인했습니다. [읽기 감사 보존113 후보](infra/validation/native-read-audit/README.md)·식별자 수정의 정확 승인/운영 적용, Harness² 승인 E2E·독립 평가는 별도 잔여입니다. 이번 실제 채팅·공격·학습·운영 변경은0입니다. 아래 날짜별 설명은 당시 검증 범위입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 관리자231 경유 접속을 확인했고 [사건 완료 조건 후보](infra/validation/incident-completion/README.md)를 검증했습니다. Native449·SDK77·조회408·설치46과 Hermes환경24 검사는 통과했지만 모델 정정2회 모두 보고서 형식이 불완전해 운영 채택을 보류했습니다. [종류 참조 후보](infra/validation/peer-proof-kinds/README.md)도 의미 오류로 계속 보류합니다. 정본·초기 설치·운영 변경과 새 MCP/채팅·공격·학습은0입니다. 논문 MD·PDF·DOCX 제출 조건과 PDF·DOCX 각43쪽 검수는 완료했고 정장사진/학번은 미제공 공란입니다. 아래 날짜별 설명은 당시 검증 범위이며 이후 연속 정상이나 전체 완료로 확대하지 않습니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

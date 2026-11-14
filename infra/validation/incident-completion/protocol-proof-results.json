@@ -1,0 +1,160 @@
+{
+  "base": {
+    "arm": "base",
+    "rows": [
+      {
+        "case": "investigation_missing_judgment",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "plain_lookup",
+        "required": false,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "nonclosing_investigation",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "monitor",
+        "case_state": "monitor",
+        "detail": "model_requested_followup",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "untrusted_flag_cannot_disable",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "untrusted_flag_cannot_enable",
+        "required": false,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "zero_actual_reads",
+        "required": true,
+        "actual_read_probes": 0,
+        "native_status": "needs_review",
+        "case_state": "needs_review",
+        "detail": "live_verification_missing",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      }
+    ],
+    "scope": "synthetic data through actual frozen project Native-wrapper and controller methods; fake transport, no model/real MCP/chat",
+    "scope_label_corrected_from_probe": true
+  },
+  "candidate": {
+    "arm": "candidate",
+    "rows": [
+      {
+        "case": "investigation_missing_judgment",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "needs_review",
+        "case_state": "needs_review",
+        "detail": "model_needs_review",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "plain_lookup",
+        "required": false,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "nonclosing_investigation",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "monitor",
+        "case_state": "monitor",
+        "detail": "model_requested_followup",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "untrusted_flag_cannot_disable",
+        "required": true,
+        "actual_read_probes": 1,
+        "native_status": "needs_review",
+        "case_state": "needs_review",
+        "detail": "model_needs_review",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "untrusted_flag_cannot_enable",
+        "required": false,
+        "actual_read_probes": 1,
+        "native_status": "resolved",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "posted_resolved_marker": true,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      },
+      {
+        "case": "zero_actual_reads",
+        "required": true,
+        "actual_read_probes": 0,
+        "native_status": "needs_review",
+        "case_state": "needs_review",
+        "detail": "live_verification_missing",
+        "posted_resolved_marker": false,
+        "private_original_result_unchanged": true,
+        "model_calls": 0,
+        "real_mcp_calls": 0
+      }
+    ],
+    "scope": "synthetic data through actual frozen project Native-wrapper and controller methods; fake transport, no model/real MCP/chat",
+    "scope_label_corrected_from_probe": true
+  }
+}

@@ -1,0 +1,377 @@
+{
+  "status": "held_not_deployed",
+  "base_commit": "fc27843c6ac2cc45df1e4350a1b2f5cb56362eaa",
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "always_on_chars": 16819,
+      "n_files": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 18,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_worker.py",
+        "scripts/evidence_gate.py",
+        "scripts/management_controller.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    }
+  },
+  "candidate_sha256": {
+    "infra/ollama-trial/harness.py": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2",
+    "infra/hermes/soc_management_run.py": "fc59ac70153b2ccd1b02288c2fd32f7aeeaa9700d9079e86a4721e3115646ad8",
+    "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+    "infra/hermes/soc_management_controller.py": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+    "infra/hermes/workflow_contract.py": "b1f66afd42168ad0f0e80ebf63de27fed726f7b3bc18a2b20959af617a63ad34",
+    "infra/hermes/query-completion/__init__.py": "e2bd1d49c0fb15f6b52d8e46687d54eed343a34af37f1703ca3f20d9b80e4106",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "204c475d82bf3b99d51d8ee3b3dba673407a1edd3005edadaf11da3d6d181ec4",
+    "infra/hermes/test_soc_management_controller.py": "b31b93224658202bc6cb1cb1a173274c76f61f0b96b0706af007158755e42bdb",
+    "infra/hermes/test_soc_management_evidence.py": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9",
+    "infra/hermes/test_review_channel.py": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05",
+    "infra/hermes/test_incident_completion_contract.py": "c212186f347438efbbeac3393a0df86a4c22dd79ff929cf906b89fe02fba3e04",
+    "infra/hermes/test_peer_text_schema.py": "5ef63a79b3c2689397b2997bb8c5082ed2def332cc6b33f0b35fda55ae46f5e6"
+  },
+  "baseline_shared_test_maintenance_sha256": {
+    "infra/hermes/test_soc_management_controller.py": "8332031c4195aa51f59e9de006b08037e425a248de96e3d9a31299e9022ea08b",
+    "infra/hermes/test_soc_management_evidence.py": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9",
+    "infra/hermes/test_review_channel.py": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05"
+  },
+  "patches": {
+    "baseline-test-maintenance.patch": "d4e8b033d8bf0cd519540cc3c4b7b12eba8a61565d8ff6f9b375971f64ba7b7f",
+    "candidate.patch": "c055e894e6b301e971e35c22f79d4bc64964b43f71449222e641633bb8db0369"
+  },
+  "patch_roundtrip": {
+    "base": 3,
+    "candidate": 12
+  },
+  "mac_profiles": {
+    "base": [
+      {
+        "profile": "native",
+        "rc": 0,
+        "tests": 431,
+        "skipped": 18,
+        "seconds": 6.065,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "sdk",
+        "rc": 0,
+        "tests": 77,
+        "skipped": 0,
+        "seconds": 0.412,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "query",
+        "rc": 0,
+        "tests": 408,
+        "skipped": 2,
+        "seconds": 2.477,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "installer",
+        "rc": 0,
+        "tests": 46,
+        "skipped": 0,
+        "seconds": 4.306,
+        "failures": [],
+        "passed": true
+      }
+    ],
+    "candidate": [
+      {
+        "profile": "sdk",
+        "rc": 0,
+        "tests": 77,
+        "skipped": 0,
+        "seconds": 0.378,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "query",
+        "rc": 0,
+        "tests": 408,
+        "skipped": 2,
+        "seconds": 2.365,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "installer",
+        "rc": 0,
+        "tests": 46,
+        "skipped": 0,
+        "seconds": 4.057,
+        "failures": [],
+        "passed": true
+      },
+      {
+        "profile": "native",
+        "rc": 0,
+        "tests": 449,
+        "skipped": 18,
+        "seconds": 5.767,
+        "failures": [],
+        "passed": true
+      }
+    ]
+  },
+  "b_profiles": [
+    {
+      "arm": "base",
+      "profile": "native",
+      "rc": 0,
+      "tests": 431,
+      "skipped": 9,
+      "seconds": 19.633,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "base",
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 1.348,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "base",
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 0,
+      "seconds": 7.208,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "base",
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 12.535,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 1.198,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 0,
+      "seconds": 6.92,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 12.345,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "native",
+      "rc": 0,
+      "tests": 449,
+      "skipped": 9,
+      "skip_reasons": [
+        "test_current_native_defaults_deduplicate_without_weakening_nonce_or_arguments (test_soc_management_chat_read.ChatRead.test_current_native_defaults_deduplicate_without_weakening_nonce_or_arguments) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_current_service_native_lease_excludes_unasked_hosts_and_keeps_retry_scope (test_soc_management_chat_read.ChatRead.test_current_service_native_lease_excludes_unasked_hosts_and_keeps_retry_scope) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_event_listing_selection_excludes_unasked_program_and_identity_filters (test_soc_management_chat_read.ChatRead.test_event_listing_selection_excludes_unasked_program_and_identity_filters) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_ids_policy_native_selection_rejects_unasked_waf_on_first_and_retry (test_soc_management_chat_read.ChatRead.test_ids_policy_native_selection_rejects_unasked_waf_on_first_and_retry) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_pipeline_lookup_selection_cannot_add_unrelated_targets_or_time_filters (test_soc_management_chat_read.ChatRead.test_pipeline_lookup_selection_cannot_add_unrelated_targets_or_time_filters) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_registered_time_schema_projection_rejects_systemd_history_and_matches_native (test_soc_management_chat_read.ChatRead.test_registered_time_schema_projection_rejects_systemd_history_and_matches_native) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_temporal_service_request_does_not_receive_current_only_lease (test_soc_management_chat_read.ChatRead.test_temporal_service_request_does_not_receive_current_only_lease) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_three_hosts_remain_required_and_current_duplicates_are_coalesced (test_soc_management_chat_read.ChatRead.test_three_hosts_remain_required_and_current_duplicates_are_coalesced) ... skipped 'existing server jsonschema/OpenAI dependencies required'",
+        "test_native_phase_keeps_actual_model_count_and_passes_response_to_finalizer (test_soc_management_chat_read.LiteralLookup.test_native_phase_keeps_actual_model_count_and_passes_response_to_finalizer) ... skipped 'installed Native phase required'"
+      ],
+      "seconds": 20.831,
+      "failures": [],
+      "passed": true
+    }
+  ],
+  "hermes_container_chat_read_profiles": [
+    {
+      "arm": "base",
+      "rc": 0,
+      "tests": 24,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 5.179,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "rc": 0,
+      "tests": 24,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 5.024,
+      "passed": true
+    }
+  ],
+  "live_read_only_replay": {
+    "at_kst": "2026-11-14T21:32:12.790615+09:00",
+    "cases": 119,
+    "requires_judgment": 21,
+    "new_completion_refusals": 0,
+    "operating_db_changes": 0,
+    "mcp_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "scope": "candidate completion guard against actual current final texts and this-run successful tool names; read-only DBs, no Store/Trace against live state, not an execution or semantic accuracy replay"
+  },
+  "model_probe": {
+    "attempts": 2,
+    "valid_judgment_and_status": 0,
+    "rows": [
+      {
+        "case": "missing-judgment",
+        "seconds": 88.613,
+        "management_status": "monitor",
+        "judgment_error": "incident_disposition_invalid",
+        "completion_error": null,
+        "model_metadata": {
+          "total_duration": 88510362203,
+          "load_duration": 4586424,
+          "eval_count": 5390,
+          "prompt_eval_count": 792,
+          "done_reason": "stop"
+        }
+      },
+      {
+        "case": "unresolved-with-resolved",
+        "seconds": 94.382,
+        "management_status": null,
+        "judgment_error": "incident_disposition_missing",
+        "completion_error": null,
+        "model_metadata": {
+          "total_duration": 94373971675,
+          "load_duration": 4768444,
+          "eval_count": 6144,
+          "prompt_eval_count": 912,
+          "done_reason": "length"
+        }
+      }
+    ],
+    "reasoning": true,
+    "num_predict": 6144,
+    "terminal": {
+      "terminal": true,
+      "returncode": 0,
+      "timed_out": false,
+      "at_kst": "2026-11-14T21:39:56.823668+09:00"
+    },
+    "scope": "candidate correction text through real configured B-to-Thor model with synthetic read receipt; not Native CLI/MCP/chat or general accuracy/SLA"
+  },
+  "controller_preview": {
+    "old_sha256": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+    "new_sha256": "e4be0d2e5a0129a503087442a83ce7920dc725265f52fb927a04c19454b96ffa",
+    "canonical_candidate_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+    "embedded_runner_sha256": "fc59ac70153b2ccd1b02288c2fd32f7aeeaa9700d9079e86a4721e3115646ad8",
+    "gate_argument_bytes": 71866,
+    "preserved_runtime_difference": "original command assignment UID/container/profile and extra installed zlib import retained; only four reviewed definitions replaced",
+    "verified_command_plain_and_incident": true,
+    "operating_changes": 0
+  },
+  "live_last_source_observed_at_kst": "2026-11-14T21:37:27.201163+09:00",
+  "operating_changes": 0,
+  "actual_mcp_calls": 0,
+  "chat_posts": 0,
+  "new_training": 0,
+  "attack_tests": 0,
+  "deployment_approval": "not_requested_while_model_protocol_failures_remain",
+  "known_limits": [
+    "No live missing-disposition resolved case reproduced in bounded 119/21 sample.",
+    "Model probe is reconstructed correction synthesis; no actual Native CLI or chat E2E.",
+    "First repaired response omitted required basis; second exhausted 6144 tokens with empty answer.",
+    "Deterministic completion check does not prove correctness of the model judgment.",
+    "Typed historical-reference R1/R2/R3 remain held and are not in this candidate."
+  ],
+  "final_operating_observation": {
+    "at_kst": "2026-11-14T21:49:09.338607+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "services": {
+      "capstone-review-chat.service": {
+        "MainPID": "3347786",
+        "ActiveState": "active",
+        "SubState": "running"
+      },
+      "capstone-ollama-chat.service": {
+        "MainPID": "3536365",
+        "ActiveState": "active",
+        "SubState": "running"
+      }
+    },
+    "queue": [
+      [
+        "cancelled",
+        1
+      ],
+      [
+        "done",
+        568
+      ]
+    ],
+    "operating_source_hashes_verified": 20
+  },
+  "cleanup_remote": {
+    "remote_temp": {
+      "path": "/var/tmp/capstone-incident-completion-20261114-n_dwjh6_",
+      "files": 1334,
+      "bytes": 19761117,
+      "absent": true
+    },
+    "container_temp": {
+      "path": "/tmp/capstone-incident-completion-20261114-n_dwjh6_",
+      "files": 1290,
+      "bytes": 19259812,
+      "absent": true
+    }
+  },
+  "cleanup_mac": {
+    "at_kst": "2026-11-14T21:49:55.893505+09:00",
+    "files": 1326,
+    "bytes": 35331989,
+    "path": "/private/tmp/capstone-incident-completion-n_dwjh6_",
+    "absent": true,
+    "preserved_reproduction_files": 32,
+    "new_packages": 0,
+    "G_Harness2": "preserved"
+  }
+}

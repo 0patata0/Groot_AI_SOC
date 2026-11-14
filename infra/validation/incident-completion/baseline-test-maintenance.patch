@@ -1,0 +1,25 @@
+diff --git a/infra/hermes/test_soc_management_controller.py b/infra/hermes/test_soc_management_controller.py
+--- a/infra/hermes/test_soc_management_controller.py
++++ b/infra/hermes/test_soc_management_controller.py
+@@ -175,0 +176 @@
++        store.requires_incident_disposition.return_value=True
+diff --git a/infra/hermes/test_soc_management_evidence.py b/infra/hermes/test_soc_management_evidence.py
+--- a/infra/hermes/test_soc_management_evidence.py
++++ b/infra/hermes/test_soc_management_evidence.py
+@@ -222 +222 @@
+-    def test_model_can_repair_missing_status_once_without_another_forced_read(self):
++    def test_model_can_repair_missing_status_with_existing_literal_cap_without_forcing_read(self):
+@@ -232,0 +233,4 @@
++        second=call(h.agent,**h.kw)
++        self.assertEqual(second.action,'continue')  # Existing second literal-only repair, not a new budget.
++        self.assertIs(h.agent._build_api_kwargs,h.builder)
++        h.kw['codex_ack_continuations']=2
+diff --git a/infra/hermes/test_review_channel.py b/infra/hermes/test_review_channel.py
+--- a/infra/hermes/test_review_channel.py
++++ b/infra/hermes/test_review_channel.py
+@@ -767 +767 @@
+-        harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},guidance=lambda _:'read only',read_plan=lambda _:None)
++        harness=SimpleNamespace(EVIDENCE=SimpleNamespace(incident_investigation_request=lambda _:False),scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},guidance=lambda _:'read only',read_plan=lambda _:None)
+@@ -800 +800 @@
+-            harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},
++            harness=SimpleNamespace(EVIDENCE=SimpleNamespace(incident_investigation_request=lambda _:False),scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},

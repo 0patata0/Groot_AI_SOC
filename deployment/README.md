@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+[사건 완료 조건 후보](../infra/validation/incident-completion/README.md)는 운영17개 코드/스킬 사본과2개 영수증을 읽기 대조하고 controller를 미리 렌더링했지만 미채택이다. deploy.sh와 초기 설치 입력은 기존 소스를 유지한다. 후보의 완료 요건·workflow/공통 스킬은 기존 수집 경로에 포함됨을 격리46검사로 확인했으며 새 OS 전체 설치는 미수행이다. 후속 승격 시 기존 UID/컨테이너/profile·정확 원본 SHA·관련 모든 영수증과 복구를 다시 결속해야 한다.
+
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.
 
 11/7: SSH·실습 관리 주소, Wazuh 웹 관리 주소, 자동 차단 보호 주소를 별도로 입력한다. 관리자 SSH의 특정 횟수 경보만 예외 처리하고 다른 공격/인증 로그를 유지한다. [정책과 정기보고의 적용 전후 구분](../infra/validation/admin-ssh/README.md).

@@ -53,3 +53,5 @@
 격리 사본에 선택한 패치를 적용하고 기존 Python으로 `test_peer_source_context`, `test_peer_proof_roles`, 기존 `test_review_channel`·`test_workflow_contract`·`test_review_time_correction`을 실행한다. R3는 `test_peer_query_quantities`도 실행한다. 기존 `infra/hermes`, `infra/ollama-trial`, `infra/mcp`를 해당 사본의 Python 검색 경로로 지정한다. Mac에 도구나 패키지를 설치하지 않는다. 원래113검사는 준비 소스에서, context125는 앞선 문맥 후보에서 실행한다.
 
 운영 배포·새 실제 채팅·실제 Native 생성·새 OS 전체 설치는 미수행이다. 후보의 검사 성공을 이유로 승인 경계를 완화하거나 설치기에 연결하지 않는다. 임시 실험 프로세스의 정상 종료·PID 부재와 근거 보존을 확인한 뒤 이번 작업이 만든 Mac/B 임시 사본만 정리한다. G_Harness2·운영 복구본·기존 사용자 환경·가중치·데이터는 보존한다.
+
+후속 [사건 완료 조건·빈 설명 검사](../incident-completion/README.md)는 코드 회귀를 통과했지만 모델 정정2회가 모두 불완전해 역시 보류했다. 이 문서의 세 종류 참조 후보를 정본/초기 설치/운영에 넣지 않았고 의미 정확도 잔여도 유지한다.

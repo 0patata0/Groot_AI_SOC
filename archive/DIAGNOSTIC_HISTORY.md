@@ -310,3 +310,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 상태 후보 비교의 시험 입력 정정 (2026-11-14)
 
 첫8 API 시도에서 이전 후보4건이 생성 전HTTP500이었다. 합성 도구의properties 누락을 원형/보충2시도로 확인하고 시험 입력만 고쳐 양군8생성을 다시 비교했다. 총18시도/13생성/생성 전 시험 오류5이며 첫 비교는 품질 판단에서 제외한다. 최초 more_evidence prefix 측정도 메시지 추가 이후 비교한 오류여서 새 비교는 요청 직전에 측정했다. [모든 출력·분모](../infra/validation/control-status/model-results.json). 초기 설치의 오래된 assertion1실패는 기존96KiB 규칙에 시험만 맞춘 뒤 Mac/B46통과했다. 최초 경계 시험의CRLF 제어 줄과금지된0 root flag는 fixture를 기존 문법에 맞췄으며 parser/권한을 완화하지 않았다.
+
+## 2026-11-15T01:48:00.843325+09:00 준비 과정의 두 불일치와 정정
+
+처음 준비 시 조회 스킬 영수증의 과거 SHA를 발견해 운영 변경 전에 중단했다. 실제3사본이 현 Git와 일치함을 확인해 영수증만 정정하는 [후보](../infra/validation/control-status/application/README.md)를 만들었다.45스키마 목록의 순서 차이를 변화로 비교했던 검사도 alias별 해시 집합으로 바로잡았다. 기존 gateway 로그의 버전 표시 부재는 구버전 로드의 증거로 단정하지 않는다. 새 관측11검사 포함 query419/Hermes 생략0·최종 적용 도구37/Linux 생략0. 초기33→37은 heartbeat/PID·프로세스/DB 준비 확인 보강이며 기존 Native/query 코드는 바뀌지 않았다. 실제 콜드 재시작/타이머/채팅을 대신한 검증은 아니다.

@@ -1,0 +1,191 @@
+{
+  "access_mode": "hermes-parity",
+  "base": "/var/lib/capstone-native-status/e90f9a54b40fef26",
+  "catalog_sha256": "a36107209bf0ed9e0ac228ddf42a5fd8b139bd4968736342b4825b8611b20366",
+  "container": {
+    "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "mounts": [
+      {
+        "Destination": "/opt/data",
+        "RW": true,
+        "Source": "/opt/hermes-data",
+        "Type": "bind"
+      }
+    ]
+  },
+  "file_transaction_sha256": "e1985fdad2697e21f563193798d68e64cb237789428f839d37ae7aa0e2412cfa",
+  "files": [
+    {
+      "after_sha256": "914d9ee80e4730f3d97e8fa3dc76792be2bc1418b1a82515e0444e8a724aac4c",
+      "before_sha256": "6d583ca7dbf736207e5caf31cf511fc33a9c258ee17207ea9935aa3b46fa9b73",
+      "gid": 0,
+      "mode": 384,
+      "target": "/etc/capstone-ollama-trial/receipt.json",
+      "uid": 0
+    },
+    {
+      "after_sha256": "9f90a84d6e38c7ae156da1c4f598d1b9cb037b7fdfb827dd4b1a6d5d943daf5a",
+      "before_sha256": "df9004fc1983210ce12cb316900636009aae81f2b3992712d7a951c36cc7a21f",
+      "gid": 0,
+      "mode": 384,
+      "target": "/etc/capstone-review-chat/receipt.json",
+      "uid": 0
+    },
+    {
+      "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf",
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-management/skill-soc-investigate.md",
+      "uid": 0
+    },
+    {
+      "after_sha256": "b6e9ff0c3079f0ed73171405b652863ca92c3107d83380c47bb7963a039cae5a",
+      "before_sha256": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-management/soc_management_controller.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894",
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-management/soc_management_run.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61",
+      "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-management/workflow_contract.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894",
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "gid": 981,
+      "mode": 416,
+      "target": "/opt/capstone-ollama-trial/grounding.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2",
+      "before_sha256": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "gid": 981,
+      "mode": 416,
+      "target": "/opt/capstone-ollama-trial/harness.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "220990b411a870f636c17f8764fadb89216eefad3a84191d2b7f368cbe5c77cc",
+      "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "gid": 981,
+      "mode": 416,
+      "target": "/opt/capstone-ollama-trial/query_grounding.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf",
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "gid": 981,
+      "mode": 416,
+      "target": "/opt/capstone-ollama-trial/skill-soc-investigate.md",
+      "uid": 0
+    },
+    {
+      "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61",
+      "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "gid": 981,
+      "mode": 416,
+      "target": "/opt/capstone-ollama-trial/workflow_contract.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+      "before_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-review-chat/review_channel.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "before_sha256": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/capstone-review-chat/review_channel_worker.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894",
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "gid": 0,
+      "mode": 420,
+      "target": "/opt/hermes-data/management-code/run.py",
+      "uid": 0
+    },
+    {
+      "after_sha256": "220990b411a870f636c17f8764fadb89216eefad3a84191d2b7f368cbe5c77cc",
+      "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "gid": 986,
+      "mode": 384,
+      "target": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+      "uid": 995
+    },
+    {
+      "after_sha256": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2",
+      "before_sha256": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "gid": 986,
+      "mode": 384,
+      "target": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+      "uid": 995
+    },
+    {
+      "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894",
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "gid": 986,
+      "mode": 384,
+      "target": "/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+      "uid": 995
+    },
+    {
+      "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf",
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "gid": 986,
+      "mode": 384,
+      "target": "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md",
+      "uid": 995
+    },
+    {
+      "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61",
+      "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "gid": 986,
+      "mode": 384,
+      "target": "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py",
+      "uid": 995
+    }
+  ],
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "prepared_at_kst": "2026-11-15T01:33:51.885440+09:00",
+  "protected": {
+    "/etc/capstone-ollama-trial/config.json": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "/etc/capstone-review-chat/config.json": "3dd18d6b9b8d33f448cb5dbd5fbbf19eb20d2c83e98f51054969f9fa917edf91",
+    "/opt/capstone-management/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+    "/opt/capstone-ollama-trial/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+    "/opt/hermes-data/.env": "d35e80da0a63e9693b9aa03a7547c4cf7b9c617715945940a49efffe3b063b25",
+    "/opt/hermes-data/SOUL.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+    "/opt/hermes-data/config.yaml": "52b2433e7dd1267b5229826976075c76fee182eba5914529db9a5e45ddad5791",
+    "/opt/hermes-data/management/config.yaml": "fbe58e51575666fcf2337b8bab46ec20adb7ff3f7d316dd3942a8b3588a17895",
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb"
+  },
+  "query_version": "groot-query-completion:1.19.141",
+  "runtime_sha256": "eb14a0b6317de9cf1d17cf7b4116481b4b142fc04bdc27f359bb115a91da0ffc",
+  "runtime_template_sha256": "73e9806098f639c5eb5087374a2d159ddf138e870fe9b307ba65d124ea118f07",
+  "schema": 1,
+  "source_bundle_id": "e90f9a54b40fef26084a0d5c2c4b7fbf9d4edd4ddd4c1653bf0ca8ed408d540d",
+  "source_patch": "fba12379ba4b93df4b00ee33bdf9eccc567c4b8052d243e18fa0ecc636e8c5cc; plus query141 load observation"
+}

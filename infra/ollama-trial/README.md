@@ -1,6 +1,6 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-[관리 상태 정정 후보](../validation/control-status/README.md)는 Native 실행기와 기존 공통 SKILL에서 유효 판단·본문 보존 및 추가 읽기 복귀를 검증했다. SDK는 상속된 완료 조건과77회귀 범위이며 동일한 새 상태 decoder를 배포한 것이 아니다. 후보는 patch에만 보존하고 정본/설치/운영 harness·모델·권한은 유지한다.
+[정확 적용 후보](../validation/control-status/application/README.md)는 기존 공통 완료 조건과 SDK77회귀를 포함한다. Native 전용 상태 decoder를 SDK에 새로 도입한 것은 아니다. SDK 사본/영수증·heartbeat/PID/DB 확인과19파일 원복을 준비했으며 승인 전 운영 변경0이다. 이미 최신인 조회 스킬3사본은 바꾸지 않고 영수증의 오래된 해시만 정정하는 후보를 포함한다.
 
 > **2026-11-13 도구 목록 계약(21:51 B 적용·21:59 확정, 교차 검토·단독 조사형 실채팅 확인):** 11/13 00:34 B 규칙 MCP에 Harness² 도구 4개가 추가된 뒤, `rule-b`·`rule-write-b`에 연결하는 Ollama 실행이 모델 호출 전에 `server_tool_contract_changed`로 멈췄다(공동 채널 교차 검토 4회 모두 실패). `policy.py`에서 서버가 광고하는 정확한 도구 집합(`CATALOG_TOOLS`)과 사용 권한을 분리했다. 4개 도구는 계약에만 등록하고 어떤 모드에서도 노출하지 않는다. 그 밖의 목록 변화는 계속 차단하며, MCP 원본과 계약을 대조하는 회귀를 추가했다. [원인·수정·검증](../validation/catalog-contract/README.md).
 

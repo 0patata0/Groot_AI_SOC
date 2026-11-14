@@ -1,0 +1,196 @@
+diff --git a/infra/hermes/query-completion/__init__.py b/infra/hermes/query-completion/__init__.py
+--- a/infra/hermes/query-completion/__init__.py
++++ b/infra/hermes/query-completion/__init__.py
+@@ -22 +22 @@
+-VERSION = "groot-query-completion:1.19.140"
++VERSION = "groot-query-completion:1.19.141"
+@@ -25,0 +26,52 @@
++
++
++def publish_load_receipt(installed):
++    """Gateway-only load observation; no message, model or authority data."""
++    home = os.environ.get('HERMES_HOME')
++    if not home:
++        return False
++    home = Path(home)
++    plugin = Path(__file__).parent
++    if (not home.is_absolute() or plugin != home / 'plugins/groot-query-completion'
++            or home.is_symlink() or plugin.is_symlink()
++            or home.resolve() != home or plugin.resolve() != plugin):
++        return False
++    import stat
++    import tempfile
++    from datetime import datetime, timedelta, timezone
++    def safe_dir(path):
++        st = path.lstat()
++        if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.getuid() or st.st_mode & 0o022:
++            raise ValueError('load_receipt_directory_unsafe')
++    safe_dir(home)
++    health = home / 'health'
++    health.mkdir(mode=0o700, exist_ok=True)
++    safe_dir(health)
++    path = health / 'query-completion.json'
++    if path.is_symlink():
++        raise ValueError('load_receipt_symlink')
++    observed = {}
++    for name in ('__init__.py', 'grounding.py', 'workflow_contract.py',
++                 'skill-soc-investigate.md', 'chat_harness.py'):
++        source = plugin / name
++        st = source.lstat()
++        if not stat.S_ISREG(st.st_mode) or st.st_nlink != 1 or st.st_size > 2 * 1024 * 1024:
++            raise ValueError('load_receipt_source_unsafe')
++        observed[name] = hashlib.sha256(source.read_bytes()).hexdigest()
++    if observed['grounding.py'] != EVIDENCE_SOURCE_SHA256:
++        raise ValueError('load_receipt_evidence_drift')
++    ticks = int(Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19])
++    value = {'schema_version': 1, 'adapter_version': VERSION, 'pid': os.getpid(),
++        'process_start_ticks': ticks, 'observed_at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
++        'aliases_installed': installed is True, 'loaded_evidence_sha256': EVIDENCE_SOURCE_SHA256,
++        'observed_sources_sha256': observed}
++    fd, temp = tempfile.mkstemp(prefix='.query-load-', dir=health)
++    try:
++        with os.fdopen(fd, 'w') as stream:
++            os.fchmod(stream.fileno(), 0o600)
++            json.dump(value, stream, sort_keys=True, ensure_ascii=False)
++            stream.flush(); os.fsync(stream.fileno())
++        os.replace(temp, path)
++    finally:
++        if os.path.exists(temp): os.unlink(temp)
++    return True
+@@ -1127,0 +1180,2 @@
++            try: publish_load_receipt(True)
++            except Exception: logging.getLogger('capstone.query_completion').warning('load_receipt_unavailable')
+@@ -1168,0 +1223,2 @@
++            try: publish_load_receipt(False)
++            except Exception: logging.getLogger('capstone.query_completion').warning('load_receipt_unavailable')
+@@ -1198,0 +1255,8 @@
++        installed = (native.finish_text_response is wrapped and loop.finish_text_response is wrapped
++            and api.build_api_request is build_wrapped and loop.build_api_request is build_wrapped
++            and call.perform_api_call is call_wrapped and loop.perform_api_call is call_wrapped
++            and mcp_handlers._call_tool_racing_stdio_death is result_wrapped
++            and tool_executor._pre_tool_block is pre_tool_wrapped
++            and finalizer._resolve_budget_fallback is budget_wrapped)
++        try: publish_load_receipt(installed)
++        except Exception: logging.getLogger('capstone.query_completion').warning('load_receipt_unavailable')
+@@ -1202,3 +1266 @@
+-                native.finish_text_response is wrapped and loop.finish_text_response is wrapped
+-                and api.build_api_request is build_wrapped and loop.build_api_request is build_wrapped
+-                and call.perform_api_call is call_wrapped and loop.perform_api_call is call_wrapped, os.getpid(),
++                installed, os.getpid(),
+diff --git a/infra/hermes/query-completion/test_load_receipt.py b/infra/hermes/query-completion/test_load_receipt.py
+new file mode 100644
+--- /dev/null
++++ b/infra/hermes/query-completion/test_load_receipt.py
+@@ -0,0 +1,112 @@
++"""Gateway load observations; all writes stay in a temporary fake home."""
++from datetime import datetime, timedelta
++import hashlib
++import json
++import os
++from pathlib import Path
++import tempfile
++import unittest
++from unittest.mock import patch
++
++import test_completion as fixtures
++
++P = fixtures.PLUGIN
++
++
++class LoadReceipt(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory(prefix='native-load-receipt-')
++        self.addCleanup(self.temp.cleanup)
++        self.home = Path(self.temp.name).resolve()
++        self.home.chmod(0o700)
++        self.plugin = self.home / 'plugins/groot-query-completion'; self.plugin.mkdir(parents=True)
++        original = Path(P.__file__)
++        files = {'__init__.py': original,
++            'grounding.py': Path(P.EVIDENCE.__file__),
++            'workflow_contract.py': original.parent.parent / 'workflow_contract.py',
++            'skill-soc-investigate.md': original.parent.parent / 'skills/soc-investigate/SKILL.md',
++            'chat_harness.py': original.parents[2] / 'ollama-trial/harness.py'}
++        for name, source in files.items(): (self.plugin / name).write_bytes(source.read_bytes())
++        env = patch.dict(P.os.environ, {'HERMES_HOME': str(self.home)}, clear=True)
++        file = patch.object(P, '__file__', str(self.plugin / '__init__.py'))
++        env.start(); file.start(); self.addCleanup(env.stop); self.addCleanup(file.stop)
++        read_text = Path.read_text
++        def proc(path, *args, **kwargs):
++            if path == Path('/proc/self/stat'):
++                return '111 (worker (test)) ' + ' '.join(['S'] + ['0'] * 18 + ['123456'])
++            return read_text(path, *args, **kwargs)
++        proc_patch = patch.object(Path, 'read_text', proc); proc_patch.start(); self.addCleanup(proc_patch.stop)
++        self.receipt = self.home / 'health/query-completion.json'
++
++    def test_fixed_receipt_binds_version_pid_start_and_loaded_evidence(self):
++        self.assertTrue(P.publish_load_receipt(True)); v = json.loads(self.receipt.read_text())
++        self.assertEqual(set(v), {'schema_version', 'adapter_version', 'pid', 'process_start_ticks',
++            'observed_at_kst', 'aliases_installed', 'loaded_evidence_sha256', 'observed_sources_sha256'})
++        self.assertEqual(v['adapter_version'], P.VERSION); self.assertEqual(v['pid'], os.getpid())
++        self.assertEqual(v['process_start_ticks'], 123456); self.assertIs(v['aliases_installed'], True)
++        self.assertEqual(v['loaded_evidence_sha256'], P.EVIDENCE_SOURCE_SHA256)
++        self.assertEqual(datetime.fromisoformat(v['observed_at_kst']).utcoffset(), timedelta(hours=9))
++        for name, sha in v['observed_sources_sha256'].items():
++            self.assertEqual(sha, hashlib.sha256((self.plugin / name).read_bytes()).hexdigest())
++        self.assertEqual(self.receipt.stat().st_mode & 0o777, 0o600)
++        self.assertFalse(list((self.home / 'health').glob('.query-load-*')))
++
++    def test_unload_is_observed_as_not_installed(self):
++        P.publish_load_receipt(True); P.publish_load_receipt(False)
++        self.assertIs(json.loads(self.receipt.read_text())['aliases_installed'], False)
++
++    def test_non_boolean_never_reports_success(self):
++        P.publish_load_receipt(1)
++        self.assertIs(json.loads(self.receipt.read_text())['aliases_installed'], False)
++
++    def test_missing_environment_never_creates_a_home(self):
++        with patch.dict(P.os.environ, {}, clear=True): self.assertFalse(P.publish_load_receipt(True))
++        self.assertFalse(self.receipt.exists())
++
++    def test_non_gateway_profile_and_other_source_location_do_not_write(self):
++        for value in (str(self.home / 'management'), 'relative'):
++            with patch.dict(P.os.environ, {'HERMES_HOME': value}, clear=True):
++                self.assertFalse(P.publish_load_receipt(True))
++        with patch.object(P, '__file__', '/opt/capstone-ollama-trial/query_grounding.py'):
++            self.assertFalse(P.publish_load_receipt(True))
++        self.assertFalse(self.receipt.exists())
++
++    def test_unsafe_home_and_health_directory_are_rejected(self):
++        self.home.chmod(0o777)
++        with self.assertRaises(ValueError): P.publish_load_receipt(True)
++        self.home.chmod(0o700); health = self.home / 'health'; health.mkdir(); health.chmod(0o777)
++        with self.assertRaises(ValueError): P.publish_load_receipt(True)
++        self.assertFalse(self.receipt.exists())
++
++    def test_symlink_health_cannot_redirect_writes(self):
++        outside = self.home / 'outside'; outside.mkdir(); (self.home / 'health').symlink_to(outside)
++        with self.assertRaises(ValueError): P.publish_load_receipt(True)
++        self.assertFalse(list(outside.iterdir()))
++
++    def test_symlink_receipt_does_not_change_its_target(self):
++        health = self.home / 'health'; health.mkdir(mode=0o700)
++        outside = self.home / 'outside'; outside.write_text('keep'); self.receipt.symlink_to(outside)
++        with self.assertRaises(ValueError): P.publish_load_receipt(True)
++        self.assertEqual(outside.read_text(), 'keep')
++
++    def test_symlink_source_is_rejected(self):
++        target = self.plugin / 'grounding.py'; outside = self.home / 'source'
++        outside.write_bytes(target.read_bytes()); target.unlink(); target.symlink_to(outside)
++        with self.assertRaises(ValueError): P.publish_load_receipt(True)
++        self.assertFalse(self.receipt.exists())
++
++    def test_evidence_drift_cannot_produce_a_load_observation(self):
++        (self.plugin / 'grounding.py').write_bytes(b'changed')
++        with self.assertRaisesRegex(ValueError, 'evidence_drift'): P.publish_load_receipt(True)
++        self.assertFalse(self.receipt.exists())
++
++    def test_atomic_write_failure_preserves_previous_receipt(self):
++        P.publish_load_receipt(True); before = self.receipt.read_bytes()
++        with patch.object(P.os, 'replace', side_effect=OSError('injected')):
++            with self.assertRaises(OSError): P.publish_load_receipt(False)
++        self.assertEqual(self.receipt.read_bytes(), before)
++        self.assertFalse(list((self.home / 'health').glob('.query-load-*')))
++
++
++if __name__ == '__main__':
++    unittest.main()

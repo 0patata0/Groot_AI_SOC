@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 정정 후보](infra/validation/control-status/README.md)는 기존 판단·본문을 보존하고 모델이 상태 또는 추가 조회를 선택합니다. Native536은 기존 Hermes 환경에서 생략 없이 통과했고 SDK77·조회408·설치46을 확인했습니다. 표적 API 형식3사례는 이전1/3→후보3/3,추가1사례는 읽기로 복귀했으나 실제 채팅·독립 정확도는 미검증입니다. 새1.19.140은 patch에만 보존하며 정본/설치/운영1.19.137은 유지합니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. 아래 날짜별 내용은 당시 기록입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 후보의 정확 적용안](infra/validation/control-status/application/README.md)은17소스 사본+2영수증·유휴 확인·15분 원복을 준비했고 Native536/query419는 기존 Hermes 격리 환경에서 생략 없이 통과했습니다. SDK77·설치46·최종 운영자37과 복제 경로19파일 적용/원복도 통과했습니다. query1.19.141은 패치/준비 폴더만이며 정본·설치 파일137,운영 적용·새 채팅은 승인 후 확인합니다. 기존 로그의 메모리 로드 버전은 미확인입니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. 아래 날짜별 내용은 당시 기록입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

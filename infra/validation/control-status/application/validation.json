@@ -1,0 +1,426 @@
+{
+  "at_kst": "2026-11-15T01:43:47.522232+09:00",
+  "status": "PREPARED; exact candidate approval, cold apply/rollback and fresh real chat pending",
+  "base_commit": "32a65452c8ad0e24237ba62541b8c16fde60e4cf",
+  "canonical_query_version": "1.19.137",
+  "candidate_query_version": "1.19.141",
+  "plan_sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+  "source_patches": {
+    "candidate-query141.patch": {
+      "sha256": "208d1d922104c762c349d7dda89530915ce52a6934578c39f7479c15cca91bca",
+      "files": [
+        {
+          "path": "deployment/tests/test_soc_management.py",
+          "before_sha256": "1dca91138477d014c33b68b2cdd7edf6a1011b9af28262aab301e96188fd4bac",
+          "after_sha256": "d12831efb6f744949660c08fd921bad0f622b97e9c783304ae0e77ed7d5548ab"
+        },
+        {
+          "path": "infra/hermes/query-completion/__init__.py",
+          "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+          "after_sha256": "220990b411a870f636c17f8764fadb89216eefad3a84191d2b7f368cbe5c77cc"
+        },
+        {
+          "path": "infra/hermes/query-completion/test_load_receipt.py",
+          "before_sha256": null,
+          "after_sha256": "97a8e2f7f98431552f803875c54d9b4d9424fc3fd22f30ebd510660ee735a9f9"
+        },
+        {
+          "path": "infra/hermes/review_channel_worker.py",
+          "before_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+          "after_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+        },
+        {
+          "path": "infra/hermes/skills/soc-investigate/SKILL.md",
+          "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+          "after_sha256": "869e17745627df91efad0dc9824177894fb7511ab6e9d807b8301f8fc41cfbbf"
+        },
+        {
+          "path": "infra/hermes/soc_management_controller.py",
+          "before_sha256": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+          "after_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af"
+        },
+        {
+          "path": "infra/hermes/soc_management_run.py",
+          "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+          "after_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894"
+        },
+        {
+          "path": "infra/hermes/test_control_status_repair.py",
+          "before_sha256": null,
+          "after_sha256": "9b2203672f75283fd35f7cca7a8d4b391f6bd86ba8ef893eb29040034a9df5e8"
+        },
+        {
+          "path": "infra/hermes/test_disposition_workflow_contract.py",
+          "before_sha256": null,
+          "after_sha256": "1fa1fc83d7c5fd06b0f26adc05d40c253bb61f6ab837b30b7548c1f9e34e61fa"
+        },
+        {
+          "path": "infra/hermes/test_incident_completion_contract.py",
+          "before_sha256": null,
+          "after_sha256": "c212186f347438efbbeac3393a0df86a4c22dd79ff929cf906b89fe02fba3e04"
+        },
+        {
+          "path": "infra/hermes/test_peer_text_schema.py",
+          "before_sha256": null,
+          "after_sha256": "5ef63a79b3c2689397b2997bb8c5082ed2def332cc6b33f0b35fda55ae46f5e6"
+        },
+        {
+          "path": "infra/hermes/test_report_repair_diagnosis.py",
+          "before_sha256": "6ab693ab9b3a2f11dc63ec1f3a2a5593db27780cdad26b23274dd5905bc98f34",
+          "after_sha256": "711883641d800767deb43a4475059699032928c30537c4dd3118a4217edb80f3"
+        },
+        {
+          "path": "infra/hermes/test_review_channel.py",
+          "before_sha256": "658218fc8278c5856384d02e055165fdb35ecfec155ebedf19c370cdca515148",
+          "after_sha256": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05"
+        },
+        {
+          "path": "infra/hermes/test_soc_management_controller.py",
+          "before_sha256": "36d0b615b8ed60f16fb4341e5111f7f3471e776328dbe8e89f977735b0aab569",
+          "after_sha256": "b31b93224658202bc6cb1cb1a173274c76f61f0b96b0706af007158755e42bdb"
+        },
+        {
+          "path": "infra/hermes/test_soc_management_evidence.py",
+          "before_sha256": "17edb25fd19aa4bf32c6e7ffe72d8574f53a7a869278b097e317c2689addf9f1",
+          "after_sha256": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9"
+        },
+        {
+          "path": "infra/hermes/workflow_contract.py",
+          "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+          "after_sha256": "0b6fb52b38aa42d388e89372533a8ffed29d43994ca618fcfad78649214b9e61"
+        },
+        {
+          "path": "infra/ollama-trial/harness.py",
+          "before_sha256": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+          "after_sha256": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2"
+        }
+      ],
+      "roundtrip": true
+    },
+    "r3-to-query141.patch": {
+      "sha256": "3b4b41efe6162fe878ed675c0a376e47c907e45c39325b0a620707d241fc7b78",
+      "files": [
+        {
+          "path": "infra/hermes/query-completion/__init__.py",
+          "before_sha256": "ea0b038eff1b9e2b8a178b19e9c61c1100f86a533ef3f2f50529295c7f8e58e7",
+          "after_sha256": "220990b411a870f636c17f8764fadb89216eefad3a84191d2b7f368cbe5c77cc"
+        },
+        {
+          "path": "infra/hermes/query-completion/test_load_receipt.py",
+          "before_sha256": null,
+          "after_sha256": "97a8e2f7f98431552f803875c54d9b4d9424fc3fd22f30ebd510660ee735a9f9"
+        }
+      ],
+      "roundtrip": true
+    }
+  },
+  "framework": {
+    "at_kst": "2026-11-15T01:06:21.865312+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "live_observed_at_kst": "2026-11-15T01:04:34.143386+09:00",
+    "census": {
+      "operating": {
+        "always_on_chars": 16819,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16819,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "difference": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_controller.py",
+        "scripts/channel_worker.py",
+        "scripts/evidence_gate.py",
+        "scripts/management_controller.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "operating_changes": 0,
+    "extra_operator_tools": "file_transaction and release_runtime are separate operator-only sources, not model tools or normal harness prompt components"
+  },
+  "mac": [
+    {
+      "profile": "native",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 86,
+      "seconds": 5.901,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 0.379,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "query",
+      "rc": 0,
+      "tests": 419,
+      "skipped": 2,
+      "seconds": 2.422,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 4.207,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "operator",
+      "rc": 0,
+      "tests": 37,
+      "skipped": 0,
+      "seconds": 0.502,
+      "failures": [],
+      "passed": true
+    }
+  ],
+  "linux_initial": [
+    {
+      "runtime": "host",
+      "profile": "native",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 72,
+      "failures": [],
+      "seconds": 21.657,
+      "passed": true
+    },
+    {
+      "runtime": "host",
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 1.249,
+      "passed": true
+    },
+    {
+      "runtime": "host",
+      "profile": "query",
+      "rc": 0,
+      "tests": 419,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 7.0,
+      "passed": true
+    },
+    {
+      "runtime": "host",
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 12.87,
+      "passed": true
+    },
+    {
+      "runtime": "host",
+      "profile": "operator",
+      "rc": 0,
+      "tests": 33,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 1.108,
+      "passed": true
+    },
+    {
+      "runtime": "existing Hermes container",
+      "profile": "native",
+      "rc": 0,
+      "tests": 536,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 23.824,
+      "passed": true
+    },
+    {
+      "runtime": "existing Hermes container",
+      "profile": "query",
+      "rc": 0,
+      "tests": 419,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 7.917,
+      "passed": true
+    }
+  ],
+  "linux_operator_final": {
+    "rc": 0,
+    "tests": 37,
+    "skipped": 0,
+    "failures": [],
+    "controller_profile_preserved": true,
+    "gate_bytes": 73485,
+    "old_store_preserves_new_case_and_metadata": true,
+    "operating_source_writes": 0,
+    "model_calls": 0,
+    "mcp_calls": 0
+  },
+  "initial_to_final_operator_changes": "Heartbeat PID/start ticks, fresh heartbeat and websocket/worker readiness, exact container name, SQLite read-only quick_check. 33 initial tests increased to37; rerun only changed operator tests. Core Native/query sources unchanged.",
+  "final_readonly_preflight": {
+    "at_kst": "2026-11-15T01:42:30.934329+09:00",
+    "plan_sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+    "state": "PREPARED",
+    "operating_files_unchanged": 19,
+    "protected_unchanged": 9,
+    "remaining_test_pids": [],
+    "container": {
+      "remaining_test_pids": [],
+      "exists": true
+    },
+    "updated_test_sources": [
+      {
+        "file": "operator/release_runtime.py",
+        "before_sha256": "9859c8bcc0d7416e21d6a1a752f349fc21265ae415fbb83484683008e363ba3c",
+        "after_sha256": "73e9806098f639c5eb5087374a2d159ddf138e870fe9b307ba65d124ea118f07"
+      },
+      {
+        "file": "operator/test_release_runtime.py",
+        "before_sha256": "cb19409b6616b6c0d94c8ac538abdce8eea037e019412096e5906952e97c4afa",
+        "after_sha256": "a93f2a7d03a0e46629fdbab53d50aa8c7aff86fd11b465518f10f80165c059bb"
+      }
+    ],
+    "service_actions": 0,
+    "model_calls": 0,
+    "mcp_calls": 0
+  },
+  "render": {
+    "old_sha256": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+    "new_sha256": "b6e9ff0c3079f0ed73171405b652863ca92c3107d83380c47bb7963a039cae5a",
+    "canonical_candidate_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+    "embedded_runner_sha256": "20012615efd555833367aea0d2db8ee29c4633f7da04a352f041e7838c492894",
+    "gate_argument_bytes": 73485,
+    "preserved_runtime_difference": "original command assignment UID/container/profile and extra installed zlib import retained; only four reviewed definitions replaced",
+    "verified_command_plain_and_incident": true,
+    "operating_changes": 0
+  },
+  "receipt_reconciliation": {
+    "file": "/etc/capstone-ollama-trial/receipt.json",
+    "source": "skill-soc-query.md",
+    "previous_receipt_sha256": "0887e7523556e701930dfbf188b1eaf1616ef83b8b204a9d2bffcbcf27058537",
+    "verified_existing_source_sha256": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+    "three_existing_copies_match_current_git": true,
+    "source_replacement": false
+  },
+  "boundaries": {
+    "operating_source_or_db_changes": 0,
+    "service_actions": 0,
+    "model_or_mcp_tool_calls": 0,
+    "real_chats": 0,
+    "attacks_or_training": 0,
+    "new_tools_or_permissions": 0
+  },
+  "limits": [
+    "Legacy current gateway memory-loaded query version is not established by logs; installed source and health alone do not prove it.",
+    "New receipt independently binds process PID/start ticks and source hashes, but its aliases_installed is the plugin self-observation, not proof of semantics.",
+    "No actual cold apply/restart, timer fire, rollback or fresh user chat has run. Root-owned mirror applied/restored19 files and preserved a new synthetic case.",
+    "Rollback restores code/receipts only and never rolls back event/case/queue DBs; old code preserves new case/meta, but does not enforce the new completion rule.",
+    "Unknown concurrent root/source/config drift refuses overwrite; manual investigation may then be needed.",
+    "Regression denominators repeat the same suite across runtimes; tests passed excludes skips. No new model accuracy or chat latency claim."
+  ],
+  "review": {
+    "method": "defect-first manual review; original review-agent unavailable",
+    "semgrep": "not run; no Mac installation",
+    "secret_scan": {
+      "scanner": "original secret-scanner skill",
+      "scanner_source_sha256": "013a37ce9772587996b8f6412a425805827eef8481a504ddfcb8fd0870e41fc1",
+      "options": "--git /Users/patata/SW/capstone_project --json --redact 0",
+      "coverage": "original scanner --git reads current tracked working-tree files with its default binary/size filters; not Git history or separate staged blobs",
+      "tracked_paths": 2137,
+      "unchanged_preexisting_findings": 5,
+      "new_changed_path_findings": 0,
+      "values_or_snippets_saved": false,
+      "tracked_link_external_credential_preflight": "passed"
+    }
+  },
+  "cleanup": {
+    "remote": {
+      "at_kst": "2026-11-15T01:44:17.810671+09:00",
+      "removed": [
+        {
+          "path": "/tmp/capstone-status-check-20261115-147udvcr",
+          "files": 657,
+          "bytes": 10511630,
+          "absent": true
+        },
+        {
+          "path": "/var/tmp/capstone-status-check-20261115-147udvcr",
+          "files": 676,
+          "bytes": 11006386,
+          "absent": true
+        },
+        {
+          "path": "/var/lib/capstone-native-status/25b956d3d361e655",
+          "files": 25,
+          "bytes": 2604210,
+          "absent": true
+        }
+      ],
+      "retained_approval_stage": "/var/lib/capstone-native-status/e90f9a54b40fef26",
+      "retained_state": "PREPARED",
+      "operating_files_unchanged": 19,
+      "service_actions": 0,
+      "services": {
+        "capstone-review-chat.service": "active",
+        "capstone-ollama-chat.service": "active",
+        "capstone-management.timer": "active"
+      },
+      "model_or_mcp_calls": 0
+    },
+    "mac": {
+      "at_kst": "2026-11-15T01:52:07.461612+09:00",
+      "path": "/private/tmp/capstone-status-application-147udvcr",
+      "files": 3266,
+      "bytes": 59640853,
+      "reproduction_files": 36,
+      "packages_installed": 0,
+      "G_Harness2_preserved": true,
+      "absent": true
+    },
+    "retained_approval_stage": "/var/lib/capstone-native-status/e90f9a54b40fef26",
+    "retained_state": "PREPARED",
+    "pending": false
+  },
+  "operator_sources_sha256": {
+    "file_transaction.py": "e1985fdad2697e21f563193798d68e64cb237789428f839d37ae7aa0e2412cfa",
+    "test_file_transaction.py": "ff9ac9eec07dff2c02b18d0211aebb55702e116aecf00044e9722d839bd6e5ed",
+    "release_runtime.py": "73e9806098f639c5eb5087374a2d159ddf138e870fe9b307ba65d124ea118f07",
+    "test_release_runtime.py": "a93f2a7d03a0e46629fdbab53d50aa8c7aff86fd11b465518f10f80165c059bb"
+  },
+  "reproduction_files": 36,
+  "publication_checks": {
+    "related_staged_files": 23,
+    "new_markdown_links_checked": 37,
+    "paper_ledger_unchanged": true,
+    "unrelated_changes_staged": 0
+  }
+}

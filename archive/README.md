@@ -4,7 +4,7 @@
 
 현재 요약 정리 전의 STATUS·PLAN 상세는 각 통합 원장에 `source-dfc3e2a-status`·`source-dfc3e2a-plan`으로 보존했다. 정확히 같은 절만 기존 본문으로 참조하고, 원본 SHA와 Git 복구 위치를 함께 남겼다.
 
-최근 [관리 상태 정정 검증](../infra/validation/control-status/README.md)의 판단·본문 보존·추가 읽기 복귀와 시험 입력/설치 assertion 정정·운영 미적용 범위를 유형별 이력에 추가했다. 이전 형식 후보의 상세 현황은 Git d846553에서 복원할 수 있다. 구조·회귀·실제 API·실제 운영 효과를 구분한다.
+최근 [관리 상태 정확 적용 준비](../infra/validation/control-status/application/README.md)의19파일·현재 프로필 gate·시작 관측·37운영자 검사·영수증 불일치 정정·격리 원복과 미적용 범위를 유형별 이력에 추가했다. 직전 현재 요약은 Git32a6545에서 복원한다. 구조·회귀·API와 실제 적용/타이머/채팅을 구분한다.
 
 ## 유형별 통합 이력
 

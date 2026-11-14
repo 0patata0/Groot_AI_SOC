@@ -12702,3 +12702,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## 관리 상태 정정의 격리 검증 (2026-11-14)
 
 [후보 원장](../infra/validation/control-status/README.md)에 전체16/증분6패치·SHA와 Native536/SDK77/조회408/설치46·기존Hermes536/생략0을 보존했다. 표적3상태 사례의 유효값은 이전1/3→후보3/3이며 판단·본문을 보존했다. 추가1사례는 기존 읽기로 복귀했으나 실제 추가 MCP·최종 판단은 실행하지 않았다. canonical/초기 설치/운영은137 유지·미적용이다. 직전 현재 요약은 Git d846553ef32a3030f2058ed8cd39471496a9ee37:STATUS.md로 복구한다.
+
+## 2026-11-15T01:48:00.843325+09:00 정확 적용·복구 준비 완료, 운영 미적용
+
+직전 요약은 Git32a65452c8ad0e24237ba62541b8c16fde60e4cf:STATUS.md로 복원한다. [정확19파일 계획](../infra/validation/control-status/application/README.md)은 query141 시작 관측·17소스/2영수증·현재 프로필 gate·유휴 확인·15분 원복을 준비했다. Native536/query419 Hermes 생략0·SDK77/설치46/최종 운영자37·복제19원복 통과. 기존 gateway 메모리 버전은 로그만으로 미확인. 승인/실제 적용/타이머/새 채팅 미수행·운영 변경0.

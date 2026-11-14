@@ -1694,3 +1694,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-15T03:54:33.032918+09:00 journal 후보의 설치 범위
 
 canonical진단모듈은6h분할/기존20초/응답계약보존후보로갱신했다. deploy.sh→soc_diagnostics의기존고정source목록/설치20검사로연결,새패키지/이미지/포트/권한없음. 서버소스/서비스는미변경·정확적용안/A/C대조남음. B자체시험16파일427636B종료·SHA검증후제거. 초기영수증소급수정/새OS전체설치0. [근거](../infra/validation/live-reads/README.md).
+
+## journal 제한 환경 시험과 운영 미적용 (2026-11-15)
+
+canonical8f6c/설치용 기존 source 경로만 보완했으며 운영 A/B/C는8336 모듈과 기존 unit을 유지했다. 격리 unit15개/59파일424,793B는 PID종료·원문/SHA 확인 뒤 제거했고 reader PID·시작ticks/3소스/unit파일은 전후 불변·모두active다. 운영 reader/봇 재시작·실MCP·모델·채팅·공격·학습0. 기존19파일 plan fd6e7cb9/PREPARED·before19SHA는05:01에 그대로 확인했다. 새 journal 적용/원복 타이머는 없으며 패키지/이미지/포트/권한 추가도 없다. 초기 installer20 검사는 격리 범위이며 새 OS 전체 설치는 미수행이다. [검증·후속](../infra/validation/journal-reader/README.md).

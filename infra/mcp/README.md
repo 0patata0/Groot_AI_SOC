@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+[journal 후속 검증](../validation/journal-reader/README.md): A/B/C 운영 제한 환경에서 분할 후보를 대조했다. 경계 밖 로그가 표본을 밀어내는 문제는 native 마이크로초 검색으로 수정·135검사와 A1µs실읽기를 확인했으나 A의24h 검색 시간 초과가 남아 운영 미적용이다. 아래 journal 운영 이력과 최신 후보를 구분한다.
+
 2026-11-08: 현재 진단MCP1.4.0은 `get_host_inventory`를 추가해 총45도구(읽기36/보호9)입니다. OS·Docker11종 읽기와 호스트별 표·실패/0건 구분은 [상세 조회 안내](host-inventory.md)를 따릅니다. 아래 버전·도구 수는 날짜별 과거 기록입니다.
 
 11/8 [제한된 journal 원문 조회](journal-excerpts.md)를 A/B/C 운영에 적용했다. 기존 get_system_diagnostics의 view=journal로 고정 서비스·KST 기간의 마스킹된 메시지와 SHA를 읽고 두 봇에서 원문/이력/현재 상태를 구분한다. 진단MCP1.3.0·Linux1,544회귀검사·실제MCP11호출(성공9/거절2). 원문 조회 성공과 최종 판단 품질을 구분하며 [현재 결과](../../STATUS.md)를 따른다. 새 도구 이름/TCP/일반 sudo·Docker 권한0.

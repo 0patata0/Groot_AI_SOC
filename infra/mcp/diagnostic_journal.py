@@ -194,11 +194,13 @@ def answer(value, host, now=None, runner=None):
     window_until = until
     while True:
         window_since = max(since, window_until - QUERY_WINDOW_US)
-        # Integer seconds widen only this source query. Check exact microsecond
-        # slice bounds again below, including the shared boundary record.
+        # Keep the native query exact too. Rounding outward can fill its bounded
+        # tail with adjacent, out-of-window rows and hide eligible evidence.
+        # Inclusive slice boundaries are checked and deduplicated again below.
         prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
-            '--output-fields=' + FIELDS, '--since=@' + str(window_since // 1000000),
-            '--until=@' + str((window_until + 999999) // 1000000),
+            '--output-fields=' + FIELDS,
+            '--since=@' + f'{window_since // 1000000}.{window_since % 1000000:06d}',
+            '--until=@' + f'{window_until // 1000000}.{window_until % 1000000:06d}',
             '--lines=' + str(limit + 1), '--unit=' + unit]
         for suffix in filters:
             remaining = deadline - time.monotonic()

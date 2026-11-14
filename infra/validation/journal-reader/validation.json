@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "kind": "journal_candidate_environment_verification",
+  "at_kst": "2026-11-15T05:01:17.636254+09:00",
+  "candidate": {
+    "path": "infra/mcp/diagnostic_journal.py",
+    "sha256": "8f6cdafdb3829ba6c43648a99829f2bee3f28da8190ff1166574025ecca2054c",
+    "previous_candidate_sha256": "e1726ed864c9628c44b6d9f1cefaa2de66dbeac4d8fb7c88227fc4211a819145",
+    "tests_sha256": "dbc106d58941ba971b90a2a5683b4ba31b18e92bf74d9c127dab4696d6ad0c7b",
+    "operating_installed": false,
+    "application_ready": false,
+    "reason": "A_full_day_fixed_error_search_still_exceeds_existing_deadline",
+    "registered_tools_or_schema_changed": false
+  },
+  "installed_journal_sha256_all_hosts": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+  "scope": {
+    "entry": "direct_candidate_function_in_separate_restricted_systemd_unit",
+    "actual_mcp_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "operating_source_changes": 0,
+    "operating_reader_restarts": 0,
+    "new_transient_units": 15,
+    "performance_repetitions_per_reported_candidate_case": 1,
+    "shared_load_or_disk_cache_controlled": false,
+    "independent_model_quality_evaluation": false
+  },
+  "current_candidate_cases": [
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.123446
+      },
+      "recorded_at_kst": "2026-11-15T04:57:32.252645+09:00",
+      "evidence_sha256": "aeed21b8b37769496aa77923b9fcb5025e9d1e3de8d8091db9708d18713b8e30"
+    },
+    {
+      "host": "b",
+      "target": "b:rule-worker",
+      "request": {
+        "target": "b:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "returned",
+        "elapsed_seconds": 13.500225,
+        "returned_entries": 0,
+        "has_more": false,
+        "requested_window_total_count": null,
+        "journal_retention_verified": false,
+        "old_validator_passed": true
+      },
+      "recorded_at_kst": "2026-11-15T04:57:18.075227+09:00",
+      "evidence_sha256": "397260a0efbfb8e6028c8ab011f1dd6c7b9e5ef59a677a283a504d3a9f6a3580"
+    },
+    {
+      "host": "c",
+      "target": "c:apache",
+      "request": {
+        "target": "c:apache",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "returned",
+        "elapsed_seconds": 0.305286,
+        "returned_entries": 0,
+        "has_more": false,
+        "requested_window_total_count": null,
+        "journal_retention_verified": false,
+        "old_validator_passed": true
+      },
+      "recorded_at_kst": "2026-11-15T04:57:19.242828+09:00",
+      "evidence_sha256": "5ca6b606f1be40307d7c00ec101c2e1949996d5facf6de20ecb8cb160362d4f2"
+    }
+  ],
+  "native_precision_case": {
+    "host": "a",
+    "target": "a:rule-worker",
+    "request": {
+      "target": "a:rule-worker",
+      "since_kst": "2026-11-15T03:24:07.256344+09:00",
+      "until_kst": "2026-11-15T03:24:07.256345+09:00",
+      "view": "journal",
+      "limit": 50,
+      "journal_scope": "all"
+    },
+    "result": {
+      "status": "returned",
+      "elapsed_seconds": 0.09659,
+      "returned_entries": 1,
+      "has_more": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "old_validator_passed": true
+    },
+    "recorded_at_kst": "2026-11-15T04:57:06.358748+09:00",
+    "evidence_sha256": "74d6a35ad25f32b677e6f623c8c0da7426ff1ae57dea30a0bc70e27f3d13956e"
+  },
+  "prior_candidate_sandbox_cases": [
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.122776
+      },
+      "recorded_at_kst": "2026-11-15T04:36:07.042688+09:00",
+      "evidence_sha256": "7a7358fca21db455fe9c5398087bb496d986edd05884b464deb97866c0ba4e8d"
+    },
+    {
+      "host": "b",
+      "target": "b:rule-worker",
+      "request": {
+        "target": "b:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "returned",
+        "elapsed_seconds": 13.147399,
+        "returned_entries": 0,
+        "has_more": false,
+        "requested_window_total_count": null,
+        "journal_retention_verified": false,
+        "old_validator_passed": true
+      },
+      "recorded_at_kst": "2026-11-15T04:42:40.253355+09:00",
+      "evidence_sha256": "893a8c828364258c764e52cd675e30a669bd5dddaa9d4febcac4937b43854967"
+    },
+    {
+      "host": "c",
+      "target": "c:apache",
+      "request": {
+        "target": "c:apache",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "returned",
+        "elapsed_seconds": 0.669409,
+        "returned_entries": 0,
+        "has_more": false,
+        "requested_window_total_count": null,
+        "journal_retention_verified": false,
+        "old_validator_passed": true
+      },
+      "recorded_at_kst": "2026-11-15T04:42:59.297266+09:00",
+      "evidence_sha256": "a049c7572bfa08ed8eaeacaa83c6a9481c1ad26ef6d9254fd2c3f2e1d42372b8"
+    }
+  ],
+  "non_adopted_cost_experiments": [
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.13091
+      },
+      "recorded_at_kst": "2026-11-15T04:43:34.012284+09:00",
+      "evidence_sha256": "f300067a94e057d30348eb0fd94a4ca59ff6716b403859f25cf8ad02b450f955",
+      "variant": "explicit_reverse",
+      "adopted": false,
+      "operating_source_changed": false
+    },
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.113558
+      },
+      "recorded_at_kst": "2026-11-15T04:44:52.120216+09:00",
+      "evidence_sha256": "7f03d6e45bf1e6852c6d981b59e9f8c40a7f25579f61f0037d8eebdd6fe2b50d",
+      "variant": "direct_unit_fields",
+      "adopted": false,
+      "operating_source_changed": false
+    },
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 20.051561
+      },
+      "recorded_at_kst": "2026-11-15T04:48:38.582859+09:00",
+      "evidence_sha256": "c5e5cdfcbfcf91c1440ed54d42c85ca37abf54ba2d1a333a7ec92f66ebac71b9",
+      "variant": "literal_trie",
+      "adopted": false,
+      "operating_source_changed": false
+    },
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.124553
+      },
+      "recorded_at_kst": "2026-11-15T04:50:19.921201+09:00",
+      "evidence_sha256": "9202fa7a0e393ffbd57e00989143127f933611d7931273213be4473329bc4f26",
+      "variant": "anchored_equivalent_precheck",
+      "adopted": false,
+      "operating_source_changed": false
+    },
+    {
+      "host": "a",
+      "target": "a:rule-worker",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "result": {
+        "status": "failed",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.07481
+      },
+      "recorded_at_kst": "2026-11-15T04:52:57.025943+09:00",
+      "evidence_sha256": "e8cdcecb01c39fe29203eb501133716d40f9a3012793c1b8899d025a53d873b6",
+      "variant": "system_journal_source",
+      "adopted": false,
+      "operating_source_changed": false
+    }
+  ],
+  "boundary_regression": {
+    "outside_window_rows": 100,
+    "eligible_rows": 2,
+    "old_eligible_rows_returned": 0,
+    "fixed_eligible_rows_returned": 2,
+    "expected_old_failure_count": 1,
+    "old_driver_output_sha256": "87013c38d010f617b10134a686ef84574c0c917bb63f8a7879c24ba5480de75f",
+    "source_query_exact_microseconds": true,
+    "floating_point_used": false
+  },
+  "regression": {
+    "journal": 33,
+    "system_diagnostics": 43,
+    "diagnostic_history": 24,
+    "host_inventory": 15,
+    "installer": 20,
+    "passed": 135,
+    "skipped": 0
+  },
+  "cleanup": {
+    "files": 59,
+    "bytes": 424793,
+    "owned_directories_absent": 15,
+    "installed_three_sources_unit_file_reader_pid_and_start_ticks_unchanged_all_hosts": true,
+    "all_readers_active": true,
+    "journal_history_or_incident_db_restored_or_deleted": false,
+    "mac_cleanup": {
+      "files": 59,
+      "bytes": 933944,
+      "own_directory_absent": true,
+      "minimum_reproduction_sources_preserved": 15
+    }
+  },
+  "existing_control_status_candidate": {
+    "plan_sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+    "phase": "PREPARED",
+    "all_19_installed_before_hashes_match": true,
+    "modified": false
+  },
+  "unperformed": [
+    "operating_application_or_rollback_timer",
+    "actual_nonprivileged_MCP_with_candidate",
+    "fresh_bot_chat_with_candidate",
+    "new_OS_full_install",
+    "harness_change_or_Harness2_run",
+    "kernel_or_service_security_policy_change",
+    "attack_or_new_training"
+  ],
+  "references": [
+    "https://www.freedesktop.org/software/systemd/man/255/journalctl.html",
+    "https://github.com/systemd/systemd/blob/v255/src/journal/journalctl.c"
+  ]
+}

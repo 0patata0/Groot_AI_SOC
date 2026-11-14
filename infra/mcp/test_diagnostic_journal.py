@@ -1,5 +1,6 @@
 """Isolated journal contract/security tests; no real journal, SSH or service."""
 from collections import deque
+from decimal import Decimal
 import copy
 import hashlib
 import json
@@ -95,8 +96,8 @@ class Journal(unittest.TestCase):
         calls=[]
         def run(argv,maximum,seconds):
             calls.append((argv,maximum,seconds))
-            since=int(next(a.split('@',1)[1] for a in argv if a.startswith('--since=@')))*1000000
-            until=int(next(a.split('@',1)[1] for a in argv if a.startswith('--until=@')))*1000000
+            since=int(Decimal(next(a.split('@',1)[1] for a in argv if a.startswith('--since=@')))*1000000)
+            until=int(Decimal(next(a.split('@',1)[1] for a in argv if a.startswith('--until=@')))*1000000)
             selected=[r for r in records if since<=int(r['__REALTIME_TIMESTAMP'])<=until]
             if '--priority=err' in argv:selected=[r for r in selected if int(r['PRIORITY'])<=3]
             elif any(a.startswith('--grep=') for a in argv):
@@ -151,6 +152,21 @@ class Journal(unittest.TestCase):
         self.assertEqual({r['record_sha256'] for r in result['entries']},{hashlib.sha256(str(age).encode()).hexdigest() for age in (1,2)})
         self.assertEqual(result['requested_since_kst'],request['since_kst'])
         self.assertIsNone(result['requested_window_total_count'])
+
+    def test_adjacent_microsecond_burst_cannot_crowd_eligible_evidence_out_of_source_tail(self):
+        end=NOW*1000000-500000;start=end-86400*1000000
+        request=dict(args(journal_scope='all'),since_kst=h.shown(start),until_kst=h.shown(end),limit=2)
+        eligible=[dict(row('ordinary activity',identity=str(at)),__REALTIME_TIMESTAMP=str(at))
+                  for at in (end-100,end-1)]
+        adjacent=[dict(row('outside request',identity=str(at)),__REALTIME_TIMESTAMP=str(at))
+                  for at in range(end+1,end+101)]
+        result,calls=self.windowed_read(eligible+adjacent,request)
+        self.assertEqual({r['record_sha256'] for r in result['entries']},
+                         {hashlib.sha256(r['__CURSOR'].encode()).hexdigest() for r in eligible})
+        self.assertEqual(result['returned_entries'],2)
+        self.assertFalse(result['has_more'])
+        self.assertEqual(calls[0][0][5],'--since=@'+str((end-6*3600*1000000)//1000000)+'.500000')
+        self.assertEqual(calls[0][0][6],'--until=@'+str(end//1000000)+'.500000')
 
     def test_long_query_budget_exhaustion_never_returns_partial_empty_success(self):
         clock=[100.0];calls=[]

@@ -330,3 +330,9 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T03:54:33.032918+09:00 journal timeout의 원인과 시험 정정
 
 서비스active·감사command_timeout. severityerr약0.06초/고정warninginfo grep12초초과·24h역순도초과. 역순15m오류는추가옵션위치가고정grep식별을깨뜨린시험절차문제·후보에서미사용/원문보존. 새micro경계시험중복keyword fixture오류1건수정·production완화0. 최종134skip0·구간누락/충돌/마감/바이트반례포함. [근거](../infra/validation/live-reads/README.md).
+
+## journal 실제 제한 환경과 경계 누락 반례 (2026-11-15)
+
+정상 unit tail51은0.100초지만 A24h 고정 오류 검색은12초 command_timeout이다. 역순·직접 unit필드·literal trie·anchored precheck·시스템 journal 비용 실험은 모두 명령/공유 예산을 넘겨 미채택했다. 특정 내부 함수가 단독 원인이라는 profiler 증거는 없다. 초기 PrivateTmp /var/tmp 배치226/NAMESPACE와 a:waf의 journal 비등록 거절은 시험 설정 오류로 분리·정정했고 운영 장애나 모델 오답으로 세지 않았다. B active.json 부재는 prepared/증분 영수증 확인으로 처리해 이력을 덮어쓰지 않았다.
+
+또한 검색 기간의 초 단위 확장으로 인접100로그가 유효2로그를 tail 밖으로 밀어내는 누락을 이전 소스에 재현했다. 정수 마이크로초 native 경계로 수정·135검사/생략0·A native1µs1로그0.097초/기존validator를 확인했다. 최신24h A실패·B13.500초/C0.305초 반환은 각1회·MCP/모델/채팅0이다. [정확 SHA·실패·검증 범위](../infra/validation/journal-reader/README.md).

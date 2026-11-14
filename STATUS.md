@@ -45,7 +45,7 @@
 
 ## Git 반영 상태
 
-직전 native 어댑터 공개27파일은5e89ae2·게시영수증e17fcb7의 실원격 main 일치를 확인했다. 이번 정확 적용기3소스·계획/원장·관련 안내와 현재 문서는 아직 게시 전이며, 커밋·푸시 완료로 표시하지 않는다. 원래 다른9작업과 로컬 전용 자료는 stage하지 않는다. 원래 scanner·경로/링크·논문 원장 검사 후 관련 파일만 게시하고 실원격 main을 확인한다.
+정확 journal 적용기3소스·계획/원장·관련 안내와 현재 문서의 공개26파일을 `0c5d945ab48e10836671050f55160a057c5c99e0`로 커밋·푸시했고 2026-11-15T08:17:38.976747+09:00 실원격 main 일치를 확인했다. 원래 secret-scanner 추적2164경로 사전검사·기존5불변/새변경0·값/스니펫저장0, 새링크40·논문3형식원장SHA/Git제외를 확인했다. 원래 다른9작업은 SHA불변·stage0이다. 프로젝트로컬 토큰을 해당 Git 프로세스에만 전달했고 helper/캐시·HTTP상세추적·다른자격을 사용하지 않았다. 이 게시 영수증도 후속 커밋·푸시하며 마지막 ID/실원격·작업트리 상태는 로컬 기록에 남긴다. 직전 어댑터5e89ae2/e17fcb7은 과거 원장으로 보존한다.
 
 [journal9코드 정확 후보](infra/validation/journal-adapter/application/README.md)는 root 전용3폴더 PREPARED·원본6개를 보존한다. Source 순서가 구core/새journal 바인딩을 깨는 반례를 실제 A 복제에서 재현·원복하고 helper/core/journal 순서로 정정했다. 최종33개 회귀는 Mac·Linux A/B/C 각각 통과했고 실제바이트9적용/9원복·18중간 라이브러리 load·새 fixture DB 보존과 후보 직접 journal1/6/3행·기존validator를 확인했다. 운영9소스/53보호항목·reader PID/ticks는07:58까지 유지, 기존19planfd6/PREPARED/before19SHA와 두 채팅/자동조사timer는08:03 확인했다. 운영 apply/원복 timer·실제MCP/모델/새채팅·패키지·공격/새학습0이다.
 

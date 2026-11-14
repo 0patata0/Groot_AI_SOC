@@ -490,10 +490,10 @@
     "individual_child_limit_seconds": 12,
     "configured_memory_limit_bytes": 134217728,
     "configured_tasks_limit": 8,
-    "maximum_trial_threads_and_children": 5,
     "systemd_reported_unit_CPU_seconds": 23.15,
     "systemd_reported_unit_memory_peak_verbatim": "2.8M",
-    "memory_peak_is_not_total_shared_mmap_RSS": true
+    "memory_peak_is_not_total_shared_mmap_RSS": true,
+    "maximum_trial_tasks_including_parent": 5
   },
   "prototype_extra_guards_not_a_final_production_contract": {
     "message_field_threshold_bytes": 65536,

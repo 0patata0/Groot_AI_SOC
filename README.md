@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [교차 검토 개발 비교](infra/validation/peer-semantics/README.md)는15사례에서 기존10·R2 12·R3 9 통과로 R3와 추론 강화안을 기각했습니다. R2도 오류가 남아 canonical·운영에 미승격이며 내부 식별자 수정은 별도 승인 대기입니다. Harness² 확장4개는 Hermes 목록·상태 읽기를 확인했지만 Ollama 정책에서 제외돼 있고 자연어·승인 전과정은 미확인입니다. 논문은 매뉴얼형 PDF36쪽·DOCX35쪽 편집본이며 이후 추가 검증의 출력 본체 반영은 후속입니다. 논문·원문 검증은 로컬 전용입니다. 아래 날짜별 설명은 해당 시점의 검증 범위입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [읽기 감사 보존 후보](infra/validation/native-read-audit/README.md)는 실제 Hermes10실행·20읽기 재처리에서 감사 본문0→20·SHA일치, Mac/B Linux 후보113회귀를 통과했으나 운영 미적용·교차 검토 입력 연결 전입니다. [원문 분리·검증기 비교](infra/validation/peer-source-first/README.md)는 의미 오류로 미채택입니다. 내부 식별자 제거와 합친 정확 후보의 승인·적용·새 채팅은 잔여입니다. Harness² 확장4개는 Hermes 목록·상태 읽기 확인, Ollama 정책 제외·승인 E2E 미확인입니다. 논문은 매뉴얼형 PDF36쪽·DOCX35쪽 편집본이며 후속 자료의 출력 본체 반영은 다음 개정입니다. 논문·원문 검증은 로컬 전용이며 아래 날짜별 설명은 당시 검증입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

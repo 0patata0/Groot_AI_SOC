@@ -47,18 +47,44 @@ def private_read_audit(report, allowed, max_bytes=1048576):
     """Keep bounded failures and service drafts apart from reusable evidence."""
     drafts=report.get('service_report_audit',[])
     if not isinstance(drafts,list):drafts=[]
+    native=report.get('native_read_audit')
+    public_calls=report.get('calls',[])
+    if not isinstance(public_calls,list):public_calls=[]
+    native_requested='native_read_audit' in report or bool(report.get('native_read_audit_error'))
+    native_valid=(isinstance(native,dict) and native.get('schema')==1
+        and native.get('kind')=='read_turn_audit' and native.get('reusable_evidence') is False
+        and all(isinstance(report.get(k),str) and len(report[k])==32
+                and all(c in '0123456789abcdef' for c in report[k])
+                and native.get(k)==report[k] for k in ('run_id','case_id'))
+        and isinstance(native.get('calls'),list) and isinstance(native.get('limits'),list)
+        and not report.get('protected_calls')
+        and not any(isinstance(c,dict) and c.get('is_write') for c in public_calls))
+    # A partial peer report can already carry the completed scope's receipts.
+    # Audit those in place rather than duplicating them in the worker's IPC.
+    evidence=report.get('evidence')
+    scope_calls=(evidence.get('calls') if isinstance(evidence,dict) else None)
+    scope_valid=(isinstance(scope_calls,list) and scope_calls
+        and not report.get('protected_calls')
+        and not any(isinstance(c,dict) and isinstance(c.get('result'),str) for c in public_calls)
+        and not any(isinstance(c,dict) and c.get('is_write') for c in public_calls))
     if report.get('status') not in ('partial', 'failed') and not (
-            report.get('status')=='completed' and drafts):
+            report.get('status')=='completed' and (drafts or native_requested)):
         return None
     def encoded(value):
         return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(',', ':'))
     audit={'schema':1, 'kind':'read_turn_audit', 'reusable_evidence':False,
         'status':report['status'], 'calls':[], 'model_drafts':[], 'limits':[]}
+    if native_valid:
+        audit['receipt_origin']='native_trace'
+        audit['limits'].extend(x[:80] for x in native['limits'][:32] if isinstance(x,str))
+    elif native_requested:
+        audit['limits'].append('native_read_audit_unavailable' if report.get('native_read_audit_error') else 'native_read_audit_invalid')
     for name in ('run_id', 'case_id'):
         value=report.get(name)
         if isinstance(value,str) and len(value)==32 and all(c in '0123456789abcdef' for c in value):
             audit[name]=value
-    calls=report.get('calls',[])
+    calls=native['calls'] if native_valid else scope_calls if scope_valid else public_calls
+    if not native_valid and scope_valid:audit['receipt_origin']='completed_read_scope'
     if not isinstance(calls,list):calls=[]
     if len(calls)>32:audit['limits'].append('calls_after_32_omitted')
     for call in calls[:32]:
@@ -84,7 +110,22 @@ def private_read_audit(report, allowed, max_bytes=1048576):
             if digest!=actual:row['result_omitted']='sha_mismatch'
             elif len(raw)>262144:row['result_omitted']='per_result_size_limit'
             else:row['result']=body
-        else:row['result_omitted']='raw_not_returned'
+        else:
+            row['result_omitted']='raw_not_returned'
+            if native_valid:
+                reason=call.get('result_omitted')
+                if reason in ('sha_mismatch','per_result_size_limit','aggregate_size_limit','raw_not_returned'):
+                    row['result_omitted']=reason
+                digest=call.get('result_sha256');size=call.get('result_bytes')
+                if isinstance(digest,str) and len(digest)==64 and all(c in '0123456789abcdef' for c in digest):
+                    row['result_sha256']=digest
+                if type(size) is int and 0<=size<=32*1024*1024:row['result_bytes']=size
+        if native_valid and 'arguments' not in row:
+            digest=call.get('arguments_sha256')
+            if isinstance(digest,str) and len(digest)==64 and all(c in '0123456789abcdef' for c in digest):
+                row['arguments_sha256']=digest
+            if call.get('arguments_omitted') in (True,'invalid_json'):
+                row['arguments_omitted']=call['arguments_omitted']
         audit['calls'].append(row)
     if len(drafts)>12:audit['limits'].append('drafts_before_last_12_omitted')
     for draft in drafts[-12:]:
@@ -365,7 +406,7 @@ class Dispatcher:
             if future.done():
                 report = future.result()
                 # Retain bounded audit facts, without exposing raw tool bodies in chat.
-                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'peer_attempts', 'peer_validation_errors', 'peer_validation_details', 'peer_error_code', 'structured_scope_complete', 'scope_resolution', 'unqueried', 'total_seconds', 'native_seconds', 'model_calls') if k in report}
+                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'peer_attempts', 'peer_validation_errors', 'peer_validation_details', 'peer_error_code', 'structured_scope_complete', 'scope_resolution', 'unqueried', 'total_seconds', 'native_seconds', 'model_calls', 'native_read_audit_error') if k in report}
                 summary['calls'] = [{k: c[k] for k in ('server', 'name', 'seconds', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
                 summary['worker_seconds'] = max(0, time.monotonic()-self.progress_clock.get(jid,time.monotonic()))
                 with self.db:

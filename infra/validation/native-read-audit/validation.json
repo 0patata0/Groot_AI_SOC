@@ -1,0 +1,255 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-14T12:38:54.167231+09:00",
+  "state": "candidate; not deployed or chat verified",
+  "base_commit": "541276427f217d6b4c50f0bfdac089aca657007f",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "source_sha256": {
+    "infra/hermes/review_channel.py": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+    "infra/hermes/review_channel_worker.py": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+    "infra/hermes/test_review_channel.py": "658218fc8278c5856384d02e055165fdb35ecfec155ebedf19c370cdca515148"
+  },
+  "live_sha256": {
+    "/opt/capstone-review-chat/review_channel.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+    "/opt/capstone-review-chat/review_channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+    "/opt/capstone-review-chat/review_channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789"
+  },
+  "candidate_scope": "native read audit plus the already-pending identifier cleanup in canonical worker; no operating promotion",
+  "harness2": {
+    "baseline_census": {
+      "always_on_chars": 16819,
+      "n_files": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 18,
+      "plugins": 0
+    },
+    "candidate_census": {
+      "always_on_chars": 16819,
+      "n_files": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 18,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_controller.py",
+        "scripts/channel_worker.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "view_note": "one physical dispatcher represented once; removed only its duplicate alias from the prior diagnostic view"
+  },
+  "mac_regression": [
+    {
+      "arm": "base",
+      "returncode": 0,
+      "tests": 106,
+      "seconds": 3.783,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "returncode": 0,
+      "tests": 113,
+      "seconds": 4.337,
+      "passed": true
+    }
+  ],
+  "linux_regression": [
+    {
+      "arm": "base",
+      "returncode": 0,
+      "tests": 106,
+      "seconds": 11.835,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "returncode": 0,
+      "tests": 113,
+      "seconds": 13.815,
+      "passed": true
+    }
+  ],
+  "installer_bundle": {
+    "passed": true,
+    "files": 4,
+    "raw_body_matches": true
+  },
+  "native_replay": {
+    "runs": 10,
+    "completed_reads": 20,
+    "baseline_raw_receipts": 0,
+    "candidate_raw_receipts": 20
+  },
+  "native_replay_details": [
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7387,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7356,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "completed",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 11359,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 9374,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 9360,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7293,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7405,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7334,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 11274,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_raw_receipts": 0,
+      "candidate_raw_receipts": 2,
+      "all_sha_match": true,
+      "reusable_evidence": false,
+      "private_audit_bytes": 7354,
+      "tools": [
+        "security-events/search_modsecurity_alerts",
+        "security-events/search_wazuh_alerts"
+      ]
+    }
+  ],
+  "public_bodies": false,
+  "reusable_evidence_policy_changed": false,
+  "limits": {
+    "calls": 32,
+    "arguments_bytes_each": 8192,
+    "result_bytes_each": 262144,
+    "private_audit_bytes": 1048576,
+    "retained_jobs_existing_limit": 200
+  },
+  "remaining": [
+    "source audit is not yet connected to peer context",
+    "no operating install/fresh chat/actual UI verification",
+    "independent semantic quality and long-duration replay unproved",
+    "exact approval includes pending identifier cleanup; dispatcher restart required"
+  ],
+  "operating_changes": 0,
+  "mcp_calls": 0,
+  "model_calls": 0,
+  "protected_calls": 0,
+  "mattermost_posts": 0,
+  "review_fix": {
+    "issue": "full worker call list could be replaced by a narrower scope subset, losing failed read audit",
+    "fixed": "scope fallback is used only when the original call list has no raw results",
+    "new_regression": "test_private_audit_keeps_full_worker_reads_instead_of_scope_subset"
+  },
+  "cleanup": {
+    "remote_directories_removed": 6,
+    "remote_files_removed": 4070,
+    "remote_bytes_removed": 63973338,
+    "files_removed": 2570,
+    "bytes_removed": 73896251,
+    "G_Harness2_preserved": true,
+    "new_mac_package_installations": 0
+  }
+}

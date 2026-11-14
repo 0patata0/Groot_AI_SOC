@@ -12672,3 +12672,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 복합108 후보, 기존 Ansible/NAT/혼합시험 변경은 미완료 상태로 보존하며 문서 게시에 포함하지 않는다. 전체 작업 트리는 dirty이며 staged 변경은 없다. 자격·로컬 기록/검증·G_Harness2는 Git 제외다. 이전 게시 이력은 [통합 이력](../archive/STATUS_HISTORY.md)과 로컬 세션 기록에서 확인한다.
 
 </details>
+
+## source-5412764 이후: 원문 분리 기각·완료 읽기 감사 후보
+
+이전 현재 요약은 Git `541276427f217d6b4c50f0bfdac089aca657007f:STATUS.md`로 복원한다. 원문 분리12·근거 조합18·검증기26의56개 리뷰/76생성은 의미 오류로 미채택. 실제10실행·20완료 읽기가 추적에만 있고 감사/교차 입력에0개인 IO 누락을 확인했다. 후보 재처리에서는20개 모두 SHA일치·비재사용으로 보존, Mac/B Linux106/113·4파일 import통과. 운영 미적용·교차 입력 연결 전. [현재 근거](../infra/validation/native-read-audit/README.md) · [기각 원장](../infra/validation/peer-source-first/README.md).

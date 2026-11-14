@@ -48,6 +48,112 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def test_native_receipts_reach_private_audit_without_public_output_or_reuse(self):
+        import copy,hashlib
+        for status in ('partial','completed'):
+            with self.subTest(status=status):
+                call=copy.deepcopy(self.rule_fixture())
+                value=json.loads(call['result']);value['private_marker']='NATIVE_RECEIPT_PRIVATE_ONLY'
+                call['result']=json.dumps(value);call['result_sha256']=hashlib.sha256(call['result'].encode()).hexdigest()
+                h=self.actual_harness()
+                payload=w.native_read_audit([call],h.EVIDENCE.allowed,'1'*32,'2'*32)
+                report={'status':status,'final_response':'조회 결과는 확인했으며 전체 판단은 별도입니다.',
+                    'run_id':'1'*32,'case_id':'2'*32,'protected_calls':0,
+                    'calls':[{'name':call['name'],'is_error':False,'is_write':False}],
+                    'native_read_audit':payload}
+                private=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+                self.assertFalse(private['reusable_evidence']);self.assertEqual(private['receipt_origin'],'native_trace')
+                self.assertEqual(private['calls'][0]['result'],call['result'])
+                self.assertEqual(private['calls'][0]['arguments'],call['arguments'])
+                self.assertEqual(private['calls'][0]['result_sha256'],call['result_sha256'])
+        self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post);job=self.job();self.d.placeholder(job)
+        future=concurrent.futures.Future();future.set_result(report)
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        private=json.loads(self.d.db.execute('SELECT audit FROM request_audits WHERE job_id=?',(job['id'],)).fetchone()[0])
+        self.assertEqual(private['calls'][0]['result'],call['result'])
+        self.assertIsNone(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone())
+        public=self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0]
+        self.assertNotIn('NATIVE_RECEIPT_PRIVATE_ONLY',public)
+        self.assertNotIn('NATIVE_RECEIPT_PRIVATE_ONLY',json.dumps(self.apis['ollama'].sent))
+        self.assertNotIn('NATIVE_RECEIPT_PRIVATE_ONLY',self.follow('같은 조회로 다시 설명해줘')['question'])
+
+    def test_native_audit_requires_matching_run_case_and_readonly_execution(self):
+        import copy
+        h=self.actual_harness();call=self.rule_fixture()
+        payload=w.native_read_audit([call],h.EVIDENCE.allowed,'1'*32,'2'*32)
+        report={'status':'partial','run_id':'1'*32,'case_id':'2'*32,'protected_calls':0,
+            'calls':[{'name':call['name'],'is_write':False}],'native_read_audit':payload}
+        variants=[]
+        for key,value in (('run_id','3'*32),('case_id','4'*32),('reusable_evidence',True),('schema',2)):
+            bad=copy.deepcopy(report);bad['native_read_audit'][key]=value;variants.append(bad)
+        variants.append(dict(report,protected_calls=1))
+        variants.append(dict(report,calls=[{'name':'block_ip','is_write':True}]))
+        for bad in variants:
+            with self.subTest(bad=bad.get('protected_calls')):
+                audit=json.loads(m.private_read_audit(bad,h.EVIDENCE.allowed))
+                self.assertIn('native_read_audit_invalid',audit['limits']);self.assertEqual(audit['calls'],[])
+
+    def test_native_audit_revalidates_result_hash_after_transport(self):
+        import copy
+        h=self.actual_harness();call=self.rule_fixture()
+        payload=w.native_read_audit([call],h.EVIDENCE.allowed,'1'*32,'2'*32)
+        payload['calls'][0]['result']+='tampered'
+        report={'status':'partial','run_id':'1'*32,'case_id':'2'*32,'protected_calls':0,'calls':[],
+            'native_read_audit':payload}
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+        self.assertEqual(audit['calls'][0]['result_omitted'],'sha_mismatch')
+        self.assertNotIn('result',audit['calls'][0])
+
+    def test_native_audit_preserves_explicit_large_body_omission(self):
+        import hashlib
+        h=self.actual_harness();call=self.rule_fixture()
+        call.update(result='x'*270000,result_sha256=hashlib.sha256(b'x'*270000).hexdigest(),arguments={'large':'x'*9000})
+        payload=w.native_read_audit([call],h.EVIDENCE.allowed,'1'*32,'2'*32)
+        self.assertLessEqual(len(json.dumps(payload,ensure_ascii=False).encode()),1048576)
+        report={'status':'completed','run_id':'1'*32,'case_id':'2'*32,'protected_calls':0,'calls':[],
+            'native_read_audit':payload}
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed));row=audit['calls'][0]
+        self.assertEqual(row['result_omitted'],'per_result_size_limit')
+        self.assertEqual(row['result_bytes'],270000);self.assertEqual(row['result_sha256'],call['result_sha256'])
+        self.assertIn('arguments_sha256',row);self.assertTrue(row['arguments_omitted'])
+        self.assertNotIn('result',row);self.assertNotIn('arguments',row)
+
+    def test_native_audit_failure_is_recorded_without_fabricated_raw(self):
+        report={'status':'completed','run_id':'1'*32,'case_id':'2'*32,'calls':[],
+            'native_read_audit_error':'ImportError'}
+        audit=json.loads(m.private_read_audit(report,lambda *_:True))
+        self.assertIn('native_read_audit_unavailable',audit['limits']);self.assertEqual(audit['calls'],[])
+
+    def test_partial_scope_receipts_are_audited_without_duplicate_ipc_or_reuse(self):
+        h=self.actual_harness();call=self.rule_fixture()
+        report={'status':'partial','run_id':'1'*32,'case_id':'2'*32,'protected_calls':0,
+            'calls':[{'name':call['name'],'is_write':False}],
+            'evidence':{'question':'룰 조회','calls':[call]}}
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+        self.assertFalse(audit['reusable_evidence'])
+        self.assertEqual(audit['receipt_origin'],'completed_read_scope')
+        self.assertEqual(audit['calls'][0]['result'],call['result'])
+        self.assertNotIn('native_read_audit',report)
+        report['protected_calls']=1
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+        self.assertEqual(audit['calls'],[])
+        report['protected_calls']=0;report['evidence']['calls']=[None,{'name':'not_registered'}]
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+        self.assertEqual(audit['calls'],[])
+
+    def test_private_audit_keeps_full_worker_reads_instead_of_scope_subset(self):
+        import copy,hashlib
+        h=self.actual_harness();first=self.rule_fixture();failed=copy.deepcopy(first)
+        failed.update(result=json.dumps({'error':'READ_FAILURE_MARKER'}),is_error=True)
+        failed['result_sha256']=hashlib.sha256(failed['result'].encode()).hexdigest()
+        report={'status':'partial','calls':[first,failed],'protected_calls':0,
+            'evidence':{'question':'룰 조회','calls':[first]}}
+        audit=json.loads(m.private_read_audit(report,h.EVIDENCE.allowed))
+        self.assertEqual(len(audit['calls']),2)
+        self.assertTrue(audit['calls'][1]['is_error'])
+        self.assertEqual(audit['calls'][1]['result'],failed['result'])
+        self.assertFalse(audit['reusable_evidence'])
+
     def test_completed_service_keeps_drafts_private_and_caches_only_actual_reads(self):
         self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post)
         job=self.job();self.d.placeholder(job);call=self.rule_fixture()
@@ -769,6 +875,12 @@ class Tests(unittest.TestCase):
                 result=json.loads(output.getvalue());self.assertEqual(result['status'],expected)
                 self.assertEqual(result['structured_scope_complete'],complete)
                 self.assertEqual(result['management_state'],'needs_review')
+                if complete and phase=='peer':
+                    self.assertNotIn('native_read_audit',result)
+                    audit=json.loads(m.private_read_audit(result,h.EVIDENCE.allowed))
+                    self.assertEqual(audit['calls'][0]['result'],web_call()['result'])
+                elif complete:
+                    self.assertNotIn('native_read_audit',result)
 
     def test_broad_diagnostic_and_changes_do_not_get_a_single_service_shortcut(self):
         h=self.actual_harness()

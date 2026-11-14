@@ -1659,3 +1659,6 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 
 사용자 승인("0건 검사 판단 구문 수정 적용해줘")에 따라 적용했다. 컨트롤러 잠금 아래 사본 6곳을 교체했다. 대상은 관리 실행기 `88896285`→`795af33e` ×4, query-completion `ce1ba937`→`eb56d14a` ×2이다. 컨트롤러 내장본과 Ollama 영수증 2항목도 갱신했고, Ollama 봇만 재시작했다. 사후 점검은 정상이었다. 실제 채팅에서 Hermes는 1차 초안으로 바로 정상 게시됐다. 판단 구문이 나오지 않아 이 경로는 발동하지 않았다. 04:19:44에 확정했다. [기록](../infra/validation/zero-modal/README.md).
 
+## 완료 읽기 감사 후보 — 운영 미적용
+
+관리자231 경유12:27 KST 실제 worker1cff48cc/dispatcherf52ec1a2·영수증 일치·큐0·서비스active. canonical 두 파일에는 읽기 감사와 이전 식별자 제거를 합친 후보가 있으며 정확 승인 대기다. 초기 설치4파일/오프라인 의존성 범위 불변·Linux 격리 import통과, 새 OS 전체 설치0. 실제 소스 교체/영수증 변경/재시작/승인 타이머 설치/새 채팅0. [파일 SHA·검사·남은 적용 절차](../infra/validation/native-read-audit/README.md).

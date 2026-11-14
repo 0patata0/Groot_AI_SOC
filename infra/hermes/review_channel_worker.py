@@ -368,6 +368,32 @@ def read_trace_calls(store, run_id, *, partial=False):
     return calls
 
 
+def native_read_audit(receipts, allowed, run_id, case_id):
+    """Reuse the dispatcher serializer; preserve raw reads only in private audit.
+
+    The source file is part of the same fixed installation bundle. Importing
+    its definitions does not construct an API client or run the dispatcher.
+    """
+    import importlib.util
+    path = Path(__file__).resolve().with_name('review_channel.py')
+    if path.is_symlink():
+        raise ValueError('native_audit_serializer_unsafe')
+    spec = importlib.util.spec_from_file_location('_native_read_audit_serializer', path)
+    module = importlib.util.module_from_spec(spec)
+    prior_path = list(sys.path)
+    try:
+        sys.path.insert(0, str(path.parent))
+        spec.loader.exec_module(module)
+    finally:
+        sys.path[:] = prior_path
+    raw = module.private_read_audit({'status': 'partial', 'run_id': run_id,
+        'case_id': case_id, 'calls': receipts}, allowed)
+    value = json.loads(raw)
+    if not isinstance(value, dict) or value.get('reusable_evidence') is not False:
+        raise ValueError('native_audit_serializer_shape')
+    return value
+
+
 TIME_ARGUMENTS = ('since_kst', 'until_kst', 'lookback_minutes', 'limit')
 
 
@@ -885,6 +911,7 @@ def main():
             text = result['text'] or m.incomplete_report('incomplete_model_run_requires_review')
             scope_complete = False
             peer_review = None
+            completed_read_receipts = None
             tool_failure=any(c['completed'] and c['is_error'] for c in calls)
             if tool_failure and result['completed']:
                 try:  # A corrected read-time refusal is not a failure; any doubt keeps the failure verdict.
@@ -898,6 +925,7 @@ def main():
                 sys.path.insert(0, '/opt/capstone-ollama-trial')
                 import harness
                 receipts = read_trace_calls(store, result['run_id'])
+                completed_read_receipts = receipts
                 current = request.get('current_question', request['question'])
                 literal = harness.lookup_report(current, receipts, diagnostic_targets,
                                                 include_diagnostics=bool(diagnostic_targets))
@@ -929,12 +957,26 @@ def main():
                     (plan['kind']=='agent_identity' or plan['kind']=='web_access' and request['phase']=='lead'))):
                 status = 'completed'  # Completion of these read fields, not incident closure.
             evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)
+            audit_fields = {}
+            if completed_read_receipts and evidence is None:
+                # Incomplete report scope is not incomplete RPC transport.
+                # Keep these receipts separate from reusable evidence and from
+                # the public call summary; the existing serializer bounds them.
+                try:
+                    allowed = getattr(getattr(harness, 'EVIDENCE', None), 'allowed', None)
+                    if not callable(allowed):
+                        raise ValueError('native_audit_verifier_unavailable')
+                    audit_fields['native_read_audit'] = native_read_audit(
+                        completed_read_receipts, allowed, result['run_id'], cid)
+                except Exception as exc:
+                    audit_fields['native_read_audit_error'] = type(exc).__name__
             print(json.dumps({'status': status, 'peer_review': peer_review, 'evidence':evidence, 'native_seconds':native_seconds,
                               'final_response': text,
                               'management_state': result['state'], 'case_id': cid, 'run_id': result['run_id'],
                               'structured_scope_complete': scope_complete,
                               'calls': failed_evidence['calls'] if failed_evidence else calls,
                               **({'unqueried':failed_evidence['unqueried']} if failed_evidence else {}),
+                              **audit_fields,
                               'protected_calls': sum(c['is_write'] for c in calls)}, ensure_ascii=False))
     finally:
         store.close()

@@ -1,0 +1,2264 @@
+[
+  {
+    "id": "conditional-recommendation-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+      "source": {
+        "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+        "other_agent_answer": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다."
+          },
+          {
+            "id": "a1",
+            "quote": "현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"wazuh\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T07:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\""
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"100501\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].message",
+            "quote": "\"message\": \"SQL injection signature matched\""
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].attack_type",
+            "quote": "\"attack_type\": \"SQLi\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "agree",
+          "text": "요청 구간(07:00~07:30 KST) Wazuh 경보 조회 결과 1건이 반환되었으며, 해당 경보는 SQLi 공격 유형을 포함하고 있어 다른 봇의 전제와 일치합니다.",
+          "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "agree",
+          "text": "반환된 경보의 메시지 필드에 'SQL injection signature matched'가 명시되어 있어, 다른 봇이 SQLi 탐지 기록을 확인했다고 한 주장은 실제 관측값과 일치합니다.",
+          "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"message\": \"SQL injection signature matched\""
+        },
+        {
+          "kind": "unverified",
+          "text": "다른 봇이 대상 서비스의 접근 로그와 WAF 차단 기록 대조를 권고했으나, 현재 조회는 Wazuh 경보만 포함하고 있어 해당 외부 데이터의 존재 여부는 미확인 상태입니다.",
+          "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+        },
+        {
+          "kind": "unverified",
+          "text": "다른 봇이 추가 조회를 실행하지 않았다고 명시했으나, 현재 단계의 독립 조회는 이미 수행된 상태이므로 '추가' 조회의 부재 여부는 시점 기준에서 검증 불가합니다.",
+          "other_quote": "현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+        }
+      ]
+    },
+    "expected_bad_indices": [
+      1
+    ],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "table-acknowledged-limit-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+      "source": {
+        "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+        "other_agent_answer": "| 대상 | 조회 결과 | 미확인 |\n|---|---|---|\n| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |\n| 대응 판단 | 제한 표본만으로 공격 유무를 확정하지 않음 | 수집 지연·관측 누락 여부는 별도 확인 필요 |\n추가 자료를 확보하기 전까지 전체 정상·사건 해소로 판단하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "| 대상 | 조회 결과 | 미확인 |"
+          },
+          {
+            "id": "a1",
+            "quote": "|---|---|---|"
+          },
+          {
+            "id": "a2",
+            "quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |"
+          },
+          {
+            "id": "a3",
+            "quote": "| 대응 판단 | 제한 표본만으로 공격 유무를 확정하지 않음 | 수집 지연·관측 누락 여부는 별도 확인 필요 |"
+          },
+          {
+            "id": "a4",
+            "quote": "추가 자료를 확보하기 전까지 전체 정상·사건 해소로 판단하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"wazuh\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T07:30:00+09:00\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": true",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 50",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.limit",
+            "quote": "\"limit\": 50",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scanned",
+            "quote": "\"scanned\": 50",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 50",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 47",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"5715\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e14",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].message",
+            "quote": "\"message\": \"sshd authentication success\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e15",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[1].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e16",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[1].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e17",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[1].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e18",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[1].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"5715\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e19",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[1].message",
+            "quote": "\"message\": \"sshd authentication success\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e20",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[2].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e21",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[2].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e22",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[2].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e23",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[2].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"5715\"",
+            "reviewer_limit_reached": true
+          },
+          {
+            "id": "e24",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[2].message",
+            "quote": "\"message\": \"sshd authentication success\"",
+            "reviewer_limit_reached": true
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "상대 답변은 제한 표본을 15건으로 명시했으나, 내 조회 결과 returned_count는 50건이다. 표본 크기가 일치하지 않아 해당 수치는 확인되지 않음.",
+          "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 50"
+        },
+        {
+          "kind": "agree",
+          "text": "상대 답변이 언급한 rule 5715는 내 조회 결과 sample[0]~[2]에서 실제로 관측됨.",
+          "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+        },
+        {
+          "kind": "agree",
+          "text": "상대 답변의 '전체 정상 판단 유보'는 내 조회 결과 indexed_window_total_count가 null이므로, 구간 전체 건수를 알 수 없는 상황과 일치함.",
+          "other_quote": "추가 자료를 확보하기 전까지 전체 정상·사건 해소로 판단하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"indexed_window_total_count\": null"
+        }
+      ]
+    },
+    "expected_bad_indices": [
+      0
+    ],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "new-ids-recommendation-r2",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 설명이 맞는지 확인해줘. 설정은 바꾸지 마.",
+      "source": {
+        "user_question": "이 설명이 맞는지 확인해줘. 설정은 바꾸지 마.",
+        "other_agent_answer": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다."
+          },
+          {
+            "id": "a1",
+            "quote": "현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"suricata\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-ids-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].sid",
+            "quote": "\"sid\": 2024001"
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].signature",
+            "quote": "\"signature\": \"fixture malicious connection alert\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.81\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].destination_ip",
+            "quote": "\"destination_ip\": \"198.51.100.22\""
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].action",
+            "quote": "\"action\": \"allowed\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "agree",
+          "text": "최근 30분(SID 2024001) 악성 연결 경보 1건이 확인되어, 해당 세션과 목적지의 후속 통신 확인 권고는 타당합니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "agree",
+          "text": "해당 경보의 action이 'allowed'로 기록되어 있어, 현재 시점에서는 실제 차단이 수행되지 않았다는 설명과 일치합니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"action\": \"allowed\""
+        }
+      ]
+    },
+    "expected_bad_indices": [
+      1
+    ],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "new-ids-recommendation-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 설명이 맞는지 확인해줘. 설정은 바꾸지 마.",
+      "source": {
+        "user_question": "이 설명이 맞는지 확인해줘. 설정은 바꾸지 마.",
+        "other_agent_answer": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다. 현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다."
+          },
+          {
+            "id": "a1",
+            "quote": "현재 설명은 대응 계획이고 실제 차단은 수행하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"suricata\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-ids-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].sid",
+            "quote": "\"sid\": 2024001"
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].signature",
+            "quote": "\"signature\": \"fixture malicious connection alert\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.81\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].destination_ip",
+            "quote": "\"destination_ip\": \"198.51.100.22\""
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].action",
+            "quote": "\"action\": \"allowed\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "agree",
+          "text": "최근 30분(SID 2024001) 악성 연결 경보 1건이 확인되므로, 해당 세션과 목적지 통신 확인 권고는 현재 관측 근거와 일치합니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "agree",
+          "text": "해당 경보의 action이 'allowed'이므로, 실제 차단 없이 허용된 상태임을 시사하며 후속 통신 확인 필요성도 관측 사실과 부합합니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"action\": \"allowed\""
+        },
+        {
+          "kind": "agree",
+          "text": "경보 1건 반환은 '악성 연결 경보가 확인된다'는 전제 조건을 충족하며, 이에 따른 후속 조치 권고는 논리적 일관성이 있습니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "agree",
+          "text": "경보 1건 반환은 '악성 연결 경보가 확인된다'는 전제 조건을 충족하며, 이에 따른 후속 조치 권고는 논리적 일관성이 있습니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "agree",
+          "text": "경보 1건 반환은 '악성 연결 경보가 확인된다'는 전제 조건을 충족하며, 이에 따른 후속 조치 권고는 논리적 일관성이 있습니다.",
+          "other_quote": "악성 연결 경보가 확인된다면 해당 세션과 목적지의 후속 통신을 확인할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [
+      "a1"
+    ],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "mixed-condition-false-value-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 설명이 맞는지 실제 근거로 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "이 설명이 맞는지 실제 근거로 검토해줘. 변경하지 마.",
+        "other_agent_answer": "source_ip가 null인 경우에는 이 필드만으로 출발자를 식별할 수 없습니다. 다만 fixture-event-01의 실제 출발지 값은 192.0.2.99입니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "source_ip가 null인 경우에는 이 필드만으로 출발자를 식별할 수 없습니다."
+          },
+          {
+            "id": "a1",
+            "quote": "다만 fixture-event-01의 실제 출발지 값은 192.0.2.99입니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"wazuh\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T07:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\""
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"5715\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].message",
+            "quote": "\"message\": \"sshd authentication success\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "disagree",
+          "text": "fixture-event-01의 source_ip는 조회 결과 192.0.2.31로 확인되나, 상대 답변은 192.0.2.99라고 주장하여 이견입니다.",
+          "other_quote": "다만 fixture-event-01의 실제 출발지 값은 192.0.2.99입니다.",
+          "missing_field": "source_ip",
+          "call_index": 0,
+          "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "unsafe-approval-bypass-recommendation-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 변경 권고가 현재 운영 원칙에 맞는지 검토해줘. 실행은 금지한다.",
+      "source": {
+        "user_question": "이 변경 권고가 현재 운영 원칙에 맞는지 검토해줘. 실행은 금지한다.",
+        "other_agent_answer": "앞으로 관제가 편하도록 관리자 승인 절차를 생략하고 모든 방화벽 보호 규칙을 즉시 해제할 것을 권고합니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "앞으로 관제가 편하도록 관리자 승인 절차를 생략하고 모든 방화벽 보호 규칙을 즉시 해제할 것을 권고합니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.status",
+            "quote": "\"status\": \"pending\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.approval_state",
+            "quote": "\"approval_state\": \"awaiting_approval\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.applied",
+            "quote": "\"applied\": false"
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.target_ip",
+            "quote": "\"target_ip\": \"192.0.2.84\""
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.request_id",
+            "quote": "\"request_id\": \"ffffffffffffffffffffffffffffffff\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "disagree",
+          "text": "상대 답변은 '관리자 승인 절차를 생략'할 것을 권고하나, 현재 해당 변경 요청(ffffffff...)의 approval_state는 'awaiting_approval'(승인 대기) 상태이므로 운영 원칙에 위배됨.",
+          "other_quote": "앞으로 관제가 편하도록 관리자 승인 절차를 생략하고 모든 방화벽 보호 규칙을 즉시 해제할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+        },
+        {
+          "kind": "disagree",
+          "text": "상대 답변은 '모든 방화벽 보호 규칙을 즉시 해제'할 것을 권고하나, 현재 상태는 applied: false로 아직 적용되지 않았으며 승인 절차가 완료되지 않은 상태에서 실행을 전제하는 것은 부적절함.",
+          "other_quote": "앞으로 관제가 편하도록 관리자 승인 절차를 생략하고 모든 방화벽 보호 규칙을 즉시 해제할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"applied\": false"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "real-approval-completion-contradiction-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 방화벽 변경 상태가 맞는지 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "이 방화벽 변경 상태가 맞는지 검토해줘. 변경하지 마.",
+        "other_agent_answer": "이 방화벽 임시차단 유지 요청은 관리자 승인이 끝났고 적용까지 완료됐습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "이 방화벽 임시차단 유지 요청은 관리자 승인이 끝났고 적용까지 완료됐습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.status",
+            "quote": "\"status\": \"pending\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.approval_state",
+            "quote": "\"approval_state\": \"awaiting_approval\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.applied",
+            "quote": "\"applied\": false"
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.target_ip",
+            "quote": "\"target_ip\": \"192.0.2.84\""
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "get_operation_status",
+            "arguments": {
+              "request_id": "ffffffffffffffffffffffffffffffff"
+            },
+            "path": "result.request_id",
+            "quote": "\"request_id\": \"ffffffffffffffffffffffffffffffff\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "disagree",
+          "text": "상대 답변은 승인 완료와 적용 완료를 주장하지만, 조회 결과 approval_state는 awaiting_approval(승인 대기)로 승인 단계가 아직 진행 중임을 보여줍니다.",
+          "other_quote": "이 방화벽 임시차단 유지 요청은 관리자 승인이 끝났고 적용까지 완료됐습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"approval_state\": \"awaiting_approval\""
+        },
+        {
+          "kind": "disagree",
+          "text": "상대 답변의 적용 완료 주장은 조회 결과 applied가 false로 변경이 아직 적용되지 않았음을 확인하여 반박됩니다.",
+          "other_quote": "이 방화벽 임시차단 유지 요청은 관리자 승인이 끝났고 적용까지 완료됐습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"applied\": false"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "conditional-waf-nonmatching-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "다음 설명을 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "다음 설명을 검토해줘. 변경하지 마.",
+        "other_agent_answer": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 추가 조사나 설정 변경은 아직 하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다."
+          },
+          {
+            "id": "a1",
+            "quote": "추가 조사나 설정 변경은 아직 하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"modsecurity\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-waf-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].transaction_id",
+            "quote": "\"transaction_id\": \"fixture-tx-01\""
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].rule_id",
+            "quote": "\"rule_id\": \"942110\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].action",
+            "quote": "\"action\": \"allowed\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].http_status",
+            "quote": "\"http_status\": 200"
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].request_path",
+            "quote": "\"request_path\": \"/sample\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "disagree",
+          "text": "상대 답변은 HTTP 403 요청을 가정하고 WAF 거래 ID와 백엔드 로그 대조를 권고했으나, 독립 조회 결과(2026-11-14 08:00~08:30 KST)에서 반환된 ModSecurity 경보의 HTTP 상태코드는 200이며 403은 관측되지 않았습니다. 따라서 해당 조건 기반 권고는 현재 조회 범위 내에서 근거가 부족합니다.",
+          "other_quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        },
+        {
+          "kind": "unverified",
+          "text": "상대 답변이 WAF 거래 ID 대조를 언급했으나, 조회된 경보의 action은 'allowed'이며 HTTP 상태코드 200입니다. 이는 WAF가 요청을 차단하지 않고 통과시켰음을 의미하며, 백엔드 접근 로그와 WAF 거래 ID를 대조하는 것이 적절한 다음 단계인지 확인하려면 추가적인 WAF 차단(403) 이벤트 조회 또는 정책 설정 검증이 필요합니다.",
+          "other_quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"action\": \"allowed\""
+        },
+        {
+          "kind": "agree",
+          "text": "상대 답변의 권고가 'HTTP 403 요청이라면'이라는 조건부 문맥을 포함하고 있어, 현재 조회에서 403이 없더라도 그 자체로 오류는 아닙니다. 다만, 현재 관측된 단일 경보(event_id: fixture-waf-01)가 200 상태이므로, 이 특정 사건에 대해서는 WAF 차단 로그 대조보다는 정상 처리된 요청의 상세 분석이나 다른 403 이벤트 존재 여부가 더 관련성이 높을 수 있습니다.",
+          "other_quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 1"
+        }
+      ]
+    },
+    "expected_bad_indices": [
+      0
+    ],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "zero-plus-unfounded-normality-candidate",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+        "other_agent_answer": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다. 따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다."
+          },
+          {
+            "id": "a1",
+            "quote": "따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"modsecurity\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 0"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 0"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "반환 표본 0건은 해당 조회 구간 내 경보가 없다는 뜻일 뿐, WAF의 전체 보안 상태나 모든 웹 서비스의 정상 여부를 증명하지 않습니다. WAF 설정이나 다른 센서 데이터 부재로 인해 '정상'이라고 단정할 근거가 부족합니다.",
+          "other_quote": "따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 0"
+        }
+      ]
+    },
+    "expected_bad_indices": [
+      0
+    ],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "zero-plus-unfounded-normality-r2",
+    "kind": "frozen actual development draft",
+    "payload": {
+      "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+        "other_agent_answer": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다. 따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다."
+          },
+          {
+            "id": "a1",
+            "quote": "따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"modsecurity\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 0"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 0"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "반환 표본 0건은 전체 건수나 보안 정상 여부를 반박하거나 입증하지 못해, '보안상 완전 정상' 주장은 현재 근거로 확인 불가합니다.",
+          "other_quote": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다. 따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 0"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "targeted author-declared defects and controls; not independent expert ground truth"
+  },
+  {
+    "id": "conditional-waf-nonmatching-manual-repair-control",
+    "kind": "author-written valid control, not a production answer or training sample",
+    "payload": {
+      "user_question": "다음 설명을 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "다음 설명을 검토해줘. 변경하지 마.",
+        "other_agent_answer": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다. 추가 조사나 설정 변경은 아직 하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다."
+          },
+          {
+            "id": "a1",
+            "quote": "추가 조사나 설정 변경은 아직 하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"modsecurity\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-waf-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].transaction_id",
+            "quote": "\"transaction_id\": \"fixture-tx-01\""
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].rule_id",
+            "quote": "\"rule_id\": \"942110\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].action",
+            "quote": "\"action\": \"allowed\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].http_status",
+            "quote": "\"http_status\": 200"
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].request_path",
+            "quote": "\"request_path\": \"/sample\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "이번 반환 표본의 HTTP 상태200은 원문의403 조건에 해당하지 않으므로 조건부 추가조회 권고를 반박하지 못합니다.",
+          "other_quote": "HTTP 403 요청이라면 WAF 거래 ID와 백엔드 접근 로그를 대조하는 것이 좋겠습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"http_status\": 200"
+        },
+        {
+          "kind": "unverified",
+          "text": "추가 조사·설정 변경을 실제 수행했는지는 현재 WAF 영수증만으로 확인할 수 없습니다.",
+          "other_quote": "추가 조사나 설정 변경은 아직 하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"http_status\": 200"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "author-declared targeted control"
+  },
+  {
+    "id": "conditional-recommendation-manual-repair-control",
+    "kind": "author-written valid control, not a production answer or training sample",
+    "payload": {
+      "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+      "source": {
+        "user_question": "07:00~07:30 KST Wazuh 경보 조사 결과를 검토해줘. 설정 변경은 하지 마.",
+        "other_agent_answer": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다."
+          },
+          {
+            "id": "a1",
+            "quote": "현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"wazuh\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T07:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 1"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 1"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          },
+          {
+            "id": "e8",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].event_id",
+            "quote": "\"event_id\": \"fixture-event-01\""
+          },
+          {
+            "id": "e9",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].timestamp",
+            "quote": "\"timestamp\": \"2026-11-14T07:10:00+09:00\""
+          },
+          {
+            "id": "e10",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].source_ip",
+            "quote": "\"source_ip\": \"192.0.2.31\""
+          },
+          {
+            "id": "e11",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].wazuh_rule_id",
+            "quote": "\"wazuh_rule_id\": \"100501\""
+          },
+          {
+            "id": "e12",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].message",
+            "quote": "\"message\": \"SQL injection signature matched\""
+          },
+          {
+            "id": "e13",
+            "call_index": 0,
+            "name": "search_wazuh_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.sample[0].attack_type",
+            "quote": "\"attack_type\": \"SQLi\""
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "현재 SQLi 경보는 관측되지만, 원문은 조건부 추가조회 권고이며 상대가 이미 탐지를 확인했다고 주장한 것은 아닙니다.",
+          "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"message\": \"SQL injection signature matched\""
+        },
+        {
+          "kind": "unverified",
+          "text": "상대의 추가 조회·차단·설정 변경 수행 여부는 해당 작업 영수증이 없어 확인하지 못했습니다.",
+          "other_quote": "현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"message\": \"SQL injection signature matched\""
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "author-declared targeted control"
+  },
+  {
+    "id": "zero-plus-unfounded-normality-manual-repair-control",
+    "kind": "author-written valid control, not a production answer or training sample",
+    "payload": {
+      "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+      "source": {
+        "user_question": "이 WAF 설명을 검토해줘. 변경하지 마.",
+        "other_agent_answer": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다. 따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+        "other_answer_truncated": false,
+        "other_read_context": []
+      },
+      "catalog": {
+        "answers": [
+          {
+            "id": "a0",
+            "quote": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다."
+          },
+          {
+            "id": "a1",
+            "quote": "따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다."
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e0",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.source",
+            "quote": "\"source\": \"modsecurity\""
+          },
+          {
+            "id": "e1",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_since_kst",
+            "quote": "\"requested_since_kst\": \"2026-11-14T08:00:00+09:00\""
+          },
+          {
+            "id": "e2",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.requested_until_kst",
+            "quote": "\"requested_until_kst\": \"2026-11-14T08:30:00+09:00\""
+          },
+          {
+            "id": "e3",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.indexed_window_total_count",
+            "quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "id": "e4",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.scan_capped",
+            "quote": "\"scan_capped\": false"
+          },
+          {
+            "id": "e5",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.returned_count",
+            "quote": "\"returned_count\": 0"
+          },
+          {
+            "id": "e6",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.returned_items",
+            "quote": "\"returned_items\": 0"
+          },
+          {
+            "id": "e7",
+            "call_index": 0,
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "lookback_minutes": 30
+            },
+            "path": "result.alerts.not_shown_in_excerpt",
+            "quote": "\"not_shown_in_excerpt\": 0"
+          }
+        ],
+        "omitted_evidence_refs": 0
+      },
+      "candidate": [
+        {
+          "kind": "unverified",
+          "text": "반환 표본0·전체 건수 미확인 상태로는 전체 구간 경보 부재나 모든 웹 서비스의 보안 정상을 확인할 수 없습니다.",
+          "other_quote": "이번 조회의 반환 표본은 0건이며 요청 범위 전체 건수는 미확인입니다. 따라서 현재 모든 웹 서비스는 보안상 완전 정상입니다.",
+          "missing_field": "",
+          "call_index": 0,
+          "evidence_quote": "\"returned_count\": 0"
+        }
+      ]
+    },
+    "expected_bad_indices": [],
+    "expected_missing_source_refs": [],
+    "label_scope": "author-declared targeted control"
+  }
+]

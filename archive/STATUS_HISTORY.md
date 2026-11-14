@@ -12676,3 +12676,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## source-5412764 이후: 원문 분리 기각·완료 읽기 감사 후보
 
 이전 현재 요약은 Git `541276427f217d6b4c50f0bfdac089aca657007f:STATUS.md`로 복원한다. 원문 분리12·근거 조합18·검증기26의56개 리뷰/76생성은 의미 오류로 미채택. 실제10실행·20완료 읽기가 추적에만 있고 감사/교차 입력에0개인 IO 누락을 확인했다. 후보 재처리에서는20개 모두 SHA일치·비재사용으로 보존, Mac/B Linux106/113·4파일 import통과. 운영 미적용·교차 입력 연결 전. [현재 근거](../infra/validation/native-read-audit/README.md) · [기각 원장](../infra/validation/peer-source-first/README.md).
+
+## source-61733a1 이후: 과거 범위 연결 보류·현재 단위 마감
+
+이전 현재 요약은 `61733a179f2c887980055c70f587809c24f719cb:STATUS.md`로 복원한다. 후보는 실제20문맥·160필드와 Mac/B Linux125회귀를 통과했다. 새6합성 사례는 같은 학습 모델로12리뷰/20생성·양쪽 답변 생성3/6·실제 모순 통제2/2지만 범위 오류 잔여여서 미승격. 후보4파일 패치 SHA 왕복 확인·canonical/초기설치 입력 복구, 운영 변경/새 채팅0. 사용자 지시로 현재 단위만 마감·일시정지. [원장](../infra/validation/peer-source-context/README.md).

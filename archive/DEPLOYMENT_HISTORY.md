@@ -1662,3 +1662,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 완료 읽기 감사 후보 — 운영 미적용
 
 관리자231 경유12:27 KST 실제 worker1cff48cc/dispatcherf52ec1a2·영수증 일치·큐0·서비스active. canonical 두 파일에는 읽기 감사와 이전 식별자 제거를 합친 후보가 있으며 정확 승인 대기다. 초기 설치4파일/오프라인 의존성 범위 불변·Linux 격리 import통과, 새 OS 전체 설치0. 실제 소스 교체/영수증 변경/재시작/승인 타이머 설치/새 채팅0. [파일 SHA·검사·남은 적용 절차](../infra/validation/native-read-audit/README.md).
+
+## 역사 문맥 연결 후보 — 미적용·canonical 복구
+
+기준61733a1 대비 전달기/정책/SKILL3개와 전용12검사를 후보로 작성·동결했다. 운영 대비에는 이전 작업자 수정도 남아 있다. 후보 전송/회귀 성공과 모델 의미 미완료를 분리해 패치로 보존하고 canonical/초기 설치 입력을 기준 커밋으로 복구했다. 운영 적용·서비스 재시작·새 채팅0.13:44 KST 관리231 경유8경로 SHA·학습본·서비스active·큐0 재확인. [검증](../infra/validation/peer-source-context/README.md).

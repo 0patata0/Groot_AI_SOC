@@ -1,0 +1,275 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-14T13:42:18.964844+09:00",
+  "state": "held; not promoted to canonical/initial installer or operating service; scoped user stop after current unit",
+  "base_commit": "61733a179f2c887980055c70f587809c24f719cb",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "candidate_patch": {
+    "file": "candidate.patch",
+    "sha256": "c6ed95e47d3bbb561a9ee8fe68b36123cae1764e68f5b526f8ba63a74636aad8",
+    "roundtrip_verified": true,
+    "files": {
+      "infra/hermes/review_channel.py": {
+        "base_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+        "candidate_sha256": "c68ecf468898551fdb4201dcbdfda161a0953509a9923b35848c1df0c0d4da28"
+      },
+      "infra/hermes/review_channel_policy.py": {
+        "base_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+        "candidate_sha256": "717dae6fad18b746680ac00b83fe580e47d3b54901368a2f808370b6b48442f9"
+      },
+      "infra/hermes/skills/soc-investigate/SKILL.md": {
+        "base_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "candidate_sha256": "30d99369b8282a10a2b2b904f43a490a85425badf77618bf494994b8b532ee5e"
+      },
+      "infra/hermes/test_peer_source_context.py": {
+        "base_sha256": null,
+        "candidate_sha256": "73cc34cac0e8e299ec4f879c5509ae4d10e5eee8e9ecab4aa0d0d4b9bf4b8aad"
+      }
+    }
+  },
+  "harness2": {
+    "census": {
+      "always_on_chars": 16819,
+      "n_files": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 18,
+      "plugins": 0
+    },
+    "diff_from_prepared": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_controller.py",
+        "scripts/channel_policy.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "diff_from_operating": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_controller.py",
+        "scripts/channel_policy.py",
+        "scripts/channel_worker.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    }
+  },
+  "mac_regression": [
+    {
+      "arm": "base",
+      "returncode": 0,
+      "tests": 113,
+      "seconds": 4.33,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "returncode": 0,
+      "tests": 125,
+      "seconds": 5.304,
+      "passed": true
+    }
+  ],
+  "linux_regression": [
+    {
+      "arm": "base",
+      "returncode": 0,
+      "tests": 113,
+      "seconds": 14.359,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "returncode": 0,
+      "tests": 125,
+      "seconds": 16.904,
+      "passed": true
+    }
+  ],
+  "actual_trace_replay": {
+    "runs": 10,
+    "completed_reads": 20,
+    "baseline_context_rows": 0,
+    "candidate_context_rows": 20,
+    "exact_scope_fields": 160
+  },
+  "actual_trace_details": [
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 4311
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 5091
+    },
+    {
+      "status": "completed",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 5404
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 4594
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 5006
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 3904
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 4031
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 3846
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 4517
+    },
+    {
+      "status": "partial",
+      "completed_reads": 2,
+      "baseline_context_rows": 0,
+      "candidate_context_rows": 2,
+      "exact_scope_fields": 16,
+      "all_argument_and_result_sha_match": true,
+      "reusable_evidence": false,
+      "packet_bytes": 3973
+    }
+  ],
+  "model_summary": {
+    "base": {
+      "logical_reviews": 6,
+      "model_completions": 10,
+      "synthesis_delivered": 3,
+      "synthesis_failed": 3,
+      "seconds_median": 12.1135,
+      "real_contradictions_detected": 2
+    },
+    "candidate": {
+      "logical_reviews": 6,
+      "model_completions": 10,
+      "synthesis_delivered": 3,
+      "synthesis_failed": 3,
+      "seconds_median": 16.404,
+      "real_contradictions_detected": 2
+    }
+  },
+  "logical_reviews_total": 12,
+  "model_completions_total": 20,
+  "manual_assessment": {
+    "native-wazuh-count17": "base delivered only a total-count limitation; candidate failed synthesis. Neither proves a full original-sample review; do not call this a candidate gain.",
+    "cached-waf-count9": "base failed; candidate delivered but used its own limit31 as uncertainty/refutation language for an original limit9 despite historical9 being present. Target unresolved.",
+    "native-period-boundary": "both failed after trying fresh request period/scan_capped as proof for historical query.",
+    "native-requested-sshd-scope": "both failed after using reviewer scope as proof for original sample/filter.",
+    "actual-ip-contradiction": "both detected same-event explicit IP contradiction.",
+    "actual-approval-contradiction": "both detected applied claim against awaiting_approval/applied false."
+  },
+  "structural_diagnosis": "historical context is now delivered but reference catalog still contains fresh-proof references only; history-scope confirmation cannot safely use a fresh-query echo. Typed origin/scope references remain to be designed; guards were not weakened.",
+  "limits": [
+    "synthesis delivered is schema/guard completion, not semantic accuracy",
+    "six author-declared synthetic development cases, each arm once; no independent expert evaluation",
+    "shared GPU/cache/order uncontrolled; median is not causal speed comparison or chat latency",
+    "actual trace replay is isolated in-memory DB; operating SQLite read-only",
+    "not actual Native generation or real chat/approval E2E",
+    "no unused176 evaluation or training data used"
+  ],
+  "operating_changes": 0,
+  "mcp_calls": 0,
+  "chat_posts": 0,
+  "protected_calls": 0,
+  "training_runs": 0,
+  "attacks": 0,
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "arm_semantics": {
+    "base": "previous harness; same trained model as candidate",
+    "candidate": "historical-context transport and one peer-review skill bullet; same trained model"
+  },
+  "remote_cleanup": {
+    "directory": "capstone-peer-context-20261114-0llj093s",
+    "files": 1028,
+    "bytes": 16522769,
+    "absent": true
+  },
+  "operating_recheck": {
+    "at_kst": "2026-11-14T13:44:49.562118+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "service": "active",
+    "queue": {
+      "pending": 0,
+      "active": []
+    },
+    "operating_changes": 0,
+    "services_restarted": 0
+  },
+  "mac_cleanup": {
+    "files": 1028,
+    "bytes": 29242582,
+    "absent": true,
+    "preserved_reproduction_files": 16,
+    "G_Harness2_preserved": true,
+    "new_mac_packages": 0
+  }
+}

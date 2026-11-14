@@ -1,0 +1,779 @@
+{
+  "terminal": true,
+  "status": "completed",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "expected_reviews": 12,
+  "rows": [
+    {
+      "case": "native-wazuh-count17",
+      "arm": "base",
+      "seconds": 11.747,
+      "context": {
+        "historical_context_rows": 0,
+        "historical_fields": [],
+        "history_origin": null,
+        "packet_bytes": 1332
+      },
+      "model_calls": [
+        {
+          "eval_count": 206,
+          "prompt_eval_count": 5029,
+          "total_duration": 8952735087,
+          "load_duration": 5444536,
+          "prompt_eval_duration": 5017785000,
+          "eval_duration": 3843560000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 100,
+          "prompt_eval_count": 5711,
+          "total_duration": 2618888410,
+          "load_duration": 6339146,
+          "prompt_eval_duration": 1016179000,
+          "eval_duration": 1535313000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 상대 답변이 요청 구간 전체 건수를 확인하지 못했다고 한 점은 정확합니다. 실제 결과(indexed_window_total_count)가 null로 반환되어 전체 집계 수치는 알 수 없습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.returned_count",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "상대 답변이 요청 구간 전체 건수를 확인하지 못했다고 한 점은 정확합니다. 실제 결과(indexed_window_total_count)가 null로 반환되어 전체 집계 수치는 알 수 없습니다.",
+            "other_quote": "조회 한도17로 반환된 표본17건을 확인했습니다. 요청 구간 전체 건수와 침해 여부는 확인하지 못했습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          }
+        ]
+      }
+    },
+    {
+      "case": "native-wazuh-count17",
+      "arm": "candidate",
+      "seconds": 18.44,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "applied_filters",
+          "arguments",
+          "indexed_window_total_count",
+          "is_error",
+          "limit",
+          "name",
+          "requested_since_kst",
+          "requested_until_kst",
+          "result_sha256",
+          "returned_count",
+          "scan_capped",
+          "scanned",
+          "server",
+          "source",
+          "truncated"
+        ],
+        "history_origin": "source_read_audit",
+        "packet_bytes": 2127
+      },
+      "model_calls": [
+        {
+          "eval_count": 341,
+          "prompt_eval_count": 5560,
+          "total_duration": 12007732496,
+          "load_duration": 4657678,
+          "prompt_eval_duration": 5527204000,
+          "eval_duration": 6362427000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 337,
+          "prompt_eval_count": 6391,
+          "total_duration": 6360879775,
+          "load_duration": 4844361,
+          "prompt_eval_duration": 1175222000,
+          "eval_duration": 5114721000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.returned_count",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 2,
+            "kind": "agree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "cached-waf-count9",
+      "arm": "candidate",
+      "seconds": 15.166,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "applied_filters",
+          "arguments",
+          "indexed_window_total_count",
+          "is_error",
+          "limit",
+          "name",
+          "requested_since_kst",
+          "requested_until_kst",
+          "result_sha256",
+          "returned_count",
+          "scan_capped",
+          "scanned",
+          "server",
+          "source",
+          "truncated"
+        ],
+        "history_origin": "completed_read_receipt",
+        "packet_bytes": 2161
+      },
+      "model_calls": [
+        {
+          "eval_count": 261,
+          "prompt_eval_count": 5548,
+          "total_duration": 9775623986,
+          "load_duration": 4696732,
+          "prompt_eval_duration": 5135511000,
+          "eval_duration": 4497865000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 268,
+          "prompt_eval_count": 6257,
+          "total_duration": 5316361437,
+          "load_duration": 5758452,
+          "prompt_eval_duration": 1032142000,
+          "eval_duration": 4212154000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "- **일치**: 상대 답변이 '전체 구간 경보 건수 미확인'이라고 한 것은, 독립 조회 결과(indexed_window_total_count=null)와 일치합니다.\n- **미확인**: 상대 답변의 '한도 9' 주장은 독립 조회의 limit=31이 검토자 자신의 요청 조건이므로 반박 근거가 되어 불확실합니다.\n- **미확인**: 상대 답변의 '표본 9건' 주장은 독립 조회의 returned_count=31이 검토자 자신의 요청 조건이므로 반박 근거가 되어 불확실합니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.limit",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "상대 답변이 '전체 구간 경보 건수 미확인'이라고 한 것은, 독립 조회 결과(indexed_window_total_count=null)와 일치합니다.",
+            "other_quote": "이번 조회는 한도9의 표본9건입니다. 전체 구간의 경보 건수는 미확인이고 차단 성공 여부도 이 표본만으로 확정하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 '한도 9' 주장은 독립 조회의 limit=31이 검토자 자신의 요청 조건이므로 반박 근거가 되어 불확실합니다.",
+            "other_quote": "이번 조회는 한도9의 표본9건입니다. 전체 구간의 경보 건수는 미확인이고 차단 성공 여부도 이 표본만으로 확정하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"limit\": 31"
+          },
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 '표본 9건' 주장은 독립 조회의 returned_count=31이 검토자 자신의 요청 조건이므로 반박 근거가 되어 불확실합니다.",
+            "other_quote": "이번 조회는 한도9의 표본9건입니다. 전체 구간의 경보 건수는 미확인이고 차단 성공 여부도 이 표본만으로 확정하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 31"
+          }
+        ]
+      }
+    },
+    {
+      "case": "cached-waf-count9",
+      "arm": "base",
+      "seconds": 15.436,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "arguments",
+          "name",
+          "result_sha256",
+          "server"
+        ],
+        "history_origin": null,
+        "packet_bytes": 1594
+      },
+      "model_calls": [
+        {
+          "eval_count": 284,
+          "prompt_eval_count": 5126,
+          "total_duration": 9910198417,
+          "load_duration": 4937899,
+          "prompt_eval_duration": 4811925000,
+          "eval_duration": 4977580000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 277,
+          "prompt_eval_count": 5864,
+          "total_duration": 5458764400,
+          "load_duration": 7003525,
+          "prompt_eval_duration": 1049667999,
+          "eval_duration": 4337810000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.limit",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 2,
+            "kind": "agree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "native-period-boundary",
+      "arm": "base",
+      "seconds": 12.48,
+      "context": {
+        "historical_context_rows": 0,
+        "historical_fields": [],
+        "history_origin": null,
+        "packet_bytes": 1319
+      },
+      "model_calls": [
+        {
+          "eval_count": 193,
+          "prompt_eval_count": 5043,
+          "total_duration": 8544716506,
+          "load_duration": 4614261,
+          "prompt_eval_duration": 4945910000,
+          "eval_duration": 3468380000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 188,
+          "prompt_eval_count": 5732,
+          "total_duration": 3864834223,
+          "load_duration": 4691473,
+          "prompt_eval_duration": 1014985000,
+          "eval_duration": 2786994000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.requested_since_kst",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 1,
+            "kind": "agree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "native-period-boundary",
+      "arm": "candidate",
+      "seconds": 17.642,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "applied_filters",
+          "arguments",
+          "indexed_window_total_count",
+          "is_error",
+          "limit",
+          "name",
+          "requested_since_kst",
+          "requested_until_kst",
+          "result_sha256",
+          "returned_count",
+          "scan_capped",
+          "scanned",
+          "server",
+          "source",
+          "truncated"
+        ],
+        "history_origin": "source_read_audit",
+        "packet_bytes": 2104
+      },
+      "model_calls": [
+        {
+          "eval_count": 315,
+          "prompt_eval_count": 5575,
+          "total_duration": 11336614038,
+          "load_duration": 5975823,
+          "prompt_eval_duration": 5498728000,
+          "eval_duration": 5714651000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 321,
+          "prompt_eval_count": 6392,
+          "total_duration": 6234479125,
+          "load_duration": 5096566,
+          "prompt_eval_duration": 1154982000,
+          "eval_duration": 4832939000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.requested_since_kst",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 2,
+            "kind": "agree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "native-requested-sshd-scope",
+      "arm": "candidate",
+      "seconds": 18.367,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "applied_filters",
+          "arguments",
+          "indexed_window_total_count",
+          "is_error",
+          "limit",
+          "name",
+          "requested_since_kst",
+          "requested_until_kst",
+          "result_sha256",
+          "returned_count",
+          "scan_capped",
+          "scanned",
+          "server",
+          "source",
+          "truncated"
+        ],
+        "history_origin": "source_read_audit",
+        "packet_bytes": 2160
+      },
+      "model_calls": [
+        {
+          "eval_count": 348,
+          "prompt_eval_count": 5570,
+          "total_duration": 12072955272,
+          "load_duration": 4718844,
+          "prompt_eval_duration": 5518859000,
+          "eval_duration": 6425735000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 340,
+          "prompt_eval_count": 6425,
+          "total_duration": 6225359707,
+          "load_duration": 7410515,
+          "prompt_eval_duration": 1202469000,
+          "eval_duration": 4948845000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 1,
+            "kind": "agree",
+            "evidence_path": "result.requested_since_kst",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 2,
+            "kind": "agree",
+            "evidence_path": "result.requested_until_kst",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "native-requested-sshd-scope",
+      "arm": "base",
+      "seconds": 16.537,
+      "context": {
+        "historical_context_rows": 0,
+        "historical_fields": [],
+        "history_origin": null,
+        "packet_bytes": 1338
+      },
+      "model_calls": [
+        {
+          "eval_count": 321,
+          "prompt_eval_count": 5029,
+          "total_duration": 10788401793,
+          "load_duration": 5599788,
+          "prompt_eval_duration": 4995578000,
+          "eval_duration": 5670160000,
+          "done_reason": "stop"
+        },
+        {
+          "eval_count": 296,
+          "prompt_eval_count": 5823,
+          "total_duration": 5680793693,
+          "load_duration": 8700254,
+          "prompt_eval_duration": 1117583000,
+          "eval_duration": 4492624000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 1,
+            "kind": "disagree",
+            "evidence_path": "result.alerts.returned_items",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      }
+    },
+    {
+      "case": "actual-ip-contradiction",
+      "arm": "base",
+      "seconds": 7.578,
+      "context": {
+        "historical_context_rows": 0,
+        "historical_fields": [],
+        "history_origin": null,
+        "packet_bytes": 1229
+      },
+      "model_calls": [
+        {
+          "eval_count": 146,
+          "prompt_eval_count": 5016,
+          "total_duration": 7510037634,
+          "load_duration": 6346840,
+          "prompt_eval_duration": 4701124000,
+          "eval_duration": 2686270000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 다른 봇은 사건 ctx-web-51의 출발지 IP를 192.0.2.12라고 주장했으나, 내 조회 결과(2026-11-14 08:10~08:55 KST)에서 해당 사건의 src_ip는 192.0.2.87로 확인됩니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "다른 봇은 사건 ctx-web-51의 출발지 IP를 192.0.2.12라고 주장했으나, 내 조회 결과(2026-11-14 08:10~08:55 KST)에서 해당 사건의 src_ip는 192.0.2.87로 확인됩니다.",
+            "other_quote": "사건 ctx-web-51의 출발지 IP는 192.0.2.12입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"src_ip\": \"192.0.2.87\""
+          }
+        ]
+      }
+    },
+    {
+      "case": "actual-ip-contradiction",
+      "arm": "candidate",
+      "seconds": 7.564,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "applied_filters",
+          "arguments",
+          "indexed_window_total_count",
+          "is_error",
+          "limit",
+          "name",
+          "requested_since_kst",
+          "requested_until_kst",
+          "result_sha256",
+          "returned_count",
+          "scan_capped",
+          "scanned",
+          "server",
+          "source",
+          "truncated"
+        ],
+        "history_origin": "source_read_audit",
+        "packet_bytes": 2015
+      },
+      "model_calls": [
+        {
+          "eval_count": 119,
+          "prompt_eval_count": 5543,
+          "total_duration": 7496758861,
+          "load_duration": 4932020,
+          "prompt_eval_duration": 5145500000,
+          "eval_duration": 2245438000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 다른 봇은 사건 ctx-web-51의 출발지 IP를 192.0.2.12로 주장했으나, 실제 조회 결과(sample[0].src_ip)는 192.0.2.87입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "다른 봇은 사건 ctx-web-51의 출발지 IP를 192.0.2.12로 주장했으나, 실제 조회 결과(sample[0].src_ip)는 192.0.2.87입니다.",
+            "other_quote": "사건 ctx-web-51의 출발지 IP는 192.0.2.12입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"src_ip\": \"192.0.2.87\""
+          }
+        ]
+      }
+    },
+    {
+      "case": "actual-approval-contradiction",
+      "arm": "candidate",
+      "seconds": 5.864,
+      "context": {
+        "historical_context_rows": 1,
+        "historical_fields": [
+          "arguments",
+          "is_error",
+          "name",
+          "result_sha256",
+          "server",
+          "status"
+        ],
+        "history_origin": "source_read_audit",
+        "packet_bytes": 1803
+      },
+      "model_calls": [
+        {
+          "eval_count": 170,
+          "prompt_eval_count": 4058,
+          "total_duration": 5794244992,
+          "load_duration": 4660640,
+          "prompt_eval_duration": 2484719000,
+          "eval_duration": 3185356000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 상대 답변은 차단 요청이 '적용 완료'라고 주장하지만, 실제 조회 결과(status)는 'awaiting_approval'(승인 대기)로 이견이 있습니다.\n- **이견**: 상대 답변의 적용 완료 주장은 applied=false라는 근거와도 모순됩니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 차단 요청이 '적용 완료'라고 주장하지만, 실제 조회 결과(status)는 'awaiting_approval'(승인 대기)로 이견이 있습니다.",
+            "other_quote": "해당 차단 요청은 이미 적용 완료 상태입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"status\": \"awaiting_approval\""
+          },
+          {
+            "kind": "disagree",
+            "text": "상대 답변의 적용 완료 주장은 applied=false라는 근거와도 모순됩니다.",
+            "other_quote": "해당 차단 요청은 이미 적용 완료 상태입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"applied\": false"
+          }
+        ]
+      }
+    },
+    {
+      "case": "actual-approval-contradiction",
+      "arm": "base",
+      "seconds": 5.222,
+      "context": {
+        "historical_context_rows": 0,
+        "historical_fields": [],
+        "history_origin": null,
+        "packet_bytes": 1278
+      },
+      "model_calls": [
+        {
+          "eval_count": 194,
+          "prompt_eval_count": 3677,
+          "total_duration": 5153335176,
+          "load_duration": 4643816,
+          "prompt_eval_duration": 1763252000,
+          "eval_duration": 3337952000,
+          "done_reason": "stop"
+        }
+      ],
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 요청 ID 66666666666666666666666666666666의 상태는 'awaiting_approval'(승인 대기)이며, 적용 완료 주장과 이견이 있습니다.\n- **이견**: 적용 여부(applied)가 false로 확인되어 적용 완료 상태가 아님을 확인했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "요청 ID 66666666666666666666666666666666의 상태는 'awaiting_approval'(승인 대기)이며, 적용 완료 주장과 이견이 있습니다.",
+            "other_quote": "해당 차단 요청은 이미 적용 완료 상태입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"status\": \"awaiting_approval\""
+          },
+          {
+            "kind": "disagree",
+            "text": "적용 여부(applied)가 false로 확인되어 적용 완료 상태가 아님을 확인했습니다.",
+            "other_quote": "해당 차단 요청은 이미 적용 완료 상태입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"applied\": false"
+          }
+        ]
+      }
+    }
+  ],
+  "at_kst": "2026-11-14T13:27:02.737632+09:00",
+  "real_mcp_calls": 0,
+  "protected_calls": 0,
+  "operating_changes": 0,
+  "mattermost_posts": 0,
+  "error_type": null,
+  "scope": "frozen SDK synthesis with synthetic source/fresh receipts and isolated dispatcher databases; not actual Native generation, live MCP or chat"
+}

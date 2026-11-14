@@ -282,3 +282,7 @@ B 이력 자동 전송이 23:54부터 `finalize`에서 exit 65로 실패한다. 
 ## 네이티브 완료 읽기 전달 누락과 격리 재처리
 
 최근 Hermes10실행(부분9·완료1)의 matched RPC20개는 추적에서 허용 읽기/해시를 확인했으나 공개 요약은 name/is_error/is_write뿐이고 private audit 본문0개였다. 운영 SQLite는 mode=ro로 읽고 Store/Dispatcher를 만들지 않은 재처리에서 후보20/20 SHA일치·비재사용 보존. 실제 도구 재호출이나 운영 DB 변경은 없다. 이미 evidence로 전달한 본문은 중복 IPC를 피하도록 수정했다. [검사 원장](../infra/validation/native-read-audit/validation.json).
+
+## 과거 범위 문맥 도착과 fresh-only 참조의 한계
+
+실제 과거10실행의20읽기는 후보 메모리DB 재처리에서 모두 같은 인자/SHA로 교차 입력에 도착했고 기간·한도·필터·표본/잘림160필드를 원값으로 보존했다. 실제 운영 SQLite 변경0. 그러나 선택 가능한 참조는 여전히 새 조회뿐이라 원래 조건을 확인하려고 새 조건/표본을 선택하면 기존 경계가 거절한다. 6사례 양쪽 답변 생성3/6과 실패/오류 원문을 보존하고 경계를 약화하지 않았다. [전송/모델 분리 원장](../infra/validation/peer-source-context/validation.json).

@@ -708,3 +708,7 @@ python3 -B finetuning/train.py --check
 ## 현재35B SOC 후속 경로
 
 현재 저장 루트는 Thor `~/Capstone_Groot_training/qwen36-20261027`이다. 새 자료는212대화·train/validation/test144/32/36이며 Git 제외다. `soc_dataset.py`는 계약/출처/분할을 검사하고 `config.qwen36-soc-main.json`·`soc-train`은 전체224prefix1epoch를 별도 결과에 저장한다. `merge_streaming.py`는 MTP/비전이 빠지지 않게 원본 전체를 보존하며190개 LoRA만 병합하고, `convert_soc.py`는 같은 HF 미학습/학습본을 같은 GGUF/Q4_K_M으로 비교할 준비를 한다. 실제pilot HF 내보내기는 검증 완료, 본 학습과 base 변환은 진행 중이다. 단계별 명령/자원·검증 범위는 [THOR_35B](THOR_35B.md), 최신 완료 여부/Git은 [STATUS](../STATUS.md)를 따른다.
+
+## 동일 학습 모델의 역사 문맥 하네스 비교
+
+[새6사례 비교](../infra/validation/peer-source-context/README.md)의 base/candidate는 모두 같은 균형 학습 모델이다. 답변 생성3/6 동률·범위 오류 잔여로 후보를 보류했고, 새로운 모델 학습/가중치/자료 편입은 없다. 이 생성 성공 수를 정답률이나 학습 효과로 표시하지 않는다.

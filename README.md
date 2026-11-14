@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [읽기 감사 보존 후보](infra/validation/native-read-audit/README.md)는 실제 Hermes10실행·20읽기 재처리에서 감사 본문0→20·SHA일치, Mac/B Linux 후보113회귀를 통과했으나 운영 미적용·교차 검토 입력 연결 전입니다. [원문 분리·검증기 비교](infra/validation/peer-source-first/README.md)는 의미 오류로 미채택입니다. 내부 식별자 제거와 합친 정확 후보의 승인·적용·새 채팅은 잔여입니다. Harness² 확장4개는 Hermes 목록·상태 읽기 확인, Ollama 정책 제외·승인 E2E 미확인입니다. 논문은 매뉴얼형 PDF36쪽·DOCX35쪽 편집본이며 후속 자료의 출력 본체 반영은 다음 개정입니다. 논문·원문 검증은 로컬 전용이며 아래 날짜별 설명은 당시 검증입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 사용자 지시에 따라 현재 단위를 마감하고 일시정지합니다. [과거 조회 범위 연결 후보](infra/validation/peer-source-context/README.md)는 Mac/B Linux125검사·실제20문맥/160필드 전달을 통과했지만 모델 답변 생성3/6 동률·범위 오류가 남아 보류하고 기본 소스를 복구했습니다. [읽기 감사 보존113 후보](infra/validation/native-read-audit/README.md)·식별자 제거의 운영 승인/적용도 미완료입니다. Harness² 확장 도구의 실제 승인 E2E, 독립 평가·논문 본체의 후속 실측 반영은 잔여입니다. 논문은 매뉴얼형 PDF36쪽·DOCX35쪽 검수본이고 로컬 전용입니다. 아래 날짜별 설명은 당시 검증 범위입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

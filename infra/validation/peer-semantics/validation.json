@@ -1,0 +1,738 @@
+{
+  "status": "candidate_not_deployed_quality_incomplete",
+  "at_kst": "2026-11-14T08:01:43.049798+09:00",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "base_commit": "dfc3e2ad3512460f5d20ec396969d1726e26ec58",
+  "base_skill_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+  "candidate_skill_sha256": "83ea52e24574087b516b747461a6d6f4585a8e697949d423c4b130bc8b266639",
+  "live_worker_sha256": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+  "harness2": {
+    "base_commit": "dfc3e2ad3512460f5d20ec396969d1726e26ec58",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "live_observed_at_kst": "2026-11-14T07:52:49.976047+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "census": {
+      "base": {
+        "always_on_chars": 16845,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16845,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "changed_source": "infra/hermes/skills/soc-investigate/SKILL.md",
+    "base_sha": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+    "candidate_sha": "83ea52e24574087b516b747461a6d6f4585a8e697949d423c4b130bc8b266639",
+    "scope": "structure only; semantic A/B pending",
+    "operating_changes": 0,
+    "audit_only_trigger_index": true,
+    "initial_attempt": "failed because audit index omitted skill names; corrected index to actual workflow routing, no runtime edit"
+  },
+  "regression": {
+    "tests": 104,
+    "passed": 104,
+    "seconds": 3.416
+  },
+  "evaluation": {
+    "kind": "synthetic semantic development probes via installed B worker and B agent runtime to Thor",
+    "r1_runs": 12,
+    "r2_runs": 18,
+    "real_mcp_calls": 0,
+    "mattermost_posts": 0,
+    "operating_changes": 0,
+    "manual_rater": "Codex, not independent expert",
+    "alternating_pair_order": true,
+    "single_run_per_case_per_arm": true,
+    "latency_is_chat_e2e": false,
+    "summary": {
+      "base": {
+        "semantic_pass": 6,
+        "cases": 9,
+        "median_seconds": 5.273,
+        "mean_seconds": 7.127,
+        "synthesis_failures": 0,
+        "true_contradictions_detected": 3
+      },
+      "candidate": {
+        "semantic_pass": 7,
+        "cases": 9,
+        "median_seconds": 5.694,
+        "mean_seconds": 7.721,
+        "synthesis_failures": 1,
+        "true_contradictions_detected": 3
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "conditional-nonmatching",
+      "arm": "base",
+      "seconds": 6.546,
+      "at_kst": "2026-11-14T07:59:35.941851+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건(sample[0])의 source_ip는 '192.0.2.31'로 null이 아니므로, 출발지 식별이 가능합니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건(sample[0])의 source_ip는 '192.0.2.31'로 null이 아니므로, 출발지 식별이 가능합니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "conditional-nonmatching",
+      "arm": "candidate",
+      "seconds": 4.646,
+      "at_kst": "2026-11-14T07:59:40.588884+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 source_ip는 '192.0.2.31'로 null이 아닙니다. 따라서 출발자 식별이 가능한 상태입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 source_ip는 '192.0.2.31'로 null이 아닙니다. 따라서 출발자 식별이 가능한 상태입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 경보의 source_ip가 null인 경우에는 출발자를 이 필드만으로 식별할 수 없습니다. IP가 있는 표본은 그 값으로 출발지를 확인할 수 있습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "conditional-contradiction",
+      "arm": "candidate",
+      "seconds": 4.448,
+      "at_kst": "2026-11-14T07:59:45.037911+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과는 192.0.2.31로 기록되어 있어 이견입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 fixture-event-01의 source_ip를 192.0.2.40으로 주장하나, 실제 조회 결과(e10)는 192.0.2.31로 기록되어 있어 이견입니다.",
+            "other_quote": "07:00~07:30 KST의 fixture-event-01은 rule 5715인 경우 source_ip가 192.0.2.40으로 기록되어 있습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "conditional-contradiction",
+      "arm": "base",
+      "seconds": 4.267,
+      "at_kst": "2026-11-14T07:59:49.305910+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 다른 봇은 fixture-event-01의 source_ip를 192.0.2.40으로 주장했으나, 실제 조회 결과에서는 192.0.2.31로 기록되어 있어 이견이 있습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "다른 봇은 fixture-event-01의 source_ip를 192.0.2.40으로 주장했으나, 실제 조회 결과(e10)에서는 192.0.2.31로 기록되어 있어 이견이 있습니다.",
+            "other_quote": "07:00~07:30 KST의 fixture-event-01은 rule 5715인 경우 source_ip가 192.0.2.40으로 기록되어 있습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "acknowledged-limit",
+      "arm": "base",
+      "seconds": 5.273,
+      "at_kst": "2026-11-14T07:59:54.581619+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 message는 'sshd authentication success'로 SSH 인증 성공을 포함합니다.\n- **일치**: 반환된 경보 건수는 1건으로 제한된 표본이며, 전체 구간 경보 수나 공격 부재 여부는 확인되지 않았습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 message는 'sshd authentication success'로 SSH 인증 성공을 포함합니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"message\": \"sshd authentication success\""
+          },
+          {
+            "kind": "agree",
+            "text": "반환된 경보 건수는 1건으로 제한된 표본이며, 전체 구간 경보 수나 공격 부재 여부는 확인되지 않았습니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 1"
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "acknowledged-limit",
+      "arm": "candidate",
+      "seconds": 5.694,
+      "at_kst": "2026-11-14T08:00:00.276804+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 message는 'sshd authentication success'입니다.\n- **일치**: 반환된 경보 건수는 1건으로 제한된 표본이며, 전체 경보 건수나 공격 부재 여부는 확인되지 않았습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 구간(07:00~07:30 KST) 조회 결과 1건이 반환되었으며, 해당 경보의 message는 'sshd authentication success'입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"message\": \"sshd authentication success\""
+          },
+          {
+            "kind": "agree",
+            "text": "반환된 경보 건수는 1건으로 제한된 표본이며, 전체 경보 건수나 공격 부재 여부는 확인되지 않았습니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 반환 표본에 SSH 인증 성공이 있습니다. 제한된 표본이므로 전체 경보 건수와 공격 부재는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 1"
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "same-event-false-value",
+      "arm": "candidate",
+      "seconds": 4.392,
+      "at_kst": "2026-11-14T08:00:04.669853+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31로 확인됨.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31로 확인됨.",
+            "other_quote": "07:00~07:30 KST Wazuh 사건 fixture-event-01의 출발지 IP는 192.0.2.40입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "same-event-false-value",
+      "arm": "base",
+      "seconds": 4.045,
+      "at_kst": "2026-11-14T08:00:08.715812+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 사건 fixture-event-01의 출발지 IP를 192.0.2.40으로 주장하나, 실제 조회 결과(sample[0].source_ip)는 192.0.2.31입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 사건 fixture-event-01의 출발지 IP는 192.0.2.40입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "zero-sample-boundary",
+      "arm": "base",
+      "seconds": 10.063,
+      "at_kst": "2026-11-14T08:00:18.780251+09:00",
+      "result": {
+        "status": "partial",
+        "final_response": "- **미확인**: 상대 답변의 시각 범위가 실제 조회 조건과 일치하는지 확인 근거가 부족합니다.\n- **일치**: 지정 구간 내 경보 반환 건수가 0건임을 확인했습니다.\n- **일치**: 전체 인덱스 카운트가 null이므로 전체 건수 및 공격 유무는 미확인 상태입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.requested_since_kst",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 시각 범위가 실제 조회 조건과 일치하는지 확인 근거가 부족합니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+          },
+          {
+            "kind": "agree",
+            "text": "지정 구간 내 경보 반환 건수가 0건임을 확인했습니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 0"
+          },
+          {
+            "kind": "agree",
+            "text": "전체 인덱스 카운트가 null이므로 전체 건수 및 공격 유무는 미확인 상태입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "zero-sample-boundary",
+      "arm": "candidate",
+      "seconds": 10.62,
+      "at_kst": "2026-11-14T08:00:29.401768+09:00",
+      "result": {
+        "status": "partial",
+        "final_response": "- **미확인**: 상대 답변의 시각/표본 일치 주장은 검토자 조회 조건으로만 확인 가능해 unverified로 남깁니다.\n- **일치**: 해당 기간 경보 반환 건수 0건으로, 공격 의심 표본은 관측되지 않았습니다.\n- **일치**: 인덱싱 전체 건수(null)가 미제공되어 전체 경보 부재 여부는 미확인입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.requested_since_kst",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 시각/표본 일치 주장은 검토자 조회 조건(e1)으로만 확인 가능해 unverified로 남깁니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 0"
+          },
+          {
+            "kind": "agree",
+            "text": "해당 기간 경보 반환 건수 0건으로, 공격 의심 표본은 관측되지 않았습니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 0"
+          },
+          {
+            "kind": "agree",
+            "text": "인덱싱 전체 건수(null)가 미제공되어 전체 경보 부재 여부는 미확인입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 조회에서 반환 표본은 0건입니다. 전체 경보 건수와 공격 유무는 미확인입니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "real-positive-vs-absence",
+      "arm": "candidate",
+      "seconds": 5.448,
+      "at_kst": "2026-11-14T08:00:34.851138+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 요청 구간(07:00~07:30 KST) Wazuh 경보에 SQLi 탐지 기록이 1건 존재합니다. 반환된 경보(event_id: fixture-event-01, timestamp: 2026-11-14T07:10:00+09:00)의 message는 'SQL injection signature matched'이며 attack_type은 'SQLi'입니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "요청 구간(07:00~07:30 KST) Wazuh 경보에 SQLi 탐지 기록이 1건 존재합니다. 반환된 경보(event_id: fixture-event-01, timestamp: 2026-11-14T07:10:00+09:00)의 message는 'SQL injection signature matched'이며 attack_type은 'SQLi'입니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 경보에는 SQLi 탐지 기록이 전혀 없습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"message\": \"SQL injection signature matched\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "real-positive-vs-absence",
+      "arm": "base",
+      "seconds": 4.048,
+      "at_kst": "2026-11-14T08:00:38.900362+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 다른 봇은 SQLi 탐지 기록이 없다고 주장했으나, 실제 조회 결과(1건)에 'SQL injection signature matched' 메시지와 attack_type: SQLi가 명확히 확인됩니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "다른 봇은 SQLi 탐지 기록이 없다고 주장했으나, 실제 조회 결과(1건)에 'SQL injection signature matched' 메시지와 attack_type: SQLi가 명확히 확인됩니다.",
+            "other_quote": "07:00~07:30 KST Wazuh 경보에는 SQLi 탐지 기록이 전혀 없습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"message\": \"SQL injection signature matched\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "사전 사례 기준 충족. 독립 평가나 전체 정확도 증거 아님."
+    },
+    {
+      "case": "table-conditional",
+      "arm": "base",
+      "seconds": 11.95,
+      "at_kst": "2026-11-14T08:00:50.851858+09:00",
+      "result": {
+        "status": "partial",
+        "final_response": "- **미확인**: 상대 답변의 시각 범위가 실제 경보 수집 구간과 일치하는지 확인 근거가 부족합니다.\n- **이견**: 반환된 rule 5715는 'authentication success'로 정상 인증 기록이며, 공격이나 비정상 접근을 의미하지 않습니다.\n- **이견**: 실제 관측된 source_ip는 '192.0.2.31'로 null이 아니며, 출발지 식별에 문제가 없습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "agree",
+            "evidence_path": "result.requested_until_kst",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 시각 범위가 실제 경보 수집 구간과 일치하는지 확인 근거가 부족합니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"requested_since_kst\": \"2026-11-14T07:00:00+09:00\""
+          },
+          {
+            "kind": "disagree",
+            "text": "반환된 rule 5715는 'authentication success'로 정상 인증 기록이며, 공격이나 비정상 접근을 의미하지 않습니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+          },
+          {
+            "kind": "disagree",
+            "text": "실제 관측된 source_ip는 '192.0.2.31'로 null이 아니며, 출발지 식별에 문제가 없습니다.",
+            "other_quote": "| 출발지 | source_ip가 null인 경우 이 필드로는 출발자를 식별할 수 없음 | IP가 있는 표본은 값으로 확인 가능 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": false,
+      "manual_reason": "조건부 IP 설명을 전칭 주장으로 오독하고, 인증 성공을 공격 주장으로 오독한 거짓 이견"
+    },
+    {
+      "case": "table-conditional",
+      "arm": "candidate",
+      "seconds": 9.541,
+      "at_kst": "2026-11-14T08:01:00.394079+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 구간(07:00~07:30 KST) 내 Wazuh 경보 2건이 반환되었습니다.\n- **일치**: 반환된 경보 중 rule 5715(인증 성공)가 포함되어 있습니다.\n- **일치**: 반환된 경보 중 rule 5501(PAM 세션 열림)가 포함되어 있습니다.\n- **일치**: 인덱싱된 전체 건수(indexed_window_total_count)는 null로 확인되지 않았습니다.\n- **일치**: 표본의 source_ip는 null이 아닌 192.0.2.31로 확인되었습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 구간(07:00~07:30 KST) 내 Wazuh 경보 2건이 반환되었습니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 2"
+          },
+          {
+            "kind": "agree",
+            "text": "반환된 경보 중 rule 5715(인증 성공)가 포함되어 있습니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+          },
+          {
+            "kind": "agree",
+            "text": "반환된 경보 중 rule 5501(PAM 세션 열림)가 포함되어 있습니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"wazuh_rule_id\": \"5501\""
+          },
+          {
+            "kind": "agree",
+            "text": "인덱싱된 전체 건수(indexed_window_total_count)는 null로 확인되지 않았습니다.",
+            "other_quote": "| Wazuh 07:00~07:30 KST | rule 5715 인증 성공, 5501 세션 열림 표본 | 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "kind": "agree",
+            "text": "표본의 source_ip는 null이 아닌 192.0.2.31로 확인되었습니다.",
+            "other_quote": "| 출발지 | source_ip가 null인 경우 이 필드로는 출발자를 식별할 수 없음 | IP가 있는 표본은 값으로 확인 가능 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"source_ip\": \"192.0.2.31\""
+          }
+        ]
+      },
+      "manual_pass": true,
+      "manual_reason": "거짓 이견은 사라짐. 다만 5개 항목으로 권장 1~3개보다 길다."
+    },
+    {
+      "case": "table-acknowledged-limit",
+      "arm": "candidate",
+      "seconds": 18.207,
+      "at_kst": "2026-11-14T08:01:18.603007+09:00",
+      "result": {
+        "status": "partial",
+        "final_response": "\n조회는 수행했으나 상대 답변과의 대조를 완료하지 못했습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch",
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 1
+          },
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 2,
+            "kind": "agree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 2
+          }
+        ],
+        "peer_review": "synthesis_failed",
+        "error_type": "PeerClaimRefused",
+        "peer_error_code": "peer_query_scope_mismatch"
+      },
+      "manual_pass": false,
+      "manual_reason": "조회 한도 근거 연결 검사 2회 거절 후 합성 실패. 검사를 약화하지 않았으나 답변 미완수."
+    },
+    {
+      "case": "table-acknowledged-limit",
+      "arm": "base",
+      "seconds": 13.396,
+      "at_kst": "2026-11-14T08:01:32.002684+09:00",
+      "result": {
+        "status": "partial",
+        "final_response": "- **이견**: 상대 답변은 구간 전체 건수를 미확인이라고 했으나, 내 조회 결과 indexed_window_total_count가 null로 실제 수집된 총계 정보가 제공되지 않았다.\n- **이견**: 상대 답변은 rule 5715 인증 성공을 포함한다고 했으나, 내 조회 sample에는 wazuh_rule_id 5715와 sshd authentication success 메시지가 명확히 관측되었다.\n- **미확인**: 상대 답변의 제한 표본 15건은 내 조회의 scan_capped=true 조건과 직접 비교할 근거가 부족해 미확인으로 남긴다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [
+          "peer_query_scope_mismatch"
+        ],
+        "peer_attempts": 2,
+        "peer_validation_details": [
+          {
+            "code": "peer_query_scope_mismatch",
+            "claim_index": 0,
+            "kind": "disagree",
+            "evidence_path": "result.scan_capped",
+            "attempt": 1
+          }
+        ],
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 구간 전체 건수를 미확인이라고 했으나, 내 조회 결과 indexed_window_total_count가 null로 실제 수집된 총계 정보가 제공되지 않았다.",
+            "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"indexed_window_total_count\": null"
+          },
+          {
+            "kind": "disagree",
+            "text": "상대 답변은 rule 5715 인증 성공을 포함한다고 했으나, 내 조회 sample에는 wazuh_rule_id 5715와 sshd authentication success 메시지가 명확히 관측되었다.",
+            "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"wazuh_rule_id\": \"5715\""
+          },
+          {
+            "kind": "unverified",
+            "text": "상대 답변의 제한 표본 15건은 내 조회의 scan_capped=true 조건과 직접 비교할 근거가 부족해 미확인으로 남긴다.",
+            "other_quote": "| Wazuh | 제한 표본 15건, rule 5715 인증 성공 포함 | 구간 전체 건수 미확인 |",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"scan_capped\": true"
+          }
+        ]
+      },
+      "manual_pass": false,
+      "manual_reason": "같은 전체 건수 미확인·같은 인증 성공을 이견으로 표시"
+    },
+    {
+      "case": "conditional-recommendation",
+      "arm": "base",
+      "seconds": 4.553,
+      "at_kst": "2026-11-14T08:01:36.557546+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **이견**: 다른 봇은 경보가 확인되지 않아 추가 조치를 하지 않았다고 서술했으나, 실제 조회 결과(2026-11-14 07:00~07:30 KST)에 SQLi 탐지 경보 1건(event_id: fixture-event-01)이 반환되었습니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "disagree",
+            "text": "다른 봇은 경보가 확인되지 않아 추가 조치를 하지 않았다고 서술했으나, 실제 조회 결과(2026-11-14 07:00~07:30 KST)에 SQLi 탐지 경보 1건(event_id: fixture-event-01)이 반환되었습니다.",
+            "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 1"
+          }
+        ]
+      },
+      "manual_pass": false,
+      "manual_reason": "SQLi 미관측 때문에 조치하지 않았다는 원문에 없는 이유를 생성"
+    },
+    {
+      "case": "conditional-recommendation",
+      "arm": "candidate",
+      "seconds": 6.491,
+      "at_kst": "2026-11-14T08:01:43.049798+09:00",
+      "result": {
+        "status": "completed",
+        "final_response": "- **일치**: 요청 시각(07:00~07:30 KST) Wazuh 경보 조회 결과, 총 1건의 SQLi 탐지 경보가 반환되었습니다.\n- **일치**: 반환된 경보는 SQL injection signature matched 메시지이며, 공격 유형은 SQLi로 분류됩니다.\n- **일치**: 상대 답변의 'SQLi 탐지 기록 확인' 주장은 실제 경보 데이터와 일치합니다.",
+        "protected_calls": 0,
+        "peer_validation_errors": [],
+        "peer_attempts": 1,
+        "peer_review": "source_bound_claims",
+        "peer_claims": [
+          {
+            "kind": "agree",
+            "text": "요청 시각(07:00~07:30 KST) Wazuh 경보 조회 결과, 총 1건의 SQLi 탐지 경보가 반환되었습니다.",
+            "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"returned_count\": 1"
+          },
+          {
+            "kind": "agree",
+            "text": "반환된 경보는 SQL injection signature matched 메시지이며, 공격 유형은 SQLi로 분류됩니다.",
+            "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"message\": \"SQL injection signature matched\""
+          },
+          {
+            "kind": "agree",
+            "text": "상대 답변의 'SQLi 탐지 기록 확인' 주장은 실제 경보 데이터와 일치합니다.",
+            "other_quote": "Wazuh 경보에서 SQLi 탐지 기록이 확인되는 경우 대상 서비스의 접근 로그와 WAF 차단 기록을 대조할 것을 권고합니다. 현재는 추가 조회·차단·설정 변경을 실행하지 않았습니다.",
+            "missing_field": "",
+            "call_index": 0,
+            "evidence_quote": "\"attack_type\": \"SQLi\""
+          }
+        ]
+      },
+      "manual_pass": false,
+      "manual_reason": "조건부 권고를 SQLi 탐지 기록을 확인했다는 실제 주장으로 바꿈. agree 표시에 가려진 의미 오류."
+    }
+  ],
+  "candidate_file": "infra/validation/peer-semantics/candidate-soc-investigate.md",
+  "canonical_promotion": "not promoted; canonical skill restored to the observed base"
+}

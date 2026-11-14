@@ -20,6 +20,8 @@
 
 이후 이 절에 더한 원칙(11/14): 검토자 자신의 조회가 한도에 닿았으면(`scan_capped` true) `scanned`·`returned_count`·`returned_items`·`omitted_items`는 그 한도와 같은 값이라 상대 표본 크기를 확인하거나 반박하지 못한다. 같은 경계는 작업자 코드(`bind_peer_references`)가 `peer_query_scope_mismatch`로 강제한다. [후보](../validation/peer-limit/README.md). 정정(11/14 01:50): 처음 문장은 `omitted_items`도 한도 값으로 묶었으나 틀렸다. 이 값은 작업자의 표시용 발췌에서 뺀 수다. 이름을 `not_shown_in_excerpt`로 바꾸고, 스킬에는 "표시용 발췌에서 뺀 수이며 조회에서 빠진 경보가 아니다"를 두었다. [후보](../validation/peer-excerpt/README.md).
 
+**현재 미승격 후보:** [교차 검토 의미 비교](../validation/peer-semantics/README.md)의 조건·표본·권고 구분 보완은 별도 후보 파일이다. 기존6/9·후보7/9이고 의미 오류가 남아 canonical·운영·초기 설치 스킬에는 반영하지 않았다. 실제 판단 지침 변경과 구조 검사·운영 배포는 구분한다.
+
 ## 실제 연결
 
 `workflow_contract.py`는 고정된 네 이름만 허용한다. 각 SKILL의 이름·설명·고유 마커·크기와 파일 경로를 확인하며 누락·중복·심볼릭 링크를 조용히 무시하지 않는다. 원본 정의는 위 네 폴더에 하나씩 둔다. 설치된 세 프로필의 `skill-soc-*.md`는 같은 원본 바이트의 배포 복사본이다. flat 이름으로 기존 파일별 백업/원복과 충돌 없는 초기 반입을 유지한다.

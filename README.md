@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+<!-- current-work-summary:start -->
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [교차 검토 의미 후보](infra/validation/peer-semantics/README.md)는 기존6/9·후보7/9의 개발 비교이며 오류가 남아 canonical·운영에 미승격입니다. 내부 식별자 수정도 별도 승인 대기입니다. 논문은 구성·설치·운영·장애 대응 중심의 매뉴얼형 PDF36쪽·DOCX35쪽으로 검수했으며 Word 본문·팀원 표는 편집 가능합니다. 논문 본체와 원문 검증은 로컬 전용입니다. 아래 날짜별 설명은 해당 시점의 검증 범위입니다.
+<!-- current-work-summary:end -->
+
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.
 
 [공통 조회 스킬](infra/hermes/skills/soc-query/SKILL.md)은 범위 확인·실제 MCP·근거 검증·표 보고 절차를 두 봇에서 공유합니다. [최근 경보 조회의 수정·실측·한계](infra/hermes/event-listing-parity.md). [OS·Docker 상세 조회와 호스트별 표](infra/mcp/host-inventory.md)는 서비스·컨테이너·자원·네트워크·디스크를 실제 읽고 A/B/C로 나눠 표시합니다. 디스크·메모리·스왑 용량은 공통 출력 스킬과 코드로 GB/TB 등 소수점 최대 두 자리·괄호 원값을 표시합니다.
@@ -757,7 +761,7 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 
 Suricata는 기본 수동 탐지 모드이며 nft 대응은 LLM 조사·판단과 제한된 실행 경로를 거칩니다. LLM에 일반 sudo/Docker·패키지 설치 권한을 주지 않습니다. 이전 PHP·Java 직접 구동 설명은 각각의 README와 검증 이력에 보존합니다.
 
-논문 로컬 PDF는11/8 결과를 반영한46쪽이다. 균형 학습 완료와 실제 복합 답변의 판단 누락/추세 오류를 구분했고, 본문·표822블록/목차71개·전체 시각 검수를 마쳤다. 새 학습본의 품질·독립평가·최종 제출본과 발표 리허설은 미완료다. 논문/발표·가중치/로컬 검증은 Git에 올리지 않는다.
+논문은 구성·설치·운영·장애·승인·복구 매뉴얼형 편집 초안으로 정리했다. 로컬 PDF36쪽·DOCX35쪽이며 본문/표483·489개 누락0, 목차85·60개 쪽수 일치와 화면 검수를 확인했다. 팀원 표는 사진/학번 공란·일반 편집 상태다. 독립 평가·최종 제출규격·최신 실측 반영과 발표 리허설은 미완료다. 논문/발표·가중치/로컬 검증은 Git에 올리지 않는다.
 
 관리 경로는 조회·점검까지 Mac→관리자231→A→B/C로 통일한다. 공격 시험은 Kali232·233에서만 송신하며 Mac VPN 주소로 대신하지 않는다. 현재 공격 시험 중단은 유지한다. [운영 절차](deployment/OPERATIONS.md).
 

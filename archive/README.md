@@ -4,7 +4,9 @@
 
 현재 요약 정리 전의 STATUS·PLAN 상세는 각 통합 원장에 `source-dfc3e2a-status`·`source-dfc3e2a-plan`으로 보존했다. 정확히 같은 절만 기존 본문으로 참조하고, 원본 SHA와 Git 복구 위치를 함께 남겼다.
 
-최근 [이력 전송 읽기 감사](../infra/normalization/vector/history-auto-transfer/AUDIT.md)의14완료·420일치·실패43보존검토·같은420배치80회시간측정/1024추정을추가했다. 운영변경0이며정확적용승인은계속대기다.
+최근 [평가범위정정](../finetuning/EVALUATION_SCOPE.md)은기존test176의소비128·workflow0을확인하고비교준비기의사용이력감사를추가했다.새독립관제평가·운영변경으로표시하지않는다.
+
+직전 [이력 전송 읽기 감사](../infra/normalization/vector/history-auto-transfer/AUDIT.md)의14완료·420일치·실패43보존검토·같은420배치80회시간측정/1024추정을추가했다. 운영변경0이며정확적용승인은계속대기다.
 
 직전 [관리 상태 정확 적용 준비](../infra/validation/control-status/application/README.md)의19파일·현재 프로필 gate·시작 관측·37운영자 검사·영수증 불일치 정정·격리 원복과 미적용 범위를 유형별 이력에 추가했다. 직전 현재 요약은 Git32a6545에서 복원한다. 구조·회귀·API와 실제 적용/타이머/채팅을 구분한다.
 

@@ -12710,3 +12710,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## 2026-11-15T02:05:02.400137+09:00 이력 전송 읽기 감사
 
 A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bcanonical420payloadSHA확인.43실패폴더는예상메타데이터복사뿐·삭제0.현재단위읽기만/운영정책변경0. [근거와범위](../infra/normalization/vector/history-auto-transfer/AUDIT.md). 이전 요약은 Gitf499a42에서 복원한다.
+
+## 2026-11-15T02:22:24.049396+09:00 평가자료범위·사용이력정정
+
+앞선현재요약의미사용176독립평가표현을정정.실test176=128소비V5CTI+GUIDE48·도구workflow0,현재1220train정확입력중복0만으로독립성입증불가.현재준비기범위감사/48검사·운영변경0. [근거](../finetuning/EVALUATION_SCOPE.md).직전현재요약은Gitb826696에서복원한다.과거실험원문/학습분할/가중치는유지한다.

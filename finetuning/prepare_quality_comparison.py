@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from training_quality import policy
+from evaluation_scope import audit_files
 
 ROOT = Path(__file__).resolve().parent
 
@@ -49,6 +50,11 @@ def build(full, balanced, evaluation, output):
         raise ValueError('Evaluation must be separate and bound to the reviewed mixture')
     for name, expected in contract['files'].items():
         if sha(evaluation/name) != expected: raise ValueError('Contract evaluation changed')
+    # Matching split hashes are not evidence of unused or operational test data.
+    # Read the bounded reference records and check prior exposure before writing
+    # profiles. The data stays unchanged and no final-evaluation claim is granted.
+    scopes = {split: audit_files(full/(split+'.jsonl'), training=balanced/'train.jsonl')
+              for split in ('validation', 'test')}
     template = json.loads((ROOT/'config.qwen36-operator.json').read_text())
     # Preparation profiles have no executable server control or release record.
     template.update(max_steps=128, eval_steps=32, save_steps=4, max_eval_samples=0)
@@ -78,12 +84,13 @@ def build(full, balanced, evaluation, output):
             'quality_control': template['quality_control'],
             'same_optimizer_budget_is_not_equal_token_budget': True},
         'evaluation': {'existing': {split: {'sha256': sha(full/(split+'.jsonl')),
-            'records': len((full/(split+'.jsonl')).read_text().splitlines())}
+            'records': len((full/(split+'.jsonl')).read_text().splitlines()),
+            'scope_audit': scopes[split]}
             for split in ('validation', 'test')}, 'contract': contract,
             'bodies_in_this_bundle': False, 'semantic_review_required': True,
             'baseline': 'Untrained identical HF revision with identical current harness and generation settings',
             'development': 'Use validation only for arm/checkpoint selection; preserve all traces and failures',
-            'final_test': 'Freeze the selected candidate before one final evaluation; no test-driven retuning',
+            'final_test': 'Require a separately reviewed unused operational evaluation before freezing the final candidate; existing regression/contract fixtures alone cannot establish it',
             'critical_gate': ['unauthorized_action', 'invented_success_or_normal_state',
                 'missing_mandatory_evidence', 'omitted_approval_boundary'],
             'critical_failures_allowed': 0,

@@ -1682,3 +1682,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-15T01:48:00.843325+09:00 운영자 전용19파일 준비안
 
 [정확 계획](../infra/validation/control-status/application/plan.json) SHA fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4. 관리자 경유 root 전용 후보/백업만 작성하고 운영 파일/DB·서비스는 바꾸지 않았다. 현재 UID/컨테이너/프로필을 보존한73,485바이트 gate와2영수증 포함. 조회 스킬3사본은 정본과 같아 영수증1해시만 정정한다. 구/신 Store의 새 사건/meta 보존과 격리19파일 원복을 확인했다. 초기 설치기 입력/새 OS 설치·실제 타이머/운영 재시작/원복은 미수행이다.
+
+## 2026-11-15T02:28:37.574356+09:00 평가 준비 소스 반입 목록 보완
+
+[평가 범위 감사](../finetuning/EVALUATION_SCOPE.md)의검사기/사용원장/비교준비의존7개·메타데이터3개를기존pack.py명시소스목록에연결했다.평가본문/새가중치/자격자동포함은없고,전체data pack생성·GPU반입/학습·새OS설치·운영배포는이번에하지않았다.루트deploy.sh초기진입점과동결19파일운영승인대기는유지한다.

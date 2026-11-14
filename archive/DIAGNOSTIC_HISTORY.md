@@ -318,3 +318,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T02:05:02.400137+09:00 이력 전송 읽기 감사
 
 실패43:manifest_pull12×35/65×4/255×1·finalize65×3.목록/영수증이모두canonical과일치·예상밖파일0.255상세원인은남은phase/code만으로확정불가.최근500journal중99상태/96성공/3과거보류,완전96triplet·420신규0의80회중앙150.08초/p95152.69초.1024/374.57초는단순환산·실측아님. [근거와범위](../infra/normalization/vector/history-auto-transfer/AUDIT.md). 이전 요약은 Gitf499a42에서 복원한다.
+
+## 2026-11-15T02:22:24.049396+09:00 평가자료범위·사용이력정정
+
+보관압축/manifest/7멤버SHA대조로test176안의128이과거V5test와ID/전체레코드/실제입력정확일치함을확인.과거공개결과는양군128씩응답생성완료.모든176tool정의/호출/관측0.첫rollout수집오류는드라이버PYTHONPATH누락·해당6만재실행통과·원문보존. [근거](../finetuning/EVALUATION_SCOPE.md).직전현재요약은Gitb826696에서복원한다.과거실험원문/학습분할/가중치는유지한다.

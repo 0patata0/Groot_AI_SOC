@@ -87,11 +87,63 @@
     "existing": {
       "validation": {
         "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
-        "records": 176
+        "records": 176,
+        "scope_audit": {
+          "data_sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+          "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+          "records": 176,
+          "tool_definition_rows": 0,
+          "tool_observation_rows": 0,
+          "assistant_tool_call_rows": 0,
+          "sources": {
+            "source-labelled-evidence-v5": 128,
+            "microsoft-guide-v2-retrospective-triage": 48
+          },
+          "known_consumed_record": 0,
+          "training_overlap_record": 0,
+          "known_consumed_visible_input": 0,
+          "training_overlap_visible_input": 0,
+          "known_consumed_nonassistant_input": 0,
+          "training_overlap_nonassistant_input": 0,
+          "allowed_use": "development_regression_only",
+          "independent_operational_quality_proven": false,
+          "promotion_evidence_allowed_by_this_audit": false,
+          "limits": [
+            "No observed tool workflow coverage",
+            "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+          ]
+        }
       },
       "test": {
         "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
-        "records": 176
+        "records": 176,
+        "scope_audit": {
+          "data_sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+          "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+          "records": 176,
+          "tool_definition_rows": 0,
+          "tool_observation_rows": 0,
+          "assistant_tool_call_rows": 0,
+          "sources": {
+            "source-labelled-evidence-v5": 128,
+            "microsoft-guide-v2-retrospective-triage": 48
+          },
+          "known_consumed_record": 128,
+          "training_overlap_record": 0,
+          "known_consumed_visible_input": 128,
+          "training_overlap_visible_input": 0,
+          "known_consumed_nonassistant_input": 128,
+          "training_overlap_nonassistant_input": 0,
+          "allowed_use": "development_regression_only",
+          "independent_operational_quality_proven": false,
+          "promotion_evidence_allowed_by_this_audit": false,
+          "limits": [
+            "Previously consumed evaluation records or visible inputs",
+            "Previously consumed nonassistant inputs; inspect context and source-family reuse",
+            "No observed tool workflow coverage",
+            "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+          ]
+        }
       }
     },
     "contract": {
@@ -139,7 +191,7 @@
     "semantic_review_required": true,
     "baseline": "Untrained identical HF revision with identical current harness and generation settings",
     "development": "Use validation only for arm/checkpoint selection; preserve all traces and failures",
-    "final_test": "Freeze the selected candidate before one final evaluation; no test-driven retuning",
+    "final_test": "A separately reviewed unused operational evaluation is required; existing regression/reference/contract sets do not establish it.",
     "critical_gate": [
       "unauthorized_action",
       "invented_success_or_normal_state",
@@ -150,7 +202,8 @@
     "unmodelled_valid_read": "unscored_pending_semantic_review_not_auto_failure",
     "decision": "Require trace-reviewed improvement without critical regressions; inconclusive or tied keeps the deployed base",
     "independent_expert_gold": false,
-    "actual_mcp_and_chat_validation_required": true
+    "actual_mcp_and_chat_validation_required": true,
+    "scope_correction": "See EVALUATION_SCOPE.md: existing176are regression/reference, not unused independent SOC operational evaluation."
   },
   "execution_gate": [
     "explicit bounded pilot start",
@@ -164,5 +217,6 @@
     "Budgets, mixture caps and rates are hypotheses, not proven optima",
     "128-step pilot does not cover every training row",
     "No overall SOC gain, overfitting prevention or production readiness is established"
-  ]
+  ],
+  "scope_review_at_kst": "2026-11-15T02:22:24.049396+09:00"
 }

@@ -1,0 +1,443 @@
+{
+  "at_kst": "2026-11-15T02:22:24.049396+09:00",
+  "status": "evaluation_scope_corrected_and_preparation_guard_verified; no model evaluation run",
+  "archive": {
+    "cleaned_sha256": "34964874a5a967c6fd9748347b52cee290de5f5602f00f9be924b0d6cecdee45",
+    "manifest_sha256": "dfe1c92e6a000647609a6eb0ba8bf14b8430567c70c01c07f812ec228fe14b28",
+    "selected_members": {
+      "finetuning/data-balanced-preflight-20261107-r2/data/train.jsonl": {
+        "bytes": 4764062,
+        "path": "finetuning/data-balanced-preflight-20261107-r2/data/train.jsonl",
+        "sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+        "extracted_as": "balanced-train.jsonl"
+      },
+      "finetuning/data-balanced-preflight-20261107-r2/data/validation.jsonl": {
+        "bytes": 397304,
+        "path": "finetuning/data-balanced-preflight-20261107-r2/data/validation.jsonl",
+        "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+        "extracted_as": "legacy-validation176.jsonl"
+      },
+      "finetuning/data-balanced-preflight-20261107-r2/data/test.jsonl": {
+        "bytes": 407058,
+        "path": "finetuning/data-balanced-preflight-20261107-r2/data/test.jsonl",
+        "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+        "extracted_as": "legacy-test176.jsonl"
+      },
+      "finetuning/data-soc-evidence-v5-r3/validation.jsonl": {
+        "bytes": 309267,
+        "path": "finetuning/data-soc-evidence-v5-r3/validation.jsonl",
+        "sha256": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7",
+        "extracted_as": "consumed-v5-validation128.jsonl"
+      },
+      "finetuning/data-soc-evidence-v5-r3/test.jsonl": {
+        "bytes": 315503,
+        "path": "finetuning/data-soc-evidence-v5-r3/test.jsonl",
+        "sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045",
+        "extracted_as": "consumed-v5-test128.jsonl"
+      },
+      "finetuning/data-operator-contract-eval-20261107-r1/validation.jsonl": {
+        "bytes": 36772,
+        "path": "finetuning/data-operator-contract-eval-20261107-r1/validation.jsonl",
+        "sha256": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042",
+        "extracted_as": "workflow-validation16.jsonl"
+      },
+      "finetuning/data-operator-contract-eval-20261107-r1/test.jsonl": {
+        "bytes": 36429,
+        "path": "finetuning/data-operator-contract-eval-20261107-r1/test.jsonl",
+        "sha256": "cd32e521cb9e56c8d77fdd0c2bb006fd63056c7729acada3c11dc898fa505558",
+        "extracted_as": "workflow-test16.jsonl"
+      }
+    }
+  },
+  "split_structure": {
+    "legacy-test176.jsonl": {
+      "rows": 176,
+      "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+      "tool_definition_rows": 0,
+      "tool_message_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "source_fields": {
+        "source-labelled-evidence-v5": 128,
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "id_prefixes": {
+        "soc": 128,
+        "guide": 48
+      },
+      "overlap_with_v5_128": {
+        "identical_full_records": 128,
+        "identical_input_messages": 128,
+        "same_ids": 128
+      },
+      "exact_input_overlap_current1220train": 0,
+      "remaining_rows": 48,
+      "remaining_sources": {
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "remaining_id_prefixes": {
+        "guide": 48
+      }
+    },
+    "balanced-train.jsonl": {
+      "rows": 1220,
+      "sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
+      "tool_definition_rows": 41,
+      "tool_message_rows": 35,
+      "assistant_tool_call_rows": 41,
+      "source_fields": {
+        "soc-reviewed-v4": 126,
+        "source-labelled-evidence-v5": 48,
+        "soc-source-observation-candidate": 17,
+        "microsoft-guide-v2-retrospective-triage": 288,
+        "wazuh": 357,
+        "crs": 111,
+        "cisa_counter": 152,
+        "microsoft_excytin": 16,
+        "splunk_attack": 40,
+        "project_live_mcp": 17,
+        "project_isolated_executor": 24,
+        "ctu13-source-bound-investigation": 24
+      },
+      "id_prefixes": {
+        "soc": 174,
+        "OBS": 17,
+        "guide": 288,
+        "operator": 717,
+        "ctu13": 24
+      }
+    },
+    "legacy-validation176.jsonl": {
+      "rows": 176,
+      "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+      "tool_definition_rows": 0,
+      "tool_message_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "source_fields": {
+        "source-labelled-evidence-v5": 128,
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "id_prefixes": {
+        "soc": 128,
+        "guide": 48
+      },
+      "overlap_with_v5_128": {
+        "identical_full_records": 128,
+        "identical_input_messages": 128,
+        "same_ids": 128
+      },
+      "exact_input_overlap_current1220train": 0,
+      "remaining_rows": 48,
+      "remaining_sources": {
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "remaining_id_prefixes": {
+        "guide": 48
+      }
+    },
+    "workflow-test16.jsonl": {
+      "rows": 16,
+      "sha256": "cd32e521cb9e56c8d77fdd0c2bb006fd63056c7729acada3c11dc898fa505558",
+      "tool_definition_rows": 13,
+      "tool_message_rows": 13,
+      "assistant_tool_call_rows": 13,
+      "source_fields": {
+        "soc-reviewed-v6": 16
+      },
+      "id_prefixes": {
+        "contract": 16
+      }
+    },
+    "workflow-validation16.jsonl": {
+      "rows": 16,
+      "sha256": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042",
+      "tool_definition_rows": 13,
+      "tool_message_rows": 13,
+      "assistant_tool_call_rows": 13,
+      "source_fields": {
+        "soc-reviewed-v6": 16
+      },
+      "id_prefixes": {
+        "contract": 16
+      }
+    },
+    "consumed-v5-test128.jsonl": {
+      "rows": 128,
+      "sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045",
+      "tool_definition_rows": 0,
+      "tool_message_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "source_fields": {
+        "source-labelled-evidence-v5": 128
+      },
+      "id_prefixes": {
+        "soc": 128
+      }
+    },
+    "consumed-v5-validation128.jsonl": {
+      "rows": 128,
+      "sha256": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7",
+      "tool_definition_rows": 0,
+      "tool_message_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "source_fields": {
+        "source-labelled-evidence-v5": 128
+      },
+      "id_prefixes": {
+        "soc": 128
+      }
+    }
+  },
+  "scope_audits": {
+    "legacy-validation176.jsonl": {
+      "data_sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+      "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+      "records": 176,
+      "tool_definition_rows": 0,
+      "tool_observation_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "sources": {
+        "source-labelled-evidence-v5": 128,
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "known_consumed_record": 0,
+      "training_overlap_record": 0,
+      "known_consumed_visible_input": 0,
+      "training_overlap_visible_input": 0,
+      "known_consumed_nonassistant_input": 0,
+      "training_overlap_nonassistant_input": 0,
+      "allowed_use": "development_regression_only",
+      "independent_operational_quality_proven": false,
+      "promotion_evidence_allowed_by_this_audit": false,
+      "limits": [
+        "No observed tool workflow coverage",
+        "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+      ]
+    },
+    "legacy-test176.jsonl": {
+      "data_sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+      "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+      "records": 176,
+      "tool_definition_rows": 0,
+      "tool_observation_rows": 0,
+      "assistant_tool_call_rows": 0,
+      "sources": {
+        "source-labelled-evidence-v5": 128,
+        "microsoft-guide-v2-retrospective-triage": 48
+      },
+      "known_consumed_record": 128,
+      "training_overlap_record": 0,
+      "known_consumed_visible_input": 128,
+      "training_overlap_visible_input": 0,
+      "known_consumed_nonassistant_input": 128,
+      "training_overlap_nonassistant_input": 0,
+      "allowed_use": "development_regression_only",
+      "independent_operational_quality_proven": false,
+      "promotion_evidence_allowed_by_this_audit": false,
+      "limits": [
+        "Previously consumed evaluation records or visible inputs",
+        "Previously consumed nonassistant inputs; inspect context and source-family reuse",
+        "No observed tool workflow coverage",
+        "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+      ]
+    },
+    "workflow-validation16.jsonl": {
+      "data_sha256": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042",
+      "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+      "records": 16,
+      "tool_definition_rows": 13,
+      "tool_observation_rows": 13,
+      "assistant_tool_call_rows": 13,
+      "sources": {
+        "soc-reviewed-v6": 16
+      },
+      "known_consumed_record": 0,
+      "training_overlap_record": 0,
+      "known_consumed_visible_input": 0,
+      "training_overlap_visible_input": 0,
+      "known_consumed_nonassistant_input": 0,
+      "training_overlap_nonassistant_input": 0,
+      "allowed_use": "unverified_evaluation_candidate_only",
+      "independent_operational_quality_proven": false,
+      "promotion_evidence_allowed_by_this_audit": false,
+      "limits": [
+        "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+      ]
+    },
+    "workflow-test16.jsonl": {
+      "data_sha256": "cd32e521cb9e56c8d77fdd0c2bb006fd63056c7729acada3c11dc898fa505558",
+      "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+      "records": 16,
+      "tool_definition_rows": 13,
+      "tool_observation_rows": 13,
+      "assistant_tool_call_rows": 13,
+      "sources": {
+        "soc-reviewed-v6": 16
+      },
+      "known_consumed_record": 0,
+      "training_overlap_record": 0,
+      "known_consumed_visible_input": 0,
+      "training_overlap_visible_input": 0,
+      "known_consumed_nonassistant_input": 0,
+      "training_overlap_nonassistant_input": 0,
+      "allowed_use": "unverified_evaluation_candidate_only",
+      "independent_operational_quality_proven": false,
+      "promotion_evidence_allowed_by_this_audit": false,
+      "limits": [
+        "Source/incident independence, expert correctness and actual MCP/chat execution are not established by fingerprints"
+      ]
+    }
+  },
+  "usage_registry_sha256": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+  "consumption_evidence": {
+    "file": "V5_EXECUTION_RESULTS.json",
+    "pointer": "post_training_comparison.final_test",
+    "finished_at_kst": "2026-10-30T00:35:11.012074+09:00",
+    "control_responses": 128,
+    "candidate_responses": 128,
+    "consumed_test_sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045"
+  },
+  "regressions": {
+    "at_kst": "2026-11-15T02:19:40.131413+09:00",
+    "profiles": [
+      {
+        "pattern": "test_evaluation_scope.py",
+        "rc": 0,
+        "tests": 7,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_quality_comparison.py",
+        "rc": 0,
+        "tests": 4,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_operator_contract_eval.py",
+        "rc": 0,
+        "tests": 3,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_balanced_operator.py",
+        "rc": 0,
+        "tests": 3,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_evaluate.py",
+        "rc": 0,
+        "tests": 16,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_soc_evaluate.py",
+        "rc": 0,
+        "tests": 9,
+        "skipped": 0,
+        "failures": []
+      },
+      {
+        "pattern": "test_operator_rollout.py",
+        "rc": 0,
+        "tests": 6,
+        "skipped": 0,
+        "failures": [],
+        "seconds": 0.133
+      }
+    ],
+    "total_tests": 48,
+    "explicit_source_handoff_entries_checked": [
+      "EVALUATION_USAGE.json",
+      "config.qwen36-operator.json",
+      "evaluation_scope.py",
+      "mcp_contract.20261107.json",
+      "prepare_balanced_operator.py",
+      "prepare_operator_contract_eval.py",
+      "prepare_quality_comparison.py"
+    ],
+    "initial_test_driver_failure": "test_operator_rollout was invoked without finetuning on PYTHONPATH; collection ImportError before any tests. Original stderr preserved. Reran only this suite with the established PYTHONPATH; production/test sources unchanged.",
+    "full_data_pack_or_new_server_install_tested": false,
+    "model_calls": 0,
+    "training_started": false,
+    "operating_changes": 0,
+    "review_final_recheck": [
+      {
+        "pattern": "test_evaluation_scope.py",
+        "rc": 0,
+        "tests": 7,
+        "skipped": 0
+      },
+      {
+        "pattern": "test_quality_comparison.py",
+        "rc": 0,
+        "tests": 4,
+        "skipped": 0
+      }
+    ],
+    "explicit_metadata_handoff_entries_checked": [
+      "EVALUATION_SCOPE.md",
+      "EVALUATION_SCOPE_AUDIT.json",
+      "QUALITY_COMPARISON_PLAN.json"
+    ]
+  },
+  "source_sha256": {
+    "evaluation_scope.py": "4034b892789b57f82c7459fba95136a9d4614ac9d52407c5cb7d0ddfc90769e3",
+    "prepare_quality_comparison.py": "a1f06314d878810130533ff489a10ee73b4d4a8ab7791fd45811639b60a2bea4",
+    "pack.py": "0f67c27c2d62b532f09f012a25532a9cb13ca1ea79fa9b6a4b1d953ca5b0c82b",
+    "EVALUATION_USAGE.json": "d62d6b5ba13c2fdf3991620d535e7b400eff1de11286b62d674289c27f62aaad",
+    "tests/test_evaluation_scope.py": "791bcd11eed3bd67a24c78cd88549975efcdf372abe3e6b13dd0cf8950b57da0",
+    "tests/test_quality_comparison.py": "b8fdb46254c342eee7dbf7b8543bbb6f788f3c75223c4ed592a8bb02fa7e5190"
+  },
+  "claim_correction": "The inherited test176 is128already-consumed V5 CTI mapping records plus48retrospective GUIDE triage records, with0tool workflows. It is a regression/reference set, not176unused independent SOC operational cases. The GUIDE48 are not certified unused or independent by this audit. The separate16+16workflow fixtures are project authored, unvalidated model/operational candidates, not provider incident gold.",
+  "scope": [
+    "No model/API/MCP/chat calls, no actual tool/approval/rollback operations or new quality score.",
+    "No new training, weights, served-model/harness/config change. The pending exact19-file native status candidate is unchanged.",
+    "Current1220train exact inputs overlap0with audited splits does not prove semantic/source-family/pretraining separation.",
+    "Registry is a verified exposure lower bound; absence does not certify unused data.",
+    "Old training validation loss/composition hashes remain historical; no claims of measured SOC performance are derived from them.",
+    "The source pack allowlist was checked; a complete data bundle build/new server installation was not run."
+  ],
+  "review": {
+    "method": "defect-first manual review; original review-agent unavailable",
+    "semgrep": "not run; no Mac installation",
+    "hardening": "Manual review added explicit empty user/reference refusal and invalid registry SHA type refusal; reran the changed7+4suites and checked all4real split audit outputs unchanged. Other37tests unchanged and not repeated.",
+    "secret_scan": {
+      "scanner": "original secret-scanner skill",
+      "options": "--git /Users/patata/SW/capstone_project --json --redact 0",
+      "coverage": "original scanner --git reads current tracked working-tree files with its default binary/size filters; not Git history or separate staged blobs",
+      "tracked_paths": 2144,
+      "unchanged_preexisting_findings": 5,
+      "new_changed_path_findings": 0,
+      "values_or_snippets_saved": false,
+      "tracked_link_external_credential_preflight": "passed"
+    },
+    "exposure_registry_review": "Distinct consumed records may share input fingerprints; retain both records and union inputs. Duplicate full-record entries still refuse. Added this counterexample to the existing scope test and reran changed7+4only."
+  },
+  "cleanup": {
+    "at_kst": "2026-11-15T02:26:12.430788+09:00",
+    "path": "/private/tmp/capstone-eval-integrity-sic95rx_",
+    "files": 9,
+    "bytes": 6288834,
+    "selected_data_bodies_removed": 7,
+    "reproduction_sources": 2,
+    "remote_temp_or_jobs_created": 0,
+    "packages_installed": 0,
+    "G_Harness2_preserved": true,
+    "retained_data_archives": [
+      "datasets/archives/original.tar.gz",
+      "datasets/archives/cleaned.tar.gz"
+    ],
+    "absent": true
+  },
+  "publication_checks": {
+    "related_staged_files": 24,
+    "new_markdown_links_checked": 30,
+    "paper_ledger_unchanged": true,
+    "unrelated_changes_staged": 0
+  }
+}

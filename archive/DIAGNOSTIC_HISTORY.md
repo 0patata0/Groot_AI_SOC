@@ -314,3 +314,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T01:48:00.843325+09:00 준비 과정의 두 불일치와 정정
 
 처음 준비 시 조회 스킬 영수증의 과거 SHA를 발견해 운영 변경 전에 중단했다. 실제3사본이 현 Git와 일치함을 확인해 영수증만 정정하는 [후보](../infra/validation/control-status/application/README.md)를 만들었다.45스키마 목록의 순서 차이를 변화로 비교했던 검사도 alias별 해시 집합으로 바로잡았다. 기존 gateway 로그의 버전 표시 부재는 구버전 로드의 증거로 단정하지 않는다. 새 관측11검사 포함 query419/Hermes 생략0·최종 적용 도구37/Linux 생략0. 초기33→37은 heartbeat/PID·프로세스/DB 준비 확인 보강이며 기존 Native/query 코드는 바뀌지 않았다. 실제 콜드 재시작/타이머/채팅을 대신한 검증은 아니다.
+
+## 2026-11-15T02:05:02.400137+09:00 이력 전송 읽기 감사
+
+실패43:manifest_pull12×35/65×4/255×1·finalize65×3.목록/영수증이모두canonical과일치·예상밖파일0.255상세원인은남은phase/code만으로확정불가.최근500journal중99상태/96성공/3과거보류,완전96triplet·420신규0의80회중앙150.08초/p95152.69초.1024/374.57초는단순환산·실측아님. [근거와범위](../infra/normalization/vector/history-auto-transfer/AUDIT.md). 이전 요약은 Gitf499a42에서 복원한다.

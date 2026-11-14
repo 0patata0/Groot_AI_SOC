@@ -12706,3 +12706,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## 2026-11-15T01:48:00.843325+09:00 정확 적용·복구 준비 완료, 운영 미적용
 
 직전 요약은 Git32a65452c8ad0e24237ba62541b8c16fde60e4cf:STATUS.md로 복원한다. [정확19파일 계획](../infra/validation/control-status/application/README.md)은 query141 시작 관측·17소스/2영수증·현재 프로필 gate·유휴 확인·15분 원복을 준비했다. Native536/query419 Hermes 생략0·SDK77/설치46/최종 운영자37·복제19원복 통과. 기존 gateway 메모리 버전은 로그만으로 미확인. 승인/실제 적용/타이머/새 채팅 미수행·운영 변경0.
+
+## 2026-11-15T02:05:02.400137+09:00 이력 전송 읽기 감사
+
+A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bcanonical420payloadSHA확인.43실패폴더는예상메타데이터복사뿐·삭제0.현재단위읽기만/운영정책변경0. [근거와범위](../infra/normalization/vector/history-auto-transfer/AUDIT.md). 이전 요약은 Gitf499a42에서 복원한다.

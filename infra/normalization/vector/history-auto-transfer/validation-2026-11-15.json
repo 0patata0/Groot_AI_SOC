@@ -1,0 +1,168 @@
+{
+  "at_kst": "2026-11-15T02:05:02.400137+09:00",
+  "subject": "Read-only audit of A history completion, B canonical preservation and43 retained failed attempts",
+  "status": "audit_completed; operating policy/source/data unchanged",
+  "observed_at_kst": {
+    "a": "2026-11-15T01:59:56.776321+09:00",
+    "b": "2026-11-15T02:01:54.988972+09:00"
+  },
+  "summary": {
+    "a_jobs_complete": true,
+    "a_batches": 420,
+    "a_records": 413594,
+    "a_bytes": 223151607,
+    "b_batches": 420,
+    "b_records": 413594,
+    "b_bytes": 223151607,
+    "a_failed_copy_manifests_equal": 396,
+    "b_canonical_payloads_verified": 420,
+    "kept_runs": 43,
+    "only_expected_files": true,
+    "failure_groups": {
+      "manifest_pull:12": 35,
+      "manifest_pull:65": 4,
+      "finalize:65": 3,
+      "manifest_pull:255": 1
+    },
+    "kept_run_entries": 2496,
+    "kept_run_bytes": 2924163,
+    "kept_run_mib": 2.79,
+    "logical_entries": 5044,
+    "entry_limit": 16384,
+    "logical_bytes": 237512786,
+    "byte_limit": 1073741824,
+    "latest_exec_seconds": 153.633694,
+    "journal_observed_json_statuses": 99,
+    "journal_status_counts": {
+      "remote_files_preserved": 96,
+      "deferred": 3
+    },
+    "paired_success_invocations": 96,
+    "steady_420_zero_new": {
+      "count": 80,
+      "min_seconds": 148.730174,
+      "median_seconds": 150.08478250000002,
+      "p95_nearest_rank_seconds": 152.690255,
+      "max_seconds": 153.690577
+    },
+    "projection_1024_from_latest_seconds": 374.57,
+    "projection_is_measured": false,
+    "failure_copy_disposition": "all43 expected metadata/catalog only; canonical matches; no deletion performed",
+    "scope": "file preservation to source fixed cutoffs only; not all historical events or Wazuh/Indexer delivery acknowledgement",
+    "operating_writes": 0,
+    "service_actions": 0,
+    "a_b_all_420_batch_ids_and_manifest_payload_metadata_equal": true,
+    "cross_host_observed_at_kst": {
+      "a": "2026-11-15T01:59:56.776321+09:00",
+      "b": "2026-11-15T02:01:54.988972+09:00"
+    }
+  },
+  "a_units": {
+    "capstone-vector-history-auto.service": {
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "capstone-vector-history-auto.timer": {
+      "Result": "success",
+      "ActiveState": "active",
+      "SubState": "waiting"
+    }
+  },
+  "b_units": {
+    "capstone-history-auto-transfer.service": {
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStartTimestampMonotonic": "217352387153",
+      "ExecMainExitTimestampMonotonic": "217506020847",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "capstone-history-auto-transfer.timer": {
+      "Result": "success",
+      "ActiveState": "active",
+      "SubState": "waiting"
+    }
+  },
+  "source_sha256": {
+    "/usr/local/lib/capstone-vector-history-auto/auto-lib.sh": "a210fd64d0cb6f4e6e8be0697be51f0c06896fb42c0cf59f698e3ef275ad5ba5",
+    "/usr/local/lib/capstone-vector-history-auto/runtime.sha256": "258ccfde07a75b153618060aa4bfde5af3b32c4a23e83a711d71d051678a2246",
+    "/usr/local/libexec/capstone-history-export": "fd1e7769f8da6828da31aac101fc29a3ea343a2ff1c57301b27f09483f80355e",
+    "/usr/local/lib/capstone-history-auto-transfer/worker-b.sh": "6781b8fd74546f36e1b8bad3ddbcddb7055c5e7a5625acb914dd885d1c5304b5",
+    "/usr/local/lib/capstone-history-auto-transfer/transfer-lib.sh": "0ed5bbe69829a9d7dc3671241872da82590982f5ecd97167c2e05c0c8006cb2d",
+    "/usr/local/lib/capstone-history-auto-transfer/ssh-b.sh": "7ea52f7d15e77a241aec04c9c77544d2553d61e7b343b9bdf607a543e296bd85",
+    "/usr/local/lib/capstone-history-auto-transfer/runtime.sha256": "abdd7d6748228e090770fa8f1f329551fda9c076ef8d184f7b54b7eed13eede8"
+  },
+  "failed_attempt_evidence": {
+    "expected_patterns": [
+      "failure.json",
+      "receipt.json",
+      "receipts.jsonl",
+      "status.json",
+      "catalog/batch-<64hex>/manifest.json"
+    ],
+    "failure_metadata_files": 43,
+    "top_level_last_receipts": 3,
+    "completed_attempt_receipt_catalogs": 3,
+    "completed_attempt_statuses": 3,
+    "copied_manifests": 1179,
+    "unique_copied_manifests": 396,
+    "last_receipts_equal_canonical": true,
+    "status_matches_own_receipt_catalog": true,
+    "unexpected_files_or_payload_copies": 0,
+    "deletion_performed": false,
+    "exact_cause_unconfirmed": "One historical manifest_pull/255 failure cannot be diagnosed beyond its retained phase/code metadata; raw SSH/rsync stderr was intentionally not retained."
+  },
+  "timing_method": "Pair systemd journal start/status/finish by boot+invocation ID and subtract monotonic timestamps. Last500 journal records yield99 status rows (96success,3older deferred),96complete successful triplets. Steady stats use only80triplets with420batches/new0, nearest-rank p95. Latest ExecMain monotonic duration is separate.",
+  "boundaries": {
+    "management_route": "Mac-admin231-A[-B]",
+    "model_or_mcp_calls": 0,
+    "real_chats": 0,
+    "attacks_or_training": 0,
+    "operating_source_or_data_writes": 0,
+    "service_actions": 0,
+    "native_status_candidate_applied": false
+  },
+  "limits": [
+    "Fixed retained source cutoffs only, not proof that every event ever emitted was retained.",
+    "remote_file_preserved is file custody, not source ACK or Wazuh analysis/Indexer delivery ACK.",
+    "1024batch374.57s is a linear projection from latest420batch153.633694s, not a measured1024batch result or capacity guarantee.",
+    "Steady80samples repeat420existing immutable batches with no new receipt, not workload-independent performance.",
+    "Failed work metadata retained unchanged; no retention/deletion policy applied.",
+    "B payload byte SHA was compared with A manifest SHA fields; A original payload bytes were not rehashed in this audit."
+  ],
+  "review": {
+    "method": "defect-first manual review; no production code change",
+    "semgrep": "not run; no Mac installation",
+    "secret_scan": {
+      "scanner": "original secret-scanner skill",
+      "options": "--git /Users/patata/SW/capstone_project --json --redact 0",
+      "coverage": "original scanner --git reads current tracked working-tree files with its default binary/size filters; not Git history or separate staged blobs",
+      "tracked_paths": 2139,
+      "unchanged_preexisting_findings": 5,
+      "new_changed_path_findings": 0,
+      "values_or_snippets_saved": false,
+      "tracked_link_external_credential_preflight": "passed"
+    }
+  },
+  "cleanup": {
+    "at_kst": "2026-11-15T02:06:10.453894+09:00",
+    "mac_temp": "/private/tmp/capstone-history-audit-_s1u2lbl",
+    "files": 5,
+    "bytes": 27567,
+    "reproduction_sources": 5,
+    "packages_installed": 0,
+    "remote_temp_files_created": 0,
+    "G_Harness2_preserved": true,
+    "absent": true
+  },
+  "publication_checks": {
+    "related_staged_files": 11,
+    "new_markdown_links_checked": 17,
+    "paper_ledger_unchanged": true,
+    "unrelated_changes_staged": 0
+  }
+}

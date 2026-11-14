@@ -4,6 +4,8 @@
 현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 후보의 정확 적용안](infra/validation/control-status/application/README.md)은17소스 사본+2영수증·유휴 확인·15분 원복을 준비했고 Native536/query419는 기존 Hermes 격리 환경에서 생략 없이 통과했습니다. SDK77·설치46·최종 운영자37과 복제 경로19파일 적용/원복도 통과했습니다. query1.19.141은 패치/준비 폴더만이며 정본·설치 파일137,운영 적용·새 채팅은 승인 후 확인합니다. 기존 로그의 메모리 로드 버전은 미확인입니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. [이력 전송 점검](infra/normalization/vector/history-auto-transfer/AUDIT.md)에서도 A14작업 완료·A/B420배치 일치와 실패43폴더의 메타데이터 보존을 확인했습니다. [평가자료감사](finetuning/EVALUATION_SCOPE.md)에서는기존176이독립SOC평가가아님을확인해범위와비교준비기를정정했습니다. 아래 날짜별 내용은 당시 기록입니다.
 <!-- current-work-summary:end -->
 
+[현재 모델의 개발16사례 진단](finetuning/WORKFLOW_DEVELOPMENT.md)을 마쳤습니다. 조회 없이 FW·DNS·서비스 상태를 조회했다고 쓴3답변을 확인했고 설치된 기존 Ollama 근거 검사가 모두 검출했습니다. 대상 없는 룰 질문도 실제 runtime이 먼저 확인합니다. 최종 보정·채팅까지의 성공을 입증한 시험은 아니며 다른 읽기7개는 미채점입니다. 최신45도구 스키마와 평가기 journal 호환을 맞췄고 로컬49검사를 통과했습니다. 운영/권한 변경·새 학습0, 정확19파일 후보는 계속 승인 대기입니다.
+
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.
 
 [공통 조회 스킬](infra/hermes/skills/soc-query/SKILL.md)은 범위 확인·실제 MCP·근거 검증·표 보고 절차를 두 봇에서 공유합니다. [최근 경보 조회의 수정·실측·한계](infra/hermes/event-listing-parity.md). [OS·Docker 상세 조회와 호스트별 표](infra/mcp/host-inventory.md)는 서비스·컨테이너·자원·네트워크·디스크를 실제 읽고 A/B/C로 나눠 표시합니다. 디스크·메모리·스왑 용량은 공통 출력 스킬과 코드로 GB/TB 등 소수점 최대 두 자리·괄호 원값을 표시합니다.

@@ -1,6 +1,6 @@
 {
   "schema": "groot-quality-comparison-v1",
-  "status": "prepared_not_executed",
+  "status": "training_arms_prepared_not_executed",
   "base_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
   "fresh_base_each_arm": true,
   "prior_adapter_or_optimizer_reused": false,
@@ -151,7 +151,7 @@
       "training_included": false,
       "provider_incident_gold": false,
       "independent_expert_review": false,
-      "model_evaluation_run": false,
+      "model_evaluation_run": true,
       "training_sha256": "13346ceab447de63798e382e85464ac8e8a53ba6b230cf76b3d9a98d4a2cf5de",
       "catalog_sha256": "dc8955a546f3ba6e9e75a8da146de2b34e6c3745ab35a6b9b154792dfbafe06c",
       "counts": {
@@ -185,7 +185,16 @@
       "files": {
         "test.jsonl": "cd32e521cb9e56c8d77fdd0c2bb006fd63056c7729acada3c11dc898fa505558",
         "validation.jsonl": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042"
-      }
+      },
+      "model_evaluation_scope": "Current deployed-model component diagnostic on validation16 only; no new training arm, full harness/MCP/chat or baseline pair run.",
+      "development_review": {
+        "path": "WORKFLOW_DEVELOPMENT_REVIEW.json",
+        "sha256": "7c213c8bf2378bf1645a6025273171ae684343e852c8c74ba1168a81c2d79e6d",
+        "source_validation_records": 16,
+        "test_split_requested_in_this_run": false,
+        "operational_acceptance": false
+      },
+      "source_validation_usage": "Consumed development fixtures; original fingerprints retained in EVALUATION_USAGE.json; actual transformed wire request hashes are separate."
     },
     "bodies_in_this_bundle": false,
     "semantic_review_required": true,

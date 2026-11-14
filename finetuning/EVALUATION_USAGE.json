@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-15T02:17:25.563465+09:00",
+  "updated_at_kst": "2026-11-15T03:06:44.308222+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -652,6 +652,99 @@
           "record_sha256": "0ecc2d7ee233159bac6de3547542ec5d52479b9badc63dccb5720c7b07478d0c",
           "visible_input_sha256": "b9a3b7f25f4da1e59a8c3a34a896fd70886907e4e76cfdc4dee4a9222ae630b1",
           "nonassistant_input_sha256": "dd1baef103b1c1fbc1703f030142550badc126fa0f32d9e33652f66a3e7711ed"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "project-operator-contract/validation",
+      "data_sha256": "32228440f31e77a05bb3ba9cf7a5dc46ba1c25686f3fa625ffc75abe9375a042",
+      "records": 16,
+      "evidence": "finetuning/WORKFLOW_DEVELOPMENT_REVIEW.json; current-model21requests/16sourcefixtures used for development and full-trace manual review",
+      "evidence_sha256": "7c213c8bf2378bf1645a6025273171ae684343e852c8c74ba1168a81c2d79e6d",
+      "consumed_at_kst": "2026-11-15T02:57:39.528816+09:00",
+      "task": "Current ChatOllama model component with transformed policy/tool catalog, fixed observations; not full operational agent",
+      "fingerprint_scope": "Original source/reference fixture identities used for development; NOT hashes of actual transformed wire messages or an assertion all reference tool observations were delivered.",
+      "fingerprints": [
+        {
+          "record_sha256": "1f18569ac46bb57299b4ff3fb297f0f3c123bab6cf294fc36d6c0fba481c2f5b",
+          "visible_input_sha256": "d7d18a276d348a71eb378bf1ed10f65282feb2d2dcb3efb54c6d3a6fd95783a7",
+          "nonassistant_input_sha256": "3bce71df8f9f24d8a238e11f19ec6b439dbe759bd9b23fd88730513d70d33151"
+        },
+        {
+          "record_sha256": "da2bc64d87f18fafe082145e5fd5a305a14a56bdc7cbe586ab81f7c210dceeb9",
+          "visible_input_sha256": "95a9b848ef252b14c5c584c4534b8d20c94725cb7b2665e6ce7e8e6190d0c2ba",
+          "nonassistant_input_sha256": "2f2b20a8e717ec126daeae46bf736a58eced28f407c37e492f8221d1eb814cfb"
+        },
+        {
+          "record_sha256": "798f5a81bdad1e11543170c96814becedd27b9788d0399d47cbcd3e3482b9da2",
+          "visible_input_sha256": "7bdd1e5320be214149a61ae9e49dabbfdd7368b6096873641237af26c6545bec",
+          "nonassistant_input_sha256": "4c53b406e37470ca5a00f4ccec06df2d42a23098e351d0ad835d62160ed27645"
+        },
+        {
+          "record_sha256": "278ed99d3db4655d881df75105f1b6a2655491a3c98dec968a065ce19741dd42",
+          "visible_input_sha256": "7ef0046fa26c128fcfa66499645ca4551f5bd0e23bfe3512e5960bd09a3a6727",
+          "nonassistant_input_sha256": "c235b67b577c1e626d8d0642604dcada59c1588484d4082bd81b202795e73fd9"
+        },
+        {
+          "record_sha256": "28a99fee00d9f4f04e3c233777787fae19b5593f0102d874362e994fb076bcee",
+          "visible_input_sha256": "02c5722dea07ee7e58af6f830b1ab9ba0c83007ef798c4ec7f301e675651f2b3",
+          "nonassistant_input_sha256": "e3416812f2366c4c01d78f022e7876e700d465db8610bae84b729ebf50789f5b"
+        },
+        {
+          "record_sha256": "6ddff1e6f7851662baa7dd4fc67a5d6b847954bf692f827c1213295d2585acf9",
+          "visible_input_sha256": "ecd74310b7d0838616f7b32336b5dfbe861bc530d2a56a59663a22a39a7a5505",
+          "nonassistant_input_sha256": "6ecb0a2fd14ccb1916fcf671c958093060e885cba7341fcc683e55c3df35ddc3"
+        },
+        {
+          "record_sha256": "7a158e6cd074c43c50425247727c2317e4a5e36bcbd0b896d987de84d44d9991",
+          "visible_input_sha256": "414b59b293df0dcdf9bbff4ff9cbfba3310ec060cfede382a22bc5deacb9a3ff",
+          "nonassistant_input_sha256": "e37a262ee31ff891e2b484bed269f7dc9c65abcd9bfbe1fa4e4fea3f102339c9"
+        },
+        {
+          "record_sha256": "048d2760383d080752b274811c308fb769bc160eb4e95277d0e6e961dfe08f67",
+          "visible_input_sha256": "feb62987479ac3c1a9ccba6472b5e8ec6d2cbadf619ffdcaa742bf18473db9cd",
+          "nonassistant_input_sha256": "fb268b03a07d5d0ea0c16a2a2bf53d4eb7ea55c0db4109862290e90cbf186ee5"
+        },
+        {
+          "record_sha256": "6f607c05856ce825f96f14a40067791ce21cfb031b62c40f05defdc9bae4bbe7",
+          "visible_input_sha256": "99b81161611a78ea7949459eacc06cf23bbce0845744f048f9eff333a8ff784e",
+          "nonassistant_input_sha256": "6d39fd4b7b455c08acc1f7167db7dc51abf27916434d81d2fb3404e19df91423"
+        },
+        {
+          "record_sha256": "aa0f3a3257a0a0615da8edb5be49d2acd236180a6a5ef0c6360e5dde425fa108",
+          "visible_input_sha256": "88dd25bbaa750021df7330c40a300a313b6063cb1e602d1218f38acaa642da1c",
+          "nonassistant_input_sha256": "7866313557df8b9fe0b38ce9938f750e13d4a38ec05249692b9b6841036d8661"
+        },
+        {
+          "record_sha256": "d1c3678c954d4c57667cce5a808315779406f0d09a39b4878bfad17d0c4155a0",
+          "visible_input_sha256": "616c291c685eb500b6c0ea98619da83bae567c343c68bda368989acac8ee8b7b",
+          "nonassistant_input_sha256": "5acf4511eb2268189f80aefb0333a6ca9f183bdf9497b61d729e81ff1cd124eb"
+        },
+        {
+          "record_sha256": "1d115e63f927493dfe770f8f3ce634ba4042cd24b5062df5c1b7277416c88e82",
+          "visible_input_sha256": "7a92f9680e2da1182a2bc1193ecfa8a826ebeb8d5078c9a41763c54af68759ea",
+          "nonassistant_input_sha256": "f04f679cf8c7fe67d6d849abc8f78d8ae02b4390b580938d275e16079d082fee"
+        },
+        {
+          "record_sha256": "26520db239e1e9b3f30be47d483a6c79a51075c5555472010c5f9cb654a7e683",
+          "visible_input_sha256": "d482bb84cdde0fa65d160be75117db646ae195180dab03f97ed61f2122e55e58",
+          "nonassistant_input_sha256": "62957892ba2cb1285da4c53f190f5985ee5f46c773e45aec84d504c239bb1610"
+        },
+        {
+          "record_sha256": "985fc254bc08bb403f00083e53cc36e13451966de950c98dca552a7e7ba0431e",
+          "visible_input_sha256": "e341f610f5fad151915e17097ddedda698ef455732fbe347777745b3d450400e",
+          "nonassistant_input_sha256": "3d238f203219a48411f764a0200bddbfcf2185f255ad23c8dd530eb70de7f3ec"
+        },
+        {
+          "record_sha256": "4ee1e94618f884d8744299f720caad282ff07b8e69c36813157e4e6e078e5442",
+          "visible_input_sha256": "6903ade42de998a1a22d79e4753344f0d8a40a3a105413341dfdcfcb2bc71e88",
+          "nonassistant_input_sha256": "b552d28bfcbd42cf21f099f207bd8bd3f3eeb7f0b4e62c2870132ce43133fc07"
+        },
+        {
+          "record_sha256": "a29ffc932306ac17f34b7a9d829c4d21e8ab2024c58a1a7fe8f0683abea461bb",
+          "visible_input_sha256": "b18c737d9ca086d104c9a4e4edfeb6728b935e1e55c6b2b0f706adfd6c9d86db",
+          "nonassistant_input_sha256": "cdef46308aae2de2fc357dae0201046ce9d1b292051612d5e12fa82b78b73f87"
         }
       ]
     }

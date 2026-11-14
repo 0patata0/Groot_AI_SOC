@@ -12730,3 +12730,8 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 ## journal CPU·native 가능성 후속 (2026-11-15)
 
 같은A고정24h의공식Reader/2동시요약실험11.946초·구간검사합32004/선택0·표본cursorSHA일치를확인했다. 8f6c/운영8336은불변·표준MCP응답/보안회귀/적용/채팅미완료다. 직전경계보완은내용7803cc3/영수증969de2e에서복원한다. [정확 원장·조건](../infra/validation/journal-native/README.md).
+
+
+## 2026-11-15T07:03:37.745990+09:00 journal native 어댑터 구현·격리 검증
+
+공통 native journal 어댑터를 구현했다. 25등록unit·4 unit-match분기·정수µs·고정 오류 선택·공통 마스킹/행/응답 검사를 보존하고, 최대2개 child/공유20초/child12초·64KiB private packet·최종60000B·취소/회수·잘림 cutoff를 검증했다. native28+기존115+설치23=166pass/skip0. A/B/C 같은24h 오류 후보15.137/7.400/0.335초, B과거 오류6행·A1µs1행은CLI와 완전한 정규화 행/has_more 일치·8건 모두 구validator 통과. 각1회/부하캐시비통제·MCP/모델/채팅0·운영8336유지다. 설치기 source/영수증과systemd255/binding235/API검사·오프라인목록을동기화했다. 새 OS 전체 설치/정확 적용·복구/승인/실제MCP·새채팅은 남는다. 서버21파일286019B/3폴더·Mac15파일772643B자체제거·최소재현6소스보존·운영3source/unit/readerPID/ticks불변active. 기존19planfd6/PREPARED와원래9변경·논문43쪽본문SHA·G_Harness2/자료/가중치/복구본보존. 초기unit변수/mock/ROOT치환누락은수정·실패원문구분. 후속core docstring만변경/실행AST동일. 하네스변경0으로공식H2미사용·review-agent미발견/수동결함검토·Semgrep미수행. [상세 원장](../infra/validation/journal-adapter/README.md).

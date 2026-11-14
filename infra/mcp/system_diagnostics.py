@@ -93,7 +93,7 @@ def journal_library():
         module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
             'need', 'DiagnosticError', 'TARGETS', 'PROFILES', 'ROLE_HOST', 'ERROR_PATTERN',
             'ERROR_CODES', 'STRUCTURED_ERROR_CODES', 'SOURCE_NAMES',
-            'parsed', 'encode', 'trusted_parents', 'bounded_command', 'history_library')})
+            'parsed', 'encode', 'trusted_parents', 'root_file', 'bounded_command', 'history_library')})
         _journal = module
     return _journal
 
@@ -212,8 +212,8 @@ def root_file(path, maximum, mode=None, gid=None):
         return data
 
 
-def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False):
-    """No shell/inherited credentials. Stderr only for fixed Docker log reads."""
+def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False, cancel=None):
+    """No shell/inherited credentials; reject stderr from fixed journal reads."""
     if docker_logs:
         need(len(argv) == 9 and argv[0] in ('/usr/bin/docker', '/usr/local/bin/docker')
              and argv[1:8] == ['logs', '--since', '15m', '--tail', '20', '--timestamps', '--']
@@ -221,15 +221,20 @@ def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False):
              'docker_log_command_invalid')
     checked_journal = argv[:4] == ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json']
     checked_grep = checked_journal and argv[-2:] == ['--priority=warning..info', '--grep=' + ERROR_PATTERN]
+    checked_native = argv == ['/usr/bin/python3', '-I', '-B',
+        str(Path(__file__).with_name('diagnostic_journal_native.py')), '--worker']
+    checked_streams = checked_journal or checked_native
+    need(cancel is None or callable(cancel), 'command_cancel_invalid')
+    need(cancel is None or not cancel(), 'command_cancelled')
     process = subprocess.Popen(argv, stdin=subprocess.PIPE if input_data is not None else subprocess.DEVNULL,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT if docker_logs else subprocess.PIPE if checked_journal else subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT if docker_logs else subprocess.PIPE if checked_streams else subprocess.DEVNULL,
         env=ENV, close_fds=True, start_new_session=True)
     result = bytearray()
     stderr_bytes = 0
     deadline = time.monotonic() + seconds
     selector = selectors.DefaultSelector()
     selector.register(process.stdout, selectors.EVENT_READ, 'stdout')
-    if checked_journal:
+    if checked_streams:
         selector.register(process.stderr, selectors.EVENT_READ, 'stderr')
     try:
         if input_data is not None:
@@ -237,6 +242,7 @@ def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False):
             process.stdin.write(input_data)
             process.stdin.close()
         while selector.get_map():
+            need(cancel is None or not cancel(), 'command_cancelled')
             remaining = deadline - time.monotonic()
             need(remaining > 0, 'command_timeout')
             for key, _ in selector.select(min(remaining, 0.25)):
@@ -251,10 +257,11 @@ def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False):
                 else:
                     stderr_bytes += len(chunk)
                     need(stderr_bytes <= MAX_COMMAND_STDERR, 'command_stderr_bound')
+        need(cancel is None or not cancel(), 'command_cancelled')
         remaining = deadline - time.monotonic()
         need(remaining > 0, 'command_timeout')
         code = process.wait(timeout=remaining)
-        if checked_journal:
+        if checked_streams:
             need(stderr_bytes == 0, 'journal_query_stderr')
         if checked_grep:
             # journalctl --grep returns 1 for no matching entries. Only the

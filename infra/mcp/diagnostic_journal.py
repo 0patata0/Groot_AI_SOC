@@ -17,6 +17,7 @@ import stat
 import struct
 import syslog
 import time
+import types
 
 core = None
 SOCKET = Path('/run/capstone-journal/read.sock')
@@ -181,12 +182,60 @@ def redact(message):
     return text, 'redacted' if text != message else 'unchanged', sha
 
 
+def source_row(item, unit, since, until):
+    """One shared source check and masking path for CLI and native readers."""
+    core.need(isinstance(item, dict), 'journal_row_invalid')
+    matches = {item[k] for k in ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT')
+               if isinstance(item.get(k), str) and item[k] in core.TARGETS.values()}
+    core.need(matches == {unit}, 'journal_unit_mismatch')
+    stamp, cursor, priority = item.get('__REALTIME_TIMESTAMP'), item.get('__CURSOR'), item.get('PRIORITY')
+    core.need(isinstance(stamp, str) and re.fullmatch(r'[0-9]{1,20}', stamp)
+              and isinstance(cursor, str) and 1 <= len(cursor) <= 2048
+              and isinstance(priority, str) and priority in tuple('01234567'), 'journal_fields_invalid')
+    at = int(stamp)
+    if not since <= at <= until:
+        return None
+    excerpt, state, sha = redact(item.get('MESSAGE'))
+    row = {'at_kst':core.history_library().shown(at), 'priority':int(priority),
+        'record_sha256':digest(cursor.encode()), 'message_sha256':sha,
+        'message_excerpt':excerpt, 'message_state':state,
+        'excerpt_sha256':digest(excerpt.encode()) if excerpt is not None else None}
+    return row
+
+
+def add_row(rows, row):
+    key = row['record_sha256']
+    core.need(key not in rows or rows[key] == row, 'journal_cursor_conflict')
+    rows[key] = row
+
+
+_native = None
+
+
+def native_library():
+    global _native
+    if _native is None:
+        path = Path(__file__).with_name('diagnostic_journal_native.py')
+        raw = core.root_file(path, 131072)
+        module = types.ModuleType('fixed_diagnostic_journal_native')
+        module.__file__ = str(path)
+        exec(compile(raw, str(path), 'exec'), module.__dict__)
+        module.core = core
+        module.journal = types.SimpleNamespace(**{name: globals()[name] for name in (
+            'request', 'source_row', 'add_row', 'finish', 'validate_entries',
+            'QUERY_WINDOW_US', 'QUERY_TIMEOUT', 'COMMAND_TIMEOUT', 'MAX_RESULT')})
+        _native = module
+    return _native
+
+
 def answer(value, host, now=None, runner=None):
     now = int(time.time()) if now is None else now
     target, since, until, limit, scope = request(value, now)
     core.need(host in core.ROLE_HOST.values() and target[0] == host, 'journal_host_mismatch')
     unit = core.TARGETS[target]
-    runner = core.bounded_command if runner is None else runner
+    if runner is None:
+        return native_library().answer(value, host, now)
+    # Explicit runner injection keeps the bounded CLI source as a test oracle.
     filters = ([['--priority=err'], ['--priority=warning..info', '--grep=' + core.ERROR_PATTERN]]
                if scope == 'errors' else [[]])
     rows, source_limited, read_bytes = {}, False, 0
@@ -214,26 +263,9 @@ def answer(value, host, now=None, runner=None):
             core.need(len(lines) <= limit + 1, 'journal_row_bound')
             source_limited |= len(lines) == limit + 1
             for line in lines:
-                item = core.parsed(line)
-                core.need(isinstance(item, dict), 'journal_row_invalid')
-                matches = {item[k] for k in ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT')
-                           if isinstance(item.get(k), str) and item[k] in core.TARGETS.values()}
-                core.need(matches == {unit}, 'journal_unit_mismatch')
-                stamp, cursor, priority = item.get('__REALTIME_TIMESTAMP'), item.get('__CURSOR'), item.get('PRIORITY')
-                core.need(isinstance(stamp, str) and re.fullmatch(r'[0-9]{1,20}', stamp)
-                          and isinstance(cursor, str) and 1 <= len(cursor) <= 2048
-                          and isinstance(priority, str) and priority in tuple('01234567'), 'journal_fields_invalid')
-                at = int(stamp)
-                if not window_since <= at <= window_until:
-                    continue
-                excerpt, state, sha = redact(item.get('MESSAGE'))
-                row = {'at_kst':core.history_library().shown(at), 'priority':int(priority),
-                    'record_sha256':digest(cursor.encode()), 'message_sha256':sha,
-                    'message_excerpt':excerpt, 'message_state':state,
-                    'excerpt_sha256':digest(excerpt.encode()) if excerpt is not None else None}
-                key = row['record_sha256']
-                core.need(key not in rows or rows[key] == row, 'journal_cursor_conflict')
-                rows[key] = row
+                row = source_row(core.parsed(line), unit, window_since, window_until)
+                if row is not None:
+                    add_row(rows, row)
         if window_since == since:
             break
         # Earlier slices cannot displace this strictly newer, full tail. Keep
@@ -244,12 +276,18 @@ def answer(value, host, now=None, runner=None):
             break
         window_until = window_since
     core.need(time.monotonic() <= deadline, 'journal_query_timeout')
-    ordered = sorted(rows.values(), key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
+    return finish(value, host, now, list(rows.values()), source_limited)
+
+
+def finish(value, host, now, entries, source_limited, size_limited=False):
+    target, since, until, limit, scope = request(value, now)
+    unit = core.TARGETS[target]
+    ordered = sorted(entries, key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
     result = {'schema':1, 'kind':'journal_excerpt', 'target':target, 'host':host, 'unit':unit,
         'observed_at_kst':core.history_library().shown(now * 1000000),
         'requested_since_kst':value['since_kst'], 'requested_until_kst':value['until_kst'],
         'journal_scope':scope, 'status':'observed', 'entries':ordered[:limit],
-        'has_more':source_limited or len(ordered) > limit, 'response_size_limited':False,
+        'has_more':source_limited or len(ordered) > limit, 'response_size_limited':size_limited,
         'requested_window_total_count':None, 'journal_retention_verified':False,
         'raw_messages_returned':False, 'redacted_excerpts_returned':True,
         'live_query':True, 'mutation_performed':False, 'untrusted_evidence':True,
@@ -295,6 +333,14 @@ def validate_answer(result, value, host, now=None):
     entries = result.get('entries')
     core.need(isinstance(entries, list) and len(entries) <= limit and type(result.get('returned_entries')) is int
               and result['returned_entries'] == len(entries), 'journal_response_count')
+    validate_entries(entries, since, until, limit)
+    core.need(len(core.encode(result)) <= MAX_RESULT, 'journal_result_bound')
+    return result
+
+
+def validate_entries(entries, since, until, maximum):
+    core.need(isinstance(entries, list) and len(entries) <= maximum, 'journal_response_count')
+    h = core.history_library()
     identities = set()
     for row in entries:
         core.need(isinstance(row, dict) and set(row) == {'at_kst', 'priority', 'record_sha256', 'message_sha256',
@@ -312,8 +358,6 @@ def validate_answer(result, value, host, now=None):
                       and row['excerpt_sha256'] == digest(text.encode()), 'journal_response_excerpt')
             if state == 'unchanged':core.need(sha == row['excerpt_sha256'], 'journal_response_sha')
         else:core.need(text is None and row['excerpt_sha256'] is None, 'journal_response_withheld')
-    core.need(len(core.encode(result)) <= MAX_RESULT, 'journal_result_bound')
-    return result
 
 
 def receive(connection, maximum, seconds):

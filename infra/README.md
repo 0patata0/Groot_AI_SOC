@@ -1,5 +1,7 @@
 # infra — 서버 구성·배포
 
+현재 journal 읽기는 [native 어댑터 후보](validation/journal-adapter/README.md)의166검사·A/B/C 실제 격리8건을 확인했다. 운영 파일/서비스는 유지했고 정확 적용/승인·실제MCP/새채팅이 남는다. 아래 날짜별 구성은 당시 이력이며 현재 모델·도구·권한은 [STATUS](../STATUS.md)를 따른다.
+
 **운영 토폴로지 — 2026-11-02:** [서버·연결·근거](diagrams/README.md) · [기존 형태 상세형](../topology/토폴로지_상세.svg) · [버스형](../topology/토폴로지_버스.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).
 
 A/B/C·Thor의21:53~21:55 KST 읽기 확인을 반영했다. 두 봇은B, 원본35B 추론은B SSH터널→A→Thor, 학습은DGX다. MCP는11/1 14:24 계약 기준8서버/41도구이며 현재 단계·한계는 [STATUS](../STATUS.md)를 따른다. 아래 날짜별 배포·시험 내용은 당시 이력이다. 도식 최신화로 서버 설정이나 보안 정책을 변경하지 않았다.

@@ -49,10 +49,39 @@ class Profiles(unittest.TestCase):
             d.install_common(settings(), 'service')
         self.assertIn(str(d.CODE / 'diagnostic_history.py'), written)
         self.assertIn(str(d.CODE / 'diagnostic_journal.py'), written)
+        self.assertIn(str(d.CODE / 'diagnostic_journal_native.py'), written)
         self.assertIn(str(d.CODE / 'host_inventory.py'), written)
         self.assertIn(['/usr/bin/systemctl','enable','--now',d.JOURNAL_SERVICE], calls)
         backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
         self.assertLess(calls.index(backfill), calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
+
+    def test_native_dependencies_require_reviewed_binding_api_and_systemd_major(self):
+        calls = []
+        def run(argv):
+            calls.append(argv)
+            return b'systemd 255 (255.4-1ubuntu8.18)\n' if argv[0].endswith('journalctl') else b'{"binding":"235","api":true}'
+        with mock.patch.object(d.common, 'run', side_effect=run): d.native_dependencies()
+        self.assertEqual(calls[1][:4], ['/usr/bin/python3','-I','-B','-c'])
+        self.assertIn("'_previous'", calls[1][4])
+        self.assertNotIn('pip', calls[1][4])
+        for raw in (b'', b'systemd 254 (254.0)\n', b'systemd 2550\n'):
+            with mock.patch.object(d.common,'run',return_value=raw), self.assertRaises(ValueError):
+                d.native_dependencies()
+
+    def test_wrong_dependency_metadata_is_not_silently_accepted(self):
+        for raw in (b'{}', b'{"binding":"236","api":true}', b'{"binding":"235","api":false}'):
+            with mock.patch.object(d.common,'run',side_effect=[b'systemd 255\n',raw]), self.assertRaises(ValueError):
+                d.native_dependencies()
+
+    def test_native_helper_is_part_of_local_and_source_receipt_contract(self):
+        self.assertIn('diagnostic_journal_native.py', d.LOCAL_SOURCES)
+        self.assertTrue(set(d.LOCAL_SOURCES) <= set(d.SOURCES))
+        saved = {'profile': {'fixed':True}, 'files': {}}
+        with mock.patch.object(d.common,'read',return_value=json.dumps(saved).encode()), \
+             mock.patch.object(d,'profile',return_value=saved['profile']), \
+             mock.patch.object(d.common,'run') as run, self.assertRaisesRegex(ValueError,'source_receipt_missing'):
+            d.verify(settings(), 'service')
+        run.assert_not_called()
 
     def test_private_distinct_hosts_and_custom_ssh_port(self):
         env = {**HOSTS, 'CAPSTONE_SOURCE': '/approved/source', 'SSH_PORT': '2222'}
@@ -113,7 +142,8 @@ class Profiles(unittest.TestCase):
                 self.assertNotIn(text, unit)
 
     def test_check_never_installs_or_starts_services(self):
-        with mock.patch.object(d, 'source_bundle'), mock.patch.object(d.sys, 'platform', 'linux'), \
+        with mock.patch.object(d, 'source_bundle'), mock.patch.object(d, 'native_dependencies'), \
+             mock.patch.object(d.sys, 'platform', 'linux'), \
              mock.patch.object(d.os, 'geteuid', return_value=0), \
              mock.patch.object(d.common, 'read', return_value=KEY.encode()), \
              mock.patch.object(Path, 'is_file', return_value=True), \

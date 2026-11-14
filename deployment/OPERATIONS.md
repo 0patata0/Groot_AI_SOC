@@ -1,5 +1,7 @@
 # SOC 운영 절차
 
+[native journal 후보](../infra/validation/journal-adapter/README.md)는 helper를 단일deploy.sh의 기존 진단 소스/영수증에 추가했다. systemd255·python3-systemd binding235/API를 사전 검사하며 빠진 패키지는 승인된 오프라인 deb로 준비한다. A/B/C는235-1build4/255.4-1ubuntu8.18 기존 설치 확인·추가 설치0. 회귀166/실제 격리8건이며 운영 적용·새 OS 전체 설치는 미수행이다. 아래 과거 “새 패키지0” 설명은 당시 구현 범위다.
+
 2026-11-08: 현재 OS·Docker 상세 조회는 승인 없이 사용하며, 변경은 기존 정확 후보 승인 경계를 유지합니다. 서비스 목록은 호스트별로 나누고 Docker 상세·로그, OS 자원·네트워크·디스크까지 조회합니다. [질문 예·조회 한계·복구](../infra/mcp/host-inventory.md). 아래 버전별 단락은 당시 검증 기록입니다.
 
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.

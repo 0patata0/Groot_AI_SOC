@@ -1,5 +1,7 @@
 # 설치 후 접속·검증·장애 진단
 
+native journal 후보는 systemd255·python3-systemd235/API와 root 소유 helper/설치 영수증을 검사한다. 실패·stderr·시간/출력 한도 초과는 unavailable이며 빈 결과로 바꾸지 않는다. [166검사·실제 격리8건](../infra/validation/journal-adapter/README.md)은 운영 반영·새 채팅·전체 보존 인증을 대신하지 않는다. 현재 운영 reader 소스와 후보 설치 사본을 먼저 구분한다.
+
 ## B 호스트 수집과 manager 컨테이너 구분
 
 새 설치 `deploy.sh`는 `capstone-siem-host`를 별도 등록한다. 운영 이름은 `groot-siem-host`이며 ID는 등록/조회 결과에서 확인하고 고정000/003으로 가정하지 않는다. Wazuh agent000의 Amazon Linux 결과는 manager 컨테이너이고 B Ubuntu24.04 호스트 결과가 아니다.

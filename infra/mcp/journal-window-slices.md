@@ -1,5 +1,7 @@
 # 긴 journal 조회의 분할 후보
 
+후속 [공통 native 어댑터](../validation/journal-adapter/README.md)는 구현166검사와 A/B/C 실제 격리8건·기존 validator 대조를 완료했다. 운영 미적용·실제MCP/새채팅 미수행이다. 이 문서의 기존 후보/실험 수치와 “아직 미구현” 표기는 당시 단계로 보존한다.
+
 **전체24시간을6시간 이하 구간으로 결합하고 native 시각 경계를 마이크로초로 유지하는 후보다. 135검사와 실제 제한 환경에서 B/C 반환을 확인했으나 A의24시간 검색은 여전히12초 제한에 걸린다. 운영 적용 준비는 미완료다.** [실제 읽기 검증](../validation/live-reads/README.md) · [후보·결과 원장](../validation/live-reads/validation.json) · [이전 시간예산 적용](journal-query-budget.md).
 
 | 항목 | 후보의 동작 |

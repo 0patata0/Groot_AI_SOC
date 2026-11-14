@@ -1,5 +1,9 @@
 # 패키지·이미지·배포 자료 준비
 
+**현재 native journal 후보의 추가 의존성:** 각 역할 A/B/C에 Ubuntu24.04의 `python3-systemd` binding235와 systemd/libsystemd0 major255가 필요하다. 실제 세 서버의 기존 버전은 `235-1build4`/`255.4-1ubuntu8.18`이며 설치0이다. 새 환경에 없으면 같은 배포판·아키텍처의 서명 검토된 deb와 전이 의존성을 역할별 artifacts.json의 실제 package/version/architecture/SHA로 등록한 뒤 기존 오프라인 설치기로 반입한다. Mac 설치·온라인 pip/apt fallback은 없다. 보안 업데이트 revision을 이 문서의 관측값으로 자동 다운그레이드하지 않는다.
+
+반입 소스에 `infra/mcp/diagnostic_journal_native.py`를 추가하고 core/journal·`deployment/soc_diagnostics.py`를 함께 맞춘다. helper·6개 local source의 설치 영수증 및 dependency API를 검사한다. 새 TCP·키·MCP 도구/인자·일반 권한0이다. [회귀166·실제8건과 미적용 범위](../infra/validation/journal-adapter/README.md). 새 OS 전체 설치·서명된 deb 전체 재반입 검증은 이번에 수행하지 않았다.
+
 2026-11-08: OS·Docker 상세 조회 반입 소스는 host_inventory.py, system_diagnostics.py, read-system-diagnostics.py, system-diagnostics-mcp.py와 공통 하네스·스킬입니다. 기존 source_bundle에 포함하며 추가deb/wheel/image·설정입력·키·공개포트는 없습니다. 기존 systemd/Docker/procps/iproute2/coreutils를 사용하고 수집unit의 AF_NETLINK 허용을 설치기에 반영했습니다. [운영 검증·범위](../infra/mcp/host-inventory.md).
 
 2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).

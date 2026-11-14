@@ -1,0 +1,331 @@
+{
+  "schema": 1,
+  "status": "candidate_implemented_and_sandbox_validated_not_installed",
+  "recorded_at_kst": "2026-11-15T07:01:59.923090+09:00",
+  "source_sha256": {
+    "infra/mcp/system_diagnostics.py": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+    "infra/mcp/diagnostic_journal.py": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+    "infra/mcp/diagnostic_journal_native.py": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+    "infra/mcp/test_diagnostic_journal_native.py": "17a0739c222e12e80afc757491d1e2ee0c283146e101536878fc6b43beec6c96",
+    "deployment/soc_diagnostics.py": "6d40706fb8b820a37176233f53583590becff764649010f96199ba43e32234c3",
+    "deployment/tests/test_soc_diagnostics.py": "7419eef5d7568872893d44dc9440f15fe8871a9098e935a7bbaab8a75ab4349c"
+  },
+  "sandbox_core_sha256": "ccda01e9b39578e4f5a6a2fb0c15c798d4566231b996631b220ece31ac9f4d4c",
+  "post_sandbox_edit": {
+    "only": "bounded_command docstring",
+    "executable_AST_equal": true
+  },
+  "regression": {
+    "passed": 166,
+    "skipped": 0,
+    "native": 28,
+    "journal": 33,
+    "core": 43,
+    "history": 24,
+    "inventory": 15,
+    "installer": 23
+  },
+  "live_dependency_packages": {
+    "a": [
+      "libsystemd0 255.4-1ubuntu8.18 install ok installed",
+      "python3-systemd 235-1build4 install ok installed",
+      "systemd 255.4-1ubuntu8.18 install ok installed"
+    ],
+    "b": [
+      "libsystemd0 255.4-1ubuntu8.18 install ok installed",
+      "python3-systemd 235-1build4 install ok installed",
+      "systemd 255.4-1ubuntu8.18 install ok installed"
+    ],
+    "c": [
+      "libsystemd0 255.4-1ubuntu8.18 install ok installed",
+      "python3-systemd 235-1build4 install ok installed",
+      "systemd 255.4-1ubuntu8.18 install ok installed"
+    ]
+  },
+  "cases": [
+    {
+      "host": "a",
+      "name": "known_microsecond",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-15T03:24:07.256344+09:00",
+        "until_kst": "2026-11-15T03:24:07.256345+09:00",
+        "view": "journal",
+        "limit": 50,
+        "journal_scope": "all"
+      },
+      "status": "returned",
+      "elapsed_seconds": 0.21728,
+      "returned_entries": 1,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [
+        "045f524fc5635df261d1ac94c47af407edc1c07e54f621d0c549bfb14d535b99"
+      ],
+      "result_sha256": "ab7d30f6e094d35158a9f1d628ebc7324ee78a95d30d678c1ad5e8259d386db2",
+      "old_validator_passed": true,
+      "cli_row_and_has_more_parity": true,
+      "recorded_at_kst": "2026-11-15T06:57:19.794089+09:00"
+    },
+    {
+      "host": "a",
+      "name": "full_day_errors",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "status": "returned",
+      "elapsed_seconds": 15.136741,
+      "returned_entries": 0,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [],
+      "result_sha256": "ffb5639c2a52632bb2f50b29b5ef4c3188c27db75b12bce38583898ee1089102",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:19.794089+09:00"
+    },
+    {
+      "host": "a",
+      "name": "full_day_all_tail",
+      "request": {
+        "target": "a:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 5,
+        "journal_scope": "all"
+      },
+      "status": "returned",
+      "elapsed_seconds": 0.300139,
+      "returned_entries": 5,
+      "has_more": true,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [
+        "045f524fc5635df261d1ac94c47af407edc1c07e54f621d0c549bfb14d535b99",
+        "b24a0350b55fb5bf199958857aead301e1179dbbadd49fc2d04fa8a131414f54",
+        "c55a1e1e2238d1b0dc984e01ba2a24010a21cce95282eec28698f466e66c9edc",
+        "b0d5c09ac36c50a5664882b07038ac216a025e7a9dd11a4bc97978cb1f9e5768",
+        "76b2ba961916fc57e8d4517ca19362af229fd6920d28e6f1ff40ebe5a38a06f1"
+      ],
+      "result_sha256": "3f4c4d286a0bc53a8c591d1cd21337454e1992be4538535da8bd8a8cf389230c",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:19.794089+09:00"
+    },
+    {
+      "host": "b",
+      "name": "full_day_errors",
+      "request": {
+        "target": "b:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "status": "returned",
+      "elapsed_seconds": 7.400123,
+      "returned_entries": 0,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [],
+      "result_sha256": "f0dd430fcfa6d67f5cc4dae9e3363b1824579fefe02335bec7dc09d6a21ae265",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:20.161853+09:00"
+    },
+    {
+      "host": "b",
+      "name": "full_day_all_tail",
+      "request": {
+        "target": "b:rule-worker",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 5,
+        "journal_scope": "all"
+      },
+      "status": "returned",
+      "elapsed_seconds": 0.270565,
+      "returned_entries": 5,
+      "has_more": true,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [
+        "dd0c671e3ddd74befc628add3b9ae3a2d13948938af57398bb2954eb606a4912",
+        "0d56fbfad6dabd5b9ac7c8259a09501a930fdf2155502942f452914cb328e4d9",
+        "54b260a3d5b7464768f439f7cd8d605e19fc2356e21e3f8ac8095d6fb2a57fc6",
+        "06e59ac4254c9a3b4be58406d0147fd2ec6b7d11ea2bd85f6a53b71463d0dedd",
+        "869b22dcdc4c6c2448824bbce41bd0e507ccc261dda8bfae32df4ce8dc06990a"
+      ],
+      "result_sha256": "a88ae9995791b9a12cfd13ef28880f70814002e0066aab1d2c0390659b8ad47c",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:20.161853+09:00"
+    },
+    {
+      "host": "b",
+      "name": "historical_management_errors",
+      "request": {
+        "target": "b:management",
+        "since_kst": "2026-11-07T00:00:00+09:00",
+        "until_kst": "2026-11-07T06:00:00+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "status": "returned",
+      "elapsed_seconds": 5.789551,
+      "returned_entries": 6,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [
+        "a79f5ebb777513191644274931f8f402296ac204009bd972cd7216b4beb73a24",
+        "a86787894cc8d4be30057137b8a11c659a3280a509343f8250cff764aa3871a2",
+        "58db89f5e004e1d115b0fd060d139faba39e33d2bc6d221efca4b46dd9dd50a3",
+        "074c5da433b31f6a5fcf0f5e2bd39576ab75ccdda1d0a84fc285766b4da602b0",
+        "0ce8ab87ddfb96f28e5fbef738ee62057980511af9cce705ee57708cb8e2d83f",
+        "dd41cf564ba1adf692d7c973997aba5c17d6ef09e3e5713afd413464d816d3da"
+      ],
+      "result_sha256": "3fb3c0e62cf0aaf60bdd3fa8571b6ef0a37b40168b65b20590e10012197a4e16",
+      "old_validator_passed": true,
+      "cli_row_and_has_more_parity": true,
+      "recorded_at_kst": "2026-11-15T06:57:20.161853+09:00"
+    },
+    {
+      "host": "c",
+      "name": "full_day_errors",
+      "request": {
+        "target": "c:apache",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 50
+      },
+      "status": "returned",
+      "elapsed_seconds": 0.335078,
+      "returned_entries": 0,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [],
+      "result_sha256": "fd1e29468e708b8e075f37f85ae9c0c3b23267ed4acbc8fa98d073f2132c5458",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:20.133504+09:00"
+    },
+    {
+      "host": "c",
+      "name": "full_day_all_tail",
+      "request": {
+        "target": "c:apache",
+        "since_kst": "2026-11-14T03:24:10.795222+09:00",
+        "until_kst": "2026-11-15T03:24:10.795222+09:00",
+        "view": "journal",
+        "limit": 5,
+        "journal_scope": "all"
+      },
+      "status": "returned",
+      "elapsed_seconds": 0.265009,
+      "returned_entries": 3,
+      "has_more": false,
+      "response_size_limited": false,
+      "requested_window_total_count": null,
+      "journal_retention_verified": false,
+      "record_sha256": [
+        "4299ecdf43f377a19a1c22bdc5d71d8e561360fa8a6037ca187668be36fe63aa",
+        "cec7e08922ad816860e038538b30e46b80b77a6f06e086460bd8c71f36ba5efc",
+        "d38803de8dcaaea805f14087241696937617f8a9b98aabd23d1a20c3dfd489c7"
+      ],
+      "result_sha256": "35edf6f457694c0de62649ceb850a0e291ab9a695b0a7335d72141e41684ad37",
+      "old_validator_passed": true,
+      "recorded_at_kst": "2026-11-15T06:57:20.133504+09:00"
+    }
+  ],
+  "safety": {
+    "original_response_validator_passed_all_cases": true,
+    "host_unit_authority_expanded": false,
+    "fixed_unit_registry_count": 25,
+    "native_max_workers": 2,
+    "maximum_parent_threads_children_tasks": 5,
+    "service_MemoryMax_bytes": 134217728,
+    "service_TasksMax": 8,
+    "query_deadline_seconds": 20,
+    "child_timeout_seconds": 12,
+    "private_packet_maximum_bytes": 65536,
+    "public_response_maximum_bytes": 60000,
+    "before_and_after_fixed_zero_row_journalctl_access_check": true,
+    "worker_stderr_rejected": true,
+    "all_results_total_count_null_and_retention_false": true,
+    "source_log_data_not_instructions": true
+  },
+  "cleanup": {
+    "servers": [
+      {
+        "host": "a",
+        "files": 7,
+        "bytes": 95555,
+        "root_absent": true,
+        "production_sources_unit_reader_pid_and_ticks_unchanged": true,
+        "at_kst": "2026-11-15T06:59:44.266549+09:00"
+      },
+      {
+        "host": "b",
+        "files": 7,
+        "bytes": 95895,
+        "root_absent": true,
+        "production_sources_unit_reader_pid_and_ticks_unchanged": true,
+        "at_kst": "2026-11-15T06:59:44.566761+09:00"
+      },
+      {
+        "host": "c",
+        "files": 7,
+        "bytes": 94569,
+        "root_absent": true,
+        "production_sources_unit_reader_pid_and_ticks_unchanged": true,
+        "at_kst": "2026-11-15T06:59:44.568137+09:00"
+      }
+    ],
+    "mac": {
+      "files": 15,
+      "bytes": 772643,
+      "own_directory_absent": true,
+      "minimum_reproduction_sources_preserved": 6
+    }
+  },
+  "scope": {
+    "operating_source_changes": 0,
+    "production_service_operations": 0,
+    "packages_installed": 0,
+    "actual_MCP_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "Harness2_runs": 0,
+    "attacks": 0,
+    "training_runs": 0
+  },
+  "unperformed": [
+    "exact operational native apply/rollback plan and approval",
+    "actual nonprivileged MCP with candidate",
+    "fresh bot chat with candidate",
+    "new OS complete installation",
+    "controlled-load repeated performance/p95",
+    "complete journal retention or file-integrity certification"
+  ],
+  "existing_control_status_plan_sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+  "initial_setup_failures": {
+    "local_missing_finish_unit": 28,
+    "installer_prerequisite_mock": 1,
+    "launch_unexpanded_ROOT_hosts": 3,
+    "operating_source_or_service_changes_from_failures": 0
+  }
+}

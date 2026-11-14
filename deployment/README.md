@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+[native journal 후보](../infra/validation/journal-adapter/README.md)는 helper를 단일deploy.sh의 기존 진단 소스/영수증에 추가했다. systemd255·python3-systemd binding235/API를 사전 검사하며 빠진 패키지는 승인된 오프라인 deb로 준비한다. A/B/C는235-1build4/255.4-1ubuntu8.18 기존 설치 확인·추가 설치0. 회귀166/실제 격리8건이며 운영 적용·새 OS 전체 설치는 미수행이다. 아래 과거 “새 패키지0” 설명은 당시 구현 범위다.
+
 [정확 적용·복구 후보](../infra/validation/control-status/application/README.md)는 현재 프로필로 내장 gate와19파일·영수증·유휴 확인·15분 원복을 준비했다. 설치 회귀46과 격리 원복은 통과했지만 정본·초기 설치 입력은 유지한다. 운영 적용은 정확 승인 후이며 실제 콜드 재시작/새 채팅·새 OS 전체 설치는 아직 미수행이다. 단일 deploy.sh 진입점도 유지한다.
 
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.

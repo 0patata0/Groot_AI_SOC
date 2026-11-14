@@ -35,7 +35,9 @@ READER_HOME = STATE / 'reader'
 MCP_USER = 'capstone-mcp'
 ROLE_HOST = {'security': 'a', 'siem': 'b', 'service': 'c'}
 HOST_ENV = {'security': 'SECURITY_HOST', 'siem': 'SIEM_HOST', 'service': 'SERVICE_HOST'}
-SOURCES = ('system_diagnostics.py', 'diagnostic_history.py', 'diagnostic_journal.py', 'runtime_health.py', 'host_inventory.py', 'system-diagnostics-mcp.py',
+LOCAL_SOURCES = ('system_diagnostics.py', 'diagnostic_history.py', 'diagnostic_journal.py',
+                 'diagnostic_journal_native.py', 'runtime_health.py', 'host_inventory.py')
+SOURCES = (*LOCAL_SOURCES, 'system-diagnostics-mcp.py',
            'read-system-diagnostics.py', 'run-system-diagnostics.sh')
 SERVICE = 'capstone-system-diagnostics.service'
 TIMER = 'capstone-system-diagnostics.timer'
@@ -111,6 +113,25 @@ def account_absent(name, kind):
     raise common.Refused('unmanaged_diagnostic_' + kind + '_exists')
 
 
+def native_dependencies():
+    # The private worker uses the reviewed v235 low-level binding API and the
+    # systemd255 JSON/unit semantics. No pip, download or implicit fallback.
+    version = common.run(['/usr/bin/journalctl', '--version']).decode().splitlines()
+    need(version and re.match(r'^systemd 255(?:\s|\.)', version[0]),
+         'diagnostic_native_requires_systemd255')
+    code = """import json
+from systemd import journal
+assert str(journal.__version__) == '235'
+required = ('_previous', '_get', '_get_all', '_get_realtime', '_get_cursor',
+            'close', 'seek_realtime', 'add_match', 'add_conjunction', 'add_disjunction')
+assert all(callable(getattr(journal.Reader, name, None)) for name in required)
+assert hasattr(journal.Reader, 'data_threshold') and type(journal.LOCAL_ONLY) is int
+print(json.dumps({'binding': '235', 'api': True}))
+"""
+    result = common.parse(common.run(['/usr/bin/python3', '-I', '-B', '-c', code]))
+    need(result == {'binding': '235', 'api': True}, 'diagnostic_native_dependency_invalid')
+
+
 def check(s, role):
     need(role in ROLE_HOST, 'diagnostic_role_invalid')
     source_bundle(s)
@@ -119,6 +140,7 @@ def check(s, role):
                    '/usr/bin/ssh-keygen', '/usr/sbin/sshd', '/usr/sbin/groupadd', '/usr/sbin/useradd',
                    '/usr/sbin/usermod', '/usr/sbin/runuser', '/usr/bin/prlimit'):
         need(Path(binary).is_file(), 'diagnostic_binary_missing')
+    native_dependencies()
     common.public_key(common.read('/etc/ssh/ssh_host_ed25519_key.pub', 4096))
     if STATE.exists() or STATE.is_symlink():
         common.trusted_directory(STATE)
@@ -164,7 +186,7 @@ def install_common(s, role):
     common.mkdir(STATE, 0o750, 0, gid); common.mkdir(PRIVATE)
     common.write(PRIVATE / 'intent.json', common.canonical(profile(s, role)))
     common.mkdir(CODE, 0o755)
-    for name in ('system_diagnostics.py','diagnostic_history.py','diagnostic_journal.py','runtime_health.py','host_inventory.py'):
+    for name in LOCAL_SOURCES:
         common.write(CODE / name, source_bundle(s)[name], 0o644)
     for name, raw in unit_documents(role).items():
         common.write(Path('/etc/systemd/system') / name, raw, 0o644)
@@ -203,7 +225,7 @@ def prepare_siem(s):
     bundle = source_bundle(s)
     for name in ('system-diagnostics-mcp.py', 'run-system-diagnostics.sh'):
         common.write(MCP / name, bundle[name], 0o550, 0, mc.pw_gid)
-    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'diagnostic_journal.py', CODE / 'runtime_health.py', CODE / 'host_inventory.py', KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
+    files = [*(CODE / name for name in LOCAL_SOURCES), KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
              MCP / 'system-diagnostics-mcp.py', MCP / 'run-system-diagnostics.sh']
     files += [Path('/etc/systemd/system') / n for n in unit_documents('siem')]
     saved = {'schema': 1, 'profile': profile(s, 'siem'), 'files': {str(p): installed_record(p) for p in files}}
@@ -277,7 +299,7 @@ def apply_reader(s, role, raw):
     common.write(sshd, reader_ssh_configuration(), 0o644)
     common.run(['/usr/sbin/sshd', '-t']); verify_ssh_policy(s, role)
     common.run(['/usr/bin/systemctl', 'reload', 'ssh'])
-    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'diagnostic_journal.py', CODE / 'runtime_health.py', CODE / 'host_inventory.py', reader, launcher, keys, sshd]
+    files = [*(CODE / name for name in LOCAL_SOURCES), reader, launcher, keys, sshd]
     files += [Path('/etc/systemd/system') / n for n in unit_documents(role)]
     common.write(PRIVATE / 'active.json', common.canonical({'schema': 1, 'profile': profile(s, role),
         'reader_public_key': public, 'files': {str(p): installed_record(p) for p in files}}))
@@ -457,6 +479,9 @@ def verify(s, role):
     need(saved['profile'] == profile(s, role), 'diagnostic_installation_profile_changed')
     for path, record in saved['files'].items():
         need(installed_record(path) == record, 'diagnostic_installed_file_changed')
+    need(all(str(CODE / name) in saved['files'] for name in LOCAL_SOURCES),
+         'diagnostic_native_source_receipt_missing')
+    native_dependencies()
     common.run(['/usr/bin/systemctl', 'is-enabled', TIMER])
     common.run(['/usr/bin/systemctl', 'is-active', TIMER])
     common.run(['/usr/bin/systemctl', 'is-enabled', JOURNAL_SERVICE])

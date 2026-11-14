@@ -1,5 +1,7 @@
 # 제한된 서비스 journal 조회
 
+후속 [공통 native 어댑터](../validation/journal-adapter/README.md)는 구현166검사와 A/B/C 실제 격리8건·기존 validator 대조를 완료했다. 운영 미적용·실제MCP/새채팅 미수행이다. 이 문서의 기존 후보/실험 수치와 “아직 미구현” 표기는 당시 단계로 보존한다.
+
 **현재 긴 구간 조회:** [실제 읽기 진단](../validation/live-reads/README.md)에서 B rule-worker24시간이 command_timeout으로 실패했다. 권한 거부나 reader 중단은 아니며 [전체 기간 분할 후보](journal-window-slices.md)를 로컬 소스/134검사·격리 실제 읽기까지 검증했다. 운영 reader/MCP·새 채팅은 아직 원형이므로 적용 완료로 표시하지 않는다.
 
 2026-11-08. 기존 `get_system_diagnostics`의 `view="journal"`을 A/B/C 운영에 적용했다. 초기 운영 연결 당시 진단 MCP1.3.0·common1.5.71/query1.19.122였으며 현재 버전은 STATUS를 따른다. 아래 초기 시험은 당시 원본35B 기준이다. 현재는11/8 균형 학습본을 운용하며 최신 상태는 STATUS를 따른다. 초기 격리 시험과 후속 운영 검증은 별도 범위다. [검증 원장](journal-excerpts.validation.json) · [현재 상태](../../STATUS.md).

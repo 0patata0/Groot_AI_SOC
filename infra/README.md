@@ -1,6 +1,6 @@
 # infra — 서버 구성·배포
 
-현재 journal 읽기는 [native 어댑터 후보](validation/journal-adapter/README.md)의166검사·A/B/C 실제 격리8건을 확인했다. 운영 파일/서비스는 유지했고 정확 적용/승인·실제MCP/새채팅이 남는다. 아래 날짜별 구성은 당시 이력이며 현재 모델·도구·권한은 [STATUS](../STATUS.md)를 따른다.
+현재 journal 읽기는 [native 어댑터 후보](validation/journal-adapter/README.md)166검사/실제격리8건과 [정확9코드 적용안](validation/journal-adapter/application/README.md)33회귀/9복제원복·18중간load를 확인했다. A/B/C PREPARED·원본6개를 보관하며 운영 적용·원복timer/실제MCP·새채팅은 미수행이다. 아래 날짜별 구성은 당시 이력이며 현재 상태는 [STATUS](../STATUS.md)를 따른다.
 
 **운영 토폴로지 — 2026-11-02:** [서버·연결·근거](diagrams/README.md) · [기존 형태 상세형](../topology/토폴로지_상세.svg) · [버스형](../topology/토폴로지_버스.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).
 

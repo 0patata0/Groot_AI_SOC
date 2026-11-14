@@ -1,6 +1,6 @@
 # 설치 후 접속·검증·장애 진단
 
-native journal 후보는 systemd255·python3-systemd235/API와 root 소유 helper/설치 영수증을 검사한다. 실패·stderr·시간/출력 한도 초과는 unavailable이며 빈 결과로 바꾸지 않는다. [166검사·실제 격리8건](../infra/validation/journal-adapter/README.md)은 운영 반영·새 채팅·전체 보존 인증을 대신하지 않는다. 현재 운영 reader 소스와 후보 설치 사본을 먼저 구분한다.
+native journal 후보는 systemd255/binding235 API·root helper/영수증을 검사하며 실패를 빈 결과로 바꾸지 않는다. [정확 적용안](../infra/validation/journal-adapter/application/README.md)은 원본6개·33회귀/9복제원복/18중간load와 PREPARED를 확인했지만 운영 적용/원복 timer·실MCP/새채팅은 미수행이다. 관측 timeout에는 같은 unit/state를 확인하고 재시작으로 대신하지 않는다.
 
 ## B 호스트 수집과 manager 컨테이너 구분
 

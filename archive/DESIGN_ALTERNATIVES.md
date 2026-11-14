@@ -591,3 +591,8 @@ R2는필수3필드/basis20~2000/실제인용/상태관계를기존스킬한절�
 ## journal CPU·native 가능성 후속 (2026-11-15)
 
 공식Reader의전체변환·선택필드·Pythonbyte정규식·동일PCRE2JIT와2동시를격리비교했다. 단일24h는11.5초내부한도실패·선택필드순차20초실패, JIT는19.295초로여유작음/FFI필요해우선도입하지않는다. 공용Reader2동시11.946초를표준응답/보안회귀를갖출다음구현방향으로정했다.64KiB내부정규화패킷/전역tail잘림은검증전제안이며운영반영이아니다. [정확 원장·조건](../infra/validation/journal-native/README.md).
+
+
+## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
+
+journal 적용은3파일전체의동시원자성을주장하지않는다. 실제구core/새journal조합이깨지는것을확인해 helper→core→journal과역방향의존복구를선택했다. reader정지·collector완료대기·각파일원자교체·backup/CAS/독립timer와중간라이브러리호환으로보완한다. 재부팅복구시험과단순coldload는구분한다. [설계/한계](../infra/validation/journal-adapter/application/README.md).

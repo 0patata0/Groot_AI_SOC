@@ -1,0 +1,591 @@
+{
+  "schema": 1,
+  "status": "PREPARED_NOT_APPLIED",
+  "plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+  "source_sha256": {
+    "file_transaction.py": "b3d966d1982139e6acde1660951ebe70b633d50268b390d53ca343ddaa1e66b4",
+    "release_runtime.py": "65c3f3a15f15af1f349a57e59191fb25b976e973b2776cfbe626b77ad06ca154",
+    "test_release.py": "6009a7cd15a020bd659464aea5973a73d14cdc908ec8b5cc3fd127751d351941"
+  },
+  "access_mode": "Mac-admin231-A-B_or_C",
+  "unique_release_tests": 33,
+  "local_regression": {
+    "passed": 33,
+    "skipped": 0
+  },
+  "linux_regression": [
+    {
+      "at_kst": "2026-11-15T07:48:04.087619+09:00",
+      "status": "passed",
+      "returncode": 0,
+      "host": "a",
+      "tests_expected": 33,
+      "test_summary": [
+        "----------------------------------------------------------------------",
+        "Ran 33 tests in 0.137s",
+        "",
+        "OK"
+      ],
+      "test_output_sha256": "598f899b7c404438aa4d9e7f3eab47428129883f596007e8367ea8a9908354b5",
+      "source_sha256": {
+        "file_transaction.py": "b3d966d1982139e6acde1660951ebe70b633d50268b390d53ca343ddaa1e66b4",
+        "release_runtime.py": "65c3f3a15f15af1f349a57e59191fb25b976e973b2776cfbe626b77ad06ca154",
+        "test_release.py": "6009a7cd15a020bd659464aea5973a73d14cdc908ec8b5cc3fd127751d351941",
+        "probe.py": "82ecc695aa908ba2a8cc822793bd4a160d724be42beb631217953c663f49a852"
+      },
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "AF_INET_blocked": true,
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "operating_apply_or_rollback_timer": false,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 1618978,
+      "start_ticks": 23851880
+    },
+    {
+      "at_kst": "2026-11-15T07:48:04.434150+09:00",
+      "status": "passed",
+      "returncode": 0,
+      "host": "b",
+      "tests_expected": 33,
+      "test_summary": [
+        "----------------------------------------------------------------------",
+        "Ran 33 tests in 0.172s",
+        "",
+        "OK"
+      ],
+      "test_output_sha256": "2d9e15c62c3fabc6c82be2991115dcc1d36dd753a7eda7b93fbd238099895132",
+      "source_sha256": {
+        "file_transaction.py": "b3d966d1982139e6acde1660951ebe70b633d50268b390d53ca343ddaa1e66b4",
+        "release_runtime.py": "65c3f3a15f15af1f349a57e59191fb25b976e973b2776cfbe626b77ad06ca154",
+        "test_release.py": "6009a7cd15a020bd659464aea5973a73d14cdc908ec8b5cc3fd127751d351941",
+        "probe.py": "82ecc695aa908ba2a8cc822793bd4a160d724be42beb631217953c663f49a852"
+      },
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "AF_INET_blocked": true,
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "operating_apply_or_rollback_timer": false,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 3865075,
+      "start_ticks": 23851921
+    },
+    {
+      "at_kst": "2026-11-15T07:48:04.375504+09:00",
+      "status": "passed",
+      "returncode": 0,
+      "host": "c",
+      "tests_expected": 33,
+      "test_summary": [
+        "----------------------------------------------------------------------",
+        "Ran 33 tests in 0.133s",
+        "",
+        "OK"
+      ],
+      "test_output_sha256": "d59d05467cb00ef1a3e0e9c6145a1d418b94093484055a6f13e9fadc880f19ea",
+      "source_sha256": {
+        "file_transaction.py": "b3d966d1982139e6acde1660951ebe70b633d50268b390d53ca343ddaa1e66b4",
+        "release_runtime.py": "65c3f3a15f15af1f349a57e59191fb25b976e973b2776cfbe626b77ad06ca154",
+        "test_release.py": "6009a7cd15a020bd659464aea5973a73d14cdc908ec8b5cc3fd127751d351941",
+        "probe.py": "82ecc695aa908ba2a8cc822793bd4a160d724be42beb631217953c663f49a852"
+      },
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "AF_INET_blocked": true,
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "operating_apply_or_rollback_timer": false,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 1544972,
+      "start_ticks": 23851914
+    }
+  ],
+  "exact_byte_replicas": [
+    {
+      "at_kst": "2026-11-15T07:48:22.582752+09:00",
+      "host": "a",
+      "status": "passed",
+      "applied_replica_files": 3,
+      "restored_replica_files": 3,
+      "new_helper_absent_after_restore": true,
+      "candidate_actual_journal_read": {
+        "request": {
+          "target": "a:rule-worker",
+          "view": "journal",
+          "since_kst": "2026-11-15T03:24:07.256344+09:00",
+          "until_kst": "2026-11-15T03:24:07.256345+09:00",
+          "journal_scope": "all",
+          "limit": 50
+        },
+        "returned_entries": 1,
+        "has_more": false,
+        "seconds": 0.228938,
+        "old_validator_passed": true,
+        "result_sha256": "a3c2805a7357e9bbbddf5659677fd9a63aed0a3670d929ae9a196467524626e9"
+      },
+      "new_fixture_db_evidence_preserved": true,
+      "registry_and_pattern_unchanged": true,
+      "cold_load_checks": [
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": true,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "after_restore",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        }
+      ],
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 1619165,
+      "start_ticks": 23853721
+    },
+    {
+      "at_kst": "2026-11-15T07:48:24.098114+09:00",
+      "host": "b",
+      "status": "passed",
+      "applied_replica_files": 3,
+      "restored_replica_files": 3,
+      "new_helper_absent_after_restore": true,
+      "candidate_actual_journal_read": {
+        "request": {
+          "target": "b:management",
+          "view": "journal",
+          "since_kst": "2026-11-07T00:00:00+09:00",
+          "until_kst": "2026-11-07T06:00:00+09:00",
+          "limit": 50
+        },
+        "returned_entries": 6,
+        "has_more": false,
+        "seconds": 1.482219,
+        "old_validator_passed": true,
+        "result_sha256": "d02831f64f263d53a82b6710f33e2f2cd4da6682dbcb999ae7d038306fb35e01"
+      },
+      "new_fixture_db_evidence_preserved": true,
+      "registry_and_pattern_unchanged": true,
+      "cold_load_checks": [
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": true,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "after_restore",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        }
+      ],
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 3874304,
+      "start_ticks": 23853754
+    },
+    {
+      "at_kst": "2026-11-15T07:48:22.888588+09:00",
+      "host": "c",
+      "status": "passed",
+      "applied_replica_files": 3,
+      "restored_replica_files": 3,
+      "new_helper_absent_after_restore": true,
+      "candidate_actual_journal_read": {
+        "request": {
+          "target": "c:apache",
+          "view": "journal",
+          "since_kst": "2026-11-14T03:24:10.795222+09:00",
+          "until_kst": "2026-11-15T03:24:10.795222+09:00",
+          "journal_scope": "all",
+          "limit": 5
+        },
+        "returned_entries": 3,
+        "has_more": false,
+        "seconds": 0.289538,
+        "old_validator_passed": true,
+        "result_sha256": "15c137fb7adf7a3078e77854fb8a8256a6fe8bb3b12b7c56ed1f8f427c9fc117"
+      },
+      "new_fixture_db_evidence_preserved": true,
+      "registry_and_pattern_unchanged": true,
+      "cold_load_checks": [
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "apply",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": true,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        },
+        {
+          "operation": "restore",
+          "target": "after_restore",
+          "uses_native_journal": false,
+          "cold_load_succeeded": true
+        }
+      ],
+      "NoNewPrivs": 1,
+      "CapBnd": "0000000000000004",
+      "operating_sources_unchanged": true,
+      "production_service_operations": 0,
+      "actual_MCP_or_model_or_chat": 0,
+      "pid": 1545032,
+      "start_ticks": 23853747
+    }
+  ],
+  "prior_expected_failure": {
+    "at_kst": "2026-11-15T07:44:09.480166+09:00",
+    "host": "a",
+    "status": "expected_failure_reproduced_and_restored",
+    "trace": [
+      {
+        "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+        "new_native_journal": false
+      },
+      {
+        "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+        "new_native_journal": true
+      }
+    ],
+    "failure": {
+      "type": "AttributeError",
+      "reason": "'types.SimpleNamespace' object has no attribute 'root_file'"
+    },
+    "restored_replica_files": 2,
+    "new_helper_absent_after_restore": true,
+    "new_fixture_db_evidence_preserved": true,
+    "operating_sources_unchanged": true,
+    "production_service_operations": 0,
+    "actual_MCP_or_model_or_chat": 0,
+    "pid": 1613154,
+    "start_ticks": 23828441
+  },
+  "prepared_hosts": [
+    {
+      "at_kst": "2026-11-15T07:46:51.164060+09:00",
+      "host": "a",
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-a",
+      "plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "phase": "PREPARED",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "protected_files": 15,
+      "reader": {
+        "pid": 885,
+        "start_ticks": 2569
+      },
+      "backup_files": 2,
+      "rollback_timer_created": false,
+      "apply_unit_created": false,
+      "operating_source_changes": 0,
+      "production_service_operations": 0
+    },
+    {
+      "at_kst": "2026-11-15T07:46:51.535134+09:00",
+      "host": "b",
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-b",
+      "plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "phase": "PREPARED",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "protected_files": 23,
+      "reader": {
+        "pid": 927,
+        "start_ticks": 7043
+      },
+      "backup_files": 2,
+      "rollback_timer_created": false,
+      "apply_unit_created": false,
+      "operating_source_changes": 0,
+      "production_service_operations": 0
+    },
+    {
+      "at_kst": "2026-11-15T07:46:51.528154+09:00",
+      "host": "c",
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-c",
+      "plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "phase": "PREPARED",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "protected_files": 15,
+      "reader": {
+        "pid": 888,
+        "start_ticks": 2976
+      },
+      "backup_files": 2,
+      "rollback_timer_created": false,
+      "apply_unit_created": false,
+      "operating_source_changes": 0,
+      "production_service_operations": 0
+    }
+  ],
+  "cleanup": {
+    "a": {
+      "at_kst": "2026-11-15T07:58:15.164984+09:00",
+      "host": "a",
+      "removed_files": 70,
+      "removed_bytes": 1067749,
+      "removed_artifact_roots": [
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-a",
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-r3-a",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-a",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-r3-a",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-bad-order-a",
+        "/var/lib/capstone-journal-native/343cb824287a1752-a",
+        "/var/lib/capstone-journal-native/b429a240ba03b2bc-a"
+      ],
+      "all_roots_absent": true,
+      "final_plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "final_phase": "PREPARED",
+      "final_prepared_directory_preserved": true,
+      "final_backup_count": 2,
+      "reader": {
+        "pid": 885,
+        "start_ticks": 2569
+      },
+      "operating_sources_and_protected_files_unchanged": true,
+      "production_service_operations": 0
+    },
+    "b": {
+      "at_kst": "2026-11-15T07:58:15.476262+09:00",
+      "host": "b",
+      "removed_files": 55,
+      "removed_bytes": 818589,
+      "removed_artifact_roots": [
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-b",
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-r3-b",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-b",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-r3-b",
+        "/var/lib/capstone-journal-native/343cb824287a1752-b",
+        "/var/lib/capstone-journal-native/b429a240ba03b2bc-b"
+      ],
+      "all_roots_absent": true,
+      "final_plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "final_phase": "PREPARED",
+      "final_prepared_directory_preserved": true,
+      "final_backup_count": 2,
+      "reader": {
+        "pid": 927,
+        "start_ticks": 7043
+      },
+      "operating_sources_and_protected_files_unchanged": true,
+      "production_service_operations": 0
+    },
+    "c": {
+      "at_kst": "2026-11-15T07:58:15.453094+09:00",
+      "host": "c",
+      "removed_files": 58,
+      "removed_bytes": 865567,
+      "removed_artifact_roots": [
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-c",
+        "/var/lib/capstone-journal-release-tests/20261115-kmthe87t-r3-c",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-c",
+        "/var/lib/capstone-journal-replicas/20261115-kmthe87t-r3-c",
+        "/var/lib/capstone-journal-native/343cb824287a1752-c",
+        "/var/lib/capstone-journal-native/b429a240ba03b2bc-c"
+      ],
+      "all_roots_absent": true,
+      "final_plan_sha256": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e",
+      "final_phase": "PREPARED",
+      "final_prepared_directory_preserved": true,
+      "final_backup_count": 2,
+      "reader": {
+        "pid": 888,
+        "start_ticks": 2976
+      },
+      "operating_sources_and_protected_files_unchanged": true,
+      "production_service_operations": 0
+    },
+    "mac": {
+      "file_count": 67,
+      "bytes": 2285932,
+      "directory_absent": true,
+      "minimum_reproduction_sources": 10,
+      "operator_sources": 6
+    }
+  },
+  "operator_wrappers_sha256": {
+    "observe-a.py": "c9128cbc7b2da8ac2570200fa6fe8403f4c8ab457666b8f40b43701b6e047d36",
+    "observe-b.py": "097023aab67728544d9e14b2879c0e870741e50c80f22afcf84c09517dbea668",
+    "observe-c.py": "9f910df77a43120ea5efbb2cb2c699aa74a02e32e3cdb4b22546bbb6f0fa3933",
+    "start-a.py": "6923e238e59b83779db84cdf7e8ff2aa2e4b7685c270dc0181da4c0301de3aab",
+    "start-b.py": "2e9c679ff10561d4d9606cd3b68dd870cdefdc4e0082b99bb5bc178b8709c612",
+    "start-c.py": "84cf2bcf5367b56dc3b2e75d7092fd01841ae7cfad729b55007e7aba939f24ee"
+  },
+  "unperformed": [
+    "actual production source replacement",
+    "actual rollback timer creation/firing or production rollback",
+    "actual nonprivileged MCP and fresh chat with installed candidate",
+    "full new OS installation",
+    "host reboot or power-loss recovery trial",
+    "Harness2 run for this backend-only unit"
+  ],
+  "production_operations": {
+    "source_changes": 0,
+    "service_operations": 0,
+    "rollback_timers_created": 0,
+    "actual_MCP_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "packages_installed": 0,
+    "attacks_or_training": 0
+  },
+  "existing_19_plan": {
+    "sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+    "modified": false,
+    "included_in_this_approval": false
+  },
+  "cold_load_report_normalization": "Raw private probe field native_library_loadable identifies use of new native module; false is the valid legacy branch. Public field renamed uses_native_journal and success recorded separately. Raw results and source SHA preserved."
+}

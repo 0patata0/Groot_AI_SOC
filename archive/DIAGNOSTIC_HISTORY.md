@@ -345,3 +345,8 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T07:03:37.745990+09:00 journal native 어댑터 구현·격리 검증
 
 공통 native journal 어댑터를 구현했다. 25등록unit·4 unit-match분기·정수µs·고정 오류 선택·공통 마스킹/행/응답 검사를 보존하고, 최대2개 child/공유20초/child12초·64KiB private packet·최종60000B·취소/회수·잘림 cutoff를 검증했다. native28+기존115+설치23=166pass/skip0. A/B/C 같은24h 오류 후보15.137/7.400/0.335초, B과거 오류6행·A1µs1행은CLI와 완전한 정규화 행/has_more 일치·8건 모두 구validator 통과. 각1회/부하캐시비통제·MCP/모델/채팅0·운영8336유지다. 설치기 source/영수증과systemd255/binding235/API검사·오프라인목록을동기화했다. 새 OS 전체 설치/정확 적용·복구/승인/실제MCP·새채팅은 남는다. 서버21파일286019B/3폴더·Mac15파일772643B자체제거·최소재현6소스보존·운영3source/unit/readerPID/ticks불변active. 기존19planfd6/PREPARED와원래9변경·논문43쪽본문SHA·G_Harness2/자료/가중치/복구본보존. 초기unit변수/mock/ROOT치환누락은수정·실패원문구분. 후속core docstring만변경/실행AST동일. 하네스변경0으로공식H2미사용·review-agent미발견/수동결함검토·Semgrep미수행. [상세 원장](../infra/validation/journal-adapter/README.md).
+
+
+## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
+
+실제netlink drop-in을제거하지않고고정했으며 timer에MainPID가없는계약을수정했다. B영수증+0900 basename범위거절을같은고정디렉터리허용/root메타검사로정정했다. 실제A복제의구core/새journal에서root_file AttributeError 재현·2원복/새fixture보존후교체순서수정. 최종고유33 Mac/A/B/C각pass·3역할9적용/9원복·18중간로드·기존validator통과를확인했으나운영효과/독립정확도아님. [실패와정정 원장](../infra/validation/journal-adapter/application/validation.json).

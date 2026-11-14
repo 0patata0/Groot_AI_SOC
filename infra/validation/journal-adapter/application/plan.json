@@ -1,0 +1,604 @@
+{
+  "access_mode": "Mac-admin231-A-B_or_C",
+  "bundle_id": "12545722ac1fd845cefc0c45e9defc5e4a4fb63f1ec3576445aacd7fb918f114",
+  "files_module_sha256": "b3d966d1982139e6acde1660951ebe70b633d50268b390d53ca343ddaa1e66b4",
+  "hosts": {
+    "a": {
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-a",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "machine_id_sha256": "d2aed240dbb3b4d37fceb1c725af7f141dab5f7ea7d5533f613d3110b3b4eed5",
+      "observed_at_kst": "2026-11-15T07:23:43.153501+09:00",
+      "protected": {
+        "/etc/systemd/system/capstone-journal-reader.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "bfd2aa60d85636b229f9adf4e764e7739290368e0c3a104990726607fef98a59",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "5eedbadbc162f68601fe029c1a0635dca749055501786c33831fd2b017b909f0",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.timer": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/diagnostic_history.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/host_inventory.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+          "gid": 985,
+          "mode": 360,
+          "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/runtime_health.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/active.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "cb869de5f73f79666e0a76a9b8bc9024ab15b6a9b6d4e54602cd587e851993f5",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/intent.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "38c98786bde1b7d262830a9d3cdea721ca56e1d15172870444f2e0b77965c806",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-extension-final-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "62168cc355fc18a5eb3d5f198a8987a7bd3b99cbb6db32454bf7adcb0dbd987f",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-redaction-v5-verification.json": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "e1ca441d5d18dd0312a57d82e056362cbe4b3963ffe9ac51f47b4db3af6f3814",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-v4-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "574e8529f87b50c9f73dbb08683351fee30e4f654c7bb3357d98fecea8417ddd",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-sdk-v3-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "eaa1e86917d651827b08367e408b45d20fd70331ef8998d1c1607490f1526eae",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-v2-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "d327c54e5b09cf185157a66e61d25a97f89e7749fc3cdd851024182ae9113850",
+          "uid": 0
+        }
+      },
+      "reader_account": {
+        "gid": 985,
+        "name": "capstone-diagnostics",
+        "uid": 994
+      },
+      "role": "security",
+      "runtime_sha256": "1f37d0a9f74415ea9c43abebb822ae70525e7fd0566b8a3f43e0ad2b2de57745",
+      "services": {
+        "capstone-journal-reader.service": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-journal-reader.service",
+          "MainPID": "885",
+          "SubState": "running",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "start_ticks": 2569,
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "bfd2aa60d85636b229f9adf4e764e7739290368e0c3a104990726607fef98a59",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.service": {
+          "ActiveState": "activating",
+          "DropInPaths": "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.service",
+          "MainPID": "1593571",
+          "SubState": "start",
+          "UnitFileState": "static",
+          "dropin_files": {
+            "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+              "gid": 0,
+              "mode": 420,
+              "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+              "uid": 0
+            }
+          },
+          "start_ticks": 23705220,
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "5eedbadbc162f68601fe029c1a0635dca749055501786c33831fd2b017b909f0",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.timer": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.timer",
+          "SubState": "running",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "unit_uid": 0
+        }
+      }
+    },
+    "b": {
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-b",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "machine_id_sha256": "e289d5dae0d62f42f3e6de154cf650676a49309767445dcb08bf47d3199af9c5",
+      "observed_at_kst": "2026-11-15T07:23:43.427760+09:00",
+      "protected": {
+        "/etc/systemd/system/capstone-journal-reader.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d139b899114abf7d273689bd27c7c2e29b4f748d26c3d26347c0ec1c805aebdd",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d53de01e10d4a6c255d37dcd546c87967a9e308468615d2e321f005d8d471043",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.timer": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/diagnostic_history.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/host_inventory.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+          "gid": 984,
+          "mode": 360,
+          "sha256": "967e7b5b88745a22f0554660f2dceab9904a415081b08264b750f9bccf14cc37",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/runtime_health.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/intent.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "5833090ca2f84179c4094851392886f69ba0925b74b0e4816939b0abd7b8397c",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-extension-final-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "a6aff64f0214986957e6bde625cc4c29cdfe374e4b6ace6a9f21a80e9ebb4956",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-redaction-v5-verification.json": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "fd4b23f0384cc887893bb02ffe66a7e5a3ad020b7cb3ee17d0315aef1fa9ca11",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-v4-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "26862aef8f78983b52c1c0755f3d542e1d659443fcb05940f5831675def716ca",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v5-20261024T021707+0900.json": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "b4e9d761de950c0ff936ba8e0cf6cc2c9d5bfdbaafead871abf186fad36339a6",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v6-20261023T214546Z.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "9070a01c6d51a26a9d443b8f365d1ee886013fc2fe0ffcc3c092e70884618653",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v6-20261023T220048Z.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "8d55c82e63a8eaaeec5f477c2fc8bbee976882810336f99c5d98183f10751ef6",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v6-20261023T223017Z.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "e178a32761c386d2cc8402625775f109217898befb37b697e3093528e2be87b3",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v6-20261023T223938Z.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "8c7b3f9b7bd88c8fd4b21d4d46db7f573d7231095f1bc3de03d414770a29776a",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-management-v6-20261023T225239Z.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "d1cb509499e485e9c6373ad2002da9b3aa25c6475d46f2806ff2321ddbc2fe0b",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-preparation.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "7f1b7b174b6e9c80a6efab2c8805e21ae64e00f1c320f01c6253c679c6c3c595",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-sdk-v3-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "b0b76ca624104f0f58ea424cfd7fa23cf1eee442190dab326b348304cce64b7d",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-transport-preparation.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "cbfdc329cbc05d3908156ea24ec4eba9641282eedd637d30bb72c209aa6f4513",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-v2-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "860a2a7a3d3b6377f46bf611f1dc0649878201c7650a8f729164af4c427d8aee",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/prepared.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "dbe33d5b45fe7dad91b7976b69cfb999005e9ab9f5ab47afbb98d385c93a07db",
+          "uid": 0
+        }
+      },
+      "reader_account": {
+        "gid": 988,
+        "name": "mcp",
+        "uid": 999
+      },
+      "role": "siem",
+      "runtime_sha256": "86081ace64e04dde838f6c07345b9c36e106e090dfb9c06b7e8896378ad15fd4",
+      "services": {
+        "capstone-journal-reader.service": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-journal-reader.service",
+          "MainPID": "927",
+          "SubState": "running",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "start_ticks": 7043,
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "d139b899114abf7d273689bd27c7c2e29b4f748d26c3d26347c0ec1c805aebdd",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.service": {
+          "ActiveState": "activating",
+          "DropInPaths": "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.service",
+          "MainPID": "3707472",
+          "SubState": "start",
+          "UnitFileState": "static",
+          "dropin_files": {
+            "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+              "gid": 0,
+              "mode": 420,
+              "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+              "uid": 0
+            }
+          },
+          "start_ticks": 23705472,
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "d53de01e10d4a6c255d37dcd546c87967a9e308468615d2e321f005d8d471043",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.timer": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.timer",
+          "SubState": "running",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "unit_uid": 0
+        }
+      }
+    },
+    "c": {
+      "base": "/var/lib/capstone-journal-native/12545722ac1fd845-c",
+      "files": [
+        {
+          "after_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+          "before_sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/system_diagnostics.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+          "before_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal.py",
+          "uid": 0
+        },
+        {
+          "after_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+          "before_sha256": null,
+          "gid": 0,
+          "mode": 420,
+          "target": "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "uid": 0
+        }
+      ],
+      "machine_id_sha256": "1955a87316e8c624d11cd0c2fa589487247363e0bba2dfc0a47bfa86610811a4",
+      "observed_at_kst": "2026-11-15T07:23:43.377784+09:00",
+      "protected": {
+        "/etc/systemd/system/capstone-journal-reader.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "e2b5a46cd49330ff594bc9cfc56f138ede71f2c792779b78814059c1b1732838",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "5952f4e6bcea69bea1dbacc6d1902ca679043caa95c73907e0ebf77cd17bbd76",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+          "uid": 0
+        },
+        "/etc/systemd/system/capstone-system-diagnostics.timer": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/diagnostic_history.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/host_inventory.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+          "gid": 987,
+          "mode": 360,
+          "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+          "uid": 0
+        },
+        "/opt/capstone-diagnostics/runtime_health.py": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/active.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "2151d992c6bafa256c56c54bb510d8747d1308ca5b27719da9177760a84f6e37",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/intent.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "5b20fd6f16b363994c50e56938c24614fa77c01bb23f81e56f6aca0ca72b2a0d",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-extension-final-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "87b60aec57c89eb934bc0586be5dbedc54bf7932813533e51c154310b688388a",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-redaction-v5-verification.json": {
+          "gid": 0,
+          "mode": 420,
+          "sha256": "37b98b70c7917c68b14b8677ab702a4cc76484b54123e36e0f9a6af819a108cd",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-journal-v4-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "c185c6ebbfceae0046561894254ea1a1b56705625c35cb9020037265a8684143",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-sdk-v3-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "cfa777c613f0ce45a60fcc92bba155f402b11ce73948c7f58b56e6b58c688c46",
+          "uid": 0
+        },
+        "/var/lib/capstone-diagnostics/installation/live-v2-verification.json": {
+          "gid": 0,
+          "mode": 384,
+          "sha256": "691ee35a4425e5631a8ea8c30ff6e23a10beaf04293826be9b8d2d301f34b43b",
+          "uid": 0
+        }
+      },
+      "reader_account": {
+        "gid": 987,
+        "name": "capstone-diagnostics",
+        "uid": 996
+      },
+      "role": "service",
+      "runtime_sha256": "cc6e73f1a1df8591dd24376db32d40411cf5fd137e02c695d2484c73df08c6f9",
+      "services": {
+        "capstone-journal-reader.service": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-journal-reader.service",
+          "MainPID": "888",
+          "SubState": "running",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "start_ticks": 2976,
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "e2b5a46cd49330ff594bc9cfc56f138ede71f2c792779b78814059c1b1732838",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.service": {
+          "ActiveState": "inactive",
+          "DropInPaths": "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.service",
+          "MainPID": "0",
+          "SubState": "dead",
+          "UnitFileState": "static",
+          "dropin_files": {
+            "/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf": {
+              "gid": 0,
+              "mode": 420,
+              "sha256": "9c5a2c98f2caae408ffab49dd76d6787dd35a5fcfe568a69dd978b413881c6b1",
+              "uid": 0
+            }
+          },
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "5952f4e6bcea69bea1dbacc6d1902ca679043caa95c73907e0ebf77cd17bbd76",
+          "unit_uid": 0
+        },
+        "capstone-system-diagnostics.timer": {
+          "ActiveState": "active",
+          "DropInPaths": "",
+          "FragmentPath": "/etc/systemd/system/capstone-system-diagnostics.timer",
+          "SubState": "waiting",
+          "UnitFileState": "enabled",
+          "dropin_files": {},
+          "unit_gid": 0,
+          "unit_mode": 420,
+          "unit_sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+          "unit_uid": 0
+        }
+      }
+    }
+  },
+  "limits": {
+    "apply_runtime_seconds": 300,
+    "child_seconds": 12,
+    "memory_bytes": 134217728,
+    "query_seconds": 20,
+    "rollback_runtime_seconds": 180,
+    "rollback_seconds": 900,
+    "tasks": 8
+  },
+  "prepared_at_kst": "2026-11-15T07:46:50.068369+09:00",
+  "runtime_template_sha256": "65c3f3a15f15af1f349a57e59191fb25b976e973b2776cfbe626b77ad06ca154",
+  "schema": 1,
+  "source_commit": "e17fcb79632a39c630d1a5a3bdec8b927d3e8c5b"
+}

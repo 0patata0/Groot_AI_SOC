@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-[journal native 어댑터](../validation/journal-adapter/README.md):166검사·A/B/C 실제 격리8건·구validator 통과. 같은24h 오류 조회15.137/7.400/0.335초, 기존 B오류6행/CLI 일치. 단일 설치기 helper·systemd255/binding235 의존성 검사를 맞췄지만 운영8336/실제MCP/새채팅은 아직 유지·미수행이다. 아래 journal 운영 이력과 후보를 구분한다.
+[journal native 어댑터](../validation/journal-adapter/README.md):166검사·실제격리8건과 [정확9코드 적용안](../validation/journal-adapter/application/README.md)의33회귀·9복제적용/원복·18중간cold load를 확인했다. 운영8336/기존unit·권한은 유지, 최종3PREPARED·원본6개를 보관한다. 정확 승인 뒤 실MCP/양봇 새채팅·확정이 남았다. 아래 journal 이력과 미적용 후보를 구분한다.
 
 2026-11-08: 현재 진단MCP1.4.0은 `get_host_inventory`를 추가해 총45도구(읽기36/보호9)입니다. OS·Docker11종 읽기와 호스트별 표·실패/0건 구분은 [상세 조회 안내](host-inventory.md)를 따릅니다. 아래 버전·도구 수는 날짜별 과거 기록입니다.
 

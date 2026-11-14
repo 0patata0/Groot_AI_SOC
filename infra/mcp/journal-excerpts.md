@@ -1,6 +1,6 @@
 # 제한된 서비스 journal 조회
 
-후속 [공통 native 어댑터](../validation/journal-adapter/README.md)는 구현166검사와 A/B/C 실제 격리8건·기존 validator 대조를 완료했다. 운영 미적용·실제MCP/새채팅 미수행이다. 이 문서의 기존 후보/실험 수치와 “아직 미구현” 표기는 당시 단계로 보존한다.
+후속 [정확9코드 journal 적용안](../validation/journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.
 
 **현재 긴 구간 조회:** [실제 읽기 진단](../validation/live-reads/README.md)에서 B rule-worker24시간이 command_timeout으로 실패했다. 권한 거부나 reader 중단은 아니며 [전체 기간 분할 후보](journal-window-slices.md)를 로컬 소스/134검사·격리 실제 읽기까지 검증했다. 운영 reader/MCP·새 채팅은 아직 원형이므로 적용 완료로 표시하지 않는다.
 

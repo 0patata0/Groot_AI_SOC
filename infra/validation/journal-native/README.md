@@ -1,6 +1,6 @@
 # journal native API의 비용·가능성 실험
 
-후속 [공통 native 어댑터](../journal-adapter/README.md)는 구현166검사와 A/B/C 실제 격리8건·기존 validator 대조를 완료했다. 운영 미적용·실제MCP/새채팅 미수행이다. 이 문서의 기존 후보/실험 수치와 “아직 미구현” 표기는 당시 단계로 보존한다.
+후속 [정확9코드 journal 적용안](../journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.
 
 **A의 같은24시간 오류 후보를 공식 API와 최대2개 동시 읽기로11.95초에 검사한 격리 요약 프로토타입이다. 표준 MCP 응답 어댑터·운영 적용은 아직 없다.** [수치·실패·한계 원장](validation.json) · [현재 경계 후보](../../mcp/journal-window-slices.md) · [현황](../../../STATUS.md).
 

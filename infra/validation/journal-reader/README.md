@@ -1,6 +1,6 @@
 # journal reader 제한 환경과 시각 경계 검증
 
-후속 [공통 native 어댑터](../journal-adapter/README.md)는 구현166검사와 A/B/C 실제 격리8건·기존 validator 대조를 완료했다. 운영 미적용·실제MCP/새채팅 미수행이다. 이 문서의 기존 후보/실험 수치와 “아직 미구현” 표기는 당시 단계로 보존한다.
+후속 [정확9코드 journal 적용안](../journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.
 
 **A/B/C의 운영 reader와 같은 보안·자원 제한으로 후보를 읽었다. B/C는 반환했으나 A의24시간 오류 검색은 여전히 시간 초과다. 운영 적용 준비 완료로 판정하지 않는다.** [결과 원장](validation.json) · [후보 설명](../../mcp/journal-window-slices.md) · [현재 상태](../../../STATUS.md).
 

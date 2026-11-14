@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 관리자231 경유 접속을 확인했고 [사건 완료 조건 후보](infra/validation/incident-completion/README.md)를 검증했습니다. Native449·SDK77·조회408·설치46과 Hermes환경24 검사는 통과했지만 모델 정정2회 모두 보고서 형식이 불완전해 운영 채택을 보류했습니다. [종류 참조 후보](infra/validation/peer-proof-kinds/README.md)도 의미 오류로 계속 보류합니다. 정본·초기 설치·운영 변경과 새 MCP/채팅·공격·학습은0입니다. 논문 MD·PDF·DOCX 제출 조건과 PDF·DOCX 각43쪽 검수는 완료했고 정장사진/학번은 미제공 공란입니다. 아래 날짜별 설명은 당시 검증 범위이며 이후 연속 정상이나 전체 완료로 확대하지 않습니다.
+현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [공통 판단 형식 후보](infra/validation/judgment-format/README.md)는 필수 basis 누락을 보완했고 Native454·SDK77·조회408·설치46과 Hermes환경29 검사를 통과했습니다(생략 수는 원장 참조). 같은 모델3개 개발 사례의 형식1/3→2/3은 일반 정확도가 아니며 상태 값 오류·한국어 실사용 보고 검증이 남아 정본/설치/운영에 반영하지 않았습니다. 직전 보조 시험의 추론 설정 차이도 정정했습니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수는 유지하며 사진/학번은 공란입니다. 실제 채팅·MCP·공격·학습·운영 변경0,아래 날짜별 내용은 당시 기록입니다.
 <!-- current-work-summary:end -->
 
 [Harness² 보완 점검과 하네스 정리 순서](infra/validation/harness2/README.md) — 라이브 스키마·배포 SHA를 기준으로 정리하고, 동결·회귀 후 실제 채팅을 검증합니다.

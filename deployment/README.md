@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[사건 완료 조건 후보](../infra/validation/incident-completion/README.md)는 운영17개 코드/스킬 사본과2개 영수증을 읽기 대조하고 controller를 미리 렌더링했지만 미채택이다. deploy.sh와 초기 설치 입력은 기존 소스를 유지한다. 후보의 완료 요건·workflow/공통 스킬은 기존 수집 경로에 포함됨을 격리46검사로 확인했으며 새 OS 전체 설치는 미수행이다. 후속 승격 시 기존 UID/컨테이너/profile·정확 원본 SHA·관련 모든 영수증과 복구를 다시 결속해야 한다.
+[공통 형식 R2](../infra/validation/judgment-format/README.md)는 전체14/부모대비6파일 patch로 보존한 격리 후보다. deploy.sh·초기 설치 입력·운영 사본은 기존 소스를 유지한다. 부모 R1의 controller 미리보기는 옛 gate SHA에 결속돼 있어 새 후보 배포본으로 재사용하지 않는다. 정확 적용/복구 묶음·모든 사본/영수증·유휴 반영·승인·새 실제 채팅은 별도 준비/검증이 필요하다.
 
 11/8 [제한된 journal 원문 조회](../infra/mcp/journal-excerpts.md)를 A/B/C 운영에 적용했다. 진단MCP1.3.0·common71/query122, Linux1,544회귀검사·비특권 실제MCP11호출(정상9/인자거절2)·독립복구 확정. 초기 deploy.sh는 같은 소스와 고정 service를 설치하며 새 패키지/TCP/일반 sudo·Docker 권한0이다. **실제 새 OS 전체 설치와 일반 복합 판단 정확성은 미완료**다. 최신 채팅/모델/운영 결과는 [STATUS](../STATUS.md)를 따른다.
 

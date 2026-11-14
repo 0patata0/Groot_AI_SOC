@@ -1670,3 +1670,7 @@ A/B/C `/opt/capstone-diagnostics/diagnostic_journal.py` 각1파일을 `ddf0cc0c0
 ## 2026-11-14T21:48:17.722062+09:00 완료 조건의 읽기 대조·renderer 미리보기,적용0
 
 운영 코드/스킬17사본·영수증2개를 읽기 대조했다. controller는 정본 대비 command_for와 추가 zlib import 차이를 보존하고 검토4정의만 바꾼 preview를 만들었다. 내장 runner SHA·UID/container/profile·71866<98304·평상시/사건 플래그 차이 검증. 모델 정정 실패로 정확 적용 승인 요청·배포/원복 실행기·서비스 재시작·운영쓰기0. 초기 설치 입력/가중치/복구본 유지. [후보·분모·한계](../infra/validation/incident-completion/README.md).
+
+## 2026-11-14T22:48:39.353793+09:00 R2 격리 보존·운영 적용0
+
+전체14·R1대비6파일patch 실제복원SHA대조·새139는격리pin. 현재137·초기설치입력·운영/영수증유지. R1inlinegate미리보기는R2새runnerSHA용이아니므로재사용금지. 정확적용/복구패키지·운영승인/새실채팅미준비·서비스재시작0.22:44관리자경유20고정SHA/모델/권한/두채팅active/큐0확인후자체임시만제거. [입출력·분모·한계](../infra/validation/judgment-format/README.md).

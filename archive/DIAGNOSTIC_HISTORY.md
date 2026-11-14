@@ -302,3 +302,7 @@ B 이력 자동 전송이 23:54부터 `finalize`에서 exit 65로 실패한다. 
 ## 2026-11-14T21:48:17.722062+09:00 격리 경로 오류와 실제 모델 정정 실패
 
 Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 Hermes환경 chat-read24×양군으로 보충했다. 최초2테스트 실패는 설치 harness import 오류,가짜 MCP 실패는 bare 이름 계층 오류였고 원문/후속 통과를 보존했다. 실제 모델2합성 정정은88.613초 basis누락·monitor,94.382초6144길이종료/빈 본문. reasoning 원문 저장0·일반 정확도/NativeCLI/채팅SLA 아님.119실제 응답 RO대조는 신규 거절0. [후보·분모·한계](../infra/validation/incident-completion/README.md).
+
+## 2026-11-14T22:48:39.353793+09:00 정정 프로필 강제와 불완전한 합성 완료 이벤트 정정
+
+직전helper는2질문모두true/6144를강제했으나기존상태/서식정정은none/2048이었다. 이번builder6전제검사·함수AST동일로확인해새최적화라쓰지않음. 첫post-model재처리의Emitter.tool.completed누락은가짜시험절차오류였고모델6원문그대로wire+successEmitter로재처리(모델/MCP추가0). Mac489는fixture35중복수집으로고쳐454. 최초결과/정정모두보존. [입출력·분모·한계](../infra/validation/judgment-format/README.md).

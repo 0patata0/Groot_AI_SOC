@@ -373,5 +373,12 @@
     "preserved_reproduction_files": 32,
     "new_packages": 0,
     "G_Harness2": "preserved"
+  },
+  "follow_up_scope_correction": {
+    "recorded_at_kst": "2026-11-14T22:43:53.129742+09:00",
+    "follow_up": "../judgment-format/README.md",
+    "prior_model_probe": "both cases were forced true/6144 by helper; existing conflict repair was already none/2048",
+    "do_not_infer_production_latency_or_new_reasoning_optimization": true,
+    "original_model_outputs_unchanged": true
   }
 }

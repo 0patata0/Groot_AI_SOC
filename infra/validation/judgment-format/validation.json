@@ -1,0 +1,486 @@
+{
+  "at_kst": "2026-11-14T22:41:07.535253+09:00",
+  "status": "held_not_deployed",
+  "base_commit": "31809b45d42dbaba063113a21fe43ef9c27ff29a",
+  "parent_candidate": "../incident-completion/candidate.patch",
+  "full_candidate_source_sha256": {
+    "infra/hermes/query-completion/__init__.py": "f2032182d6b5138dc301c1a6f13dddeee5d9212d4f824da84b2f8981f777d320",
+    "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "33d0f2d5463ebc88da671cfcfc838f9622a611678c57d69df735ff757f2d8dae",
+    "infra/hermes/soc_management_controller.py": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+    "infra/hermes/soc_management_run.py": "0f40424a8d40d6229132dd82503ffc0a46f9054d457ab11bdc8f7360b466ff03",
+    "infra/hermes/test_disposition_workflow_contract.py": "1fa1fc83d7c5fd06b0f26adc05d40c253bb61f6ab837b30b7548c1f9e34e61fa",
+    "infra/hermes/test_incident_completion_contract.py": "c212186f347438efbbeac3393a0df86a4c22dd79ff929cf906b89fe02fba3e04",
+    "infra/hermes/test_peer_text_schema.py": "5ef63a79b3c2689397b2997bb8c5082ed2def332cc6b33f0b35fda55ae46f5e6",
+    "infra/hermes/test_report_repair_diagnosis.py": "711883641d800767deb43a4475059699032928c30537c4dd3118a4217edb80f3",
+    "infra/hermes/test_review_channel.py": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05",
+    "infra/hermes/test_soc_management_controller.py": "b31b93224658202bc6cb1cb1a173274c76f61f0b96b0706af007158755e42bdb",
+    "infra/hermes/test_soc_management_evidence.py": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9",
+    "infra/hermes/workflow_contract.py": "2b392c72df1031b61321b6bbd9d91347b3996ad45d508bab143b0392bc4ac36d",
+    "infra/ollama-trial/harness.py": "34257b1c259dedeab60ac1ef201a0976f47e8924d8678bdf801bd6212cb0abd2"
+  },
+  "r1_delta_source_sha256": {
+    "infra/hermes/query-completion/__init__.py": "f2032182d6b5138dc301c1a6f13dddeee5d9212d4f824da84b2f8981f777d320",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "33d0f2d5463ebc88da671cfcfc838f9622a611678c57d69df735ff757f2d8dae",
+    "infra/hermes/soc_management_run.py": "0f40424a8d40d6229132dd82503ffc0a46f9054d457ab11bdc8f7360b466ff03",
+    "infra/hermes/test_disposition_workflow_contract.py": "1fa1fc83d7c5fd06b0f26adc05d40c253bb61f6ab837b30b7548c1f9e34e61fa",
+    "infra/hermes/test_report_repair_diagnosis.py": "711883641d800767deb43a4475059699032928c30537c4dd3118a4217edb80f3",
+    "infra/hermes/workflow_contract.py": "2b392c72df1031b61321b6bbd9d91347b3996ad45d508bab143b0392bc4ac36d"
+  },
+  "patches": {
+    "candidate.patch": "05a449a3c1badf31db861f8946da4330fb71cc6a2ed175cbeaa57fb2e4e0a03b",
+    "r1-to-r2.patch": "aafa23fefb25080829bb7b639feb562c19d9745236a9739a7c0e81c0133da925"
+  },
+  "patch_roundtrip_files": {
+    "canonical": 14,
+    "r1": 6
+  },
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "always_on_chars": 16819,
+      "n_files": 25,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 18,
+      "plugins": 0
+    },
+    "delta_from_r1": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "delta_from_canonical": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/channel_worker.py",
+        "scripts/evidence_gate.py",
+        "scripts/management_controller.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "reasoning_code_unchanged": {
+      "management_reasoning": "a8bcd92e346df64b1cc0b3d313c94e5d107083b013cc2e230f95e4b078a7884e",
+      "arm_literal_repair": "9d313210ecd26fbb132739493fb27b92509b8705a11428e3950f0c6af2245561",
+      "management_report_request": "4a72e520b4e673c55567d87053cd24e088c818303d94d59fe572b671003206da"
+    }
+  },
+  "mac_profiles": [
+    {
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 0.378,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 2,
+      "seconds": 2.381,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 4.062,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "profile": "native",
+      "rc": 0,
+      "tests": 454,
+      "skipped": 18,
+      "seconds": 5.724,
+      "failures": [],
+      "passed": true
+    }
+  ],
+  "b_profiles": [
+    {
+      "arm": "r1",
+      "profile": "native",
+      "rc": 0,
+      "tests": 449,
+      "skipped": 9,
+      "seconds": 20.387,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "native",
+      "rc": 0,
+      "tests": 454,
+      "skipped": 9,
+      "seconds": 20.666,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "sdk",
+      "rc": 0,
+      "tests": 77,
+      "skipped": 0,
+      "seconds": 1.285,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "query",
+      "rc": 0,
+      "tests": 408,
+      "skipped": 0,
+      "seconds": 6.973,
+      "failures": [],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "profile": "installer",
+      "rc": 0,
+      "tests": 46,
+      "skipped": 0,
+      "seconds": 12.457,
+      "failures": [],
+      "passed": true
+    }
+  ],
+  "native_effective_profile_prechecks": [
+    {
+      "arm": "r1",
+      "case": "missing-judgment",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "medium",
+        "max_tokens": 6144,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": false
+    },
+    {
+      "arm": "r1",
+      "case": "unresolved-with-resolved",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": false
+    },
+    {
+      "arm": "r1",
+      "case": "formatted-unresolved-report",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": false
+    },
+    {
+      "arm": "candidate",
+      "case": "missing-judgment",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "medium",
+        "max_tokens": 6144,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": true
+    },
+    {
+      "arm": "candidate",
+      "case": "unresolved-with-resolved",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": true
+    },
+    {
+      "arm": "candidate",
+      "case": "formatted-unresolved-report",
+      "rc": 0,
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "shared_judgment_fields_present": true
+    }
+  ],
+  "hermes_container_profiles": [
+    {
+      "arm": "r1",
+      "rc": 0,
+      "tests": 24,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 4.98,
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "rc": 0,
+      "tests": 29,
+      "skipped": 0,
+      "failures": [],
+      "seconds": 4.934,
+      "passed": true
+    }
+  ],
+  "model_summary": {
+    "cases": 3,
+    "generations": 6,
+    "same_model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "valid_judgment_and_status": {
+      "r1": 1,
+      "candidate": 2
+    },
+    "new_model_calls_for_replay": 0,
+    "process": {
+      "terminal": true,
+      "returncode": 0,
+      "timed_out": false,
+      "at_kst": "2026-11-14T22:18:15.681032+09:00"
+    },
+    "timings": [
+      {
+        "arm": "r1",
+        "case": "missing-judgment",
+        "seconds": 88.765,
+        "effective_native_profile": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": "incident_disposition_invalid",
+        "management_status": "monitor"
+      },
+      {
+        "arm": "candidate",
+        "case": "missing-judgment",
+        "seconds": 69.18,
+        "effective_native_profile": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": null,
+        "management_status": "monitor"
+      },
+      {
+        "arm": "candidate",
+        "case": "unresolved-with-resolved",
+        "seconds": 3.572,
+        "effective_native_profile": {
+          "reasoning_effort": "none",
+          "max_tokens": 2048,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": null,
+        "management_status": null
+      },
+      {
+        "arm": "r1",
+        "case": "unresolved-with-resolved",
+        "seconds": 2.157,
+        "effective_native_profile": {
+          "reasoning_effort": "none",
+          "max_tokens": 2048,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": null,
+        "management_status": null
+      },
+      {
+        "arm": "r1",
+        "case": "formatted-unresolved-report",
+        "seconds": 2.205,
+        "effective_native_profile": {
+          "reasoning_effort": "none",
+          "max_tokens": 2048,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": null,
+        "management_status": "needs_review"
+      },
+      {
+        "arm": "candidate",
+        "case": "formatted-unresolved-report",
+        "seconds": 2.307,
+        "effective_native_profile": {
+          "reasoning_effort": "none",
+          "max_tokens": 2048,
+          "after_one_build": {
+            "reasoning_effort": "medium",
+            "max_tokens": 6144
+          },
+          "permitted_tool_count": 10,
+          "tool_choice": "auto"
+        },
+        "judgment_error": null,
+        "management_status": "needs_review"
+      }
+    ],
+    "scope": "paired developer late-report probes with Native-selected effective profiles, fake MCP and no model tools; not full Native agent/chat or general accuracy",
+    "not_general_accuracy": true,
+    "not_actual_native_wire_cli_mcp_or_chat": true
+  },
+  "prior_probe_scope_correction": {
+    "prior_path": "../incident-completion/model-probe-results.json",
+    "fact": "prior helper forced reasoning=true/6144 in both cases instead of using the actual one-shot builder profile",
+    "actual_existing_conflict_profile": [
+      "none",
+      2048
+    ],
+    "native_reasoning_code_change": false,
+    "do_not_interpret_as_new_runtime_optimization": true
+  },
+  "known_limits": [
+    "Both arms still generated MANAGEMENT_STATUS: unresolved for the conflicting-state case; this is invalid.",
+    "Candidate first-case basis was English and the late-report probes do not establish Korean human-facing report quality.",
+    "The model-side tool catalog was not sent; fake MCP and native-emitter events were used only in postprocessing.",
+    "First replay omitted the native completion emitter event; corrected replays add it without any new model calls.",
+    "These are three developer cases, including two prior reproductions, not independent accuracy.",
+    "No canonical source, initial-install input or operating files changed; exact live apply/rollback package and fresh real-chat verification remain unprepared."
+  ],
+  "operating_changes": 0,
+  "actual_mcp_calls": 0,
+  "chat_posts": 0,
+  "new_training": 0,
+  "attack_tests": 0,
+  "automatic_judgment_selection": false,
+  "final_operating_observation": {
+    "at_kst": "2026-11-14T22:44:55.443093+09:00",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "services": {
+      "capstone-review-chat.service": {
+        "MainPID": "3347786",
+        "ActiveState": "active",
+        "SubState": "running"
+      },
+      "capstone-ollama-chat.service": {
+        "MainPID": "3536365",
+        "ActiveState": "active",
+        "SubState": "running"
+      }
+    },
+    "queue": [
+      [
+        "cancelled",
+        1
+      ],
+      [
+        "done",
+        568
+      ]
+    ],
+    "operating_source_hashes_verified": 20
+  },
+  "cleanup_remote": {
+    "remote_temp": {
+      "path": "/var/tmp/capstone-judgment-format-20261114-0j1asgzj",
+      "files": 1357,
+      "bytes": 19861953,
+      "absent": true
+    },
+    "container_temp": {
+      "path": "/tmp/capstone-judgment-format-20261114-0j1asgzj",
+      "files": 1293,
+      "bytes": 19290949,
+      "absent": true
+    }
+  },
+  "cleanup_mac": {
+    "at_kst": "2026-11-14T22:46:44.322037+09:00",
+    "path": "/private/tmp/capstone-judgment-format-0j1asgzj",
+    "files": 1976,
+    "bytes": 46108104,
+    "absent": true,
+    "preserved_reproduction_files": 32,
+    "new_packages": 0,
+    "G_Harness2": "preserved"
+  }
+}

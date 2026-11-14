@@ -12694,3 +12694,7 @@ R25/R26 검증·마감 공개4문서는 `5edbb5f9f68aff1f1b6ac64cb4e0754a7d16e86
 ## 2026-11-14T21:48:17.722062+09:00 사건 완료 조건 후보 보류
 
 관리자231 경유 복구 후 현재 소스/도구·17사본/2영수증 읽기 대조. Native449·SDK77·query408·installer46과 실제 Hermes환경24 통과,119/21 과거 최종 응답의 새 거절0. 실제 모델2정정은 basis 누락·6144 소진/빈 본문으로 유효보고0/2여서 정본/설치/운영 미승격. 현재 요약은 STATUS로 이동했고 이전 상세는 Git fc27843:STATUS.md에서 복구한다. [후보·분모·한계](../infra/validation/incident-completion/README.md).
+
+## 2026-11-14T22:48:39.353793+09:00 공통 판단 형식 R2 검증과 미적용
+
+필수 basis 안내를 기존 스킬로 묶어 형식1/3→2/3(동일3개개발사례/양군6생성). Native454·SDK77·query408·installer46·기존Hermes29통과(생략/반복분모 원장),상태unresolved오류·한국어사용자보고미검증으로정본/설치/운영미반영. 이전요약은Git31809b4:STATUS.md로복구가능. [입출력·분모·한계](../infra/validation/judgment-format/README.md).

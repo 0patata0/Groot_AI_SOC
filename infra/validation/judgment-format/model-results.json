@@ -1,0 +1,411 @@
+{
+  "at_kst": "2026-11-14T22:18:15.636469+09:00",
+  "terminal": true,
+  "status": "completed",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "rows": [
+    {
+      "arm": "r1",
+      "case": "missing-judgment",
+      "question": "최근 Wazuh 경보를 조사하고 판단해줘.",
+      "draft": "반환 표본을 확인했습니다.\nMANAGEMENT_STATUS: resolved",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: incident_disposition_missing. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. INCIDENT_DISPOSITION은 exact JSON 한 줄이며 assessment는 benign/remediated/unresolved 중 하나, evidence_tools는 이번 실행에서 실제 성공한 정확한 도구 이름만 사용하세요. 이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- <!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 사건 조사 완료\n- 단순 목록·상태 조회 완료와 사건·경보/로그 원인조사의 완료를 구분한다. 조회의 resolved는 요청한 필드의 조회 완료이며 다른 사건을 종결하지 않는다.\n- 사건 조사를 resolved로 완료하려면 실제 성공한 도구에 결속된 자신의 INCIDENT_DISPOSITION 판단 줄을 남긴다. 근거가 부족하면 미확인·필요한 다음 조사를 설명하고 완료로 표시하지 않는다. 형식을 맞추려고 benign/remediated를 선택하지 않는다. 추가 조사가 필요하면 실제 등록된 읽기 도구를 사용한다.\n- 자동 후속·새 세션도 같은 사건의 완료 조건을 유지한다. 완료 조건은 도구·쓰기·승인 권한을 늘리지 않는다. 모델이 판단을 선택하고 실행기는 형식·실제 인용·완료 조건을 검사한다.\n<!-- soc-workflows:end -->\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n최근 Wazuh 경보를 조사하고 판단해줘.",
+      "effective_native_profile": {
+        "reasoning_effort": "medium",
+        "max_tokens": 6144,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "28deb774b3480eb849b3453d5b7db362b0537377b84cae821b41b7e6e3d62db1",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "제공된 표본에 따르면, 도구 `mcp__wazuh_ro__get_wazuh_alert_summary`는 0개의 경보를 반환했습니다(`returned_count: 0`). 분석할 실제 경보 데이터가 없으므로 사건이 정상인지(benign) 또는 조치되었는지(remediated)를 판단할 근거가 부족합니다. 또한 전체 시스템의 상태나 사건 부재를 단정할 수 없습니다. 현재 조회 결과만으로는 사건 조사를 완료할 수 없으며, 추가적인 조사 또는 다른 범위의 데이터 수집이 필요할 수 있습니다.\n\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: monitor",
+      "assessment": null,
+      "judgment_error": "incident_disposition_invalid",
+      "management_status": "monitor",
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 88596803604,
+        "load_duration": 4828967,
+        "prompt_eval_count": 792,
+        "eval_count": 5390,
+        "done_reason": "stop"
+      },
+      "seconds": 88.765,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "r1",
+        "case": "missing-judgment",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": false
+    },
+    {
+      "arm": "candidate",
+      "case": "missing-judgment",
+      "question": "최근 Wazuh 경보를 조사하고 판단해줘.",
+      "draft": "반환 표본을 확인했습니다.\nMANAGEMENT_STATUS: resolved",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: incident_disposition_missing. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. \n<!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 판단 메타데이터 형식\n- INCIDENT_DISPOSITION은 서식 없이 줄 맨 앞부터 쓰는 JSON 한 줄이다. 키는 assessment, basis, evidence_tools 세 개만 모두 넣으며 생략하거나 추가하지 않는다. JSON은 큰따옴표를 사용한다.\n- assessment는 자신의 근거 기반 판단인 benign, remediated, unresolved 중 하나다. basis는 그 판단을 뒷받침한 관측과 한계를 설명하는 문자열이며 앞뒤 공백을 제외하고 20~2000자다. 설명을 본문에 썼더라도 basis 필드를 생략하지 않는다. 형식을 채우려고 확인하지 않은 사실·원인·정상·조치 성공을 만들지 않는다.\n- evidence_tools는 이번 실행에서 실제 성공했고 판단의 근거로 사용한 정확한 도구 이름 1~16개의 중복 없는 배열이다. 과거 실행·이름 별칭·호출 실패·미실행 도구는 인용하지 않는다. 실제 성공한 읽기가 없으면 판단 줄을 만들어 종결하지 말고 조회 실패와 미확인을 보고한다.\n- 이미 유효한 판단 줄의 서식이나 제어 상태만 고칠 때는 그 판단·근거·실제 인용을 유지한다. unresolved와 resolved의 모순을 없애려고 판단을 정상·해결로 바꾸지 않는다. 추가 근거와 재판단이 필요하면 허용된 실제 조회와 정상 조사 단계를 이어간다. 이 형식은 도구·쓰기·승인 권한이 아니다.\n- 두 제어 줄이 모두 필요하면 INCIDENT_DISPOSITION 줄을 먼저 쓰고 MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 둔다. 두 줄 모두 백틱·굵게·인용부호·목록 기호 없이 줄 맨 앞부터 쓴다. 보고서 전체나 제어 줄을 코드 블록으로 감싸지 않는다. INCIDENT_DISPOSITION의 assessment가 unresolved이면 MANAGEMENT_STATUS를 resolved로 쓰지 않는다. MANAGEMENT_STATUS는 resolved, monitor, needs_review, awaiting_approval 중 현재 판단에 맞는 하나이며 선택지를 그대로 나열하지 않는다.\n<!-- soc-workflows:end -->\n이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- <!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 사건 조사 완료\n- 단순 목록·상태 조회 완료와 사건·경보/로그 원인조사의 완료를 구분한다. 조회의 resolved는 요청한 필드의 조회 완료이며 다른 사건을 종결하지 않는다.\n- 사건 조사를 resolved로 완료하려면 실제 성공한 도구에 결속된 자신의 INCIDENT_DISPOSITION 판단 줄을 남긴다. 근거가 부족하면 미확인·필요한 다음 조사를 설명하고 완료로 표시하지 않는다. 형식을 맞추려고 benign/remediated를 선택하지 않는다. 추가 조사가 필요하면 실제 등록된 읽기 도구를 사용한다.\n- 자동 후속·새 세션도 같은 사건의 완료 조건을 유지한다. 완료 조건은 도구·쓰기·승인 권한을 늘리지 않는다. 모델이 판단을 선택하고 실행기는 형식·실제 인용·완료 조건을 검사한다.\n<!-- soc-workflows:end -->\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n최근 Wazuh 경보를 조사하고 판단해줘.",
+      "effective_native_profile": {
+        "reasoning_effort": "medium",
+        "max_tokens": 6144,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "d20db35bf99cdb695c564b8c1baefcb918601e6988050150ae5b6a245edf44ba",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"mcp__wazuh_ro__get_wazuh_alert_summary returned 0 alerts in the sample, but full_window_count_known is false. Cannot confirm total absence of alerts.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: monitor",
+      "assessment": "unresolved",
+      "judgment_error": null,
+      "management_status": "monitor",
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 69011828800,
+        "load_duration": 4941523,
+        "prompt_eval_count": 1216,
+        "eval_count": 3955,
+        "done_reason": "stop"
+      },
+      "seconds": 69.18,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "candidate",
+        "case": "missing-judgment",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"mcp__wazuh_ro__get_wazuh_alert_summary returned 0 alerts in the sample, but full_window_count_known is false. Cannot confirm total absence of alerts.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: monitor",
+        "case_state": "monitor",
+        "case_detail": "model_requested_followup",
+        "stored_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"mcp__wazuh_ro__get_wazuh_alert_summary returned 0 alerts in the sample, but full_window_count_known is false. Cannot confirm total absence of alerts.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: monitor",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": true
+    },
+    {
+      "arm": "candidate",
+      "case": "unresolved-with-resolved",
+      "question": "이 경보의 현재 영향까지 조사해줘.",
+      "draft": "전체 영향은 미확인입니다.\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: resolved",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: unresolved_disposition_marked_resolved. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. \n<!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 판단 메타데이터 형식\n- INCIDENT_DISPOSITION은 서식 없이 줄 맨 앞부터 쓰는 JSON 한 줄이다. 키는 assessment, basis, evidence_tools 세 개만 모두 넣으며 생략하거나 추가하지 않는다. JSON은 큰따옴표를 사용한다.\n- assessment는 자신의 근거 기반 판단인 benign, remediated, unresolved 중 하나다. basis는 그 판단을 뒷받침한 관측과 한계를 설명하는 문자열이며 앞뒤 공백을 제외하고 20~2000자다. 설명을 본문에 썼더라도 basis 필드를 생략하지 않는다. 형식을 채우려고 확인하지 않은 사실·원인·정상·조치 성공을 만들지 않는다.\n- evidence_tools는 이번 실행에서 실제 성공했고 판단의 근거로 사용한 정확한 도구 이름 1~16개의 중복 없는 배열이다. 과거 실행·이름 별칭·호출 실패·미실행 도구는 인용하지 않는다. 실제 성공한 읽기가 없으면 판단 줄을 만들어 종결하지 말고 조회 실패와 미확인을 보고한다.\n- 이미 유효한 판단 줄의 서식이나 제어 상태만 고칠 때는 그 판단·근거·실제 인용을 유지한다. unresolved와 resolved의 모순을 없애려고 판단을 정상·해결로 바꾸지 않는다. 추가 근거와 재판단이 필요하면 허용된 실제 조회와 정상 조사 단계를 이어간다. 이 형식은 도구·쓰기·승인 권한이 아니다.\n- 두 제어 줄이 모두 필요하면 INCIDENT_DISPOSITION 줄을 먼저 쓰고 MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 둔다. 두 줄 모두 백틱·굵게·인용부호·목록 기호 없이 줄 맨 앞부터 쓴다. 보고서 전체나 제어 줄을 코드 블록으로 감싸지 않는다. INCIDENT_DISPOSITION의 assessment가 unresolved이면 MANAGEMENT_STATUS를 resolved로 쓰지 않는다. MANAGEMENT_STATUS는 resolved, monitor, needs_review, awaiting_approval 중 현재 판단에 맞는 하나이며 선택지를 그대로 나열하지 않는다.\n<!-- soc-workflows:end -->\n이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- INCIDENT_DISPOSITION의 assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved입니다.\n- <!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 사건 조사 완료\n- 단순 목록·상태 조회 완료와 사건·경보/로그 원인조사의 완료를 구분한다. 조회의 resolved는 요청한 필드의 조회 완료이며 다른 사건을 종결하지 않는다.\n- 사건 조사를 resolved로 완료하려면 실제 성공한 도구에 결속된 자신의 INCIDENT_DISPOSITION 판단 줄을 남긴다. 근거가 부족하면 미확인·필요한 다음 조사를 설명하고 완료로 표시하지 않는다. 형식을 맞추려고 benign/remediated를 선택하지 않는다. 추가 조사가 필요하면 실제 등록된 읽기 도구를 사용한다.\n- 자동 후속·새 세션도 같은 사건의 완료 조건을 유지한다. 완료 조건은 도구·쓰기·승인 권한을 늘리지 않는다. 모델이 판단을 선택하고 실행기는 형식·실제 인용·완료 조건을 검사한다.\n<!-- soc-workflows:end -->\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n이 경보의 현재 영향까지 조사해줘.",
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "b99069228cc4ec593fe9cae5e7052d912e7af659bed8bc5cad3e3e5980fcb782",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"요청된 경보의 현재 영향 조사를 위해 mcp__wazuh_ro__get_wazuh_alert_summary 도구를 실행했으나, 반환된 결과에서 returned_count가 0이고 impact_verified가 false로 설정되어 있어 실제 영향 범위를 확인할 수 없습니다. 제공된 표본만으로는 전체 영향이 미확인 상태입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: unresolved",
+      "assessment": "unresolved",
+      "judgment_error": null,
+      "management_status": null,
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 3405461799,
+        "load_duration": 4450653,
+        "prompt_eval_count": 1295,
+        "eval_count": 116,
+        "done_reason": "stop"
+      },
+      "seconds": 3.572,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "candidate",
+        "case": "unresolved-with-resolved",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"요청된 경보의 현재 영향 조사를 위해 mcp__wazuh_ro__get_wazuh_alert_summary 도구를 실행했으나, 반환된 결과에서 returned_count가 0이고 impact_verified가 false로 설정되어 있어 실제 영향 범위를 확인할 수 없습니다. 제공된 표본만으로는 전체 영향이 미확인 상태입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"요청된 경보의 현재 영향 조사를 위해 mcp__wazuh_ro__get_wazuh_alert_summary 도구를 실행했으나, 반환된 결과에서 returned_count가 0이고 impact_verified가 false로 설정되어 있어 실제 영향 범위를 확인할 수 없습니다. 제공된 표본만으로는 전체 영향이 미확인 상태입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": false
+    },
+    {
+      "arm": "r1",
+      "case": "unresolved-with-resolved",
+      "question": "이 경보의 현재 영향까지 조사해줘.",
+      "draft": "전체 영향은 미확인입니다.\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: resolved",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: unresolved_disposition_marked_resolved. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. INCIDENT_DISPOSITION은 exact JSON 한 줄이며 assessment는 benign/remediated/unresolved 중 하나, evidence_tools는 이번 실행에서 실제 성공한 정확한 도구 이름만 사용하세요. 이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- INCIDENT_DISPOSITION의 assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved입니다. 두 값은 같은 판단이어야 합니다. 미해결이면 resolved를 쓰지 말고 실제 판단에 맞는 상태를 쓰세요. assessment를 바꾸려면 그 판단을 뒷받침하는 실제 근거가 있어야 합니다.\n- <!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 사건 조사 완료\n- 단순 목록·상태 조회 완료와 사건·경보/로그 원인조사의 완료를 구분한다. 조회의 resolved는 요청한 필드의 조회 완료이며 다른 사건을 종결하지 않는다.\n- 사건 조사를 resolved로 완료하려면 실제 성공한 도구에 결속된 자신의 INCIDENT_DISPOSITION 판단 줄을 남긴다. 근거가 부족하면 미확인·필요한 다음 조사를 설명하고 완료로 표시하지 않는다. 형식을 맞추려고 benign/remediated를 선택하지 않는다. 추가 조사가 필요하면 실제 등록된 읽기 도구를 사용한다.\n- 자동 후속·새 세션도 같은 사건의 완료 조건을 유지한다. 완료 조건은 도구·쓰기·승인 권한을 늘리지 않는다. 모델이 판단을 선택하고 실행기는 형식·실제 인용·완료 조건을 검사한다.\n<!-- soc-workflows:end -->\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n이 경보의 현재 영향까지 조사해줘.",
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "5a5710b759705f0ec3ab0f20419475ec9e4ceb97e1554a829e9808aae1b9e3b0",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "전체 영향은 미확인입니다.\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: unresolved",
+      "assessment": "unresolved",
+      "judgment_error": null,
+      "management_status": null,
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 1977608674,
+        "load_duration": 4738737,
+        "prompt_eval_count": 914,
+        "eval_count": 75,
+        "done_reason": "stop"
+      },
+      "seconds": 2.157,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "r1",
+        "case": "unresolved-with-resolved",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "전체 영향은 미확인입니다.\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "전체 영향은 미확인입니다.\nINCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.\nMANAGEMENT_STATUS: needs_review",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": false
+    },
+    {
+      "arm": "r1",
+      "case": "formatted-unresolved-report",
+      "question": "이 기록은 무슨 뜻이야?",
+      "draft": "반환 표본만으로 전체 영향은 알 수 없습니다.\n`INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}`\n`MANAGEMENT_STATUS: needs_review`",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: missing_or_invalid_management_status. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. INCIDENT_DISPOSITION은 exact JSON 한 줄이며 assessment는 benign/remediated/unresolved 중 하나, evidence_tools는 이번 실행에서 실제 성공한 정확한 도구 이름만 사용하세요. 이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- MANAGEMENT_STATUS 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: \"`MANAGEMENT_STATUS: needs_review`\". 서식 없이 줄 맨 앞부터 MANAGEMENT_STATUS: needs_review 형식으로 쓰세요.\n- INCIDENT_DISPOSITION 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: \"`INCIDENT_DISPOSITION: {\\\"assessment\\\": \\\"unresolved\\\", \\\"basis\\\": \\\"제공된 반환 표본만 확인했고 전체…\". 서식 없이 줄 맨 앞부터 INCIDENT_DISPOSITION: 다음에 JSON 한 줄로 쓰세요.\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n이 기록은 무슨 뜻이야?",
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "b8e9e5134d6ea9f6deed2c962db145a8841b95fc8a41e00d222f6608fb874ee4",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+      "assessment": "unresolved",
+      "judgment_error": null,
+      "management_status": "needs_review",
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 2037819935,
+        "load_duration": 4460181,
+        "prompt_eval_count": 784,
+        "eval_count": 67,
+        "done_reason": "stop"
+      },
+      "seconds": 2.205,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "r1",
+        "case": "formatted-unresolved-report",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": true
+    },
+    {
+      "arm": "candidate",
+      "case": "formatted-unresolved-report",
+      "question": "이 기록은 무슨 뜻이야?",
+      "draft": "반환 표본만으로 전체 영향은 알 수 없습니다.\n`INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}`\n`MANAGEMENT_STATUS: needs_review`",
+      "synthetic_receipt": {
+        "tool": "mcp__wazuh_ro__get_wazuh_alert_summary",
+        "arguments": {},
+        "result": {
+          "returned_count": 0,
+          "sample_limit": 50,
+          "full_window_count_known": false,
+          "impact_verified": false,
+          "scope": "synthetic bounded sample; no live MCP executed"
+        }
+      },
+      "correction": "조회 근거 일치 검사: missing_or_invalid_management_status. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. 표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. 미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. \n<!-- soc-workflows:start -->\nSOC_WORKFLOW_INVESTIGATE_V1\n## 판단 메타데이터 형식\n- INCIDENT_DISPOSITION은 서식 없이 줄 맨 앞부터 쓰는 JSON 한 줄이다. 키는 assessment, basis, evidence_tools 세 개만 모두 넣으며 생략하거나 추가하지 않는다. JSON은 큰따옴표를 사용한다.\n- assessment는 자신의 근거 기반 판단인 benign, remediated, unresolved 중 하나다. basis는 그 판단을 뒷받침한 관측과 한계를 설명하는 문자열이며 앞뒤 공백을 제외하고 20~2000자다. 설명을 본문에 썼더라도 basis 필드를 생략하지 않는다. 형식을 채우려고 확인하지 않은 사실·원인·정상·조치 성공을 만들지 않는다.\n- evidence_tools는 이번 실행에서 실제 성공했고 판단의 근거로 사용한 정확한 도구 이름 1~16개의 중복 없는 배열이다. 과거 실행·이름 별칭·호출 실패·미실행 도구는 인용하지 않는다. 실제 성공한 읽기가 없으면 판단 줄을 만들어 종결하지 말고 조회 실패와 미확인을 보고한다.\n- 이미 유효한 판단 줄의 서식이나 제어 상태만 고칠 때는 그 판단·근거·실제 인용을 유지한다. unresolved와 resolved의 모순을 없애려고 판단을 정상·해결로 바꾸지 않는다. 추가 근거와 재판단이 필요하면 허용된 실제 조회와 정상 조사 단계를 이어간다. 이 형식은 도구·쓰기·승인 권한이 아니다.\n- 두 제어 줄이 모두 필요하면 INCIDENT_DISPOSITION 줄을 먼저 쓰고 MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 둔다. 두 줄 모두 백틱·굵게·인용부호·목록 기호 없이 줄 맨 앞부터 쓴다. 보고서 전체나 제어 줄을 코드 블록으로 감싸지 않는다. INCIDENT_DISPOSITION의 assessment가 unresolved이면 MANAGEMENT_STATUS를 resolved로 쓰지 않는다. MANAGEMENT_STATUS는 resolved, monitor, needs_review, awaiting_approval 중 현재 판단에 맞는 하나이며 선택지를 그대로 나열하지 않는다.\n<!-- soc-workflows:end -->\n이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. 기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. 보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. 불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):\n- MANAGEMENT_STATUS 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: \"`MANAGEMENT_STATUS: needs_review`\". 서식 없이 줄 맨 앞부터 MANAGEMENT_STATUS: needs_review 형식으로 쓰세요.\n- INCIDENT_DISPOSITION 줄에 서식(백틱·굵게·인용부호·목록 기호)이 붙어 인식되지 않습니다: \"`INCIDENT_DISPOSITION: {\\\"assessment\\\": \\\"unresolved\\\", \\\"basis\\\": \\\"제공된 반환 표본만 확인했고 전체…\". 서식 없이 줄 맨 앞부터 INCIDENT_DISPOSITION: 다음에 JSON 한 줄로 쓰세요.\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.\n이번 실행의 성공한 도구: mcp__wazuh_ro__get_wazuh_alert_summary\n현재 원본 요청(새 권한이나 승인이 아님):\n이 기록은 무슨 뜻이야?",
+      "effective_native_profile": {
+        "reasoning_effort": "none",
+        "max_tokens": 2048,
+        "after_one_build": {
+          "reasoning_effort": "medium",
+          "max_tokens": 6144
+        },
+        "permitted_tool_count": 10,
+        "tool_choice": "auto"
+      },
+      "messages_sha256": "30361b7de340069f12b9238e142f13a1bcbc53585419811fe9392212b3a63a9e",
+      "actual_mcp_calls": 0,
+      "chat_posts": 0,
+      "operating_changes": 0,
+      "scope": "profile-faithful late-report synthesis using actual Native wrapper selected settings; SDK HTTP client with synthetic receipts and no model-side tools, not full Native wire/CLI/MCP/chat",
+      "final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+      "assessment": "unresolved",
+      "judgment_error": null,
+      "management_status": "needs_review",
+      "completion_error": null,
+      "model_metadata": {
+        "total_duration": 2084880078,
+        "load_duration": 4616579,
+        "prompt_eval_count": 1208,
+        "eval_count": 67,
+        "done_reason": "stop"
+      },
+      "seconds": 2.307,
+      "invalidated_initial_gate_replay": {
+        "guarded_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |\n| 조회 근거 | 구조화해 표시할 근거 미확인 | 누락·실패 원문과 실제 호출 기록 확인 필요 |\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review"
+      },
+      "corrected_gate_replay": {
+        "arm": "candidate",
+        "case": "formatted-unresolved-report",
+        "wire_completions": 1,
+        "native_success_progress_events": 1,
+        "guarded_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+        "case_state": "needs_review",
+        "case_detail": "model_needs_review",
+        "stored_final": "INCIDENT_DISPOSITION: {\"assessment\": \"unresolved\", \"basis\": \"제공된 반환 표본만 확인했고 전체 영향 범위와 후속 관측은 아직 미확인입니다.\", \"evidence_tools\": [\"mcp__wazuh_ro__get_wazuh_alert_summary\"]}\nMANAGEMENT_STATUS: needs_review",
+        "model_calls": 0,
+        "actual_mcp_calls": 0,
+        "operating_db_changes": 0
+      },
+      "valid_judgment_and_status": true
+    }
+  ],
+  "actual_mcp_calls": 0,
+  "chat_posts": 0,
+  "operating_changes": 0,
+  "scope": "paired developer late-report probes with Native-selected effective profiles, fake MCP and no model tools; not full Native agent/chat or general accuracy",
+  "initial_replay_correction": "first post-model replay omitted the native emitter completion event; original model texts unchanged; replay adds both observed wire and native tool.completed protocol without new model/MCP calls",
+  "original_model_results_sha256": "02855511a98bbe11d583ad1de369e1f73e34912733d0b445b3394701ddcd7024",
+  "new_model_calls_for_replay": 0
+}

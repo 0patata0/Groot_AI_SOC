@@ -1,6 +1,6 @@
 # Journal 조회 시간과 도구 실패 보고 보완
 
-**후속 검증:** 현재12초/공유20초에서도 B rule-worker24시간 고정 grep이 제한에 걸렸다. [분할·정밀 경계 후보](journal-window-slices.md)는135검사·같은 제한 환경에서 B13.500초/C0.305초 반환, A12초 실패다. [경계 누락 반례·실패와 정정](../validation/journal-reader/README.md)을 보존하며 운영 적용 준비는 미완료다. 아래11/8예산 적용과 당시6초 실측은 과거 이력으로 보존한다.
+**후속 검증:** 현재12초/공유20초에서도 B rule-worker24시간 고정 grep이 제한에 걸렸다. [분할·정밀 경계 후보](journal-window-slices.md)는135검사·같은 제한 환경에서 B13.500초/C0.305초 반환, A12초 실패다. [경계 누락 반례·실패와 정정](../validation/journal-reader/README.md)을 보존하며 운영 적용 준비는 미완료다. 추가 [공식API/2동시 실험](../validation/journal-native/README.md)은 같은24h11.946초의 요약 프로토타입이며 기존 MCP응답을 대체하지 않았다. 아래11/8예산 적용과 당시6초 실측은 과거 이력으로 보존한다.
 
 2026-11-08 KST. 하루치 journal 검색이 약6초 걸려 기존 명령당4초 제한으로 실패한 문제를 수정했다. Hermes review의 CLI 실행은 완료됐지만 도구 조회가 실패했을 때, 성공한 다른 읽기까지 일반 실패 문구로 사라지던 경로도 보완했다. [현재 현황](../../STATUS.md) · [작은 재현 원장](journal-query-budget.validation.json).
 

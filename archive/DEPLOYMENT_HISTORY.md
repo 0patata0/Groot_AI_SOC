@@ -1698,3 +1698,7 @@ canonical진단모듈은6h분할/기존20초/응답계약보존후보로갱신�
 ## journal 제한 환경 시험과 운영 미적용 (2026-11-15)
 
 canonical8f6c/설치용 기존 source 경로만 보완했으며 운영 A/B/C는8336 모듈과 기존 unit을 유지했다. 격리 unit15개/59파일424,793B는 PID종료·원문/SHA 확인 뒤 제거했고 reader PID·시작ticks/3소스/unit파일은 전후 불변·모두active다. 운영 reader/봇 재시작·실MCP·모델·채팅·공격·학습0. 기존19파일 plan fd6e7cb9/PREPARED·before19SHA는05:01에 그대로 확인했다. 새 journal 적용/원복 타이머는 없으며 패키지/이미지/포트/권한 추가도 없다. 초기 installer20 검사는 격리 범위이며 새 OS 전체 설치는 미수행이다. [검증·후속](../infra/validation/journal-reader/README.md).
+
+## journal CPU·native 가능성 후속 (2026-11-15)
+
+A의별도제한unit7개·28파일222046B/7폴더는종료/PID부재/SHA보존뒤제거했다. 운영진단3source/unit/readerPID·ticks불변/active, 패키지설치·권한/운영source/service/DB변경·실MCP/모델/채팅/공격/학습0이다. 기존19planfd6/PREPARED/before19SHA·두chat/managementtimer를06:05에확인했다. 새native적용/원복stage/timer미준비·단일설치기native경로미구현이다. [정확 원장·조건](../infra/validation/journal-native/README.md).

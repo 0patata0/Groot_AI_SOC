@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-[journal 후속 검증](../validation/journal-reader/README.md): A/B/C 운영 제한 환경에서 분할 후보를 대조했다. 경계 밖 로그가 표본을 밀어내는 문제는 native 마이크로초 검색으로 수정·135검사와 A1µs실읽기를 확인했으나 A의24h 검색 시간 초과가 남아 운영 미적용이다. 아래 journal 운영 이력과 최신 후보를 구분한다.
+[journal 후속 검증](../validation/journal-reader/README.md): A/B/C 운영 제한 환경에서 분할 후보를 대조했다. 경계 밖 로그가 표본을 밀어내는 문제는 native 마이크로초 검색으로 수정·135검사와 A1µs실읽기를 확인했으나 A의24h 검색 시간 초과가 남아 운영 미적용이다. 후속 [native API·2동시 요약 실험](../validation/journal-native/README.md)은 같은24h11.946초였지만 표준응답/마스킹·파일실패/byte·회귀·설치/운영 검증이 남았다. 아래 journal 운영 이력과 후보·실험을 구분한다.
 
 2026-11-08: 현재 진단MCP1.4.0은 `get_host_inventory`를 추가해 총45도구(읽기36/보호9)입니다. OS·Docker11종 읽기와 호스트별 표·실패/0건 구분은 [상세 조회 안내](host-inventory.md)를 따릅니다. 아래 버전·도구 수는 날짜별 과거 기록입니다.
 

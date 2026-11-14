@@ -1,0 +1,550 @@
+{
+  "schema": 1,
+  "kind": "journal_native_feasibility_not_operating_response",
+  "at_kst": "2026-11-15T06:11:32.835872+09:00",
+  "target": "a:rule-worker",
+  "requested_since_kst": "2026-11-14T03:24:10.795222+09:00",
+  "requested_until_kst": "2026-11-15T03:24:10.795222+09:00",
+  "scope": {
+    "actual_mcp_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "operating_source_changes": 0,
+    "operating_service_restarts": 0,
+    "new_transient_units": 7,
+    "new_packages_installed": 0,
+    "repetitions_per_variant": 1,
+    "cache_or_competing_load_controlled": false,
+    "independent_security_accuracy_evaluation": false
+  },
+  "canonical_journal_sha256": "8f6cdafdb3829ba6c43648a99829f2bee3f28da8190ff1166574025ecca2054c",
+  "installed_journal_sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+  "existing_fixed_grep_resource_measurements": [
+    {
+      "name": "one_microsecond",
+      "since_unix_microseconds": 1794680647256344,
+      "until_unix_microseconds": 1794680647256345,
+      "seconds_bound": 6,
+      "status": "returned",
+      "returncode": 0,
+      "bytes": 0,
+      "rows": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.054383,
+      "child_resource_delta": {
+        "ru_utime": 0.011728,
+        "ru_stime": 0.040071,
+        "ru_minflt": 4829,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 1,
+        "ru_nivcsw": 36
+      },
+      "largest_child_maxrss_kb_so_far": 133336
+    },
+    {
+      "name": "fifteen_minutes",
+      "since_unix_microseconds": 1794679750795222,
+      "until_unix_microseconds": 1794680650795222,
+      "seconds_bound": 6,
+      "status": "returned",
+      "returncode": 0,
+      "bytes": 0,
+      "rows": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.923413,
+      "child_resource_delta": {
+        "ru_utime": 0.592784,
+        "ru_stime": 0.136947,
+        "ru_minflt": 9087,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 1,
+        "ru_nivcsw": 401
+      },
+      "largest_child_maxrss_kb_so_far": 133748
+    },
+    {
+      "name": "six_hours",
+      "since_unix_microseconds": 1794659050795222,
+      "until_unix_microseconds": 1794680650795222,
+      "seconds_bound": 12,
+      "status": "failed",
+      "type": "DiagnosticError",
+      "reason": "command_timeout",
+      "elapsed_seconds": 12.009588,
+      "child_resource_delta": {
+        "ru_utime": 9.748601,
+        "ru_stime": 1.681307,
+        "ru_minflt": 80045,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 1,
+        "ru_nivcsw": 4421
+      },
+      "largest_child_maxrss_kb_so_far": 137048
+    },
+    {
+      "name": "six_hours_single_literal",
+      "since_unix_microseconds": 1794659050795222,
+      "until_unix_microseconds": 1794680650795222,
+      "seconds_bound": 6,
+      "status": "returned",
+      "returncode": 1,
+      "bytes": 0,
+      "rows": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 3.735514,
+      "child_resource_delta": {
+        "ru_utime": 1.60098,
+        "ru_stime": 2.113692,
+        "ru_minflt": 98109,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 1,
+        "ru_nivcsw": 762
+      },
+      "largest_child_maxrss_kb_so_far": 138304
+    }
+  ],
+  "existing_packages_A": {
+    "at_kst": "2026-11-15T05:21:38.810381+09:00",
+    "python_systemd_available": true,
+    "python_systemd_origin": "/usr/lib/python3/dist-packages/systemd/__init__.py",
+    "packages_rc": 0,
+    "packages": "libpcre2-8-0:amd64 10.42-4ubuntu2.1 ii \nlibsystemd0:amd64 255.4-1ubuntu8.18 ii \npython3-systemd 235-1build4 ii \n",
+    "packages_installed": 0
+  },
+  "A_resource_snapshot_before_parallel": {
+    "at_kst": "2026-11-15T05:49:12.825088+09:00",
+    "logical_cpus": 2,
+    "allowed_cpus": 2,
+    "loadavg": [
+      "0.59",
+      "0.57",
+      "0.54"
+    ],
+    "MemAvailable": "4674880 kB",
+    "cgroups": {
+      "host_cgroup": {}
+    },
+    "changes": 0,
+    "previous_jit2_trial_unit": {
+      "MainPID": "0",
+      "ControlGroup": "",
+      "MemoryCurrent": "[not set]",
+      "MemoryPeak": "[not set]",
+      "CPUUsageNSec": "[not set]",
+      "TasksCurrent": "[not set]",
+      "ActiveState": "inactive"
+    },
+    "previous_jit2_trial_unit_name": "capstone-journal-probe-a-20261115-oq4hi35o-jit2.service",
+    "not_operating_reader_state": true
+  },
+  "trials": [
+    {
+      "name": "native",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.192906,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "six_hours_text",
+          "status": "returned",
+          "elapsed_seconds": 5.691533,
+          "sample": {
+            "scanned_entries": 8008,
+            "matched_entries": 0,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "full_day_errors",
+          "status": "failed",
+          "elapsed_seconds": 11.60418,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'AssertionError', 'reason': 'prototype_deadline'}"
+        }
+      ],
+      "source_evidence_sha256": "1801712bc9979995f855669cfb20de8dd85508f202cbf819fcc52212f94e1d48",
+      "source_sha256": "cc984ac6c7f3a4f00d1baa160c79c2afc9dc6c16b96f4f79841b4713cc99d79e"
+    },
+    {
+      "name": "fields",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.120256,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "six_hours_text",
+          "status": "returned",
+          "elapsed_seconds": 5.396909,
+          "sample": {
+            "scanned_entries": 8008,
+            "matched_entries": 0,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "full_day_errors",
+          "status": "failed",
+          "elapsed_seconds": 11.603768,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'AssertionError', 'reason': 'prototype_deadline'}"
+        },
+        {
+          "name": "full_day_sliced_errors",
+          "status": "failed",
+          "elapsed_seconds": 20.006447,
+          "error_type": "DiagnosticError",
+          "reason": "command_timeout",
+          "slices": [
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0
+            },
+            {
+              "scanned_entries": 7988,
+              "matched_entries": 0
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0
+            }
+          ]
+        }
+      ],
+      "source_evidence_sha256": "3b534585ccea4f9085bdcb4da267925216dbe25ac85efcf92b8125029fd6909e",
+      "source_sha256": "0f7267dcc8a156dda1facbb35a704076de4df64b67a1591fa836c827162db90e"
+    },
+    {
+      "name": "fast",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.128432,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "six_hours_text",
+          "status": "returned",
+          "elapsed_seconds": 7.208423,
+          "sample": {
+            "scanned_entries": 8008,
+            "matched_entries": 0,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "full_day_errors",
+          "status": "failed",
+          "elapsed_seconds": 11.619404,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'AssertionError', 'reason': 'prototype_deadline'}"
+        },
+        {
+          "name": "full_day_sliced_errors",
+          "status": "failed",
+          "elapsed_seconds": 20.008288,
+          "error_type": "DiagnosticError",
+          "reason": "command_timeout",
+          "slices": [
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0,
+              "selection": "text"
+            },
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 7988,
+              "matched_entries": 0,
+              "selection": "text"
+            },
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            }
+          ]
+        }
+      ],
+      "source_evidence_sha256": "9454df42c0597d9ae72c310badeda55f177af3002f8dc6200121ff3a467a429b",
+      "source_sha256": "741bca772d3b94ffa57d1dbb19d8ff1a36fa87945d38ff1c90fa2385c6d29599"
+    },
+    {
+      "name": "jit",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.127667,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "six_hours_text",
+          "status": "failed",
+          "elapsed_seconds": 0.142695,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'TypeError', 'reason': None}"
+        },
+        {
+          "name": "full_day_errors",
+          "status": "failed",
+          "elapsed_seconds": 0.149359,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'TypeError', 'reason': None}"
+        },
+        {
+          "name": "full_day_sliced_errors",
+          "status": "failed",
+          "elapsed_seconds": 0.305856,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'TypeError', 'reason': None}",
+          "slices": [
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            }
+          ]
+        }
+      ],
+      "source_evidence_sha256": "7ba6b0e06a67c3a50edccdf9b5c7d9c0e7bef6a78e5407fa0fe425134686326d",
+      "source_sha256": "8d16ea2c4a05e136595b21019f295a8a4504098e689b5d01797bff110eb640fe"
+    },
+    {
+      "name": "jit2",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.123087,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "six_hours_text",
+          "status": "returned",
+          "elapsed_seconds": 5.76186,
+          "sample": {
+            "scanned_entries": 8008,
+            "matched_entries": 0,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "full_day_errors",
+          "status": "failed",
+          "elapsed_seconds": 11.607136,
+          "error_type": "AssertionError",
+          "reason": "{'status': 'failed', 'error_type': 'AssertionError', 'reason': 'prototype_deadline'}"
+        },
+        {
+          "name": "full_day_sliced_errors",
+          "status": "returned",
+          "elapsed_seconds": 19.294692,
+          "slices": [
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0,
+              "selection": "text"
+            },
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 7988,
+              "matched_entries": 0,
+              "selection": "text"
+            },
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0,
+              "selection": "text"
+            },
+            {
+              "scanned_entries": 0,
+              "matched_entries": 0,
+              "selection": "err"
+            },
+            {
+              "scanned_entries": 8000,
+              "matched_entries": 0,
+              "selection": "text"
+            }
+          ]
+        }
+      ],
+      "source_evidence_sha256": "2b43dca101e04c5d56e7247c6d632cf1f915b0147765156a325b04d3295dc3d8",
+      "source_sha256": "39cb1ba732256e4bdfa2b1f2daac7800ddb6f525e06d1ae95f93817715b066c6"
+    },
+    {
+      "name": "parallel",
+      "cases": [
+        {
+          "name": "precision",
+          "status": "returned",
+          "elapsed_seconds": 0.123211,
+          "sample": {
+            "scanned_entries": 1,
+            "matched_entries": 1,
+            "whole_requested_range_exhausted": true
+          }
+        },
+        {
+          "name": "full_day_parallel_two",
+          "status": "returned",
+          "elapsed_seconds": 11.945833,
+          "slices": [
+            {
+              "scanned_entries": 7988,
+              "matched_entries": 0,
+              "seconds": 5.409541
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0,
+              "seconds": 6.173883
+            },
+            {
+              "scanned_entries": 8008,
+              "matched_entries": 0,
+              "seconds": 5.889891
+            },
+            {
+              "scanned_entries": 8000,
+              "matched_entries": 0,
+              "seconds": 5.763117
+            }
+          ]
+        }
+      ],
+      "source_evidence_sha256": "9ac1f85dcb72e529a155086d4bcfd7a0bb17052e4499a9886078a2777d3b50be",
+      "source_sha256": "5d68247eb3b64683f3c391ea19ab3d78b06fd3e701ef7368bcc68f6015e11146"
+    }
+  ],
+  "preferred_direction": {
+    "name": "native_API_with_at_most_two_parallel_reads",
+    "public_Reader_prototype_seconds": 11.945833,
+    "scan_observations_sum": 32004,
+    "scan_observations_are_not_unique_event_count": true,
+    "slice_boundary_overlap_possible": true,
+    "matching_candidates_in_observed_data": 0,
+    "requested_window_total_count": null,
+    "journal_retention_verified": false,
+    "known_precision_cursor_sha_matches_existing": true,
+    "native_MCP_response_adapter_implemented": false,
+    "operating_application_ready": false,
+    "shared_query_deadline_seconds": 20,
+    "individual_child_limit_seconds": 12,
+    "configured_memory_limit_bytes": 134217728,
+    "configured_tasks_limit": 8,
+    "maximum_trial_threads_and_children": 5,
+    "systemd_reported_unit_CPU_seconds": 23.15,
+    "systemd_reported_unit_memory_peak_verbatim": "2.8M",
+    "memory_peak_is_not_total_shared_mmap_RSS": true
+  },
+  "prototype_extra_guards_not_a_final_production_contract": {
+    "message_field_threshold_bytes": 65536,
+    "maximum_scan_observations_per_child": 250000,
+    "native_worker_internal_deadline_seconds": 11.5
+  },
+  "setup_errors": [
+    "initial temporary path did not exist; local before SSH",
+    "basename-versus-absolute-source manifest key mismatch; local generator then missing starter; no remote unit started",
+    "first JIT callable shadowed by result list; TypeError before timing; corrected and positive/negative/NUL literal smoke added"
+  ],
+  "next_required": [
+    "version/permissions/current sources and dependency presence on A/B/C",
+    "standard response plus identical unit/time/priority/source evidence and masking",
+    "native file-access/corruption/truncation failures cannot become empty success",
+    "binary/UTF-8/large/multivalue fields and timestamp/cursor conflicts",
+    "whole byte/time limits with bounded parallel work and cancellation",
+    "tail ordering/early termination/cropping parity under high volume",
+    "single installer/offline manifest and isolated regression",
+    "exact approval-bound apply/rollback then actual MCP and fresh chat"
+  ],
+  "cleanup_remote": {
+    "at_kst": "2026-11-15T06:11:32.835872+09:00",
+    "host": "a",
+    "removed_files": 28,
+    "removed_bytes": 222046,
+    "owned_directories_absent": 7,
+    "parent_removed_if_empty": true,
+    "source_and_unit_sha_unchanged": true,
+    "reader_pid_and_start_ticks_unchanged": true,
+    "reader_active": true,
+    "production_service_operations": 0,
+    "journal_history_deleted": false
+  },
+  "cleanup_mac": {
+    "files": 26,
+    "bytes": 405428,
+    "own_directory_absent": true,
+    "minimum_reproduction_sources": 12,
+    "packages_installed": 0
+  },
+  "existing_control_status_plan": {
+    "sha256": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+    "phase": "PREPARED",
+    "before_19_sources_match": true,
+    "modified": false
+  },
+  "references": [
+    "https://github.com/systemd/systemd/blob/v255/src/shared/logs-show.c",
+    "https://github.com/systemd/systemd/blob/v255/src/shared/pcre2-util.c",
+    "https://github.com/systemd/python-systemd/tree/v235",
+    "https://www.pcre.org/current/doc/html/pcre2jit.html"
+  ]
+}

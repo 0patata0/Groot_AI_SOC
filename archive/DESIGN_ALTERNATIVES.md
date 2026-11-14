@@ -587,3 +587,7 @@ R2는필수3필드/basis20~2000/실제인용/상태관계를기존스킬한절�
 ## journal 검색 비용 실험 미채택 (2026-11-15)
 
 역순은 systemd255의 grep+lines가 이미 포함하고 실제 A 비용도 개선하지 못했다. 직접 unit 필드·시스템 journal 한정은 시간 초과가 남고 동등 범위도 인증하지 않아 채택하지 않았다. 동등 literal trie/precheck도 공유/명령 예산을 넘었다. RuntimeError만 검색하면 더 빠르지만 필요한 다른 오류를 제외하므로 해결안이 아니다. 기존 전체 기간·등록 대상·제한을 유지하며 경계 누락만 별도 수정했다. [현재 후보·반례·관측](../infra/validation/journal-reader/README.md).
+
+## journal CPU·native 가능성 후속 (2026-11-15)
+
+공식Reader의전체변환·선택필드·Pythonbyte정규식·동일PCRE2JIT와2동시를격리비교했다. 단일24h는11.5초내부한도실패·선택필드순차20초실패, JIT는19.295초로여유작음/FFI필요해우선도입하지않는다. 공용Reader2동시11.946초를표준응답/보안회귀를갖출다음구현방향으로정했다.64KiB내부정규화패킷/전역tail잘림은검증전제안이며운영반영이아니다. [정확 원장·조건](../infra/validation/journal-native/README.md).

@@ -336,3 +336,7 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 정상 unit tail51은0.100초지만 A24h 고정 오류 검색은12초 command_timeout이다. 역순·직접 unit필드·literal trie·anchored precheck·시스템 journal 비용 실험은 모두 명령/공유 예산을 넘겨 미채택했다. 특정 내부 함수가 단독 원인이라는 profiler 증거는 없다. 초기 PrivateTmp /var/tmp 배치226/NAMESPACE와 a:waf의 journal 비등록 거절은 시험 설정 오류로 분리·정정했고 운영 장애나 모델 오답으로 세지 않았다. B active.json 부재는 prepared/증분 영수증 확인으로 처리해 이력을 덮어쓰지 않았다.
 
 또한 검색 기간의 초 단위 확장으로 인접100로그가 유효2로그를 tail 밖으로 밀어내는 누락을 이전 소스에 재현했다. 정수 마이크로초 native 경계로 수정·135검사/생략0·A native1µs1로그0.097초/기존validator를 확인했다. 최신24h A실패·B13.500초/C0.305초 반환은 각1회·MCP/모델/채팅0이다. [정확 SHA·실패·검증 범위](../infra/validation/journal-reader/README.md).
+
+## journal CPU·native 가능성 후속 (2026-11-15)
+
+고정6h검색12.010초실패에서child user9.749/system1.681=11.430CPU초·majorfault/inblock0을관측했다. 공용Reader/선택필드/Pythonregex는순차20초실패,JIT2는19.295초여유작음,공식Reader2동시는11.946초반환했다. 처음JIT함수/list이름충돌TypeError와로컬경로/키준비오류는시험오류로분리·정정했다. JITsmoke/프로토타입/135기존회귀를독립정확도나새검사수로합산하지않는다. [정확 원장·조건](../infra/validation/journal-native/README.md).

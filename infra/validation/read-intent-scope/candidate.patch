@@ -1,0 +1,138 @@
+diff --git a/infra/hermes/chat_contract.py b/infra/hermes/chat_contract.py
+index 5d96fde..edc0438 100644
+--- a/infra/hermes/chat_contract.py
++++ b/infra/hermes/chat_contract.py
+@@ -8,7 +8,7 @@ import math
+ from pathlib import Path
+ import re
+ 
+-VERSION = 'soc-chat-contract:1.5.86'
++VERSION = 'soc-chat-contract:1.5.87'
+ MODEL_STEPS = 12
+ TOOL_CALLS = 32
+ READ_TIMEOUT = 90
+@@ -527,6 +527,22 @@ def _service_natural_period(question, at):
+     except ValueError:return None
+ 
+ 
++def read_action_remainder(text):
++    """Remove affirmative lookup verbs only; never erase objects or negation.
++
++    Callers retain their own closed object/condition grammar. This recognizes
++    conversational spelling, not a decision, permission or request execution.
++    """
++    if not isinstance(text,str):return text
++    return re.sub(r'(?<![A-Za-z0-9_])(?:'
++        r'보여\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
++        r'알려\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
++        r'(?:조회|확인|정리)\s*(?:해\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)|부탁(?:해요|해|드려요|드립니다)?)|'
++        r'봐\s*(?:주세요|줄래요|줄래|줘)|볼\s*(?:수\s*있을까|수\s*있나요|수\s*있니|래요|래)|'
++        r'(?:조회|확인|정리)해줄\s*수\s*있(?:을까|나요|니)'
++        r')(?![A-Za-z0-9_])',' ',text)
++
++
+ def service_log_request(question):
+     """Message-log intent, excluding words embedded in target/unit names."""
+     if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
+@@ -837,8 +853,9 @@ def service_lookup_scope(plan, question):
+         if re.fullmatch(r'(?:설정\s*)?(?:변경|수정|재시작|재가동|실행)(?:은|는|을|를)?\s*(?:하지\s*마(?:세요)?|금지)[.!?。]*',part):continue
+         kept.append(part)
+     text=' '.join(kept)
+-    if not re.search(r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)',text):return False
++    if read_action_remainder(text)==text:return False
+     # Bare A/B/C beside an exact unit must agree with the registered host too.
++    text=read_action_remainder(text)
+     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z0-9_:])([ABC])(?:\s*(?:서버|호스트))?(?=\s|의|$)',text,re.I)}
+     if hosts and (len(hosts)!=1 or any(t[0] not in hosts for t in plan['units'])):return False
+     if re.search(r'관제|처리|대기',text) and 'b:management-pipeline' not in plan.get('current_companions',[]):return False
+diff --git a/infra/ollama-trial/harness.py b/infra/ollama-trial/harness.py
+index 18e61ae..746e724 100644
+--- a/infra/ollama-trial/harness.py
++++ b/infra/ollama-trial/harness.py
+@@ -985,6 +985,24 @@ def structured_read(question):
+                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
+ 
+ 
++def event_topic(question):
++    """An explicit DNS topic, never a source-IP/port or safe-traffic verdict."""
++    text=normalized(question)
++    return 'dns' if re.search(r'(?<![A-Za-z0-9_])DNS(?![A-Za-z0-9_])',text,re.I) else None
++
++
++def event_topic_rows(topic, rows):
++    """Display-only subset of actual rows. No server filter or full coverage."""
++    if topic is None:return list(rows)
++    if topic!='dns':return []
++    return [row for row in rows if isinstance(row,dict) and (
++        isinstance(row.get('dns_questions'),list) and any(isinstance(q,dict) and
++            isinstance(q.get('name'),str) and 1<=len(q['name'])<=253 and
++            re.fullmatch(r'[A-Za-z0-9_.-]+',q['name']) and isinstance(q.get('type'),str) and
++            re.fullmatch(r'[A-Z0-9]{1,16}',q['type']) for q in row['dns_questions']) or
++        re.search(r'(?<![A-Za-z0-9_])DNS(?![A-Za-z0-9_])',str(row.get('signature','')),re.I))]
++
++
+ def _event_lookup_request(question):
+     """A bounded log listing, shared by selectors and the channel worker.
+ 
+@@ -997,6 +1015,10 @@ def _event_lookup_request(question):
+     devices = {label for pattern, label in (
+         (r'WAF|ModSecurity', 'modsecurity'), (r'IDS|IPS|Suricata|수리카타', 'suricata'),
+         (r'Wazuh|와주', 'wazuh')) if re.search(pattern, text, re.I)}
++    topic=event_topic(text)
++    if topic:
++        if devices and devices!={'suricata'}:return None
++        devices={'suricata'}
+     if not devices:
+         if not re.search(r'경보|이벤트', text): return None
+         devices = {'wazuh'}  # Unified indexed alerts; the report names this scope.
+@@ -1011,6 +1033,8 @@ def _event_lookup_request(question):
+     # One explicit recent window ("최근 30분") is a listing bound, not an unknown filter.
+     rest = re.sub(r'WAF|ModSecurity|IDS|IPS|Suricata|수리카타|Wazuh|와주', '', CONTRACT.without_relative_window(text), flags=re.I)
+     if counts: rest = re.sub(r'[0-9]+\s*(?:개|건)', '', rest)
++    rest = CONTRACT.read_action_remainder(rest)
++    if topic:rest=re.sub(r'(?<![A-Za-z0-9_])DNS(?![A-Za-z0-9_])','',rest,flags=re.I)
+     rest = re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|정리(?:해서|해줘)?|'
+                   r'조회(?:해줘|해주세요)?|오늘|금일|최근|지금|현재|올라온|차단|보안|로그|경보|이벤트|'
+                   r'목록|표로|테이블로|간단히|상세히|좀|하고|및|각각|장비별로|는|은|를|을|도|만|의', '', rest)
+@@ -3698,16 +3722,25 @@ def event_report(question, calls):
+                       'mcp__security_events__search_wazuh_alerts':'wazuh'}.get(name)
+             if source!=expected or not isinstance(alerts,list) or any(not isinstance(a,dict) for a in alerts):
+                 rows.extend(READ.table(['조회 상태','확인 범위'],[['반환 형식 미확인','0건으로 판단하지 않습니다.']])); continue
++            topic=event_topic(question) if event_lookup_scope(question) else None
+             rows.extend(READ.table(['요청 구간(KST)','반환 상태'],[[
+                 str(data.get('requested_since_kst','미확인'))+' ~ '+str(data.get('requested_until_kst','미확인')),
+-                f"반환 표본 {data.get('returned_count','미확인')}건 · 표시 {len(alerts)}건 · "
++                f"반환 표본 {data.get('returned_count','미확인')}건 · "
++                + (f"반환 행 {len(alerts)}건 · " if topic else f"표시 {len(alerts)}건 · ")
+                 + ('조회 한도 도달·추가 경보 존재 여부/구간 전체 건수 미확인' if data.get('scan_capped') is True
+                    else '구간 전체 건수 미확인')]]))
+             count=data.get('returned_count')
+             if type(count) is not int or count!=len(alerts):
+                 rows.extend(['',*READ.table(['조회 상태','확인 범위'],[['반환 건수 불일치·미확인','실제 반환 행만 표시하며 완전한 조회로 판단하지 않습니다.']])])
++            if topic:
++                sample_count=len(alerts)
++                alerts=event_topic_rows(topic,alerts)
++                rows.extend(['',*READ.table(['주제·선별 근거','표시 범위'],[[
++                    'DNS: 반환 DNS 질문 필드 또는 센서 signature의 DNS 표기',
++                    f'전체 반환 표본 {sample_count}건 중 DNS 관련 {len(alerts)}건 · 서버 DNS 필터/전체 DNS 경보 수 조회 아님']])])
+             if not alerts:
+-                state='반환 표본 없음' if type(count) is int and count==0 else '반환 행 없음·건수 미확인'
++                state=('반환 표본에서 DNS 관련 행 없음' if topic else
++                    '반환 표본 없음' if type(count) is int and count==0 else '반환 행 없음·건수 미확인')
+                 rows.extend(['',*READ.table(['조회 상태','확인 범위'],[[state,'전체 경보·공격 부재의 증거가 아님']])]);continue
+             rendered=[]
+             for alert in alerts:
+diff --git a/infra/hermes/skills/soc-query/SKILL.md b/infra/hermes/skills/soc-query/SKILL.md
+index e17c552..7d8f970 100644
+--- a/infra/hermes/skills/soc-query/SKILL.md
++++ b/infra/hermes/skills/soc-query/SKILL.md
+@@ -55,3 +55,9 @@ SOC_WORKFLOW_QUERY_V1
+ - 직접 지정한 담당 봇은 같은 사용자·채널·스레드의 15분 이내 연속 조회 후속에서도 유지한다. 새 대상·새 담당 지정은 우선하며, 태그·승인·과거 수치는 계승하지 않는다.
+ - 등록된 OS 서비스의 “로그 보여줘/로그도”는 실제 `view=journal` 발췌를 읽는다. 기간 생략 시 요청 시각 기준 최근 15분·최대 50행의 전체 우선순위 표본을 사용하고 구간·한도를 표시한다. 오류 요청은 오류 후보 범위를 구분한다. 현재 상태나 정제 이력만 읽고 로그 조회를 완료로 표시하지 않는다. 명시 기간을 기본 구간으로 대체하지 않으며, 미등록 unit·잘림·조회 실패를 무로그/정상으로 표현하지 않는다. Docker 로그는 기존 컨테이너 로그 도구와 객체 범위를 유지한다.
+ - Adapter마다 조회 조건을 다시 추정하지 않는다. Native와 SDK는 공통 scope/인자 검증을 재사용하고, FW hook·origin·rule ID·Wazuh 상관 필터 등 장비별 조건은 그대로 보존한다.
++
++### 짧은 조회와 주제별 표본
++
++- ‘봐줘’, ‘볼래’, ‘확인해 줄래’도 조회 의도로 읽되 원래 장비·대상·기간·부정문을 유지한다. 짧다는 이유로 요청하지 않은 룰 정의를 가져오거나 로그 요청을 현재 상태로 대신하지 않는다.
++- DNS 경보 단순 목록은 Suricata 경보 표본의 DNS 질문 필드·signature 표기를 근거로 관련 행을 구분한다. 서버에 없는 DNS 필터를 전달하지 않으며 전체 반환 표본 수와 주제 관련 표시 수를 함께 밝힌다. DNS 포트만으로 정상/악성·DNS 사건을 단정하지 않는다. 빈 표본·표본 안 관련 행 없음은 전체 DNS 경보 부재가 아니다. 명시한 다른 센서·기간·IP·조건·위험 판단은 이 단순 선별로 대체하지 않는다.
++- 서비스·systemd 로그는 실제 journal·수집된 로그와 현재 snapshot을 구분한다. 등록되지 않은 집계 대상의 과거 로그는 해당 unit·수집 자산을 확인한 뒤 조회하고, 시도하지 않은 과거 조회를 ‘실패’로 꾸미지 않는다.

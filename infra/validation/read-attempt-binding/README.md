@@ -61,3 +61,6 @@ SOC_ATTEMPT_ROOT=/새로운/임시/read-attempt-review/candidate python3 -B infr
 4. 실제 스키마의 조건부 target/view 제약과 지원 필터를 조사 계획에 반영한다. 이후 공식H2·동결·회귀·새 실제 읽기와 별도 정확 승인/적용·복구·양봇 새 채팅을 검증한다.
 
 기존 [관리 상태19파일](../control-status/application/README.md)과 [journal9코드](../journal-adapter/application/README.md)의 계획 SHA·승인 대기는 불변이다. 이6소스를 기존 승인에 포함한 것으로 해석하지 않는다.
+
+
+[짧은 조회3소스 후속](../read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.

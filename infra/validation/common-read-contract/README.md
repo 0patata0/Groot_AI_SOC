@@ -48,3 +48,6 @@ SOC_CONTRACT_ROOT=/private/tmp/soc-read-check/candidate python3 -B infra/validat
 ```
 
 스냅샷·실제 반환 원문/해시·초기 실패·정정·격리 병합·정리·결함 우선 검토는 로컬 `대화기록/검증/2026-11-15-common-read-contract/`에 보존한다. 패키지는 설치하지 않았다. 공식 구조 통과·반례 회귀·실제 읽기·실제 채팅은 서로 다른 증거다.
+
+
+[짧은 조회3소스 후속](../read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.

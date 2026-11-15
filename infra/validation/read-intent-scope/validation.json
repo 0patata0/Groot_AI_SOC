@@ -1,0 +1,158 @@
+{
+  "at_kst": "2026-11-15T16:46:27.796398+09:00",
+  "status": "isolated_candidate_validated_pending_broader_evidence_and_exact_release",
+  "harness2": {
+    "at_kst": "2026-11-15T16:42:18.510712+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/sdk_harness.py",
+        "skills/soc-query/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "source_sha256": {
+      "infra/hermes/SOUL.groot.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "infra/hermes/chat_contract.py": "dba8b47f55ae52fc271aa8ad2c2ec7afac5fb8cd0fc3c4d8e55a94074be9a74e",
+      "infra/hermes/read_contract.py": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331",
+      "infra/hermes/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "infra/hermes/workflow_contract.py": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3",
+      "infra/hermes/review_channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "infra/hermes/query-completion/__init__.py": "6e529e83e744fbfdb9372d5ebc3cdb7d47f5c965936a100a5714d4d654fcbb85",
+      "infra/hermes/soc_management_run.py": "9d8c1438a165ccb3bdc6f3a61a2013f1d62df94b6754c9e91058b78bf6ead7b2",
+      "infra/hermes/soc_management_controller.py": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+      "infra/hermes/review_channel.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "infra/ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "infra/ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "infra/ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "35b64f54af24e0c37f2754a152f1a49b195b5da7d74df66f30e879cdb8da88a9",
+      "infra/hermes/skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "infra/hermes/skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "infra/ollama-trial/harness.py": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc",
+      "infra/hermes/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "infra/mcp/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "infra/hermes/skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "infra/hermes/skills/soc-query/SKILL.md": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31",
+      "infra/ollama-trial/runtime.py": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06",
+      "infra/hermes/query-completion/alignment.py": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d",
+      "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+    },
+    "operating_changes": 0,
+    "baseline": "Unapproved read-attempt6 R2 composite; not installed or approved operating baseline."
+  },
+  "local": {
+    "tests": 801,
+    "passed": 795,
+    "skipped": 6,
+    "all_groups_rc_zero": true
+  },
+  "existing_hermes": {
+    "tests": 801,
+    "passed": 801,
+    "skipped": 0,
+    "uid": 10001,
+    "network_connect_denied": true,
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283"
+  },
+  "live_source_observed_kst": "2026-11-15T16:32:08.794240+09:00",
+  "live_schemas": 45,
+  "actual_candidate_probes": [
+    {
+      "case": "dns-short",
+      "question": "DNS 로그 좀 확인해줄래",
+      "status": "completed",
+      "total_seconds": 16.044,
+      "mcp_calls": 1,
+      "model_calls": 1,
+      "tool": "search_suricata_alerts",
+      "arguments": {
+        "lookback_minutes": 60
+      },
+      "returned_rows": 0,
+      "output_table": true,
+      "no_whole_absence_claim": true,
+      "manual_acceptance": "scope/read/table/sample-limit for these empty results only; not positive-case/live-chat acceptance"
+    },
+    {
+      "case": "ids-short",
+      "question": "최근 30분 IDS 경보 봐 줄래",
+      "status": "completed",
+      "total_seconds": 12.271,
+      "mcp_calls": 1,
+      "model_calls": 1,
+      "tool": "search_suricata_alerts",
+      "arguments": {
+        "lookback_minutes": 30,
+        "limit": 10
+      },
+      "returned_rows": 0,
+      "output_table": true,
+      "no_whole_absence_claim": true,
+      "manual_acceptance": "scope/read/table/sample-limit for these empty results only; not positive-case/live-chat acceptance"
+    },
+    {
+      "case": "waf-short",
+      "question": "WAF 차단 로그 볼래",
+      "status": "completed",
+      "total_seconds": 12.092,
+      "mcp_calls": 1,
+      "model_calls": 1,
+      "tool": "search_modsecurity_alerts",
+      "arguments": {
+        "lookback_minutes": 60,
+        "limit": 10
+      },
+      "returned_rows": 0,
+      "output_table": true,
+      "no_whole_absence_claim": true,
+      "manual_acceptance": "scope/read/table/sample-limit for these empty results only; not positive-case/live-chat acceptance"
+    }
+  ],
+  "model_digest_end": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "operating_changes": 0,
+  "chat_posts": 0,
+  "attacks": 0,
+  "new_training": 0,
+  "limits": [
+    "Candidate-only, no controlled paired speed or accuracy comparison; CPU tests briefly overlapped.",
+    "All three actual returns were empty; mixed/nonempty topic selection verified with fixtures only.",
+    "Target-only OS invented failures/current snapshot vs historical journal and zero/per-SID claims in investigations remain unresolved.",
+    "Native adapter actual conversation, Mattermost delivery/render and operating apply were not performed.",
+    "The parent composite and this patch are not part of either pending exact approval plan.",
+    "Collection-time model digest matches prior-unit observation; no fresh pre-probe digest was captured in this unit."
+  ],
+  "source_drift_at_collection": [],
+  "prior_observation_model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "model_digest_start_observed_this_unit": false,
+  "cleanup": {
+    "server_roots": 2,
+    "server_files": 1195,
+    "server_bytes": 17648253,
+    "server_absent": true,
+    "mac_files": 8129,
+    "mac_bytes": 121402859,
+    "mac_absent": true,
+    "embedded_stage_source_removed": true
+  }
+}

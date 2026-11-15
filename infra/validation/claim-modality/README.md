@@ -60,3 +60,6 @@ SOC_MODALITY_ROOT=/새로운/임시/claim-review/candidate python3 -B infra/vali
 4. 다시 공식 Harness²·동결·반례/회귀·실제 읽기를 확인한다. 이후에도 정확 운영 승인·적용/복구·새 Mattermost 채팅 검증은 별도다.
 
 기존 [관리 상태19파일](../control-status/application/README.md)과 [journal9코드](../journal-adapter/application/README.md)의 승인·계획 SHA는 바꾸지 않았다. 이 개발 후보를 기존 승인에 끼워 넣거나 운영 완료로 표시하지 않는다.
+
+
+[짧은 조회3소스 후속](../read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.

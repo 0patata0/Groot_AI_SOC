@@ -1,0 +1,176 @@
+{
+  "status": "development_candidate_not_applied",
+  "revision": "r3",
+  "generated_at_kst": "2026-11-15T16:46:27.793394+09:00",
+  "base_commit": "16180fdd922d4873e9b91c304f33793e3fa35f70",
+  "parent_artifacts": {
+    "infra/validation/read-attempt-binding/candidate.patch": "a8a146727f785ea48077e5c3117077da853bee1ba92d5e05614a66e7ce8b3b12",
+    "infra/validation/read-attempt-binding/manifest.json": "ba08bbdf7c1ab150eaab0c3b6e19201ac4b7b3a73bc5471770068f9ca03c8d74",
+    "infra/validation/read-attempt-binding/reproduce.py": "5c9b47331a73b0fd283f7565cf9a3b9d2acff3bd4e65dd605729e95b9a4a5974",
+    "infra/validation/read-attempt-binding/test_attempts.py": "467a855c137e41c2993d3f1f17e08b32a7b71bb3bef1647c765ebf40b50d7ca1"
+  },
+  "parent_baseline_note": "Unapproved read-attempt6 R2 composite; not an operating release or approval extension.",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "access_mode": "hermes-parity",
+  "component_mapping": {
+    "systemprompt.md": "infra/hermes/SOUL.groot.md",
+    "scripts/chat_contract.py": "infra/hermes/chat_contract.py",
+    "scripts/read_contract.py": "infra/hermes/read_contract.py",
+    "scripts/output_contract.py": "infra/hermes/output_contract.py",
+    "scripts/workflow_contract.py": "infra/hermes/workflow_contract.py",
+    "scripts/channel_policy.py": "infra/hermes/review_channel_policy.py",
+    "scripts/native_query.py": "infra/hermes/query-completion/__init__.py",
+    "scripts/evidence_gate.py": "infra/hermes/soc_management_run.py",
+    "scripts/management_controller.py": "infra/hermes/soc_management_controller.py",
+    "scripts/channel_controller.py": "infra/hermes/review_channel.py",
+    "scripts/sdk_chat.py": "infra/ollama-trial/chat.py",
+    "scripts/sdk_chat_policy.py": "infra/ollama-trial/chat_policy.py",
+    "scripts/sdk_authority.py": "infra/ollama-trial/policy.py",
+    "skills/soc-investigate/SKILL.md": "infra/hermes/skills/soc-investigate/SKILL.md",
+    "skills/soc-change/SKILL.md": "infra/hermes/skills/soc-change/SKILL.md",
+    "skills/soc-recover/SKILL.md": "infra/hermes/skills/soc-recover/SKILL.md",
+    "scripts/sdk_harness.py": "infra/ollama-trial/harness.py",
+    "scripts/chat_markdown.py": "infra/hermes/chat_markdown.py",
+    "scripts/soc_bot.py": "infra/mcp/soc_bot.py",
+    "skills/soc-output/SKILL.md": "infra/hermes/skills/soc-output/SKILL.md",
+    "skills/soc-query/SKILL.md": "infra/hermes/skills/soc-query/SKILL.md",
+    "scripts/sdk_runtime.py": "infra/ollama-trial/runtime.py",
+    "scripts/native_alignment.py": "infra/hermes/query-completion/alignment.py",
+    "scripts/channel_worker.py": "infra/hermes/review_channel_worker.py"
+  },
+  "modified_sources": [
+    "infra/hermes/chat_contract.py",
+    "infra/ollama-trial/harness.py",
+    "infra/hermes/skills/soc-query/SKILL.md"
+  ],
+  "patch_sha256": "c03a53f0cdf9c614e52003781349fef61449f209905abb28fbb1c27ec51ac368",
+  "test_sha256": "7581716edfe39e1c4656fc2ad01e9f1773860f4020eb9fb53c0ae8acdc197afd",
+  "sources": {
+    "infra/hermes/SOUL.groot.md": {
+      "before_sha256": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "candidate_sha256": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871"
+    },
+    "infra/hermes/chat_contract.py": {
+      "before_sha256": "48f20a5c7ccd143ee2af935f8aea94c02bb6304f5ac7df0132829542248b162e",
+      "candidate_sha256": "dba8b47f55ae52fc271aa8ad2c2ec7afac5fb8cd0fc3c4d8e55a94074be9a74e"
+    },
+    "infra/hermes/read_contract.py": {
+      "before_sha256": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331",
+      "candidate_sha256": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331"
+    },
+    "infra/hermes/output_contract.py": {
+      "before_sha256": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "candidate_sha256": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6"
+    },
+    "infra/hermes/workflow_contract.py": {
+      "before_sha256": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3",
+      "candidate_sha256": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3"
+    },
+    "infra/hermes/review_channel_policy.py": {
+      "before_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "candidate_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "before_sha256": "6e529e83e744fbfdb9372d5ebc3cdb7d47f5c965936a100a5714d4d654fcbb85",
+      "candidate_sha256": "6e529e83e744fbfdb9372d5ebc3cdb7d47f5c965936a100a5714d4d654fcbb85"
+    },
+    "infra/hermes/soc_management_run.py": {
+      "before_sha256": "9d8c1438a165ccb3bdc6f3a61a2013f1d62df94b6754c9e91058b78bf6ead7b2",
+      "candidate_sha256": "9d8c1438a165ccb3bdc6f3a61a2013f1d62df94b6754c9e91058b78bf6ead7b2"
+    },
+    "infra/hermes/soc_management_controller.py": {
+      "before_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+      "candidate_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af"
+    },
+    "infra/hermes/review_channel.py": {
+      "before_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "candidate_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217"
+    },
+    "infra/ollama-trial/chat.py": {
+      "before_sha256": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "candidate_sha256": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30"
+    },
+    "infra/ollama-trial/chat_policy.py": {
+      "before_sha256": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "candidate_sha256": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72"
+    },
+    "infra/ollama-trial/policy.py": {
+      "before_sha256": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "candidate_sha256": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "before_sha256": "35b64f54af24e0c37f2754a152f1a49b195b5da7d74df66f30e879cdb8da88a9",
+      "candidate_sha256": "35b64f54af24e0c37f2754a152f1a49b195b5da7d74df66f30e879cdb8da88a9"
+    },
+    "infra/hermes/skills/soc-change/SKILL.md": {
+      "before_sha256": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "candidate_sha256": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb"
+    },
+    "infra/hermes/skills/soc-recover/SKILL.md": {
+      "before_sha256": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "candidate_sha256": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68"
+    },
+    "infra/ollama-trial/harness.py": {
+      "before_sha256": "b96bfe73245ca92d93779e06a176e2be6aca5f97b9aa86d8a3675ebe5d2a6496",
+      "candidate_sha256": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc"
+    },
+    "infra/hermes/chat_markdown.py": {
+      "before_sha256": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "candidate_sha256": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f"
+    },
+    "infra/mcp/soc_bot.py": {
+      "before_sha256": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "candidate_sha256": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d"
+    },
+    "infra/hermes/skills/soc-output/SKILL.md": {
+      "before_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "candidate_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926"
+    },
+    "infra/hermes/skills/soc-query/SKILL.md": {
+      "before_sha256": "c4ebb4605763ab8216161a2d4cb038ffa1e52e5d8c664f9585691eded4fa2d54",
+      "candidate_sha256": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "before_sha256": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06",
+      "candidate_sha256": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06"
+    },
+    "infra/hermes/query-completion/alignment.py": {
+      "before_sha256": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d",
+      "candidate_sha256": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d"
+    },
+    "infra/hermes/review_channel_worker.py": {
+      "before_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "candidate_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+    }
+  },
+  "ast_scope": {
+    "files": [
+      {
+        "source": "infra/hermes/chat_contract.py",
+        "permitted_definitions": [
+          "read_action_remainder",
+          "service_lookup_scope"
+        ],
+        "permitted_metadata": [
+          "VERSION"
+        ]
+      },
+      {
+        "source": "infra/ollama-trial/harness.py",
+        "permitted_definitions": [
+          "event_topic",
+          "event_topic_rows",
+          "_event_lookup_request",
+          "event_report"
+        ],
+        "permitted_metadata": []
+      }
+    ]
+  },
+  "operating_changes": 0,
+  "chat_posts": 0,
+  "test_dependencies": {
+    "infra/ollama-trial/test_event_lookup.py": "732e4b8b759dcf878d8d09df9057c017caec4dc7a34daf2cf720cc743193668c"
+  }
+}

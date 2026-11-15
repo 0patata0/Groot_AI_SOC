@@ -12755,3 +12755,8 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 ## 2026-11-15T16:18:29.576405+09:00 실제 읽기 시도 결속 후보
 
 직전 상태는 Git116d16668f77f64c23612e2ee771b99cbf9471d1:STATUS.md,원문 SHA 16b55144ba5659afd3c3e34e5abbcff02036dd5af170dd1ac6926557b4480ecf에서 복원한다. 읽기 시도6소스 R2를 격리 검증했지만 대상명만 쓴 OS 실패·짧은DNS의 불필요 룰/활성 주장·표본0 과장이 남아 미채택이다. 로컬785집계779통과/6생략·기존 Hermes785생략0·실제6요청/MCP6·모델15. [현재 결과](../infra/validation/read-attempt-binding/README.md).
+
+
+### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
+
+짧은 조회 표현·DNS 표본3소스 후보를 완료했다. 실제3개 빈 표본을 필요한 경보만 읽고 표로 반환했으나 운영 미적용·OS/조사 의미 오류 잔여다. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.

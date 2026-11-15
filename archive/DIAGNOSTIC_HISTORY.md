@@ -365,3 +365,8 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T16:18:29.576405+09:00 실제 읽기 시도 결속 후보
 
 이전 실제 Wazuh 가짜 실패는 새 검사로 추가 검출했으나 표시문에서 숨긴 INCIDENT_DISPOSITION의 부재 오류는 모델 품질 비교에서 제외한다. R1이후 순서 뒤집힘 가능성을 발견해 R2의 명시 sequence로 보완,785집계/기존Hermes 생략0을 확인했다. 실제6요청에서 base짧은DNS는MCP0/조회중completed,후보는2MCP 중 불필요 룰·미검증SID활성,OS는summary1성공인데 과거실패를 주장했다. b:systemd journal은 실제조건부enum에서제외되고 반환scope는최신snapshot뿐임을로컬검증했다. DNS0의 전체부재 과장도남아 미채택. [정확 수치/원인](../infra/validation/read-attempt-binding/validation.json).
+
+
+### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
+
+공식H2 25구성/3수정면/상시0,로컬801집계795pass6skip·기존Hermes801skip0. 실제DNS16.044/IDS12.271/WAF12.092초 각1MCP1모델,모두빈표본. 초기 선별0표시문/일반WAF표시문 회귀2건을 수정하고R3전부통과. 과거digest와 수집digest일치만 확보·이번직전freshdigest없음. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.

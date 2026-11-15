@@ -181,3 +181,6 @@ python3 -B -m unittest discover -s deployment/tests -p 'test_controller.py'
 ```
 
 정책/반입물/JSON 출력 검사와 배포 분기 검사는 실제 신규 서버 설치를 대신하지 않는다. 실제 운영 설치·MCP 호출·자연어 비교·보류 범위를 [STATUS](../../STATUS.md)에 구분한다.
+
+
+[짧은 조회3소스 후속](../validation/read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.

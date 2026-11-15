@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·방법·확인·복구를 따르는 매뉴얼형 MD·PDF·DOCX56쪽 검수본을 유지합니다. 정장사진/학번은 공란이며 논문/발표/포트폴리오는 로컬 전용입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·방법·확인·복구를 따르는 매뉴얼형 MD·PDF·DOCX56쪽 검수본입니다. 세 형식의 본문·목차·표지·편집 가능 항목을 재검수했고 기존 검수본과 SHA가 같습니다. 논문 폴더 README에서 업무별 읽는 순서와 다음 단계의 통과 기준을 안내합니다. 정장사진/학번은 공란이며 논문/발표/포트폴리오는 로컬 전용입니다.
 
 [호스트 journal의 실제 SDK4요청](infra/validation/host-journal-model/README.md)에서 후보 MCP의5읽기·모델12완료를 확인했습니다. 로그는 읽혔지만 정상 기동을 실패로 묶은 해석·과거/현재와 원인 미확인 검사·대상 확인 지연·not-found/Docker 범위·소수초 경계가 남았습니다. 부모backend24h A5.50/B2.61/C1.94초/CLI일치·1137회귀와 모델의 정확한 보고는 별도입니다. 운영 미적용·실제채널 게시0·기존19/journal9 승인안 불변입니다.
 <!-- current-work-summary:end -->

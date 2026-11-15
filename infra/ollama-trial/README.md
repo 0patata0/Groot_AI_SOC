@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+[최신 OS 범위 후보](../validation/read-target-binding/README.md)는 앞선 대상명 허위 실패를 도구·host/unit/container·view·기간·반환에 결속했다. 공식Harness²/로컬840집계·기존Hermes840생략0/과거 실제 응답 두arm 검출·공개 재현을 확인했다. **설치 runtime·운영에는 미적용**, 새 모델/MCP 읽기·채팅0이다. 조회 대상25개와 현재snapshot 차이는 유지하고, 새 실제 정정/Native·양봇 채팅 및 조사 부재/활성 과장은 후속 검증이다.
+
 [읽기 시도 결속 후속](../validation/read-attempt-binding/README.md)은 실제 calls와 별도 입력 거절·시도 순서·반환/예외를 공통 검사에 전달했다. 로컬785집계/기존 Hermes785생략0·실제6요청/MCP6·모델15를 확인했지만 대상명 OS 실패·짧은DNS 룰 확대·부재/활성 과장 때문에 미채택이다. 운영/설치·권한·실채팅은 변경하지 않았다.
 
 [공통 주장·범위 후속](../validation/claim-modality/README.md)은 격리4소스·585로컬 집계/기존 Hermes264검사·실제9요청을 검증했다. WAF1읽기·51.243초를 확인했지만 무호출 Wazuh 실패 서술과 짧은 DNS 무조회가 남아 미채택이다. runtime completed와 품질 검토는 별개이며 정본/운영/설치·실채팅 변경0이다.

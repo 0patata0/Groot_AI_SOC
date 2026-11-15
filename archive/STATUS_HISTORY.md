@@ -12760,3 +12760,9 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 ### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
 
 짧은 조회 표현·DNS 표본3소스 후보를 완료했다. 실제3개 빈 표본을 필요한 경보만 읽고 표로 반환했으나 운영 미적용·OS/조사 의미 오류 잔여다. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.
+
+## 2026-11-15 OS 범위 후보와 매뉴얼 상세화
+
+매뉴얼형 논문 MD/PDF/DOCX56쪽 개정·하네스8/학습10 상세화·본문 작업날짜0/서지 보존. MD717/DOCX720항목 누락0·114쪽수·56쪽 전수 검수, 실제 화면5/도식2/표35/문헌16·사진/학번 공란. 로컬9파일 SHA복구본 보존. OS 대상·범위 결속4소스 R6는 로컬840(834pass6skip)/기존Hermes840skip0·과거두arm 가짜실패 검출·공개24SHA/AST/39재현, 새 생성/읽기/채팅0·운영미적용. 기존 short-read3 실제3빈표본/12~16초와 구분. B16:56→17:52 소스24/schema45/config/modeldigest/PID/timer불변.
+
+근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.

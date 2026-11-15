@@ -6359,3 +6359,9 @@ journal 공통 구현 뒤 정확9코드 적용/복구·게이트·3PREPARED 준�
 ### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
 
 공통 짧은 조회 이후에는 비어 있지 않은 근거·Native/실채팅, target/view/기간의 OS 로그 결속을 우선한다. 정확 승인 두 건과 새3소스는 별개다. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.
+
+## 2026-11-15 OS 범위 후보와 매뉴얼 상세화
+
+사용자는 날짜별 작업 나열 대신 무엇을·어떻게·왜 했는지와 후임자 재현을 요구했다. 설치→운영→조사→승인→장애→하네스→학습/적재→인수 매뉴얼을 실제 코드·원장으로 상세화하고 세 형식56쪽을 확정했다. OS 후보는 새 모델 정정/실MCP·Native·채팅 검증이 다음이며 19/journal9 정확 계획의 승인은 별도다. 공격·새학습 중단 유지. 이전 활성 계획 전체는 Git3efcb39의 PLAN.md에서 복구 가능하다.
+
+근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.

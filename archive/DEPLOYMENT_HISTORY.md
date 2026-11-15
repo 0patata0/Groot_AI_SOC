@@ -1732,3 +1732,9 @@ A의별도제한unit7개·28파일222046B/7폴더는종료/PID부재/SHA보존�
 ### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
 
 운영/초기 설치/서비스·타이머/DB 변경0. 기존19/journal9 계획 SHA불변. 자체2테스트root1,195파일17,648,253B를 전체수집/SHA/종료PID 확인 후 제거했고16:47의24운영SHA/기존PID·timeractive를 확인했다. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.
+
+## 2026-11-15 OS 범위 후보와 매뉴얼 상세화
+
+운영 배포0·정본/초기설치 입력 변경0. 기존19파일 계획fd6e7cb9와journal9계획0f5cc45f는 그대로 승인 대기. 대상범위4소스는 patch/manifest/reproduce/tests만 공개하고 contract1.5.88/query1.19.144를 설치본으로 표시하지 않는다. 설치 관측은contract1.5.84/query137/routing1.1.8·학습본7ac2a1dc. 자체Hermes시험608파일8,920,745B 수집/SHA후17:48부재 확인. 이전 PREPARED후보/백업·G_Harness2/가중치 보존. 논문 출력은로컬교체이고서버배포아님.
+
+근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.

@@ -616,3 +616,9 @@ journal 적용은3파일전체의동시원자성을주장하지않는다. 실제
 ### 2026-11-15T16:50:00.878841+09:00 짧은 조회 의도·표본 후보
 
 질문별 하드코딩 대신 공통 긍정 조회 동사 문법을 재사용했다. DNS는 실제 반환 질문/signature 표기 부분집합이며 서버 필터·전체DNS/정상판단이 아니다. 서비스 집계snapshot을 journal로 바꾸는 우회는 채택하지 않았다. [패치·재현·한계](../infra/validation/read-intent-scope/README.md). 기준 Git16180fd에서 복구하며 과거 원문/판정은 보존한다.
+
+## 2026-11-15 OS 범위 후보와 매뉴얼 상세화
+
+실제 읽기 완료의 tool-name만 대조하는 방식은 대상명 B systemd·view·기간 혼동을 놓쳤다. 공통 원장에 typed selector/응답범위/요청기간을 결속하고 명시 unit/container의 점을 해당 검사에서만 보존했다. 현재상태·오류이력·원문journal·실제서비스실패·조회실패를 구분한다. 일반자연어전부검증·별칭unit추정·과거aggregate권한확대는 하지 않는다. 논문은 날짜별 개발일지 대신 개념/목적/준비/실행/확인/복구를 채택하고 기존43쪽/9파일은 로컬SHA복구본으로 보존했다.
+
+근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.

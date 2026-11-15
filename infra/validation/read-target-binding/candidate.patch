@@ -1,0 +1,347 @@
+diff --git a/infra/hermes/chat_contract.py b/infra/hermes/chat_contract.py
+index edc0438..37bf76e 100644
+--- a/infra/hermes/chat_contract.py
++++ b/infra/hermes/chat_contract.py
+@@ -8,7 +8,7 @@ import math
+ from pathlib import Path
+ import re
+ 
+-VERSION = 'soc-chat-contract:1.5.87'
++VERSION = 'soc-chat-contract:1.5.88'
+ MODEL_STEPS = 12
+ TOOL_CALLS = 32
+ READ_TIMEOUT = 90
+@@ -1986,8 +1986,9 @@ def claim_modality(after):
+     coordinated=r'(?:\s*(?:또는|혹은|및|이나|나|와|과|[·/])\s*'+noun+r'(?:\s+'+noun+r'){0,3})?'
+     prefix=(r'\s*(?:(?:상태|현상|상황|문제)\s*)?'
+             r'(?:(?:이라는|이라고|이란|다는|다고|라고|라는|으로|를|을|이|가|은|는|고)\s*)?'
++            r'(?:(?:한|된)\s*)?'
+             r'(?:(?:것|사실|주장|판정|결론)(?:을|은|는|이|임을)?\s*)?')
+-    if re.match(prefix+r'(?:한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
++    if re.match(prefix+r'(?:한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
+         return 'conditional_or_unverified'
+     if re.match(prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):
+         return 'conditional_or_unverified'
+diff --git a/infra/hermes/query-completion/__init__.py b/infra/hermes/query-completion/__init__.py
+index 31a02d0..5cf76d6 100644
+--- a/infra/hermes/query-completion/__init__.py
++++ b/infra/hermes/query-completion/__init__.py
+@@ -19,10 +19,10 @@ import re
+ import time
+ from types import ModuleType, SimpleNamespace
+ 
+-VERSION = "groot-query-completion:1.19.143"
++VERSION = "groot-query-completion:1.19.144"
+ # One canonical implementation is also embedded in the root management gate.
+ # The installer ships it verbatim here; reject drift before executing it.
+-EVIDENCE_SOURCE_SHA256 = '9d8c1438a165ccb3bdc6f3a61a2013f1d62df94b6754c9e91058b78bf6ead7b2'
++EVIDENCE_SOURCE_SHA256 = 'd59efff77a873c1200969b579db9171a87007139d58b91ad07e4bb1865d345da'
+ 
+ 
+ def publish_load_receipt(installed):
+diff --git a/infra/hermes/soc_management_run.py b/infra/hermes/soc_management_run.py
+index 7030b35..15f9199 100644
+--- a/infra/hermes/soc_management_run.py
++++ b/infra/hermes/soc_management_run.py
+@@ -12,6 +12,7 @@ import functools
+ from datetime import datetime, timedelta, timezone
+ import hashlib
+ import importlib
++import importlib.util
+ import ipaddress
+ import json
+ import os
+@@ -1192,7 +1193,7 @@ EPISTEMIC_INABILITY = (r'(?:알|판단할|배제할|단정할|확정할|확인
+                        r'결론\s*(?:내릴|지을))\s*수\s*없[가-힣]*')
+ 
+ 
+-def claim_sentences(text):
++def claim_sentences(text, *, identifier_spans=()):
+     """Sentences as separate claims, each with the qualifier scope that belongs to it.
+ 
+     A sentence ends at . ! ? ; or a line end, so a qualifier in another sentence
+@@ -1202,7 +1203,13 @@ def claim_sentences(text):
+     A period between digits (22:22:30.915, 172.17.0.2, 1.5) does not end one.
+     Yields (sentence, sentence plus its attached parenthetical).
+     """
+-    parts = re.split(r'([\n!?;]|\.(?![0-9])|(?<![0-9])\.|[。！？])', text)
++    boundaries=list(re.finditer(r'[\n!?;]|\.(?![0-9])|(?<![0-9])\.|[。！？]',text))
++    spans=[(a,b) for a,b in identifier_spans if type(a) is int and type(b) is int and 0<=a<b<=len(text)]
++    parts=[];position=0
++    for match in boundaries:
++        if match[0]=='.' and any(a<=match.start()<b for a,b in spans):continue
++        parts.extend((text[position:match.start()],match[0]));position=match.end()
++    parts.append(text[position:])
+     sentences, ends = parts[0::2], parts[1::2]
+     for i, sentence in enumerate(sentences):
+         attached = None
+@@ -1257,6 +1264,106 @@ def unobserved_event_source_violations(text, observed_sources):
+     return sorted(issues)
+ 
+ 
++def read_receipt_scope(tool, arguments, data):
++    """Typed request/receipt selectors only, never a health or success verdict."""
++    out={'selectors':{},'requested_mode':None,'observed_mode':None,'scope_verified':False}
++    for key in ('target','host','unit','container','view','journal_scope'):
++        value=arguments.get(key)
++        if isinstance(value,str) and 1<=len(value)<=248 and re.fullmatch(r'[A-Za-z0-9@_.:-]+',value):
++            out['selectors'][key]=value
++    if tool=='mcp__system_diagnostics__get_system_diagnostics':
++        out['requested_mode']=('journal_excerpt' if arguments.get('view')=='journal' else
++            'history' if 'since_kst' in arguments or 'until_kst' in arguments else
++            'error_sample' if 'lookback_minutes' in arguments else 'snapshot')
++    if not isinstance(data,dict):return out
++    target=data.get('target')
++    if isinstance(target,str) and re.fullmatch(r'[abc]:[A-Za-z0-9_.-]{1,150}',target):
++        if 'target' not in arguments:out['selectors']['target']=target
++        if 'target' in arguments and arguments['target']!=target:return out
++        out['selectors'].setdefault('host',target[0])
++    unit=data.get('unit')
++    if isinstance(unit,str) and re.fullmatch(r'[A-Za-z0-9@_.-]{1,150}\.service',unit):out['selectors'].setdefault('unit',unit)
++    if tool!='mcp__system_diagnostics__get_system_diagnostics':return out
++    if type(data.get('schema')) is not int or data['schema']!=1 or data.get('target')!=arguments.get('target'):return out
++    if 'host' in data and data['host']!=str(data.get('target',''))[:1]:return out
++    start,end=map(parse_instant,(data.get('requested_since_kst'),data.get('requested_until_kst')))
++    bounds=bool(start and end and start<end)
++    if data.get('kind')=='journal_excerpt':
++        fields=diagnostic_contract().diagnostic_observation_fields(data)
++        if fields.get('journal_valid') is not True:return out
++        mode='journal_excerpt'
++    elif data.get('kind')=='journal_history':
++        if not bounds:return out
++        mode='history'
++    elif data.get('lookback_scope')=='latest_snapshot_only_not_requested_history' or data.get('kind')=='runtime':mode='snapshot'
++    elif bounds and isinstance(data.get('recent_errors'),list):mode='error_sample'
++    else:mode='snapshot'
++    for key in ('since_kst','until_kst'):
++        if key in arguments and parse_instant(arguments[key])!=parse_instant(data.get('requested_'+key)):return out
++    if arguments.get('view')=='journal' and (mode!='journal_excerpt' or data.get('journal_scope')!=arguments.get('journal_scope','errors')):return out
++    if 'since_kst' in arguments and mode not in ('history','journal_excerpt'):return out
++    out.update(observed_mode=mode,observed_modes=([mode,'snapshot'] if mode=='error_sample' else [mode]),scope_verified=True)
++    if bounds:out['requested_since_kst']=data['requested_since_kst'];out['requested_until_kst']=data['requested_until_kst']
++    return out
++
++
++def read_claim_subjects(sentence, rows):
++    """Resolve literal read subjects; do not guess an unregistered host/unit."""
++    exact=re.compile(r'(?<![A-Za-z0-9_])(?:mcp__[A-Za-z0-9_]+__(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+|(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+)(?![A-Za-z0-9_])')
++    mentions=[{'start':m.start(),'end':m.end(),'names':{m[0]},'selectors':{},'label':m[0],'reset':True} for m in exact.finditer(sentence)]
++    sensors=((SURICATA_NAMES,{'mcp__security_events__search_suricata_alerts'}),
++        (MODSECURITY_NAMES,{'mcp__security_events__search_modsecurity_alerts'}),
++        (r'(?<![A-Za-z0-9_])(?:Wazuh|와주)(?![A-Za-z0-9_])',{'mcp__security_events__search_wazuh_alerts','mcp__wazuh_ro__get_wazuh_alert_summary'}))
++    for pattern,names in sensors:
++        for m in re.finditer(pattern,sentence,re.I):
++            if re.search(r'경보|로그|이벤트',sentence[m.end():m.end()+36]):
++                mentions.append({'start':m.start(),'end':m.end(),'names':names,'selectors':{},'label':sorted(names)[0],'reset':True})
++    # An explicit selector can refine a named method without losing that method.
++    selector=r'(?<![A-Za-z0-9_])(target|host|unit|container|view|journal_scope|since_kst|until_kst|lookback_minutes|limit)\s*[:=]\s*[\"\x27]?([A-Za-z0-9@_.:+-]+)'
++    for m in re.finditer(selector,sentence):
++        value=m[2].rstrip('.')
++        mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{m[1]:value},'label':m[1]+':'+value,'reset':False})
++    patterns=[(r'(?<![A-Za-z0-9_:])([abc]:[a-z][a-z0-9_.-]*)(?![A-Za-z0-9_])','target'),
++        (r'(?<![A-Za-z0-9@_.:-])([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_.:-])','unit'),
++        (r'(?:컨테이너|\bcontainer)\s+([A-Za-z0-9][A-Za-z0-9_.-]{0,127})','container')]
++    for pattern,key in patterns:
++        for m in re.finditer(pattern,sentence):
++            if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
++            value=m[1].rstrip('.')
++            mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{key:value},'label':key+':'+value,'reset':False})
++    # A human host+systemd label names the aggregate runtime target, not an
++    # arbitrary .service. Do not turn a bare lowercase English article into A.
++    for m in re.finditer(r'(?<![A-Za-z0-9가-힣_:])([ABC])(?:\s*(?:서버|호스트))?\s*(?:의\s*)?systemd(?![A-Za-z0-9_])',sentence,re.I):
++        if not re.search(r'서버|호스트',m[0]) and m[1] not in 'ABC':continue
++        if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
++        target=m[1].lower()+':systemd'
++        mentions.append({'start':m.start(),'end':m.end(),'names':{'mcp__system_diagnostics__get_system_diagnostics'},'selectors':{'target':target},'label':'target:'+target,'reset':True})
++    for m in re.finditer(r'(?<![A-Za-z0-9가-힣_:])([ABC])\s*(?:서버|호스트)(?=\s|의|$)',sentence,re.I):
++        if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
++        mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{'host':m[1].lower()},'label':'host:'+m[1].lower(),'reset':False})
++    mentions.sort(key=lambda a:(a['start'],-a['end']))
++    active_names=set();active_selectors={};active_host=None;result=[]
++    for item in mentions:
++        if result and item['start']<result[-1]['end']:continue
++        selectors=item['selectors']
++        if item['reset']:
++            gap=sentence[result[-1]['end']:item['start']] if result else ''
++            preserve=bool(active_selectors and not re.search(r'조회|읽기|검색|호출|질의|[;.!?]',gap))
++            active_names=set(item['names'])
++            if not preserve:active_selectors={};active_host=None
++        if 'host' in selectors:active_host=selectors['host']
++        if 'target' in selectors and re.fullmatch('[abc]:[A-Za-z0-9_.-]+',selectors['target']):active_host=selectors['target'][0]
++        # A new target/entity starts its own entity clause; a view or host
++        # qualifies the current one. Explicit method identity remains bound.
++        if set(selectors)&{'target','unit','container'}:
++            gap=sentence[result[-1]['end']:item['start']] if result else ''
++            if 'target' in selectors or set(selectors)&set(active_selectors) or re.search(r'조회|읽기|검색|호출|질의',gap):active_selectors={}
++            if active_host:active_selectors['host']=active_host
++        active_selectors.update(selectors)
++        result.append({**item,'names':set(active_names),'selectors':dict(active_selectors)})
++    return result
++
++
+ def read_attempt_view(records, *, complete=True):
+     """Bound actual read attempts, independently of successful evidence facts.
+ 
+@@ -1280,6 +1387,7 @@ def read_attempt_view(records, *, complete=True):
+             if type(flag) is not bool:raise ValueError('protocol_error')
+             row = {'index': len(view['rows']), 'tool': name, 'arguments': json.loads(encoded), 'phase': phase,
+                    'outcome': phase, 'result_sha256': None, 'error_codes': []}
++            row['receipt_scope']=read_receipt_scope(name,arguments,None)
+             if phase in ('transport_error', 'pending'):
+                 if record.get('output') is not None or record.get('result_sha256') is not None:raise ValueError('synthetic_result')
+                 error_type = record.get('error_type')
+@@ -1319,6 +1427,7 @@ def read_attempt_view(records, *, complete=True):
+                 row['outcome'] = ('input_rejected' if phase == 'input_rejected' else
+                                   'reported_error' if failed else 'returned')
+                 row['error_codes'] = list(dict.fromkeys(row['error_codes']))[:8]
++                row['receipt_scope']=read_receipt_scope(name,arguments,data)
+             view['rows'].append(row)
+             if name == BUNDLE_TOOL and phase == 'returned' and row['outcome'] == 'returned':
+                 parts = incident_bundle_reads(arguments, data)
+@@ -1391,55 +1500,85 @@ def read_attempts_from_messages(messages):
+ 
+ 
+ def read_attempt_claim_violations(text, attempts):
+-    """Check named past read outcomes; never judge risk, health or approval."""
+-    if attempts is None or not isinstance(text, str):return []
+-    if not isinstance(attempts, dict) or type(attempts.get('complete')) is not bool or not isinstance(attempts.get('rows'), list):
+-        return ['read_attempt_provenance_unverified']
+-    rows = attempts['rows']
+-    if any(not isinstance(row,dict) or not allowed(row.get('tool'),'verify')
+-            or not isinstance(row.get('arguments'),dict) or row.get('outcome') not in
+-            ('returned','reported_error','input_rejected','transport_error','pending') for row in rows):
+-        return ['read_attempt_provenance_unverified']
+-    issues = set();contract = diagnostic_contract()
+-    exact = re.compile(r'(?<![A-Za-z0-9_])(?:mcp__[A-Za-z0-9_]+__(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+|(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+)(?![A-Za-z0-9_])')
+-    sensors = ((SURICATA_NAMES, {'mcp__security_events__search_suricata_alerts'}),
+-        (MODSECURITY_NAMES, {'mcp__security_events__search_modsecurity_alerts'}),
+-        (r'(?<![A-Za-z0-9_])(?:Wazuh|와주)(?![A-Za-z0-9_])',
+-         {'mcp__security_events__search_wazuh_alerts', 'mcp__wazuh_ro__get_wazuh_alert_summary'}))
+-    query = (r'(?:조회|검색|읽기|질의|호출)(?:가|이|는|에|을|를)?\s*'
+-             r'(?:(?:중에?|도중|과정(?:에서)?|시도(?:에서)?)\s*)?')
+-    outcome = re.compile(query + r'(?P<failed>실패(?:했|하였|함|됨|했습니다|입니다|다)?|불가|거절|오류)|'
+-        r'(?:도구|API|MCP)(?:에서|가|이|는|에)?\s*(?P<error>오류|에러|실패)|' + query +
+-        r'(?P<returned>성공|완료|했습니다|했음|했으며|했지만)', re.I)
+-    for sentence, _ in claim_sentences(re.sub(r'[*`]', '', text)):
+-        mentions = [(m.start(), m.end(), {m[0]}, 'exact') for m in exact.finditer(sentence)]
+-        for pattern, names in sensors:
+-            for m in re.finditer(pattern, sentence, re.I):
+-                # Event-source shorthand is deliberately limited to a named
+-                # alert/log inquiry; a Wazuh service failure is not a read error.
+-                if re.search(r'경보|로그|이벤트', sentence[m.end():m.end()+36]):
+-                    mentions.append((m.start(), m.end(), names, 'sensor'))
+-        mentions.sort(key=lambda x: x[:2])
+-        for j, (start, end, names, kind) in enumerate(mentions):
+-            stop = mentions[j+1][0] if j+1 < len(mentions) else len(sentence)
+-            clause = sentence[end:stop]
++    """Bind named outcomes to actual method, entity, view and query arguments."""
++    if attempts is None or not isinstance(text,str):return []
++    if not isinstance(attempts,dict) or type(attempts.get('complete')) is not bool or not isinstance(attempts.get('rows'),list):return ['read_attempt_provenance_unverified']
++    rows=attempts['rows']
++    if any(not isinstance(row,dict) or not allowed(row.get('tool'),'verify') or not isinstance(row.get('arguments'),dict)
++            or row.get('outcome') not in ('returned','reported_error','input_rejected','transport_error','pending') for row in rows):return ['read_attempt_provenance_unverified']
++    issues=set();contract=diagnostic_contract()
++    query=(r'(?:조회|검색|읽기|질의|호출)(?:가|이|는|에|을|를)?\s*'
++           r'(?:(?:중에?|도중|과정(?:에서)?|시도(?:에서)?)\s*)?')
++    outcome=re.compile(query+r'(?P<failed>실패(?:했|하였|함|됨|했습니다|입니다|다)?|불가|거절|오류)|'
++        r'(?:도구|API|MCP)(?:에서|가|이|는|에)?\s*(?P<error>오류|에러|실패)|'+query+
++        r'(?P<returned>성공|완료|했습니다|했음|했으며|했지만|결과)',re.I)
++    clean=re.sub(r'[*`]', '', text)
++    protected=[(m.start(),m.end()) for m in re.finditer(r'(?<![A-Za-z0-9@_.:-])(?:[abc]:)?[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',clean)]
++    for m in re.finditer(r'\b(?:container|unit|target)\s*[:=]\s*[\"\x27]?([A-Za-z0-9@_.:-]+)',clean):
++        protected.append((m.start(1),m.start(1)+len(m[1].rstrip('.'))))
++    for sentence,_ in claim_sentences(clean,identifier_spans=protected):
++        mentions=read_claim_subjects(sentence,rows)
++        for j,subject in enumerate(mentions):
++            last=j
++            while last+1<len(mentions):
++                a,b=mentions[last],mentions[last+1]
++                same_entity=any(k in a['selectors'] and k in b['selectors'] for k in ('target','unit','container'))
++                if not same_entity or not re.fullmatch(r'[\s/·,&]*(?:(?:및|와|과|그리고|and|or)[\s/·,&]*)?',sentence[a['end']:b['start']],re.I):break
++                last+=1
++            stop=mentions[last+1]['start'] if last+1<len(mentions) else len(sentence)
++            clause=sentence[mentions[last]['end']:stop]
+             for match in outcome.finditer(clause):
+-                after = clause[match.end():]
+-                if contract.claim_modality(after) in ('not_asserted', 'conditional_or_unverified', 'planned_check'):continue
+-                # A simple past read assertion needs an actual matching outcome.
+-                matching = [row for row in rows if any(row.get('tool') == n or
+-                    not n.startswith('mcp__') and row.get('tool', '').endswith('__'+n) for n in names)]
+-                if not attempts['complete']:
+-                    issues.add('read_attempt_provenance_unverified');continue
+-                failed = bool(match['failed'] or match['error'])
+-                needed = {'reported_error', 'transport_error', 'input_rejected'} if failed else {'returned'}
+-                if re.search(r'현재|지금|최종|마지막', clause[:match.start()]):matching = matching[-1:]
+-                if not any(row.get('outcome') in needed for row in matching):
+-                    label = 'unobserved_read_failure' if failed else 'unobserved_read_success'
+-                    issues.add(label + ':' + sorted(names)[0])
+-                elif failed and re.search(r'서버|MCP', clause[:match.end()], re.I) and all(
+-                        row.get('outcome') == 'input_rejected' for row in matching):
+-                    issues.add('read_failure_stage_mismatch:' + sorted(names)[0])
++                after=clause[match.end():]
++                if match['returned']=='결과' and not subject['selectors']:continue
++                if contract.claim_modality(after) in ('not_asserted','conditional_or_unverified','planned_check'):continue
++                if not attempts['complete']:issues.add('read_attempt_provenance_unverified');continue
++                def selectors(row):
++                    scope=row.get('receipt_scope',{});scope=scope if isinstance(scope,dict) else {}
++                    values={**scope.get('selectors',{}),**{k:v for k,v in row['arguments'].items() if k in ('target','host','unit','container','view','journal_scope','since_kst','until_kst','lookback_minutes','limit')}}
++                    target=values.get('target')
++                    if isinstance(target,str) and re.fullmatch('[abc]:[A-Za-z0-9_.-]+',target):values.setdefault('host',target[0])
++                    return values
++                def selected(row,key,value):
++                    actual=selectors(row).get(key)
++                    if key in ('since_kst','until_kst'):return bool(parse_instant(actual) and parse_instant(actual)==parse_instant(value))
++                    if key in ('limit','lookback_minutes'):return type(actual) is int and str(actual)==value
++                    return actual==value
++                matching=[r for r in rows if (not subject['names'] or any(r['tool']==n or not n.startswith('mcp__') and r['tool'].endswith('__'+n) for n in subject['names']))
++                    and all(selected(r,k,v) for k,v in subject['selectors'].items())]
++                prefix=sentence[subject['start']:subject['end']]+clause[:match.start()]
++                modes=[(m.start(),'history') for m in re.finditer(r'과거|이력|history|최근\s*\d+\s*(?:분|시간|일)',prefix,re.I)]
++                modes += [(m.start(),'journal_excerpt') for m in re.finditer(r'journal|원문|발췌',prefix,re.I)]
++                modes += [(m.start(),'snapshot') for m in re.finditer(r'현재|지금|최종|마지막|스냅샷|snapshot',prefix,re.I)]
++                mode=max(modes)[1] if modes else None
++                failed=bool(match['failed'] or match['error'])
++                scoped=[]
++                for row in matching:
++                    scope=row.get('receipt_scope',{});scope=scope if isinstance(scope,dict) else {}
++                    actual=scope.get('observed_mode') if row['outcome']=='returned' else scope.get('requested_mode')
++                    actual_modes=scope.get('observed_modes',[actual]) if row['outcome']=='returned' else ([actual,'snapshot'] if actual=='error_sample' else [actual])
++                    if mode is None or row['tool']!='mcp__system_diagnostics__get_system_diagnostics' or (any(m in ('history','journal_excerpt','error_sample') for m in actual_modes) if mode=='history' else mode in actual_modes):scoped.append(row)
++                durations=re.findall(r'최근\s*([1-9][0-9]*)\s*(분|시간|일)',prefix)
++                if len(durations)==1:
++                    amount,unit=durations[0];seconds=int(amount)*{'분':60,'시간':3600,'일':86400}[unit]
++                    def period_matches(row):
++                        scope=row.get('receipt_scope',{});args=row['arguments']
++                        if row['outcome']=='returned':start,end=map(parse_instant,(scope.get('requested_since_kst'),scope.get('requested_until_kst')))
++                        else:start,end=map(parse_instant,(args.get('since_kst'),args.get('until_kst')))
++                        return bool(start and end and abs((end-start).total_seconds()-seconds)<1 or row['outcome']!='returned' and type(args.get('lookback_minutes')) is int and args['lookback_minutes']*60==seconds)
++                    scoped=[row for row in scoped if period_matches(row)]
++                if re.search(r'현재|지금|최종|마지막',prefix):scoped=scoped[-1:]
++                label=subject['label'];needed={'reported_error','transport_error','input_rejected'} if failed else {'returned'}
++                eligible=[row for row in scoped if row['outcome'] in needed]
++                if not eligible:
++                    issues.add(('unobserved_read_failure:' if failed else 'unobserved_read_success:')+label)
++                elif failed and re.search(r'서버|MCP',clause[:match.end()],re.I) and all(row['outcome']=='input_rejected' for row in eligible):
++                    issues.add('read_failure_stage_mismatch:'+label)
++                if not failed and subject['selectors'] and any(r['tool']=='mcp__system_diagnostics__get_system_diagnostics' and r.get('receipt_scope',{}).get('scope_verified') is not True for r in eligible):
++                    issues.add('read_receipt_scope_unverified:'+label)
++                # A claim about supplied arguments is distinct from tool/schema
++                # documentation. Only an asserted read outcome activates it.
++                supplied=re.findall(r'\b(lookback_minutes|since_kst|until_kst|limit|view|journal_scope)(?:을|를|만)?\s*(?:제공|전달|지정|사용)(?:했|하였|하고|하여|함|됨)',clause)
++                if supplied and eligible and not any(all(k in row['arguments'] for k in supplied) for row in eligible):issues.add('read_arguments_not_supplied:'+label)
+     return sorted(issues)
+ 
+ 
+diff --git a/infra/hermes/skills/soc-investigate/SKILL.md b/infra/hermes/skills/soc-investigate/SKILL.md
+index 1f9d7a9..3753ef6 100644
+--- a/infra/hermes/skills/soc-investigate/SKILL.md
++++ b/infra/hermes/skills/soc-investigate/SKILL.md
+@@ -47,6 +47,8 @@ LLM이 관제 주체로 사건을 조사하고 위험·조치 필요성·후속
+ - DNS 조사는 실제 질의/응답·출발지/리졸버·등록 서비스·후속 연결/호스트 행위를 확인한다. 정보성 분류나 승인된 DNS 경로의 일치만으로 다른 악성 행위까지 정상으로 만들지 않는다. 단순 경로 정보와 실제 조회에서 확인한 요청은 구별한다.
+ - 판단 메타데이터의 `evidence_tools`에는 이번 요청에서 성공한 실제 근거의 전체 도구 이름을 정확히 복사한다. 관측 자료의 `tool` 필드는 `mcp__서버__도구` 전체 이름이며 `name`만 쓰거나 서버·구분자를 바꾸지 않는다. 짧은 이름의 형식 오류는 실제 조회 누락과 구분해 정정하고, 아직 실행하지 않은 도구를 인용하거나 유효한 읽기를 반복하지 않는다. `assessment`·판단 근거·조치 필요성은 실제 자료를 보고 직접 결정하며 인용 형식의 성공을 의미 정확도로 대체하지 않는다.
+ 
++- 조회 결과 설명은 실제 호출한 도구뿐 아니라 target·host·unit·container·view·기간/제공 인자에 연결한다. 현재 snapshot 성공은 과거 journal 조회 실패/완료의 근거가 아니며, 다른 대상의 오류를 가져오지 않는다. 미지원·미실행·실행 전 인자 거절·서버 오류·전송 예외는 실제 기록에 맞춰 구분한다. 미확인 범위는 등록된 과거 로그/원문 도구로 이어서 조사하거나 필요한 대상만 확인하고, 수행하지 않은 조회를 실패했다고 설명하지 않는다.
++
+ ## 서비스 원인 조사
+ 
+ - 서비스 오류 질문은 등록된 target·unit·호스트를 먼저 맞추고 실제 서비스 이력/원문을 조사한다. 짧은 이름이 여러 호스트에 있으면 한 번 확인하며 이전 봇의 호스트·PID·수치를 새 관측으로 쓰지 않는다. 기간 없는 원인 조사는 최근24시간의 이력/원문 표본에서 시작하고, 단순 로그 조회는 최근15분 표본을 사용한다. 명시된 기간은 그대로 유지한다. 기본 구간은 사용자가 말한 과거 사건 시각이 아니다. 표본에 원인이 없으면 확보한 현재 관측과 사건 시각/추가 원문의 미확인을 구분한다.

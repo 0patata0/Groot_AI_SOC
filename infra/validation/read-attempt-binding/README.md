@@ -64,3 +64,7 @@ SOC_ATTEMPT_ROOT=/새로운/임시/read-attempt-review/candidate python3 -B infr
 
 
 [짧은 조회3소스 후속](../read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.
+
+## 대상·view·과거 범위의 후속 검증
+
+[공통4소스 후보](../read-target-binding/README.md)는 OS 대상명·host/unit/container·view·기간과 실제 읽기 시도를 결속했다. 같은 질문의 과거 실제 두arm에서 미실행 과거 조회를 실패로 쓰는 문제를 검출하고 로컬840집계/기존Hermes840생략0·공식Harness²·공개24SHA/AST/신규39재현을 확인했다. 새 생성·실MCP·채팅0이며 운영 미적용이다. 이 결과로 앞선 실제 응답이나 속도 수치를 소급 성공으로 바꾸지 않는다.

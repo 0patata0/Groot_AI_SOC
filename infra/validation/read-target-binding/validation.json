@@ -1,0 +1,162 @@
+{
+  "status": "isolated_guard_validated_runtime_not_validated_not_applied",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "harness2": {
+    "at_kst": "2026-11-15T17:15:24.215605+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "source_sha256": {
+      "infra/hermes/SOUL.groot.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "infra/hermes/chat_contract.py": "d54e16c101ce578430a1d3665960dbe18904ba79aaeac728f58262f178a99251",
+      "infra/hermes/read_contract.py": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331",
+      "infra/hermes/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "infra/hermes/workflow_contract.py": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3",
+      "infra/hermes/review_channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "infra/hermes/query-completion/__init__.py": "e22218ccc052fa8bb75c91811fac30e4139fd97ef310e76f24cdce548981371b",
+      "infra/hermes/soc_management_run.py": "d59efff77a873c1200969b579db9171a87007139d58b91ad07e4bb1865d345da",
+      "infra/hermes/soc_management_controller.py": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+      "infra/hermes/review_channel.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "infra/ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "infra/ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "infra/ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "1aa096640e64b32609daeaa721c2e453b820b13db6a28e8e72ae33ec35060e94",
+      "infra/hermes/skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "infra/hermes/skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "infra/ollama-trial/harness.py": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc",
+      "infra/hermes/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "infra/mcp/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "infra/hermes/skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "infra/hermes/skills/soc-query/SKILL.md": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31",
+      "infra/ollama-trial/runtime.py": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06",
+      "infra/hermes/query-completion/alignment.py": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d",
+      "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+    },
+    "operating_changes": 0,
+    "baseline": "Unapproved common short-read3 R3 composite; not installed or approved operating baseline."
+  },
+  "local": {
+    "tests": 840,
+    "passed": 834,
+    "skipped": 6
+  },
+  "existing_hermes": {
+    "tests": 840,
+    "skipped": 0,
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "uid": 10001,
+    "network_connect_denied": true,
+    "passed": 840
+  },
+  "earlier_actual_os_replays": [
+    {
+      "prior_arm": "base",
+      "raw_sha256": "242d2b0b06e679e27a6968c1a6c1e233e50c5ef17cdd352f3881a30a1d174665",
+      "issues": [
+        "unobserved_read_failure:target:b:systemd"
+      ],
+      "new_model_or_mcp_calls": 0,
+      "note": "Earlier actual response replay with its real call receipt; not fresh generation or an independent case."
+    },
+    {
+      "prior_arm": "candidate",
+      "raw_sha256": "cc8c44f616e7a3f32ee91f0b3c8cbdc4b53105b341d515739348adf0fd10263f",
+      "issues": [
+        "unobserved_read_failure:target:b:systemd"
+      ],
+      "new_model_or_mcp_calls": 0,
+      "note": "Earlier actual response replay with its real call receipt; not fresh generation or an independent case."
+    }
+  ],
+  "new_model_calls": 0,
+  "new_mcp_read_calls": 0,
+  "chat_posts": 0,
+  "operating_changes": 0,
+  "limits": [
+    "Replays are earlier developer observations; 840 regressions are not independent SOC cases.",
+    "No new runtime model/repair-loop or Mattermost acceptance was executed for this patch.",
+    "Human labels beyond literal targets/explicit selectors/registered actual units and B systemd forms are not a complete semantic verifier.",
+    "A snapshot and an unsupported aggregate history query remain different capabilities; this guard adds no journal target, permission or host identity.",
+    "General absence/per-SID loading claims in investigations still require separate improvements."
+  ],
+  "live_before_after": {
+    "initial_at_kst": "2026-11-15T16:56:33.712110+09:00",
+    "at_kst": "2026-11-15T17:52:41.701637+09:00",
+    "source_count": 24,
+    "schemas_count": 45,
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "access_mode": "hermes-parity",
+    "versions": {
+      "scripts/chat_contract.py": "soc-chat-contract:1.5.84",
+      "scripts/channel_policy.py": "soc-review-routing:1.1.8",
+      "scripts/native_query.py": "groot-query-completion:1.19.137"
+    },
+    "all_sources_schemas_config_model_services_unchanged": true,
+    "scope": "Fresh B administrator-routed read/discovery/API tags only. No proof of currently loaded gateway memory version or A/C journal state."
+  },
+  "remote_temporary_cleanup": {
+    "at_kst": "2026-11-15T17:48:09.520199+09:00",
+    "root": "/opt/hermes-data/.capstone-read-target-cdbgnlcb-tests",
+    "files": 608,
+    "bytes": 8920745,
+    "absent": true,
+    "operating_changes": 0
+  },
+  "public_reconstruction": {
+    "source_hashes_per_arm": 24,
+    "ast_scope_verified": true,
+    "harness2": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "tests": 39,
+    "passed": 39,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0
+  },
+  "mac_temporary_cleanup": {
+    "at_kst": "2026-11-15T20:20:09.971197+09:00",
+    "files_removed": 6930,
+    "bytes_removed": 253226609,
+    "all_task_roots_absent": true,
+    "new_mac_packages": 0,
+    "framework_data_weights_backups_preserved": true
+  }
+}

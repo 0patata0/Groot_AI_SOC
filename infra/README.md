@@ -1,5 +1,7 @@
 # infra — 서버 구성·배포
 
+현재 역할은 B의 두 에이전트·MCP와 Thor의 학습본 추론이며, DGX는 학습을 담당한다. [OS 대상·범위 서술 후보](validation/read-target-binding/README.md)는 기존 Hermes840회귀/공식Harness²·과거 응답 검출을 확인한 **미적용 격리 후보**다. 17:52 KST B24소스/45schema·학습본digest·기존 PID/timer 불변을 확인했고 운영/초기설치 입력은 변경하지 않았다. 매뉴얼형 논문56쪽과 현재 승인 대기 범위는 [STATUS](../STATUS.md)를 따른다. 아래 모델·도구 수·날짜별 내용은 당시 기록이다.
+
 현재 journal 읽기는 [native 어댑터 후보](validation/journal-adapter/README.md)166검사/실제격리8건과 [정확9코드 적용안](validation/journal-adapter/application/README.md)33회귀/9복제원복·18중간load를 확인했다. A/B/C PREPARED·원본6개를 보관하며 운영 적용·원복timer/실제MCP·새채팅은 미수행이다. 아래 날짜별 구성은 당시 이력이며 현재 상태는 [STATUS](../STATUS.md)를 따른다.
 
 **운영 토폴로지 — 2026-11-02:** [서버·연결·근거](diagrams/README.md) · [기존 형태 상세형](../topology/토폴로지_상세.svg) · [버스형](../topology/토폴로지_버스.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).

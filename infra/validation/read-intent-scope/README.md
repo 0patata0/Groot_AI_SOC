@@ -46,3 +46,7 @@ SOC_INTENT_ROOT=/private/tmp/fresh-read-intent-replay/candidate python3 -B infra
 ```
 
 [정확 SHA·부모·변경 범위](manifest.json) · [동결 패치](candidate.patch) · [검증 요약](validation.json). 패치는 운영 서버에 직접 실행하는 설치/적용 스크립트가 아니다. 원문/상세시각·현재 소스 관측·영수증/테스트 출력은 로컬 전용 `대화기록/검증/2026-11-15-read-intent-scope/`에 보존한다.
+
+## 대상·view·과거 범위의 후속 검증
+
+[공통4소스 후보](../read-target-binding/README.md)는 OS 대상명·host/unit/container·view·기간과 실제 읽기 시도를 결속했다. 같은 질문의 과거 실제 두arm에서 미실행 과거 조회를 실패로 쓰는 문제를 검출하고 로컬840집계/기존Hermes840생략0·공식Harness²·공개24SHA/AST/신규39재현을 확인했다. 새 생성·실MCP·채팅0이며 운영 미적용이다. 이 결과로 앞선 실제 응답이나 속도 수치를 소급 성공으로 바꾸지 않는다.

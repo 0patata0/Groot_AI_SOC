@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+[공통 짧은 조회 후보](../validation/common-read-contract/README.md)는 실제 설치본 복제와 같은 모델/권한으로 B systemd 범위·KST 표시를 검증했다. 321회귀·B22/실제8요청·MCP9/모델14이며 운영 미적용이다. DNS 완료는 실패했고 정확 인용·부정문/계획 오탐·모델 오류를 구분한다. 아래 운영/과거 버전과 후보를 혼동하지 않는다.
+
 **현재 읽기 경로 확인:** [설치 runtime·실제 MCP6요청](../validation/live-reads/README.md)은 FW15.003초/실조회1회를 확인했지만 journal 실패·B의 호스트 범위 확대·DNS판단 미완료·불필요한 시각 계산이 남았다. 현재 허용은 읽기36/동등권한45이며 모델은 학습본 `soc-qwen36:35b-balanced-q4km-20261108`, 전용·공동·경보 채널은 공개다. 소스19/스킬·45스키마·config와 GET메타데이터를 대조했다. 이하 날짜별 수치는 당시 검증 이력이다. 새 journal 후보는 로컬 소스/격리 검증만 했으며 운영에는 미적용이다.
 
 [정확 적용 후보](../validation/control-status/application/README.md)는 기존 공통 완료 조건과 SDK77회귀를 포함한다. Native 전용 상태 decoder를 SDK에 새로 도입한 것은 아니다. SDK 사본/영수증·heartbeat/PID/DB 확인과19파일 원복을 준비했으며 승인 전 운영 변경0이다. 이미 최신인 조회 스킬3사본은 바꾸지 않고 영수증의 오래된 해시만 정정하는 후보를 포함한다.

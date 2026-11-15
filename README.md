@@ -2,6 +2,8 @@
 
 <!-- current-work-summary:start -->
 현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 후보의 정확 적용안](infra/validation/control-status/application/README.md)은17소스 사본+2영수증·유휴 확인·15분 원복을 준비했고 Native536/query419는 기존 Hermes 격리 환경에서 생략 없이 통과했습니다. SDK77·설치46·최종 운영자37과 복제 경로19파일 적용/원복도 통과했습니다. query1.19.141은 패치/준비 폴더만이며 정본·설치 파일137,운영 적용·새 채팅은 승인 후 확인합니다. 기존 로그의 메모리 로드 버전은 미확인입니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. [이력 전송 점검](infra/normalization/vector/history-auto-transfer/AUDIT.md)에서도 A14작업 완료·A/B420배치 일치와 실패43폴더의 메타데이터 보존을 확인했습니다. [평가자료감사](finetuning/EVALUATION_SCOPE.md)에서는기존176이독립SOC평가가아님을확인해범위와비교준비기를정정했습니다. 아래 날짜별 내용은 당시 기록입니다.
+
+[공통 짧은 조회 후보](infra/validation/common-read-contract/README.md): 공식 Harness²·321검사·실제8요청에서 B systemd 호스트 유지와 제공 KST 표시의 불필요 호출 제거를 확인했습니다. DNS 판단은 검사 오탐·모델 상태/범위 오류가 남습니다. 정본/설치/운영 미적용·실채팅 미검증이며 기존 두 정확 후보의 승인을 확대하지 않습니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

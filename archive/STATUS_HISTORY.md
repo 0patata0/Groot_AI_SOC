@@ -12740,3 +12740,8 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 ## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
 
 별도 journal9코드 정확 후보0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e·root3PREPARED/원본6개를 준비했다. 고유33회귀 Mac/A/B/C각pass0skip·실제9바이트복제 적용/9원복·18중간cold load·새SQLite fixture보존·직접journal1/6/3행/구validator통과. 구core/새journal root_file부재를 실제복제에서재현/2원복하고 helper/core/journal순서로정정했다. 운영source/service/timer·실MCP/모델/채팅0·초기설치/API/모델/권한/TTL변경0이다. 폐기준비/시험183파일2751905B/19artifact폴더·Mac67파일2285932B 제거·부재/최소재현10·운영자source6보존. 최종후보/원본·기존19planfd6/PREPARED·원래9SHA/논문43쪽본문SHA·G_Harness2/자료/가중치/운영복구본보존. 실제적용·타이머발동·실MCP/새채팅·재부팅/새OS는남는다. [현재 적용안](../infra/validation/journal-adapter/application/README.md).
+
+
+## 2026-11-15T09:11:40.469152+09:00 공통 짧은 조회·시각 표시 후속
+
+공통 조회 후보는 공식 Harness² 25구성·8수정면/상시 증가0, 로컬321·B 새22검사와 격리 병합의 같은321검사를 통과했다. 실제 요청8개/MCP9·모델14에서 B systemd는3호스트→B만, 제공KST표시는13.174초/계산1·모델1→0.002초/호출0을 확인했다. A Docker/C서비스 상세도 지정 범위를 유지했다. DNS는78.842초partial로 미해결이며 전체 이름 인용 뒤 부정문·추가 조사 계획의 검사 오탐과 모델의 불필요WAF/잘못된 상태를 분리했다. 운영·설치기·권한·TTL 변경0·실채팅0·독립 정확도/왕복p95 아님. 기존19파일/journal9코드 승인·PREPARED와 원래 다른9작업은 보존했다. 이전 현재 요약은 Git29df486에서 복원한다.

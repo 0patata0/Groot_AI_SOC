@@ -1712,3 +1712,8 @@ A의별도제한unit7개·28파일222046B/7폴더는종료/PID부재/SHA보존�
 ## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
 
 호스트별 core/journal2교체+helper1추가·UID/GID0/0644만허용한다. root3준비/원본6개·새helper부재생성/자기after만삭제·900초원복/300초apply/180초복구·collector완료대기/강제kill금지·reader재시작/기존계정읽기·현재MCP/채팅proof확정으로구성했다. 실제운영기동·원복timer는생성전이다. 초기deploy/helper/오프라인의존성은그대로이며새설치시험미수행. [전체SHA/범위](../infra/validation/journal-adapter/application/plan.json).
+
+
+## 2026-11-15T09:11:40.469152+09:00 공통 짧은 조회·시각 표시 후속
+
+운영 배포0. 기존19/journal9 PREPARED·승인 범위를 보존한 별도8소스 patch를 검증했다. 초기 설치기/의존/권한·모델·TTL은 변경하지 않았다. B 자체 임시2세대는 근거/SHA/종료·소스 불변 대조 후 제거했다. 실제 채팅·승인 적용·새OS 설치는 미수행. [원장](../infra/validation/common-read-contract/README.md).

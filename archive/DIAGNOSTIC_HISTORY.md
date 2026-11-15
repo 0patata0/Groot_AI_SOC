@@ -350,3 +350,8 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
 
 실제netlink drop-in을제거하지않고고정했으며 timer에MainPID가없는계약을수정했다. B영수증+0900 basename범위거절을같은고정디렉터리허용/root메타검사로정정했다. 실제A복제의구core/새journal에서root_file AttributeError 재현·2원복/새fixture보존후교체순서수정. 최종고유33 Mac/A/B/C각pass·3역할9적용/9원복·18중간로드·기존validator통과를확인했으나운영효과/독립정확도아님. [실패와정정 원장](../infra/validation/journal-adapter/application/validation.json).
+
+
+## 2026-11-15T09:11:40.469152+09:00 공통 짧은 조회·시각 표시 후속
+
+기존/후보 실제 요청8/MCP9/모델14·각1회·개발재사용·캐시/부하/구간 미통제. B systemd3→1읽기, 제공KST13.174→0.002초/호출0. DNS77.931→78.842초partial, 부재 부정/추가 조사 계획 오탐·불필요WAF·허용 밖 상태값 잔여. 첫 worker는 root-only 소스 읽기 거부로 model/MCP 전 종료, 권한 확장 없이 root/비특권 검증 분리. 로컬 감사 인자/복제fixture/테스트mock 오류와 실제 파서 충돌을 구분·정정. [전체 범위](../infra/validation/common-read-contract/validation.json).

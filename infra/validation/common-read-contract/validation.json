@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-15T09:04:34.284070+09:00",
+  "candidate_patch_sha256": "ecb117c150f1cb908cdd9c13e32adf562709d8c044044f49a97ddd758bdc5f03",
+  "scope": "Isolated source replicas, same configured model/permissions and real read MCPs. Not operating application, Hermes live chat or Mattermost queue/delivery. Each case once; development reuse, uncontrolled cache/load/window, not independent accuracy or p95.",
+  "official_harness2": {
+    "added": [],
+    "removed": [],
+    "modified": [
+      "scripts/native_alignment.py",
+      "scripts/native_query.py",
+      "scripts/read_contract.py",
+      "scripts/sdk_harness.py",
+      "scripts/sdk_runtime.py",
+      "scripts/workflow_contract.py",
+      "skills/soc-investigate/SKILL.md",
+      "skills/soc-query/SKILL.md"
+    ],
+    "always_on_char_delta": 0
+  },
+  "local_regressions": {
+    "new_counterexamples": 22,
+    "existing_sdk": 106,
+    "existing_native": 181,
+    "workflow_and_scope": 12,
+    "total_tests": 321,
+    "failures": 0,
+    "skips": 0
+  },
+  "server_new_regressions": {
+    "tests": 22,
+    "failures": 0,
+    "skips": 0
+  },
+  "pending19_compatibility": {
+    "same_tests_repeated": 321,
+    "failures": 0,
+    "skips": 0,
+    "initial_overlap_files": 2,
+    "resolved_only_in_isolated_copy": true,
+    "existing_plan_or_stage_changed": false,
+    "official_harness2_modified_components": 11,
+    "not_a_release_or_approval": true
+  },
+  "actual_totals": {
+    "requests": 8,
+    "model_completions": 14,
+    "mcp_reads": 9,
+    "protected_dispatches": 0,
+    "chat_posts": 0
+  },
+  "arms": {
+    "base": [
+      {
+        "id": "dns",
+        "question": "192.168.16.230 DNS 경보 조사해. 최근 15분, 목적지는 168.126.63.1:53이야.",
+        "runtime_status": "partial",
+        "seconds": 77.931282,
+        "actual_reads": 1,
+        "model_completions": 4,
+        "call_scope": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T08:57:39.693862+09:00"
+            },
+            "is_error": false,
+            "result_sha256": "638bdbf40b4457dc785c0b5cab4024e2c49044b020a0fa2cf79ca251c0aa50c8"
+          }
+        ],
+        "answer_sha256": "c87b0c91ec5d8b450ec23a959a3bfddab63413fa2f782f6583c0c2335c66aa7c",
+        "stop_reason": "repeated_unchanged_judgment",
+        "remaining_issues": [
+          "incident_event_verification_missing",
+          "sample_zero_presented_as_absence",
+          "unobserved_event_source:modsecurity"
+        ]
+      },
+      {
+        "id": "systemd",
+        "question": "B systemd 지금 문제 있어?",
+        "runtime_status": "completed",
+        "seconds": 17.145818,
+        "actual_reads": 3,
+        "model_completions": 2,
+        "call_scope": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd"
+            },
+            "is_error": false,
+            "result_sha256": "4da3e13d16cd445ce81ae7c4add0b3f53a64a48a49a0d06ea934bcc7f4a8575a"
+          },
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "a:systemd"
+            },
+            "is_error": false,
+            "result_sha256": "4604462c2456dd80537c92926df4edb3efaca8e1f7827df81174ba5ea4bc92fb"
+          },
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "c:systemd"
+            },
+            "is_error": false,
+            "result_sha256": "01d9b91a28ce7afb98d1f8feb451edb7b90ecaf4675d9683ed531ce10ce4b19a"
+          }
+        ],
+        "answer_sha256": "d7f9e8ac9cc975961ee04eda17195d72e3834b7fab34ecb5779b8d69c4c49385",
+        "stop_reason": null,
+        "remaining_issues": []
+      },
+      {
+        "id": "kst",
+        "question": "2026-11-06T01:24:00+09:00 이 시각 정리해줘.",
+        "runtime_status": "completed",
+        "seconds": 13.174336,
+        "actual_reads": 1,
+        "model_completions": 1,
+        "call_scope": [
+          {
+            "server": "system-diagnostics",
+            "name": "calculate_time",
+            "arguments": {
+              "timestamps": [
+                {
+                  "id": "req_ts",
+                  "value": "2026-11-06T01:24:00+09:00"
+                },
+                {
+                  "id": "now_ts",
+                  "value": "2026-11-06T01:24:00+09:00"
+                }
+              ]
+            },
+            "is_error": false,
+            "result_sha256": "2bfa56e24a5d5d22d33f80f4eee59b9d0a415560f5d9f11d0939f0bb8e194dea"
+          }
+        ],
+        "answer_sha256": "a57eb0c718727505465374b685ee8fc20153b8a10bcf493d9cd47a3c8d0253c5",
+        "stop_reason": null,
+        "remaining_issues": []
+      }
+    ],
+    "candidate": [
+      {
+        "id": "dns",
+        "question": "192.168.16.230 DNS 경보 조사해. 최근 15분, 목적지는 168.126.63.1:53이야.",
+        "runtime_status": "partial",
+        "seconds": 78.841837,
+        "actual_reads": 1,
+        "model_completions": 4,
+        "call_scope": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T08:59:28.929564+09:00"
+            },
+            "is_error": false,
+            "result_sha256": "a82341581a7c54e7ecf2d4b786747b98bcd3306f6b503fff47aa5dd9e91fe026"
+          }
+        ],
+        "answer_sha256": "646aec68f562d81f8b81c3154c60201651671784790799f961df54bb999e13a2",
+        "stop_reason": "repeated_unchanged_judgment",
+        "remaining_issues": [
+          "sample_zero_presented_as_absence",
+          "unobserved_event_source:modsecurity"
+        ]
+      },
+      {
+        "id": "systemd",
+        "question": "B systemd 지금 문제 있어?",
+        "runtime_status": "completed",
+        "seconds": 13.4814,
+        "actual_reads": 1,
+        "model_completions": 1,
+        "call_scope": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd"
+            },
+            "is_error": false,
+            "result_sha256": "5f24c50a1d885bc829d1bfb1349e6ebf972b129d47bb1a009d344e150970f77d"
+          }
+        ],
+        "answer_sha256": "e0ce3c312a4fb4b8a806ac2cbc1614663352ca27ff7a43ef1d50e8c93dd3eb2c",
+        "stop_reason": null,
+        "remaining_issues": []
+      },
+      {
+        "id": "kst",
+        "question": "2026-11-06T01:24:00+09:00 이 시각 정리해줘.",
+        "runtime_status": "completed",
+        "seconds": 0.001962,
+        "actual_reads": 0,
+        "model_completions": 0,
+        "call_scope": [],
+        "answer_sha256": "0c9461e66fb7bd9cf88c87e85be8b926e9803deff82bd98d72706e332ecc5387",
+        "stop_reason": null,
+        "remaining_issues": []
+      },
+      {
+        "id": "docker-a",
+        "question": "A Docker 사용량 보여줘",
+        "runtime_status": "completed",
+        "seconds": 12.780706,
+        "actual_reads": 1,
+        "model_completions": 1,
+        "call_scope": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "a",
+              "limit": 100,
+              "offset": 0,
+              "state": "all",
+              "view": "container_stats"
+            },
+            "is_error": false,
+            "result_sha256": "222ea0daece454ce6b33737a8c131940ad496f528718a73d3bef5fb2a8d2c112"
+          }
+        ],
+        "answer_sha256": "639ccd38525004226ed99c2eec9bfbeffee91243c4eb7f66ff47beb80f349ef1",
+        "stop_reason": null,
+        "remaining_issues": []
+      },
+      {
+        "id": "unit-c",
+        "question": "C ssh.service 상세 상태 보여줘",
+        "runtime_status": "completed",
+        "seconds": 12.70436,
+        "actual_reads": 1,
+        "model_completions": 1,
+        "call_scope": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "c",
+              "limit": 100,
+              "offset": 0,
+              "state": "all",
+              "unit": "ssh.service",
+              "view": "service_details"
+            },
+            "is_error": false,
+            "result_sha256": "e760c34094a2be0edca5a04396221056fce066b7bff347f259e60234f98ea04f"
+          }
+        ],
+        "answer_sha256": "d8d51adc1b0b5e8186316cc4a93c7232341686d4266ccc30c68b3ef798d04cd4",
+        "stop_reason": null,
+        "remaining_issues": []
+      }
+    ]
+  },
+  "semantic_review": {
+    "short_host": "Candidate B systemd reads only b:systemd; base expands to three hosts. A Docker and C ssh.service keep host/object and return tables.",
+    "supplied_kst": "Candidate preserves the exact supplied value with no model or MCP call. Not a live timestamp or arithmetic result.",
+    "dns": "Not resolved. Exact qualified citation now appears in drafts, but zero-absence disclaimer and future ModSecurity/Wazuh investigation mentions are rejected. Candidate also proposes irrelevant WAF checks and emits invalid MANAGEMENT_STATUS unresolved. No normal/success verdict is published.",
+    "next": "Reproduce common sentence/modality false positives without weakening factual-evidence guards; distinguish this from model target/status errors."
+  },
+  "operating_changes": 0,
+  "new_packages": 0,
+  "attack_or_training_runs": 0,
+  "initial_failures": {
+    "local_only": "Audit argument order and source-copy/fixture setup corrected. A too-short disposition basis and missing native verdict mock were test fixture errors. One short-host/agent-identity interaction was corrected before final freeze.",
+    "server": "First own worker could not read root-only socbot source and exited before model/MCP calls. Root still verifies all 24 components; worker checks only readable SDK paths. No permission changes."
+  },
+  "cleanup": {
+    "server_files": 240,
+    "server_bytes": 6243812,
+    "server_task_roots_absent": true,
+    "mac_files": 4015,
+    "mac_bytes": 70087034,
+    "mac_task_root_absent": true,
+    "temporary_embedded_source_scripts_removed": 6,
+    "minimum_candidate_sources": 8,
+    "driver_sources": 4,
+    "operating_sources_unchanged": true,
+    "framework_user_environment_data_weights_backups_preserved": true
+  },
+  "reproducer_checks": {
+    "positive_materialization": "passed",
+    "reconstructed_candidate_new_tests": 22,
+    "configuration_source_catalog_tampering": 3,
+    "tampered_output_created": false
+  }
+}

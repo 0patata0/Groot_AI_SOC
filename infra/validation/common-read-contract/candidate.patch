@@ -1,0 +1,367 @@
+--- a/infra/ollama-trial/harness.py
++++ b/infra/ollama-trial/harness.py
+@@ -48,6 +48,10 @@
+     return CONTRACT.normalize_query_text(READ.without_prohibitions(SHARED._unquoted_text(text)))
+ 
+ 
++def supplied_time_report(question):
++    return READ.supplied_kst_display(normalized(question), EVIDENCE._AWARE_TIME)
++
++
+ def request_kind(question):
+     """Shared routing precedence; this classifies the request, never the event.
+ 
+@@ -81,7 +85,7 @@
+     if follow:
+         prior_text=normalized(previous)
+         units=list(dict.fromkeys(re.findall(r'(?<![A-Za-z0-9_.@-])[A-Za-z0-9_.@-]+\.service\b',prior_text)))
+-        hosts=list(dict.fromkeys(re.findall(r'(?<![A-Za-z0-9])([ABC])\s*서버',prior_text,re.I)))
++        hosts=list(dict.fromkeys(host for _, _, host in READ.host_mentions(READ.scope_text(prior_text))))
+         if len(units)==1 and len(hosts)<=1 and not re.search(r'컨테이너|container',prior_text,re.I):
+             prefix=(hosts[0].upper()+' 서버 ') if hosts else ''
+             field=follow[1]
+@@ -674,7 +678,9 @@
+     # A host qualifier identifies where an explicit OS/Docker object lives;
+     # it does not turn that object's status into Wazuh agent identity.
+     if (plan and plan.get('kind') == 'agent_identity'
+-            and re.search(r'\.service\b|\bsystemd\b|컨테이너|\bcontainer\b', text, re.I)):
++            and (re.search(r'\.service\b|\bsystemd\b|컨테이너|\bcontainer\b', text, re.I)
++                 or not re.search(r'에이전트|\bagent\b|식별|(?<![A-Za-z])ID(?![A-Za-z])', text, re.I)
++                 and any(re.search(pattern, text, re.I) for pattern, _, _ in DIAGNOSTIC_SERVICE_ALIASES))):
+         return None
+     return plan
+ 
+@@ -1548,6 +1554,7 @@
+                if set(EVIDENCE.evidence_claim_violations(line, facts) + incident_context_violations(line)
+                       + incident_field_violations(line, calls)).intersection(issues)][:6]
+     return (incident_observation_prompt(question, calls) +
++            '\n' + CONTRACT.workflow_policy(('soc-investigate',), section='investigation-evidence') +
+             '\n최종 답변 근거 검사: ' + ', '.join(issues) +
+             '\n이전 초안의 오류를 실제 조회 자료와 대조해 정정하세요. '
+             '표본 0건은 전체 공격·경보가 없다는 증거가 아닙니다. '
+@@ -1611,7 +1618,8 @@
+         if not EVIDENCE.allowed('mcp__'+str(call.get('server','')).replace('-','_')+'__'+str(call.get('name','')),'verify') or not payload(call):
+             continue
+         shown = model_view(call['server'], call['name'], call['result'])
+-        observed.append({'server': call['server'], 'name': call['name'],
++        observed.append({'tool': 'mcp__' + call['server'].replace('-', '_') + '__' + call['name'],
++                         'server': call['server'], 'name': call['name'],
+                          'bundle_component': calls.component_origins.get(id(call)),
+                          'arguments': call.get('arguments', {}), 'result': shown[:24000],
+                          'result_truncated': len(shown) > 24000})
+@@ -2266,6 +2274,17 @@
+                            ('wazuh-agent.service','wazuh-agent',None))
+ 
+ 
++DIAGNOSTIC_SERVICE_ALIASES = tuple([
++        (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
++        (r'Suricata|IDS|수리카타','suricata','a'),(r'WAF|ModSecurity','waf','a'),
++        (r'에이전트|수집기|\bcollection\b','collection',None),
++        (r'Ollama|올라마','ollama','b'),(r'Wazuh\s*(?:manager|매니저)','wazuh-manager','b'),
++        (r'Indexer|인덱서','wazuh-indexer','b'),(r'Mattermost|매터모스트','mattermost','b'),
++        (r'LLM|모델','llm','b'),(r'사건.*(?:처리|전달)|관리.*파이프라인','management-pipeline','b'),
++        (r'수집.*(?:경로|전달|파이프라인)|ingestion','ingestion','b'),
++        (r'\bsoc-bot\b','soc-bot',None),(r'\bDocker\b|도커','docker',None),
++        (r'(?<![A-Za-z])Vector(?![A-Za-z])|벡터','vector','a')])
++
+ def host_read_prohibited(question):
+     return bool(re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이|보여주지',
+                           SHARED._unquoted_text(question)))
+@@ -2273,13 +2292,13 @@
+ 
+ def detailed_host_request(question):
+     if host_read_prohibited(question):return None
+-    text = normalized(question)
++    text = READ.scope_text(normalized(question))
+     if READ.wants_write(text): return None
+     text = text.replace('헤르메스', 'hermes')
+-    hosts = re.findall(r'(?<![a-z0-9])([abc])\s*서버', text, re.I)
++    hosts = [host for _, _, host in READ.host_mentions(text)]
+     if len(set(x.lower() for x in hosts)) > 1: return None
+     host = hosts[0].lower() if hosts else 'all'
+-    rest = re.sub(r'(?<![a-z0-9])[abc]\s*서버', '', text, flags=re.I)
++    rest = READ.without_hosts(text)
+     units = re.findall(r'(?<![A-Za-z0-9_.@-])[A-Za-z0-9_.@-]+\.service\b', rest)
+     docker = bool(re.search(r'컨테이너|도커|Docker|container', rest, re.I))
+     counts = re.findall(r'([0-9]+)\s*(?:개|건)', rest); pages = re.findall(r'([0-9]+)\s*페이지', rest)
+@@ -2322,7 +2341,7 @@
+     model selection and actual MCP receipts are still required.
+     """
+     if host_read_prohibited(question):return None
+-    text = normalized(question)
++    text = READ.scope_text(normalized(question))
+     if READ.wants_write(text): return None
+     detail = detailed_host_request(question)
+     if detail: return detail
+@@ -2340,7 +2359,7 @@
+               ('storage', r'파일시스템|마운트|디스크|disk')]
+     views = [key for key, pattern in groups if re.search(pattern, text, re.I)]
+     if not views: return None
+-    hosts = re.findall(r'(?<![a-z0-9])([abc])\s*서버', text, re.I)
++    hosts = [host for _, _, host in READ.host_mentions(text)]
+     if len(set(x.lower() for x in hosts)) > 1: return None
+     host = hosts[0].lower() if hosts else 'all'
+     counts = re.findall(r'([0-9]+)\s*(?:개|건)', text)
+@@ -2357,7 +2376,7 @@
+     if running and views == ['processes']: state = 'all'  # ps snapshot, not runnable-only task filtering.
+     if state != 'all' and set(views) - {'services', 'containers'}: return None
+     if failed and views != ['services']: return None
+-    rest = re.sub(r'(?<![a-z0-9])[abc]\s*서버|[0-9]+\s*(?:개|건|페이지)', '', text, flags=re.I)
++    rest = re.sub(r'[0-9]+\s*(?:개|건|페이지)', '', READ.without_hosts(text))
+     for _, pattern in groups: rest = re.sub(pattern, '', rest, flags=re.I)
+     if set(views) <= {'storage','resources'}: rest = re.sub(r'남은|공간|(?<![가-힣])용량', '', rest)
+     if views == ['network']: rest = re.sub(r'경로', '', rest)
+@@ -2550,8 +2569,8 @@
+     if not health and not pipeline and not re.search(r'시작\s*설정|\b(?:LoadState|UnitFileState)\b',text,re.I) and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
+     if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
+         return {'all':True,'requested':[]}
+-    host_matches=list(re.finditer(r'(?<![A-Za-z0-9])([ABC])\s*서버',text,re.I))
+-    hosts=[m[1].lower() for m in host_matches]
++    host_matches=READ.host_mentions(text)
++    hosts=[host for _, _, host in host_matches]
+     host=hosts[0] if len(hosts)==1 else None
+     wanted=re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])',text)
+     if pipeline:wanted.append('b:management-pipeline')
+@@ -2561,22 +2580,13 @@
+     # to unrelated services. General systemd questions can discover failures.
+     for unit, name, default in DIAGNOSTIC_UNIT_ALIASES:
+         for match in re.finditer(r'(?<![A-Za-z0-9@_.:-])'+re.escape(unit)+r'(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',text):
+-            preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
++            preceding=[h for _, end, h in host_matches if end<=match.start()]
+             selected=(preceding[-1] if preceding else host) or default
+             if selected:wanted.append(selected+':'+name)
+-    for pattern,name,default in [
+-        (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
+-        (r'Suricata|IDS|수리카타','suricata','a'),(r'WAF|ModSecurity','waf','a'),
+-        (r'에이전트|수집기|\bcollection\b','collection',None),
+-        (r'Ollama|올라마','ollama','b'),(r'Wazuh\s*(?:manager|매니저)','wazuh-manager','b'),
+-        (r'Indexer|인덱서','wazuh-indexer','b'),(r'Mattermost|매터모스트','mattermost','b'),
+-        (r'LLM|모델','llm','b'),(r'사건.*(?:처리|전달)|관리.*파이프라인','management-pipeline','b'),
+-        (r'수집.*(?:경로|전달|파이프라인)|ingestion','ingestion','b'),
+-        (r'\bsoc-bot\b','soc-bot',None),(r'\bDocker\b|도커','docker',None),
+-        (r'(?<![A-Za-z])Vector(?![A-Za-z])|벡터','vector','a')]:
++    for pattern,name,default in DIAGNOSTIC_SERVICE_ALIASES:
+         for match in re.finditer(pattern,text,re.I):
+             if re.search(r'[abc]:$',text[max(0,match.start()-2):match.start()]): continue
+-            preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
++            preceding=[h for _, end, h in host_matches if end<=match.start()]
+             selected=(preceding[-1] if preceding else host) or default
+             if selected: wanted.append(selected+':'+name)
+     return {'all':False,'requested':list(dict.fromkeys(wanted)),'unresolved':not wanted}
+--- a/infra/hermes/skills/soc-query/SKILL.md
++++ b/infra/hermes/skills/soc-query/SKILL.md
+@@ -10,6 +10,8 @@
+ 
+ 1. **범위를 정한다.** 짧은 질문의 명시 장비를 유지한다. 같은 사용자·대화에서 대상이 분명하면 이어받고 새 대화의 ‘룰 보여줘’는 장비를 한 번 확인한다. 봇의 과거 오답을 근거로 삼지 않는다. 원인·위험·영향 판단은 `soc-investigate`, 변경은 `soc-change`로 이어가며 단순 조회 완료로 대신하지 않는다.
+ 2. **필요한 읽기를 선택한다.** 아래 업무와 실제 카탈로그의 대상·필수 인자·enum을 대조한다. 요청하지 않은 장비·IP·프로그램·agent·룰 필터를 추가하지 않는다. 등록 도구로 조회할 수 있으면 연결·권한을 추측해 포기하지 않는다.
++
++짧은 `A`·`B`·`C` 호스트 지정은 `A 서버`·`B 서버`·`C 서버`와 같은 범위다. systemd 진단·서비스/컨테이너 상세·자원 목록·후속 질문 모두 그 범위를 유지한다. 해당 호스트에 등록되지 않은 대상은 미지원으로 남기며 다른 호스트의 동명 서비스로 대체하지 않는다. 명시적으로 제외한 호스트는 조회하지 않는다.
+ 
+ | 요청 | 실제 조회 범위 |
+ |---|---|
+@@ -34,6 +36,8 @@
+ 
+ 기간 없는 ‘최근’ 경보는 제공된 최근60분 `lookback_minutes`를 선택하며 절대시각을 암산하지 않는다. 오늘/금일은 KST 자정~요청 시각의 `since_kst`·`until_kst`이고 lookback과 혼용하지 않는다. 지정 기간은 최신 요약으로 대체하지 않는다. 제공된 KST를 재변환하지 않는다.
+ 
++`+09:00`·`+0900`·`KST`가 붙은 제공 시각을 정리·표시하는 요청은 원시각을 그대로 표에 둔다. 시각 차이·경과시간·순서 정렬이나 실제 다른 시간대로의 변환을 요청한 경우에만 `calculate_time`을 사용한다. 단순 표시를 위해 `now`·기준 시각·0초 간격·두 번째 가상 사건을 만들지 않는다. 제공 자료의 정리는 실시간 서버 조회가 아니다.
++
+ ‘경보 10개’처럼 개수를 지정하면 실제 카탈로그가 허용한 `limit`에 맞춰 조회한다. 반환이 적으면 실제 건수만 보여주고 요청 건수를 채우려고 행을 만들지 않는다. 전체 조회·여러 장비 합계·범위 밖 개수는 단일 표본 조회로 완료 처리하지 않는다.
+ 
+ 3. **근거와 범위를 확인한다.** 실제 성공한 응답·필터·기간·반환수를 확인한다. 전체 목록 요청은 동일 snapshot의 next_offset을 끝까지 따른다. 표본 한도 도달은 전체 건수·추가 경보 유무 미확인으로 표시하며, 실패·0건·미지원은 구분한다. 누락된 범위만 추가 조회하고 같은 성공 결과를 목적 없이 다시 읽지 않는다. 반복 실패는 같은 인자로 계속 재시도하지 말고 실패·미확인 범위를 남긴다.
+--- a/infra/ollama-trial/runtime.py
++++ b/infra/ollama-trial/runtime.py
+@@ -111,6 +111,11 @@
+     current = harness.resolve_card_request(question,current)
+     question = harness.card_query_context(question,current)
+     report['access_mode'] = mode
++    supplied_time = harness.supplied_time_report(current)
++    if supplied_time and not request.get('discover_only'):
++        report.update(status='completed', final_response=supplied_time,
++                      supplied_data_only=True, total_seconds=time.perf_counter() - started)
++        return report
+     notice = harness.scope_notice(current)
+     if notice and not request.get('discover_only'):
+         report.update(status='partial', final_response=notice,
+--- a/infra/hermes/query-completion/alignment.py
++++ b/infra/hermes/query-completion/alignment.py
+@@ -340,6 +340,12 @@
+             agent._capstone_read_selection = None
+             agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))
+             agent._capstone_query_completion_local_format = (turn, prior or '같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.')
++            return result
++        supplied_time = harness.supplied_time_report(request)
++        if supplied_time:
++            agent._capstone_read_selection = None
++            agent._capstone_query_completion_local_format = (turn, supplied_time)
++            agent._capstone_alignment_partial = False
+             return result
+         policy_answer = harness.policy_explanation(request, getattr(agent, 'tools', []))
+         if policy_answer:
+--- a/infra/hermes/read_contract.py
++++ b/infra/hermes/read_contract.py
+@@ -36,10 +36,84 @@
+             (r'로그\s*수집기?[^.!?\n]{0,35}통계|log.?collector', 'get_wazuh_log_collector_stats'))
+ 
+ 
++def host_mentions(text):
++    """Explicit project host qualifiers with offsets, never live identities.
++
++    Formal names are case insensitive. A standalone uppercase A/B/C is a
++    short host label; a lowercase English article, unit, path or address is not.
++    Callers remove quoted instructions and excluded subjects before planning.
++    """
++    names = {'groot-sec': 'a', 'groot-siem-host': 'b', 'groot-web': 'c'}
++    found = [(m.start(), m.end(), names[name])
++             for pattern, name in ASSET_PATTERNS if name in names
++             for m in re.finditer(r'(?<![A-Za-z0-9_.:/@-])(?:' + pattern + r')(?![A-Za-z0-9_.:/@-])', text, re.I)]
++    for match in re.finditer(r'(?<![A-Za-z0-9_.:/@-])([ABC])(?=$|[\s,;/·]|(?:의|은|는|도|만)(?![A-Za-z]))', text):
++        if not any(a <= match.start() and match.end() <= b for a, b, _ in found):
++            found.append((match.start(), match.end(), match[1].lower()))
++    return sorted(set(found))
++
++
++def without_hosts(text):
++    for start, end, _ in reversed(host_mentions(text)):
++        text = text[:start] + ' ' * (end - start) + text[end:]
++    return text
++
++
++def time_calculation_required(text, aware_time):
++    """Time arithmetic/conversion intent, distinct from already-KST display."""
++    if not isinstance(text, str) or not 0 < len(text) <= 20000:
++        return False
++    text = without_prohibitions(text)
++    if wants_write(text) or re.search(r'도구\s*(?:없이|쓰지|사용하지)|도구.{0,8}말', text):
++        return False
++    stamps = aware_time.findall(text)
++    if not stamps:
++        return False
++    intent = re.sub(r'(?:계산|재?변환)(?:은|는)?\s*(?:하지\s*(?:말고|마|마세요)|없이)', '', text)
++    if re.search(r'시간\s*차|시각\s*차|차이|간격|경과|지났|남았|순서|정렬|계산|시간\s*순|elapsed|duration|chronological|timeline', intent, re.I):
++        return True
++    # The supplied offset is authoritative. No inferred "now" is needed just
++    # to display +09:00/+0900/KST, including an explicit no-op KST conversion.
++    is_kst = lambda value: bool(re.search(r'(?:\+09:?00| KST)$', value, re.I))
++    to_utc = bool(re.search(r'UTC(?:으)?로\s*(?:변환|바꿔|바꾸)', intent, re.I))
++    return (to_utc and any(is_kst(s) for s in stamps) or
++            any(not is_kst(s) for s in stamps) and
++            bool(re.search(r'시간|시각|KST|한국\s*시간|변환', intent, re.I)))
++
++
++def supplied_kst_display(text, aware_time):
++    """Pure formatting of supplied KST values; never a current observation.
++
++    Decline mixed operational requests, arithmetic, unknown restrictions and
++    requested JSON. Preserve every original value and its fractional seconds.
++    """
++    if not isinstance(text, str) or len(text) > 20000 or time_calculation_required(text, aware_time):
++        return None
++    stamps = aware_time.findall(text)
++    if not 1 <= len(stamps) <= 32 or any(not re.search(r'(?:\+09:?00| KST)$', s, re.I) for s in stamps):
++        return None
++    try:
++        if any(datetime.fromisoformat(s.replace(' KST', '+09:00')).utcoffset() != timedelta(hours=9) for s in stamps):
++            return None
++    except ValueError:
++        return None
++    rest = aware_time.sub('', text)
++    rest = re.sub(r'(?:계산|재?변환)(?:은|는)?\s*하지\s*(?:말고|마세요|마)', '', rest)
++    rest = re.sub(r'KST|한국\s*시간|시각|시간|날짜|시작|종료|제공한|이(?:미|\s*시각)?|해당|원본|아래|그대로|그냥|다시|표(?:로)?|목록|정리(?:해줘|해주세요)?|표시(?:해줘|해주세요)?|보여(?:줘|주세요)|출력(?:해줘|해주세요)?|변환(?:해줘|해주세요)?|바꿔(?:줘|주세요)?|는|은|를|을|이|가|로|의|와|과', '', rest, flags=re.I)
++    if re.sub(r'[\s:;,.!?？·/`"\'()\[\]-]+', '', rest):
++        return None
++    return '\n'.join(['**제공된 시각 (KST)**', '',
++        *table(['항목', 'KST 원시각'], [(i + 1, stamp) for i, stamp in enumerate(stamps)]), '',
++        '사용자가 제공한 시각을 그대로 표시했습니다. 실시간 서버 조회·시각 계산은 수행하지 않았습니다.'])
++
++
+ def asset_mentions(text):
+-    mentions = sorted((m.start(), m.end(), name, None)
+-                      for pattern, name in ASSET_PATTERNS
+-                      for m in re.finditer(pattern, text, re.I))
++    names = {'a': 'groot-sec', 'b': 'groot-siem-host', 'c': 'groot-web'}
++    mentions = [(start, end, names[host], None) for start, end, host in host_mentions(text)]
++    mentions += [(m.start(), m.end(), name, None)
++                 for pattern, name in ASSET_PATTERNS if name == 'wazuh.manager'
++                 for m in re.finditer(pattern, text, re.I)]
++    mentions.sort()
+     result = []
+     for i, mention in enumerate(mentions):
+         # "B 서버의 Wazuh Manager" names a container's location, whereas
+@@ -72,7 +146,12 @@
+ 
+ def scope_text(text):
+     if wants_write(text): return text
+-    for start, end in reversed(exclusion_spans(text)):
++    spans = exclusion_spans(text)
++    for start, end, _ in host_mentions(text):
++        excluded = re.match(r'\s*(?:은|는|을|를)?\s*(?:말고|빼(?:고|줘|주세요)|제외(?:해|하고|하세요))', text[end:])
++        if excluded:
++            spans.append((start, end + excluded.end()))
++    for start, end in sorted(set(spans), reverse=True):
+         text = text[:start] + ' ' * (end - start) + text[end:]
+     return text
+ 
+@@ -156,7 +235,7 @@
+     if block:
+         return block
+     stamps = aware_time.findall(text)
+-    if stamps and re.search(r'시간|시각|계산|KST|UTC|timeline', text, re.I):
++    if time_calculation_required(text, aware_time):
+         return {'kind': 'time', 'stamps': stamps, 'question': question}
+     ids = re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', text)
+     if ids and re.search(r'요청|작업|operation', text, re.I) and re.search(r'재시작|재로드|reload|restart|임시\s*차단|containment', text, re.I):
+--- a/infra/hermes/workflow_contract.py
++++ b/infra/hermes/workflow_contract.py
+@@ -10,6 +10,7 @@
+     'soc-recover':'SOC_WORKFLOW_RECOVER_V1',
+ }
+ SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사'),
++          'investigation-evidence':('soc-investigate','## 조사 근거 확인과 인용'),
+           'peer-review':('soc-investigate','## 교차 검토 대조')}
+ # Loaded only by their own phase (the peer review), never in the full
+ # workflow body of an investigation or query prompt.
+--- a/infra/hermes/query-completion/__init__.py
++++ b/infra/hermes/query-completion/__init__.py
+@@ -44,6 +44,16 @@
+     return module
+ 
+ CHAT_MARKDOWN = _load_chat_markdown()
++
++def _load_read_contract():
++    path = Path(__file__).with_name('read_contract.py')
++    if not path.exists():
++        path = Path(__file__).parent.parent / 'read_contract.py'
++    module = ModuleType('_capstone_shared_read_contract')
++    exec(compile(path.read_bytes(), str(path), 'exec'), module.__dict__)
++    return module
++
++READ_CONTRACT = _load_read_contract()
+ 
+ EVIDENCE = _load_evidence()
+ SOURCE_ROOT = Path("/opt/hermes")
+@@ -387,8 +397,7 @@
+     return (isinstance(request, str) and len(request) <= 20000
+             and not live_rule_request(request)
+             and not re.search(r'도구\s*(?:없이|쓰지|사용하지)|도구.{0,8}말', request)
+-            and len(EVIDENCE._AWARE_TIME.findall(request)) >= 1
+-            and bool(re.search(r'시간|시각|순서|정렬|계산|최신\s*관측|KST|UTC|elapsed|timeline', request, re.I))
++            and READ_CONTRACT.time_calculation_required(request, EVIDENCE._AWARE_TIME)
+             and not _WRITE.search(re.sub(r'(?:실제\s*)?(?:변경|수정|차단|적용|배포)\s*(?:없이|하지\s*말고|금지)', '', _unquoted_text(request))))
+ 
+ 
+--- a/infra/hermes/skills/soc-investigate/SKILL.md
++++ b/infra/hermes/skills/soc-investigate/SKILL.md
+@@ -20,6 +20,13 @@
+ - 결과·표본/기간·수집/보관 한계·미확인 자산과 필요한 다음 조사를 추적한다. 종결 최소 검사는 충분한 의미 검증을 대신하지 않는다. 실제 판단 메타데이터는 실행기 계약에 맞추고 내부 제어 줄은 감사에만 둔다. 두 제어 줄이 모두 필요하면 INCIDENT_DISPOSITION 줄을 먼저 쓰고 MANAGEMENT_STATUS 줄을 응답의 맨 마지막 줄로 둔다. 두 줄 모두 백틱·굵게·인용부호·목록 기호 없이 줄 맨 앞부터 쓴다. 보고서 전체나 제어 줄을 코드 블록으로 감싸지 않는다. INCIDENT_DISPOSITION의 assessment가 unresolved이면 MANAGEMENT_STATUS를 resolved로 쓰지 않는다.
+ - 교차 검토도 필요한 근거를 직접 대조한다. 상대 보고의 결론·잘못된 범위를 복사하지 말고 누락·모순·확인된 일치와 남은 한계를 구별한다. 출력은 공통 soc-output을 재사용한다.
+ 
++## 조사 근거 확인과 인용
++
++- 요청한 기간·주소·장비·대상을 실제 조회 조건과 대조한다. 카탈로그가 직접 지원하지 않는 목적지·포트·질의 이름 조건은 반환 원문에 실제 필드가 있을 때만 확인하며, 그 필터까지 적용했다고 쓰지 않는다. SID·agent ID·페이지 토큰은 사용자 요청이나 실제 반환에 있는 값만 사용한다. 없는 SID를 추가로 지정하라고 요구하거나 임의 필터를 만들어 0건을 설명하지 않는다.
++- 반환 표본 0건은 정상·사건 부재가 아니다. 다른 등록된 조회가 누락된 질문을 확인할 수 있으면 그 도구를 실제 선택한다. 같은 색인을 다른 도구로 조회한 결과를 독립 센서의 교차 확인으로 표현하지 않는다. 기간을 임의로 늘리거나 같은 성공 조회를 반복해 답을 채우지 않는다. 추가로 확인할 단서가 없으면 확인한 표본·전체 건수 미확인·결론의 한계·필요한 다음 조사를 보고하고 위험 판단은 unresolved로 남긴다.
++- DNS 조사는 실제 질의/응답·출발지/리졸버·등록 서비스·후속 연결/호스트 행위를 확인한다. 정보성 분류나 승인된 DNS 경로의 일치만으로 다른 악성 행위까지 정상으로 만들지 않는다. 단순 경로 정보와 실제 조회에서 확인한 요청은 구별한다.
++- 판단 메타데이터의 `evidence_tools`에는 이번 요청에서 성공한 실제 근거의 전체 도구 이름을 정확히 복사한다. 관측 자료의 `tool` 필드는 `mcp__서버__도구` 전체 이름이며 `name`만 쓰거나 서버·구분자를 바꾸지 않는다. 짧은 이름의 형식 오류는 실제 조회 누락과 구분해 정정하고, 아직 실행하지 않은 도구를 인용하거나 유효한 읽기를 반복하지 않는다. `assessment`·판단 근거·조치 필요성은 실제 자료를 보고 직접 결정하며 인용 형식의 성공을 의미 정확도로 대체하지 않는다.
++
+ ## 서비스 원인 조사
+ 
+ - 서비스 오류 질문은 등록된 target·unit·호스트를 먼저 맞추고 실제 서비스 이력/원문을 조사한다. 짧은 이름이 여러 호스트에 있으면 한 번 확인하며 이전 봇의 호스트·PID·수치를 새 관측으로 쓰지 않는다. 기간 없는 원인 조사는 최근24시간의 이력/원문 표본에서 시작하고, 단순 로그 조회는 최근15분 표본을 사용한다. 명시된 기간은 그대로 유지한다. 기본 구간은 사용자가 말한 과거 사건 시각이 아니다. 표본에 원인이 없으면 확보한 현재 관측과 사건 시각/추가 원문의 미확인을 구분한다.

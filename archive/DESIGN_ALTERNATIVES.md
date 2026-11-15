@@ -596,3 +596,8 @@ R2는필수3필드/basis20~2000/실제인용/상태관계를기존스킬한절�
 ## 2026-11-15T08:11:55.464522+09:00 journal 정확 적용·복구 준비
 
 journal 적용은3파일전체의동시원자성을주장하지않는다. 실제구core/새journal조합이깨지는것을확인해 helper→core→journal과역방향의존복구를선택했다. reader정지·collector완료대기·각파일원자교체·backup/CAS/독립timer와중간라이브러리호환으로보완한다. 재부팅복구시험과단순coldload는구분한다. [설계/한계](../infra/validation/journal-adapter/application/README.md).
+
+
+## 2026-11-15T09:11:40.469152+09:00 공통 짧은 조회·시각 표시 후속
+
+시간 표시를 모델 계산과 분리하고 공통 호스트 파서를 재사용한다. 이는 도구 자동 선택·사건 정상 판단·승인 경계 변경이 아니다. DNS는 정확 인용 안내만으로 완료되지 않았고 guard 오탐/모델 오류를 분리해 추가 검증한다. 스킬 절에 안내를 두고 강제 권한은 코드에 유지한다. [후보](../infra/validation/common-read-contract/README.md).

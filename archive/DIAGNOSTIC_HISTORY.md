@@ -360,3 +360,8 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T14:49:24.191213+09:00 공통 주장·조회 범위 개발 후보
 
 초기22반례10실패(못했다/조건어미/greedy/이중부정/계획뒤 실제부재)·diagnostic 기간 회귀1개를 정정했다. Mac6생략은 Hermes엔진이 아니라 OpenAI/jsonschema 의존 조건이며 기존 Hermes264생략0으로 확인했다. 로컬 준비의 외부 test_claims/test_common 경로2오류와 새파일패치 모드 누락은 실행/적용 전 거절·수정 후 재현했다. R6 실제 지정DNS는 무호출 Wazuh 실패를 보고했고 기존 검사도 놓쳤다. 짧은 DNS 무조회 fabricated24h표본은 unobserved_attack_absence_claim이 차단했다. 각9요청·MCP9/모델19와 runtime완료/의미검토를 분리했다. [전체 결과](../infra/validation/claim-modality/validation.json).
+
+
+## 2026-11-15T16:18:29.576405+09:00 실제 읽기 시도 결속 후보
+
+이전 실제 Wazuh 가짜 실패는 새 검사로 추가 검출했으나 표시문에서 숨긴 INCIDENT_DISPOSITION의 부재 오류는 모델 품질 비교에서 제외한다. R1이후 순서 뒤집힘 가능성을 발견해 R2의 명시 sequence로 보완,785집계/기존Hermes 생략0을 확인했다. 실제6요청에서 base짧은DNS는MCP0/조회중completed,후보는2MCP 중 불필요 룰·미검증SID활성,OS는summary1성공인데 과거실패를 주장했다. b:systemd journal은 실제조건부enum에서제외되고 반환scope는최신snapshot뿐임을로컬검증했다. DNS0의 전체부재 과장도남아 미채택. [정확 수치/원인](../infra/validation/read-attempt-binding/validation.json).

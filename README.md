@@ -3,7 +3,7 @@
 <!-- current-work-summary:start -->
 현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. [관리 상태 후보의 정확 적용안](infra/validation/control-status/application/README.md)은17소스 사본+2영수증·유휴 확인·15분 원복을 준비했고 Native536/query419는 기존 Hermes 격리 환경에서 생략 없이 통과했습니다. SDK77·설치46·최종 운영자37과 복제 경로19파일 적용/원복도 통과했습니다. query1.19.141은 패치/준비 폴더만이며 정본·설치 파일137,운영 적용·새 채팅은 승인 후 확인합니다. 기존 로그의 메모리 로드 버전은 미확인입니다. 논문 MD·PDF·DOCX 조건과 PDF·DOCX 각43쪽 검수본은 유지하며 사진/학번은 공란입니다. [이력 전송 점검](infra/normalization/vector/history-auto-transfer/AUDIT.md)에서도 A14작업 완료·A/B420배치 일치와 실패43폴더의 메타데이터 보존을 확인했습니다. [평가자료감사](finetuning/EVALUATION_SCOPE.md)에서는기존176이독립SOC평가가아님을확인해범위와비교준비기를정정했습니다. 아래 날짜별 내용은 당시 기록입니다.
 
-[공통 조회·주장 결속 후보](infra/validation/claim-modality/README.md): 부정/조건/계획 검사와 첫 센서 범위를 정리하고585개 로컬 집계·Hermes264검사/생략0, 실제9요청을 확인했습니다. WAF는1조회·51.243초였지만 DNS는 무호출 Wazuh 실패 서술·짧은 요청 무조회가 남아 미채택입니다. 내부 completed를 품질 성공으로 세지 않습니다. 앞선 [공통 조회8소스](infra/validation/common-read-contract/README.md)의 B 호스트/KST 보완과 구분하며 운영·설치/권한·실채팅 변경0, 기존 두 정확 계획은 계속 승인 대기입니다.
+[읽기 시도 결속 후보](infra/validation/read-attempt-binding/README.md): 실제 호출·반환 SHA·입력 거절/전송 예외와 성공·실패 서술을 두 경로에 연결했습니다. 기존 Hermes785검사는 생략 없이 통과했지만 실제6요청에서 OS 대상명만 쓴 가짜 실패·불필요 룰 조회·부재/활성 과장이 남아 미채택입니다. completed를 품질 성공으로 세지 않습니다. 운영/설치·권한·실채팅 변경0이며 기존 두 정확 계획은 승인 대기입니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

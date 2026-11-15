@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+[읽기 시도 결속 후속](../validation/read-attempt-binding/README.md)은 실제 calls와 별도 입력 거절·시도 순서·반환/예외를 공통 검사에 전달했다. 로컬785집계/기존 Hermes785생략0·실제6요청/MCP6·모델15를 확인했지만 대상명 OS 실패·짧은DNS 룰 확대·부재/활성 과장 때문에 미채택이다. 운영/설치·권한·실채팅은 변경하지 않았다.
+
 [공통 주장·범위 후속](../validation/claim-modality/README.md)은 격리4소스·585로컬 집계/기존 Hermes264검사·실제9요청을 검증했다. WAF1읽기·51.243초를 확인했지만 무호출 Wazuh 실패 서술과 짧은 DNS 무조회가 남아 미채택이다. runtime completed와 품질 검토는 별개이며 정본/운영/설치·실채팅 변경0이다.
 
 [공통 짧은 조회 후보](../validation/common-read-contract/README.md)는 실제 설치본 복제와 같은 모델/권한으로 B systemd 범위·KST 표시를 검증했다. 321회귀·B22/실제8요청·MCP9/모델14이며 운영 미적용이다. DNS 완료는 실패했고 정확 인용·부정문/계획 오탐·모델 오류를 구분한다. 아래 운영/과거 버전과 후보를 혼동하지 않는다.

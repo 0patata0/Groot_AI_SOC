@@ -4,7 +4,7 @@
 
 논문 매뉴얼형 MD·PDF·DOCX는 첫 장/목차/글꼴/구현 화면/명령표/참고문헌/요약/팀원 소개 조건을 반영했다. PDF·DOCX 각43쪽·전수 내용 대조 누락0·91개 쪽수 일치다. 정장사진·학번은 미제공 공란이며 추가 학교 지정값·최종 인적사항 반영과 재검수가 남는다.
 
-[공통 주장 결속 후보](infra/validation/claim-modality/README.md)는585로컬 집계/기존 Hermes264검사와 실제9요청을 마쳤으나, 무호출 Wazuh 실패 서술·짧은 DNS의 무조회·미지원 필터 제안이 남아 미채택이다. 다음은 실제 읽기 시도/결과·계획 능력·공통 짧은 요청 의도를 결속하는 후보를 공식 Harness²부터 다시 검증한다. 기존 두 승인 대기 계획과 섞지 않는다.
+[읽기 시도 결속6소스 후보](infra/validation/read-attempt-binding/README.md)는785로컬 집계/기존 Hermes785검사·실제6요청을 확인했지만 대상명만 쓴 OS 가짜 실패·짧은 요청의 불필요 룰 조회·표본 부재 과장이 남아 미채택이다. 다음은 실제 tool/target/view/인자·조회 목적과 서술을 결속하고 짧은 경보/로그의 공통 읽기·완료 조건을 보완한다. b:systemd 최신 스냅샷과25개 등록 서비스의 과거 journal 지원을 구분한다. 기존 두 승인 대기 계획과 섞지 않는다.
 
 ## 현재 진행 순서
 
@@ -12,7 +12,7 @@
 |---|---|---|
 | 1 | 정확 후보 적용과 사건·교차 검토 의미 | [19파일 적용안](infra/validation/control-status/application/README.md) 준비·Native536/query419 Hermes 생략0·SDK77/설치46/운영자37·복제19원복 통과. 정확 승인→최신 대조/유휴 확인→15분 원복 설정→적용/실제 로드→새 채팅/MCP→확정. 의미 오류·기존176회귀·참고와다른새독립운영평가필요 |
 | 2 | 승인 대기 식별자 수정·Harness² 채팅 연결 검증 | Hermes 목록4개·상태 읽기는 확인, 자연어 선택·승인 클릭→고정 worker1회 실행→결과 읽기는 미확인. Ollama4개는 정책에서 제외되므로 별도 권한 후보·정확 승인 검토 |
-| 3 | journal 가용성·보고 판단과 전송 장기성 | [journal 제한 환경 검증](infra/validation/journal-reader/README.md):경계 누락 수정135검사, A24h12초 실패·B13.500초/C0.305초 반환. [후속 native 어댑터](infra/validation/journal-adapter/README.md)는166검사·A/B/C 실제8건/구validator 통과, 같은24h15.137/7.400/0.335초. 공통 byte/마스킹/실패·취소/설치 경로 완료. [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)·원본6개/33회귀·9복제원복/18중간load·3PREPARED 완료. 다음 정확 승인→실MCP/양봇 새채팅·확정이며 운영 미적용. 후속 [공통8소스 후보](infra/validation/common-read-contract/README.md)는 공식Harness²·321검사·실제8요청으로 B범위/KST표시를 격리 보완. 부정/계획 오탐·첫 센서 범위의 후속4소스 후보는 회귀를 통과했지만 실제 DNS에서 무호출 실패 서술과 짧은 요청 누락이 남았다. [결과·다음 조건](infra/validation/claim-modality/README.md)에 따라 근거 검사를 완화하지 않고 보완한다. 운영/설치·양봇 채팅은 별도. 판단 없는 resolved·질문 밖 장비 확대 보완. [전송 감사](infra/normalization/vector/history-auto-transfer/AUDIT.md)는 A14완료/A·B420일치·실패43메타데이터 보존검토 완료. 현재420재사용80회 p95 152.69초이며1024실부하·보관 수명은 별도 |
+| 3 | journal 가용성·보고 판단과 전송 장기성 | [journal 제한 환경 검증](infra/validation/journal-reader/README.md):경계 누락 수정135검사, A24h12초 실패·B13.500초/C0.305초 반환. [후속 native 어댑터](infra/validation/journal-adapter/README.md)는166검사·A/B/C 실제8건/구validator 통과, 같은24h15.137/7.400/0.335초. 공통 byte/마스킹/실패·취소/설치 경로 완료. [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)·원본6개/33회귀·9복제원복/18중간load·3PREPARED 완료. 다음 정확 승인→실MCP/양봇 새채팅·확정이며 운영 미적용. 후속 [공통8소스 후보](infra/validation/common-read-contract/README.md)는 공식Harness²·321검사·실제8요청으로 B범위/KST표시를 격리 보완. 후속 [읽기 시도 결속6소스](infra/validation/read-attempt-binding/README.md)는 명시 도구의 허위 실패를 검사하지만 OS 대상명·짧은 요청·표본/적재 과장이 남았다. 도구와 대상/view·의도·완료 조건을 공통 보완한다. 운영/설치·양봇 채팅은 별도. 판단 없는 resolved·질문 밖 장비 확대 보완. [전송 감사](infra/normalization/vector/history-auto-transfer/AUDIT.md)는 A14완료/A·B420일치·실패43메타데이터 보존검토 완료. 현재420재사용80회 p95 152.69초이며1024실부하·보관 수명은 별도 |
 | 4 | 독립 사건·모델·승인 평가 | [기존176범위정정](finetuning/EVALUATION_SCOPE.md):소비128포함/workflow0. [개발16진단](finetuning/WORKFLOW_DEVELOPMENT.md)은21응답·무조회단정3개/기존검사검출·다른읽기7개미채점. 동등한추가읽기관측→현재보정/최종게시검증→새출처·사건분리관제평가/동일조건모델비교. 승인형OS회수·감사·복구도 별도 |
 | 5 | 네트워크·혼합 트래픽·설치 인수 | 자체 Suricata 인라인 IPS·검증 룰 drop, WAF/IPS/FW 장비별30사례, 정상 다수와 혼합. 중단된 공격은 명시 재개 후만 실행 |
 | 6 | 논문 제출과 발표 | MD 개정·PDF/DOCX 각43쪽 제출 조건 반영·검수 완료. 정장사진/학번·추가 학교 서식·후속 새 실측 반영, 최종 발표 리허설 |

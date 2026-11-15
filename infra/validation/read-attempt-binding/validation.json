@@ -1,0 +1,508 @@
+{
+  "status": "development_candidate_withheld_not_operating_ready",
+  "at_kst": "2026-11-15T16:10:51.513236+09:00",
+  "fresh_observation": {
+    "source_at_kst": "2026-11-15T14:57:34.726390+09:00",
+    "last_collected_at_kst": "2026-11-15T16:00:09.564614+09:00",
+    "source_count": 24,
+    "source_drift": [],
+    "actual_tool_count": 45,
+    "full_schemas_reused_after_fresh_alias_hash_equality": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest_start": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "model_digest_end": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "access_mode": "hermes-parity"
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/sdk_runtime.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "baseline": "Unapproved pending19+common8+claim4 R6, not installed baseline."
+  },
+  "scope": {
+    "ledger": "actual tool/arguments/hash/protocol error or transport exception and pre-dispatch rejection; local rejection stays outside actual MCP counts; mixed legacy chronology remains unverified",
+    "checked_claims": "named read method identifiers and explicit sensor alert/log inquiry success/failure propositions, attached negation/condition/plan, unique ID-linked Native results and verified bundle components",
+    "not_proven": "all natural-language target-only outcome claims, arbitrary narrated argument scope, complete business success from an opaque returned response, an actual Native chat response or operating release"
+  },
+  "regressions": {
+    "local": [
+      {
+        "group": "new",
+        "tests": 40,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "prior-claim",
+        "tests": 28,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "root",
+        "tests": 236,
+        "skipped": 6,
+        "rc": 0
+      },
+      {
+        "group": "sdk",
+        "tests": 106,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "native",
+        "tests": 181,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "common-new",
+        "tests": 22,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "workflow",
+        "tests": 12,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "sdk-flow",
+        "tests": 66,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "root-flow",
+        "tests": 94,
+        "skipped": 0,
+        "rc": 0
+      }
+    ],
+    "local_total": 785,
+    "local_skipped": 6,
+    "existing_hermes": [
+      {
+        "group": "new",
+        "tests": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "prior-claim",
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "root",
+        "tests": 236,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "sdk",
+        "tests": 106,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "native",
+        "tests": 181,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "common-new",
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "workflow",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "sdk-flow",
+        "tests": 66,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      },
+      {
+        "group": "root-flow",
+        "tests": 94,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "uid": 10001,
+        "network_connect_denied": true,
+        "openai_available": true,
+        "jsonschema_available": true
+      }
+    ],
+    "hermes_total": 785,
+    "hermes_skipped": 0,
+    "isolation": "existing pinned image, UID10001, test-process network connect denied, fresh process per group; no package or image/config change",
+    "reconstruction": "parent artifact hashes from Git116d166 + six-source patch; both24 source hashes/AST, root authority check/other nested functions, official H2 and new40 passed",
+    "counting": "development fixture executions, not independent SOC events or a model accuracy denominator"
+  },
+  "replay": {
+    "source": "Previous R6 displayed response and actual one-Suricata receipt",
+    "result": "New check adds unobserved_read_failure for the invented Wazuh failure; two labels describe one fault",
+    "limits": "No new model response. Displayed responses have internal INCIDENT_DISPOSITION removed, so incident_disposition_missing in the broad replay is excluded from this read-outcome comparison."
+  },
+  "actual_model_mcp": {
+    "requests": 6,
+    "mcp_calls": 6,
+    "model_calls": 15,
+    "cases": [
+      {
+        "arm": "base",
+        "case": "dns-fixed-regression",
+        "question": "192.168.16.230 DNS 경보 조사해. 최근 15분, 목적지는 168.126.63.1:53이야.",
+        "status": "partial",
+        "seconds": 95.744,
+        "mcp_calls": 1,
+        "model_calls": 4,
+        "remaining_issues": [
+          "sample_zero_presented_as_absence"
+        ],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T15:44:39.029571+09:00"
+            },
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "arm": "base",
+        "case": "dns-natural-new",
+        "question": "DNS 경보 좀 봐줘",
+        "status": "completed",
+        "seconds": 30.66,
+        "mcp_calls": 0,
+        "model_calls": 1,
+        "remaining_issues": [],
+        "reads": []
+      },
+      {
+        "arm": "base",
+        "case": "systemd-natural-new",
+        "question": "B systemd 오류 로그 좀 봐줘. 조회가 실패했다면 어떤 조회가 실패했는지도 알려줘.",
+        "status": "completed",
+        "seconds": 36.078,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd"
+            },
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "arm": "candidate",
+        "case": "dns-fixed-regression",
+        "question": "192.168.16.230 DNS 경보 조사해. 최근 15분, 목적지는 168.126.63.1:53이야.",
+        "status": "completed",
+        "seconds": 60.186,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T15:47:22.549813+09:00"
+            },
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "arm": "candidate",
+        "case": "dns-natural-new",
+        "question": "DNS 경보 좀 봐줘",
+        "status": "completed",
+        "seconds": 91.116,
+        "mcp_calls": 2,
+        "model_calls": 4,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "get_security_rules",
+            "arguments": {
+              "target": "a:suricata",
+              "view": "details",
+              "origin": "all"
+            },
+            "is_error": false
+          },
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 1440,
+              "limit": 50
+            },
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "arm": "candidate",
+        "case": "systemd-natural-new",
+        "question": "B systemd 오류 로그 좀 봐줘. 조회가 실패했다면 어떤 조회가 실패했는지도 알려줘.",
+        "status": "completed",
+        "seconds": 40.286,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd"
+            },
+            "is_error": false
+          }
+        ]
+      }
+    ],
+    "protected_dispatches": 0,
+    "chat_posts": 0,
+    "limits": [
+      "Three questions per arm, first is a prior development regression and two are new phrasings.",
+      "Cache/load and log windows uncontrolled. First baseline request overlapped the isolated native CPU tests.",
+      "A runtime completed flag is not semantic acceptance or Mattermost delivery; no general speed/accuracy/p95 claim."
+    ]
+  },
+  "manual_findings": [
+    {
+      "severity": "critical",
+      "case": "candidate/systemd-natural-new",
+      "finding": "Only get_system_diagnostics(target=b:systemd) summary succeeded; no lookback_minutes or historical/journal attempt was made. Answer nevertheless labels the past read failed and says lookback_minutes was supplied. Target-only wording bypassed the named-method outcome check.",
+      "followup": "Bind actual argument target/view/purpose and narrated outcome, distinguish unperformed/unsupported from failed, without one-service exceptions."
+    },
+    {
+      "severity": "critical",
+      "case": "candidate/dns-fixed-regression",
+      "finding": "Returned0 sample and unknown total were restated as no indexed alerts in the window and no additional risk signs. A later caveat did not justify those broader claims. Guard did not reject them.",
+      "followup": "Limit qualifier/negation scope to its own proposition and reject unverified total/risk absence."
+    },
+    {
+      "severity": "high",
+      "case": "candidate/dns-natural-new",
+      "finding": "An unrequested rules query preceded alert retrieval; only20 of52,500 matched rule definitions returned, current_file/per-SID load not verified. Answer calls selected SID examples active and displays irrelevant rule groups.",
+      "followup": "Common short alert/log intent, correct view/scope and evidence-bound activation wording."
+    },
+    {
+      "severity": "high",
+      "case": "base/dns-natural-new",
+      "finding": "Runtime completed with MCP0, a query-in-progress table and a future promise. No actual read was performed.",
+      "followup": "Unfulfilled read requests and in-progress claims need actual execution/state validation."
+    },
+    {
+      "severity": "high",
+      "case": "base/systemd-natural-new",
+      "finding": "Current-only snapshot of failed units was described as a recent30day historical error sample.",
+      "followup": "Latest snapshot is not requested history; use allowed history target or explicitly explain unsupported coverage."
+    }
+  ],
+  "systemd_capability": {
+    "verification": "Local Draft202012 schema validation of the freshly observed actual tool, not a server call/error.",
+    "target": "b:systemd",
+    "history_supported": false,
+    "reason": "since_kst restricts target to25 registered service aliases; b:systemd aggregate is not in that enum.",
+    "actual_snapshot_scope": "latest_snapshot_only_not_requested_history",
+    "actual_snapshot_metrics": {
+      "failed_units_total": 0,
+      "returned_units": 0,
+      "unit_list_truncated": false
+    },
+    "extra_mcp_calls": 0
+  },
+  "unchanged": {
+    "operating_apply": 0,
+    "service_or_timer_actions": 0,
+    "model_authority_ttl_role_changes": 0,
+    "packages_installed": 0,
+    "chat_posts": 0,
+    "attack_tests": 0,
+    "new_training": 0,
+    "pending_plans": [
+      "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+      "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e"
+    ]
+  },
+  "reviews": {
+    "defect_first_manual": "performed; target-only false failure and broader absence/activation claims prevent adoption",
+    "review_agent_skill": "not found, not claimed as run",
+    "semgrep": "not run; no local install",
+    "secret_scan": {
+      "tracked_paths": 2183,
+      "existing_findings": 5,
+      "new_changed_path_findings": 0,
+      "value_or_snippet_saved": false,
+      "scope": "original scanner --git, tracked symlink/external/credential preflight; existing five unchanged false positives reviewed; not Git history"
+    }
+  },
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-15T16:07:36.978747+09:00",
+      "removed": [
+        {
+          "root": "/var/tmp/capstone-read-attempt-w890wwlf",
+          "files": 124,
+          "bytes": 3706602,
+          "absent": true
+        },
+        {
+          "root": "/opt/hermes-data/.capstone-read-attempt-w890wwlf-tests",
+          "files": 602,
+          "bytes": 8872985,
+          "absent": true
+        }
+      ],
+      "source_drift": [],
+      "services": {
+        "capstone-ollama-chat.service": {
+          "rc": 0,
+          "properties": [
+            "MainPID=3536365",
+            "ActiveState=active",
+            "SubState=running"
+          ]
+        },
+        "capstone-review-chat.service": {
+          "rc": 0,
+          "properties": [
+            "MainPID=3347786",
+            "ActiveState=active",
+            "SubState=running"
+          ]
+        },
+        "capstone-management.timer": {
+          "rc": 0,
+          "properties": [
+            "ActiveState=active",
+            "SubState=waiting"
+          ]
+        }
+      }
+    },
+    "mac": {
+      "at_kst": "2026-11-15T16:11:58.395482+09:00",
+      "root": "/private/tmp/capstone-read-attempt-w890wwlf",
+      "files_removed": 3474,
+      "bytes_removed": 56676328,
+      "absent": true,
+      "embedded_temporary_scripts_removed": [
+        {
+          "file": "reproduction/prepare-b.py",
+          "bytes": 1702473,
+          "sha256": "686eb89d6374e00aee29a3902e650252cfac077381bdab1b39c64a81d813deca"
+        },
+        {
+          "file": "reproduction/native-b.py",
+          "bytes": 4848621,
+          "sha256": "92ea6239744db1952596f3e82bf0f8010638dbd25eae34ca99831e0ea1167311"
+        },
+        {
+          "file": "reproduction/read_attempt_helpers.py",
+          "bytes": 10132,
+          "sha256": "63df5996e41067540d407497a4a44ae8752f68558dfbee70e8a57bdc73307bde"
+        }
+      ],
+      "minimum_sources_preserved": 6,
+      "public_reconstruction_verified": true,
+      "packages_installed": 0
+    },
+    "preserved": "Original nine unrelated changes, pending19/journal9 plans/stages/backups, G_Harness2, datasets/weights and paper43 outputs. Source/replay/real-read evidence retained locally."
+  }
+}

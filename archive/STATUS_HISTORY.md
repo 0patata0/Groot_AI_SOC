@@ -12750,3 +12750,8 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 ## 2026-11-15T14:49:24.191213+09:00 공통 주장·조회 범위 개발 후보
 
 직전 현재 요약은 Git69f809b4a9c210fb2b89421359cc1564ba8d95c5:STATUS.md,원문 SHA b208d2b50d9aa4c51e0246591dfca40753cfc839abd0788beadc883112f3dcc1에서 복원한다. 공통4소스의 부정/조건/조사 예정·첫 센서 범위 후보를 검증했지만 무호출 Wazuh 실패 서술·짧은 DNS 무조회 때문에 미채택했다. 로컬585집계579통과/6생략·기존 Hermes264생략0·실제9요청/MCP9·모델19. WAF51.243초/1조회는 격리 한 번이며 채팅 지연·독립 정확도가 아니다. [정확 결과](../infra/validation/claim-modality/README.md).
+
+
+## 2026-11-15T16:18:29.576405+09:00 실제 읽기 시도 결속 후보
+
+직전 상태는 Git116d16668f77f64c23612e2ee771b99cbf9471d1:STATUS.md,원문 SHA 16b55144ba5659afd3c3e34e5abbcff02036dd5af170dd1ac6926557b4480ecf에서 복원한다. 읽기 시도6소스 R2를 격리 검증했지만 대상명만 쓴 OS 실패·짧은DNS의 불필요 룰/활성 주장·표본0 과장이 남아 미채택이다. 로컬785집계779통과/6생략·기존 Hermes785생략0·실제6요청/MCP6·모델15. [현재 결과](../infra/validation/read-attempt-binding/README.md).

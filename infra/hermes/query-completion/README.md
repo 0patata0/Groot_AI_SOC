@@ -1,5 +1,7 @@
 # Mattermost 조회 응답 보완
 
+[읽기 시도 결속 후보](../../validation/read-attempt-binding/README.md)의 query1.19.143/contract1.5.86은 격리 버전이다. Native 이번턴 고유 callID/실제 응답과 root dispatch의 반환/거절/예외를 검사하고 원래 허용·예산을 유지했다. 기존 Hermes785생략0은 실제 Native 운영 채팅을 대신하지 않으며 OS 대상명 서술 등 잔여로 미채택이다. 설치137·별도141 준비/승인 대기는 불변이다.
+
 [공통 주장 결속 후보](../../validation/claim-modality/README.md)의 query1.19.142는 격리4소스/동결 SHA에만 있다. 부정·조건·계획/이중부정과 Native·SDK 공통 gate 핀을 검증했고585로컬 집계·기존 Hermes264검사는 통과했으나 DNS 실제 근거 오류로 미채택이다. 현재 설치137·별도141 준비/승인 대기는 변경하지 않았다.
 
 [공통 조회 후보](../../validation/common-read-contract/README.md)는 Native/SDK가 같은 호스트 파서·제공 KST 표시기를 사용하도록8소스를 격리 수정했다. Native181+새22 등321회귀와 provider 미호출을 확인했지만 실제 Hermes 채팅 검증·운영 적용은 미수행이다. 기존1.19.137/별도141 준비 후보와 구분하며 승인 대기 원본을 변경하지 않았다.

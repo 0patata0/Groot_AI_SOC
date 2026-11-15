@@ -1,0 +1,332 @@
+{
+  "status": "recent_host_journal_verified_long_error_search_failed_not_applied",
+  "base_commit": "51a6b693426cb5d172397da81cee655778ef002d",
+  "parent_artifacts": {
+    "infra/validation/read-target-binding/candidate.patch": "51a03b892c1bad31555e7c87847bed578f3743c54d04385593842250db95c82e",
+    "infra/validation/read-target-binding/manifest.json": "44083125a3614034c6a374e8cb3692461fe2f6a916b73ab6bc5b1d4a0c2f5a34",
+    "infra/validation/read-target-binding/reproduce.py": "7206b87301dccae77404840f440acec3ee5f9bcc7f4b88dd103732d5a494cc52",
+    "infra/validation/read-target-binding/test_targets.py": "81de2f158d662f06cc887812b49d456cad4e31146b1911c81c147d3f7c2561b1"
+  },
+  "baseline_note": "Unapproved R6 target-bound harness composite plus committed native journal and installation dependencies. Neither is an operating apply.",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "component_mapping": {
+    "systemprompt.md": "infra/hermes/SOUL.groot.md",
+    "scripts/chat_contract.py": "infra/hermes/chat_contract.py",
+    "scripts/read_contract.py": "infra/hermes/read_contract.py",
+    "scripts/output_contract.py": "infra/hermes/output_contract.py",
+    "scripts/workflow_contract.py": "infra/hermes/workflow_contract.py",
+    "scripts/channel_policy.py": "infra/hermes/review_channel_policy.py",
+    "scripts/native_query.py": "infra/hermes/query-completion/__init__.py",
+    "scripts/evidence_gate.py": "infra/hermes/soc_management_run.py",
+    "scripts/management_controller.py": "infra/hermes/soc_management_controller.py",
+    "scripts/channel_controller.py": "infra/hermes/review_channel.py",
+    "scripts/sdk_chat.py": "infra/ollama-trial/chat.py",
+    "scripts/sdk_chat_policy.py": "infra/ollama-trial/chat_policy.py",
+    "scripts/sdk_authority.py": "infra/ollama-trial/policy.py",
+    "skills/soc-investigate/SKILL.md": "infra/hermes/skills/soc-investigate/SKILL.md",
+    "skills/soc-change/SKILL.md": "infra/hermes/skills/soc-change/SKILL.md",
+    "skills/soc-recover/SKILL.md": "infra/hermes/skills/soc-recover/SKILL.md",
+    "scripts/sdk_harness.py": "infra/ollama-trial/harness.py",
+    "scripts/chat_markdown.py": "infra/hermes/chat_markdown.py",
+    "scripts/soc_bot.py": "infra/mcp/soc_bot.py",
+    "skills/soc-output/SKILL.md": "infra/hermes/skills/soc-output/SKILL.md",
+    "skills/soc-query/SKILL.md": "infra/hermes/skills/soc-query/SKILL.md",
+    "scripts/sdk_runtime.py": "infra/ollama-trial/runtime.py",
+    "scripts/native_alignment.py": "infra/hermes/query-completion/alignment.py",
+    "scripts/channel_worker.py": "infra/hermes/review_channel_worker.py",
+    "scripts/mcp/system_diagnostics.py": "infra/mcp/system_diagnostics.py",
+    "scripts/mcp/diagnostic_history.py": "infra/mcp/diagnostic_history.py",
+    "scripts/mcp/diagnostic_journal.py": "infra/mcp/diagnostic_journal.py",
+    "scripts/mcp/diagnostic_journal_native.py": "infra/mcp/diagnostic_journal_native.py",
+    "scripts/mcp/system-diagnostics-mcp.py": "infra/mcp/system-diagnostics-mcp.py",
+    "scripts/mcp/read-system-diagnostics.py": "infra/mcp/read-system-diagnostics.py",
+    "scripts/install/soc_diagnostics.py": "deployment/soc_diagnostics.py",
+    "scripts/install/soc_monitoring.py": "deployment/soc_monitoring.py"
+  },
+  "audit_index": "Audit index only: workflow_contract selects soc-query, soc-investigate, soc-change, soc-recover. output_contract loads soc-output. Fixed journal MCP/reader and installer are inspected, not delegated. No authority or production prompt is replaced.\n",
+  "extra_dependencies": {
+    "deploy.sh": "67a1058d4be0979278f30fc0b81739a49bc5d6874c843d60dab36bbdd69f3b35",
+    "deployment/review_chat.py": "ba6c943bb193bac704ea227c7f7c11c750eaa5e579b6f251db459d6797b860cb",
+    "deployment/internal_tls.py": "3e4c4379f9f4878e471af80b140bdf68d7b48957a771a25710c3ed0107942955",
+    "deployment/validate_lab_site.py": "9cf0d5b2bd01211a7543c91cb35b7e360c0e2abf27c66505f02093e50bb5ab60",
+    "deployment/soc_agent_block.py": "2387265201472570c2551836c0d5374f893fad2f787a5312373d59b04150117c",
+    "deployment/validate_log4shell_jar.py": "b69df872d08dfffb099a20023b1b58854f68889eb96d6f9efd68c39b96c1d022",
+    "deployment/soc_management.py": "4a2ab36e2ad1053c67ef8ae10ba9646547d40c70ce3aff681b78377b9e57b7d0",
+    "deployment/web_security.py": "1ae9ddc7e37cc9527d2ee24e7eff658b847af92e34ec49957f1dc265210cdd05",
+    "deployment/test_log_pipeline.py": "b618d17c5e1fc638db1d6a86590574c42756c4d6d461c087e828cd72eb9c17cd",
+    "deployment/offline_service.py": "44b3d788e5f7943b5c22b106173d3f08b3308cbaeffbc7d96b214cf43c8992e3",
+    "deployment/basic_nat.py": "dca094465332bb97917674e31f3560ccb63ae8598bf65c79d0032f2d4376ee66",
+    "deployment/prerequisites.py": "bf5437b823556ba8b8f8422883931b7001b7dc0e98bd10f11ea5d4f30512ecde",
+    "deployment/soc_diagnostics.py": "6d40706fb8b820a37176233f53583590becff764649010f96199ba43e32234c3",
+    "deployment/offline_security.py": "c82bc2d221884ab793dda620297b52bed11d62341c3a18560f45199809da155f",
+    "deployment/response_entrypoint.py": "a5d8cc966a91561ea7d14f12ec723ea754a79b743fab1c65c2f3dd33a530c65e",
+    "deployment/ollama_trial.py": "c417513f676df029cfc063d1b5f704d3c8aa9bad78e8531af85cc4b81b8871b6",
+    "deployment/validate_management_isolated.py": "57445945e769656d802f64809feb58ac7c635f58f9a1e32909ab9f712254a534",
+    "deployment/web_traffic_guard.py": "53c20709186aa2e538dabfd540e0ca148c681ba88876a187dcd6aca6bd212a05",
+    "deployment/test_soc_dashboard.py": "7ce03ff2b4009b8161d8ed533270ade024c345f23351fa3cd7ff125cc3d605d0",
+    "deployment/ssh_macs.py": "b79c50905cef6528be8418ca82af59f059ecb107a575939f2606c243883a237c",
+    "deployment/soc_dashboard.py": "645c220fc688828798c76cb70cdf4f0c34075bfeed121076f28619467643a244",
+    "deployment/soc_runtime.py": "a77b45a9dedf54c7a9de6dbe18ef99e2ee4c354d76be022da61ac4f08188384f",
+    "deployment/web_access_deploy.py": "53645d34328d17178429901a38ec5268eb80e81927ba5272e6c81506643a77ab",
+    "deployment/ipv4_only.py": "43c47726f82cb1ed366ba925c6dd9f41223213e897bc23ff8201d1c5c4927bd9",
+    "deployment/test_offline_service.py": "17c2716d85bea0af4d46c6da5a376e4ed54a04e41ce96c4cbae199ceb16dbd14",
+    "deployment/siem_host_agent.py": "5a1cfbe52a9b9161bbf894df781ca2f3ddb7262e1fc1a42c47613a56b0399b4e",
+    "deployment/host_security.py": "c9e817f51d7febe2151a2a35f03843bdfcdd5de95933903c0ee2e81010f4f69a",
+    "deployment/protected_hosts.py": "9f2ab56a63d8e68cc64a3afdde4e061ac631f908e90633e990ba12540d7f8a50",
+    "deployment/report_publisher.py": "392441216a76dd14ec167fc6bca735c21f00f6d620a783f97c7d292767ba13d8",
+    "deployment/ollama_trial_chat.py": "38ec1b39b7aa6f2a3faec5ce82ddb5008f62146618538e93ccdbc49221059329",
+    "deployment/inference_tunnel.py": "45133b9490158e2b65380178c0956c698f34ad43a18d8b25188549fef2211895",
+    "deployment/harness_maintenance.py": "25bbc2160b2ab5696c35a9db67c182f6753776bb6771d752b5fcaaa616d39a1d",
+    "deployment/soc_monitoring.py": "6fd93774554616084b0f36bc2badeb909d13e766f3dab5468ff683f2c7b236fb",
+    "deployment/bot_profiles.py": "fd12ad43e85802df26924a0c90b4d9085c16a6d5304f64ff11cf854991504422",
+    "deployment/verify_log4shell_app.py": "583b78376970e671e98a995dac591fbb1628e543763b079d7150407564ac3bbf",
+    "deployment/lab_key.py": "27497948227462468e569ff7b621e2392dcf0d4ab81cedf3ff7cdd9aac0f37de",
+    "deployment/log_pipeline.py": "c1db66baad3fc14ec1f95a26a6cfaf953e7f24603712412bbde9715c276220a9",
+    "deployment/management_access.py": "92ee3eb0fc5d83571d6ce6b8395542b899dddb02810562ec90d893905f93e832",
+    "deployment/test_ollama_source_bundle.py": "7ec86cf9fad3c3a23b785939dadf987bf4433e2e860ef5fee14c54288fc8063f",
+    "infra/normalization/wazuh-vector/history-replay-b/canary-validation.jq": "023c59258899b05f918735d2741669243bb4e31480f1ac359681fef6840b78e8",
+    "infra/normalization/wazuh-vector/fixtures/correlation/expected.tsv": "aa22132fd8f74c733ce46cfb0c5cc71c077b7f26dbe948efbc7baada2a4cd867",
+    "infra/normalization/wazuh-vector/fixtures/correlation/cross-suricata-nft.jsonl": "c12995fd7bdc191b6677b1730be3832afb97e4d1e1a808710b2fcb759f5c108b",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-wrong-ip.jsonl": "1eb45bba54334fc0fadf4043691bc6156a1396a626ab99c1badcd9e1532318c0",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-repeat.jsonl": "6fd45116feb2d957a84b169eacceaed71bd290580b9274f4c2bc9bd46f0bd6bc",
+    "infra/normalization/wazuh-vector/fixtures/correlation/cross-nft-suricata.jsonl": "1c5c1940e0832a97a75078916090c4f1e7c9990208f6b8482b71f9b019de3ed2",
+    "infra/normalization/wazuh-vector/fixtures/correlation/future.jsonl": "b75b055146960ddd64e8a18f472bad068375c90bb3e3de8a4ddd1a1a0ec2ad8b",
+    "infra/normalization/wazuh-vector/fixtures/correlation/missing-key.jsonl": "0c83351f7f5f9ed1b451e0bc927830014cb76fdf0ce94c7a7b7670ca800419c4",
+    "infra/normalization/wazuh-vector/fixtures/correlation/protected.jsonl": "5c876f7b2dab20384ad37f04d2027ef05a2884632bea745297eb7956e7ac687c",
+    "infra/normalization/wazuh-vector/fixtures/correlation/different-direction.jsonl": "45533d604d4a268ebc1bbb369653687e6853f3ca57ed4d774c2edd94899e7ae6",
+    "infra/normalization/wazuh-vector/fixtures/correlation/processing-time-only.jsonl": "348a38ae80b0ce36599c578656d2e31447d2f949a37cc4a5a534599092c9c031",
+    "infra/normalization/wazuh-vector/fixtures/correlation/historical.jsonl": "352a5db7e932557f38bf21bc66b5f6e3d29b88c98529778ef7ab7fae841d811a",
+    "infra/normalization/wazuh-vector/fixtures/correlation/duplicate-history-limitation.jsonl": "8f557dd2bb0edc15b808523a56c4cd3150d0d9d2da0a450dee0c702233a1b4ca",
+    "infra/normalization/wazuh-vector/fixtures/correlation/different-sensor.jsonl": "482cad129ee5f64f2d2b051fd1431dbe2bd003c6821a4cc020be5051d92b1b44",
+    "infra/normalization/wazuh-vector/fixtures/correlation/raw-isolation.jsonl": "d15af64057115eaf1cf3e711098456fbe6f3570e21dc0b4006b69975d6fb0b46",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-repeat-duplicate.jsonl": "4660b20d4ef1233d9dbcff6f67da81b0261fc380e1a60ecfb9161cdcdc5eacc2",
+    "infra/normalization/wazuh-vector/fixtures/correlation/repeat-nftables.jsonl": "8afe8f991c18294a89f6b515839cfeaa23093bb5981f8c6fddd2fc3474f0648b",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-historical.jsonl": "dfeb3224ef59e47d20c7e6b1157dbe911d51b9dfadf333079d8dd850459633a3",
+    "infra/normalization/wazuh-vector/fixtures/correlation/ineligible.jsonl": "c6f8696e6c8b0d950873a0caa3dbb88fb5403cfbf1b30ebed5c21966bc4aecec",
+    "infra/normalization/wazuh-vector/fixtures/correlation/different-source.jsonl": "e33417dd68197d7d151c18515fc0fa5e6f26ad4a3eb2469d4f5691e386e629d9",
+    "infra/normalization/wazuh-vector/fixtures/correlation/repeat-suricata.jsonl": "6a71d2e650efb77ccc44fec642d687f41549bce289b28f2ea70079763d4ba184",
+    "infra/normalization/wazuh-vector/fixtures/correlation/different-service.jsonl": "549466e24d7bf6efcf0f27b5dee5f50c489fd1afe0d74df6907370f20c32eec7",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-production-location.jsonl": "d57735b5a298ae06bde2899dbe8f512d04f51c2c513bad3695b228666b63aad6",
+    "infra/normalization/wazuh-vector/fixtures/correlation/canary-cross.jsonl": "1ff2615c3c1cd8aa365d13c4125f86bdc5bf1dd5823b3c703c32e455a8359e7c",
+    "infra/normalization/wazuh-vector/fixtures/correlation/duplicate-current.jsonl": "ed50a42bf023b1e461fafbdbfff7c36d9d0bd33d53e0fd90a1e96727bd7f94f6",
+    "infra/normalization/wazuh-vector/fixtures/correlation/missing-time-class.jsonl": "d19f2d6421e40df33926bc0cf9a5ff63484b3c794f2358d6b031d70591a120b9",
+    "infra/normalization/vector/raw-operations/coordinator.sh": "95f86e2db4115b929193fa9fac5c81fd4ad5cc98afc65ed3cad42dd7c950063e"
+  },
+  "modified_sources": [
+    "deployment/soc_diagnostics.py",
+    "deployment/tests/test_soc_diagnostics.py",
+    "infra/hermes/chat_contract.py",
+    "infra/hermes/query-completion/__init__.py",
+    "infra/hermes/skills/soc-investigate/SKILL.md",
+    "infra/hermes/soc_management_run.py",
+    "infra/mcp/diagnostic_history.py",
+    "infra/mcp/diagnostic_journal.py",
+    "infra/mcp/diagnostic_journal_native.py",
+    "infra/mcp/system-diagnostics-mcp.py",
+    "infra/mcp/test_diagnostic_journal_native.py"
+  ],
+  "sources": {
+    "deployment/soc_diagnostics.py": {
+      "before_sha256": "6d40706fb8b820a37176233f53583590becff764649010f96199ba43e32234c3",
+      "candidate_sha256": "d30193a5fb4ecd797a820eec7dafa69f9b5ec9dd7c65143a929b4b933b470ccc"
+    },
+    "deployment/soc_monitoring.py": {
+      "before_sha256": "6fd93774554616084b0f36bc2badeb909d13e766f3dab5468ff683f2c7b236fb",
+      "candidate_sha256": "6fd93774554616084b0f36bc2badeb909d13e766f3dab5468ff683f2c7b236fb"
+    },
+    "deployment/tests/test_soc_diagnostics.py": {
+      "before_sha256": "7419eef5d7568872893d44dc9440f15fe8871a9098e935a7bbaab8a75ab4349c",
+      "candidate_sha256": "4c1eb7359d2c3e7eac4f6eff45e0313c01f772415ebb1e09cfb3fd8ecbadd969"
+    },
+    "infra/hermes/SOUL.groot.md": {
+      "before_sha256": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "candidate_sha256": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871"
+    },
+    "infra/hermes/chat_contract.py": {
+      "before_sha256": "d54e16c101ce578430a1d3665960dbe18904ba79aaeac728f58262f178a99251",
+      "candidate_sha256": "7a2eebe98b17260bd4ccd43ad75c53453f81679be2ae4c798dd03f1bd73ed0ea"
+    },
+    "infra/hermes/chat_markdown.py": {
+      "before_sha256": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "candidate_sha256": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f"
+    },
+    "infra/hermes/output_contract.py": {
+      "before_sha256": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "candidate_sha256": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "before_sha256": "e22218ccc052fa8bb75c91811fac30e4139fd97ef310e76f24cdce548981371b",
+      "candidate_sha256": "3fe73704f97854e49ad9949ca2a11de5a01463c7094625b334ceb860ed3cc819"
+    },
+    "infra/hermes/query-completion/alignment.py": {
+      "before_sha256": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d",
+      "candidate_sha256": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d"
+    },
+    "infra/hermes/read_contract.py": {
+      "before_sha256": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331",
+      "candidate_sha256": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331"
+    },
+    "infra/hermes/review_channel.py": {
+      "before_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "candidate_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217"
+    },
+    "infra/hermes/review_channel_policy.py": {
+      "before_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "candidate_sha256": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789"
+    },
+    "infra/hermes/review_channel_worker.py": {
+      "before_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "candidate_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+    },
+    "infra/hermes/skills/soc-change/SKILL.md": {
+      "before_sha256": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "candidate_sha256": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "before_sha256": "1aa096640e64b32609daeaa721c2e453b820b13db6a28e8e72ae33ec35060e94",
+      "candidate_sha256": "ef41793cd9a1770c1e8960cdf9cdfe73c85d466e1bad5b45951bc3b701a8ca20"
+    },
+    "infra/hermes/skills/soc-output/SKILL.md": {
+      "before_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "candidate_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926"
+    },
+    "infra/hermes/skills/soc-query/SKILL.md": {
+      "before_sha256": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31",
+      "candidate_sha256": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31"
+    },
+    "infra/hermes/skills/soc-recover/SKILL.md": {
+      "before_sha256": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "candidate_sha256": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68"
+    },
+    "infra/hermes/soc_management_controller.py": {
+      "before_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af",
+      "candidate_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af"
+    },
+    "infra/hermes/soc_management_run.py": {
+      "before_sha256": "d59efff77a873c1200969b579db9171a87007139d58b91ad07e4bb1865d345da",
+      "candidate_sha256": "5156269d3e1846ec678fbd72e720f95574d4dce8af7f57f4ae5fc173e6536a57"
+    },
+    "infra/hermes/workflow_contract.py": {
+      "before_sha256": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3",
+      "candidate_sha256": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3"
+    },
+    "infra/mcp/diagnostic_history.py": {
+      "before_sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+      "candidate_sha256": "ae5b23973ab7d0dff1cbcce093aae3a9dfab334d9ded0cb4617a71234cbeb314"
+    },
+    "infra/mcp/diagnostic_journal.py": {
+      "before_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+      "candidate_sha256": "28cbb7a2e4fbda1a4b032bbd33d70773248755d935385eb547a3d71da62ffb47"
+    },
+    "infra/mcp/diagnostic_journal_native.py": {
+      "before_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+      "candidate_sha256": "e0244ac8bc6641b52162ca5fbc236399bcd24ca87934f10944b8c1deef54e3fd"
+    },
+    "infra/mcp/read-system-diagnostics.py": {
+      "before_sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+      "candidate_sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3"
+    },
+    "infra/mcp/soc_bot.py": {
+      "before_sha256": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "candidate_sha256": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d"
+    },
+    "infra/mcp/system-diagnostics-mcp.py": {
+      "before_sha256": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+      "candidate_sha256": "89f1731bd6b1a2f6c87affd5a5df664dc40f564dfaf19bee0e77ac35c49b2705"
+    },
+    "infra/mcp/system_diagnostics.py": {
+      "before_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+      "candidate_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142"
+    },
+    "infra/mcp/test_diagnostic_journal_native.py": {
+      "before_sha256": "17a0739c222e12e80afc757491d1e2ee0c283146e101536878fc6b43beec6c96",
+      "candidate_sha256": "e3ebd1f55510620aa7cd0c8cc665b43efc1de459cf5219b6aac16c0b850f762b"
+    },
+    "infra/ollama-trial/chat.py": {
+      "before_sha256": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "candidate_sha256": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30"
+    },
+    "infra/ollama-trial/chat_policy.py": {
+      "before_sha256": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "candidate_sha256": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72"
+    },
+    "infra/ollama-trial/harness.py": {
+      "before_sha256": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc",
+      "candidate_sha256": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc"
+    },
+    "infra/ollama-trial/policy.py": {
+      "before_sha256": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "candidate_sha256": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "before_sha256": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06",
+      "candidate_sha256": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06"
+    }
+  },
+  "ast_changes": {
+    "deployment/soc_diagnostics.py": [
+      "native_dependencies"
+    ],
+    "infra/mcp/diagnostic_journal_native.py": [
+      "access_check",
+      "assign:ROW_FIELDS",
+      "checked_packet",
+      "read_group",
+      "reader_factory"
+    ],
+    "infra/mcp/system-diagnostics-mcp.py": [
+      "handle",
+      "tools"
+    ],
+    "infra/mcp/diagnostic_journal.py": [
+      "Expr(value=Constant(value='Fixed-unit journal excerpts through a local, bounded privileged reader.\\n\\nLoaded only from the trusted diagnostics directory. The MCP/SSH account never\\ngets journal membership, sudo, shell commands, file paths or journal options.\\n'))",
+      "Expr(value=Constant(value='Fixed-unit or fixed-host system journal excerpts through a bounded reader.\\n\\nLoaded only from the trusted diagnostics directory. The MCP/SSH account never\\ngets journal membership, sudo, shell commands, file paths or journal options.\\n'))",
+      "answer",
+      "assign:FIELDS",
+      "finish",
+      "request",
+      "source_identity",
+      "source_row",
+      "validate_answer",
+      "validate_entries"
+    ],
+    "infra/mcp/test_diagnostic_journal_native.py": [
+      "Native"
+    ],
+    "infra/mcp/diagnostic_history.py": [
+      "request"
+    ],
+    "infra/hermes/chat_contract.py": [
+      "assign:VERSION",
+      "diagnostic_evidence_rows",
+      "diagnostic_journal_catalog",
+      "diagnostic_journal_fields",
+      "operator_diagnostic_options",
+      "service_history_plan",
+      "service_history_state",
+      "service_lookup_scope",
+      "service_report_context"
+    ],
+    "infra/hermes/soc_management_run.py": [
+      "chat_read_schema"
+    ],
+    "infra/hermes/query-completion/__init__.py": [
+      "assign:EVIDENCE_SOURCE_SHA256",
+      "assign:VERSION"
+    ],
+    "deployment/tests/test_soc_diagnostics.py": [
+      "Profiles"
+    ]
+  },
+  "patch_sha256": "e078485880764226711986e3dee0ac34c4a21828a2dfdabbcbb1c208b7f943de",
+  "test_sha256": "1ea2bc604fac5a3a6b1bd4f91652ab2997fadbafb07ed7737d361c3a2609823b",
+  "operating_changes": 0,
+  "current_model_calls": 0,
+  "current_mcp_calls": 0,
+  "chat_posts": 0,
+  "limitations": [
+    "24h host errors searches timed out on A/B/C in native and CLI readers",
+    "No new SDK/native model selection, installed MCP, operating load or Mattermost verification",
+    "Existing two exact approval plans are unchanged; this candidate does not reuse either approval"
+  ]
+}

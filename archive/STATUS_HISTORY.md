@@ -12772,3 +12772,9 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 R6후속실제SDK2질문×2비교본4요청·MCP7/기록모델13. 집계systemd 질문:부모snapshot1읽기/이력혼동,후보0읽기/로그생성→새검사거절/최종근거없음. Vector과거+현재:양쪽3읽기·부모없는Type추정거절·후보잔여검사0이나unresolved/partial. 전체미채택·운영0.
 
 [질문·호출/응답SHA·시간·한계](../infra/validation/read-target-live/README.md)·[현재상태](../STATUS.md). 로컬원문과계획재현은대화기록/검증/2026-11-15-read-target-live에보존한다.
+
+## 2026-11-15 집계 journal 후속 후보와 실제 읽기 한계
+
+[후보·원장](../infra/validation/host-journal/README.md). 원인은 짧은 host systemd 로그 요청의 필수 읽기 공백이며 공통 스키마/계획·실제 system journal·출처 표시·설치 사전검사를 격리 구현했다. 운용9소스/검사2개·공식 Harness²33구성/상시증가0·Mac1038중1032통과6생략/기존Hermes1121통과생략0·공개34소스씩SHA/AST재현/새19검사다.
+
+A/B/C 자체 제한 서비스의21논리시험은15성공/6실패다. 최근errors/all·등록unit·인증소켓과9native/CLI전체응답일치는확인했지만24h errors는두backend모두시간제한이다. 실패를0건/정상/전체조회완료로치환하지않는다. 실제MCP·모델·채팅0/운영소스·기존서비스변경0·정확두계획불변. 원격자체7폴더725파일10,356,916B는출력44파일/전체SHA/종료확인후정리하고제거영수증을별도로보존한다. 논문매뉴얼56쪽15SHA·기존9/운영백업·G_Harness2보존. 새모델선택·긴검색가용성·정확새승인·실제로딩/채팅이후속조건이다.

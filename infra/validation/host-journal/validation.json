@@ -1,0 +1,1107 @@
+{
+  "status": "recent_host_journal_verified_long_error_search_failed_not_applied",
+  "candidate_manifest_sha256": "a07daf9dd8ab48ba94e1ad83e58fbee15bfe87f775ef8efe9081c48879b6fe6d",
+  "frozen_candidate": "r1",
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/install/soc_diagnostics.py",
+        "scripts/mcp/diagnostic_history.py",
+        "scripts/mcp/diagnostic_journal.py",
+        "scripts/mcp/diagnostic_journal_native.py",
+        "scripts/mcp/system-diagnostics-mcp.py",
+        "scripts/native_query.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "ast_changes": {
+      "deployment/soc_diagnostics.py": [
+        "native_dependencies"
+      ],
+      "infra/mcp/diagnostic_journal_native.py": [
+        "access_check",
+        "assign:ROW_FIELDS",
+        "checked_packet",
+        "read_group",
+        "reader_factory"
+      ],
+      "infra/mcp/system-diagnostics-mcp.py": [
+        "handle",
+        "tools"
+      ],
+      "infra/mcp/diagnostic_journal.py": [
+        "Expr(value=Constant(value='Fixed-unit journal excerpts through a local, bounded privileged reader.\\n\\nLoaded only from the trusted diagnostics directory. The MCP/SSH account never\\ngets journal membership, sudo, shell commands, file paths or journal options.\\n'))",
+        "Expr(value=Constant(value='Fixed-unit or fixed-host system journal excerpts through a bounded reader.\\n\\nLoaded only from the trusted diagnostics directory. The MCP/SSH account never\\ngets journal membership, sudo, shell commands, file paths or journal options.\\n'))",
+        "answer",
+        "assign:FIELDS",
+        "finish",
+        "request",
+        "source_identity",
+        "source_row",
+        "validate_answer",
+        "validate_entries"
+      ],
+      "infra/mcp/test_diagnostic_journal_native.py": [
+        "Native"
+      ],
+      "infra/mcp/diagnostic_history.py": [
+        "request"
+      ],
+      "infra/hermes/chat_contract.py": [
+        "assign:VERSION",
+        "diagnostic_evidence_rows",
+        "diagnostic_journal_catalog",
+        "diagnostic_journal_fields",
+        "operator_diagnostic_options",
+        "service_history_plan",
+        "service_history_state",
+        "service_lookup_scope",
+        "service_report_context"
+      ],
+      "infra/hermes/soc_management_run.py": [
+        "chat_read_schema"
+      ],
+      "infra/hermes/query-completion/__init__.py": [
+        "assign:EVIDENCE_SOURCE_SHA256",
+        "assign:VERSION"
+      ],
+      "deployment/tests/test_soc_diagnostics.py": [
+        "Profiles"
+      ]
+    }
+  },
+  "regressions": {
+    "mac": {
+      "executed": 1038,
+      "passed": 1032,
+      "skipped": 6,
+      "groups": [
+        {
+          "group": "new-targets",
+          "tests": 39,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "new-intents",
+          "tests": 16,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "new",
+          "tests": 40,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "prior-claim",
+          "tests": 28,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "root",
+          "tests": 236,
+          "skipped": 6,
+          "rc": 0
+        },
+        {
+          "group": "sdk",
+          "tests": 106,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "native",
+          "tests": 181,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "common-new",
+          "tests": 22,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "workflow",
+          "tests": 12,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "sdk-flow",
+          "tests": 66,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "root-flow",
+          "tests": 94,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "host-journal",
+          "tests": 19,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "journal",
+          "tests": 85,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "installation",
+          "tests": 30,
+          "skipped": 0,
+          "rc": 0
+        },
+        {
+          "group": "common-service-mac",
+          "tests": 64,
+          "skipped": 0,
+          "rc": 0
+        }
+      ]
+    },
+    "existing_hermes": {
+      "executed": 1121,
+      "skipped": 0,
+      "all_passed": true,
+      "groups": [
+        {
+          "group": "new-targets",
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.542
+        },
+        {
+          "group": "new-intents",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.538
+        },
+        {
+          "group": "new",
+          "tests": 40,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.415
+        },
+        {
+          "group": "prior-claim",
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.647
+        },
+        {
+          "group": "root",
+          "tests": 236,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 3.256
+        },
+        {
+          "group": "sdk",
+          "tests": 106,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.63
+        },
+        {
+          "group": "native",
+          "tests": 181,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 3.827
+        },
+        {
+          "group": "common-new",
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.58
+        },
+        {
+          "group": "workflow",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.449
+        },
+        {
+          "group": "sdk-flow",
+          "tests": 66,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.493
+        },
+        {
+          "group": "root-flow",
+          "tests": 94,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.166
+        },
+        {
+          "group": "host-journal",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.686
+        },
+        {
+          "group": "journal",
+          "tests": 85,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.31
+        },
+        {
+          "group": "installation",
+          "tests": 30,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.285
+        },
+        {
+          "group": "common-service-full",
+          "tests": 147,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 4.671
+        }
+      ]
+    },
+    "new_tests": 19,
+    "public_reproduction_new_tests": 19,
+    "comparison_note": "test executions with overlap, not independent cases or accuracy; Mac common-service subset64 versus Hermes full147"
+  },
+  "actual_read_probes": {
+    "logical_cases": 21,
+    "passed": 15,
+    "failed": 6,
+    "native_cli_exact_response_matches": 9,
+    "adapter_invocations": 30,
+    "cases": [
+      {
+        "name": "host_recent_errors",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:17:59+09:00",
+          "until_kst": "2026-11-15T21:32:59+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "returned",
+        "elapsed_seconds": 1.811663,
+        "native_seconds": 0.761675,
+        "cli_seconds": 1.049941,
+        "native_cli_equal": true,
+        "result_sha256": "96646e58ccdeb4bebdad0bb94070e3382afa4f90829c5e112d9576773ef84370",
+        "host": "a",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "a:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "errors",
+          "returned_entries": 0,
+          "has_more": false,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_recent_all",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:29:59+09:00",
+          "until_kst": "2026-11-15T21:32:59+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.171007,
+        "native_seconds": 0.15039,
+        "cli_seconds": 0.020559,
+        "native_cli_equal": true,
+        "result_sha256": "568556249ca7bdf1db4574064b3b8718cfeb8eb8a5ef10786a37daf48156667b",
+        "host": "a",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "a:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:32:59+09:00",
+          "until_kst": "2026-11-15T21:32:59+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "DiagnosticError",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.026008,
+        "host": "a",
+        "reader_experiment": "live"
+      },
+      {
+        "name": "registered_unit_regression",
+        "arguments": {
+          "target": "a:rule-worker",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:17:59+09:00",
+          "until_kst": "2026-11-15T21:32:59+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.22997,
+        "native_seconds": 0.190353,
+        "cli_seconds": 0.039569,
+        "native_cli_equal": true,
+        "result_sha256": "bad0f3f9ac30995a6f5e68067a5856e4b65fcab7e09587162f7a06429b970c43",
+        "host": "a",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "a:rule-worker",
+          "unit": "rule-change-worker.service",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "isolated_authenticated_socket",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:29:59+09:00",
+          "until_kst": "2026-11-15T21:32:59+09:00",
+          "journal_scope": "all",
+          "limit": 2
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.151563,
+        "result_sha256": "20e30d9e8a9f381a66eb32d664eb4a5bbe286fb02b4053281a032d17d645597a",
+        "host": "a",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "a:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 2,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_recent_errors",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:18:05+09:00",
+          "until_kst": "2026-11-15T21:33:05+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "returned",
+        "elapsed_seconds": 4.058145,
+        "native_seconds": 3.553338,
+        "cli_seconds": 0.504758,
+        "native_cli_equal": true,
+        "result_sha256": "13d59c6c261cc302f19c7c7f852a2a585d2033c54d4cf42b1db9a26257d377b1",
+        "host": "b",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "b:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "errors",
+          "returned_entries": 0,
+          "has_more": false,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_recent_all",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:30:05+09:00",
+          "until_kst": "2026-11-15T21:33:05+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.160213,
+        "native_seconds": 0.138357,
+        "cli_seconds": 0.021796,
+        "native_cli_equal": true,
+        "result_sha256": "b6f366e17b1aac4d5a768bddd81c6d3ff5736fdac3bc9aa39df39763ec82ff97",
+        "host": "b",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "b:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:33:05+09:00",
+          "until_kst": "2026-11-15T21:33:05+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "DiagnosticError",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.026279,
+        "host": "b",
+        "reader_experiment": "live"
+      },
+      {
+        "name": "registered_unit_regression",
+        "arguments": {
+          "target": "b:management",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:18:05+09:00",
+          "until_kst": "2026-11-15T21:33:05+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.296077,
+        "native_seconds": 0.235702,
+        "cli_seconds": 0.060323,
+        "native_cli_equal": true,
+        "result_sha256": "252576b80d4f592c5a5cb8e3dfdc98e37d370727e128d79e2e613a966bcb0a89",
+        "host": "b",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "b:management",
+          "unit": "capstone-management.service",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "isolated_authenticated_socket",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:30:05+09:00",
+          "until_kst": "2026-11-15T21:33:05+09:00",
+          "journal_scope": "all",
+          "limit": 2
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.191036,
+        "result_sha256": "4f5987baeb11fdee9f8576913929505c83f957e59c127dc75b057cb07ddef9f1",
+        "host": "b",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "b:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 2,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_recent_errors",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:18:14+09:00",
+          "until_kst": "2026-11-15T21:33:14+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "returned",
+        "elapsed_seconds": 2.662789,
+        "native_seconds": 2.240589,
+        "cli_seconds": 0.422156,
+        "native_cli_equal": true,
+        "result_sha256": "d14b0fc2ac48c133b1f5a82f33c07dffbcf08af78b10aa754d9f71a3a082c623",
+        "host": "c",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "c:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "errors",
+          "returned_entries": 0,
+          "has_more": false,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_recent_all",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:30:14+09:00",
+          "until_kst": "2026-11-15T21:33:14+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.146124,
+        "native_seconds": 0.130227,
+        "cli_seconds": 0.015842,
+        "native_cli_equal": true,
+        "result_sha256": "ad362d4a8077cd27d680fa1faa348ccb14c46834484193ee9a57f2ef00756158",
+        "host": "c",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "c:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:33:14+09:00",
+          "until_kst": "2026-11-15T21:33:14+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "TimeoutError",
+        "reason": null,
+        "elapsed_seconds": 20.014055,
+        "host": "c",
+        "reader_experiment": "live"
+      },
+      {
+        "name": "registered_unit_regression",
+        "arguments": {
+          "target": "c:apache",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:18:14+09:00",
+          "until_kst": "2026-11-15T21:33:14+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.172033,
+        "native_seconds": 0.150818,
+        "cli_seconds": 0.021163,
+        "native_cli_equal": true,
+        "result_sha256": "3d23f1ae09c5596305e4f3b25c5770bc9f7c2864abaae9f64388195498b71fb4",
+        "host": "c",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "c:apache",
+          "unit": "apache2.service",
+          "journal_scope": "all",
+          "returned_entries": 0,
+          "has_more": false,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "isolated_authenticated_socket",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T21:30:14+09:00",
+          "until_kst": "2026-11-15T21:33:14+09:00",
+          "journal_scope": "all",
+          "limit": 2
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.130234,
+        "result_sha256": "cdfc75798d55f5a928968400b556f94ec03701683040c6653c47e774428efe44",
+        "host": "c",
+        "reader_experiment": "live",
+        "response_summary": {
+          "target": "c:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 2,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors_cli",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:35:58+09:00",
+          "until_kst": "2026-11-15T21:35:58+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "DiagnosticError",
+        "reason": "command_timeout",
+        "elapsed_seconds": 12.020416,
+        "host": "a",
+        "reader_experiment": "cli"
+      },
+      {
+        "name": "host_day_all_cli",
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:35:58+09:00",
+          "until_kst": "2026-11-15T21:35:58+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.020921,
+        "result_sha256": "49d5257b2f711df4c153cc8d0eebc5e8ac8b8f9929531cfe4190e78fd560e473",
+        "host": "a",
+        "reader_experiment": "cli",
+        "response_summary": {
+          "target": "a:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors_cli",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:36:30+09:00",
+          "until_kst": "2026-11-15T21:36:30+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "DiagnosticError",
+        "reason": "command_timeout",
+        "elapsed_seconds": 20.008635,
+        "host": "b",
+        "reader_experiment": "cli"
+      },
+      {
+        "name": "host_day_all_cli",
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:36:30+09:00",
+          "until_kst": "2026-11-15T21:36:30+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.01836,
+        "result_sha256": "2619df7d55b2b3f48cb1f6a298bfa46bc258bbbc60a1718c9264dbb44fd1b90d",
+        "host": "b",
+        "reader_experiment": "cli",
+        "response_summary": {
+          "target": "b:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      },
+      {
+        "name": "host_day_errors_cli",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:36:31+09:00",
+          "until_kst": "2026-11-15T21:36:31+09:00",
+          "journal_scope": "errors",
+          "limit": 5
+        },
+        "status": "failed",
+        "error_type": "DiagnosticError",
+        "reason": "command_timeout",
+        "elapsed_seconds": 20.005335,
+        "host": "c",
+        "reader_experiment": "cli"
+      },
+      {
+        "name": "host_day_all_cli",
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-14T21:36:31+09:00",
+          "until_kst": "2026-11-15T21:36:31+09:00",
+          "journal_scope": "all",
+          "limit": 3
+        },
+        "status": "returned",
+        "elapsed_seconds": 0.016629,
+        "result_sha256": "d5baa3b32ef1a4101777f13ca97d91522fd8557c207dbccaf3b2a65b69e76479",
+        "host": "c",
+        "reader_experiment": "cli",
+        "response_summary": {
+          "target": "c:systemd",
+          "unit": null,
+          "journal_target_scope": "host_system",
+          "journal_scope": "all",
+          "returned_entries": 3,
+          "has_more": true,
+          "response_size_limited": false,
+          "journal_retention_verified": false,
+          "requested_window_total_count": null
+        }
+      }
+    ],
+    "scope": "own isolated limited services reading actual journals and AF_UNIX, not installed MCP or chat; sequential/cache/load uncontrolled"
+  },
+  "live_observation": {
+    "a_b_c": {
+      "a": {
+        "checked_at_kst": "2026-11-15T21:47:14.945124+09:00",
+        "files": {
+          "/opt/capstone-diagnostics/system_diagnostics.py": {
+            "exists": true,
+            "sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+            "bytes": 31242
+          },
+          "/opt/capstone-diagnostics/diagnostic_history.py": {
+            "exists": true,
+            "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+            "bytes": 18220
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal.py": {
+            "exists": true,
+            "sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+            "bytes": 19968
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal_native.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/diagnostic_runtime.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+            "exists": true,
+            "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+            "bytes": 3905
+          },
+          "/opt/mcp/system-diagnostics-mcp.py": {
+            "exists": false
+          },
+          "/opt/mcp/run-system-diagnostics.sh": {
+            "exists": false
+          }
+        },
+        "reader_unchanged": true
+      },
+      "b": {
+        "checked_at_kst": "2026-11-15T21:47:15.174206+09:00",
+        "files": {
+          "/opt/capstone-diagnostics/system_diagnostics.py": {
+            "exists": true,
+            "sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+            "bytes": 31242
+          },
+          "/opt/capstone-diagnostics/diagnostic_history.py": {
+            "exists": true,
+            "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+            "bytes": 18220
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal.py": {
+            "exists": true,
+            "sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+            "bytes": 19968
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal_native.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/diagnostic_runtime.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+            "exists": true,
+            "sha256": "967e7b5b88745a22f0554660f2dceab9904a415081b08264b750f9bccf14cc37",
+            "bytes": 2950
+          },
+          "/opt/mcp/system-diagnostics-mcp.py": {
+            "exists": true,
+            "sha256": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+            "bytes": 36033
+          },
+          "/opt/mcp/run-system-diagnostics.sh": {
+            "exists": true,
+            "sha256": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+            "bytes": 301
+          }
+        },
+        "reader_unchanged": true
+      },
+      "c": {
+        "checked_at_kst": "2026-11-15T21:47:15.200671+09:00",
+        "files": {
+          "/opt/capstone-diagnostics/system_diagnostics.py": {
+            "exists": true,
+            "sha256": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+            "bytes": 31242
+          },
+          "/opt/capstone-diagnostics/diagnostic_history.py": {
+            "exists": true,
+            "sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+            "bytes": 18220
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal.py": {
+            "exists": true,
+            "sha256": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+            "bytes": 19968
+          },
+          "/opt/capstone-diagnostics/diagnostic_journal_native.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/diagnostic_runtime.py": {
+            "exists": false
+          },
+          "/opt/capstone-diagnostics/read-system-diagnostics.py": {
+            "exists": true,
+            "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+            "bytes": 3905
+          },
+          "/opt/mcp/system-diagnostics-mcp.py": {
+            "exists": false
+          },
+          "/opt/mcp/run-system-diagnostics.sh": {
+            "exists": false
+          }
+        },
+        "reader_unchanged": true
+      }
+    },
+    "b_at_kst": "2026-11-15T21:47:15.152679+09:00",
+    "components24_schema45_config_model_and_process_identities_unchanged": true,
+    "catalog_comparison": "exact source/schema/target identity and exposed-name set; clocks/durations/order are dynamic; installed source is not proof of gateway in-memory version"
+  },
+  "cleanup": {
+    "remote_roots": 7,
+    "remote_files": 725,
+    "remote_bytes": 10356916,
+    "remote_absent": true,
+    "output_files_preserved": 44,
+    "mac": {
+      "at_kst": "2026-11-15T21:56:07.208332+09:00",
+      "files": 9047,
+      "bytes": 133737924,
+      "absent": true,
+      "minimal_candidate_preserved_files": 11,
+      "paper15_sha_unchanged": true,
+      "unrelated9_sha_unchanged": true,
+      "new_mac_packages": 0,
+      "generated_transport_files_removed": 7,
+      "generated_transport_bytes_removed": 5746523
+    }
+  },
+  "data_mcp_calls": 0,
+  "model_generations": 0,
+  "chat_posts": 0,
+  "protected_dispatches": 0,
+  "operating_source_config_db_changes": 0,
+  "existing_service_operations": 0,
+  "new_package_installs": 0,
+  "catalog_discovery_runs": 2,
+  "pending_plan_sha256": {
+    "control_status": "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+    "journal_adapter": "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e"
+  },
+  "not_verified": [
+    "24h host error availability",
+    "new SDK/native model selected reads and final semantic quality",
+    "installed MCP path and gateway actual load",
+    "fresh Mattermost E2E",
+    "new OS full installation",
+    "independent trained-model quality superiority"
+  ],
+  "next": "Fix long error-query cost/failed-window investigation, test fresh model decisions, then exact new approval/apply/load/new chat. Do not reuse existing approvals."
+}

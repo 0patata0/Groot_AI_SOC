@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+[호스트 journal 후속 후보](../validation/host-journal/README.md)는 고정 A/B/C systemd 로그를 기존 도구에 연결하고 current·unit 색인·host system journal을 구분한다. native는 LOCAL_ONLY|SYSTEM_ONLY, 행의 실제 source_units/source_transport를 보존한다. 짧은 요청의 공통 필수 읽기·스키마와 설치 사전검사도 맞췄다. Mac1038/기존Hermes1121생략0·최근 실제 조회는 성공했지만24h errors는 native/CLI 모두 시간 제한이다. 운영·모델·실제 MCP/채팅은0이며 정본/두 기존 정확계획은 유지한다. 아래 내용은 각 과거 단위의 관측이다.
+
 [실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 
 [대상·view·기간 결속 후보](../validation/read-target-binding/README.md)는 실제 호출의 범위와 모델의 성공/실패 서술을 대조하는 하네스 수정이다. 새 MCP 도구·과거 journal 대상·OS 권한은 추가하지 않았다. B의 실제45스키마는17:52 KST에도 불변이었다. `b:systemd` 현재 snapshot과 등록25개 서비스의 과거 journal을 구분하며, 미실행을 서버 조회 실패로 꾸미지 않는다. 회귀840/기존Hermes840생략0·과거 응답 재처리는 새 실제 MCP/채팅 수용과 별도이며 운영 미적용이다.

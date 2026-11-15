@@ -1,11 +1,9 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·방법·이유·확인·복구 중심의 매뉴얼로 상세화했고 로컬 MD·PDF·DOCX56쪽·내용누락0·114목차/캡션·전페이지검수를 마쳤습니다. 사진/학번은 공란이며 논문/발표/포트폴리오는 Git 제외입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 후임자가 따르는 목적·준비·방법·확인·복구 중심의 매뉴얼로 상세화했고 로컬 MD·PDF·DOCX56쪽·내용 누락0·114목차/캡션·전페이지 검수를 마쳤습니다. 사진/학번은 공란이며 논문/발표/포트폴리오는 Git 제외입니다.
 
-[OS 대상·범위 후보](infra/validation/read-target-binding/README.md)의 회귀 뒤 [실제 모델 비교](infra/validation/read-target-live/README.md)를 진행했습니다. 2질문×2비교본·4요청/실제7읽기/모델13완료이며 짧은 systemd 질문에서 무조회 로그 생성이 새 검사기에 거절됐습니다. 필수읽기계획이 없어 실제조회는 미완수, 운영 미채택입니다. 공통 현재/이력/원문 capability와 집계로그경로부터 보완합니다. 20:52 KST B24소스/45허용schema/config·학습본digest·기존 서비스 불변을 확인했습니다.
-
-[관리상태19파일](infra/validation/control-status/application/README.md)과 별도 [journal9코드](infra/validation/journal-adapter/application/README.md)는 정확 승인 대기·운영 미적용입니다. 두 계획에 새 후보/기능을 자동 편입하지 않습니다. 아래 날짜별 내용은 당시 기록입니다.
+[집계 host journal 후보](infra/validation/host-journal/README.md)는 고정 A/B/C 실제 로그와 공통 필수읽기·출처 표시·설치 사전검사를 연결했습니다. Mac1,038/기존 Hermes1,121생략0·실제21논리시험15성공/6실패이며24h errors 검색 지연은 남습니다. 설치된 MCP/모델/실제채팅0·운영 미적용입니다. 앞선 [실제 모델 비교4요청](infra/validation/read-target-live/README.md)의 허위 로그 거절·계획 공백과 별도 증거입니다. 기존19/journal9 정확승인안·운영 모델/권한·기존9변경·논문 산출물은 보존합니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

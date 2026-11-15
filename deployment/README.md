@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+[집계 host journal 개발 후보](../infra/validation/host-journal/README.md)는 후보 설치 사전검사에서 python-systemd235의 SYSTEM_ONLY 지원을 확인하고 기존 모듈 전달을 유지한다. 단일 deploy.sh 정본/운영 설치 입력을 지금 교체한 것은 아니다. 설치 회귀30·Hermes 전체1121생략0이며 신규 OS 전체 설치는 미수행이다. 24h errors 지연·새 모델/MCP/채팅과 정확 새 승인 적용이 남는다. 기존19/journal9 계획의 승인 범위를 확장하지 않는다.
+
 [읽기 시도6소스 개발 후보](../infra/validation/read-attempt-binding/README.md)는 실제 OS/DNS 근거 오류가 남아 미채택이며 단일 deploy.sh 정본/설치 입력을 변경하지 않았다. query143·controller 내장 gate의 향후 같은 SHA 재렌더와 정확 적용/복구·새 채팅 검증은 별도다. 기존19/journal9 정확 계획도 불변이다.
 
 [주장 결속 개발 후보](../infra/validation/claim-modality/README.md)는 실제 DNS 근거 오류가 남아 미채택이며 단일 deploy.sh의 정본/설치 입력에 넣지 않았다. 기존19파일·journal9코드의 정확 적용 계획도 불변이다. 개발 패치 재구성을 운영 설치/새 OS 검증으로 사용하지 않는다.

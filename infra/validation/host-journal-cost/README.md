@@ -1,5 +1,9 @@
 # 호스트 시스템 journal의 전체 구간 검색 후보
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 후속 [실제 MCP·모델4요청](../host-journal-model/README.md)은 B의5읽기·12모델완료를 확인했으나 의미 오류·검사 오탐·대상 확인/시각 경계가 남았다. 운영 미적용·실제채팅0이며 아래 당시 관측을 성공으로 덮어쓰지 않는다.
 
 호스트 전체 오류 로그의 24시간 검색이 시간 제한으로 끝나던 문제를 파일별 native 조회로 보완했다. **A·B·C 실제 격리 시험은 성공했으며 운영에는 아직 적용하지 않았다.** 부모 [집계 journal 후보](../host-journal/README.md)의 실패 기록을 보존하고 별도 후속 패치로 관리한다. 설치된 MCP·모델의 도구 선택·새 Mattermost 응답은 이번 검증 범위에 포함하지 않는다.

@@ -1,5 +1,9 @@
 # 등록 journal native 조회 어댑터
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 후속 [실제 MCP·모델4요청](../host-journal-model/README.md)은 B의5읽기·12모델완료를 확인했으나 의미 오류·검사 오탐·대상 확인/시각 경계가 남았다. 운영 미적용·실제채팅0이며 아래 당시 관측을 성공으로 덮어쓰지 않는다.
 
 후속 [집계 host journal](../host-journal/README.md)과 [파일별 비용 보완](../host-journal-cost/README.md)은 별도 미승인 수정이다. 파일별후보의실제24h A/B/C 응답은CLI전체병합과일치했다. 기존정확9코드적용계획은불변이며 이후속후보를포함하거나승인한것이아니다. 아래등록unit8건·부모21논리시험과후속78요청은대상/분모가다르다. 실제모델/MCP/새채팅은남는다.

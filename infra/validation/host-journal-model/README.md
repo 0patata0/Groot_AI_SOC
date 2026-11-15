@@ -1,5 +1,9 @@
 # 호스트 journal의 실제 MCP·모델 검증
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 **실제 로그 읽기는 가능해졌으나 응답의 의미와 검사에 문제가 남아 운영 후보를 확정하지 않았다.** [파일별 native 후보](../host-journal-cost/README.md)를 현재 학습 모델·SDK에 연결해 새 요청4개를 각각 독립된 대화로 실행했다. 모두 내부 상태는 partial이며, 이를 곧바로 같은 종류의 실패4건이나 정확도 점수로 계산하지 않는다. 조회 완수·모델 주장·검사 거절·최종 답변을 나눠 평가했다.
 
 ## 범위와 실제 결과

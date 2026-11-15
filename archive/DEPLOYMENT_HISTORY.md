@@ -1762,3 +1762,9 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 별도MCP는기존mcpUID/기존capdiag그룹/cap0·자체IPC에서만실행했다. 설치config/키/그룹/권한/기존서비스/모델경로는불변. rootbrokerUID전환·과도한SDK파일검사준비실패는모델요청전확인해권한확대없이수정. own RuntimeMax변경은거절돼기존제한유지.
 
 [새4요청·재현·분모](../infra/validation/host-journal-model/README.md). 소비4관측은정답/SFT가아니며원래9/논문15SHA·두정확계획·framework/자료가중치를보존한다.
+
+## 진단 경계 자체 시험과 운영 미적용 (2026-11-16)
+
+관리자231 경유 B의30설치SHA/45스키마·모델/권한과reader927/ticks7043을 대조했다. 자체657입력의기존Hermes격리검사→비교원본MCP1파일추가/해당13재검사, 별도67입력의mcpUID/cap0 IPC와root고정reader로실제wire/SDK를검증했다. supervisor가자체unit2개를중지·원문69파일/전체SHA보존뒤자체일반785파일/소켓2개·11,908,183B를제거했다. 운영서비스/파일·정본/초기설치·보호호출/실채팅/공격/학습0·기존후보/백업보존. [근거](../infra/validation/diagnostic-read-boundaries/README.md).
+
+2026-11-16T04:51:08.311759+09:00 마감: 실제 시험 source59와 공개 동결643트리의 SHA 일치·worker manifest 결속을 확인했다. Mac자체13652파일/207960500B와생성transport7개도소스11·검수근거보존뒤제거했다. 기존원격모델/설정과reader927/ticks7043·두정확계획·논문15SHA/다른9불변이다.

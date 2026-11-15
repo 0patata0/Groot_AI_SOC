@@ -1,5 +1,9 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 [실제 journal 후보 검증](../validation/host-journal-model/README.md). 현재학습모델과SDK의미승인후보에서4요청·5읽기·12모델완료를확인했다. 37.57/71.63/19.60/39.70초이며각partial·의미/검사/대상오류가남았다. 이시험프로세스만MCP전송이별도IPC이며설치config/권한/추론경로/기존서비스는불변이다. MattermostSLA/모델우위증거아님. 아래는 각 과거 단위의 관측이다.
 
 [실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.

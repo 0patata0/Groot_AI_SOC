@@ -1,9 +1,9 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·방법·확인·복구를 따르는 매뉴얼형 MD·PDF·DOCX56쪽 검수본입니다. 세 형식의 본문·목차·표지·편집 가능 항목을 재검수했고 기존 검수본과 SHA가 같습니다. 논문 폴더 README에서 업무별 읽는 순서와 다음 단계의 통과 기준을 안내합니다. 정장사진/학번은 공란이며 논문/발표/포트폴리오는 로컬 전용입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·실행·확인·복구와 하네스/학습의 방법·이유를 설명하는 매뉴얼형 MD와56쪽 PDF·DOCX 검수본입니다. 사진·학번은 공란이며 로컬 전용입니다.
 
-[호스트 journal의 실제 SDK4요청](infra/validation/host-journal-model/README.md)에서 후보 MCP의5읽기·모델12완료를 확인했습니다. 로그는 읽혔지만 정상 기동을 실패로 묶은 해석·과거/현재와 원인 미확인 검사·대상 확인 지연·not-found/Docker 범위·소수초 경계가 남았습니다. 부모backend24h A5.50/B2.61/C1.94초/CLI일치·1137회귀와 모델의 정확한 보고는 별도입니다. 운영 미적용·실제채널 게시0·기존19/journal9 승인안 불변입니다.
+[진단 시각·대상 후보](infra/validation/diagnostic-read-boundaries/README.md)는 실제 B MCP에서 소수초 성공과3인자 거절, 실제SDK의 대상 확인8.389초/모델0을 검증했습니다. 나머지 두 응답에는 부재 정정과 not-found/default Result 해석 오류가 남아 운영 승격하지 않았습니다. Mac1084/Hermes1167 회귀·공식Harness²·실제 모델 내용과 운영/채팅 완료는 별개입니다. 현재 소스·권한·모델과 기존19/journal9 승인안은 유지합니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

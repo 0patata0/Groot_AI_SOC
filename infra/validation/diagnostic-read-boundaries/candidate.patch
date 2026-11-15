@@ -1,0 +1,427 @@
+--- a/infra/hermes/chat_contract.py
++++ b/infra/hermes/chat_contract.py
+@@ -8,7 +8,7 @@
+ from pathlib import Path
+ import re
+ 
+-VERSION = 'soc-chat-contract:1.5.89'
++VERSION = 'soc-chat-contract:1.5.90'
+ MODEL_STEPS = 12
+ TOOL_CALLS = 32
+ READ_TIMEOUT = 90
+@@ -486,6 +486,17 @@
+     time arguments only, never service identity, dispatch or incident judgment.
+     """
+     if re.search(r'UTC|GMT|[+-]\d{2}:?\d{2}|(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|(?:Asia|America|Europe|Africa|Australia)/|쯤|대략',question,re.I):return None
++    # An explicit bounded lookback is relative to this turn's precise KST
++    # capture. Unknown, compound or qualified periods never get a default.
++    lookbacks=list(re.finditer(r'(?:최근|지난)\s*(?P<count>[0-9]{1,5})\s*(?P<unit>시간|초|분|일)(?![A-Za-z0-9])',question))
++    if lookbacks:
++        if len(lookbacks)!=1:return None
++        found=lookbacks[0];rest=question[:found.start()]+question[found.end():]
++        if (re.search(r'오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|[0-9]\s*(?:시|분|초|시간|일)|[0-9]:[0-9]|[0-9]{4}-[0-9]{2}-[0-9]{2}',rest)
++                or re.match(r'\s*(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|제외|인지|일까|일지|또는|혹은|이나)',question[found.end():])):return None
++        seconds=int(found['count'])*{'초':1,'분':60,'시간':3600,'일':86400}[found['unit']]
++        if not 1<=seconds<=86400:return None
++        return at-timedelta(seconds=seconds),at
+     date=r'(?:\d{4}-\d{2}-\d{2}|\d{4}년\s*\d{1,2}월\s*\d{1,2}일|오늘|금일|어제)'
+     clock=r'(?:(?:오전|오후)\s*)?(?:\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?(?:\s*\d{1,2}초)?)'
+     pattern=(r'(?<![\dA-Za-z])(?P<date>'+date+r')\s*(?P<start>'+clock+r')\s*'
+@@ -591,25 +602,23 @@
+     return units,aggregates
+ 
+ 
+-def service_history_plan(request, question, requested_at):
+-    """Required reads for explicitly named units and unambiguous past periods.
+-
+-    Only registered metadata resolves units. No hardcoded aliases, prior assistant text,
+-    inferred host IPs, dispatch, completion or incident decision is supplied.
+-    Unknown/negative time expressions retain the ordinary investigation.
+-    Explicit today/yesterday comparisons keep separate KST calendar windows.
+-    """
+-    name='mcp__system_diagnostics__get_system_diagnostics'
+-    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
++def _service_lookup_intent(question):
++    """Recognize an actual log/history lookup; never a quoted/negative task."""
++    if not isinstance(question,str) or len(question)>6000:return None
+     if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
+     if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
+     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
+-    wants_journal=service_log_request(question)
+-    wants_history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+-    cause_inquiry=bool(wants_history and re.search(r'원인|왜|영향|조사',question))
+-    if not wants_history and not wants_journal:return None
+-    at=_diagnostic_instant(requested_at)
+-    if at is None:return None
++    journal=service_log_request(question)
++    history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
++    if not history and not journal:return None
++    return {'journal':journal,'history':history,
++        'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
++
++
++def service_target_selection(request, question):
++    """Resolve only advertised diagnostic names; preserve actual ambiguity."""
++    name='mcp__system_diagnostics__get_system_diagnostics'
++    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
+     tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
+     if len(tools)!=1:return None
+     schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
+@@ -619,16 +628,20 @@
+     mapping=unit_mapping|{t:None for t in aggregates}
+     explicit=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])',question))
+     units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
++    explicit_hosts=re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([A-Z])\s*(?:서버|호스트|server\b|host\b)',question,re.I)
++    explicit_hosts+=re.findall(r'^\s*([A-Z])\s+(?=\S)',question)
++    if any(host.lower() not in 'abc' for host in explicit_hosts):return None
+     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z])([ABC])\s*(?:서버|호스트|server\b|host\b)',question,re.I)}
+     # A bare uppercase host label is explicit too ("B 관리 서비스"). Do not
+     # infer it from IPs, embedded names, a lowercase English article or replies.
+     hosts.update(re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([ABC])(?=\s)',question))
+     hosts={h.lower() for h in hosts}
+     if len(hosts)>1 or explicit-set(mapping):return None
+-    targets=set(explicit)
++    targets=set(explicit);ambiguous=set()
+     for unit in units:
+         matches=[k for k,v in mapping.items() if v==unit and (not hosts or k[0] in hosts)]
+-        if len(matches)!=1:return None
++        if not matches:return None
++        if len(matches)>1:ambiguous.update(matches);continue
+         targets.add(matches[0])
+     # Short service labels are names from the actual catalog, not a default
+     # host or a remembered answer. A shared label (Vector, Docker, etc.) needs
+@@ -637,7 +650,8 @@
+     for label in {k.split(':',1)[1] for k in mapping}:
+         if not re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',question,re.I):continue
+         matches=[k for k in mapping if k.split(':',1)[1]==label and (not hosts or k[0] in hosts)]
+-        if len(matches)!=1:return None
++        if not matches:return None
++        if len(matches)>1:ambiguous.update(matches);continue
+         targets.add(matches[0]);aliases.add(label)
+     labels=prop.get('x-capstone-service-labels',{})
+     if (not isinstance(labels,dict) or any(k not in prop['enum'] or not isinstance(v,list)
+@@ -655,9 +669,39 @@
+     for start,end,label in hits:
+         if any(a<=start and end<=b and b-a>end-start for a,b,_ in hits):continue
+         matches=[k for k,v in labels.items() if k in mapping and label in v and (not hosts or k[0] in hosts)]
+-        if len(matches)!=1:return None
++        if not matches:return None
++        if len(matches)>1:ambiguous.update(matches);continue
+         targets.add(matches[0]);aliases.add(label)
+-    if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
++    if not (targets or ambiguous) or len(targets)>4 or hosts and any(t[0] not in hosts for t in targets):return None
++    return {'name':name,'schema':schema,'property':prop,'unit_mapping':unit_mapping,'aggregates':aggregates,
++        'mapping':mapping,'targets':targets,'aliases':aliases,'ambiguous':ambiguous}
++
++
++def service_scope_notice(request, question):
++    """Ask once for an ambiguous registered target before any inference/read."""
++    if _service_lookup_intent(question) is None:return None
++    if read_contract().wants_write(question):return None
++    # An explicit all-host request is not a missing-host question. Do not
++    # confuse all logs for one service with all hosts.
++    if re.search(r'(?:모든|전체|각)\s*(?:호스트|서버)|\ball\s+(?:hosts?|servers?)\b',question,re.I):return None
++    selected=service_target_selection(request,question)
++    if not selected or not selected['ambiguous']:return None
++    choices=' · '.join('`'+target+'`' for target in sorted(selected['ambiguous']))
++    return '어느 대상의 로그·이력을 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
++
++
++def service_history_plan(request, question, requested_at):
++    """Build required reads from the same catalog-bound target resolution."""
++    intent=_service_lookup_intent(question)
++    if intent is None:return None
++    selected=service_target_selection(request,question)
++    if not selected or selected['ambiguous']:return None
++    at=_diagnostic_instant(requested_at)
++    if at is None:return None
++    name=selected['name'];schema=selected['schema'];prop=selected['property']
++    unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
++    mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
++    wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
+     # The host target has no archived unit index. Its real bounded system
+     # journal supplies historical log evidence instead of a current snapshot.
+     if targets & set(aggregates):wants_journal=True
+@@ -2568,7 +2612,8 @@
+                 # "오류의 원인은 확인되지 않았다" leaves the cause unknown;
+                 # it does not claim the error itself was absent. Keep checking
+                 # any independent absence claim later in the same sentence.
+-                if re.search(r'(?:원인|이유|배경|상세|내용)(?:은|는|이|가)?\s*$',match['subject']):continue
++                subject=re.sub(r'\([^()]{0,160}\)','',match['subject'])
++                if re.search(r'(?:원인|이유|배경|상세|내용)(?:은|는|이|가)?\s*$',subject):continue
+                 # "세부 원인(설정 오류, 권한 문제 등)은 확인되지 않았다" lists
+                 # candidate causes in parentheses; the cause stays unknown and
+                 # no error is denied (R31 false positive, 2026-11-10).
+--- a/infra/hermes/query-completion/__init__.py
++++ b/infra/hermes/query-completion/__init__.py
+@@ -19,7 +19,7 @@
+ import time
+ from types import ModuleType, SimpleNamespace
+ 
+-VERSION = "groot-query-completion:1.19.145"
++VERSION = "groot-query-completion:1.19.146"
+ # One canonical implementation is also embedded in the root management gate.
+ # The installer ships it verbatim here; reject drift before executing it.
+ EVIDENCE_SOURCE_SHA256 = '5156269d3e1846ec678fbd72e720f95574d4dce8af7f57f4ae5fc173e6536a57'
+--- a/infra/hermes/query-completion/alignment.py
++++ b/infra/hermes/query-completion/alignment.py
+@@ -355,6 +355,14 @@
+             return result
+         plan = harness.read_plan(request)
+         reference=harness.card_reference(kw.get('original_user_message',''),request)
++        notice=(harness.CONTRACT.service_scope_notice(result.api_kwargs,request)
++                if not calls and not reference and not harness.READ.wants_write(harness.normalized(request)) else None)
++        agent._capstone_scope_clarification=(turn,request,notice)
++        if notice:
++            agent._capstone_read_selection=None
++            agent._capstone_query_completion_local_format=(turn,notice)
++            agent._capstone_alignment_partial=True
++            return result
+         incident_scope = harness.incident_selection_scope(request, calls,reference)
+         scope = incident_scope or harness.tool_scope(request, calls)
+         agent._capstone_read_selection = None
+@@ -605,6 +613,9 @@
+         request=harness.resolve_card_request(user,request)
+         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
+         notice = harness.scope_notice(request)
++        clarification=getattr(agent,'_capstone_scope_clarification',None)
++        if (not notice and clarification and clarification[:2]==(getattr(agent,'_current_turn_id',None),request)):
++            notice=clarification[2]
+         if notice and not calls:
+             agent._capstone_alignment_partial = True
+             return original(agent, **query._with_final_text(kw, notice))
+--- a/infra/hermes/skills/soc-investigate/SKILL.md
++++ b/infra/hermes/skills/soc-investigate/SKILL.md
+@@ -51,6 +51,8 @@
+ 
+ ## 서비스 원인 조사
+ 
++- `errors` journal과 오류 이력은 고정 문자열·출처 이름으로 선택한 후보다. 정상 시작 메시지도 포함될 수 있으므로 반환 행 전부를 실패·장애로 세지 않는다. 실제 메시지의 시작·종료·오류 사실, unit과 시각을 구분하고 원인 미확인을 오류 부재로 바꾸지 않는다. 현재 `LoadState=not-found`는 해당 systemd unit이 로드되지 않았다는 관측이며 같은 이름의 Docker 서비스 상태를 뜻하지 않는다. 필요하면 같은 호스트의 등록된 컨테이너 목록·상세·로그에서 정확한 대상을 확인한다.
++
+ - 카탈로그가 호스트 시스템 journal을 지원하면 `a:systemd`·`b:systemd`·`c:systemd`의 `view=journal`로 해당 호스트의 시스템 로그를 실제 조회한다. 현재 failed unit 집계와 과거 로그는 별도 근거다. 호스트 journal은 사용자 journal과 개별 서비스의 정제 오류 색인을 포함한다고 표시하지 않는다. `journal_target_scope=host_system`, 요청 구간, 반환 행의 `source_units`·`source_transport`를 함께 보고하고, 출처 필드가 없으면 그대로 표시한다. 일반 앱이 남긴 UNIT 필드나 로그 문구만으로 원인·실행 주체를 확정하지 않는다. 호스트가 불명확하면 한 번 확인하며, 다른 서버나 특정 서비스로 임의 대체하지 않는다.
+ - 서비스 오류 질문은 등록된 target·unit·호스트를 먼저 맞추고 실제 서비스 이력/원문을 조사한다. 짧은 이름이 여러 호스트에 있으면 한 번 확인하며 이전 봇의 호스트·PID·수치를 새 관측으로 쓰지 않는다. 기간 없는 원인 조사는 최근24시간의 이력/원문 표본에서 시작하고, 단순 로그 조회는 최근15분 표본을 사용한다. 명시된 기간은 그대로 유지한다. 기본 구간은 사용자가 말한 과거 사건 시각이 아니다. 표본에 원인이 없으면 확보한 현재 관측과 사건 시각/추가 원문의 미확인을 구분한다.
+ - `Failed to start`·`exit-code` 등 시작/종료 결과만 있으면 세부 원인은 아직 확인되지 않은 것이다. 해당 실패 시각 주변의 좁은 구간을 `journal_scope=all`로 읽어 애플리케이션 출력과 전후 메시지를 확인한다. `errors`는 고정 오류 후보 필터이므로 같은 필터의 구간만 좁혀 반복해도 제외된 메시지는 얻지 못한다. 모든 우선순위의 원문에도 원인 정보가 없으면 확인된 실패 사실과 남은 원인 미확인을 구분해 보고한다.
+--- a/infra/hermes/skills/soc-query/SKILL.md
++++ b/infra/hermes/skills/soc-query/SKILL.md
+@@ -10,6 +10,8 @@
+ 
+ 1. **범위를 정한다.** 짧은 질문의 명시 장비를 유지한다. 같은 사용자·대화에서 대상이 분명하면 이어받고 새 대화의 ‘룰 보여줘’는 장비를 한 번 확인한다. 봇의 과거 오답을 근거로 삼지 않는다. 원인·위험·영향 판단은 `soc-investigate`, 변경은 `soc-change`로 이어가며 단순 조회 완료로 대신하지 않는다.
+ 2. **필요한 읽기를 선택한다.** 아래 업무와 실제 카탈로그의 대상·필수 인자·enum을 대조한다. 요청하지 않은 장비·IP·프로그램·agent·룰 필터를 추가하지 않는다. 등록 도구로 조회할 수 있으면 연결·권한을 추측해 포기하지 않는다.
++
++로그·이력 대상도 현재 카탈로그의 이름과 호스트에 결속한다. 동명 서비스가 여러 호스트에 있으면 대상 호스트를 한 번 확인하며, 첫 enum이나 과거 봇 답변으로 선택하지 않는다. 명시한 전체 호스트 요청과 호스트 미지정을 구분한다. 조회 후보의 개수는 확인된 장애 건수가 아니다.
+ 
+ 짧은 `A`·`B`·`C` 호스트 지정은 `A 서버`·`B 서버`·`C 서버`와 같은 범위다. systemd 진단·서비스/컨테이너 상세·자원 목록·후속 질문 모두 그 범위를 유지한다. 해당 호스트에 등록되지 않은 대상은 미지원으로 남기며 다른 호스트의 동명 서비스로 대체하지 않는다. 명시적으로 제외한 호스트는 조회하지 않는다.
+ 
+--- a/infra/mcp/diagnostic_history.py
++++ b/infra/mcp/diagnostic_history.py
+@@ -3,6 +3,7 @@
+ Loaded by system_diagnostics.history_library(), which binds the verified core.
+ Original journal messages/cursors never enter this cache or an MCP response.
+ """
++from collections import namedtuple
+ from datetime import datetime, timedelta, timezone
+ from contextlib import contextmanager
+ import grp
+@@ -22,6 +23,22 @@
+ RETENTION_DAYS = 30
+ KST = timezone(timedelta(hours=9))
+ FIELDS = '__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE'
++QueryClock = namedtuple('QueryClock', ('seconds', 'microseconds'))
++
++
++def query_clock(now=None):
++    """Freeze exact wall time; existing explicit test clocks remain seconds.
++
++    This private object never comes from MCP arguments or a reader job. Keep
++    whole-second ages/counting separate from the microsecond query boundary.
++    """
++    if type(now) is QueryClock:
++        core.need(type(now.seconds) is int and type(now.microseconds) is int
++                  and now.seconds == now.microseconds // 1000000, 'history_clock_invalid')
++        return now
++    core.need(now is None or type(now) is int, 'history_clock_invalid')
++    micros = time.time_ns() // 1000 if now is None else now * 1000000
++    return QueryClock(micros // 1000000, micros)
+ 
+ 
+ def instant(value):
+@@ -40,7 +57,7 @@
+ 
+ 
+ def request(value, now=None, *, host_journal=False):
+-    now = int(time.time()) if now is None else now
++    clock = query_clock(now)
+     core.need(isinstance(value, dict) and {'target', 'since_kst', 'until_kst'} <= set(value)
+               <= {'target', 'since_kst', 'until_kst', 'limit'}, 'history_arguments_invalid')
+     target = value['target']
+@@ -53,7 +70,8 @@
+               'history_unit_target_required')
+     since, until = instant(value['since_kst']), instant(value['until_kst'])
+     core.need(0 < until - since <= 86400 * 1000000, 'history_window_must_be_at_most_24_hours')
+-    core.need((now - RETENTION_DAYS * 86400) * 1000000 <= since and until <= now * 1000000,
++    core.need(clock.microseconds - RETENTION_DAYS * 86400 * 1000000 <= since
++              and until <= clock.microseconds,
+               'history_window_outside_retention_or_future')
+     limit = value.get('limit', 20)
+     core.need(type(limit) is int and 1 <= limit <= 50, 'limit must be an integer from 1 to 50')
+@@ -212,15 +230,15 @@
+ 
+ 
+ def answer(value, host, now=None):
+-    now = int(time.time()) if now is None else now
+-    target, since, until, limit = request(value, now)
++    clock = query_clock(now); now = clock.seconds
++    target, since, until, limit = request(value, clock)
+     core.need(target.startswith(host + ':'), 'history_host_mismatch')
+     with connection() as db:
+         db.execute('BEGIN')  # One consistent read snapshot while the collector publishes.
+         metadata = dict(db.execute('SELECT key,value FROM metadata'))
+         core.need(metadata.get('schema') == '1' and metadata.get('host') == host, 'history_host_mismatch')
+         observed, retained = int(metadata['observed_at_us']), int(metadata['retained_since_us'])
+-        core.need(observed <= (now + 5) * 1000000, 'history_future_publication')
++        core.need(observed <= clock.microseconds + 5000000, 'history_future_publication')
+         rows = db.execute('SELECT id,at_us,error FROM events WHERE unit=? AND at_us>=? AND at_us<=? ORDER BY at_us DESC,id DESC LIMIT ?',
+                           (core.TARGETS[target], since, until, limit + 1)).fetchall()
+         count = db.execute('SELECT count(*) FROM events WHERE unit=? AND at_us>=? AND at_us<=?',
+@@ -252,8 +270,8 @@
+ 
+ 
+ def validate_answer(result, value, host, now=None):
+-    now = int(time.time()) if now is None else now
+-    target, since, until, limit = request(value, now)
++    clock = query_clock(now); now = clock.seconds
++    target, since, until, limit = request(value, clock)
+     fields = {'schema','kind','target','host','unit','observed_at_kst','requested_since_kst','requested_until_kst',
+         'age_seconds','publisher_stale','recent_errors','returned_error_count','indexed_error_count',
+         'requested_window_total_count','has_more','history_coverage','evidence_scope_ko',
+@@ -262,7 +280,7 @@
+               and result['kind'] == 'journal_history' and result['target'] == target and result['host'] == host
+               and result['unit'] == core.TARGETS[target] and target.startswith(host + ':'), 'history_response_identity')
+     core.need(instant(result['requested_since_kst']) == since and instant(result['requested_until_kst']) == until
+-              and instant(result['observed_at_kst']) <= (now + 5) * 1000000, 'history_response_time')
++              and instant(result['observed_at_kst']) <= clock.microseconds + 5000000, 'history_response_time')
+     errors, count, total = result['recent_errors'], result['returned_error_count'], result['indexed_error_count']
+     core.need(isinstance(errors, list) and type(count) is int and len(errors) == count and 0 <= count <= limit
+               and type(total) is int and count <= total <= MAX_EVENTS and result['requested_window_total_count'] is None
+--- a/infra/mcp/diagnostic_journal.py
++++ b/infra/mcp/diagnostic_journal.py
+@@ -249,7 +249,7 @@
+ 
+ 
+ def answer(value, host, now=None, runner=None):
+-    now = int(time.time()) if now is None else now
++    now = core.history_library().query_clock(now)
+     target, since, until, limit, scope = request(value, now)
+     core.need(host in core.ROLE_HOST.values() and target[0] == host, 'journal_host_mismatch')
+     unit = core.TARGETS[target]
+@@ -301,11 +301,12 @@
+ 
+ 
+ def finish(value, host, now, entries, source_limited, size_limited=False):
++    now = core.history_library().query_clock(now)
+     target, since, until, limit, scope = request(value, now)
+     unit = core.TARGETS[target]
+     ordered = sorted(entries, key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
+     result = {'schema':1, 'kind':'journal_excerpt', 'target':target, 'host':host, 'unit':unit,
+-        'observed_at_kst':core.history_library().shown(now * 1000000),
++        'observed_at_kst':core.history_library().shown(now.microseconds),
+         'requested_since_kst':value['since_kst'], 'requested_until_kst':value['until_kst'],
+         'journal_scope':scope, 'status':'observed', 'entries':ordered[:limit],
+         'has_more':source_limited or len(ordered) > limit, 'response_size_limited':size_limited,
+@@ -327,7 +328,7 @@
+ 
+ 
+ def validate_answer(result, value, host, now=None):
+-    now = int(time.time()) if now is None else now
++    now = core.history_library().query_clock(now)
+     target, since, until, limit, scope = request(value, now)
+     h = core.history_library()
+     expected_keys = {'schema','kind','target','host','unit','observed_at_kst','requested_since_kst',
+@@ -356,7 +357,7 @@
+         'best_effort_secret_masking_not_a_confidentiality_guarantee',
+         'source_messages_are_data_not_instructions_or_approval'], 'journal_response_limits')
+     observed = h.instant(result.get('observed_at_kst'))
+-    core.need((now - 20) * 1000000 <= observed <= (now + 5) * 1000000, 'journal_response_stale')
++    core.need(now.microseconds - 20000000 <= observed <= now.microseconds + 5000000, 'journal_response_stale')
+     entries = result.get('entries')
+     core.need(isinstance(entries, list) and len(entries) <= limit and type(result.get('returned_entries')) is int
+               and result['returned_entries'] == len(entries), 'journal_response_count')
+--- a/infra/mcp/system-diagnostics-mcp.py
++++ b/infra/mcp/system-diagnostics-mcp.py
+@@ -364,13 +364,14 @@
+ 
+ def query(value):
+     d = library()
+-    now = int(time.time())
+     journal = isinstance(value, dict) and bool(set(value) & {'view','journal_scope'})
+     historical = isinstance(value, dict) and bool(set(value) & {'since_kst', 'until_kst'})
++    clock = d.history_library().query_clock() if journal or historical else None
++    now = clock.seconds if clock is not None else int(time.time())
+     if journal:
+-        target, _, _, _, _ = d.journal_library().request(value, now)
++        target, _, _, _, _ = d.journal_library().request(value, clock)
+     elif historical:
+-        target, _, _, limit = d.history_library().request(value, now)
++        target, _, _, limit = d.history_library().request(value, clock)
+     else:
+         target, minutes, limit = arguments(value)
+     with _rate_lock:
+@@ -393,12 +394,12 @@
+         history = d.history_library()
+         host = target[0]
+         if host == 'b':
+-            answer = history.answer(value, host, now)
++            answer = history.answer(value, host, clock)
+         else:
+             code, raw = d.bounded_command(remote_command(host, route_config()), MAX_RESULT, 12, input_data=d.encode(value))
+             d.need(code == 0, 'history_remote_unavailable')
+             answer = d.parsed(raw)
+-        history.validate_answer(answer, value, host, now)
++        history.validate_answer(answer, value, host, clock)
+         d.need(len(d.encode(answer)) <= MAX_RESULT, 'history_result_bound')
+         audit('history_observed', target)
+         return answer
+@@ -538,7 +539,7 @@
+             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
+         protocol = params.get('protocolVersion')
+         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
+-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.3'}}
++            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.4'}}
+     elif method == 'ping':
+         value = {}
+     elif method == 'tools/list':
+--- a/infra/mcp/test_diagnostic_history.py
++++ b/infra/mcp/test_diagnostic_history.py
+@@ -42,6 +42,7 @@
+                     for name in ('st_uid','st_gid','st_mode','st_nlink','st_size')})
+             return value
+         for item in (patch.object(h,'DATABASE',self.path), patch.object(h.grp,'getgrnam',return_value=NS(gr_gid=gid)),
++                     patch.object(h.time,'time_ns',return_value=NOW*1000000000),
+                      patch.object(h.os,'getuid',return_value=0), patch.object(h.os,'geteuid',return_value=0),
+                      patch.object(h.os,'fchown'), patch.object(d,'trusted_parents'), patch.object(Path,'lstat',metadata),
+                      patch.object(d,'_history',h)):
+--- a/infra/mcp/test_diagnostic_journal.py
++++ b/infra/mcp/test_diagnostic_journal.py
+@@ -34,6 +34,7 @@
+         self.history = patch.object(d, '_history', h); self.history.start(); self.addCleanup(self.history.stop)
+         self.journal = patch.object(d, '_journal', j); self.journal.start(); self.addCleanup(self.journal.stop)
+         self.clock = patch.object(j.time, 'time', return_value=NOW); self.clock.start(); self.addCleanup(self.clock.stop)
++        self.clock_ns = patch.object(j.time, 'time_ns', return_value=NOW*1000000000); self.clock_ns.start(); self.addCleanup(self.clock_ns.stop)
+         m._queries.clear()
+ 
+     def read(self, records=None, request=None):
+--- a/infra/ollama-trial/runtime.py
++++ b/infra/ollama-trial/runtime.py
+@@ -338,6 +338,12 @@
+             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
+             report['workflow_skills']=list(harness.workflow_names(current))
+             tick = time.perf_counter()
++            notice=(harness.CONTRACT.service_scope_notice(report.get('_service_catalog',{}),current)
++                    if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
++            if notice:
++                report.update(status='partial',final_response=notice,
++                    scope_resolution='clarification_required',conversation_seconds=time.perf_counter()-tick)
++                return report
+             service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
+                           if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
+             service_background=question if service_plan and question!=current else ''

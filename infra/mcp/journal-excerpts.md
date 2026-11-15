@@ -1,5 +1,9 @@
 # 제한된 서비스 journal 조회
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 [실제 journal 후보 검증](../validation/host-journal-model/README.md). 전체구간 backend일치 뒤 실제B 후보MCP/SDK에서로그가반환됐다. 반환은고정필터후보이며Started행도포함된다. 실제실패·원인·현재상태와구분해야하며partial원인/과거ExitCode검사·소수초경계는미수정이다. 운영reader는기존상태다. 아래는 각 과거 단위의 관측이다.
 
 후속 [정확9코드 journal 적용안](../validation/journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.

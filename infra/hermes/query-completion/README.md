@@ -1,5 +1,9 @@
 # Mattermost 조회 응답 보완
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../../validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 [실제 journal 후보 검증](../../validation/host-journal-model/README.md). query1.19.145미승인후보로실제SDK읽기를확인했으나부재/과거종료값검사와미지정대상가짜0건·확인질문지연이남았다. 운영query1.19.137과혼동하지않는다. 같은입력재처리는새독립사례가아니며공통후속후보를검증해야한다. 아래는 각 과거 단위의 관측이다.
 
 [읽기 시도 결속 후보](../../validation/read-attempt-binding/README.md)의 query1.19.143/contract1.5.86은 격리 버전이다. Native 이번턴 고유 callID/실제 응답과 root dispatch의 반환/거절/예외를 검사하고 원래 허용·예산을 유지했다. 기존 Hermes785생략0은 실제 Native 운영 채팅을 대신하지 않으며 OS 대상명 서술 등 잔여로 미채택이다. 설치137·별도141 준비/승인 대기는 불변이다.

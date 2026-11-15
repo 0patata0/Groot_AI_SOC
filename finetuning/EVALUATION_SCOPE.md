@@ -1,5 +1,9 @@
 # 평가 자료의 사용 이력·업무 범위 정정
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../infra/validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 **기존 test176을 “미사용 독립 SOC 평가”라고 부른 최근 현황 요약은 잘못된 표현이었다. 실제 파일은 이미 사용한 CTI128개와 GUIDE48개이며 도구 workflow는0개다.** [검증 원장](EVALUATION_SCOPE_AUDIT.json) · [해시 기반 사용 원장](EVALUATION_USAGE.json) · [현재 상태](../STATUS.md). 과거 생성/학습 기록을 삭제하거나 다시 채점하지 않고 이 정정으로 범위를 한정한다.
 
 | 자료 | 실제 구성과 사용 이력 | 사용할 수 있는 근거 |

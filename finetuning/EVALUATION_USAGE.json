@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-16T00:08:29.525755+09:00",
+  "updated_at_kst": "2026-11-16T04:14:16.852547+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -778,6 +778,34 @@
           "record_sha256": "8e9c1e3b4283fa28e32c4a109b71d9b8e1a40a3199353618d066929a92b45429",
           "visible_input_sha256": "3a7fc2bdee298c5133d6aa7436ff6d67111f7cb90e574378afb99eb275d7ae00",
           "nonassistant_input_sha256": "829b0a65b45687cace1af0fe5c23c903aecdd8c5b5c2b48d6a2d06a966069a6e"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "diagnostic-read-boundaries-development",
+      "data_sha256": "2b7390ce10cf693c909c7c2a6976d89750cda4d60bcd7951114b7476acf81acb",
+      "records": 3,
+      "evidence": "infra/validation/diagnostic-read-boundaries/validation.json",
+      "evidence_sha256": "e6b73f605c25f86f23638763a4cd61c32b9c52599fd978a2ac9a4d68c6c9726e",
+      "consumed_at_kst": "2026-11-16T03:53:10.389345+09:00",
+      "task": "Observed developer user/final-answer fixtures, including one pre-model clarification. Known answer defects; never gold/SFT or new held-out SOC evidence.",
+      "fingerprint_scope": "Observed question/final-answer only; not complete actual runtime wire prompts/tools/policy/evidence.",
+      "fingerprints": [
+        {
+          "record_sha256": "575602a1779cee312adfba2e5c7dbc1a6a3ba0bb52cf1823329d47fedaf730c7",
+          "visible_input_sha256": "4e73eed51892691c6c8667dd2f25eaa029353121a71f871dccaf125e4c310720",
+          "nonassistant_input_sha256": "554e688a5df961e3aa3898f31984f6283a2951558e9229daa0b0afe9f53b4a5f"
+        },
+        {
+          "record_sha256": "71c8005f1f4b1b718e78f1b347d3f1d50446c701430a2912c937488adf44c739",
+          "visible_input_sha256": "f2feb29f4d2c5cf273436b5e1a4380c6f7055bd7f5a84c58533696e7e0c2162e",
+          "nonassistant_input_sha256": "50fbd00f37230c04ec04f57f811b152e4b5fda72a8a292e773871f75ca811727"
+        },
+        {
+          "record_sha256": "31b419e76d243210bef9a7da8e57bc69cbd3a55f65ba7e079b6af011d5a68099",
+          "visible_input_sha256": "7da80c0f5ece1f9fa9d07be971e5110c73ffc686d2aa82dbf8ae8de7654bb169",
+          "nonassistant_input_sha256": "ebf3d5fc7c7bdf39baae38d9553b190a188345c8221ebcaff639f6f4ce9fbff9"
         }
       ]
     }

@@ -1,5 +1,9 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../infra/validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 [현재 학습본의 OS 조회 후속](../infra/validation/read-target-live/README.md)에서2질문×2비교본4요청/실제7읽기/기록된모델13완료를 확인했다. 조회 없이 만든 로그와 없는Type추정은 검사에 걸렸지만 공통 집계로그 계획 공백 때문에 실제 조회가 미완수다. 코드/도구capability 문제와 모델 근거해석 오류를 구분하며 새 학습으로 해결했다고 쓰지 않는다. 현재 자료·가중치·모델은 불변이며 일반정확도/학습우위 점수로 환산하지 않는다.
 
 학습 방법을 설명할 때에는 [실제 설정](config.qwen36-operator.json)·[품질 준비](QUALITY_PREPARATION.md)·[본학습 원장](BALANCED_MAIN_20261107.json)·[운영 전환](TRAINED_OPERATION_20261108.md)을 함께 대조한다. 로컬 논문은 준비/방법/이유/확인/복구의 매뉴얼형56쪽으로 상세화했다. 학습 전4비트 양자화 없는 LoRA와 학습 후Q4_K_M 추론 변환을 구분하고, 균형1,220건·610step·중단 재개·토큰 마스크와 소비된 평가176의 한계를 명시했다. 이번 설명·하네스 회귀 작업으로 새 학습·가중치·모델 교체를 수행하지 않았다.

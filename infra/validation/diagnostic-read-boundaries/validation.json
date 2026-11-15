@@ -1,0 +1,172 @@
+{
+  "status": "partially_improved_not_applied",
+  "scope": "Frozen private composite, real B candidate MCP and current B-to-Thor SDK. No production install, Hermes live request, Mattermost delivery or independent SOC-quality benchmark.",
+  "cases": [
+    {
+      "id": "target-clarify",
+      "question": "systemd 오류 로그 좀 볼래?",
+      "status": "partial",
+      "calls": 0,
+      "recorded_model_completions": 0,
+      "total_seconds": 8.3893784530228,
+      "initialization_seconds": 8.163970091030933,
+      "final_response_sha256": "88b21936c52baf0a4ea5a0766b8f698c0e358d3b8529947c86e0f95aeba3ffa6",
+      "observed_failure_types": []
+    },
+    {
+      "id": "recent-host-log",
+      "question": "B systemd 최근 10분 오류 로그만 표로 보여줘",
+      "status": "partial",
+      "calls": 1,
+      "recorded_model_completions": 4,
+      "total_seconds": 34.01402208697982,
+      "initialization_seconds": 4.166263160004746,
+      "final_response_sha256": "23b429318f1c6fb0de4179788ecaf1d39ca3cab398f380941f3c3e3227fe59fd",
+      "observed_failure_types": [
+        "unsupported_absence_pruned"
+      ]
+    },
+    {
+      "id": "typed-service",
+      "question": "B Vector 지금 상태와 최근 15분 로그를 함께 보여줘",
+      "status": "partial",
+      "calls": 3,
+      "recorded_model_completions": 2,
+      "total_seconds": 21.885769928980153,
+      "initialization_seconds": 5.569262893986888,
+      "final_response_sha256": "83c81acc75c7ab6511a210ebbaff63409843dcc285f89ccab8443086658caa27",
+      "observed_failure_types": [
+        "not_found_default_result_not_execution_evidence",
+        "unit_state_not_process_or_container_state"
+      ]
+    }
+  ],
+  "candidate_mcp": {
+    "successful_data_reads": 2,
+    "rejected_arguments": 3,
+    "same_second_observed": true,
+    "server_version": "1.4.4"
+  },
+  "sdk_data_reads": 4,
+  "recorded_model_completions": 6,
+  "protected_calls": 0,
+  "chat_posts": 0,
+  "operating_changes": 0,
+  "regressions": {
+    "mac": {
+      "run": 1084,
+      "passed": 1078,
+      "skipped": 6,
+      "skip_reason": "six existing optional OpenAI tests; new thirty no skips"
+    },
+    "hermes": {
+      "run": 1167,
+      "passed": 1167,
+      "skipped": 0,
+      "fixture_packaging_correction": "initial thirteen-clock profile had one missing comparison-MCP fixture; unchanged baseline file added and only that profile rerun",
+      "network_connect_denied": true,
+      "uid": 10001,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283"
+    }
+  },
+  "live_snapshot": {
+    "at_kst": "2026-11-16T03:22:45.272707+09:00",
+    "installed_sources_verified": 30,
+    "changed_sources": [],
+    "actual_catalog_count": 45,
+    "catalog_schema_hashes_match_previous": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "access_mode": "hermes-parity",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "catalog_only_data_calls": 0,
+    "model_calls": 0,
+    "operating_changes": 0
+  },
+  "private_result_sha256": "37c2f9652d98fd11a61c34359194ceffca090a65a730246fc9dd17ad6897e11a",
+  "wire_probe_sha256": "dc87ff361578ee0c78d1b05e6c11010827bb515205efeed4f47455fb58338f52",
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "components": {
+      "always_on_chars": 16917,
+      "n_files": 35,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 20,
+      "plugins": 0
+    },
+    "modified_components": [
+      "scripts/chat_contract.py",
+      "scripts/extra_test_diagnostic_history.py",
+      "scripts/extra_test_diagnostic_journal.py",
+      "scripts/mcp/diagnostic_history.py",
+      "scripts/mcp/diagnostic_journal.py",
+      "scripts/mcp/system-diagnostics-mcp.py",
+      "scripts/native_alignment.py",
+      "scripts/native_query.py",
+      "scripts/sdk_runtime.py",
+      "skills/soc-investigate/SKILL.md",
+      "skills/soc-query/SKILL.md"
+    ],
+    "always_on_char_delta": 0
+  },
+  "limitations": [
+    "All three SDK statuses partial; target clarification is an intentional question, not a completed data lookup.",
+    "Started record was correctly identified; an unsupported period-wide absence sentence was pruned.",
+    "Typed-service answer still derives historical success and actual process state from not-found unit defaults without proof; existing guards did not catch these claims.",
+    "New literal/relative questions and live windows differ from prior trial; no controlled end-to-end before/after or p95.",
+    "Only B real protocol was exercised; A/C share unit regressions but no new live clock or model test.",
+    "No candidate promotion or exact new operating approval; current canonical/installed paths and two PREPARED approval plans unchanged."
+  ],
+  "remote_cleanup": {
+    "at_kst": "2026-11-16T04:02:31.526276+09:00",
+    "removed_own_roots": {
+      "tests": {
+        "regular_files": 698,
+        "bytes": 9864720,
+        "absent_after": true
+      },
+      "model": {
+        "regular_files": 87,
+        "bytes": 2043463,
+        "absent_after": true
+      }
+    },
+    "other_roots_removed": [],
+    "operating_changes": 0
+  },
+  "observed_at_kst": "2026-11-16T04:14:16.852547+09:00",
+  "observed_fixture_sha256": "2b7390ce10cf693c909c7c2a6976d89750cda4d60bcd7951114b7476acf81acb",
+  "evaluation_scope": "Three consumed developer user/final-answer observations (one non-model clarification, two model workflows); answers are not gold/SFT and not full wire inputs.",
+  "final_identity": {
+    "at_kst": "2026-11-16T04:11:29.990649+09:00",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "operating_reader_pid": 927,
+    "operating_reader_start_ticks": 7043,
+    "removed_roots_absent": true,
+    "operating_changes": 0,
+    "data_tool_calls": 0,
+    "model_calls": 0
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-16T04:45:14.382861+09:00",
+    "regular_files": 13652,
+    "bytes": 207960500,
+    "active_processes": 0,
+    "source_edits_preserved": 11,
+    "source_tree_reconstruction_verified": true,
+    "absent_after": true,
+    "other_roots_removed": [],
+    "transport_scripts_removed": 7
+  },
+  "defect_first_review": {
+    "method": "manual source/authority/negative-case review; review-agent original unavailable",
+    "promotion_block": "Unloaded unit/default Result is still overinterpreted in actual typed-service response; additional typed reads and semantic checks required",
+    "semgrep": "not run; no Mac CLI installation",
+    "source_authority_changes": 0
+  },
+  "trial_source_manifest_sha256": "12a9c78de13904c556529ba04581a22b2b80cdafb0ca80b7eb197ee1f8baf868",
+  "trial_candidate_sources_verified": 59
+}

@@ -12794,3 +12794,7 @@ B 후보MCP/SDK4요청에서5실제읽기·12모델완료·모두partial. 37.57/
 ## 매뉴얼 전달본 확인 (2026-11-16)
 
 기존 매뉴얼형 MD·PDF·DOCX의 동일본·56쪽·본문/목차·표지·팀원 편집 조건을 재검수했다. 본문 변경·재변환·운영 적용은 없고 업무별 절 찾기만 로컬 안내에 추가했다. [검사 범위와 미제공 항목](DIAGNOSTIC_HISTORY.md#매뉴얼-산출물의-동일본-재검수-2026-11-16)을 구분한다.
+
+## 진단 시각·등록 대상 후보와 실제 응답 (2026-11-16)
+
+소수초 실제 성공/미래·보존·외부clock 거절과 모델0 대상 확인을 검증했다. SDK3요청 전부partial이며 not-found/default Result 해석 오류가 남아 미승격이다. Mac1084/Hermes1167 회귀와 실제 의미를 구분한다. [전체 검증](../infra/validation/diagnostic-read-boundaries/README.md). 이전 STATUS 전체는 Git `04f2baf9d91576f2fcc69a6023996e8adb04af8d:STATUS.md`, SHA256 `3336419acfaabbb02e538215fbad783a52d7768bc10c1d97f3c9251a586bdc48`로 복구한다. 기존 정확19/journal9 계획·논문56쪽·다른9작업은 보존했다.

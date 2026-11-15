@@ -1,5 +1,7 @@
 # 과거 기록과 복원 안내
 
+최근 [진단 시각·등록 대상의 실제 검증](../infra/validation/diagnostic-read-boundaries/README.md)과 미승격·fixture 정정·typed 실행 근거 잔여를 아래5유형에 보존했다. 643소스 복원·회귀·실제MCP·모델 내용과 운영 로드/채팅을 구분한다.
+
 최근 [실제 journal MCP·모델4요청](../infra/validation/host-journal-model/README.md)의 실제조회/의미오류/검사오탐·대상확인·소수초경계·소비원장·미적용과정리근거를아래5유형으로보존했다. backend일치·회귀·모델완수·실제채팅을구분한다.
 
 최근 [OS 실제 비교4요청](../infra/validation/read-target-live/README.md)의 실패·가드레일검출·집계로그필수계획공백·20:52라이브/자체정리를5유형이력에추가했다. 회귀840과실제완수/운영적용은구분하며후보는미채택이다.

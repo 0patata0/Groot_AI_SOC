@@ -1,5 +1,9 @@
 # LLM 운영설정 공통화 — 단일 소스 지도와 공통 원칙 (작업 #6)
 
+<!-- diagnostic-read-boundaries:start -->
+진단 경계 후속은 [검증 원장](../validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
+<!-- diagnostic-read-boundaries:end -->
+
 [실제 journal 후보 검증](../validation/host-journal-model/README.md). 실제후속SDK4요청/5읽기·12모델완료는조회공백을줄였지만정확한보고를보장하지못했다. 두봇공통대상확인·후보/실패구분·과거/현재/원인미확인검사·unit종류를보완해야한다. canonical/운영·기존정확승인계획/권한은유지하며Hermes/채팅검증은미수행이다. 아래는 각 과거 단위의 관측이다.
 
 이 문서는 SOC 봇의 LLM 운영설정(SOC 스킬·공통 스크립트·시스템 프롬프트)이 **하나의 리포 소스에서 공통화**되어 있음을 고정 기록하고, 장비·surface별 **정당한 차이**와 **공통 운영 원칙**, 그리고 공통성을 유지·강제하는 경로를 정리한다. 변경 원칙: **공통 요소를 먼저 바꾸고, surface별 차이는 그 위에 얹는다.** 특정 질문·특정 surface만 통과하는 예외를 쌓지 않는다.

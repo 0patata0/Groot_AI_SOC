@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[호스트 journal 파일별 후속 후보](../infra/validation/host-journal-cost/README.md)는 설치 사전검사에 바인딩235 Reader의 files인자 확인을 추가했다. 단일 deploy.sh 진입점/모듈 전달/정확권한은 유지하며 canonical·운영 초기설치 입력을 지금 교체하지 않았다. 설치30회귀·기존Hermes1137생략0·A/B/C 의존API 검사와24h backend일치를 확인했지만 새OS 전체설치·실제모델/MCP/새채팅·정확 새 승인/로드는 미수행이다.
+[실제 journal 후보 검증](../infra/validation/host-journal-model/README.md). 후보의B MCP/SDK통합을별도임시경로에서검증했다. 운영입력·단일deploy.sh·OS/그룹/SSH/config·두정확승인계획은바꾸지않았다. backend읽기와모델보고정확도는별도이며의미오류/시각경계를고친정확새후보·실제로딩/채팅·새OS전체설치가남는다. 아래는 각 과거 단위의 관측이다.
 
 [읽기 시도6소스 개발 후보](../infra/validation/read-attempt-binding/README.md)는 실제 OS/DNS 근거 오류가 남아 미채택이며 단일 deploy.sh 정본/설치 입력을 변경하지 않았다. query143·controller 내장 gate의 향후 같은 SHA 재렌더와 정확 적용/복구·새 채팅 검증은 별도다. 기존19/journal9 정확 계획도 불변이다.
 

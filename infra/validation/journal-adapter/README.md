@@ -1,5 +1,7 @@
 # 등록 journal native 조회 어댑터
 
+후속 [실제 MCP·모델4요청](../host-journal-model/README.md)은 B의5읽기·12모델완료를 확인했으나 의미 오류·검사 오탐·대상 확인/시각 경계가 남았다. 운영 미적용·실제채팅0이며 아래 당시 관측을 성공으로 덮어쓰지 않는다.
+
 후속 [집계 host journal](../host-journal/README.md)과 [파일별 비용 보완](../host-journal-cost/README.md)은 별도 미승인 수정이다. 파일별후보의실제24h A/B/C 응답은CLI전체병합과일치했다. 기존정확9코드적용계획은불변이며 이후속후보를포함하거나승인한것이아니다. 아래등록unit8건·부모21논리시험과후속78요청은대상/분모가다르다. 실제모델/MCP/새채팅은남는다.
 
 후속 [정확 운영 적용안](application/README.md)은33개 고유 회귀를 Mac/A/B/C에서 각각 통과했고 실제 바이트9적용/9원복·18중간 cold load·3PREPARED/원본6개를 준비했다. 운영 source/service/timer·실제MCP/새채팅은 아직 미적용·미수행이다. 아래166검사·8건은 앞선 어댑터 구현 검증이며 합쳐 독립 정확도로 세지 않는다.

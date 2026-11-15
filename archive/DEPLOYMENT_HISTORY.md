@@ -1756,3 +1756,9 @@ A/B/C 자체 제한 서비스의21논리시험은15성공/6실패다. 최근erro
 canonical/운영소스·기존서비스변경0. 후보설치기는binding235/systemd255 및files인자를검사하고단일deploy.sh전달은유지한다. 빈files검사는실제바인딩오류로버렸으며최종후보에없다. 새OS전체설치미수행.
 
 [후보·재현·원장](../infra/validation/host-journal-cost/README.md). 원문·SHA·실패후보·정리영수증·논문15SHA·기존9변경과두정확계획을보존한다.
+
+## 2026-11-16 실제 journal 모델 검증·남은 의미 문제
+
+별도MCP는기존mcpUID/기존capdiag그룹/cap0·자체IPC에서만실행했다. 설치config/키/그룹/권한/기존서비스/모델경로는불변. rootbrokerUID전환·과도한SDK파일검사준비실패는모델요청전확인해권한확대없이수정. own RuntimeMax변경은거절돼기존제한유지.
+
+[새4요청·재현·분모](../infra/validation/host-journal-model/README.md). 소비4관측은정답/SFT가아니며원래9/논문15SHA·두정확계획·framework/자료가중치를보존한다.

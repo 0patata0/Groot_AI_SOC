@@ -6383,3 +6383,9 @@ A/B/C 자체 제한 서비스의21논리시험은15성공/6실패다. 최근erro
 긴구간backend가용성은확인했다. 다음실제모델선택/실패처리→정확새승인/복구계획→관리자231경유적용/실제로딩→새채팅. 기존관리19/journal9계획·승인대기는변하지않는다.
 
 [후보·재현·원장](../infra/validation/host-journal-cost/README.md). 원문·SHA·실패후보·정리영수증·논문15SHA·기존9변경과두정확계획을보존한다.
+
+## 2026-11-16 실제 journal 모델 검증·남은 의미 문제
+
+다음은공통대상사전확인·후보/실패·과거/현재·원인미확인검사·unit not-found/Docker·microsecond경계를고친새후보와Harness²/반례/회귀/새모델시험이다. 이후정확새승인/복구안·관리자경유설치MCP/로드/양봇새채팅. 기존두계획승인재사용금지.
+
+[새4요청·재현·분모](../infra/validation/host-journal-model/README.md). 소비4관측은정답/SFT가아니며원래9/논문15SHA·두정확계획·framework/자료가중치를보존한다.

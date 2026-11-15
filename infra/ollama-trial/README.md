@@ -1,6 +1,6 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-[호스트 journal 후속 후보](../validation/host-journal-cost/README.md)는 부모 공통필수읽기/출처 계획을 유지하고 native파일별 검색을 보완했다. 같은24h A/B/C 전체CLI 병합과 일치·기존Hermes1137생략0·공식Harness²를 확인했다. backend가용성은 실제 모델 선택/설치MCP/새채팅과 별도이며 canonical·운영에는 미반영이다. 후보 common1.5.89/query1.19.145·MCP1.4.3도 운영 버전이 아니며 기존 두 정확계획·권한·예산은 유지한다.
+[실제 journal 후보 검증](../validation/host-journal-model/README.md). 현재학습모델과SDK의미승인후보에서4요청·5읽기·12모델완료를확인했다. 37.57/71.63/19.60/39.70초이며각partial·의미/검사/대상오류가남았다. 이시험프로세스만MCP전송이별도IPC이며설치config/권한/추론경로/기존서비스는불변이다. MattermostSLA/모델우위증거아님. 아래는 각 과거 단위의 관측이다.
 
 [실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 

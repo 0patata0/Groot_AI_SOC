@@ -721,3 +721,7 @@ python3 -B finetuning/train.py --check
 ## 동일 학습 모델의 역사 문맥 하네스 비교
 
 [새6사례 비교](../infra/validation/peer-source-context/README.md)의 base/candidate는 모두 같은 균형 학습 모델이다. 답변 생성3/6 동률·범위 오류 잔여로 후보를 보류했고, 새로운 모델 학습/가중치/자료 편입은 없다. 이 생성 성공 수를 정답률이나 학습 효과로 표시하지 않는다.
+
+## 후속 실제 journal 개발 질문 사용
+
+[실제 SDK4요청](../infra/validation/host-journal-model/README.md)의 새질문4개와관측된모델답변을소비원장에추가했다. 실제SDK5읽기·모델12완료가있지만답변에의미오류/검사오탐·대상누락이남는다. 이답변은정답·SFT대상·새독립평가로사용하지않는다. 원장지문은로컬user/final-answer관측fixture이며실제wire의공통정책/도구/문맥을포함한입력지문이아니다. 네fixture모두현재사용원장에서소비됨으로검출됐고기존검사7개도통과했다. 기존176/계약16자료의원문·학습·평가결과는변경하지않는다. 원장부재가미사용/독립성증거가아닌원칙도유지한다.

@@ -1,6 +1,6 @@
 # 제한된 서비스 journal 조회
 
-[호스트 시스템 journal 후속 후보](../validation/host-journal-cost/README.md)는 가용시스템파일 전체를native FD로분할해 같은24h errors A5.50/B2.61/C1.94초·CLI전체병합응답일치를 확인했다. 사용자journal 제외·등록unit형태·마스킹/기간/패킷/권한은 유지한다. 운영은기존reader이며후보미적용·실제MCP데이터/모델/채팅0이다. 부모의긴검색실패기록도보존한다.
+[실제 journal 후보 검증](../validation/host-journal-model/README.md). 전체구간 backend일치 뒤 실제B 후보MCP/SDK에서로그가반환됐다. 반환은고정필터후보이며Started행도포함된다. 실제실패·원인·현재상태와구분해야하며partial원인/과거ExitCode검사·소수초경계는미수정이다. 운영reader는기존상태다. 아래는 각 과거 단위의 관측이다.
 
 후속 [정확9코드 journal 적용안](../validation/journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.
 

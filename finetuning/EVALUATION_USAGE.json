@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-15T03:06:44.308222+09:00",
+  "updated_at_kst": "2026-11-16T00:08:29.525755+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -745,6 +745,39 @@
           "record_sha256": "a29ffc932306ac17f34b7a9d829c4d21e8ab2024c58a1a7fe8f0683abea461bb",
           "visible_input_sha256": "b18c737d9ca086d104c9a4e4edfeb6728b935e1e55c6b2b0f706adfd6c9d86db",
           "nonassistant_input_sha256": "cdef46308aae2de2fc357dae0201046ce9d1b292051612d5e12fa82b78b73f87"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "host-journal-model-development",
+      "data_sha256": "34bc6213e7c13a69c02afb26c26fcf8845d1dfb5732e6d8f18b2158c69744362",
+      "records": 4,
+      "evidence": "infra/validation/host-journal-model/validation.json",
+      "evidence_sha256": "c544deee086e2e53df8ad11e9134f2f6adfea2f5261452d06a98e0099e452a67",
+      "consumed_at_kst": "2026-11-15T23:58:45.876727+09:00",
+      "task": "Observed developer question/answer transcripts only; answers have known defects, never use as ground truth/SFT or a new held-out test.",
+      "fingerprint_scope": "Local observed user/final-answer fixtures; not complete actual wire inputs with runtime policy/tools/context.",
+      "fingerprints": [
+        {
+          "record_sha256": "b7fb269d3424d418ceba2a303d0d3244725d558bedff19ccf91859d90242227c",
+          "visible_input_sha256": "e5d8086f0e02954f18b19d7416f55ff4533ec3ab02bc7e067a732da71ccb3bea",
+          "nonassistant_input_sha256": "fad5f4d57e2998f68cac70b505a41a189cbfe86f0900307723621db4d94c021a"
+        },
+        {
+          "record_sha256": "3ed51437e94401c391a78d1e1038dbb8f60c271a2635a25711d656aa942fe2b4",
+          "visible_input_sha256": "3a2056aa74388ff91fe4bae166579fb87a46bcd0512044ad0360201fa491b74b",
+          "nonassistant_input_sha256": "ef836769ad02762abf43e1f05f7dc9e53828adb3fc58a243e30673899554814e"
+        },
+        {
+          "record_sha256": "5dd3580a74439496dded62e630f584345a3952696ea71058b033ce2d0cb482da",
+          "visible_input_sha256": "e10bcbafc637cb272560a33c5f78699b580696d0f0dc6de794a0426b75358a5b",
+          "nonassistant_input_sha256": "2b6ca0dbb1fa1ed05e82e48726080e02dc5ea5538513934529c22bf2587d208b"
+        },
+        {
+          "record_sha256": "8e9c1e3b4283fa28e32c4a109b71d9b8e1a40a3199353618d066929a92b45429",
+          "visible_input_sha256": "3a7fc2bdee298c5133d6aa7436ff6d67111f7cb90e574378afb99eb275d7ae00",
+          "nonassistant_input_sha256": "829b0a65b45687cace1af0fe5c23c903aecdd8c5b5c2b48d6a2d06a966069a6e"
         }
       ]
     }

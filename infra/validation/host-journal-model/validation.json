@@ -1,0 +1,606 @@
+{
+  "status": "actual_reads_verified_semantic_and_guard_errors_remain_not_applied",
+  "scope": "Four fresh SDK requests using the current learned model and an isolated candidate MCP/native backend; developer diagnosis, not independent accuracy, Hermes or channel delivery.",
+  "started_at_kst": "2026-11-15T23:55:57.342509+09:00",
+  "finished_at_kst": "2026-11-15T23:58:45.876727+09:00",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "model_digest_at_start": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "access_mode": "hermes-parity",
+  "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+  "candidate_parent": {
+    "manifest": "infra/validation/host-journal-cost/manifest.json",
+    "sha256": "2e69e2e006e1d41287da2ce0042c65285f687aa3893ef32f4b7d0ce58de7afb7"
+  },
+  "structural_audit": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/install/soc_diagnostics.py",
+        "scripts/mcp/diagnostic_journal_native.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "sources_verified_per_arm": 34,
+    "ast_scope_verified": true,
+    "operating_changes": 0,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "chat_posts": 0,
+    "scope": "frozen source/structure reconstruction only; three full-day backend comparisons returned; this is not an operating release or chat benchmark"
+  },
+  "counts": {
+    "actual_sdk_mcp_data_calls": 5,
+    "recorded_model_completions": 12,
+    "protocol_smoke_mcp_data_calls": 1,
+    "protected_dispatches": 0,
+    "channel_posts": 0,
+    "protocol_smoke_failed_tool_calls": 1,
+    "total_mcp_tool_call_attempts": 7
+  },
+  "cases": [
+    {
+      "id": "host-short",
+      "question": "B 서버 systemd 오류 로그 확인해줘",
+      "status": "partial",
+      "elapsed_seconds": 37.56754292495316,
+      "model_completions": 3,
+      "reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd",
+            "since_kst": "2026-11-15T23:40:57.346633+09:00",
+            "until_kst": "2026-11-15T23:55:57.346633+09:00",
+            "view": "journal",
+            "limit": 50
+          },
+          "is_error": false,
+          "seconds": 0.2555614989832975,
+          "result_sha256": "3615c1a7b730bdd18da5ce9a03e40990361352013700a00d575aebad173d4ae5",
+          "returned": {
+            "kind": "journal_excerpt",
+            "target": "b:systemd",
+            "host": "b",
+            "unit": null,
+            "status": "observed",
+            "returned_entries": 7,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system",
+            "has_more": false,
+            "requested_window_total_count": null,
+            "journal_retention_verified": false,
+            "mutation_performed": false
+          }
+        }
+      ],
+      "final_response_sha256": "834f42390e77b6c2d574681720bafe1d1d0aa44a61b12169a47999ba47fb8896",
+      "rejected_drafts": [
+        {
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ],
+          "draft_sha256": "b71757ae56a7fcf1cfa6640775ec2ebfc21ebdcd5b83bba5b2a44ca4b7a62ec9"
+        }
+      ],
+      "observed_findings": [
+        "Host journal actually read: 7 fixed-filter candidates, including 3 Started rows.",
+        "Model falsely generalized all returned candidates as failures.",
+        "Cause-unknown sentence falsely treated as absence; exact same-input replay confirmed."
+      ],
+      "initialization_seconds": 9.355528732994571,
+      "recorded_model_round_trip_seconds_sum": 27.419332963996567,
+      "recorded_mcp_seconds_sum": 0.2555614989832975
+    },
+    {
+      "id": "host-day",
+      "question": "B systemd 지난 24시간 오류 로그만 표로 보여줘",
+      "status": "partial",
+      "elapsed_seconds": 71.63265323202359,
+      "model_completions": 4,
+      "reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T23:56:34+09:00",
+            "until_kst": "2026-11-15T23:56:34+09:00",
+            "journal_scope": "errors",
+            "limit": 50
+          },
+          "is_error": false,
+          "seconds": 2.671405728033278,
+          "result_sha256": "e74da696b1d57430a239e055fa8843e72ba9c939852dc9c904209b6c1ea80853",
+          "returned": {
+            "kind": "journal_excerpt",
+            "target": "b:systemd",
+            "host": "b",
+            "unit": null,
+            "status": "observed",
+            "returned_entries": 9,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system",
+            "has_more": false,
+            "requested_window_total_count": null,
+            "journal_retention_verified": false,
+            "mutation_performed": false
+          }
+        }
+      ],
+      "final_response_sha256": "d379d7e9fe8b9418d753df71fceb3ee097dc0a7314cfdbab9a5c1edec36e12e7",
+      "rejected_drafts": [
+        {
+          "issues": [
+            "diagnostic_current_exit_status_unverified"
+          ],
+          "draft_sha256": "98557082d3b2b058d394706598ae9af8b7c5b6474d53cafe829c1aa2a1c4d9e5"
+        }
+      ],
+      "observed_findings": [
+        "Whole requested day actually read: 9 candidates.",
+        "Historical exit-code summary rejected as unverified current exit status.",
+        "The model also suggested a possible restart loop across different unit names; not a proven loop."
+      ],
+      "initialization_seconds": 4.07005904300604,
+      "recorded_model_round_trip_seconds_sum": 64.65071196691133,
+      "recorded_mcp_seconds_sum": 2.671405728033278
+    },
+    {
+      "id": "unit-now-log",
+      "question": "B vector 로그와 지금 상태 알려줘",
+      "status": "partial",
+      "elapsed_seconds": 19.59795581601793,
+      "model_completions": 2,
+      "reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector"
+          },
+          "is_error": false,
+          "seconds": 0.11131117801414803,
+          "result_sha256": "6cf4e1d87aabeab37a01b3752f42bdf0e8f4a3a8c00c8faa8b901d3ce8df83a1",
+          "returned": {
+            "target": "b:vector",
+            "host": "b",
+            "unit": "capstone-vector.service",
+            "status": "observed",
+            "requested_window_total_count": null,
+            "mutation_performed": false
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector",
+            "since_kst": "2026-11-15T23:42:46.564547+09:00",
+            "until_kst": "2026-11-15T23:57:46.564547+09:00",
+            "view": "journal",
+            "limit": 50,
+            "journal_scope": "all"
+          },
+          "is_error": false,
+          "seconds": 0.14822918002028018,
+          "result_sha256": "20cf9cc678dff11283b24028aee62635b26e3aff777dd058a4fc4e56efcd1d2b",
+          "returned": {
+            "kind": "journal_excerpt",
+            "target": "b:vector",
+            "host": "b",
+            "unit": "capstone-vector.service",
+            "status": "observed",
+            "returned_entries": 0,
+            "journal_scope": "all",
+            "has_more": false,
+            "requested_window_total_count": null,
+            "journal_retention_verified": false,
+            "mutation_performed": false
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:collection"
+          },
+          "is_error": false,
+          "seconds": 0.0025340550346300006,
+          "result_sha256": "221ddca72ca8fdbeb5c035238797c6d1cf8d84751312d891a64ad0c07fe6042b",
+          "returned": {
+            "kind": "runtime",
+            "target": "b:collection",
+            "host": "b",
+            "status": "ok",
+            "mutation_performed": false
+          }
+        }
+      ],
+      "final_response_sha256": "647b896392f19a9426218e35fd5c8a285bdf9e23b68cf3fbbc65cab6cf2d6adb",
+      "rejected_drafts": [],
+      "observed_findings": [
+        "Actual current snapshot, unit journal and collection companion reads.",
+        "LoadState=not-found was returned; summary inactive/dead wording does not establish an installed stopped service.",
+        "Actual containerized Vector state/logs were not established by these unit reads."
+      ],
+      "initialization_seconds": 4.098650016996544,
+      "recorded_model_round_trip_seconds_sum": 15.016391744022258,
+      "recorded_mcp_seconds_sum": 0.2620744130690582
+    },
+    {
+      "id": "host-ambiguous",
+      "question": "systemd 오류 로그 확인해줘",
+      "status": "partial",
+      "elapsed_seconds": 39.69747314497363,
+      "model_completions": 3,
+      "reads": [],
+      "final_response_sha256": "bfc193543663ef4e004c2ddde99291a77fcf33ee27ae5eda2158b177455aee22",
+      "rejected_drafts": [
+        {
+          "issues": [
+            "current_state_requires_actual_read"
+          ],
+          "draft_sha256": "6f75bc49f13fc7b059d841c92ea597df9ca070f322a06a153e8ac27a81d19003"
+        },
+        {
+          "issues": [
+            "current_state_requires_actual_read"
+          ],
+          "draft_sha256": "f85361481aec3895b682cba4feecdb4275124b9ac3c2f632c41bd0ed030bbbd4"
+        },
+        {
+          "issues": [
+            "current_state_requires_actual_read"
+          ],
+          "draft_sha256": "6f75bc49f13fc7b059d841c92ea597df9ca070f322a06a153e8ac27a81d19003"
+        }
+      ],
+      "observed_findings": [
+        "No data read; 3 model drafts invented A/B/C zero-failed status and were rejected.",
+        "Final response was a generic evidence failure, not a useful immediate target clarification."
+      ],
+      "initialization_seconds": 4.629589011019561,
+      "recorded_model_round_trip_seconds_sum": 34.88952496199636,
+      "recorded_mcp_seconds_sum": 0
+    }
+  ],
+  "transport": {
+    "kind": "Staging-only stdio/Unix proxy to MCP under existing mcp UID, existing journal group and no capabilities; native reader retains root/UID/rate/resource restrictions.",
+    "only_b_integrated": true,
+    "installed_config_source_permission_changes": 0,
+    "source_sha256": {
+      "worker.py": "70deb1e7995e964ae73c51c3c2bae40690cdfface6a31060fd15f6b92a1c960c",
+      "proxy.py": "646e475cd67eafb80c2b0b99b58b31c194361097ec87ba2d05a2693362f803b5",
+      "reader.py": "ae9bd2654213d804f34e65d04a2e7361fcd57b7a7007be069e8716d28fa43e51",
+      "broker.py": "5b68644df4390a1961fc62dd65a60a52fa3d90b578237b4373fef6019bec808b",
+      "mcp-server.py": "6e5adbdcb87f50167504840cfaa44a99c917f986eedf0d78dd2fc324054834dd",
+      "smoke.py": "3b2620c0aea99fb9f5e2b9d5b5d06b212e76f891efec9e7ee3e422ed8dfa849c",
+      "candidate/infra/ollama-trial/test_service_semantics.py": "3b623c0895f17e6a66fd871d67a530053256a21353a3671c2b4c30edf9af7661",
+      "candidate/infra/ollama-trial/test_firewall_ip_view.py": "acffa25cd1f4dea07d9e1a09098ec23dd4b816ce50ff7626938878a5b49dd9aa",
+      "candidate/infra/ollama-trial/test_pipeline_selection.py": "527ce4d8649986f5304fac5745511b7d0fc5fe400ff464019acf9524f95fbcc6",
+      "candidate/infra/ollama-trial/harness.py": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc",
+      "candidate/infra/ollama-trial/test_current_diagnostic_selection.py": "38a044ad6cb65ffde726e1703486b64a6ee4a36b69867d52591320e7937ea42d",
+      "candidate/infra/ollama-trial/test_host_lookup.py": "f731c5b9e795483a1bf7dcdec57f8ae3e79c7e3c58edbdc97e4653f2b4ada196",
+      "candidate/infra/ollama-trial/test_card_summary.py": "3732795f97e2dfec4c0028c2fc5cdb4ac927df42cf0c0da54017927ef8de9e1a",
+      "candidate/infra/ollama-trial/test_service_read_schema.py": "ce22e3401c225b1639f2106430cdbfcc52bfdacf1df5930677f23db1539ff571",
+      "candidate/infra/ollama-trial/test_read_pool.py": "be96522a47e5a8a3f9352c53313d8c258afd1e83347c4e772fa268dd1cc22596",
+      "candidate/infra/ollama-trial/test_harness.py": "d6dafe16fa61348c61ca11e9f0e880fa829024dfd2bccdf8ab5fb14fd46dd7e3",
+      "candidate/infra/ollama-trial/test_incident_closure.py": "2e23475e29b7d3a2923806cf764e1aec5714c7c2cb7a567d08c57bf8d97c98bb",
+      "candidate/infra/ollama-trial/test_incident_reasoning.py": "68f831185873d15b363a47155f89ef7744c7fc06f51d0b9f67fb51c081576c86",
+      "candidate/infra/ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "candidate/infra/ollama-trial/test_investigation_scope.py": "9517b0b19201876a18e1b1fc2392adaac2496356ea6847e0a6388f7bc5506d85",
+      "candidate/infra/ollama-trial/test_runtime.py": "7a76283b3bb3b217440de5d6805b9ca85a1078727b2dd514759b0f88e6bfdb43",
+      "candidate/infra/ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "candidate/infra/ollama-trial/test_firewall_harness.py": "4d1428b4c45832a5d0b0e86863fc4d3e5c6d8a4995efd3caecea8bc040a6d2b0",
+      "candidate/infra/ollama-trial/hermes_benchmark.py": "66662c4ffd082c3d2154d3fa2e06dd2d720b23197c8bc51fc92244ea8cef0f6e",
+      "candidate/infra/ollama-trial/test_event_lookup.py": "732e4b8b759dcf878d8d09df9057c017caec4dc7a34daf2cf720cc743193668c",
+      "candidate/infra/ollama-trial/test_workflow_selection.py": "c55af3ff3d612986f93b2f2792b2076e6b8e166ab913aa80548ef6dc9f4e22a3",
+      "candidate/infra/ollama-trial/runtime.py": "2bfb21e42342ad043f32ec2fea1f7c70c69cdb4ac16df8c2e5319be9870a8e06",
+      "candidate/infra/ollama-trial/read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+      "candidate/infra/ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "candidate/infra/ollama-trial/test_block_lists.py": "b7934b5957e5c963afd01396a3b6a4241e41131651a772473ca62e5cf2e97d70",
+      "candidate/infra/ollama-trial/test_chat.py": "30b1cd9449581a26779653ae10e1876388e5986455ba8d4bf64e77dedb839b94",
+      "candidate/infra/ollama-trial/test_diagnostic_grounding.py": "cec2850573a2164b579d6c49cc48ffcc6cb1758f3804b1c509f80324d569da33",
+      "candidate/infra/ollama-trial/test_short_context.py": "d4b5b0b5d6922fa54f72eb14711f62bb6fd35cc2458fd3b6bd7ade2715642358",
+      "candidate/infra/ollama-trial/test_systemd_comparison.py": "0d725feac1deb8af1b603776588b63554cbd2bed273e6aee3b7fcb581f36bbde",
+      "candidate/infra/ollama-trial/test_short_request_regressions.py": "5f03f167b5f44714b6ba1947db17005c73e1f84be75740af8c1e46f27743ba16",
+      "candidate/infra/ollama-trial/test_firewall_scope.py": "bd2eae2cdb35ac002e27be7399f608dfc59b6fa083bc525e690838d27378ff1b",
+      "candidate/infra/ollama-trial/test_selection_feedback.py": "b6274e625b253c75cf73d2e7e171729cc70e9b8c6898ea2bf33d0dd283e35d63",
+      "candidate/infra/ollama-trial/test_soc_overview.py": "67074d28d9304af75e4feec13241cb1b25817bd3032e3d0b81d1455dec2a75ac",
+      "candidate/infra/ollama-trial/test_read_claim_boundaries.py": "9699c3531f0c8ea9b61dfb0fa81f2690de1410242d7f97ffd46db95f7d5ddc04",
+      "candidate/infra/ollama-trial/test_incident_intent.py": "374d893decf14aedba5cfd71a41ce8afe4614c2152e82b19bf37d58f1db312cc",
+      "candidate/infra/ollama-trial/test_service_history.py": "90919ed249de799f20bdc3eff8e9c6f75a566218c79c5cb62422dea90ab197fa",
+      "candidate/infra/ollama-trial/test_policy.py": "4f14aa373aed1e71a355d9c053913116a9513e0ce233dbfa0672c8d2eac7d250",
+      "candidate/infra/ollama-trial/test_incident_bundle.py": "a087acdff685c0577f4a888b279577560fdce6142ce04b5c016e887b18fc719d",
+      "candidate/infra/ollama-trial/test_security_inventory.py": "cb8f3348545e59621a451282247e7065830733cdf170d36e145f756496e174ca",
+      "candidate/infra/mcp/diagnostic_journal_native.py": "8978a59e06dca2c1f30300fab50805c2b445b51c01de9aa8a5aad1a1f162e931",
+      "candidate/infra/mcp/system-diagnostics-mcp.py": "89f1731bd6b1a2f6c87affd5a5df664dc40f564dfaf19bee0e77ac35c49b2705",
+      "candidate/infra/mcp/system_diagnostics.py": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+      "candidate/infra/mcp/diagnostic_journal.py": "28cbb7a2e4fbda1a4b032bbd33d70773248755d935385eb547a3d71da62ffb47",
+      "candidate/infra/mcp/runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+      "candidate/infra/mcp/host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+      "candidate/infra/mcp/diagnostic_history.py": "ae5b23973ab7d0dff1cbcce093aae3a9dfab334d9ded0cb4617a71234cbeb314",
+      "candidate/infra/hermes/chat_contract.py": "7a2eebe98b17260bd4ccd43ad75c53453f81679be2ae4c798dd03f1bd73ed0ea",
+      "candidate/infra/hermes/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "candidate/infra/hermes/soc_management_run.py": "5156269d3e1846ec678fbd72e720f95574d4dce8af7f57f4ae5fc173e6536a57",
+      "candidate/infra/hermes/SOUL.groot.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "candidate/infra/hermes/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "candidate/infra/hermes/read_contract.py": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331",
+      "candidate/infra/hermes/workflow_contract.py": "a8fe1eeb9c64e349bb2011bf81f9664538fc18ef73f10cca3fef14a624458dd3",
+      "candidate/infra/hermes/query-completion/alignment.py": "3d1a70581f47d5bdea46efaa75e78d2ca8c6f2fb1df833bf47da898f1c6bde7d",
+      "candidate/infra/hermes/query-completion/__init__.py": "3fe73704f97854e49ad9949ca2a11de5a01463c7094625b334ceb860ed3cc819",
+      "candidate/infra/hermes/skills/soc-investigate/SKILL.md": "ef41793cd9a1770c1e8960cdf9cdfe73c85d466e1bad5b45951bc3b701a8ca20",
+      "candidate/infra/hermes/skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "candidate/infra/hermes/skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "candidate/infra/hermes/skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "candidate/infra/hermes/skills/soc-query/SKILL.md": "66a56452584a948184ee2e3a45c69e9eaf6d3a3e3b14f401cbfaf7d759bacc31"
+    },
+    "root_installed_sources_sha256": {
+      "/opt/capstone-ollama-trial/harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "/opt/capstone-ollama-trial/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "/opt/socbot/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "/opt/capstone-ollama-trial/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "/opt/capstone-ollama-trial/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "/opt/capstone-ollama-trial/runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+      "/opt/capstone-review-chat/review_channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+      "/opt/capstone-ollama-trial/soc_policy.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "/opt/capstone-ollama-trial/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "/opt/capstone-ollama-trial/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "/opt/capstone-review-chat/review_channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+      "/opt/capstone-ollama-trial/query_grounding.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "/opt/capstone-management/soc_management_run.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "/opt/capstone-management/soc_management_controller.py": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+      "/opt/capstone-review-chat/review_channel.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+      "/opt/capstone-ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "/opt/capstone-ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/capstone-ollama-trial/skill-soc-change.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "/opt/capstone-ollama-trial/skill-soc-recover.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "/opt/capstone-diagnostics/system_diagnostics.py": "e72f3fddfd828404c51b00cee688026ac8fbebc83ad246f29a25f5d299707b0d",
+      "/opt/capstone-diagnostics/diagnostic_history.py": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+      "/opt/capstone-diagnostics/diagnostic_journal.py": "8336e073a249f9a31d4ea5fd90d506f126aada2bf93ec0dcfa47fc135383c1cc",
+      "/opt/capstone-diagnostics/read-system-diagnostics.py": "967e7b5b88745a22f0554660f2dceab9904a415081b08264b750f9bccf14cc37",
+      "/opt/mcp/system-diagnostics-mcp.py": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+      "/opt/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e"
+    },
+    "sdk_readable_installed_sources_sha256": {
+      "/opt/capstone-ollama-trial/harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "/opt/capstone-ollama-trial/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+      "/opt/capstone-ollama-trial/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "/opt/capstone-ollama-trial/skill-soc-query.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "/opt/capstone-ollama-trial/runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+      "/opt/capstone-ollama-trial/soc_policy.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "/opt/capstone-ollama-trial/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "/opt/capstone-ollama-trial/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "/opt/capstone-ollama-trial/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "/opt/capstone-ollama-trial/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "/opt/capstone-ollama-trial/query_grounding.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "/opt/capstone-ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "/opt/capstone-ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "/opt/capstone-ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "/opt/capstone-ollama-trial/skill-soc-change.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "/opt/capstone-ollama-trial/skill-soc-recover.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68"
+    },
+    "startup_failures": "Rejected root-broker UID transition and overbroad worker file-hash preflight; no model call before corrected start. Separate subsecond-bound rejection and rejected transient RuntimeMax property update retained.",
+    "cross_request_conversation_history": false,
+    "chat_or_latency_comparison": false
+  },
+  "same_input_replay": [
+    {
+      "case": "host-short",
+      "draft_sha256": "b71757ae56a7fcf1cfa6640775ec2ebfc21ebdcd5b83bba5b2a44ca4b7a62ec9",
+      "observed_issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "replayed_issues": [
+        "sample_zero_presented_as_absence"
+      ]
+    },
+    {
+      "case": "host-day",
+      "draft_sha256": "98557082d3b2b058d394706598ae9af8b7c5b6474d53cafe829c1aa2a1c4d9e5",
+      "observed_issues": [
+        "diagnostic_current_exit_status_unverified"
+      ],
+      "replayed_issues": [
+        "diagnostic_current_exit_status_unverified"
+      ]
+    },
+    {
+      "case": "host-ambiguous",
+      "draft_sha256": "6f75bc49f13fc7b059d841c92ea597df9ca070f322a06a153e8ac27a81d19003",
+      "observed_issues": [
+        "current_state_requires_actual_read"
+      ],
+      "replayed_issues": [
+        "current_state_requires_actual_read"
+      ]
+    },
+    {
+      "case": "host-ambiguous",
+      "draft_sha256": "f85361481aec3895b682cba4feecdb4275124b9ac3c2f632c41bd0ed030bbbd4",
+      "observed_issues": [
+        "current_state_requires_actual_read"
+      ],
+      "replayed_issues": [
+        "current_state_requires_actual_read"
+      ]
+    },
+    {
+      "case": "host-ambiguous",
+      "draft_sha256": "6f75bc49f13fc7b059d841c92ea597df9ca070f322a06a153e8ac27a81d19003",
+      "observed_issues": [
+        "current_state_requires_actual_read"
+      ],
+      "replayed_issues": [
+        "current_state_requires_actual_read"
+      ]
+    }
+  ],
+  "clock_boundary": {
+    "scope": "pure frozen argument-validation clock mock; no live query/model/operating change",
+    "source_sha256": "ae5b23973ab7d0dff1cbcce093aae3a9dfab334d9ded0cb4617a71234cbeb314",
+    "cases": [
+      {
+        "id": "past_fraction",
+        "arguments": {
+          "target": "b:vector",
+          "since_kst": "2026-11-15T22:39:59+09:00",
+          "until_kst": "2026-11-15T22:40:00.500000+09:00"
+        },
+        "actual_now_kst": "2026-11-15T22:40:00.750000+09:00",
+        "expected_at_microsecond_resolution": "accepted",
+        "observed": "rejected",
+        "reason": "history_window_outside_retention_or_future"
+      },
+      {
+        "id": "future_fraction",
+        "arguments": {
+          "target": "b:vector",
+          "since_kst": "2026-11-15T22:39:59+09:00",
+          "until_kst": "2026-11-15T22:40:00.900000+09:00"
+        },
+        "actual_now_kst": "2026-11-15T22:40:00.750000+09:00",
+        "expected_at_microsecond_resolution": "rejected",
+        "observed": "rejected",
+        "reason": "history_window_outside_retention_or_future"
+      },
+      {
+        "id": "whole_second",
+        "arguments": {
+          "target": "b:vector",
+          "since_kst": "2026-11-15T22:39:59+09:00",
+          "until_kst": "2026-11-15T22:40:00+09:00"
+        },
+        "actual_now_kst": "2026-11-15T22:40:00.750000+09:00",
+        "expected_at_microsecond_resolution": "accepted",
+        "observed": "accepted",
+        "reason": null
+      },
+      {
+        "id": "older_than_actual_retention",
+        "arguments": {
+          "target": "b:vector",
+          "since_kst": "2026-10-16T22:40:00.500000+09:00",
+          "until_kst": "2026-10-16T22:40:01.500000+09:00"
+        },
+        "actual_now_kst": "2026-11-15T22:40:00.750000+09:00",
+        "expected_at_microsecond_resolution": "rejected",
+        "observed": "accepted",
+        "reason": null
+      }
+    ],
+    "finding": "flooring wall time to seconds rejects same-second past bounds and permits subsecond over-retention starts",
+    "operating_changes": 0,
+    "live_queries": 0,
+    "model_calls": 0
+  },
+  "remaining_work": [
+    "Common clarification before model calls for unresolved host/service kind.",
+    "Distinguish fixed-filter candidates, literal historical log claims and actual current properties.",
+    "Keep actual model mistakes separate from guard false positives; do not simply disable guards.",
+    "Preserve not-found unit versus live Docker/service identity; complete the actual requested target.",
+    "Fix microsecond current/retention boundaries without a grace period or weaker future guard.",
+    "New exact approval/rollback plan, administrator-route operating load/MCP and fresh both-bot channel verification."
+  ],
+  "operating_changes": 0,
+  "training_runs": 0,
+  "attack_tests": 0,
+  "temporary_evidence": {
+    "source_and_output_sha256_verified": true,
+    "own_processes_absent": true,
+    "files": 99,
+    "regular_file_bytes": 2217104,
+    "saved_files": 38,
+    "cleanup": "complete",
+    "remote_cleanup": {
+      "at_kst": "2026-11-16T00:14:13.495686+09:00",
+      "root": "/var/lib/capstone-host-journal-model-rvophvb_",
+      "regular_files": 97,
+      "socket_files": 2,
+      "bytes": 2217104,
+      "absent": true,
+      "operating_changes": 0
+    },
+    "mac_cleanup": {
+      "files": 5560,
+      "bytes": 82712402,
+      "absent": true,
+      "new_mac_packages": 0,
+      "generated_transports": 5
+    }
+  },
+  "limitations": [
+    "The generated answers contain known errors and are not ground truth or training targets.",
+    "No held-out or model superiority score; source questions are consumed development records.",
+    "Local transport removes SSH from this one MCP connection; do not use these durations as Mattermost SLA.",
+    "Same-unit command tokens in error filtering include benign startup lines; counts are candidates, not failures.",
+    "Full raw model wire requests/responses were not captured; final text, rejected drafts, read receipts and completion metrics were captured."
+  ],
+  "private_result_sha256": "f8290b69d868b10b336e20a10b2012d5ffd5cc60dff86d4f3281fb66b9f33425",
+  "live_reobservation": {
+    "observed_at_kst": "2026-11-16T00:09:52.047989+09:00",
+    "b_source_components": 24,
+    "exposed_schemas": 45,
+    "source_schema_model_config_bot_timer_unchanged": true,
+    "reader_process": {
+      "pid": 927,
+      "start_ticks": 7043,
+      "state": "S"
+    },
+    "installed_native_module": false,
+    "reader_files_profiles_unchanged": true,
+    "unrelated9_sha_unchanged": true,
+    "paper15_sha_unchanged": true,
+    "exact_existing_plans_unchanged": true,
+    "operating_changes": 0
+  },
+  "same_input_replay_scope": {
+    "candidate_sources_verified": 59,
+    "drafts": 5,
+    "unique_draft_sha256": 4,
+    "independent_new_cases": 0,
+    "note": "5 recorded draft entries, 4 unique texts; repeated local invocations overlap entirely and are not new cases"
+  },
+  "consumption_registry": {
+    "source": "host-journal-model-development",
+    "observed_fixtures": 4,
+    "allowed_use": "development_regression_only",
+    "known_consumed_fixture_audit": 4,
+    "existing_registry_tests_passed": 7,
+    "fixture_answers_are_not_reference_or_sft": true
+  },
+  "review": {
+    "kind": "manual defect-first review of source-pinned replay/clock probes, data labels and actual read/claim scope",
+    "review_agent": "original unavailable; not run",
+    "semgrep": "not run; no Mac CLI installation",
+    "correctness": "known semantic/guard failures retained; no operating promotion"
+  }
+}

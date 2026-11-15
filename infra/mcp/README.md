@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-[호스트 journal 비용 보완 후보](../validation/host-journal-cost/README.md)는 native가 선택한 모든 시스템 journal FD를 개별 조회·병합해 동일24h A5.50/B2.61/C1.94초와CLI전체 병합 응답 일치를 확인했다. 고정대상·필터·마스킹·시간/크기·권한 경계를 유지한다. Mac1054/기존Hermes1137생략0·공식Harness² 검증이며 운영 미적용·모델/실제MCP데이터/새채팅0이다. 아래는 각 과거 단위의 관측이며 최근 backend결과를 운영 성공으로 대신하지 않는다.
+[실제 journal 후보 검증](../validation/host-journal-model/README.md). 후속 후보 MCP는 기존mcp UID/cap0·별도 IPC와 기존 root/UID/rate/resource 경계에서 B 실제 journal을 읽었다. SDK4요청/5읽기·별도smoke 성공1/소수초거절1이며 운영 설치MCP/권한은 미변경이다. 모델 의미·검사·대상·시각 문제가 남았다. 아래는 각 과거 단위의 관측이다.
 
 [실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 

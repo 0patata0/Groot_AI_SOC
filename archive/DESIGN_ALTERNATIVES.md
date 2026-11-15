@@ -622,3 +622,9 @@ journal 적용은3파일전체의동시원자성을주장하지않는다. 실제
 실제 읽기 완료의 tool-name만 대조하는 방식은 대상명 B systemd·view·기간 혼동을 놓쳤다. 공통 원장에 typed selector/응답범위/요청기간을 결속하고 명시 unit/container의 점을 해당 검사에서만 보존했다. 현재상태·오류이력·원문journal·실제서비스실패·조회실패를 구분한다. 일반자연어전부검증·별칭unit추정·과거aggregate권한확대는 하지 않는다. 논문은 날짜별 개발일지 대신 개념/목적/준비/실행/확인/복구를 채택하고 기존43쪽/9파일은 로컬SHA복구본으로 보존했다.
 
 근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.
+
+## 2026-11-15 실제 OS 조회4요청과 공통 계획 공백
+
+새대상검사는같은실제무조회초안에부모[]/후보unobserved_read_success를검출한다. 이것은조회완수의대안이아니다. 필수계획/실제집계로그경로를보완해야하고과거요청을현재snapshot으로대체하거나다른unit/추정agentID로메우지않는다. 기존MCP의고정host·기간·마스킹·bytes/표본제한안에서집계기능확장여부검토·정확후보별도검증/승인.
+
+[질문·호출/응답SHA·시간·한계](../infra/validation/read-target-live/README.md)·[현재상태](../STATUS.md). 로컬원문과계획재현은대화기록/검증/2026-11-15-read-target-live에보존한다.

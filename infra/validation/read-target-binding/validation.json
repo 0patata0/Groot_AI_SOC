@@ -1,5 +1,5 @@
 {
-  "status": "isolated_guard_validated_runtime_not_validated_not_applied",
+  "status": "runtime_read_selection_failed_not_applied",
   "model": "soc-qwen36:35b-balanced-q4km-20261108",
   "harness2": {
     "at_kst": "2026-11-15T17:15:24.215605+09:00",
@@ -101,7 +101,7 @@
   "operating_changes": 0,
   "limits": [
     "Replays are earlier developer observations; 840 regressions are not independent SOC cases.",
-    "No new runtime model/repair-loop or Mattermost acceptance was executed for this patch.",
+    "No runtime model/repair-loop or Mattermost acceptance was executed during the original frozen regression round. See runtime_followup for subsequent failed SDK acceptance.",
     "Human labels beyond literal targets/explicit selectors/registered actual units and B systemd forms are not a complete semantic verifier.",
     "A snapshot and an unsupported aggregate history query remain different capabilities; this guard adds no journal target, permission or host identity.",
     "General absence/per-SID loading claims in investigations still require separate improvements."
@@ -158,5 +158,20 @@
     "all_task_roots_absent": true,
     "new_mac_packages": 0,
     "framework_data_weights_backups_preserved": true
+  },
+  "frozen_regression_status": "isolated_guard_validated_runtime_not_validated_not_applied",
+  "counter_scope": "Unprefixed model/read counts describe the original R6 frozen regression round. The later actual SDK run is separately recorded in runtime_followup.",
+  "runtime_followup": {
+    "validation": "../read-target-live/validation.json",
+    "logical_questions": 2,
+    "runtime_requests": 4,
+    "recorded_model_completions": 13,
+    "actual_mcp_reads": 7,
+    "same_fresh_draft_old_guard": [],
+    "same_fresh_draft_candidate_guard": [
+      "unobserved_read_success:target:b:systemd"
+    ],
+    "accepted": false,
+    "reason": "Aggregate log request has no shared mandatory read plan; a candidate response fabricated log rows without reads. The guard suppressed it, but real inquiry was not completed."
   }
 }

@@ -1,5 +1,5 @@
 {
-  "status": "isolated_guard_validated_runtime_not_validated_not_applied",
+  "status": "runtime_read_selection_failed_not_applied",
   "revision": "r6",
   "base_commit": "3efcb39d62f114bd468cee7a3ac40e9638bcc49c",
   "parent_artifacts": {
@@ -182,5 +182,8 @@
   },
   "operating_changes": 0,
   "model_calls": 0,
-  "chat_posts": 0
+  "chat_posts": 0,
+  "frozen_regression_status": "isolated_guard_validated_runtime_not_validated_not_applied",
+  "runtime_followup": "../read-target-live/validation.json",
+  "counter_scope": "model_calls/chat_posts/operating_changes=0 describe frozen artifact construction. The subsequent actual SDK comparison is separately linked by runtime_followup; no operating promotion."
 }

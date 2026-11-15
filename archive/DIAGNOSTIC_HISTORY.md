@@ -376,3 +376,9 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 OS R6/4소스: 공식Harness²고정6868817·25구성/5스킬/18스크립트·4수정면/상시증가0, 로컬840(834pass6skip)/같은기존Hermes840skip0. 공개부모복원24SHA/AST/39신규통과. 이전질문두arm rawSHA242d2b0b/cc8c44f6의 unobserved_read_failure:target:b:systemd 검출은 새 생성/독립2사례 아님. 17:52 B24/45/config/modeldigest/PID/timer불변·운영0. 논문R4 56쪽/MD717·DOCX720/114쪽수/누락0·전수시각, 내용기준SHA6d827b85/PDFc9e63327/DOCX107403e4. R2는 정제 스크립트 import누락으로 초기원고 그대로 재출력한 미사용 중간본이며 R3내용/R4목차배치가 최종이다. 검사/문서출력을 새관제품질로 확대하지 않는다.
 
 근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.
+
+## 2026-11-15 실제 OS 조회4요청과 공통 계획 공백
+
+2질문4요청의대화시간45.216/44.133/55.857/15.465초·초기화8.539/4.256/9.198/5.086초,공유GPU/캐시미통제·SDK복제본/실채팅아님. 후보systemd읽기0·2025년서비스로그생성초안을새대상검사가거절. 부모Vector Type=oneshot은실제properties에없어거절. 실제스키마49광고/45허용과A/B/C집계계획None·Vector3필수계획재현,오류표본전부0·고유운영정답률아님.
+
+[질문·호출/응답SHA·시간·한계](../infra/validation/read-target-live/README.md)·[현재상태](../STATUS.md). 로컬원문과계획재현은대화기록/검증/2026-11-15-read-target-live에보존한다.

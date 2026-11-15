@@ -1,0 +1,311 @@
+{
+  "status": "runtime_read_selection_failed_not_applied",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "model_digest_before": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "model_digest_after": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "candidate_patch_sha256": "51a03b892c1bad31555e7c87847bed578f3743c54d04385593842250db95c82e",
+  "baseline": "Unapproved short-read3 R3 composite; not installed operating baseline. Candidate adds frozen read-target R6. Both used the same current B SDK execution account/model/config and actual read MCPs.",
+  "logical_questions": 2,
+  "runtime_requests": 4,
+  "recorded_model_completions": 13,
+  "actual_mcp_reads": 7,
+  "cases": [
+    {
+      "arm": "base",
+      "id": "os-short",
+      "question": "B systemd 오류 로그 좀 봐줘",
+      "runtime_status": "partial",
+      "source_manifest_sha256": "432107b063ab0225d14e28a8ed2dbe3e4ef2be4b8799d7bec518a94c0e62f078",
+      "response_raw_sha256": "067c26105d2292a6c9af5ce5749092b25ec0c4163264f319a853d233ddd02abb",
+      "final_response_sha256": "3eeea46c5eddc328948dcefbff64dba7f7f25462571cc72b13a67adbfc21072c",
+      "initialization_seconds": 8.539,
+      "conversation_seconds": 45.216,
+      "recorded_model_completions": 4,
+      "mcp_reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          },
+          "result_sha256": "0bcef0477875ea13cce21384d437d58f315cab1add706ba7cdee24f0598d3bc2",
+          "is_error": false
+        }
+      ],
+      "required_read_count": 0,
+      "rejected_drafts": [
+        {
+          "sha256": "ee638c4a9e9f63ae7f80b42783c4c27972bebce85007a7863c493402d3a9f813",
+          "issues": [
+            "diagnostic_snapshot_is_not_functional_health",
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "e8ed29d08c1fee90e414fc53bdfb2f503cb10204fa252a2b72f27a6ef4285b26",
+          "issues": [
+            "diagnostic_snapshot_is_not_functional_health"
+          ]
+        }
+      ],
+      "remaining_issues": [
+        "diagnostic_snapshot_is_not_functional_health"
+      ],
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "manual_review": "Current loaded-failed-unit snapshot was read; model mixed it with past error history. Guards rejected drafts; final remained partial."
+    },
+    {
+      "arm": "base",
+      "id": "unit-history-now",
+      "question": "B vector 어제 오류랑 지금 상태 봐줘",
+      "runtime_status": "partial",
+      "source_manifest_sha256": "432107b063ab0225d14e28a8ed2dbe3e4ef2be4b8799d7bec518a94c0e62f078",
+      "response_raw_sha256": "b62f0ff1326f09e66ea9022b65e011a335c3983ee178d40cca7711ebbd0f2810",
+      "final_response_sha256": "55eee34749f64b3108bf1c4677f3db3a6c78f08ad964fd34de262d1ca300396b",
+      "initialization_seconds": 4.256,
+      "conversation_seconds": 44.133,
+      "recorded_model_completions": 4,
+      "mcp_reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector"
+          },
+          "result_sha256": "17697740fd0c28a93cb20b1444ae4262a978aeecdb06221392674ffe0cc157ff",
+          "is_error": false
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector",
+            "since_kst": "2026-11-14T00:00:00+09:00",
+            "until_kst": "2026-11-14T23:59:59.999999+09:00"
+          },
+          "result_sha256": "48c6e30d1991e34813ba0e23fd8f2b5639f3dc6a4c0e286b2a0983bbab7cddaa",
+          "is_error": false
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:collection"
+          },
+          "result_sha256": "4e14729c7e5a1a2d08911b6887c2e59d8425bf750d7b62855d4098429080c154",
+          "is_error": false
+        }
+      ],
+      "required_read_count": 3,
+      "rejected_drafts": [
+        {
+          "sha256": "0cf7c19d4bd6bcf30e835792990d6afeb5a3ff5871c58783e2ad3e16fd8289a0",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "98961ec7c2cc483caeaf0ba6b5795aab9a490cbdafb5fcbb93648e01700c9111",
+          "issues": [
+            "diagnostic_snapshot_is_not_functional_health"
+          ]
+        },
+        {
+          "sha256": "4b4c15f2f4e11e7c9a0eac9ca35763b2f36dfd83bb5ffa42a7a524d2809c153b",
+          "issues": [
+            "diagnostic_property_value_unverified"
+          ]
+        }
+      ],
+      "remaining_issues": [
+        "diagnostic_property_value_unverified"
+      ],
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "manual_review": "Three actual current/history/collection reads; model inferred absent Type=oneshot. Guard rejected it; final remained partial."
+    },
+    {
+      "arm": "candidate",
+      "id": "os-short",
+      "question": "B systemd 오류 로그 좀 봐줘",
+      "runtime_status": "partial",
+      "source_manifest_sha256": "432107b063ab0225d14e28a8ed2dbe3e4ef2be4b8799d7bec518a94c0e62f078",
+      "response_raw_sha256": "c8808fd36780434f2557bb26549050e78e43118eec92af84b6d7e41a6c0d71dc",
+      "final_response_sha256": "bfc193543663ef4e004c2ddde99291a77fcf33ee27ae5eda2158b177455aee22",
+      "initialization_seconds": 9.198,
+      "conversation_seconds": 55.857,
+      "recorded_model_completions": 3,
+      "mcp_reads": [],
+      "required_read_count": 0,
+      "rejected_drafts": [
+        {
+          "sha256": "e9f5f075f19289323c0287ebebf814c29bbefec07cda19f73f00102174be25da",
+          "issues": [
+            "unobserved_read_success:target:b:systemd"
+          ]
+        }
+      ],
+      "remaining_issues": [
+        "unobserved_read_success:target:b:systemd"
+      ],
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "manual_review": "No actual read; model fabricated dated service log rows. The new target-scoped guard rejected the success claim and final disclosed no evidence. Not accepted as operational read success."
+    },
+    {
+      "arm": "candidate",
+      "id": "unit-history-now",
+      "question": "B vector 어제 오류랑 지금 상태 봐줘",
+      "runtime_status": "partial",
+      "source_manifest_sha256": "432107b063ab0225d14e28a8ed2dbe3e4ef2be4b8799d7bec518a94c0e62f078",
+      "response_raw_sha256": "3a46567f1ca8282d398e1952f3afab141ac141fbba74874930c7cbd4aa5f678a",
+      "final_response_sha256": "65afc2fba52ced413a6adca90615fbe00f3469c3f376431f980913b601051604",
+      "initialization_seconds": 5.086,
+      "conversation_seconds": 15.465,
+      "recorded_model_completions": 2,
+      "mcp_reads": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector"
+          },
+          "result_sha256": "edc717285a700ff9eaef6bdd9b6d0b8e5f487fa08ad9575f9231cf5bbb560b2f",
+          "is_error": false
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector",
+            "since_kst": "2026-11-14T00:00:00+09:00",
+            "until_kst": "2026-11-14T23:59:59.999999+09:00"
+          },
+          "result_sha256": "85b4572b95defa5998a2f12fc3314585100f7dfcca8ed1d2157984edcb9b9e36",
+          "is_error": false
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:collection"
+          },
+          "result_sha256": "5aa112fc6cd986392adadb753abef61b1116d0b493aa2c7aaf9d69cfbedb78dc",
+          "is_error": false
+        }
+      ],
+      "required_read_count": 3,
+      "rejected_drafts": [],
+      "remaining_issues": [],
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "manual_review": "Three actual required reads with scoped current/history table and limits. No recorded rejected draft or remaining issue; unresolved incident status/partial remains. Empty error samples and a not-found unit are not broad health evidence."
+    }
+  ],
+  "same_source_schema_config_model_before": {
+    "model": true,
+    "model_digest": true,
+    "access_mode": true,
+    "config_sha256": true,
+    "services": true,
+    "source_sha_equal": true,
+    "schema_equal": true
+  },
+  "remote_temporary_cleanup": {
+    "at_kst": "2026-11-15T20:43:30.820672+09:00",
+    "removed": [
+      {
+        "root": "/var/tmp/capstone-read-target-live-ampfsk3y",
+        "files": 122,
+        "bytes": 3458007,
+        "absent": true
+      }
+    ],
+    "installed_sources_verified": 24,
+    "source_drift": [],
+    "services": {
+      "capstone-ollama-chat.service": {
+        "rc": 0,
+        "properties": [
+          "MainPID=3536365",
+          "ActiveState=active",
+          "SubState=running"
+        ]
+      },
+      "capstone-review-chat.service": {
+        "rc": 0,
+        "properties": [
+          "MainPID=3347786",
+          "ActiveState=active",
+          "SubState=running"
+        ]
+      },
+      "capstone-management.timer": {
+        "rc": 0,
+        "properties": [
+          "ActiveState=active",
+          "SubState=waiting"
+        ]
+      }
+    },
+    "operating_changes": 0,
+    "preserved": "Pending19/journal9 stages and backups, datasets/weights, G_Harness2 and operating code/config/services/DB/queue untouched."
+  },
+  "schema_metadata_only_followup": {
+    "at_kst": "2026-11-15T20:48:21.725476+09:00",
+    "allowed_tools": 45,
+    "advertised_tools": 49,
+    "excluded_harness_tools": 4,
+    "model_calls": 0,
+    "tool_read_calls": 0
+  },
+  "planning_gap": "A service log intent leaves the current diagnostic path. The shared required history plan resolves only registered unit mappings; aggregate runtime targets such as a/b/c:systemd are not history targets. Thus no mandatory read plan, static tool scope or missing-read requirement is produced for those host-qualified aggregate log requests.",
+  "operating_changes": 0,
+  "protected_calls": 0,
+  "chat_posts": 0,
+  "limits": [
+    "Two developer questions run once per arm, sequentially. Not independent SOC accuracy or a controlled latency comparison.",
+    "SDK replicas only; not Hermes Native runtime or Mattermost delivery. Existing permissions were not enlarged; worker-only extra guard denied protected dispatch.",
+    "Current metrics were nonempty but all returned error samples were empty. No mixed benign/malicious traffic or actual recovery/approval was tested.",
+    "Source hashes, schemas and registered model digest do not prove current gateway memory load or all A/C state.",
+    "No candidate was promoted or merged into either pending exact operating plan."
+  ],
+  "same_fresh_draft_guard_counterfactual": {
+    "same_fresh_draft": true,
+    "actual_receipts": 0,
+    "checks": {
+      "base": [],
+      "candidate": [
+        "unobserved_read_success:target:b:systemd"
+      ]
+    },
+    "model_calls": 0,
+    "scope": "Local guard counterfactual, not a second model run or operating outcome"
+  },
+  "final_live": {
+    "at_kst": "2026-11-15T20:52:49.056075+09:00",
+    "initial_at_kst": "2026-11-15T20:32:21.744194+09:00",
+    "checks": {
+      "model": true,
+      "model_digest": true,
+      "access_mode": true,
+      "config_sha256": true,
+      "services": true,
+      "source_sha_equal": true,
+      "schema_equal": true
+    },
+    "source_count": 24,
+    "schema_count": 45,
+    "operating_changes": 0
+  },
+  "mac_temporary_cleanup": {
+    "at_kst": "2026-11-15T20:58:54.165064+09:00",
+    "files_removed": 3016,
+    "bytes_removed": 48172237,
+    "new_mac_packages": 0,
+    "paper_15_sha_unchanged": true,
+    "existing_user_files_removed": 0
+  }
+}

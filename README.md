@@ -1,11 +1,11 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)와 [PLAN](PLAN.md)을 기준으로 합니다. 논문은 날짜별 이력 대신 목적·방법·이유·확인·복구 절차를 설명하는 매뉴얼로 상세화했습니다. 하네스·파인튜닝을 실제 코드/학습 원장과 대조했고 로컬 MD·PDF·DOCX56쪽·내용 누락0·목차/캡션114개·전 페이지 검수를 마쳤습니다. 정장사진·학번은 공란이며 논문/발표/포트폴리오는 Git 제외입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·방법·이유·확인·복구 중심의 매뉴얼로 상세화했고 로컬 MD·PDF·DOCX56쪽·내용누락0·114목차/캡션·전페이지검수를 마쳤습니다. 사진/학번은 공란이며 논문/발표/포트폴리오는 Git 제외입니다.
 
-[관리 상태19파일](infra/validation/control-status/application/README.md)과 별도 [journal9코드](infra/validation/journal-adapter/application/README.md)는 정확 후보·15분 원복 준비/격리 검증 완료, 운영 적용·새 채팅은 승인 대기입니다. 정본·설치query1.19.137과 gateway 메모리 로드 입증은 구분합니다.
+[OS 대상·범위 후보](infra/validation/read-target-binding/README.md)의 회귀 뒤 [실제 모델 비교](infra/validation/read-target-live/README.md)를 진행했습니다. 2질문×2비교본·4요청/실제7읽기/모델13완료이며 짧은 systemd 질문에서 무조회 로그 생성이 새 검사기에 거절됐습니다. 필수읽기계획이 없어 실제조회는 미완수, 운영 미채택입니다. 공통 현재/이력/원문 capability와 집계로그경로부터 보완합니다. 20:52 KST B24소스/45허용schema/config·학습본digest·기존 서비스 불변을 확인했습니다.
 
-[짧은 조회3소스](infra/validation/read-intent-scope/README.md)의 실제 빈 표본3요청12~16초 다음으로 [OS 대상·범위 결속4소스](infra/validation/read-target-binding/README.md)를 검증했습니다. 공식 Harness²·로컬840집계/기존 Hermes840생략0·공개24SHA/AST/39반례 복원·과거 OS 응답의 허위 실패 검출을 확인했습니다. 새 모델/MCP 읽기·채팅0·운영 미적용이며, 조사 부재/개별SID 활성 과장과 새 실제 정정 검증은 남습니다. 17:52 KST B24소스/45스키마·config·학습본digest·기존 서비스 불변을 읽기로 대조했습니다. 아래 날짜별 내용은 당시 이력입니다.
+[관리상태19파일](infra/validation/control-status/application/README.md)과 별도 [journal9코드](infra/validation/journal-adapter/application/README.md)는 정확 승인 대기·운영 미적용입니다. 두 계획에 새 후보/기능을 자동 편입하지 않습니다. 아래 날짜별 내용은 당시 기록입니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

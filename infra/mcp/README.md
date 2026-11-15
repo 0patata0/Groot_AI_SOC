@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+[실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
+
 [대상·view·기간 결속 후보](../validation/read-target-binding/README.md)는 실제 호출의 범위와 모델의 성공/실패 서술을 대조하는 하네스 수정이다. 새 MCP 도구·과거 journal 대상·OS 권한은 추가하지 않았다. B의 실제45스키마는17:52 KST에도 불변이었다. `b:systemd` 현재 snapshot과 등록25개 서비스의 과거 journal을 구분하며, 미실행을 서버 조회 실패로 꾸미지 않는다. 회귀840/기존Hermes840생략0·과거 응답 재처리는 새 실제 MCP/채팅 수용과 별도이며 운영 미적용이다.
 
 [journal native 어댑터](../validation/journal-adapter/README.md):166검사·실제격리8건과 [정확9코드 적용안](../validation/journal-adapter/application/README.md)의33회귀·9복제적용/원복·18중간cold load를 확인했다. 운영8336/기존unit·권한은 유지, 최종3PREPARED·원본6개를 보관한다. 정확 승인 뒤 실MCP/양봇 새채팅·확정이 남았다. 아래 journal 이력과 미적용 후보를 구분한다.

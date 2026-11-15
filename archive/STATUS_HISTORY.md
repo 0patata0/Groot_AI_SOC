@@ -12766,3 +12766,9 @@ A14작업complete/A·B420배치manifest·payloadSHA/수량 일치,413594건·Bca
 매뉴얼형 논문 MD/PDF/DOCX56쪽 개정·하네스8/학습10 상세화·본문 작업날짜0/서지 보존. MD717/DOCX720항목 누락0·114쪽수·56쪽 전수 검수, 실제 화면5/도식2/표35/문헌16·사진/학번 공란. 로컬9파일 SHA복구본 보존. OS 대상·범위 결속4소스 R6는 로컬840(834pass6skip)/기존Hermes840skip0·과거두arm 가짜실패 검출·공개24SHA/AST/39재현, 새 생성/읽기/채팅0·운영미적용. 기존 short-read3 실제3빈표본/12~16초와 구분. B16:56→17:52 소스24/schema45/config/modeldigest/PID/timer불변.
 
 근거: [후보·검사·한계](../infra/validation/read-target-binding/README.md)·[현재 상태](../STATUS.md). 이전 현재상태/계획은 Git `3efcb39d62f114bd468cee7a3ac40e9638bcc49c`의 STATUS.md/PLAN.md 및 해당 검증 원장에서 복구한다. 로컬 원문은 대화기록의 read-target-binding/thesis-methods에 보존한다.
+
+## 2026-11-15 실제 OS 조회4요청과 공통 계획 공백
+
+R6후속실제SDK2질문×2비교본4요청·MCP7/기록모델13. 집계systemd 질문:부모snapshot1읽기/이력혼동,후보0읽기/로그생성→새검사거절/최종근거없음. Vector과거+현재:양쪽3읽기·부모없는Type추정거절·후보잔여검사0이나unresolved/partial. 전체미채택·운영0.
+
+[질문·호출/응답SHA·시간·한계](../infra/validation/read-target-live/README.md)·[현재상태](../STATUS.md). 로컬원문과계획재현은대화기록/검증/2026-11-15-read-target-live에보존한다.

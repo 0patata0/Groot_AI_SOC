@@ -1,5 +1,7 @@
 # 두 봇의 공통 하네스
 
+[실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
+
 [OS 대상·범위 결속4소스 후보](../validation/read-target-binding/README.md)는 공통 읽기 원장과 Native/SDK 검사·기존 조사 스킬 절을 보완했다. 공식Harness²/840회귀·기존Hermes840생략0과 과거 실제OS 응답의 허위 실패 검출을 확인했다. contract1.5.88/query1.19.144는 격리 사본이며 현재 설치본이 아니다. root dispatch·권한·재시도·승인·TTL 불변, 새 모델/MCP 읽기·채팅0·운영 미적용이다.
 
 현행 복합 조사에는 [실제 조회 원장·ID/인용·사실 모순 보완](read-ledger.md)과 [부정 표현·정상 단정 검사](health-claim-check.md)를 적용했다. 실제 모델/채팅/독립평가 범위와 미완료는 해당 원장을 따른다. [입력·재조회 추가 비교](report-input-audit.md)의 후보는 비채택으로 현행 버전에 포함되지 않는다.

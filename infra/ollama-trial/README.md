@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+[실제OS조회후속](../validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
+
 [최신 OS 범위 후보](../validation/read-target-binding/README.md)는 앞선 대상명 허위 실패를 도구·host/unit/container·view·기간·반환에 결속했다. 공식Harness²/로컬840집계·기존Hermes840생략0/과거 실제 응답 두arm 검출·공개 재현을 확인했다. **설치 runtime·운영에는 미적용**, 새 모델/MCP 읽기·채팅0이다. 조회 대상25개와 현재snapshot 차이는 유지하고, 새 실제 정정/Native·양봇 채팅 및 조사 부재/활성 과장은 후속 검증이다.
 
 [읽기 시도 결속 후속](../validation/read-attempt-binding/README.md)은 실제 calls와 별도 입력 거절·시도 순서·반환/예외를 공통 검사에 전달했다. 로컬785집계/기존 Hermes785생략0·실제6요청/MCP6·모델15를 확인했지만 대상명 OS 실패·짧은DNS 룰 확대·부재/활성 과장 때문에 미채택이다. 운영/설치·권한·실채팅은 변경하지 않았다.

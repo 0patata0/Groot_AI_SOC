@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+[공통 주장·범위 후속](../validation/claim-modality/README.md)은 격리4소스·585로컬 집계/기존 Hermes264검사·실제9요청을 검증했다. WAF1읽기·51.243초를 확인했지만 무호출 Wazuh 실패 서술과 짧은 DNS 무조회가 남아 미채택이다. runtime completed와 품질 검토는 별개이며 정본/운영/설치·실채팅 변경0이다.
+
 [공통 짧은 조회 후보](../validation/common-read-contract/README.md)는 실제 설치본 복제와 같은 모델/권한으로 B systemd 범위·KST 표시를 검증했다. 321회귀·B22/실제8요청·MCP9/모델14이며 운영 미적용이다. DNS 완료는 실패했고 정확 인용·부정문/계획 오탐·모델 오류를 구분한다. 아래 운영/과거 버전과 후보를 혼동하지 않는다.
 
 **현재 읽기 경로 확인:** [설치 runtime·실제 MCP6요청](../validation/live-reads/README.md)은 FW15.003초/실조회1회를 확인했지만 journal 실패·B의 호스트 범위 확대·DNS판단 미완료·불필요한 시각 계산이 남았다. 현재 허용은 읽기36/동등권한45이며 모델은 학습본 `soc-qwen36:35b-balanced-q4km-20261108`, 전용·공동·경보 채널은 공개다. 소스19/스킬·45스키마·config와 GET메타데이터를 대조했다. 이하 날짜별 수치는 당시 검증 이력이다. 새 journal 후보는 로컬 소스/격리 검증만 했으며 운영에는 미적용이다.

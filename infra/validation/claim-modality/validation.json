@@ -1,0 +1,434 @@
+{
+  "status": "development_candidate_withheld_not_operating_ready",
+  "at_kst": "2026-11-15T14:45:25.255292+09:00",
+  "sources": {
+    "live_observed_at_kst": "2026-11-15T13:37:20.020483+09:00",
+    "last_source_recheck_kst": "2026-11-15T14:43:41.273570+09:00",
+    "operating_sources_verified": 24,
+    "drift": [],
+    "fresh_tool_count": 45,
+    "full_schema_reused_only_after_fresh_hash_equality": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "actual_schema_properties": {
+      "mcp__security_events__search_suricata_alerts": [
+        "limit",
+        "lookback_minutes",
+        "signature_id",
+        "since_kst",
+        "source_ip",
+        "until_kst"
+      ],
+      "mcp__security_events__search_wazuh_alerts": [
+        "agent_id",
+        "limit",
+        "lookback_minutes",
+        "program_name",
+        "since_kst",
+        "source_ip",
+        "until_kst",
+        "wazuh_rule_id"
+      ]
+    }
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "future-base": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16848,
+        "n_files": 25,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "basis": "unapproved pending19+common8 composite; not installed operating baseline"
+  },
+  "regressions": {
+    "local": [
+      {
+        "group": "new",
+        "tests": 28,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "root",
+        "tests": 236,
+        "skipped": 6,
+        "rc": 0
+      },
+      {
+        "group": "sdk",
+        "tests": 106,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "native",
+        "tests": 181,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "common-new",
+        "tests": 22,
+        "skipped": 0,
+        "rc": 0
+      },
+      {
+        "group": "workflow",
+        "tests": 12,
+        "skipped": 0,
+        "rc": 0
+      }
+    ],
+    "local_executions": 585,
+    "local_skipped": 6,
+    "existing_hermes_r5": {
+      "tests": 236,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "uid": 10001,
+      "network_connect_denied": true,
+      "openai_available": true,
+      "jsonschema_available": true
+    },
+    "existing_hermes_r6": {
+      "tests": 264,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "uid": 10001,
+      "network_connect_denied": true,
+      "openai_available": true,
+      "jsonschema_available": true
+    },
+    "public_reconstruction": "24 sources/arm + four-file AST equality + new28 pass",
+    "counting": "Repeated version/platform executions, parameterized subcases and project fixtures are not independent SOC cases; do not sum as accuracy denominator."
+  },
+  "actual_reads": {
+    "requests": 9,
+    "mcp_calls": 9,
+    "model_calls": 19,
+    "rows": [
+      {
+        "revision": "r5",
+        "arm": "base",
+        "case": "dns-fixed",
+        "status": "partial",
+        "seconds": 65.791,
+        "mcp_calls": 1,
+        "model_calls": 3,
+        "remaining_issues": [
+          "incident_disposition_missing",
+          "sample_zero_presented_as_absence",
+          "unobserved_event_source:modsecurity"
+        ],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T14:11:04+09:00"
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r5",
+        "arm": "base",
+        "case": "dns-short",
+        "status": "partial",
+        "seconds": 40.675,
+        "mcp_calls": 0,
+        "model_calls": 1,
+        "remaining_issues": [
+          "unobserved_attack_absence_claim",
+          "unobserved_event_source:modsecurity",
+          "unobserved_event_source:suricata"
+        ],
+        "reads": []
+      },
+      {
+        "revision": "r5",
+        "arm": "base",
+        "case": "waf-investigation",
+        "status": "completed",
+        "seconds": 56.015,
+        "mcp_calls": 2,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 60,
+              "until_kst": "2026-11-15T14:12:51.325488+09:00"
+            }
+          },
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 60,
+              "until_kst": "2026-11-15T14:12:51.325488+09:00"
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r5",
+        "arm": "candidate",
+        "case": "dns-fixed",
+        "status": "completed",
+        "seconds": 61.663,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T14:13:48.406813+09:00"
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r5",
+        "arm": "candidate",
+        "case": "dns-short",
+        "status": "partial",
+        "seconds": 47.518,
+        "mcp_calls": 1,
+        "model_calls": 4,
+        "remaining_issues": [
+          "sample_zero_presented_as_absence"
+        ],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "lookback_minutes": 1440,
+              "limit": 50
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r5",
+        "arm": "candidate",
+        "case": "waf-investigation",
+        "status": "completed",
+        "seconds": 55.802,
+        "mcp_calls": 2,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 60,
+              "until_kst": "2026-11-15T14:15:37.601841+09:00"
+            }
+          },
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 60,
+              "until_kst": "2026-11-15T14:15:37.601841+09:00"
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r6",
+        "arm": "candidate",
+        "case": "dns-fixed",
+        "status": "completed",
+        "seconds": 58.044,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 15,
+              "source_ip": "192.168.16.230",
+              "until_kst": "2026-11-15T14:36:45+09:00"
+            }
+          }
+        ]
+      },
+      {
+        "revision": "r6",
+        "arm": "candidate",
+        "case": "dns-short",
+        "status": "partial",
+        "seconds": 39.796,
+        "mcp_calls": 0,
+        "model_calls": 1,
+        "remaining_issues": [
+          "unobserved_attack_absence_claim"
+        ],
+        "reads": []
+      },
+      {
+        "revision": "r6",
+        "arm": "candidate",
+        "case": "waf-investigation",
+        "status": "completed",
+        "seconds": 51.243,
+        "mcp_calls": 1,
+        "model_calls": 2,
+        "remaining_issues": [],
+        "reads": [
+          {
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "limit": 50,
+              "lookback_minutes": 60,
+              "until_kst": "2026-11-15T14:38:23.116013+09:00"
+            }
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Same three development questions; cache/load/log window uncontrolled; no independent model quality or latency/p95 comparison.",
+      "SDK isolated workers use actual MCP and configured model with protected dispatch denied locally; no operating config/authority or Mattermost posts.",
+      "R6 WAF 51.243 seconds is query-to-final in shadow runtime, not user chat delivery.",
+      "A runtime completed response may contain unverified or unsupported statements; manual review is separate."
+    ]
+  },
+  "semantic_findings": [
+    {
+      "severity": "critical",
+      "case": "r6/dns-fixed",
+      "result": "runtime completed but manual rejection",
+      "problem": "Only search_suricata_alerts was called, yet answer reported a failed search_wazuh_alerts call and its exact argument error. This claim has no matching attempted-call receipt; existing checks did not catch it. The freshly hash-verified Wazuh tool schema actually permits lookback_minutes, so the claimed unsupported-argument failure is also contradicted by the schema."
+    },
+    {
+      "severity": "high",
+      "case": "r6/dns-short",
+      "result": "partial; fabricated absence blocked",
+      "problem": "No MCP call. Model fabricated recent24h DNS samples; unobserved_attack_absence_claim stopped publication. Short alert request routing remains incomplete."
+    },
+    {
+      "severity": "high",
+      "case": "r5/candidate/dns-fixed",
+      "result": "completed but unsupported next step",
+      "problem": "Proposed destination-IP reverse Suricata query, but actual45-tool schema does not expose destination IP/port filters. Not an executed read."
+    },
+    {
+      "severity": "info",
+      "case": "r6/waf-investigation",
+      "result": "scope/receipt sample review passed",
+      "problem": "One actual ModSecurity read,60min,0 returned sample/unknown total and unresolved evidence. No all-clear. Later investigation plans remain unexecuted."
+    }
+  ],
+  "next": [
+    "Bind claimed read success/failure to actual attempts, tool names, arguments and outcomes in both Native/SDK; do not invent an error receipt.",
+    "Repair common short-alert lookup vs investigation intent and default time scope without fixed verdicts, guessed IDs or redundant calls.",
+    "Supply actual capability/schema constraints to follow-up planning, distinguishing unsupported filter from no data.",
+    "Official Harness2 freeze/regressions/fresh read tests, then separate exact approval/apply and new Mattermost verification."
+  ],
+  "unchanged": {
+    "operating_apply": 0,
+    "service_or_timer_actions": 0,
+    "chat_posts": 0,
+    "attack_tests": 0,
+    "new_training": 0,
+    "packages_installed": 0,
+    "authority_ttl_model_changes": 0,
+    "pending_plans": [
+      "fd6e7cb98ddbcbefa2c7517f73dc6f549eedc2aca6fb4cdad3e78f0ba2b501c4",
+      "0f5cc45fbdb0a0ca1ec18cc0cc1428a4d982549a7ca7cbeab7095cabaa4c219e"
+    ]
+  },
+  "cleanup": {
+    "server_roots_removed": 4,
+    "server_files_removed": 1394,
+    "server_bytes_removed": 24498923,
+    "server_absence_verified": true,
+    "minimum_sources": "Local four-file snapshots per R5/R6, frozen patch/reconstruction and raw evidence retained; user data, weights, G_Harness2 and operating backups preserved.",
+    "mac_temporary_cleanup": {
+      "at_kst": "2026-11-15T14:47:01.811038+09:00",
+      "root": "/private/tmp/capstone-claim-modality-ji0fxny8",
+      "files_removed": 4040,
+      "bytes_removed": 70808473,
+      "absent": true,
+      "embedded_temporary_scripts_removed": [
+        {
+          "file": "reproduction/prepare-b.py",
+          "bytes": 1687722,
+          "sha256": "e6e65aecd52def06394e22cedbbae2c6cd31d51e35b22e6a81509447eb73426c"
+        },
+        {
+          "file": "reproduction/native-b.py",
+          "bytes": 4905945,
+          "sha256": "1550c2bbaafa1b01c7f6e5f6014fc26391dd8fe41f41b4de7fd9b20dc6c011a6"
+        },
+        {
+          "file": "reproduction/prepare-r6-b.py",
+          "bytes": 1688332,
+          "sha256": "a8a5cb2d1fc78812582d2ea4a441be00de95f69301773894a677ad896c253f49"
+        },
+        {
+          "file": "reproduction/native-r6-b.py",
+          "bytes": 4907291,
+          "sha256": "44209fe3a01406f4ed2993a3da43c95756e754eacd2c7ccc34c5d59e8f275b1d"
+        }
+      ],
+      "minimum_sources_preserved": 8,
+      "public_reconstruction_verified": true,
+      "packages_installed": 0,
+      "preserved": "User data/weights, G_Harness2, operating prepared stages/backups, original nine worktree changes and paper outputs."
+    }
+  },
+  "reviews": {
+    "manual_defect_first": "performed; critical read-failure fabrication prevents adoption",
+    "review_agent_skill": "not found; not claimed as run",
+    "semgrep": "not run; no local CLI installed",
+    "secret_scan": {
+      "tracked_paths": 2177,
+      "findings": 5,
+      "new_changed_path_findings": 0,
+      "value_or_snippet_saved": false,
+      "scope": "original scanner --git, tracked-path/symlink/external/credential preflight; existing five unchanged false positives reviewed",
+      "not_covered": "Git history, ignored local artifacts and independent semantic quality"
+    }
+  }
+}

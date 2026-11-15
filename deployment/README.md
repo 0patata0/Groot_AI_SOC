@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+[주장 결속 개발 후보](../infra/validation/claim-modality/README.md)는 실제 DNS 근거 오류가 남아 미채택이며 단일 deploy.sh의 정본/설치 입력에 넣지 않았다. 기존19파일·journal9코드의 정확 적용 계획도 불변이다. 개발 패치 재구성을 운영 설치/새 OS 검증으로 사용하지 않는다.
+
 [native journal 후보](../infra/validation/journal-adapter/README.md)의 단일deploy.sh/helper·systemd255/binding235 API·오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은33회귀·9복제원복/18중간load·A/B/C PREPARED/원본6개를 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용/원복timer/새채팅·새 OS 전체 설치는 미수행이다. 아래 날짜별 설명은 당시 범위다.
 
 [정확 적용·복구 후보](../infra/validation/control-status/application/README.md)는 현재 프로필로 내장 gate와19파일·영수증·유휴 확인·15분 원복을 준비했다. 설치 회귀46과 격리 원복은 통과했지만 정본·초기 설치 입력은 유지한다. 운영 적용은 정확 승인 후이며 실제 콜드 재시작/새 채팅·새 OS 전체 설치는 아직 미수행이다. 단일 deploy.sh 진입점도 유지한다.

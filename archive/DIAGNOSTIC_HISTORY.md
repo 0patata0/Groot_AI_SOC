@@ -355,3 +355,8 @@ Mac/B Native431→449·SDK77/query408/installer46 통과. B의9생략은 기존 
 ## 2026-11-15T09:11:40.469152+09:00 공통 짧은 조회·시각 표시 후속
 
 기존/후보 실제 요청8/MCP9/모델14·각1회·개발재사용·캐시/부하/구간 미통제. B systemd3→1읽기, 제공KST13.174→0.002초/호출0. DNS77.931→78.842초partial, 부재 부정/추가 조사 계획 오탐·불필요WAF·허용 밖 상태값 잔여. 첫 worker는 root-only 소스 읽기 거부로 model/MCP 전 종료, 권한 확장 없이 root/비특권 검증 분리. 로컬 감사 인자/복제fixture/테스트mock 오류와 실제 파서 충돌을 구분·정정. [전체 범위](../infra/validation/common-read-contract/validation.json).
+
+
+## 2026-11-15T14:49:24.191213+09:00 공통 주장·조회 범위 개발 후보
+
+초기22반례10실패(못했다/조건어미/greedy/이중부정/계획뒤 실제부재)·diagnostic 기간 회귀1개를 정정했다. Mac6생략은 Hermes엔진이 아니라 OpenAI/jsonschema 의존 조건이며 기존 Hermes264생략0으로 확인했다. 로컬 준비의 외부 test_claims/test_common 경로2오류와 새파일패치 모드 누락은 실행/적용 전 거절·수정 후 재현했다. R6 실제 지정DNS는 무호출 Wazuh 실패를 보고했고 기존 검사도 놓쳤다. 짧은 DNS 무조회 fabricated24h표본은 unobserved_attack_absence_claim이 차단했다. 각9요청·MCP9/모델19와 runtime완료/의미검토를 분리했다. [전체 결과](../infra/validation/claim-modality/validation.json).

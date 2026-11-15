@@ -1,5 +1,7 @@
 # Mattermost 조회 응답 보완
 
+[공통 주장 결속 후보](../../validation/claim-modality/README.md)의 query1.19.142는 격리4소스/동결 SHA에만 있다. 부정·조건·계획/이중부정과 Native·SDK 공통 gate 핀을 검증했고585로컬 집계·기존 Hermes264검사는 통과했으나 DNS 실제 근거 오류로 미채택이다. 현재 설치137·별도141 준비/승인 대기는 변경하지 않았다.
+
 [공통 조회 후보](../../validation/common-read-contract/README.md)는 Native/SDK가 같은 호스트 파서·제공 KST 표시기를 사용하도록8소스를 격리 수정했다. Native181+새22 등321회귀와 provider 미호출을 확인했지만 실제 Hermes 채팅 검증·운영 적용은 미수행이다. 기존1.19.137/별도141 준비 후보와 구분하며 승인 대기 원본을 변경하지 않았다.
 
 [정확 적용 후보](../../validation/control-status/application/README.md)의1.19.141은 patch/준비 폴더에만 있다. 정본·설치 파일1.19.137이며 기존 gateway 로그만으로 메모리 로드 버전까지 확인하지 못했다. 새 PID·시작 ticks·소스 SHA 관측11검사를 포함한 query419와 Native536은 기존 Hermes 격리 환경에서 생략0이다. 정확 승인·콜드 적용·실제 로드/새 채팅 확인은 남는다. 부모1.19.138~140도 운영 미적용이다.

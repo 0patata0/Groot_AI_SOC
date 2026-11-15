@@ -1,6 +1,6 @@
 # 제한된 서비스 journal 조회
 
-[집계 시스템 journal 후속 후보](../validation/host-journal/README.md)는 고정 A/B/C systemd target의 live system journal과 실제 출처 필드를 추가한다. 기존 개별 unit 응답·사용자 journal 제외·마스킹/시간/크기/권한 제한을 회귀했다. 최근 조회와 인증 소켓은 실제 성공했지만24h errors 검색은 두 backend 모두 시간 제한이다. 운영은 기존 reader이며 이 후보·MCP·실제 채팅은 미적용/미수행이다.
+[호스트 시스템 journal 후속 후보](../validation/host-journal-cost/README.md)는 가용시스템파일 전체를native FD로분할해 같은24h errors A5.50/B2.61/C1.94초·CLI전체병합응답일치를 확인했다. 사용자journal 제외·등록unit형태·마스킹/기간/패킷/권한은 유지한다. 운영은기존reader이며후보미적용·실제MCP데이터/모델/채팅0이다. 부모의긴검색실패기록도보존한다.
 
 후속 [정확9코드 journal 적용안](../validation/journal-adapter/application/README.md)은 공통166검사/격리8건 이후33회귀·9복제적용/9원복·18중간load·A/B/C PREPARED/원본6개를 준비했다. 운영 apply/원복timer·실MCP/새채팅은 미수행이다. 아래 기존 후보/실험 수치와 미구현 표기는 당시 단계로 보존한다.
 

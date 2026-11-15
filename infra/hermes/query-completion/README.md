@@ -1,6 +1,6 @@
 # Mattermost 조회 응답 보완
 
-[집계 journal 개발 후보](../../validation/host-journal/README.md)는 공통 필수 읽기와 범위/출처 표시를 보완한다. 후보 common1.5.89/query1.19.145·MCP1.4.3이며 canonical/운영 버전이 아니다. root 변경은 스키마의 동등한 모델 문법 투영뿐이며 런타임·권한·승인·예산은 유지한다. Hermes1121생략0과 최근 실제 로그/소켓 읽기는 확인했으나24h errors 지연·새 모델 선택·설치 MCP/새 채팅은 미해결/미수행이다. 기존 정확19/journal9 계획을 변경하지 않는다.
+[호스트 journal 후속 후보](../../validation/host-journal-cost/README.md)는 부모 공통필수읽기/출처 계획을 유지하고 native파일별 검색을 보완했다. 같은24h A/B/C 전체CLI 병합과 일치·기존Hermes1137생략0·공식Harness²를 확인했다. backend가용성은 실제 모델 선택/설치MCP/새채팅과 별도이며 canonical·운영에는 미반영이다. 후보 common1.5.89/query1.19.145·MCP1.4.3도 운영 버전이 아니며 기존 두 정확계획·권한·예산은 유지한다.
 
 [읽기 시도 결속 후보](../../validation/read-attempt-binding/README.md)의 query1.19.143/contract1.5.86은 격리 버전이다. Native 이번턴 고유 callID/실제 응답과 root dispatch의 반환/거절/예외를 검사하고 원래 허용·예산을 유지했다. 기존 Hermes785생략0은 실제 Native 운영 채팅을 대신하지 않으며 OS 대상명 서술 등 잔여로 미채택이다. 설치137·별도141 준비/승인 대기는 불변이다.
 

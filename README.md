@@ -3,7 +3,7 @@
 <!-- current-work-summary:start -->
 현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 후임자가 따르는 목적·준비·방법·확인·복구 중심의 매뉴얼로 상세화했고 로컬 MD·PDF·DOCX56쪽·내용 누락0·114목차/캡션·전페이지 검수를 마쳤습니다. 사진/학번은 공란이며 논문/발표/포트폴리오는 Git 제외입니다.
 
-[집계 host journal 후보](infra/validation/host-journal/README.md)는 고정 A/B/C 실제 로그와 공통 필수읽기·출처 표시·설치 사전검사를 연결했습니다. Mac1,038/기존 Hermes1,121생략0·실제21논리시험15성공/6실패이며24h errors 검색 지연은 남습니다. 설치된 MCP/모델/실제채팅0·운영 미적용입니다. 앞선 [실제 모델 비교4요청](infra/validation/read-target-live/README.md)의 허위 로그 거절·계획 공백과 별도 증거입니다. 기존19/journal9 정확승인안·운영 모델/권한·기존9변경·논문 산출물은 보존합니다.
+[호스트 journal 후속 후보](infra/validation/host-journal-cost/README.md)는24h errors 시간 제한을 파일별 native 조회로 보완했습니다. 실제 A5.50/B2.61/C1.94초이며 기존CLI 전체 구간 병합과 응답이 일치했습니다. 공식 Harness²·Mac1054/기존Hermes1137생략0·공개34소스/측 복원을 확인했습니다. 운영 미적용·실제MCP데이터/모델/새채팅0이며 모델 선택·정확 새 승인/로드·채팅이 남습니다. 기존 두 정확계획·원래9변경·논문15산출물은 보존합니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

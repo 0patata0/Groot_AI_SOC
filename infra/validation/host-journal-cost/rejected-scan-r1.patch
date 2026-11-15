@@ -1,0 +1,38 @@
+--- a/infra/mcp/diagnostic_journal_native.py
++++ b/infra/mcp/diagnostic_journal_native.py
+@@ -1,4 +1,4 @@
+-"""Private, fixed-unit native journal source; never an MCP or shell executor.
++"""Private, fixed-unit/host journal source; never an MCP or shell executor.
+ 
+ Only masked canonical rows cross the child pipe. Worker parameters are the
+ existing journal request and its host, not paths, options, patterns or code.
+@@ -93,7 +93,14 @@
+         reader.data_threshold = 0
+         if unit is not None:
+             unit_matches(reader, unit)
+-        if priorities is not None:
++        # Host-wide info/warning messages are dense. Merging several priority
++        # indexes for every entry is expensive; scan the same host/time source
++        # and apply that exact priority predicate after the text match instead.
++        # Keep the selective severity index and all existing unit-bound reads.
++        indexed_priorities = priorities is not None and (unit is not None or literals is None)
++        post_priorities = ({str(priority).encode() for priority in priorities}
++                           if priorities is not None and not indexed_priorities else None)
++        if indexed_priorities:
+             if unit is not None:
+                 reader.add_conjunction()
+             for priority in priorities:
+@@ -119,6 +126,13 @@
+                     continue
+             raw = reader._get_all()
+             core.need(isinstance(raw, dict), 'journal_native_entry_invalid')
++            if post_priorities is not None:
++                priority = raw.get('PRIORITY')
++                values = priority if isinstance(priority, list) else [priority]
++                if not any(isinstance(value, bytes) and value in post_priorities for value in values):
++                    continue
++                # A matching multivalue/invalid field still reaches source_row's
++                # strict check; it cannot disappear as a zero-result sample.
+             item = {name: json_field(name, raw[name]) for name in ROW_FIELDS if name in raw}
+             item['__REALTIME_TIMESTAMP'] = str(stamp)
+             cursor = reader._get_cursor()

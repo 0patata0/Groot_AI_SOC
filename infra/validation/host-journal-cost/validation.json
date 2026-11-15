@@ -1,0 +1,2423 @@
+{
+  "status": "full_day_backend_verified_not_applied",
+  "scope": "same frozen 24h errors interval, limit 5; backend validation only",
+  "hosts": {
+    "a": {
+      "observed_at_kst": "2026-11-15T22:58:07.748875+09:00",
+      "finished_at_kst": "2026-11-15T22:59:54.178504+09:00",
+      "fixed_limits": {
+        "memory_bytes": 134217728,
+        "query_seconds": 20,
+        "child_seconds": 12,
+        "tasks": 8
+      },
+      "cases": [
+        {
+          "name": "candidate_six_hours",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:32:59+09:00",
+            "until_kst": "2026-11-15T21:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 2.664952,
+          "result_sha256": "3a548edb6d1b9f7dcf98bce9170c742dd31fcf14851460fde813909110d31375",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "candidate_day",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:32:59+09:00",
+            "until_kst": "2026-11-15T21:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 5.500281,
+          "result_sha256": "b09f7c67569969b1a0c08954369223a7388800a26e80b58ee51830da5e0710bc",
+          "response_summary": {
+            "returned_entries": 5,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_0",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T20:32:59+09:00",
+            "until_kst": "2026-11-15T21:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.025501,
+          "result_sha256": "5e2b19a39e02317d2acc61a3ea1d316832a53596ef28eb830035bb877eb0c243",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_1",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T19:32:59+09:00",
+            "until_kst": "2026-11-15T20:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.929107,
+          "result_sha256": "7132b3f1061e8aeaff1701cd2ad0bcef267d7fcc769501069cc387b2e1eeb3c9",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_2",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T18:32:59+09:00",
+            "until_kst": "2026-11-15T19:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.944738,
+          "result_sha256": "5a9fc6753c39d030b572594f8e9c099cd7bf037117cca1fefcd08a4b65feb07e",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_3",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T17:32:59+09:00",
+            "until_kst": "2026-11-15T18:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.892962,
+          "result_sha256": "a01a142dd9e21e133aa77d3339d0da1db806c47be86930709092a0c2a7c102b7",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_4",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T16:32:59+09:00",
+            "until_kst": "2026-11-15T17:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.901942,
+          "result_sha256": "e5b8cfa1f1bfa423103e7788dd0dea1ed1cbf819245e675fd4cd498df9c7e091",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_5",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:32:59+09:00",
+            "until_kst": "2026-11-15T16:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.315018,
+          "result_sha256": "565a1d1bcbc352026f64d88513fa37cb958f1e471cad60c7753daf2e3f3a4e80",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_6",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T14:32:59+09:00",
+            "until_kst": "2026-11-15T15:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.480701,
+          "result_sha256": "cefe1fd453769caf19233f928d74f55a172e326472e4c31d9c90c0ebd9185a8d",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_7",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T13:32:59+09:00",
+            "until_kst": "2026-11-15T14:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.261034,
+          "result_sha256": "ea168cd4dfdfe7c92bfb36007ba7f56a657f047fd5ff8e60d4dbf16c1abca2ee",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_8",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T12:32:59+09:00",
+            "until_kst": "2026-11-15T13:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.158281,
+          "result_sha256": "852bc0e99d41c2ca5a787d99e9f7359152825f6622365a67c87ad00ba42ce71c",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_9",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T11:32:59+09:00",
+            "until_kst": "2026-11-15T12:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.97498,
+          "result_sha256": "0eb69faa0e13d12a59b36a6bdf3c311856935232e8c7ca0866a08e622e5d4a8e",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_10",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T10:32:59+09:00",
+            "until_kst": "2026-11-15T11:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.89121,
+          "result_sha256": "e1b8cad8563b370a8de946695944d8151a385c004dcd7824e3377d813ae6c5ad",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_11",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T09:32:59+09:00",
+            "until_kst": "2026-11-15T10:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.938074,
+          "result_sha256": "6743966362cbe3c23ac68f4c157b6db972ea074a0d11938e2bac271f98386daf",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_12",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T08:32:59+09:00",
+            "until_kst": "2026-11-15T09:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.015404,
+          "result_sha256": "b5312075bc67c57a8c697ee55661b7c5e579fde5ea87dada24f870eeb3f79930",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_13",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T07:32:59+09:00",
+            "until_kst": "2026-11-15T08:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.987594,
+          "result_sha256": "9e73dee2476b17e4934dc897faf3fc9ca1a59dba68badfa9802445564c1c9567",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_14",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T06:32:59+09:00",
+            "until_kst": "2026-11-15T07:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.07569,
+          "result_sha256": "b98c9e703d69aa58f95ea5f3413f745b22f6771e5ff6e48e74dba20ae52f029d",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_15",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T05:32:59+09:00",
+            "until_kst": "2026-11-15T06:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.971433,
+          "result_sha256": "d89b5079a0b6802993c727cdbc96fe2b2d7d9455e78c239c74d0e0982a3cb278",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_16",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T04:32:59+09:00",
+            "until_kst": "2026-11-15T05:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.039335,
+          "result_sha256": "2d1e36406a1939054f906a7d4359c39113e93f68ada6a47282ca525e2acc95c4",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_17",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T03:32:59+09:00",
+            "until_kst": "2026-11-15T04:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.924712,
+          "result_sha256": "28a2302dd29354186c7a1fafc010a6eba00f10db01c7b3ff706075bfb9719efa",
+          "response_summary": {
+            "returned_entries": 4,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_18",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T02:32:59+09:00",
+            "until_kst": "2026-11-15T03:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.988756,
+          "result_sha256": "5718611fb08a5ebddefd2730510d59bcf7ae5cbc89516e6b2bf0f8fad198c3d5",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_19",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T01:32:59+09:00",
+            "until_kst": "2026-11-15T02:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.2672,
+          "result_sha256": "651e954c107743127c40d0a4b32a6ffb5c76784b3493ffc4926cbbb459d04098",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_20",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T00:32:59+09:00",
+            "until_kst": "2026-11-15T01:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 3.912196,
+          "result_sha256": "9c86d992c4e84aa7c4d50b4ace79719f7c392eff2b61ba995313a68cbc369714",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_21",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T23:32:59+09:00",
+            "until_kst": "2026-11-15T00:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.802141,
+          "result_sha256": "aa7846d3240dd30569a0211aba098db0e518f049a04be7ff0ba52b11409c8819",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_22",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T22:32:59+09:00",
+            "until_kst": "2026-11-14T23:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.25061,
+          "result_sha256": "187f9bbc9ecfbe7c9870db9b5458697e81cd168d0183f21f2a54aa6a36ce2a8f",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_23",
+          "arguments": {
+            "target": "a:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:32:59+09:00",
+            "until_kst": "2026-11-14T22:32:59+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 4.163451,
+          "result_sha256": "1fbfb199950f4ce9c0f90056733957f0cf40a99e67af78c9c5696c88431b0c43",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        }
+      ],
+      "full_day_cli_union": {
+        "separate_requests": 24,
+        "complete": true,
+        "merged_response_sha256": "b09f7c67569969b1a0c08954369223a7388800a26e80b58ee51830da5e0710bc",
+        "merged_returned_entries": 5,
+        "candidate_full_response_equal": true,
+        "oracle_total_seconds": 98.11207
+      },
+      "installed_sources_unchanged": true
+    },
+    "b": {
+      "observed_at_kst": "2026-11-15T22:53:56.609885+09:00",
+      "finished_at_kst": "2026-11-15T22:54:46.392463+09:00",
+      "fixed_limits": {
+        "memory_bytes": 134217728,
+        "query_seconds": 20,
+        "child_seconds": 12,
+        "tasks": 8
+      },
+      "cases": [
+        {
+          "name": "candidate_six_hours",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:33:05+09:00",
+            "until_kst": "2026-11-15T21:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 1.352066,
+          "result_sha256": "874c5a4767c48e41e2e8de9f4f94589f098b940fd7369a67c2cb2f5f8a1198f5",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "candidate_day",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:33:05+09:00",
+            "until_kst": "2026-11-15T21:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 2.607778,
+          "result_sha256": "b5d3b74f0b2a962d402d779e3e797ebb2112d5274085e3ed23a0598b209a906c",
+          "response_summary": {
+            "returned_entries": 2,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_0",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T20:33:05+09:00",
+            "until_kst": "2026-11-15T21:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.984966,
+          "result_sha256": "50a325f8fa00ef062ebb3fdd35e967b924459e4fa1aeec705019028782084069",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_1",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T19:33:05+09:00",
+            "until_kst": "2026-11-15T20:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.897155,
+          "result_sha256": "4c66f015877ebdcd5e40ddfcf39320566f75890b133e4ee9735248dcfd7629e3",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_2",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T18:33:05+09:00",
+            "until_kst": "2026-11-15T19:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.966545,
+          "result_sha256": "2e7f1e51d6f1d00e8fb734e907aed87fe6c07829b7545134983a36bd087a3d0e",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_3",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T17:33:05+09:00",
+            "until_kst": "2026-11-15T18:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.892822,
+          "result_sha256": "998bb9d16accb9ef33694109802659e71d2fafd223c044f2b5d1c864dd1aa274",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_4",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T16:33:05+09:00",
+            "until_kst": "2026-11-15T17:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.908211,
+          "result_sha256": "6e6dc7fc50acd6a491471fd1b6ca424aacb26b0fda8208ba9c04b762a2f3220d",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_5",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:33:05+09:00",
+            "until_kst": "2026-11-15T16:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.98318,
+          "result_sha256": "85336c472884f24c5c71adddaa4ea1ce3661be6aec6de84e50f040d9e7ffaa11",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_6",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T14:33:05+09:00",
+            "until_kst": "2026-11-15T15:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.94039,
+          "result_sha256": "be1838de431575c8d90661d139d7c0b89c899bb886c27419af3ac457527d5311",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_7",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T13:33:05+09:00",
+            "until_kst": "2026-11-15T14:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.941056,
+          "result_sha256": "b0fda8b18946cf5b831a2599522f1b0d945fc7626c4c3c4b77a8d57d8f9990a1",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_8",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T12:33:05+09:00",
+            "until_kst": "2026-11-15T13:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.857226,
+          "result_sha256": "2a7a4d5ea0830a8b86c1691397e0e5a9ab3a89ab7434a1eea2a127df94850938",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_9",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T11:33:05+09:00",
+            "until_kst": "2026-11-15T12:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.807586,
+          "result_sha256": "ec12444a9c4076048cc5ffff0a2dea9656f47c10a129df8d0ce6c7de0fb72ef0",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_10",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T10:33:05+09:00",
+            "until_kst": "2026-11-15T11:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.860585,
+          "result_sha256": "40453d91aefbbb56936c155ddeb8aa1aa36e1b7b2034dfa66392f0b6c81f3644",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_11",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T09:33:05+09:00",
+            "until_kst": "2026-11-15T10:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.889537,
+          "result_sha256": "6810292e4e840cc84ae8509352c201fabfcca0a7cc5f4cf67df4a196ee09cab3",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_12",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T08:33:05+09:00",
+            "until_kst": "2026-11-15T09:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.895216,
+          "result_sha256": "2be5814b1c68327dfc9f24c2c00f3a04474ad0740bcb1acee68084c96b2052ae",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_13",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T07:33:05+09:00",
+            "until_kst": "2026-11-15T08:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.955014,
+          "result_sha256": "88778dee33bbdffd54508ef0907c09980890ab94c7fc0d68f8dbc1b875fdea30",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_14",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T06:33:05+09:00",
+            "until_kst": "2026-11-15T07:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.853834,
+          "result_sha256": "8a6cc5b0a8bd8a38823f74ab96cb465c9f1a2dc36ca2f3f0a574dc230828fec4",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_15",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T05:33:05+09:00",
+            "until_kst": "2026-11-15T06:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.84045,
+          "result_sha256": "9160135b805d74ad3aecb8ad85c17009b8edeeb337b73515588899d7aaa3003d",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_16",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T04:33:05+09:00",
+            "until_kst": "2026-11-15T05:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.857813,
+          "result_sha256": "a1c4ae049a8f7f1830f8b8dd616b5e75adf88c94a85b9ecacf5847dbf330d2d6",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_17",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T03:33:05+09:00",
+            "until_kst": "2026-11-15T04:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.873047,
+          "result_sha256": "080bc1d4e98490778470fd957c410bc9658d0774d0a49dc7452d0dc598198652",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_18",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T02:33:05+09:00",
+            "until_kst": "2026-11-15T03:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.918007,
+          "result_sha256": "6b5622158d06bea58822350e02df89093cad4d3c94dfb0165e09bfd8f818f0c4",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_19",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T01:33:05+09:00",
+            "until_kst": "2026-11-15T02:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.876849,
+          "result_sha256": "1ee0d373ddd8523e547e8a371d6241158449bee75bab8ab5dc10fdf0e4492b95",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_20",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T00:33:05+09:00",
+            "until_kst": "2026-11-15T01:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.881012,
+          "result_sha256": "504b5fa692477e82d332f9c2654bcac934c68a89f1f7bf5c5e5e4ed4ab0d6d60",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_21",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T23:33:05+09:00",
+            "until_kst": "2026-11-15T00:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.998383,
+          "result_sha256": "05b57f5720b9efca73bf4445a6104e0903334a6b7754a56fbc77f89ed20b5de8",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_22",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T22:33:05+09:00",
+            "until_kst": "2026-11-14T23:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.853098,
+          "result_sha256": "6cd3f807dbc63517207ab024274598950a1fb081f10b23fd742addc92f95a8fe",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_23",
+          "arguments": {
+            "target": "b:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:33:05+09:00",
+            "until_kst": "2026-11-14T22:33:05+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.929454,
+          "result_sha256": "df05226cf35d48e6495669c8873bb523c83150446a695be88c13bd77667553a5",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        }
+      ],
+      "full_day_cli_union": {
+        "separate_requests": 24,
+        "complete": true,
+        "merged_response_sha256": "b5d3b74f0b2a962d402d779e3e797ebb2112d5274085e3ed23a0598b209a906c",
+        "merged_returned_entries": 2,
+        "candidate_full_response_equal": true,
+        "oracle_total_seconds": 45.661436
+      },
+      "installed_sources_unchanged": true
+    },
+    "c": {
+      "observed_at_kst": "2026-11-15T22:58:09.007328+09:00",
+      "finished_at_kst": "2026-11-15T22:58:44.850326+09:00",
+      "fixed_limits": {
+        "memory_bytes": 134217728,
+        "query_seconds": 20,
+        "child_seconds": 12,
+        "tasks": 8
+      },
+      "cases": [
+        {
+          "name": "candidate_six_hours",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:33:14+09:00",
+            "until_kst": "2026-11-15T21:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 0.956694,
+          "result_sha256": "1099f21b8619dea209a058fc48c87ae7d640b8c6ce36f527b8cb52ae3d890e7f",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "candidate_day",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:33:14+09:00",
+            "until_kst": "2026-11-15T21:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "native_scan",
+          "status": "returned",
+          "elapsed_seconds": 1.937432,
+          "result_sha256": "d4ee5bc0018230e82eb3e792c25edaa9c2d397a57d01ac1cda8427d5a28020c0",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "response_size_limited": false,
+            "journal_scope": "errors",
+            "journal_target_scope": "host_system"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_0",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T20:33:14+09:00",
+            "until_kst": "2026-11-15T21:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.38507,
+          "result_sha256": "531b83df44f4693cd8615878ef229011017451895624cdf17109532ef103d5e6",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_1",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T19:33:14+09:00",
+            "until_kst": "2026-11-15T20:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.355683,
+          "result_sha256": "a2956c62ffd43ed1257fea83e0ed437544e5bdd2d6f83f39b84ad0e237eb2d17",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_2",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T18:33:14+09:00",
+            "until_kst": "2026-11-15T19:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.346105,
+          "result_sha256": "718b809e241049e01b1a246c8dade939c71a7f41d9abc3481e9b2620106b897d",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_3",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T17:33:14+09:00",
+            "until_kst": "2026-11-15T18:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.349936,
+          "result_sha256": "6b41e161f34bf1425aa912ddad1ab5586637e59967bb70020f30d94a72a3a97d",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_4",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T16:33:14+09:00",
+            "until_kst": "2026-11-15T17:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.360949,
+          "result_sha256": "819d7a4723ff9fad41d813ddfd08bfa350d8594af7f557e113e68af950a42ea3",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_5",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T15:33:14+09:00",
+            "until_kst": "2026-11-15T16:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.356828,
+          "result_sha256": "bdd3524d2fb7e50de14db32c29a4b3a7e0d5dbe4df506ba5b9e2a559324f64af",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_6",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T14:33:14+09:00",
+            "until_kst": "2026-11-15T15:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.347484,
+          "result_sha256": "78e0e4c42c79c66b66a72607762acc30aed829f1ff68b74a72bfa6bcadb2043b",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_7",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T13:33:14+09:00",
+            "until_kst": "2026-11-15T14:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.339381,
+          "result_sha256": "ebb9cf709f134c551fe90efcfc00fac914476be5c931ce1b3aecb5625b863583",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_8",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T12:33:14+09:00",
+            "until_kst": "2026-11-15T13:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.350079,
+          "result_sha256": "e541dfd95b777cfa30a4799eb772112f2e57263bd62776888ee9a8a8cc1a6941",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_9",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T11:33:14+09:00",
+            "until_kst": "2026-11-15T12:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.355891,
+          "result_sha256": "8d1e021e71ab68618b473ededbb39addb6fd228bf2ccadeef4a0de7f8b30a165",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_10",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T10:33:14+09:00",
+            "until_kst": "2026-11-15T11:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.341944,
+          "result_sha256": "674fe1d361efa642ab59b3ecc2c875889ebc32f357339f1a223ba13650557a87",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_11",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T09:33:14+09:00",
+            "until_kst": "2026-11-15T10:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.361965,
+          "result_sha256": "826eebd44eda54df4e151c4916eebbbc995c859a120c0d9deaea22c0bb509ee0",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_12",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T08:33:14+09:00",
+            "until_kst": "2026-11-15T09:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.368532,
+          "result_sha256": "5c81c3507f0d1efda7f2a620fea676797e00fa4100f31006ec096a34e954e8de",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_13",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T07:33:14+09:00",
+            "until_kst": "2026-11-15T08:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.360182,
+          "result_sha256": "16a9d99f43ff6bee727de133d6538856f8d4f9defcb544c8c5c736319be07f11",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_14",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T06:33:14+09:00",
+            "until_kst": "2026-11-15T07:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.386482,
+          "result_sha256": "87f0fcbebf73a817d5ba0f8bfde7d64bd0aa072bcd005574de3f187e6baf037a",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_15",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T05:33:14+09:00",
+            "until_kst": "2026-11-15T06:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.36436,
+          "result_sha256": "0618a1372770d7d0ba9e0fef70822073ba91a201c24341319c29aad8c9c948a5",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_16",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T04:33:14+09:00",
+            "until_kst": "2026-11-15T05:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.381715,
+          "result_sha256": "f966fd2f4cce6907825056b9b3d8de1339f255eb064182b1ae2ca51148530847",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_17",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T03:33:14+09:00",
+            "until_kst": "2026-11-15T04:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.378527,
+          "result_sha256": "e6ba2e8fcbe9c86b6a926d163e76ce0af5eac7e56005b18d5da638e31318868a",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_18",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T02:33:14+09:00",
+            "until_kst": "2026-11-15T03:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.379417,
+          "result_sha256": "bc79ba9772222fdda550c5233eea513e7634934157321c8a8646c36091bffb52",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_19",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T01:33:14+09:00",
+            "until_kst": "2026-11-15T02:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.373185,
+          "result_sha256": "fbbd19008c57518f2d298fe8783976e08075b18ddea1ee6e5a0dc1e6f6a1b23b",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_20",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-15T00:33:14+09:00",
+            "until_kst": "2026-11-15T01:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.398388,
+          "result_sha256": "33258875bb73abd530e7fe16f8fd8784d816126682c67980b10fb8f22e1abc9c",
+          "response_summary": {
+            "returned_entries": 1,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_21",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T23:33:14+09:00",
+            "until_kst": "2026-11-15T00:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.407991,
+          "result_sha256": "3cbc7bc12687115a5d9de413464f73b7426a416c0ed5cb06bf7f7685bd5e1deb",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_22",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T22:33:14+09:00",
+            "until_kst": "2026-11-14T23:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.395328,
+          "result_sha256": "15ab395e8a3dd2023923d1b72411be5a24c6b6e5fe0c860fb948c078e477d0a9",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        },
+        {
+          "name": "cli_oracle_slice_23",
+          "arguments": {
+            "target": "c:systemd",
+            "view": "journal",
+            "since_kst": "2026-11-14T21:33:14+09:00",
+            "until_kst": "2026-11-14T22:33:14+09:00",
+            "journal_scope": "errors",
+            "limit": 5
+          },
+          "backend": "CLI",
+          "status": "returned",
+          "elapsed_seconds": 1.363869,
+          "result_sha256": "9cd9afa34a48a66b9eb87d9cb3850bda5917a68a3f43437afc38103debab5a83",
+          "response_summary": {
+            "returned_entries": 0,
+            "has_more": false,
+            "journal_scope": "errors"
+          }
+        }
+      ],
+      "full_day_cli_union": {
+        "separate_requests": 24,
+        "complete": true,
+        "merged_response_sha256": "d4ee5bc0018230e82eb3e792c25edaa9c2d397a57d01ac1cda8427d5a28020c0",
+        "merged_returned_entries": 1,
+        "candidate_full_response_equal": true,
+        "oracle_total_seconds": 32.809291
+      },
+      "installed_sources_unchanged": true
+    }
+  },
+  "adapter_requests": 78,
+  "candidate_requests": 6,
+  "oracle_separate_requests": 72,
+  "full_day_whole_response_comparisons": 3,
+  "baseline_b": [
+    {
+      "name": "native_day_width2",
+      "status": "failed",
+      "elapsed_seconds": 20.009885,
+      "error_type": "TimeoutError",
+      "child_usage_delta": {
+        "ru_utime": 21.853019,
+        "ru_stime": 16.956586,
+        "ru_minflt": 24440,
+        "ru_majflt": 1,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 8,
+        "ru_nivcsw": 6461
+      }
+    },
+    {
+      "name": "native_day_width1",
+      "status": "failed",
+      "elapsed_seconds": 20.009165,
+      "error_type": "TimeoutError",
+      "child_usage_delta": {
+        "ru_utime": 11.221779000000002,
+        "ru_stime": 8.719776999999997,
+        "ru_minflt": 12838,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 3,
+        "ru_nivcsw": 696
+      }
+    },
+    {
+      "name": "native_six_hours_width1",
+      "status": "returned",
+      "elapsed_seconds": 11.477489,
+      "result_sha256": "8c72f4c1099160f0784f7a7e1eb2e03111d7b1a577351f1b950cc6802339014c",
+      "response_summary": {
+        "returned_entries": 1,
+        "has_more": false,
+        "response_size_limited": false,
+        "journal_scope": "errors",
+        "journal_target_scope": "host_system"
+      },
+      "child_usage_delta": {
+        "ru_utime": 6.259518999999997,
+        "ru_stime": 5.044575000000002,
+        "ru_minflt": 8016,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 3,
+        "ru_nivcsw": 735
+      }
+    },
+    {
+      "name": "cli_six_hours",
+      "status": "returned",
+      "elapsed_seconds": 11.28822,
+      "result_sha256": "8c72f4c1099160f0784f7a7e1eb2e03111d7b1a577351f1b950cc6802339014c",
+      "response_summary": {
+        "returned_entries": 1,
+        "has_more": false,
+        "response_size_limited": false,
+        "journal_scope": "errors",
+        "journal_target_scope": "host_system"
+      },
+      "child_usage_delta": {
+        "ru_utime": 6.286216000000003,
+        "ru_stime": 4.970414000000002,
+        "ru_minflt": 3533,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 2,
+        "ru_nivcsw": 290
+      }
+    }
+  ],
+  "rejected_scan_r1": [
+    {
+      "name": "candidate_six_hours",
+      "status": "returned",
+      "elapsed_seconds": 11.761387,
+      "result_sha256": "6d5d2f21a955c15f349aed84aa714bfb9bf93e13372f40abdabe8f9fa3da834c",
+      "response_summary": {
+        "returned_entries": 1,
+        "has_more": false,
+        "response_size_limited": false,
+        "journal_scope": "errors",
+        "journal_target_scope": "host_system"
+      },
+      "child_usage_delta": {
+        "ru_utime": 6.617267,
+        "ru_stime": 5.10776,
+        "ru_minflt": 7104,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 3,
+        "ru_nivcsw": 568
+      }
+    },
+    {
+      "name": "candidate_day",
+      "status": "failed",
+      "elapsed_seconds": 12.02128,
+      "error_type": "DiagnosticError",
+      "child_usage_delta": {
+        "ru_utime": 11.563847,
+        "ru_stime": 9.090885,
+        "ru_minflt": 11014,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 3,
+        "ru_nivcsw": 9196
+      }
+    },
+    {
+      "name": "cli_oracle_slice_0",
+      "status": "returned",
+      "elapsed_seconds": 11.355524,
+      "result_sha256": "6d5d2f21a955c15f349aed84aa714bfb9bf93e13372f40abdabe8f9fa3da834c",
+      "response_summary": {
+        "returned_entries": 1,
+        "has_more": false,
+        "journal_scope": "errors"
+      },
+      "child_usage_delta": {
+        "ru_utime": 6.2470870000000005,
+        "ru_stime": 5.0527229999999985,
+        "ru_minflt": 3560,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 2,
+        "ru_nivcsw": 793
+      }
+    },
+    {
+      "name": "cli_oracle_slice_1",
+      "status": "returned",
+      "elapsed_seconds": 11.012064,
+      "result_sha256": "ff562aafa18ad58930a4e5344008fd45b4bbe5530331e0f1d0492fa3f41668ae",
+      "response_summary": {
+        "returned_entries": 0,
+        "has_more": false,
+        "journal_scope": "errors"
+      },
+      "child_usage_delta": {
+        "ru_utime": 6.041201999999998,
+        "ru_stime": 4.885082000000001,
+        "ru_minflt": 3686,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 2,
+        "ru_nivcsw": 843
+      }
+    },
+    {
+      "name": "cli_oracle_slice_2",
+      "status": "failed",
+      "elapsed_seconds": 12.023566,
+      "error_type": "DiagnosticError",
+      "child_usage_delta": {
+        "ru_utime": 6.048209999999997,
+        "ru_stime": 4.940370999999999,
+        "ru_minflt": 3472,
+        "ru_majflt": 0,
+        "ru_inblock": 0,
+        "ru_oublock": 0,
+        "ru_nvcsw": 2,
+        "ru_nivcsw": 2120
+      }
+    }
+  ],
+  "rejected_decision": {
+    "at_kst": "2026-11-15T22:28:56.624340+09:00",
+    "status": "rejected_not_applied",
+    "reason": "native six-hour result equals CLI but no speed improvement; whole24h child timed out; separate oracle third6h also timed out",
+    "candidate_six_hours_seconds": 11.761387,
+    "candidate_day_seconds": 12.02128,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0
+  },
+  "regressions": {
+    "mac": {
+      "run": 1054,
+      "passed": 1048,
+      "skipped": 6,
+      "skip_reason": "existing optional OpenAI dependency",
+      "host_parent_fixture": "unchanged frozen 19 tests; new Linux fd I/O mocked only on Mac",
+      "groups": [
+        {
+          "group": "new-targets",
+          "tests": 39,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.232
+        },
+        {
+          "group": "new-intents",
+          "tests": 16,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.195
+        },
+        {
+          "group": "new",
+          "tests": 40,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.543
+        },
+        {
+          "group": "prior-claim",
+          "tests": 28,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.251
+        },
+        {
+          "group": "root",
+          "tests": 236,
+          "skipped": 6,
+          "rc": 0,
+          "seconds": 0.711
+        },
+        {
+          "group": "sdk",
+          "tests": 106,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.611
+        },
+        {
+          "group": "native",
+          "tests": 181,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.979
+        },
+        {
+          "group": "common-new",
+          "tests": 22,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.206
+        },
+        {
+          "group": "workflow",
+          "tests": 12,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.127
+        },
+        {
+          "group": "sdk-flow",
+          "tests": 66,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.596
+        },
+        {
+          "group": "root-flow",
+          "tests": 94,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.341
+        },
+        {
+          "group": "host-journal",
+          "tests": 19,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.223
+        },
+        {
+          "group": "journal",
+          "tests": 85,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.606
+        },
+        {
+          "group": "installation",
+          "tests": 30,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.099
+        },
+        {
+          "group": "common-service-mac",
+          "tests": 64,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.381
+        },
+        {
+          "group": "partitions",
+          "tests": 16,
+          "skipped": 0,
+          "rc": 0,
+          "seconds": 0.095
+        }
+      ]
+    },
+    "hermes": {
+      "run": 1137,
+      "passed": 1137,
+      "skipped": 0,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "observed_at_kst": "2026-11-15T23:20:04.702950+09:00",
+      "groups": [
+        {
+          "group": "new-targets",
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.546
+        },
+        {
+          "group": "new-intents",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.542
+        },
+        {
+          "group": "new",
+          "tests": 40,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.484
+        },
+        {
+          "group": "prior-claim",
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.645
+        },
+        {
+          "group": "root",
+          "tests": 236,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 3.23
+        },
+        {
+          "group": "sdk",
+          "tests": 106,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.63
+        },
+        {
+          "group": "native",
+          "tests": 181,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 4.103
+        },
+        {
+          "group": "common-new",
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.673
+        },
+        {
+          "group": "workflow",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.499
+        },
+        {
+          "group": "sdk-flow",
+          "tests": 66,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.547
+        },
+        {
+          "group": "root-flow",
+          "tests": 94,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.184
+        },
+        {
+          "group": "host-journal",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.67
+        },
+        {
+          "group": "journal",
+          "tests": 85,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 1.323
+        },
+        {
+          "group": "installation",
+          "tests": 30,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.279
+        },
+        {
+          "group": "common-service-full",
+          "tests": 147,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 4.488
+        },
+        {
+          "group": "partitions",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "uid": 10001,
+          "network_connect_denied": true,
+          "openai_available": true,
+          "jsonschema_available": true,
+          "rc": 0,
+          "seconds": 0.289
+        }
+      ]
+    }
+  },
+  "harness2": {
+    "revision": "partition-r2",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 33,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 18,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/install/soc_diagnostics.py",
+        "scripts/mcp/diagnostic_journal_native.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "changed_sources": [
+      "deployment/soc_diagnostics.py",
+      "deployment/tests/test_soc_diagnostics.py",
+      "infra/mcp/diagnostic_journal_native.py"
+    ],
+    "ast_allowed": [
+      "host_text_group",
+      "journal_fds",
+      "journal_path",
+      "opened_since",
+      "reader_factory",
+      "worker"
+    ],
+    "remaining_ast_unchanged": true,
+    "limits_authority_schema_runtime_unchanged": true,
+    "new_tests_sha256": "0d16e509ec944c072a1bf17fb52b5c2fc68bd36ef8f66603d1d16c3d718d4b8d",
+    "operating_changes": 0,
+    "model_calls": 0,
+    "mcp_calls": 0
+  },
+  "installer_preflight": {
+    "files_parameter_signature": "passed on A/B/C",
+    "empty_files_probe": "rejected: binding235 raises IndexError/SystemError; never included in final candidate",
+    "actual_fd_open": "supported on B; full candidate used same API on A/B/C"
+  },
+  "operating_changes": 0,
+  "model_calls": 0,
+  "actual_mcp_calls": 0,
+  "chat_posts": 0,
+  "limitations": [
+    "Three same-period backend comparisons, not an accuracy benchmark or chat SLA.",
+    "Cache and server load uncontrolled; no claim of cold-start speed or all-history completeness.",
+    "Retained local system journals only; fixed error-candidate filter; retention unverified.",
+    "Embedding with pre-existing journal fds retains original bounded global reader.",
+    "No operating plan approval, installed MCP test, model tool selection or new channel response."
+  ],
+  "live_reobservation": {
+    "hosts": {
+      "a": {
+        "observed_at_kst": "2026-11-15T23:23:19.291262+09:00",
+        "reader_process": {
+          "pid": 885,
+          "start_ticks": 2569,
+          "state": "S"
+        },
+        "installed_files_and_profiles_unchanged": true,
+        "native_module_installed": false
+      },
+      "b": {
+        "observed_at_kst": "2026-11-15T23:23:19.555216+09:00",
+        "reader_process": {
+          "pid": 927,
+          "start_ticks": 7043,
+          "state": "S"
+        },
+        "installed_files_and_profiles_unchanged": true,
+        "native_module_installed": false
+      },
+      "c": {
+        "observed_at_kst": "2026-11-15T23:23:19.499299+09:00",
+        "reader_process": {
+          "pid": 888,
+          "start_ticks": 2976,
+          "state": "S"
+        },
+        "installed_files_and_profiles_unchanged": true,
+        "native_module_installed": false
+      }
+    },
+    "b": {
+      "observed_at_kst": "2026-11-15T23:23:20.605997+09:00",
+      "components": {
+        "scripts/sdk_harness.py": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+        "scripts/chat_markdown.py": "446be0d86e7e828e36af5544efaac90dd83faaf20e5486d787f9fade1188783f",
+        "scripts/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+        "skills/soc-output/SKILL.md": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+        "skills/soc-query/SKILL.md": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+        "scripts/sdk_runtime.py": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "scripts/native_alignment.py": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+        "scripts/channel_worker.py": "1cff48cc325f5facb09c73f5c7721c2a03a5e2a903309f022349dcfcef962002",
+        "systemprompt.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+        "scripts/chat_contract.py": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+        "scripts/read_contract.py": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+        "scripts/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+        "scripts/workflow_contract.py": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "scripts/channel_policy.py": "1eb9864309893f094597bdd602bd30013bee2bca9ff82b306369e3a25e875789",
+        "scripts/native_query.py": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+        "scripts/evidence_gate.py": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+        "scripts/management_controller.py": "e347a54ac4a8e8fccf4e8efdc52ab1a79ec596c14f1ff9638f46816bb3710463",
+        "scripts/channel_controller.py": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+        "scripts/sdk_chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+        "scripts/sdk_chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+        "scripts/sdk_authority.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+        "skills/soc-investigate/SKILL.md": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+        "skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+        "skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68"
+      },
+      "schema_count": 45,
+      "schemas_and_targets_unchanged": true,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+      "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+      "access_mode": "hermes-parity",
+      "existing_bot_and_timer_states_unchanged": true
+    },
+    "remote_roots_collected": 8,
+    "remote_files": 1418,
+    "remote_bytes": 20573462,
+    "saved_outputs": 82,
+    "operating_changes": 0,
+    "mcp_metadata_discoveries": 2,
+    "mcp_data_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0
+  },
+  "public_reconstruction": {
+    "framework": {
+      "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "census": {
+        "base": {
+          "always_on_chars": 16917,
+          "n_files": 33,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        },
+        "candidate": {
+          "always_on_chars": 16917,
+          "n_files": 33,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 18,
+          "plugins": 0
+        }
+      },
+      "diff": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/install/soc_diagnostics.py",
+          "scripts/mcp/diagnostic_journal_native.py"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sources_verified_per_arm": 34,
+      "ast_scope_verified": true,
+      "operating_changes": 0,
+      "model_calls": 0,
+      "mcp_calls": 0,
+      "chat_posts": 0,
+      "scope": "frozen source/structure reconstruction only; three full-day backend comparisons returned; this is not an operating release or chat benchmark"
+    },
+    "public_partition_tests": {
+      "run": 16,
+      "passed": 16,
+      "skipped": 0
+    },
+    "frozen_parent_compat_tests": {
+      "run": 19,
+      "passed": 19,
+      "skipped": 0
+    },
+    "scope": "observed public reconstructed source validation; overlaps existing tests and is not independent accuracy"
+  },
+  "temporary_cleanup": {
+    "remote": {
+      "roots": 8,
+      "files": 1418,
+      "bytes": 20573462,
+      "all_absent": true,
+      "outputs_preserved": 82,
+      "scope": "only this unit owned staging/test roots; input and all output SHA verified before removal"
+    },
+    "mac": {
+      "files": 12289,
+      "bytes": 180961159,
+      "all_absent": true,
+      "new_mac_packages": 0,
+      "minimal_candidate_preserved_files": 3,
+      "roots_removed": 3,
+      "generated_transport_files_removed": 17,
+      "generated_transport_bytes_removed": 11761419
+    }
+  },
+  "defect_first_review": {
+    "method": "manual defect-first review of candidate diff and request/source boundaries",
+    "review_agent": "original unavailable; not executed",
+    "semgrep": "not executed; no Mac CLI install",
+    "checks": [
+      "Every native-selected system source included; over-bound generation refused.",
+      "No path/fd selection via MCP or worker JSON; existing unit/masking/limits unchanged.",
+      "Anchor/clone close and fd reuse, generation change and row conflict failure tested.",
+      "Installer probes declared files API; unsupported empty-files experiment excluded.",
+      "Operating plans/source/config/reader identities unchanged; actual model/chat still pending."
+    ],
+    "remaining_limits": [
+      "Three same-period backend comparisons, not an accuracy benchmark or chat SLA.",
+      "Cache and server load uncontrolled; no claim of cold-start speed or all-history completeness.",
+      "Retained local system journals only; fixed error-candidate filter; retention unverified.",
+      "Embedding with pre-existing journal fds retains original bounded global reader.",
+      "No operating plan approval, installed MCP test, model tool selection or new channel response."
+    ]
+  },
+  "cost_probe": {
+    "scope": "narrow prefix diagnostic; not full-window count or request-time fraction",
+    "unindexed_strace": {
+      "entries": 1000,
+      "fstat_calls": 206311,
+      "fstat_percent_of_traced_syscall_time": 97.85
+    },
+    "indexed_strace": {
+      "entries": 815,
+      "bounded_seconds": 6,
+      "fstat_calls": 168201,
+      "fstat_percent_of_traced_syscall_time": 97.66
+    },
+    "cache_and_server_load_controlled": false
+  }
+}

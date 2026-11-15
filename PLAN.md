@@ -12,7 +12,7 @@
 |---|---|---|
 | 1 | 정확 후보 적용과 사건·교차 검토 의미 | [19파일 적용안](infra/validation/control-status/application/README.md) 준비·Native536/query419 Hermes 생략0·SDK77/설치46/운영자37·복제19원복 통과. 정확 승인→최신 대조/유휴 확인→15분 원복 설정→적용/실제 로드→새 채팅/MCP→확정. 의미 오류·기존176회귀·참고와다른새독립운영평가필요 |
 | 2 | 승인 대기 식별자 수정·Harness² 채팅 연결 검증 | Hermes 목록4개·상태 읽기는 확인, 자연어 선택·승인 클릭→고정 worker1회 실행→결과 읽기는 미확인. Ollama4개는 정책에서 제외되므로 별도 권한 후보·정확 승인 검토 |
-| 3 | 집계 OS 로그·실제 모델 완수 | [고정 host journal 후보](infra/validation/host-journal/README.md)는 운용9/검사2소스·공식 Harness²·Mac1038/Hermes1121생략0·실제21논리 시험15성공/6실패. 최근 로그는 실제 읽혔으나24h errors는 두 backend 모두 시간 제한이다. 읽기 비용/좁은 구간 후속·실제 모델 선택→후보 동결/회귀→정확 새 승인/운영로드→새 채팅 순서. 기존 [journal9 정확계획](infra/validation/journal-adapter/application/README.md)과 [관리19 계획](infra/validation/control-status/application/README.md)은 덮어쓰거나 승인 재사용하지 않는다. 이전166검사/실제8건과 이번 집계 시험의 범위를 구분한다. 전송1024실부하·보관 수명과 의미 오류는 별도 잔여 |
+| 3 | 집계 OS 로그·실제 모델 완수 | [후속 native 파일별 후보](infra/validation/host-journal-cost/README.md)는 동일24h A5.50/B2.61/C1.94초·CLI전체 병합 일치, Mac1054/Hermes1137생략0·공식Harness²/공개34소스/측 복원 완료. backend가용성과 실제모델·설치MCP·채팅은 별도다. 다음 실제 모델 선택/실패 처리→정확 새 승인/복구안→관리자 경유 적용/로드→새 채팅 순서. 기존 [journal9 정확계획](infra/validation/journal-adapter/application/README.md)·[관리19 계획](infra/validation/control-status/application/README.md)은 불변이며 승인 재사용하지 않는다. |
 | 4 | 독립 사건·모델·승인 평가 | [기존176범위정정](finetuning/EVALUATION_SCOPE.md):소비128포함/workflow0. [개발16진단](finetuning/WORKFLOW_DEVELOPMENT.md)은21응답·무조회단정3개/기존검사검출·다른읽기7개미채점. 동등한추가읽기관측→현재보정/최종게시검증→새출처·사건분리관제평가/동일조건모델비교. 승인형OS회수·감사·복구도 별도 |
 | 5 | 네트워크·혼합 트래픽·설치 인수 | 자체 Suricata 인라인 IPS·검증 룰 drop, WAF/IPS/FW 장비별30사례, 정상 다수와 혼합. 중단된 공격은 명시 재개 후만 실행 |
 | 6 | 논문 제출과 발표 | MD 개정·PDF/DOCX 각56쪽의 매뉴얼형 상세화·제출 조건·전수 검수 완료. 정장사진/학번·추가 학교 서식·후속 새 실측 반영, 최종 발표 리허설 |

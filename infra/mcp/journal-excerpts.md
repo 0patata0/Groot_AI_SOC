@@ -1,5 +1,10 @@
 # 제한된 서비스 journal 조회
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 앱 선언 오류의 공통 선택과 source_filter_policy 후보를 검증했습니다. 같은 원문4행의 CLI/Native/정제 일치를 확인했지만 새 정책 게시·재스캔·실제 서비스 로드는 미수행입니다. 잘린 전처리 표본과 지원 형식 한계는 유지합니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [동일 기간 errors/all 대조](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

@@ -1,5 +1,10 @@
 # LLM 운영설정 공통화 — 단일 소스 지도와 공통 원칙 (작업 #6)
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 앱 오류/색인 후보는 기존 Hermes381검사를 통과했지만 실제 봇 로드·새 채팅·운영 승격은 아닙니다. 역할/스킬5·승인·모델을 바꾸지 않았고 이전 후보와 통합한 정확 적용안이 필요합니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [미적용5소스 후보](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

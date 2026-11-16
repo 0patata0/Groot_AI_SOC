@@ -1,5 +1,10 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 공통 진단 후보의3입력 스키마는 실제 등록 목록과 같으며 새 권한을 추가하지 않았습니다. 같은 원문의 CLI/Native/정제4행 일치이며 SDK 모델 답변·Mattermost 성공으로 환산하지 않습니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [SDK 추가 읽기·형식 정정](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

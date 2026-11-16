@@ -1,5 +1,10 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 후보 MCP1.4.5는 최상위 앱 선언 수준과 보관 정책 구분을 추가합니다. 실제3입력 스키마·대상·권한은 같으며 임의 명령/필터를 열지 않았습니다. 실제 DB는 읽기 전용으로 비교했고 운영 미적용입니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [오류 후보·원문 범위](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

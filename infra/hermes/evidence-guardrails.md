@@ -1,5 +1,10 @@
 # 근거 기반 응답 가드레일
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 실제 과거 오류4건의 누락을 입력 경로에서 보완하는 후보입니다. 근거 없는 데이터 손실/DNS 일시성 추정을 해결했다고 표시하지 않습니다. 메타데이터/필터 표본0과 전체 부재, 선언 수준과 현재 영향을 계속 구분합니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [근거 주장과 남은 미검출](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

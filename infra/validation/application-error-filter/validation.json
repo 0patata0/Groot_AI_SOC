@@ -1,0 +1,270 @@
+{
+  "observed_at_kst": "2026-11-16T17:50:42.065333+09:00",
+  "status": "isolated_candidate_not_applied",
+  "same_window": {
+    "since_kst": "2026-11-16T05:50:00+09:00",
+    "until_kst": "2026-11-16T05:53:00+09:00",
+    "installed_metadata": {
+      "seconds": 0.015227360010612756,
+      "returned": 0,
+      "indexed": 0,
+      "coverage": {
+        "retained_since_kst": "2026-10-17T16:51:59+09:00",
+        "scanned_window_count": 233,
+        "source_filters": "priority0..3_or_fixed_error_classifier4..6",
+        "status": "scanned_sample",
+        "untruncated_requested_window_scanned": true
+      }
+    },
+    "installed_errors": {
+      "seconds": 0.09983813000144437,
+      "returned": 0,
+      "indexed": null,
+      "coverage": null
+    },
+    "installed_all": {
+      "seconds": 0.11612263700226322,
+      "returned": 12,
+      "indexed": null,
+      "coverage": null
+    },
+    "direct_rows": 12,
+    "explicit_app_level_error_http500": 4,
+    "unreturned_eight_independent_normal_labels": false
+  },
+  "candidate_actual_read": {
+    "at_kst": "2026-11-16T17:16:18.258416+09:00",
+    "normalized_metadata_rows": 4,
+    "current_collector_replay_rows": 4,
+    "cli_rows": 4,
+    "native_worker_rows": 4,
+    "source_ids_identical": true,
+    "existing_cache_rows_under_candidate_reader": 0,
+    "existing_cache_coverage": {
+      "status": "partial_or_unavailable",
+      "retained_since_kst": "2026-10-17T17:16:03+09:00",
+      "source_filters": "priority0..3_or_fixed_error_classifier4..6",
+      "scanned_window_count": 233,
+      "untruncated_requested_window_scanned": false,
+      "source_filter_policy": "legacy-unversioned"
+    },
+    "durations_seconds": {
+      "normalize": 0.0031083200010471046,
+      "history_read": 0.002502614981494844,
+      "cli_excerpt": 0.0742100840434432,
+      "native_worker": 0.15611394599545747
+    },
+    "limitations": "In-memory candidate, same already-observed development window; not installed service/MCP/LLM/Mattermost or controlled latency evaluation"
+  },
+  "tests": {
+    "mac": {
+      "at_kst": "2026-11-16T17:32:12.262480+09:00",
+      "groups": [
+        {
+          "group": "diagnostics",
+          "returncode": 0,
+          "tests": 128,
+          "skipped": 0,
+          "seconds": 1.001
+        },
+        {
+          "group": "application-errors",
+          "returncode": 0,
+          "tests": 24,
+          "skipped": 0,
+          "seconds": 0.121
+        },
+        {
+          "group": "host-inventory",
+          "returncode": 0,
+          "tests": 15,
+          "skipped": 0,
+          "seconds": 0.081
+        },
+        {
+          "group": "runtime-health",
+          "returncode": 0,
+          "tests": 33,
+          "skipped": 0,
+          "seconds": 0.114
+        },
+        {
+          "group": "systemd-status",
+          "returncode": 0,
+          "tests": 4,
+          "skipped": 0,
+          "seconds": 0.081
+        },
+        {
+          "group": "installation",
+          "returncode": 0,
+          "tests": 23,
+          "skipped": 0,
+          "seconds": 0.083
+        },
+        {
+          "group": "monitoring-installation",
+          "returncode": 0,
+          "tests": 7,
+          "skipped": 0,
+          "seconds": 0.09
+        },
+        {
+          "group": "native-consumer",
+          "returncode": 0,
+          "tests": 147,
+          "skipped": 11,
+          "seconds": 0.681
+        }
+      ],
+      "complete": true,
+      "network": "socket connects denied",
+      "operating_changes": 0,
+      "dependency_scope": "Mac excludes only AST-linked OpenAI-dependent methods; all147 must run unskipped in existing Hermes image"
+    },
+    "linux_existing_hermes": {
+      "at_kst": "2026-11-16T17:34:02.325101+09:00",
+      "root": "/opt/hermes-data/.capstone-app-error-46yt3s7y-tests",
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "uid": 10001,
+      "groups": [
+        {
+          "group": "diagnostics",
+          "returncode": 0,
+          "tests": 128,
+          "skipped": 0,
+          "seconds": 2.062
+        },
+        {
+          "group": "application-errors",
+          "returncode": 0,
+          "tests": 24,
+          "skipped": 0,
+          "seconds": 0.429
+        },
+        {
+          "group": "host-inventory",
+          "returncode": 0,
+          "tests": 15,
+          "skipped": 0,
+          "seconds": 0.24
+        },
+        {
+          "group": "runtime-health",
+          "returncode": 0,
+          "tests": 33,
+          "skipped": 0,
+          "seconds": 0.646
+        },
+        {
+          "group": "systemd-status",
+          "returncode": 0,
+          "tests": 4,
+          "skipped": 0,
+          "seconds": 0.234
+        },
+        {
+          "group": "installation",
+          "returncode": 0,
+          "tests": 23,
+          "skipped": 0,
+          "seconds": 0.251
+        },
+        {
+          "group": "monitoring-installation",
+          "returncode": 0,
+          "tests": 7,
+          "skipped": 0,
+          "seconds": 0.268
+        },
+        {
+          "group": "native-consumer",
+          "returncode": 0,
+          "tests": 147,
+          "skipped": 0,
+          "seconds": 4.412
+        }
+      ],
+      "complete": true,
+      "network": "runner socket connects denied",
+      "operating_changes": 0,
+      "model_calls": 0,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    "new_test_methods": 24,
+    "base_original_diagnostic_tests": 128,
+    "old_test_methods_deleted": 0,
+    "existing_fixtures_corrected": "Arbitrary privacy/display/size messages explicitly use all scope; legacy literal positives retained; source conflict validation runs before excluding prefilter hits",
+    "mac_missing_dependency": "AST-linked OpenAI-dependent11 consumer methods excluded only on Mac; all147 consumer methods passed unskipped in existing Hermes image"
+  },
+  "official_harness2": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "components": 37,
+    "skills": 5,
+    "changed_surfaces": 8,
+    "always_on_characters": {
+      "base": 16917,
+      "candidate": 16917
+    },
+    "always_on_delta": 0,
+    "scope": "Structure/modified tests represented; not accuracy or deployment"
+  },
+  "early_failures": {
+    "prototype_diagnostics": {
+      "tests": 128,
+      "failures": 4,
+      "errors": 13,
+      "cause": "Missing unchanged source and all-scope fixture/legacy-literal contract adjustments; corrected without deleting assertions"
+    },
+    "expanded_inputs": "Incomplete selected archive lacked Wazuh XML/canary/root deploy references; full immutable2258 tracked inputs restored",
+    "orchestration": "First incomplete Mac expansion did not gate the first isolated Linux run; both stopped at missing inputs, no model/deployment. Final Linux was gated on Mac complete and inner complete/returncode",
+    "portability_and_consumer_fixtures": "Missing Mac OpenAI types and two arbitrary text display fixtures; dependency exclusions explicit and server full coverage required"
+  },
+  "permission_and_state": {
+    "input_schemas_identical_to_base_and_live": true,
+    "new_tools": 0,
+    "new_ports": 0,
+    "operating_changes": 0,
+    "history_database_writes": 0,
+    "model_calls": 0,
+    "protected_calls": 0,
+    "chat_posts": 0,
+    "new_training": 0,
+    "attacks": 0
+  },
+  "remaining": [
+    "Compose with pending host-journal/service-error-coverage sources and inspect live core/journal drift before any exact application plan",
+    "Prepare source/cache backup and rollback, obtain exact approval, confirm actual load/backfill/coverage and both bots fresh chat",
+    "Unsupported data-loss/DNS-impact inference, independent incidents and broader source formats remain unproven",
+    "Same-sample recall/general false-positive rates/model superiority/Mattermost speed are not established"
+  ],
+  "cleanup": {
+    "remote_test_root_removed": true,
+    "verified_source_files": 2261,
+    "verified_logs": 17,
+    "removed_files": 2279,
+    "removed_bytes": 36646947,
+    "own_marker_pids_absent": true,
+    "operating_sources_unchanged": true,
+    "reader_start_ticks": 7043,
+    "reader": "MainPID=927\nMemoryMax=134217728\nTasksMax=8\nActiveState=active\nSubState=running\n",
+    "native_file_installed": false,
+    "at_kst": "2026-11-16T17:52:01.568579+09:00",
+    "mac_temp": {
+      "removed": true,
+      "removed_regular_files": 11299,
+      "removed_bytes": 206402166,
+      "at_kst": "2026-11-16T18:03:29.732308+09:00",
+      "public_replay_receipt_preserved": true
+    },
+    "scope": "Exact owned test root/process marker only, not a global process audit"
+  },
+  "public_replay": {
+    "tracked_source_files": 2258,
+    "official_structure": "passed",
+    "new_tests": 24,
+    "diagnostic_tests": 128,
+    "model_or_mcp_calls": 0
+  }
+}

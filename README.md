@@ -1,9 +1,9 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 무엇·방법·이유·준비·실행·확인·복구를 설명하는 매뉴얼형 MD/PDF/DOCX60쪽·15SHA 검수본이며 사진/학번은 공란·로컬 전용입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·실행·확인·복구의 매뉴얼형 MD·PDF/DOCX60쪽이며 로컬 전용·사진/학번 공란입니다.
 
-[서비스 오류 원문·완료 조건](infra/validation/service-error-coverage/README.md): query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
+[앱 오류 필터 후보](infra/validation/application-error-filter/README.md)는 실제 원문12행/앱 오류4행이 errors/보관 색인0으로 빠지는 현상을 보완합니다. 메모리 내 정제·수집 재처리·CLI·Native가 같은4행을 확인했고 기존 Hermes381·추가24검사를 통과했습니다. 정책이 다른 과거 스캔 범위를 재사용하지 않으며 입력 스키마·권한은 유지합니다. 운영/DB·LLM/새 채팅에는 미적용이고 이전 서비스/호스트 후보와 통합한 정확 승인·복구안이 필요합니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

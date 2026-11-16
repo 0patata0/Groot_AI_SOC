@@ -1,5 +1,10 @@
 # Mattermost 조회 응답 보완
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../../validation/application-error-filter/README.md) — MCP 앱 오류/정책 구분 후보는 Native 소비자147검사를 기존 Hermes에서 생략 없이 통과했습니다. 플러그인 설치·역할·승인·실제 모델/채팅은 미변경이며 앞선 조사 후보와 통합 검증이 남았습니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [Native 공통 완료 조건](../../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

@@ -1,5 +1,10 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../infra/validation/application-error-filter/README.md) — 앱 오류 누락의 원인은 고정 도구/수집 경로에서 확인했습니다. 추가24검사·실제 메모리 내4행 대조는 코드 검증이며 새 학습/평가 점수/가중치 변화가 아닙니다. 같은 개발 구간을 독립 사건 정답으로 다시 세지 않습니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [새 개발14관측](../infra/validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

@@ -1,5 +1,10 @@
 # 두 봇의 공통 하네스
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 앱 선언 오류는 원인/영향/공격 성공이 아닙니다. 공통 MCP 후보의 같은 원문4행 검증과 새 정책 범위를 기록했으며 실제 소비자/모델 의미·새 채팅은 별도입니다. 스킬/역할/권한 문구를 늘리지 않았습니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [공통 조사·SDK 정정 범위](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

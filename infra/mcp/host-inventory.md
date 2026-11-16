@@ -1,5 +1,10 @@
 # OS·Docker 읽기와 호스트별 표
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 호스트 목록 권한·입력은 유지했습니다. 같은 공통 진단 라이브러리의 앱 오류/색인 정책 후보만 격리 검증했고 설치본은 바꾸지 않았습니다. inventory 상태로 과거 오류나 기능 복구를 대신 판정하지 않습니다.
+<!-- application-error-filter:end -->
+
+
 <!-- service-error-coverage:start -->
 [현재 속성과 기능 영향](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- service-error-coverage:end -->

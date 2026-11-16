@@ -1,5 +1,10 @@
 # 서비스 오류 원문과 조사 완료 조건
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../application-error-filter/README.md) — 앞서 남긴 같은 구간 errors0/all12 문제를 실제 보관 색인까지 대조했고 공통 후보로4행을 확인했습니다. 실제 DB/운영에는 미적용이며 이 조사 후보의 의미 오류와 별도로 통합 검증해야 합니다.
+<!-- application-error-filter:end -->
+
+
 **오류 후보 표본 뒤 실제 원문 조회와 형식 정정을 보완한 미적용 후보**다. 최종 실제4요청은21.028~43.559초였지만 근거 없는 데이터 손실·DNS 영향 추정이 남아 운영 승격하지 않는다. 부모 [출처 후보](../service-provenance/README.md)와 선행 조합도 미적용이다.
 
 ## 무엇을 어떻게 바꿨나

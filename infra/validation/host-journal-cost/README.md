@@ -1,5 +1,10 @@
 # 호스트 시스템 journal의 전체 구간 검색 후보
 
+<!-- application-error-filter:start -->
+[앱 오류 필터 검증](../application-error-filter/README.md) — 앱의 정보 우선순위 오류가 고정 선택에서 빠지는 문제를 메모리 내 공통 경로로 보완했습니다. 정책/범위·4행 동일성 검증이며 전체 호스트 journal 인수·실제 설치·모델 정확도의 증명이 아닙니다.
+<!-- application-error-filter:end -->
+
+
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
 <!-- diagnostic-read-boundaries:end -->

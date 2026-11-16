@@ -129,7 +129,7 @@ python3 -B infra/validation/journal-composition/run_collection_regressions.py --
 
 타이머 PID 필드를 가정한 사전 점검과 Docker CLI 경로를 가정한 첫 Linux 드라이버는 제품 시험 전에 실패했다. 다음 Linux 실행은944개까지 진행한 뒤 구 음성 시험1개에서 멈췄다. 이미 허용된 `b:systemd` journal을 금지로 검사하던 항목만 `b:collection`으로 정정하고, 나머지 거절 검사는 유지했다. 허용 호스트와 금지 수집 대상을 명시적으로 확인하는 양성/음성 시험을 추가해 최종40개와 전체 회귀를 재실행했다. 이전 통과를 이 계약의 증거로 재사용하지 않는다. 실제 서버를 읽은4런타임 SHA는 최종 시험 정정 전후에 같다.
 
-기존 운영 수집기 unit은 MemoryMax=infinity였으며 전체 runtime 수집에는4개 병렬 작업이 있다. 격리 읽기의128MiB/Tasks8을 전체 운영 수집기의 충분한 한도로 간주하지 않는다. 초기 설치 경로를 포함한 유한 자원 제한·소스/캐시/소비자 동시 정지·독립 원복·새 증거 결속 확정을 완성해야 한다. [현재40소스 투영](collection-release-inventory.json)은 unit/조정 범위까지 고정한 최종 승인 계획이 아니다.
+기존 운영 수집기 unit은 MemoryMax=infinity였으며 runtime 수집의4개 worker 뒤 inventory 수집의5개 worker가 실행된다. 후속 [전체 수집 자원 시험](RESOURCES.md)에서는 세 서버의 전체 수집과24시간 이력을256MiB/Tasks64 제한 안에서 완료했다. 호스트별1회 관측이며 운영 unit·초기 설치기는 아직 바꾸지 않았다. 격리 읽기의128MiB/Tasks8을 전체 운영 수집기의 충분한 한도로 간주하지 않는다. 초기 설치 경로를 포함한 유한 자원 제한·소스/캐시/소비자 동시 정지·독립 원복·새 증거 결속 확정을 완성해야 한다. [현재40소스 투영](collection-release-inventory.json)은 unit/조정 범위까지 고정한 최종 승인 계획이 아니다.
 
 이번 회귀·실제 소스 읽기를 Mattermost 응답 속도나 모델 정확도·학습 우위로 환산하지 않는다. 미선택8행의 정상 여부를 인증하거나 선택된42행을 공격42건으로 세지 않았다. Native 모듈은 운영 경로에 미설치이고 실제 reader의 PID/시작 시각, 설정과 학습 모델은 유지됐다.
 

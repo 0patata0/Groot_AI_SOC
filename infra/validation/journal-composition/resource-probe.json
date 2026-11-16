@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "scope": "One whole-collector and 24h-backfill observation per host; not production quota acceptance",
+  "access_route": "Mac -> administrator231 -> A -> B/C",
+  "candidate": {
+    "files": {
+      "system_diagnostics.py": "fba641ba794d4b0efaffacb7a113c2d8ade3c393b18e86b628dd95f061543069",
+      "diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+      "diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+      "diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+      "runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+      "host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+      "probe.py": "2fc30a2619f20fad5d2a9d9cbe56f44780bd725b83809ed1a657d55e9c8218b7"
+    },
+    "collection_candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908"
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 37,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 22,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 37,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 22,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/extra_test_diagnostic_history.py",
+        "scripts/extra_test_diagnostic_journal.py",
+        "scripts/mcp/diagnostic_history.py",
+        "scripts/mcp/diagnostic_journal_native.py",
+        "scripts/mcp/system_diagnostics.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908",
+    "scope": "Official structure and exact source restoration; not runtime accuracy, deployment or chat acceptance",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "limits": {
+    "memory_max_bytes": 268435456,
+    "memory_high_bytes": 201326592,
+    "tasks_max": 64
+  },
+  "parallelism": {
+    "runtime_workers": 4,
+    "inventory_workers": 5,
+    "sequential_pools": true,
+    "extra_probe_observer_threads": 1
+  },
+  "publication_scope": "Own state directory and read-only SQLite backup only; ProtectSystem=strict, own ReadWritePaths",
+  "operating_collector": {
+    "memory_max": "infinity",
+    "memory_high": "infinity",
+    "finite_quota_deployed": false
+  },
+  "production_changes": 0,
+  "production_restarts": 0,
+  "inference_generation_calls": 0,
+  "chat_posts": 0,
+  "read_only_api_observations": [
+    "Ollama /api/ps",
+    "Mattermost /api/v4/system/ping"
+  ],
+  "hosts": {
+    "a": {
+      "observed_at_kst": "2026-11-16T23:20:14.330839+09:00",
+      "finished_at_kst": "2026-11-16T23:20:51.579368+09:00",
+      "operating_source_and_unit_sha_unchanged": true,
+      "full_collect_seconds": 5.867654539004434,
+      "backfill_24h_seconds": 31.191563030995894,
+      "runtime_targets": 4,
+      "runtime_unavailable": [],
+      "inventory_unavailable": [],
+      "backfill_collected_rows": 0,
+      "backfill_failed_windows": 0,
+      "backfill_source_truncated": false,
+      "cgroup_measured_inside_probe": {
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "pids_max": 64,
+        "memory_peak": 58699776,
+        "sampled_tasks_peak": 41,
+        "task_peak_scope": "20ms samples include one extra observer thread; not an exact unsampled peak",
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "kernel_tasks_peak": 43
+      },
+      "systemd_memory_peak_bytes_after_exit": 51720192,
+      "cleanup_at_kst": "2026-11-16T23:24:43.494144+09:00",
+      "removed_files": 12,
+      "removed_bytes": 777579,
+      "temporary_root_absent": true,
+      "temporary_unit_unloaded": true
+    },
+    "b": {
+      "observed_at_kst": "2026-11-16T23:20:14.710441+09:00",
+      "finished_at_kst": "2026-11-16T23:20:50.737854+09:00",
+      "operating_source_and_unit_sha_unchanged": true,
+      "full_collect_seconds": 7.646079475001898,
+      "backfill_24h_seconds": 28.260957989026792,
+      "runtime_targets": 10,
+      "runtime_unavailable": [],
+      "inventory_unavailable": [],
+      "backfill_collected_rows": 7,
+      "backfill_failed_windows": 0,
+      "backfill_source_truncated": false,
+      "cgroup_measured_inside_probe": {
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "pids_max": 64,
+        "memory_peak": 53288960,
+        "sampled_tasks_peak": 44,
+        "task_peak_scope": "20ms samples include one extra observer thread; not an exact unsampled peak",
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "kernel_tasks_peak": 51
+      },
+      "systemd_memory_peak_bytes_after_exit": 51359744,
+      "cleanup_at_kst": "2026-11-16T23:24:43.893426+09:00",
+      "removed_files": 12,
+      "removed_bytes": 1664534,
+      "temporary_root_absent": true,
+      "temporary_unit_unloaded": true
+    },
+    "c": {
+      "observed_at_kst": "2026-11-16T23:20:14.655368+09:00",
+      "finished_at_kst": "2026-11-16T23:20:30.214768+09:00",
+      "operating_source_and_unit_sha_unchanged": true,
+      "full_collect_seconds": 3.2768852649605833,
+      "backfill_24h_seconds": 12.209364580980036,
+      "runtime_targets": 2,
+      "runtime_unavailable": [],
+      "inventory_unavailable": [],
+      "backfill_collected_rows": 0,
+      "backfill_failed_windows": 0,
+      "backfill_source_truncated": false,
+      "cgroup_measured_inside_probe": {
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "pids_max": 64,
+        "memory_peak": 48939008,
+        "sampled_tasks_peak": 42,
+        "task_peak_scope": "20ms samples include one extra observer thread; not an exact unsampled peak",
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "kernel_tasks_peak": 44
+      },
+      "systemd_memory_peak_bytes_after_exit": 48939008,
+      "cleanup_at_kst": "2026-11-16T23:24:43.816957+09:00",
+      "removed_files": 12,
+      "removed_bytes": 1252482,
+      "temporary_root_absent": true,
+      "temporary_unit_unloaded": true
+    }
+  },
+  "limitations": [
+    "One observation per host, not a worst-case or fault-injection test",
+    "A/C zero rows are fixed-classifier results, not absence of all faults or attacks",
+    "No installer or production-unit update in this unit",
+    "No new model generation, MCP chat acceptance, or independent SOC evaluation",
+    "Live probe driver and full receipts retained locally; public structural replay does not launch it",
+    "Use in-probe cgroup memory.peak; keep manager property separately without equating the two",
+    "Docker daemon, in-container exec, and external API-server resources are outside this service cgroup"
+  ]
+}

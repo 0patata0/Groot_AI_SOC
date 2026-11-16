@@ -1,0 +1,27 @@
+{
+  "status": "frozen_operator_readonly_foundation_not_deployed",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "limits_manifest_sha256": "d090536064cb0880e7e4ea004ee66644ab34f9402364f51c631d261b4b261200",
+  "composition_manifest_sha256": "6bd12a0e75c505be5f789fed254e590df742d12dce41b3fe4f9c55de38d394b3",
+  "source_sha256": {
+    "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+    "reader_bridge.py": "062b675e3398eb75a323e2618a34c549396ffee7927c7ff04a2318702b9adede",
+    "cohort_guard.py": "b6ee448e01576bf7b8a868f2d9bedd6b9872eac2b762be94de50dbf1f239548e",
+    "test_release_status.py": "790517785aac917bb4568db16c2b055e2960fbbcf6508ab05466da4b1092978e",
+    "test_reader_bridge.py": "8e00b5cd237cd68205626abe5f20a65e78d9b4b9d1223022fa07cad5a08d81a5",
+    "test_release_ipc.py": "4c36d68c976eea4119816d1460451561c05ac24b4083290ad84a8f1e1ca1a473",
+    "test_cohort_guard.py": "e79db78bc081a549c741565a844ff2854b1fb14df85bdf1b6a773b1be88771e1",
+    "check_release_structure.py": "2df9f77ae5ad42d52794300df112e6dd387debcd6f639749770759809156908d"
+  },
+  "component_mapping": {
+    "scripts/operator_release_status.py": "release_status.py",
+    "scripts/operator_reader_bridge.py": "reader_bridge.py",
+    "scripts/operator_cohort_guard.py": "cohort_guard.py",
+    "scripts/operator_test_release_status.py": "test_release_status.py",
+    "scripts/operator_test_reader_bridge.py": "test_reader_bridge.py",
+    "scripts/operator_test_release_ipc.py": "test_release_ipc.py",
+    "scripts/operator_test_cohort_guard.py": "test_cohort_guard.py",
+    "scripts/operator_check_release_structure.py": "check_release_structure.py"
+  },
+  "scope": "Source witness, temporary forced-reader relay, pure coherent-proof gate and validation. Does not include the full operator coordinator, service fencing, exact approval or operating deployment."
+}

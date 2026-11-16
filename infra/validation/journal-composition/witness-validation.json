@@ -1,0 +1,171 @@
+{
+  "status": "operator_readonly_foundation_verified_coordinator_not_connected",
+  "at_kst": "2026-11-17T01:57:08.551219+09:00",
+  "base_commit": "9a3fd2dd8594271e5c7958594807006a7d246bc3",
+  "manifest_sha256": "e42296de7b89989b6b5379d8c1cf3cb916bd7c7bc44c25ecf1b09d4b9f3e755b",
+  "source_sha256": {
+    "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+    "reader_bridge.py": "062b675e3398eb75a323e2618a34c549396ffee7927c7ff04a2318702b9adede",
+    "cohort_guard.py": "b6ee448e01576bf7b8a868f2d9bedd6b9872eac2b762be94de50dbf1f239548e",
+    "test_release_status.py": "790517785aac917bb4568db16c2b055e2960fbbcf6508ab05466da4b1092978e",
+    "test_reader_bridge.py": "8e00b5cd237cd68205626abe5f20a65e78d9b4b9d1223022fa07cad5a08d81a5",
+    "test_release_ipc.py": "4c36d68c976eea4119816d1460451561c05ac24b4083290ad84a8f1e1ca1a473",
+    "test_cohort_guard.py": "e79db78bc081a549c741565a844ff2854b1fb14df85bdf1b6a773b1be88771e1",
+    "check_release_structure.py": "2df9f77ae5ad42d52794300df112e6dd387debcd6f639749770759809156908d"
+  },
+  "new_test_methods": 66,
+  "existing_cache_tests": 40,
+  "mac": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 4,
+    "python": "3.12.5",
+    "success": true
+  },
+  "linux": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "python": "3.13.5",
+    "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.41",
+    "uid": 10001,
+    "success": true
+  },
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 40,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 25,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 48,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 33,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [
+        "scripts/operator_check_release_structure.py",
+        "scripts/operator_cohort_guard.py",
+        "scripts/operator_reader_bridge.py",
+        "scripts/operator_release_status.py",
+        "scripts/operator_test_cohort_guard.py",
+        "scripts/operator_test_reader_bridge.py",
+        "scripts/operator_test_release_ipc.py",
+        "scripts/operator_test_release_status.py"
+      ],
+      "removed": [],
+      "modified": [],
+      "always_on_char_delta": 0
+    },
+    "base_candidate_tree_sha256": "0f625eaa82fc247b18446446d12fd170370d2586ed64f7ada172fbfa794bdd40",
+    "operator_source_sha256": {
+      "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+      "reader_bridge.py": "062b675e3398eb75a323e2618a34c549396ffee7927c7ff04a2318702b9adede",
+      "cohort_guard.py": "b6ee448e01576bf7b8a868f2d9bedd6b9872eac2b762be94de50dbf1f239548e",
+      "test_release_status.py": "790517785aac917bb4568db16c2b055e2960fbbcf6508ab05466da4b1092978e",
+      "test_reader_bridge.py": "8e00b5cd237cd68205626abe5f20a65e78d9b4b9d1223022fa07cad5a08d81a5",
+      "test_release_ipc.py": "4c36d68c976eea4119816d1460451561c05ac24b4083290ad84a8f1e1ca1a473",
+      "test_cohort_guard.py": "e79db78bc081a549c741565a844ff2854b1fb14df85bdf1b6a773b1be88771e1",
+      "check_release_structure.py": "2df9f77ae5ad42d52794300df112e6dd387debcd6f639749770759809156908d"
+    },
+    "scope": "Operator-only source witness, temporary reader relay and pure cohort gate. No coordinator/service/deployment/MCP/chat validation.",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "operating_preservation": {
+    "a": {
+      "before_at_kst": "2026-11-17T01:45:39.094340+09:00",
+      "after_at_kst": "2026-11-17T01:57:47.939643+09:00",
+      "source_and_unit_sha256_unchanged": true,
+      "reader_pid_start_unchanged": true,
+      "native_absent": true,
+      "collector_memory_max": "infinity",
+      "projected_sources_unchanged": 10
+    },
+    "b": {
+      "before_at_kst": "2026-11-17T01:42:52.638823+09:00",
+      "after_at_kst": "2026-11-17T01:57:48.297473+09:00",
+      "source_and_unit_sha256_unchanged": true,
+      "reader_pid_start_unchanged": true,
+      "native_absent": true,
+      "collector_memory_max": "infinity",
+      "projected_sources_unchanged": 38
+    },
+    "c": {
+      "before_at_kst": "2026-11-17T01:42:52.283244+09:00",
+      "after_at_kst": "2026-11-17T01:57:48.199140+09:00",
+      "source_and_unit_sha256_unchanged": true,
+      "reader_pid_start_unchanged": true,
+      "native_absent": true,
+      "collector_memory_max": "infinity",
+      "projected_sources_unchanged": 10
+    }
+  },
+  "preexisting_40_path_drift": {
+    "a": [],
+    "b": [],
+    "c": []
+  },
+  "idle_observation_kst": "2026-11-17T01:47:06.199432+09:00",
+  "running_jobs_and_active_leases_at_observation": 0,
+  "remote_cleanup": {
+    "roots": 4,
+    "files": 38,
+    "containers_removed": true,
+    "operating_hermes_container_unchanged": true
+  },
+  "review": {
+    "scope": "Eight new operator-only Python sources; read-only defect-first review-agent procedure; no delegated review",
+    "fixed": [
+      {
+        "priority": "P1",
+        "file": "release_status.py",
+        "issue": "FIFO opened before regular-file validation could wait indefinitely",
+        "fix": "O_NONBLOCK and explicit FIFO refusal test"
+      },
+      {
+        "priority": "P2",
+        "files": [
+          "release_status.py",
+          "cohort_guard.py"
+        ],
+        "issue": "Same release identity could conceal a different metadata contract",
+        "fix": "Bind complete per-host before/after digest and UID/GID/mode rows to source_contract_sha256; mismatch regression"
+      }
+    ],
+    "remaining_actionable_findings": 0,
+    "limits": [
+      "Root daemon unit lifecycle and coordinator not yet connected/tested",
+      "Semgrep not executed",
+      "No MCP/model/chat or full new-OS acceptance"
+    ]
+  },
+  "initial_failures": [
+    "A unit template was queried as an instance; read-only inventory corrected without operating changes.",
+    "Two Linux negative tests incorrectly required a JSON reply when a rejected UID can cause connection reset or broken pipe; allowed-path failures remain strict.",
+    "First cohort negative test chose an optional absent path; required-target selection corrected."
+  ],
+  "not_performed": [
+    "Full coordinated source/cache/receipt deployment and service fencing",
+    "Independent recovery timers, reboot/partition/partial-confirmation operating trials",
+    "Exact approval, source/schema/model/authority refresh and operating installation",
+    "Actual MCP, new both-bot chats, model accuracy/latency and attacks/training",
+    "Semgrep and full new-OS installation"
+  ],
+  "operating_source_changes": 0,
+  "operating_cache_writes_by_this_work": 0,
+  "operating_service_restart_commands": 0,
+  "model_generations": 0,
+  "chat_posts": 0,
+  "attack_requests": 0,
+  "training_runs": 0
+}

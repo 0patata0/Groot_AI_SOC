@@ -1,5 +1,9 @@
 # 설치·웹 정책 이력
 
+## 운영자용 읽기 기능의 미설치 검증 (2026-11-17)
+
+관리자231 경유 A/B/C 읽기와 B의 기존 Hermes 이미지·UID10001·네트워크 없는 격리 시험만 수행했다. 운영 source/unit/reader와 Hermes 컨테이너는 전후 같았다. 임시 reader 중계·root 소켓은 운영 미설치이며 서비스 재시작·캐시 게시·MCP/모델/채팅 변경0이다. 시험4폴더38파일·시험 컨테이너를 정리했다. 초기 설치기와 기존 서버를 덮어쓰지 않았다. [검증](../infra/validation/journal-composition/witness-validation.json).
+
 ## 수집기 한도·초기 이력 후보 (2026-11-17)
 
 기존 수집 후보 위 실행 코드2·시험3의5소스 오버레이를 준비했다. MemoryMax256MiB·High192MiB·스왑0·Tasks64·FD1,024, 고정 초기 이력 unit·실로드 한도 검사·부분 수집 CLI1과 초기 설치 영수증4유닛을 연결했다. 추가17·Mac1,427/기존6생략·기존 Hermes 격리 Linux1,510/생략0·공식40구성/5변경면/상시 증가0을 확인했다. [최종 소스·범위](../infra/validation/journal-composition/LIMITS.md).

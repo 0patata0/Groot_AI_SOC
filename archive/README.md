@@ -1,6 +1,6 @@
 # 과거 기록과 복원 안내
 
-[수집기 한도·초기 이력 후보](../infra/validation/journal-composition/LIMITS.md)의 소스·초기 설치 보완, 자정 시험 정정, 격리 실행과 운영 미적용 범위를 유형별 이력에 기록했다. 현재 상태와 계획은 STATUS·PLAN을 따른다.
+[전환 상태 대조·재개 판정](../infra/validation/journal-composition/WITNESS.md)의 소스·회귀·실제 읽기·초기 실패·미설치 범위를5유형 이력에 보존했다. 현재 상태·계획은 STATUS·PLAN이 기준이며 이전 절의 미완료 표기는 당시 단계다.
 
 [전체 수집 자원 시험](../infra/validation/journal-composition/RESOURCES.md)의 호스트별1회 관측·운영 미적용과 문서 갱신 후 윤문 규칙을 현황·계획·진단 이력에 남겼다. 유한 한도 확정과 초기 설치 동기화는 남아 있다.
 

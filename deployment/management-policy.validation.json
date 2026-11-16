@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-17T07:44:53.811676+09:00",
+  "status": "pure_contract_verified_not_integrated_or_deployed",
+  "source_sha256": {
+    "deployment/management_policy.py": "950c169813cae7a68fd218f03499473f613b0ce5bee390af8bc900c90ef5235f",
+    "deployment/tests/test_management_policy.py": "149bc9c29db414b92e88c8e5fced8ad31805d9e2db2a4aa5ad4c50e986803886"
+  },
+  "platform": "macOS",
+  "tests": 34,
+  "skipped": 0,
+  "exit": 0,
+  "mandatory_surfaces": 14,
+  "scope": "Pure registry, complete-candidate and readback contract with synthetic trusted-adapter receipts. Not live adapter, MCP, approval card, access change or runtime verification.",
+  "review": [
+    "Reject every single missing surface, duplicated target, mixed base/desired revision, stale/non-KST proof and incomplete safety checks.",
+    "Bind exact candidate/source/adapter/route evidence to plan digest; readback checks candidate source and original approved digest.",
+    "Separate access, containment, sensor exceptions and fixed MCP roles; preserve audit/public inspection; no generic execution.",
+    "Retain unknown fields as unavailable, require verified runtime for positive receipt; local MCP stdio/unix does not use a fabricated IP."
+  ],
+  "known_unfinished": [
+    "Implement fixed per-engine/host adapters and trusted collection of source mappings and actual load/effect evidence.",
+    "Connect global read/propose MCP, exact administrator approval and bounded multi-host worker/recovery.",
+    "Connect a single canonical registry to deploy.sh without invoking initial installation over existing operating servers.",
+    "Test actual all-device coverage, partial failure, route replacement, rollback and both-bot chat."
+  ],
+  "operating_changes": 0,
+  "model_calls": 0,
+  "chat_posts": 0,
+  "mcp_registered": false,
+  "approval_record_created": false,
+  "review_agent_skill_available": false,
+  "semgrep_executed": false,
+  "pure_module_imports": [
+    "datetime",
+    "hashlib",
+    "ipaddress",
+    "json",
+    "re"
+  ],
+  "no_io_or_execution_imports": true,
+  "tests_scope": "34 unittest methods; parameterized missing-target checks are not counted as independent attacks or live device tests.",
+  "harness2_scope": "No harness prompt/schema or deployed tool was changed by this pure module; official coordinator review remains its separate 32-source scope."
+}

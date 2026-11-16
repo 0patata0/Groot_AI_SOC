@@ -22,7 +22,7 @@ _atomic_spec=importlib.util.spec_from_file_location('release_storage_atomic',Pat
 atomic=importlib.util.module_from_spec(_atomic_spec);_atomic_spec.loader.exec_module(atomic)
 FIXED=frozenset({'plan.json','bundle.json','approval.json','revert-approval.json','baseline.json','witness.json',
     'quiescence.json','verification.json','confirmation.json','resume.json','rollback.json',
-    'revert-fence.json','revert.json','cleanup.json','current-release.json'})
+    'revert-fence.json','revert.json','cleanup.json','current-release.json','acceptance.json','completion.json','cleanup-decision.json','cleanup-grant.json'})
 MAX_ARTIFACT=2*1024*1024
 
 
@@ -121,6 +121,46 @@ class Store:
             need(c.stamp(before)==c.stamp(os.stat(path.name,dir_fd=parent,follow_symlinks=False)),'active_release_changed')
             os.unlink(path.name,dir_fd=parent);os.fsync(parent)
         finally:os.close(parent)
+
+    def current(self):
+        """Permanent root-only pointer, independent of a released host lock."""
+        raw=self.read_path(self.base/'current.json',absent=True)
+        if raw is None:return None,None
+        value=c.parsed(raw);self.validate_current(value)
+        return value,hashlib.sha256(raw).hexdigest()
+
+    def validate_current(self,value):
+        need(isinstance(value,dict)and set(value)=={'schema','host','release_id','plan_sha256','bundle_sha256','receipt_sha256','runtime_sha256'}
+             and type(value['schema'])is int and value['schema']==1 and value['host']==self.files.host
+             and isinstance(value['release_id'],str)and c.RELEASE.fullmatch(value['release_id'])
+             and all(isinstance(value[k],str)and c.HEX.fullmatch(value[k])for k in ('plan_sha256','bundle_sha256','receipt_sha256','runtime_sha256')),
+             'current_pointer_shape')
+
+    def publish_current(self,value,expected):
+        self.require_active();self.validate_current(value)
+        need(all(value[k]==v for k,v in self.token.items()),'current_pointer_release')
+        need(expected is None or isinstance(expected,str)and c.HEX.fullmatch(expected),'current_pointer_previous_digest')
+        raw=c.canonical(value);old,digest=self.current()
+        if old==value:return False
+        need(digest==expected,'current_pointer_changed')
+        path=self.base/'current.json';parent=self.w.directory(self.base);name='.current-'+uuid.uuid4().hex;created=False
+        try:
+            original=os.stat(path.name,dir_fd=parent,follow_symlinks=False)if old is not None else None
+            fd=os.open(name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=parent);created=True
+            with os.fdopen(fd,'wb')as stream:
+                os.fchown(stream.fileno(),self.w.owner,self.gid);stream.write(raw);stream.flush();os.fsync(stream.fileno())
+            if original is None:atomic.create(parent,name,path.name)
+            else:
+                need(self.current()[1]==expected and c.stamp(os.stat(path.name,dir_fd=parent,follow_symlinks=False))==c.stamp(original),
+                     'current_pointer_changed')
+                os.replace(name,path.name,src_dir_fd=parent,dst_dir_fd=parent)
+            created=False;os.fsync(parent)
+        finally:
+            if created:
+                try:os.unlink(name,dir_fd=parent)
+                except FileNotFoundError:pass
+            os.close(parent)
+        need(self.current()[0]==value,'current_pointer_not_verified');return True
 
 
 def digest(value):return hashlib.sha256(c.canonical(value)).hexdigest()

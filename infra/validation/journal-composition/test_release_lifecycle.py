@@ -68,14 +68,15 @@ class LifecycleTests(unittest.TestCase):
             protected={}
             for relative in plan_module.PROTECTED[host]:
                 path=fs.root/relative.lstrip('/');path.parent.mkdir(parents=True,exist_ok=True)
-                if relative==plan_module.OPTIONAL_PROTECTED:protected[relative]=None;continue
+                if relative==(plan_module.ACTIVE_PROTECTED if host=='b'else plan_module.OPTIONAL_PROTECTED):
+                    protected[relative]=None;continue
                 raw=('unchanged fixture '+host+' '+relative+'\n').encode();path.write_bytes(raw);path.chmod(0o600)
                 protected[relative]={'sha256':plan_module.sha(raw),'uid':0,'gid':0,'mode':0o600}
             for name in plan_module.HELPERS:
                 path=fs.storage/name;path.write_bytes((HERE/name).read_bytes());path.chmod(0o600)
             self.nodes[host]={'fixture':f,'files':fs,'legacy':legacy,'native':native,'backend':backend,'helper_backend':hb,'process_backend':pb,
                 'host_plan':{'rows':fs.rows,'machine_sha256':plan_module.sha(machine),'diagnostic_gid':os.getgid(),'reader_uid':77,
-                    'mcp_uid':88 if host=='b'else None,'container':container,'protected':protected}}
+                    'mcp_uid':88 if host=='b'else None,'container':container,'protected':protected,'previous_current_sha256':None}}
             if host=='b':
                 (fs.root/'etc/mcp/system-diagnostics').mkdir(parents=True,mode=0o750,exist_ok=True)
                 for relative in ('var/lib/capstone-review-chat/queue.sqlite','var/lib/capstone-ollama-trial/chat/queue.sqlite'):

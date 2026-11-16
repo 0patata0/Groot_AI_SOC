@@ -4,6 +4,7 @@ import importlib.util
 import os
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 HERE=Path(__file__).parent
 def load(name,file):
@@ -91,6 +92,58 @@ class StorageTests(unittest.TestCase):
             with self.assertRaises(OSError):
                 with self.store.locked():pass
         self.assertFalse(self.store.held)
+
+    def pointer(self):
+        return {**self.store.token,'bundle_sha256':'d'*64,'receipt_sha256':'e'*64,'runtime_sha256':'f'*64}
+
+    def test_current_pointer_requires_claim_and_exact_release(self):
+        value=self.pointer()
+        with self.assertRaisesRegex(m.Refused,'active_release_required'):self.store.publish_current(value,None)
+        with self.store.locked():
+            self.store.claim();self.assertTrue(self.store.publish_current(value,None));self.assertFalse(self.store.publish_current(value,None))
+            wrong={**value,'release_id':'f'*32}
+            with self.assertRaisesRegex(m.Refused,'current_pointer_release'):self.store.publish_current(wrong,None)
+
+    def test_current_pointer_compare_and_swap_cannot_replace_a_different_generation(self):
+        value=self.pointer();path=self.store.base/'current.json';old={**value,'release_id':'f'*32}
+        path.write_bytes(m.c.canonical(old));path.chmod(0o600);previous=self.store.current()[1]
+        with self.store.locked():
+            self.store.claim()
+            with self.assertRaisesRegex(m.Refused,'current_pointer_changed'):self.store.publish_current(value,None)
+            self.assertEqual(self.store.current()[0],old);self.store.publish_current(value,previous)
+        self.assertEqual(self.store.current()[0],value)
+
+    def test_current_pointer_fifo_symlink_and_metadata_are_refused(self):
+        path=self.store.base/'current.json';os.mkfifo(path)
+        with self.assertRaisesRegex(ValueError,'unsafe_file'):self.store.current()
+        path.unlink();path.symlink_to('missing')
+        with self.assertRaises(OSError):self.store.current()
+        path.unlink();path.write_bytes(m.c.canonical(self.pointer()));path.chmod(0o644)
+        with self.assertRaisesRegex(m.Refused,'artifact_metadata'):self.store.current()
+
+    def test_current_pointer_publication_lost_ack_is_idempotent(self):
+        real=m.atomic.create
+        def lost(*args):real(*args);raise OSError('lost publication acknowledgement')
+        with self.store.locked():
+            self.store.claim()
+            with patch.object(m.atomic,'create',side_effect=lost):
+                with self.assertRaises(OSError):self.store.publish_current(self.pointer(),None)
+            self.assertFalse(self.store.publish_current(self.pointer(),None))
+        self.assertEqual((self.store.base/'current.json').stat().st_nlink,1)
+
+    def test_foreign_pointer_write_during_swap_is_not_overwritten(self):
+        value=self.pointer();path=self.store.base/'current.json';old={**value,'release_id':'e'*32}
+        path.write_bytes(m.c.canonical(old));path.chmod(0o600);previous=self.store.current()[1]
+        real=self.store.current;calls=[]
+        def changed():
+            calls.append(True)
+            if len(calls)==2:path.write_bytes(m.c.canonical({**old,'receipt_sha256':'a'*64}))
+            return real()
+        with self.store.locked():
+            self.store.claim()
+            with patch.object(self.store,'current',side_effect=changed):
+                with self.assertRaisesRegex(m.Refused,'current_pointer_changed'):self.store.publish_current(value,previous)
+        self.assertEqual(real()[0]['receipt_sha256'],'a'*64)
 
 
 if __name__=='__main__':unittest.main()

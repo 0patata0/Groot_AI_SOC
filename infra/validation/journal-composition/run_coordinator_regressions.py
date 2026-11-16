@@ -48,7 +48,7 @@ def main():
     repo=HERE.parents[2]if HERE.parts[-3:]==('infra','validation','journal-composition')else HERE
     assert not out.is_relative_to(repo),'output_must_be_outside_repository'
     manifest=json.loads((HERE/'coordinator-manifest.json').read_text());before=sources(manifest)
-    expected=manifest['regressions'];assert len(expected)==14
+    expected=manifest['regressions'];assert len(expected)==15
     out.mkdir(mode=0o700)
     work=out/'work';work.mkdir(mode=0o700);os.chown(work,-1,os.getgid())
     def one(item):
@@ -73,7 +73,7 @@ def main():
         'platform':sys.platform,'source_sha256':before,'source_unchanged':unchanged,'profiles':results,
         'tests':sum(v['tests']for v in results),'skipped':sum(v['skipped']for v in results),
         'complete':unchanged and work_empty and all(v['ok']for v in results),'own_work_removed':work_empty,'operating_changes':0,'model_calls':0,
-        'scope':'14 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; not native systemd, independent recovery, production CLI or bot/detection accuracy.'}
+        'scope':'15 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; synthetic acceptance is not actual MCP/chat evidence. Not native systemd, independent recovery, production CLI or bot/detection accuracy.'}
     (out/'results.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({k:value[k]for k in ('complete','tests','skipped','source_unchanged','operating_changes','model_calls')}))
     raise SystemExit(0 if value['complete']else 1)

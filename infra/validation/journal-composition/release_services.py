@@ -173,7 +173,8 @@ class Native:
                  and int(after.get('ExecMainStartTimestampMonotonic','0'))>int(before.get('ExecMainStartTimestampMonotonic','0')),
                  'collection_did_not_execute')
 
-    def collection_resources(self):
+    def collection_resources(self,*,release_dropins=True):
+        need(release_dropins is None or type(release_dropins)is bool,'collection_dropin_scope')
         result={}
         for name,timeout in [('capstone-system-diagnostics.service','1min 25s'),(OPTIONAL,'2min 30s')]:
             value=self.probe(name);expected={'LoadState':'loaded','Type':'oneshot','MemoryAccounting':'yes','MemoryHigh':str(192*1024*1024),
@@ -185,8 +186,9 @@ class Native:
              and reader.get('KillMode')=='control-group'and reader.get('NeedDaemonReload')=='no','reader_resource_mismatch')
         result['capstone-journal-reader.service']=reader
         for name,value in result.items():
+            include=(self.root/release_dropin(name).lstrip('/')).exists()if release_dropins is None else release_dropins
             need(value.get('FragmentPath')=='/etc/systemd/system/'+name and value.get('User')in ('','root')
-                 and set(value.get('DropInPaths','').split())==existing_dropins(name)|{release_dropin(name)},'collection_loaded_source_mismatch')
+                 and set(value.get('DropInPaths','').split())==existing_dropins(name)|({release_dropin(name)}if include else set()),'collection_loaded_source_mismatch')
         return result
 
     def docker(self):

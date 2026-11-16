@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "isolated_candidate_verified_operating_application_not_ready",
-  "at_kst": "2026-11-17T05:59:00.982901+09:00",
-  "manifest_sha256": "87d7e33266130de5d31c886b5b49a88a8adf731afdc6699cbd61700ff8dcb36a",
-  "source_files": 30,
-  "operator_modules": 14,
-  "operator_helper_files": 18,
+  "status": "isolated_completion_and_current_receipt_candidate_verified_not_deployed",
+  "at_kst": "2026-11-17T07:28:18.058766+09:00",
+  "manifest_sha256": "a7868339b5b0880f50df42e8538b0d462527b740db08a0db6626f9b287cb2fc6",
+  "source_files": 32,
+  "operator_modules": 15,
+  "operator_helper_files": 19,
   "source_targets": {
     "a": 7,
     "b": 36,
@@ -22,39 +22,47 @@
     "mac": {
       "python": "3.12.5",
       "platform": "darwin",
-      "tests": 220,
+      "tests": 252,
       "skipped": 0,
       "complete": true,
       "source_unchanged": true,
       "own_work_removed": true,
-      "scope": "14 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; not native systemd, independent recovery, production CLI or bot/detection accuracy."
+      "scope": "15 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; synthetic acceptance is not actual MCP/chat evidence. Not native systemd, independent recovery, production CLI or bot/detection accuracy."
     },
     "linux": {
       "python": "3.13.5",
       "platform": "linux",
-      "tests": 220,
+      "tests": 252,
       "skipped": 0,
       "complete": true,
       "source_unchanged": true,
       "own_work_removed": true,
-      "scope": "14 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; not native systemd, independent recovery, production CLI or bot/detection accuracy."
+      "scope": "15 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; synthetic acceptance is not actual MCP/chat evidence. Not native systemd, independent recovery, production CLI or bot/detection accuracy."
     }
   },
   "official_harness2": {
     "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
-    "before_components": 48,
-    "candidate_components": 78,
-    "added": 30,
-    "modified": 0,
+    "before_components": 78,
+    "candidate_components": 80,
+    "added": 2,
+    "modified": 14,
     "removed": 0,
     "always_on_chars": 16917,
     "always_on_char_delta": 0
   },
   "fixes": [
-    "Retry staged-only rollback from durable pending.from_phase; preserve services_untouched and avoid peer/resume side effects.",
-    "Pin actual B Docker path /usr/local/bin/docker after administrator-route read, not an assumed /usr/bin path.",
-    "Use owned current-GID temporary fixtures and support a flat isolated source mount in the unprivileged regression runner."
+    "Add all-host accepted-outcome completion, durable cleanup decision and grant, owned relay/control cleanup and read-only actual current-installation verification.",
+    "Preserve B prepared-only initial provenance; require it when initial active receipt is absent. Never rewrite initial receipts.",
+    "Keep resumed consumers running after completion/cleanup acknowledgement loss; reject source, ownership or current-pointer drift before removing temporary controls."
   ],
+  "root_entry_namespace": {
+    "cases": 5,
+    "all_expected_results": true,
+    "production_operating_probe": false,
+    "scope": "Production root-only bootstrap/context/status path in an isolated read-only container with synthetic accounts, machine, sources and cache. Not native systemd, peer SSH, actual deployment or chat acceptance.",
+    "root_removed": true,
+    "operating_container_unchanged": true
+  },
   "isolated_linux": {
     "network": "none",
     "user": "10001:10001",
@@ -72,12 +80,22 @@
     },
     "not_native_systemd": true
   },
-  "first_failures_preserved": [
-    "staged-only lost acknowledgement counterexample",
-    "missing /usr/bin/docker before container creation",
-    "Mac fixture group inheritance after clearing TMPDIR",
-    "flat /check source path and incorrect Path.chown runner API"
-  ],
+  "initial_provenance": {
+    "observation_at_kst": "2026-11-17T06:17:46+09:00",
+    "a": "active receipt retained; current reader/core drift observed",
+    "b": "prepared present, active absent; three source differences observed against prepared receipt",
+    "c": "active receipt retained; current reader/core drift observed",
+    "receipts_rewritten": false,
+    "current_pointer_published": false
+  },
+  "live_management_policy_inventory": {
+    "observed_at_kst": "2026-11-17T07:21:18.206085+09:00",
+    "a": "mgmt_src has administrator /32; never_block contains independent broader entries. Suricata selected threshold only suppresses SID2001219 for administrator /32; engine-memory loading not proved.",
+    "b": "Wazuh white_list observed only loopback entries; per-host profile management CIDRs empty.",
+    "c": "Per-host profile management CIDRs empty.",
+    "scope": "Read-only fixed-file/configuration inventory, not complete runtime allowlist validation.",
+    "global_management_policy_mcp_available": false
+  },
   "review": {
     "method": "main-agent defect-first review and targeted counterexamples",
     "review_agent_skill_available": false,
@@ -86,19 +104,21 @@
   "operating_source_changes": 0,
   "operating_services_restarted": 0,
   "model_calls": 0,
+  "protected_mcp_calls": 0,
   "chat_posts": 0,
   "attack_tests": 0,
   "training_runs": 0,
   "initial_installation_receipts_rewritten": false,
   "known_unfinished": [
-    "Cleanup and current-installation receipt/provenance integration are not connected.",
-    "Native systemd, reboot fences, independent recovery and root-entry success have not been validated.",
-    "Fresh exact operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain."
+    "Native systemd, reboot fences, independent recovery and actual operating root-entry have not been validated.",
+    "Fresh exact complete operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain.",
+    "Fixture acceptance records are synthetic; root operator attestations must cite actual MCP and both-bot evidence before operating cleanup.",
+    "One global approved management IP/CIDR policy and whole-device MCP proposal/apply/verify workflow are requested but not implemented."
   ],
   "evidence_sha256": {
-    "mac_result": "0083ef48107b9f0bd9549c43a6de9135f06f56350ddb652ca24a49df885c63fb",
-    "linux_result": "eda013a025fb07cf0fcb3ec8b6d9ae48b19cb1c50008aeb43c64548846dd73ce",
-    "harness2": "d4215b512c418f6b63d4fa32d6adae9a85ba6769f12d81b0bc280eab20412d0f",
-    "linux_operator_observation": "2b992e157de7b602c3b2acc15591f1516cbb704595d09717740fe68bd97e3131"
+    "mac_result": "6f97db56398bcc5d4d9aae9b04d0795715e8a0f08f43afc3f2e85e9b962f57ba",
+    "linux_result": "39a5943ed6a709526c7f085d93261cc65cf1be4eebc873bd591d642b852b6720",
+    "harness2": "685321395bde4fe6c5d576142713846916de3e93b8256964384644bbd55d6a82",
+    "root_namespace": "409660e0bc073d184eb8321d4caf520993888d402df609fb956425b221667315"
   }
 }

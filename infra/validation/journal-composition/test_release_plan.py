@@ -19,9 +19,9 @@ class PlanTests(unittest.TestCase):
 
     def test_full_bundle_binds_all_payloads_helpers_and_generated_controls(self):
         bundle=self.plan.bundle();self.assertEqual(sum(map(len,bundle['payloads'].values())),50)
-        self.assertEqual(len(bundle['helpers']),18);self.assertEqual(sum(map(len,bundle['controls'].values())),39)
+        self.assertEqual(len(bundle['helpers']),19);self.assertEqual(sum(map(len,bundle['controls'].values())),39)
         self.assertEqual(bundle['plan_sha256'],self.plan.sha256);proof=self.plan.verify(self.ctl.files)
-        self.assertTrue(proof['isolated_filesystem']);self.assertEqual(proof['helpers_verified'],18)
+        self.assertTrue(proof['isolated_filesystem']);self.assertEqual(proof['helpers_verified'],19)
 
     def test_unknown_or_missing_helper_is_rejected(self):
         for name in ('../outside.py','unregistered.py','/etc/shadow'):
@@ -75,6 +75,18 @@ class PlanTests(unittest.TestCase):
         (self.ctl.files.storage/'approval.json').write_bytes(m.c.canonical(approval))
         with self.assertRaisesRegex(ValueError,'approval_bundle_changed'):self.ctl.execute('arm')
         self.assertTrue(self.ctl.core_is('before_sha256'))
+
+    def test_b_prepared_only_provenance_is_preserved_but_missing_both_is_refused(self):
+        self.assertIsNone(self.value['hosts']['b']['protected'][m.ACTIVE_PROTECTED])
+        self.assertIsNotNone(self.value['hosts']['b']['protected'][m.OPTIONAL_PROTECTED])
+        self.plan.verify(self.ctl.files)
+        changed=copy.deepcopy(self.value);changed['hosts']['b']['protected'][m.OPTIONAL_PROTECTED]=None
+        with self.assertRaisesRegex(ValueError,'installation_provenance_missing'):m.Plan(changed)
+
+    def test_a_and_c_cannot_treat_active_receipt_as_optional(self):
+        for host in ('a','c'):
+            changed=copy.deepcopy(self.value);changed['hosts'][host]['protected'][m.ACTIVE_PROTECTED]=None
+            with self.assertRaisesRegex(ValueError,'plan_required_protected_file'):m.Plan(changed)
 
 
 if __name__=='__main__':unittest.main()

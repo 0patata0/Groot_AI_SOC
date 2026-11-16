@@ -119,5 +119,18 @@ class HelperTests(unittest.TestCase):
         for value in ('4d 4d','1s 1min','1.2.3s','anything','-1s'):
             with self.assertRaisesRegex(m.Refused,'timer_clock_shape'):m.scheduled(value)
 
+    def test_cleanup_job_can_finish_itself_but_cannot_exempt_other_pids(self):
+        self.manager.arm();name=self.manager.instance('cleanup')
+        self.backend.rows[name].update(ActiveState='activating',MainPID=str(os.getpid()+10000))
+        with self.assertRaisesRegex(m.Refused,'helper_action_still_running'):self.manager.disarm(finishing=True)
+        self.backend.rows[name]['MainPID']=str(os.getpid());self.backend.calls=[];self.manager.disarm(finishing=True)
+        self.assertFalse(any(args[1]in ('stop','disable')and args[-1]==name for args,_ in self.backend.calls))
+
+    def test_cleanup_self_exception_does_not_allow_another_running_action(self):
+        self.manager.arm();self.backend.rows[self.manager.instance('cleanup')].update(ActiveState='activating',MainPID=str(os.getpid()))
+        self.backend.rows[self.manager.instance('verify')].update(ActiveState='active',MainPID='33333');self.backend.calls=[]
+        with self.assertRaisesRegex(m.Refused,'helper_action_still_running'):self.manager.disarm(finishing=True)
+        self.assertFalse(any(args[1]in ('stop','disable')for args,_ in self.backend.calls))
+
 
 if __name__=='__main__':unittest.main()

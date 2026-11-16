@@ -67,5 +67,13 @@ class RuntimeTests(unittest.TestCase):
             m.main()
         ctl.execute.assert_called_once_with('recover',proofs=None);context.peers.assert_not_called()
 
+    def test_current_is_a_read_only_completion_check_not_a_lifecycle_resume(self):
+        from unittest.mock import Mock
+        context=Mock();context.completion.current.return_value={'status':'verified','mutation_performed':False}
+        args=SimpleNamespace(host='b',release_id='a'*32,plan_sha256='b'*64,operation='current')
+        with patch.object(m,'arguments',return_value=args),patch.object(m,'Context',return_value=context),patch('builtins.print'):
+            m.main()
+        context.completion.current.assert_called_once_with();context.lifecycle.execute.assert_not_called();context.peers.assert_not_called()
+
 
 if __name__=='__main__':unittest.main()

@@ -26,10 +26,10 @@ TRANSITIONS={'prepare':('staged','staged','staged'),'arm':('staged','armed','arm
  'verify':('applied','applied','verified'),'confirm':('verified','confirming','confirmed')}
 FLAGS=frozenset({'rollback_ready','fence_installed','barriers_installed','services_quiesced',
  'source_backup','cache_backup','source_restored','cache_restored','services_resumed','cleanup_complete',
- 'revert_fenced','baseline_services_resumed','helpers_prepared','services_untouched'})
+ 'revert_fenced','baseline_services_resumed','helpers_prepared','services_untouched','completion_prepared','helpers_disarmed'})
 DIGESTS=frozenset({'baseline_sha256','verification_sha256','confirmation_sha256','resume_sha256',
  'rollback_receipt_sha256','cleanup_receipt_sha256','revert_fence_sha256',
- 'revert_authorization_sha256','baseline_resume_sha256'})
+ 'revert_authorization_sha256','baseline_resume_sha256','completion_sha256','cleanup_authorization_sha256','cleanup_decision_sha256'})
 REVERSE=frozenset({'revert_fence','revert'})
 KEYS={'schema','host','release_id','plan_sha256','phase','sequence','deadline_kst','updated_at_kst','pending','facts','interrupted'}
 
@@ -68,7 +68,7 @@ class Journal:
     @staticmethod
     def validate_pending(value):
         need(isinstance(value,dict)and set(value)=={'name','nonce','from_phase','to_phase','started_at_kst'},'pending_shape')
-        need(isinstance(value['name'],str)and value['name']in {*TRANSITIONS,*REVERSE,'rollback','resume','cleanup'},'pending_name')
+        need(isinstance(value['name'],str)and value['name']in {*TRANSITIONS,*REVERSE,'rollback','resume','cleanup','completion_prepare'},'pending_name')
         need(isinstance(value['nonce'],str)and c.RELEASE.fullmatch(value['nonce']),'pending_nonce')
         need(all(isinstance(value[k],str)and value[k]in c.PHASES for k in ('from_phase','to_phase')),'pending_phase')
         instant(value['started_at_kst'])
@@ -148,7 +148,7 @@ class Journal:
 
     def begin(self,name,*,now):
         iso(now)
-        need(isinstance(name,str)and name in {*TRANSITIONS,*REVERSE,'rollback','resume','cleanup'},'operation_name')
+        need(isinstance(name,str)and name in {*TRANSITIONS,*REVERSE,'rollback','resume','cleanup','completion_prepare'},'operation_name')
         value,digest=self.read();phase=value['phase'];pending=value['pending']
         if name=='rollback':
             need(phase not in ('confirmed','rolled_back'),'stable_phase_requires_coordinated_decision')
@@ -172,7 +172,8 @@ class Journal:
                   'arm':('rollback_ready','baseline_sha256','helpers_prepared','barriers_installed'),'quiesce':('fence_installed','barriers_installed'),
                   'backup':('services_quiesced',),'apply':('source_backup','cache_backup'),
                   'confirm':('verification_sha256',),
-                  'revert':('revert_fenced','revert_fence_sha256','revert_authorization_sha256')}.get(name,())
+                  'revert':('revert_fenced','revert_fence_sha256','revert_authorization_sha256'),
+                  'cleanup':('completion_prepared','completion_sha256','cleanup_authorization_sha256')}.get(name,())
         need(all(value['facts'].get(k)for k in required),'operation_prerequisites')
         nonce=uuid.uuid4().hex;value['pending']={'name':name,'nonce':nonce,'from_phase':phase,'to_phase':to,'started_at_kst':iso(now)}
         value.update(phase=during,sequence=value['sequence']+1,updated_at_kst=iso(now));self.save(value,digest);return nonce
@@ -188,6 +189,7 @@ class Journal:
                   'rollback':('source_restored','cache_restored','rollback_receipt_sha256'),
                   'revert_fence':('revert_fenced','revert_fence_sha256'),
                   'revert':('source_restored','cache_restored','rollback_receipt_sha256'),
+                  'completion_prepare':('completion_prepared','completion_sha256'),
                   'cleanup':('cleanup_complete','cleanup_receipt_sha256')}.get(pending['name'],())
         need(all(value['facts'].get(k)for k in required),'operation_receipt_required')
         value.update(phase=pending['to_phase'],pending=None,sequence=value['sequence']+1,updated_at_kst=iso(now));self.save(value,digest);return value

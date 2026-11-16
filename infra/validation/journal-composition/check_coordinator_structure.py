@@ -55,9 +55,21 @@ def main():
     before['tool_descriptions/tool_guidance.md']=original['audit_index']
     for name,path in witness['component_mapping'].items():
         assert name not in before;before[name]=(HERE/path).read_text()
+    parent_commit=manifest['parent_commit']
+    assert isinstance(parent_commit,str)and len(parent_commit)==40 and all(ch in '0123456789abcdef'for ch in parent_commit)
+    relative='infra/validation/journal-composition/'
+    parent_raw=subprocess.check_output(['git','-C',str(repo),'show',parent_commit+':'+relative+'coordinator-manifest.json'])
+    assert hashlib.sha256(parent_raw).hexdigest()==manifest['parent_manifest_sha256']
+    parent=json.loads(parent_raw)
+    assert parent['framework_commit']==manifest['framework_commit']and parent['witness_manifest_sha256']==manifest['witness_manifest_sha256']
+    for name,path in parent['component_mapping'].items():
+        assert name not in before and Path(path).name==path and path in parent['source_sha256']
+        raw=subprocess.check_output(['git','-C',str(repo),'show',parent_commit+':'+relative+path])
+        assert hashlib.sha256(raw).hexdigest()==parent['source_sha256'][path]
+        before[name]=raw.decode()
     after=dict(before)
     for name,path in manifest['component_mapping'].items():
-        assert name not in after and path in manifest['source_sha256'];after[name]=(HERE/path).read_text()
+        assert path in manifest['source_sha256'];after[name]=(HERE/path).read_text()
     result={'framework_commit':pin,'before':tree.validate(surface,before,allow_subagents=False),
         'candidate':tree.validate(surface,after,allow_subagents=False),'diff':tree.diff_summary(surface,before,after),
         'base_candidate_tree_sha256':limits['candidate_tree_sha256'],'source_sha256':manifest['source_sha256'],

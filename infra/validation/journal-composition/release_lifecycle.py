@@ -82,7 +82,7 @@ class Lifecycle:
 
     def baseline(self):
         value=self.store.read('baseline.json');need(digest(value)==self.state()['facts'].get('baseline_sha256'),'baseline_receipt_changed')
-        need(isinstance(value,dict)and set(value)=={'schema','host','release_id','units','container'}
+        need(isinstance(value,dict)and set(value)=={'schema','host','release_id','units','container','previous_current'}
              and value['schema']==1 and value['host']==self.host and value['release_id']==self.files.release_id,'baseline_identity')
         return value
 
@@ -90,6 +90,8 @@ class Lifecycle:
         """Stage only; no units, source or live cache are changed here."""
         with self.store.locked(),self.journal.locked():
             approval=self.authorize();need(deadline<=datetime.fromisoformat(approval['expires_at_kst']),'deadline_exceeds_approval')
+            previous,previous_sha=self.store.current()
+            need(previous_sha==self.plan['hosts'][self.host]['previous_current_sha256'],'previous_current_changed')
             self.store.claim();self.files.check('before_sha256');self.files.payloads('candidates','after_sha256')
             self.files.backup();units=self.native.snapshot()
             need(all(v['ActiveState']not in ('activating','deactivating')for v in units.values()),'baseline_units_transitioning')
@@ -98,7 +100,8 @@ class Lifecycle:
             need(all(v['LoadState']=='not-found'or set(v.get('DropInPaths','').split())==self.native.baseline_dropins(n)
                 for n,v in units.items()),'unreviewed_baseline_dropin')
             container=self.native.require_original_container()if self.host=='b'else None
-            value={'schema':1,'host':self.host,'release_id':self.files.release_id,'units':units,'container':container}
+            value={'schema':1,'host':self.host,'release_id':self.files.release_id,'units':units,'container':container,
+                   'previous_current':previous}
             self.store.immutable('baseline.json',value)
             self.store.immutable('witness.json',{'schema':1,'host':self.host,'release_id':self.files.release_id,
                 'reader_uid':self.plan['hosts'][self.host]['reader_uid'],'rows':[r for r in self.files.rows if r['target']not in source.BARRIERS[self.host]]})
@@ -178,6 +181,7 @@ class Lifecycle:
                 revert=operation in ('revert_fence','revert'),protected=operation not in ('recover','rollback'))
             self.baseline()
             if operation=='recover':return self.recover()
+            need(not self.state()['facts'].get('completion_prepared'),'completion_already_prepared')
             if operation=='rollback':return self.rollback()
             if operation=='revert':return self.revert(proofs)
             if operation=='resume':return self.resume(proofs)
@@ -333,6 +337,13 @@ class Lifecycle:
 
     def recover(self):
         value=self.state();pending=value['pending']
+        # Finalization changes only owned relay/control artifacts after a
+        # coherent accepted outcome. Never stop functioning bots because an
+        # acknowledgement for that housekeeping operation was lost.
+        if pending and pending['name']in ('completion_prepare','cleanup'):
+            need(value['phase']in ('confirmed','rolled_back'),'completion_stable_phase')
+            need(self.core_is('after_sha256'if value['phase']=='confirmed'else'before_sha256'),'completion_core_changed')
+            return value
         if value['phase']=='staged'and pending is None and datetime.fromisoformat(value['deadline_kst'])>self.clock():return value
         if value['phase']=='confirmed':
             if pending:

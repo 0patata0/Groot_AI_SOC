@@ -1,39 +1,41 @@
 {
   "schema": 1,
-  "status": "isolated_operator_lifecycle_candidate_not_ready_for_operating_application",
+  "status": "isolated_completion_and_current_receipt_candidate_not_deployed",
   "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
   "witness_manifest_sha256": "e42296de7b89989b6b5379d8c1cf3cb916bd7c7bc44c25ecf1b09d4b9f3e755b",
   "source_sha256": {
     "release_files.py": "8ea85437ff7dd4fc40f0e0c47a36b401afa0265d0369bce5b673f2e67a94abe2",
     "release_reader.py": "ada6d7358233066be9c7292af9f668d8b5ca13c4c15a0d79098de5419ef9552c",
     "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
-    "release_state.py": "81dd444d63bbaa4fc7284f16df29455086e386f3d3ff929729f4793ee2a58a94",
-    "release_services.py": "c344a16748c2b1acaa4db1784b20e614de4cb37546fd20e335b0ed7a60f10d7f",
+    "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+    "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57",
     "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
-    "release_storage.py": "3e2d920aa92edbe52a9bf39024f80de583e3f01471cb10bf929af828305ba031",
-    "release_helpers.py": "0daf5ad3eb4ce72a78886cd1d07ab347df6c2b122d6b0245604336fa85414a09",
+    "release_storage.py": "20f28e00b21c7266de4923302122256bf20068fd8b811cba2fd6bdd0a7e02958",
+    "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
     "release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
     "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
-    "release_lifecycle.py": "b14cf5f00e00b5cddd5f5d339ae0bd58b69b278f0883b0d0b9aba66428f9f0d8",
+    "release_lifecycle.py": "eccb3085b048bf1fde3d444fd2e3158077ebbed87316843a27c8ce3495894e50",
     "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
-    "release_plan.py": "ef34f2f50ddbdc1f4fc2834efc36c4cbaeff5ee5cb9e44c67aa3940e3fcdc756",
-    "release_runtime.py": "a168589455304ce085f2139c48c7ee019a19db3558f00bc7f884dbf84df1a564",
+    "release_plan.py": "0680d56323b18d27ea0dbe5e1c0b50a66753d335d983ed32b0b6aafc44184509",
+    "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
     "test_release_files.py": "b1561b85af99f18817f974117ad1fd02acc20f48ddac259ecc54d1621aaced51",
     "test_release_reader.py": "bc17d3ab111ae65ab878f811b199e2b8fabce16665de55ceac30e2aa39f60e14",
     "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
     "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
     "test_release_services.py": "e526f30dfa2f3cdab6fc8181915f785854163801e62a0e60b63c728ff71a9f96",
     "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
-    "test_release_storage.py": "f8677c9955ae9f942ddd0899c364d0f7e3ef67e197dea3b680e31861f434310f",
-    "test_release_helpers.py": "cebac925c16ee3520dd61e23d0d41b5181e30c9cd8390f11b24840c073e2b2ac",
+    "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
+    "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
     "test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
     "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
-    "test_release_lifecycle.py": "36b72cc10accb232d701ab459f09eae1e8ebc3dc1be9db1347a65f315f84926e",
+    "test_release_lifecycle.py": "a75a09e2fdd108902ea4504f8c1756279e7f70ca606d0f7a020f76817c9b209f",
     "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
-    "test_release_plan.py": "b42382788c4ee33861f04ea2944472488b0f49f22f40431821cc7fed126ab3ee",
-    "test_release_runtime.py": "4a357264e9e83e6d09a002a491725daaf0a10276baae8dfe281a6e812b66c870",
-    "check_coordinator_structure.py": "dbf4c8b57fcbd7fe3f0cdb530fd95cbce0823134883dc139136d2d94db5b2da1",
-    "run_coordinator_regressions.py": "0277f8075f86061e974c0cf12871056240619b59d538b9ef705e2f2e09a65ed1"
+    "test_release_plan.py": "79f312216da9f1bf1ceade1523ab0f3d73bad9d29bf267619407ea1e38b0c487",
+    "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+    "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+    "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+    "release_completion.py": "9d7a2fcf7086e1fab80bf2e70e180bb35c98abd85094947dc6e9c2fb1ae43b91",
+    "test_release_completion.py": "c87d8285fd97ca4c24b6e76e82dd86b07ae69007a0b1d14fa165f90547d7f607"
   },
   "component_mapping": {
     "scripts/coordinator_release_files.py": "release_files.py",
@@ -65,13 +67,15 @@
     "scripts/coordinator_test_release_plan.py": "test_release_plan.py",
     "scripts/coordinator_test_release_runtime.py": "test_release_runtime.py",
     "scripts/coordinator_check_coordinator_structure.py": "check_coordinator_structure.py",
-    "scripts/coordinator_run_coordinator_regressions.py": "run_coordinator_regressions.py"
+    "scripts/coordinator_run_coordinator_regressions.py": "run_coordinator_regressions.py",
+    "scripts/coordinator_release_completion.py": "release_completion.py",
+    "scripts/coordinator_test_release_completion.py": "test_release_completion.py"
   },
-  "scope": "Fixed root-only source/cache/service coordination and isolated regressions. Official structure is not native systemd/watchdog/bootstrap, deployment, actual MCP/bot chat or SOC detection accuracy.",
+  "scope": "Fixed root-only coordination plus accepted-outcome cleanup and read-only current-installation verification. Original initial receipts are preserved, including B prepared-only provenance. Official structure and fixture acceptance do not establish operating or SOC detection accuracy.",
   "known_unfinished": [
-    "Cleanup and current-installation receipt/provenance integration are not connected.",
-    "Native systemd, reboot fences, independent recovery and root-entry success have not been validated.",
-    "Fresh exact operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain."
+    "Native systemd, reboot fences, independent recovery and production root-entry success have not been validated.",
+    "Fresh exact operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain.",
+    "Completion artifacts use operator attestations; fixture acceptance records do not prove any real bot or operating verification."
   ],
   "preserved": {
     "frozen_witness_source_files": 8,
@@ -88,17 +92,20 @@
     "state": 24,
     "services": 22,
     "controls": 14,
-    "storage": 12,
-    "helpers": 13,
+    "storage": 17,
+    "helpers": 15,
     "processes": 12,
     "cache": 42,
     "lifecycle": 19,
     "atomic": 5,
-    "plan": 10,
-    "runtime": 10
+    "plan": 12,
+    "runtime": 11,
+    "completion": 22
   },
   "dependencies_sha256": {
     "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
     "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc"
-  }
+  },
+  "parent_commit": "67ba5ce8b7b85c1f2ab45b7e8296997ad7d2d709",
+  "parent_manifest_sha256": "87d7e33266130de5d31c886b5b49a88a8adf731afdc6699cbd61700ff8dcb36a"
 }

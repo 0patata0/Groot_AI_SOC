@@ -3,7 +3,7 @@
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 
 <!-- journal-composition:start -->
-후속 조정 실행기는50소스·39제어 문서를 연결한 격리 후보다. 같은 소스로 Mac220·Linux220/생략0·공식78구성/추가30/상시 증가0을 확인했다. 운영 적용·MCP·새 채팅은 미확인이다. 임시 장치 정리·현재 설치 출처·실제 systemd/독립 복구·정확 승인이 남았다. [현재 조정 범위](../infra/validation/journal-composition/COORDINATOR.md).
+[조정 실행기](../infra/validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리대역 공통 계약은14적용면·34검사를 마쳤다. 전역 MCP·장비 어댑터·실제 적용/원복은 아직 연결하지 않았다.
 <!-- journal-composition:end -->
 
 
@@ -80,3 +80,7 @@ UI/API를 포함한 WAF 경로는 On을 기준으로 한다. 공개 열람 허�
 
 
 [짧은 조회3소스 후속](../infra/validation/read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.
+
+## 관리 IP·대역의 공통 검증
+
+[공통 정책 계약](../infra/mcp/management-policy.md)의 registry·14적용면·34검사를 작성했다. 목록과 전체 후보/읽기 확인을 검사하는 순수 함수이며 초기 설치나 운영 반영을 수행하지 않는다. 장비 어댑터·전역 MCP/카드/원복과 `deploy.sh`의 단일 정책 연결이 남았다. 기존 관리/차단/대시보드 입력을 자동으로 통합한 상태는 아니다. 추가 deb/wheel과 Mac 패키지 설치는0이다.

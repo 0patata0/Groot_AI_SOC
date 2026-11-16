@@ -1,7 +1,7 @@
 # Mattermost 조회 응답 보완
 
 <!-- journal-composition:start -->
-후속 조정 실행기는50소스·39제어 문서를 연결한 격리 후보다. 같은 소스로 Mac220·Linux220/생략0·공식78구성/추가30/상시 증가0을 확인했다. 운영 적용·MCP·새 채팅은 미확인이다. 임시 장치 정리·현재 설치 출처·실제 systemd/독립 복구·정확 승인이 남았다. [현재 조정 범위](../../validation/journal-composition/COORDINATOR.md).
+[조정 실행기](../../validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리대역 공통 계약은14적용면·34검사를 마쳤다. 전역 MCP·장비 어댑터·실제 적용/원복은 아직 연결하지 않았다.
 <!-- journal-composition:end -->
 
 

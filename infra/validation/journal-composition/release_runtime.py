@@ -3,7 +3,7 @@
 
 Root-only fixed private path, pinned plan and every helper before importing
 project code. Existing read-only peer identities are used without copying keys.
-Cleanup/current-installation acceptance is a separate, not-yet-connected gate.
+Completion uses root-only acceptance evidence and a durable all-host decision.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -26,7 +26,8 @@ import time
 BASE=Path('/var/lib/capstone-journal-release')
 KST=timezone(timedelta(hours=9))
 OPERATIONS=('initialize','prepare','arm','quiesce','backup','apply','verify','confirm','resume','rollback',
-            'revert_fence','revert','recover','status','peers','dispatch')
+            'revert_fence','revert','recover','status','peers','dispatch','completion_prepare','completion_status',
+            'cleanup_decide','cleanup_authorize','cleanup','current')
 
 
 def need(value,code):
@@ -123,7 +124,7 @@ class Context:
             spec=importlib.util.spec_from_file_location('operator_'+name.replace('.py',''),self.root/name)
             module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
         self.modules={name:load(name)for name in ('release_files.py','release_state.py','release_storage.py','release_controls.py',
-            'release_services.py','release_helpers.py','release_processes.py','release_cache.py','release_lifecycle.py')}
+            'release_services.py','release_helpers.py','release_processes.py','release_cache.py','release_lifecycle.py','release_completion.py')}
         item=self.plan['hosts'][host];self.files=self.modules['release_files.py'].FileSet(host,release_id,item['rows'],item['diagnostic_gid'])
         journal=self.modules['release_state.py'].Journal(self.files,plan_sha256);store=self.modules['release_storage.py'].Store(self.files,plan_sha256)
         controls=self.modules['release_controls.py'].Files(self.files,plan_sha256)
@@ -131,6 +132,7 @@ class Context:
         readers=self.modules['release_processes.py'].Readers(self.files,controls,journal,item['reader_uid'],item['mcp_uid'])
         cache=self.modules['release_cache.py'].Cache(host,item['diagnostic_gid'],self.files.storage/'cache')
         self.lifecycle=self.modules['release_lifecycle.py'].Lifecycle(self.files,cache,journal,store,controls,native,helpers,readers)
+        self.completion=self.modules['release_completion.py'].Completion(self.lifecycle)
         self.lifecycle.contract.verify(self.files,protected=False)
 
     def peers(self):
@@ -196,6 +198,12 @@ def main():
     elif args.operation=='status':result=ctl.local_control_proof()
     elif args.operation=='peers':result=context.peers()
     elif args.operation=='dispatch':result=context.dispatch(args.action)
+    elif args.operation=='current':result=context.completion.current()
+    elif args.operation=='completion_status':result=context.completion.proof()
+    elif args.operation=='completion_prepare':result=context.completion.prepare(input_proof())
+    elif args.operation=='cleanup_decide':result=context.completion.decide(input_proof())
+    elif args.operation=='cleanup_authorize':result=context.completion.authorize(input_proof())
+    elif args.operation=='cleanup':result=context.completion.cleanup()
     else:
         proof=None
         if args.operation in ('arm','confirm','resume'):proof=context.peers()if args.host in ('a','b')else input_proof()

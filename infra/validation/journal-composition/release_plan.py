@@ -25,7 +25,7 @@ Refused=c.Refused
 HELPERS=frozenset({'release_status.py','cohort_guard.py','cache_transaction.py','reader_bridge.py',
     'release_files.py','release_reader.py','release_mcp_launcher.py','release_state.py','release_services.py',
     'release_controls.py','release_storage.py','release_helpers.py','release_processes.py','release_cache.py',
-    'release_lifecycle.py','release_atomic.py','release_plan.py','release_runtime.py'})
+    'release_lifecycle.py','release_atomic.py','release_plan.py','release_runtime.py','release_completion.py'})
 COMMON_PROTECTED=frozenset({'/etc/systemd/system/capstone-system-diagnostics.service.d/30-inventory-netlink.conf',
     '/var/lib/capstone-diagnostics/installation/active.json','/var/lib/capstone-diagnostics/installation/intent.json',
     '/var/lib/capstone-diagnostics/installation/prepared.json'})
@@ -39,6 +39,11 @@ for _host in PROTECTED:
 PROTECTED['b']|={'/etc/systemd/system/capstone-management.service.d/10-timeout.conf'}
 PROTECTED['a']|={'/etc/capstone-diagnostics/monitor.json','/etc/capstone-diagnostics/observer_known_hosts'}
 OPTIONAL_PROTECTED='/var/lib/capstone-diagnostics/installation/prepared.json'
+ACTIVE_PROTECTED='/var/lib/capstone-diagnostics/installation/active.json'
+
+
+def optional_protected(host,path):
+    return path==OPTIONAL_PROTECTED or host=='b'and path==ACTIVE_PROTECTED
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -56,7 +61,9 @@ class Plan:
         hosts=value['hosts'];need(isinstance(hosts,dict)and set(hosts)==set(c.TARGETS),'plan_hosts')
         self.cohort=cohort.Cohort(value['cohort']);need(self.cohort.release_id==value['release_id'],'plan_cohort_release')
         for host,item in hosts.items():
-            need(isinstance(item,dict)and set(item)=={'rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected'},'plan_host_shape')
+            need(isinstance(item,dict)and set(item)=={'rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected','previous_current_sha256'},'plan_host_shape')
+            previous=item['previous_current_sha256']
+            need(previous is None or isinstance(previous,str)and c.HEX.fullmatch(previous),'plan_previous_current_digest')
             need(isinstance(item['machine_sha256'],str)and c.HEX.fullmatch(item['machine_sha256'])
                  and all(type(item[k])is int and 1<=item[k]<65534 for k in ('diagnostic_gid','reader_uid')),'plan_machine_account')
             if host=='b':
@@ -77,11 +84,13 @@ class Plan:
                      and type(row['mode'])is int and row['mode']==(0o550 if row['target']==source.READER else 0o750),'plan_barrier_metadata')
             protected=item['protected'];need(isinstance(protected,dict)and set(protected)==PROTECTED[host],'plan_protected_set')
             for path,row in protected.items():
-                if row is None:need(path==OPTIONAL_PROTECTED,'plan_required_protected_file');continue
+                if row is None:need(optional_protected(host,path),'plan_required_protected_file');continue
                 need(isinstance(row,dict)and set(row)=={'sha256','uid','gid','mode'}
                      and isinstance(row['sha256'],str)and c.HEX.fullmatch(row['sha256'])
                      and all(type(row[k])is int and 0<=row[k]<65534 for k in ('uid','gid'))
                      and type(row['mode'])is int and row['mode']in (0o550,0o600,0o640,0o644,0o750),'plan_protected_metadata')
+            need(protected[ACTIVE_PROTECTED]is not None or host=='b'and protected[OPTIONAL_PROTECTED]is not None,
+                 'installation_provenance_missing')
         self.value=value;self.sha256=digest(value)
 
     def bundle(self):

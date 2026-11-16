@@ -17,7 +17,7 @@ controls=load('release_helper_documents','release_controls.py')
 services=load('release_helper_services','release_services.py')
 need=c.need
 Refused=c.Refused
-OPERATIONS=frozenset({'arm','quiesce','backup','apply','verify','confirm','resume','rollback','revert_fence','revert'})
+OPERATIONS=frozenset({'arm','quiesce','backup','apply','verify','confirm','resume','rollback','revert_fence','revert','cleanup'})
 PROPERTIES=(*services.PROPERTIES,'NextElapseUSecMonotonic','LastTriggerUSecMonotonic')
 
 
@@ -63,16 +63,32 @@ class Manager:
         return result.stdout
 
     def probe(self,name):
+        value=self.inspect(name)
+        fragment=controls.RUNNER if name not in self.static else name
+        need(value.get('LoadState')=='loaded'
+             and value.get('FragmentPath')==str(controls.UNIT_DIR/fragment),'helper_unit_identity')
+        need(value.get('DropInPaths')==''and value.get('NeedDaemonReload')=='no','helper_unit_overridden')
+        return value
+
+    def inspect(self,name):
         need(isinstance(name,str)and name in self.units,'helper_unit')
         raw=self.run(['/usr/bin/systemctl','show',name,'--no-pager','--property='+','.join(PROPERTIES)]).decode()
         value={}
         for line in raw.splitlines():
             key,sep,item=line.partition('=');need(sep and key in PROPERTIES and key not in value,'helper_property_shape');value[key]=item
-        fragment=controls.RUNNER if name not in self.static else name
-        need(value.get('Id')==name and value.get('LoadState')=='loaded'
-             and value.get('FragmentPath')==str(controls.UNIT_DIR/fragment),'helper_unit_identity')
-        need(value.get('DropInPaths')==''and value.get('NeedDaemonReload')=='no','helper_unit_overridden')
+        need(value.get('Id')==name,'helper_unit_identity')
         return value
+
+    def stopped(self,*,finishing=False):
+        need(type(finishing)is bool,'helper_cleanup_scope')
+        result={name:self.inspect(name)for name in sorted(self.units)}
+        for name,value in result.items():
+            fragment=str(controls.UNIT_DIR/(controls.RUNNER if name not in self.static else name))
+            need(value.get('LoadState')in ('loaded','not-found')and value.get('FragmentPath')in ('',fragment)
+                 and value.get('DropInPaths')=='','helper_cleanup_unit_changed')
+            own=finishing and name==self.instance('cleanup')and value.get('MainPID')==str(os.getpid())
+            need(own or value.get('ActiveState')in ('inactive','failed')and value.get('MainPID','0')=='0','helper_not_stopped')
+        return result
 
     def documents_match(self):
         """Check files as well as manager state; a saved document is not a load."""
@@ -110,11 +126,14 @@ class Manager:
         state=self.probe(self.instance(operation))
         return state.get('ActiveState')in ('active','activating','deactivating')or int(state.get('MainPID','0'))>0
 
-    def disarm(self):
+    def disarm(self,*,finishing=False):
         """Only after global reconciliation; a local success is insufficient."""
-        self.documents_match()
+        need(type(finishing)is bool,'helper_cleanup_scope');self.documents_match()
         for operation in OPERATIONS:
-            need(not self.operation_running(operation),'helper_action_still_running')
+            running=self.operation_running(operation)
+            own=(finishing is True and operation=='cleanup'and running
+                 and self.probe(self.instance(operation)).get('MainPID')==str(os.getpid()))
+            need(not running or own,'helper_action_still_running')
         self.run(['/usr/bin/systemctl','disable','--now',controls.TIMER])
         self.run(['/usr/bin/systemctl','stop',controls.WATCH])
         self.run(['/usr/bin/systemctl','disable','--now',controls.STATUS])

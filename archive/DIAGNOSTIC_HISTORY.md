@@ -1,5 +1,13 @@
 # 진단 탐색 이력
 
+## 2026-11-17 전역 관리정책 공통 계약
+
+관리 IP·대역을 전체 장비에 반영하라는 요구에 맞춰 순수 registry·14적용면·전체 후보/읽기 검증 계약을 작성했다. Mac34검사/생략0이며 단1누락·혼합 버전·승인 계획/후보 소스/경로 변경·미로드는 전체 완료를 막는다. 실제 장비 어댑터·MCP/카드/적용/원복·초기 설치 연결은 아직 없다. 새 IP/운영 변경은0이며 합성 기록을 실제 관측으로 표시하지 않는다. [범위와 원장](../infra/mcp/management-policy.md).
+
+## 2026-11-17 합성 root 진입점·실제 관리정책 대조
+
+고정 root 진입점은 합성 namespace5조건을 통과했다. 이미지 volume/작업 경로·빈 디렉터리 누락으로 생긴 초기 실패와 정리 한계를 보존했다. 실제 FW mgmt_src·Suricata SID2001219 예외·Wazuh loopback white_list는 분리돼 있다. 설정 선언이 런타임 전체 예외를 증명하지 않는다. 읽기만 했고 새 IP/운영 변경은0이다. [검증 범위](../infra/validation/journal-composition/COORDINATOR.md).
+
 ## 2026-11-17 복구 반례와 실제 실행 경로
 
 준비 원복 완료 응답 유실 뒤 정상 서비스 정지 가능 경로를 고쳤다. 실제 B Docker는/usr/local/bin/docker로 확인해 명령 정정. 재현기의 Mac 그룹 상속·flat 경로·Path.chown 실패를 보존하고 os.chown/전용 임시 폴더로 수정. 최종 Mac220·Linux220/생략0, 운영 변경0이다. [검증 범위](../infra/validation/journal-composition/COORDINATOR.md).

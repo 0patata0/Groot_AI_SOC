@@ -1,0 +1,292 @@
+{
+  "schema": "groot-typed-service-validation-v1",
+  "status": "partially_improved_not_applied",
+  "recorded_at_kst": "2026-11-16T12:52:21.890541+09:00",
+  "versions": {
+    "candidate_query": "1.19.147",
+    "candidate_common": "1.5.91",
+    "candidate_mcp_unchanged_from_parent": "1.4.4",
+    "canonical_and_installed_query": "1.19.137"
+  },
+  "source_tree_files": 643,
+  "changed_sources": [
+    "infra/hermes/chat_contract.py",
+    "infra/hermes/query-completion/__init__.py",
+    "infra/hermes/query-completion/alignment.py",
+    "infra/hermes/skills/soc-investigate/SKILL.md",
+    "infra/hermes/skills/soc-query/SKILL.md",
+    "infra/hermes/soc_management_run.py",
+    "infra/ollama-trial/harness.py",
+    "infra/ollama-trial/runtime.py"
+  ],
+  "live_revalidation": {
+    "at_kst": "2026-11-16T12:49:07.643143+09:00",
+    "route": "Mac-admin231-A-B",
+    "installed_sources_verified": 32,
+    "changed_sources": [],
+    "actual_tool_schemas": 45,
+    "actual_tool_schema_hashes_match_previous": true,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "reader_pid": 927,
+    "reader_start_ticks": 7043,
+    "native_module_present": false,
+    "data_calls": 0,
+    "model_calls": 0
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_alignment.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/sdk_runtime.py",
+        "skills/soc-investigate/SKILL.md",
+        "skills/soc-query/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "scope": "official structure only, not model accuracy"
+  },
+  "regressions": {
+    "mac": {
+      "groups": 19,
+      "run": 1120,
+      "passed": 1114,
+      "skipped": 6
+    },
+    "existing_hermes_image": {
+      "groups": 19,
+      "run": 1203,
+      "passed": 1203,
+      "skipped": 0,
+      "uid": 10001,
+      "network_connect_denied": true,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283"
+    },
+    "new_typed_tests": 36,
+    "new_typed_skipped": 0,
+    "public_reconstruction_verified": true,
+    "public_test_run": 36,
+    "scope": "regressions, not independent SOC cases or accuracy scores"
+  },
+  "observed_inventory": {
+    "at_kst": "2026-11-16T05:18:24+09:00",
+    "host": "b",
+    "loaded_units": 187,
+    "loaded_unit_pages": [
+      100,
+      87
+    ],
+    "docker_containers": 7,
+    "vector_item_observed": false,
+    "limits": "not all installed files or processes; no automatic mapping to another host/container"
+  },
+  "actual_sdk_trial": {
+    "started_at_kst": "2026-11-16T05:52:42.999879+09:00",
+    "finished_at_kst": "2026-11-16T05:54:12.531893+09:00",
+    "worker_terminal_status": "completed",
+    "source_manifest_sha256": "79afbcbbb9e8379391f9720a1daa6511f0072a13087127354105be583a8a9dc8",
+    "cases": [
+      {
+        "case_id": "logical-current",
+        "status": "partial",
+        "worker_seconds": 20.303,
+        "mcp_reads": 4,
+        "recorded_model_completions": 3,
+        "identity_views": [
+          {
+            "host": "b",
+            "view": "services",
+            "observed_at_kst": "2026-11-16T05:52:46+09:00",
+            "total": 187,
+            "returned_rows": 187,
+            "scope": "loaded_units",
+            "component_identity_verified": false
+          },
+          {
+            "host": "b",
+            "view": "containers",
+            "observed_at_kst": "2026-11-16T05:52:46+09:00",
+            "total": 7,
+            "returned_rows": 7,
+            "scope": "docker_containers",
+            "component_identity_verified": false
+          }
+        ],
+        "actual_journal_rows": 0,
+        "http_500_in_journal": false,
+        "remaining_guard_issues": [],
+        "pruned": []
+      },
+      {
+        "case_id": "logical-history",
+        "status": "partial",
+        "worker_seconds": 28.916,
+        "mcp_reads": 6,
+        "recorded_model_completions": 4,
+        "identity_views": [
+          {
+            "host": "b",
+            "view": "services",
+            "observed_at_kst": "2026-11-16T05:52:46+09:00",
+            "total": 187,
+            "returned_rows": 187,
+            "scope": "loaded_units",
+            "component_identity_verified": false
+          },
+          {
+            "host": "b",
+            "view": "containers",
+            "observed_at_kst": "2026-11-16T05:52:46+09:00",
+            "total": 7,
+            "returned_rows": 7,
+            "scope": "docker_containers",
+            "component_identity_verified": false
+          }
+        ],
+        "actual_journal_rows": 0,
+        "http_500_in_journal": false,
+        "remaining_guard_issues": [],
+        "pruned": []
+      },
+      {
+        "case_id": "explicit-unit",
+        "status": "completed",
+        "worker_seconds": 13.875,
+        "mcp_reads": 1,
+        "recorded_model_completions": 1,
+        "identity_views": [],
+        "actual_journal_rows": 0,
+        "http_500_in_journal": false,
+        "remaining_guard_issues": [],
+        "pruned": []
+      },
+      {
+        "case_id": "loaded-unit",
+        "status": "partial",
+        "worker_seconds": 26.407,
+        "mcp_reads": 2,
+        "recorded_model_completions": 2,
+        "identity_views": [],
+        "actual_journal_rows": 12,
+        "http_500_in_journal": true,
+        "remaining_guard_issues": [],
+        "pruned": []
+      }
+    ],
+    "data_reads": 13,
+    "recorded_model_completions": 10,
+    "wire_smoke_reads": 2,
+    "initial_live_mcp_reads": 7,
+    "scope": "four fresh development SDK requests with actual registered reads, same model/permissions; not native Hermes/Mattermost delivery, controlled latency comparison or independent SOC accuracy"
+  },
+  "content_review": {
+    "previous_bad_execution_claims_now_detected": [
+      "diagnostic_execution_success_unverified",
+      "diagnostic_unloaded_unit_not_process_state"
+    ],
+    "previous_Started_record_not_rejected": true,
+    "remaining_findings": [
+      {
+        "case": "logical-current",
+        "finding": "Summary says 미확인0 while logical component identity remains unknown. Body and partial status disclose the limit, but the summary is misleading.",
+        "priority": "needs_fix_before_promotion"
+      },
+      {
+        "case": "logical-history",
+        "finding": "LoadState not-found expanded to physical unit file absence and restart advice in limitations. Same-host inventories contain no Vector item, but do not prove every file/process absent.",
+        "priority": "needs_fix_before_promotion"
+      },
+      {
+        "case": "loaded-unit",
+        "finding": "Returned journal explicitly records HTTP status=500, so that statement is supported. Context canceled was expanded to a broken network/pull connection without evidence, and resolve was translated as 해상도. These causal/translation details need correction.",
+        "priority": "needs_fix_before_promotion"
+      }
+    ],
+    "http_500_supported_by_actual_journal_entries": 4,
+    "review_correction": "Initial private truncated-excerpt review wrongly treated HTTP500 as absent. Full raw messages explicitly contain status=500; the original review is preserved locally."
+  },
+  "cleanup": {
+    "remote": {
+      "at_kst": "2026-11-16T06:01:12.533045+09:00",
+      "removed": [
+        {
+          "root": "/opt/hermes-data/.capstone-typed-service-16g4pb0k-tests",
+          "regular_files": 777,
+          "sockets": 0,
+          "bytes": 10303162
+        },
+        {
+          "root": "/var/lib/capstone-typed-service-16g4pb0k",
+          "regular_files": 90,
+          "sockets": 2,
+          "bytes": 2293875
+        }
+      ],
+      "operating_sources_unchanged": 32,
+      "operating_changes": 0
+    },
+    "mac": {
+      "at_kst": "2026-11-16T12:47:01.977892+09:00",
+      "removed_root": "/private/tmp/capstone-typed-service-16g4pb0k",
+      "regular_files": 16245,
+      "bytes": 247114429,
+      "active_processes": 0,
+      "source_edits_preserved": 8,
+      "source_tree_reconstruction_verified": true,
+      "absent_after": true,
+      "other_roots_removed": []
+    },
+    "mac_transport_scripts_removed": 9,
+    "own_roots_absent_at_latest_live_observation": {
+      "/opt/hermes-data/.capstone-typed-service-16g4pb0k-tests": true,
+      "/var/lib/capstone-typed-service-16g4pb0k": true
+    },
+    "g_harness2_preserved": true,
+    "new_mac_packages": 0,
+    "final_identity_transport_removed_after_live_check": true,
+    "mac_transport_scripts_removed_total": 10
+  },
+  "authority": {
+    "changed": false,
+    "protected_dispatches": 0,
+    "chat_posts": 0,
+    "operating_apply": false,
+    "new_attacks": 0,
+    "new_training": 0,
+    "existing_exact_approval_plans_reused": false
+  },
+  "limits": [
+    "Known semantic/reporting issues remain, so no operating promotion.",
+    "Explicit unit and typed catalog reads do not prove functional health.",
+    "Actual SDK worker completed is not quality passed.",
+    "Native wiring was tested in regression, not new real Hermes inference/chat.",
+    "Source32 and tool schemas45 at12:49 do not re-run the four05:52-05:54 requests.",
+    "Initial own test manifest self-reference was fixed before tests; later complete regressions use the final frozen source."
+  ]
+}

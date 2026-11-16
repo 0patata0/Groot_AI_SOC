@@ -1,0 +1,93 @@
+{
+  "status": "partially_improved_not_applied",
+  "base_commit": "fdcc58aacdb9c0c2d97e1a8aeda2ed218007e5c4",
+  "parent_artifacts": {
+    "infra/validation/diagnostic-read-boundaries/candidate.patch": "e3be80b84036c8ad45ff173ad89a538bafec874abda307d9fb32bf30d829e22c",
+    "infra/validation/diagnostic-read-boundaries/manifest.json": "9da1cc3ffece8e44368b615321c8e500be22d426a4f466d8ad30de54fd65d0aa",
+    "infra/validation/diagnostic-read-boundaries/reproduce.py": "10f0ff2cf10ce9d4f5c0a7f7b27b08634d30a1146dca5ce9f7407555c09ae377",
+    "infra/validation/diagnostic-read-boundaries/test_clock.py": "c0f23fd157daa28b2ec1c07a7e665422d26adf51601367cc898854213cc4db2a",
+    "infra/validation/diagnostic-read-boundaries/test_scope.py": "e96cbdb9f080284feb9108f2893980c5df656f4cf6458192933dcb71b0eb2673"
+  },
+  "parent_note": "Unapplied diagnostic boundaries composite, not canonical/installed/operating source",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "component_mapping": {
+    "systemprompt.md": "infra/hermes/SOUL.groot.md",
+    "scripts/chat_contract.py": "infra/hermes/chat_contract.py",
+    "scripts/read_contract.py": "infra/hermes/read_contract.py",
+    "scripts/output_contract.py": "infra/hermes/output_contract.py",
+    "scripts/workflow_contract.py": "infra/hermes/workflow_contract.py",
+    "scripts/channel_policy.py": "infra/hermes/review_channel_policy.py",
+    "scripts/native_query.py": "infra/hermes/query-completion/__init__.py",
+    "scripts/evidence_gate.py": "infra/hermes/soc_management_run.py",
+    "scripts/management_controller.py": "infra/hermes/soc_management_controller.py",
+    "scripts/channel_controller.py": "infra/hermes/review_channel.py",
+    "scripts/sdk_chat.py": "infra/ollama-trial/chat.py",
+    "scripts/sdk_chat_policy.py": "infra/ollama-trial/chat_policy.py",
+    "scripts/sdk_authority.py": "infra/ollama-trial/policy.py",
+    "skills/soc-investigate/SKILL.md": "infra/hermes/skills/soc-investigate/SKILL.md",
+    "skills/soc-change/SKILL.md": "infra/hermes/skills/soc-change/SKILL.md",
+    "skills/soc-recover/SKILL.md": "infra/hermes/skills/soc-recover/SKILL.md",
+    "scripts/sdk_harness.py": "infra/ollama-trial/harness.py",
+    "scripts/chat_markdown.py": "infra/hermes/chat_markdown.py",
+    "scripts/soc_bot.py": "infra/mcp/soc_bot.py",
+    "skills/soc-output/SKILL.md": "infra/hermes/skills/soc-output/SKILL.md",
+    "skills/soc-query/SKILL.md": "infra/hermes/skills/soc-query/SKILL.md",
+    "scripts/sdk_runtime.py": "infra/ollama-trial/runtime.py",
+    "scripts/native_alignment.py": "infra/hermes/query-completion/alignment.py",
+    "scripts/channel_worker.py": "infra/hermes/review_channel_worker.py",
+    "scripts/mcp/system_diagnostics.py": "infra/mcp/system_diagnostics.py",
+    "scripts/mcp/diagnostic_history.py": "infra/mcp/diagnostic_history.py",
+    "scripts/mcp/diagnostic_journal.py": "infra/mcp/diagnostic_journal.py",
+    "scripts/mcp/diagnostic_journal_native.py": "infra/mcp/diagnostic_journal_native.py",
+    "scripts/mcp/system-diagnostics-mcp.py": "infra/mcp/system-diagnostics-mcp.py",
+    "scripts/mcp/read-system-diagnostics.py": "infra/mcp/read-system-diagnostics.py",
+    "scripts/install/soc_diagnostics.py": "deployment/soc_diagnostics.py",
+    "scripts/install/soc_monitoring.py": "deployment/soc_monitoring.py",
+    "scripts/extra_test_diagnostic_history.py": "infra/mcp/test_diagnostic_history.py",
+    "scripts/extra_test_diagnostic_journal.py": "infra/mcp/test_diagnostic_journal.py"
+  },
+  "audit_index": "Audit index only: workflow_contract selects soc-query, soc-investigate, soc-change, soc-recover. output_contract loads soc-output. Fixed journal MCP/reader and installer are inspected, not delegated. No authority or production prompt is replaced.\n",
+  "sources": {
+    "infra/hermes/chat_contract.py": {
+      "before_sha256": "7c48195777ecc7177a83c81cb2a760ed438e2b3307c40ed71242b8648d556001",
+      "candidate_sha256": "95913a18dff8cb8ea3049720dda2af48676aab5505056698cc28b05f1ff654cf"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "before_sha256": "4a39280473d3bd2e4e023046fb38e6af9d26ed14ecb93a9e4daac42d3ba6f821",
+      "candidate_sha256": "8bfcfe380405eb11c529567a534c93da1a363c3731673c43e02533996817404f"
+    },
+    "infra/hermes/query-completion/alignment.py": {
+      "before_sha256": "0bf4a7c68b67a019067c14fd0e5ba7122222051c8d79bf646d26b671f80b9567",
+      "candidate_sha256": "b051164d3209d199a37404f5181c65fa9a051df93a6f19449003440acd4b49f2"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "before_sha256": "903dce78c32e7a6dd9127ee269dcc281ba7cafa6722ac0693630bb8d5138e689",
+      "candidate_sha256": "c826ea35c8d2f7f528f7ede19ee016ee4ad2c6e38971d68a800041750f1bf859"
+    },
+    "infra/hermes/skills/soc-query/SKILL.md": {
+      "before_sha256": "adaeccb1d4a897786d55570359616e91029c870d2afe746e97ea084ec5c9497b",
+      "candidate_sha256": "6e1342068b2661514c14bd9812788769eb78fe5ac6d39b353beea53583520d01"
+    },
+    "infra/hermes/soc_management_run.py": {
+      "before_sha256": "5156269d3e1846ec678fbd72e720f95574d4dce8af7f57f4ae5fc173e6536a57",
+      "candidate_sha256": "af460bf461956efbd5753ffe841f2c47045833724fdd92c3900494ffc5fe763f"
+    },
+    "infra/ollama-trial/harness.py": {
+      "before_sha256": "98d8b19bbbcc443376e8572c88f68834cb8481cda7a7c42668b6cf32334870dc",
+      "candidate_sha256": "66edb2e9ccc5ba3c758c3271e65e0df4151d90c1b200d67b242da0329f26e3e1"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "before_sha256": "63b5f4aa8864fc541753a4fdf957739c1953488dc3be82933d9cfd199ec9fc33",
+      "candidate_sha256": "a98311d9e7c01f637c6aad8db0f71272f8992bb5bf71c678f536a64cc826fabf"
+    }
+  },
+  "tree_file_count": 643,
+  "base_tree_sha256": "c4ff59e19bd6f5284deecdbc74358c21cd0835cc7c26be5e414d181c5a6b3052",
+  "candidate_tree_sha256": "4b561b691282c98d43a5bd43d408979c8330dfca725176be21defbc8c432cd16",
+  "patch_sha256": "d1b484c4d96e7146999db3bf1c74066fd077348b8fb17662921421feae3c7470",
+  "test_sha256": {
+    "test_typed_service.py": "092bdbfbc58bc43a6a7d21470c6c7cc40175795602768a38b427e69bc883038b"
+  },
+  "authority_changes": 0,
+  "operating_apply": false
+}

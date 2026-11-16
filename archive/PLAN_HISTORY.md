@@ -6397,3 +6397,7 @@ A/B/C 자체 제한 서비스의21논리시험은15성공/6실패다. 최근erro
 ## 타입과 실행 근거를 우선하는 후속 (2026-11-16)
 
 실제3응답 이후 unit 기본값을 실제 실행으로 읽는 공통 경계와 typed inventory 연결을 다음 우선순위로 정했다. 알려진 오류를 해소한 뒤 정확 새 승인/운영 로드·새 채팅을 검증한다. 이전 PLAN 전체는 Git `04f2baf9d91576f2fcc69a6023996e8adb04af8d:PLAN.md`, SHA256 `b15254a83a66d655ee7c39a21793f4f99aef4aa19847d42753920bfe0382b9b6`로 복구한다. [현재 근거](../infra/validation/diagnostic-read-boundaries/README.md).
+
+## 2026-11-16 서비스 타입·실행 근거 공통 후보
+
+이전 계획은 Git `fdcc58aacdb9c0c2d97e1a8aeda2ed218007e5c4:PLAN.md`에 보존했다. 다음 우선은 사실 조회/요약·원문/원인 구분과 Docker 실제500의 현재 영향 대조다. 정확 통합 승인/운영 로드·새 채팅은 미완료이며 기존19/journal9 승인을 재사용하지 않는다.

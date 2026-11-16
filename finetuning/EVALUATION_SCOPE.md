@@ -1,5 +1,9 @@
 # 평가 자료의 사용 이력·업무 범위 정정
 
+<!-- typed-service:start -->
+[실제 SDK 개발4관측](../infra/validation/typed-service/README.md)에서 query147/common91의 미적용8소스 후보를 확인합니다. 실제 같은 호스트 inventory/페이지·명시 unit·기본 Result의 실행 해석을 보완했고 SDK4요청/13읽기·모델완료10·13.875~28.916초를 관측했습니다. Mac1120(기존6생략)/Hermes1203·신규36생략0·공식Harness²를 구분하며 의미·요약 문제가 남아 운영 승격하지 않습니다. 정본/설치 query137·권한/모델·기존 정확 승인안은 보존합니다. 네 관측은 개발 소비이며 정답/SFT·새 독립 평가가 아닙니다.
+<!-- typed-service:end -->
+
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../infra/validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
 <!-- diagnostic-read-boundaries:end -->

@@ -1,0 +1,546 @@
+--- a/infra/hermes/chat_contract.py
++++ b/infra/hermes/chat_contract.py
+@@ -8,7 +8,7 @@
+ from pathlib import Path
+ import re
+ 
+-VERSION = 'soc-chat-contract:1.5.90'
++VERSION = 'soc-chat-contract:1.5.91'
+ MODEL_STEPS = 12
+ TOOL_CALLS = 32
+ READ_TIMEOUT = 90
+@@ -891,6 +891,98 @@
+             and r['arguments']['target']+':current:stale' in stale]
+ 
+ 
++def service_identity_state(request, question, receipts, now=None):
++    """Require typed discovery after a logical service's unit is not found.
++
++    This offers existing read calls; it neither dispatches nor maps a missing
++    unit to a container. Explicit .service requests retain their unit scope.
++    In-process receipts, not chat text, are the input to this navigation state.
++    """
++    state={'pending':[], 'incomplete':[], 'missing_units':[], 'observations':[]}
++    if (not isinstance(receipts,(list,tuple)) or len(receipts)>128 or any(not isinstance(r,dict) for r in receipts)
++            or not isinstance(question,str) or read_contract().wants_write(question)
++            or re.search(r'\.service\b|```|설명만|번역|예시|가정|조회\s*(?:하지|말)|도구\s*없이',question)):
++        return state
++    selected=service_target_selection(request,question)
++    if not selected or selected['ambiguous']:return state
++    now=now or datetime.now(timezone(timedelta(hours=9)))
++    diagnostic='mcp__system_diagnostics__get_system_diagnostics'
++    for target in sorted(selected['targets']):
++        unit=selected['mapping'].get(target)
++        if unit is None:continue
++        rows=[r for r in receipts if r.get('tool')==diagnostic and isinstance(r.get('arguments'),dict)
++            and r['arguments'].get('target')==target and not set(r['arguments'])-{'target','limit','lookback_minutes'}]
++        if not rows:continue
++        row=rows[-1];data=row.get('data');stamp=_diagnostic_instant(data.get('observed_at_kst')) if isinstance(data,dict) else None
++        if (row.get('is_error') is not False or not isinstance(data,dict)
++                or type(data.get('schema')) is not int or data['schema']!=1
++                or data.get('target')!=target or data.get('host')!=target[0]
++                or data.get('unit')!=unit or data.get('status')!='observed'
++                or data.get('mutation_performed') is not False or data.get('publisher_stale') is True
++                or not stamp or not -5<=(now-stamp).total_seconds()<=180
++                or not isinstance(data.get('properties'),dict) or data['properties'].get('LoadState')!='not-found'):continue
++        state['missing_units'].append({'target':target,'unit':unit,'host':target[0],
++            'observed_at_kst':data['observed_at_kst']})
++    if not state['missing_units']:return state
++    name='mcp__system_diagnostics__get_host_inventory'
++    tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
++    schema=tools[0].get('parameters') if len(tools)==1 else None
++    if not isinstance(schema,dict):
++        state['incomplete'].append('service_identity:inventory_capability_unavailable');return state
++    from jsonschema import Draft202012Validator
++    try:Draft202012Validator.check_schema(schema)
++    except Exception:
++        state['incomplete'].append('service_identity:inventory_schema_unavailable');return state
++    validator=Draft202012Validator(schema)
++    maximum=schema.get('properties',{}).get('limit',{}).get('maximum')
++    if type(maximum) is not int or not 1<=maximum<=100:
++        state['incomplete'].append('service_identity:inventory_page_bound_unavailable');return state
++    for host in sorted({r['host'] for r in state['missing_units']}):
++        for view in ('services','containers'):
++            offset=0;first=None;count=0
++            for _ in range(128):
++                args={'host':host,'view':view,'state':'all','limit':maximum,'offset':offset}
++                label='service_identity:'+host+':'+view
++                if not validator.is_valid(args):state['incomplete'].append(label+':unregistered');break
++                matches=[r for r in receipts if r.get('tool')==name and r.get('arguments')==args]
++                if not matches:
++                    state['pending'].append({'tool':name,'arguments':args});state['incomplete'].append(label+':not_read');break
++                row=matches[-1];data=row.get('data',{})
++                hosts=data.get('hosts') if isinstance(data,dict) else None
++                if (row.get('is_error') is not False or not isinstance(data,dict)
++                        or data.get('kind')!='host_inventory' or data.get('request')!=args
++                        or data.get('mutation_performed') is not False
++                        or not isinstance(hosts,list) or len(hosts)!=1 or not isinstance(hosts[0],dict)):
++                    state['incomplete'].append(label+':unavailable');break
++                item=hosts[0];at=_diagnostic_instant(item.get('observed_at_kst'));rows=item.get('rows')
++                age=item.get('age_seconds');total=item.get('total');more=item.get('has_more');nxt=item.get('next_offset')
++                fields=({'unit','load','active','sub'} if view=='services' else {'id','name','image','state','status'})
++                if (item.get('host')!=host or item.get('view')!=view or item.get('state')!='all'
++                        or item.get('status')!='observed' or item.get('offset')!=offset or item.get('limit')!=maximum
++                        or not at or not -5<=(now-at).total_seconds()<=180
++                        or type(age) is not int or not 0<=age<=180
++                        or type(total) is not int or total<0 or type(more) is not bool
++                        or not isinstance(rows,list) or len(rows)>maximum
++                        or any(not isinstance(r,dict) or set(r)!=fields
++                            or any(not isinstance(v,str) or len(v)>4096 for v in r.values()) for r in rows)
++                        or offset+len(rows)>total
++                        or more and (type(nxt) is not int or nxt!=offset+len(rows) or not offset<nxt<=4096 or nxt>=total)
++                        or not more and (nxt is not None or offset+len(rows)!=total)):
++                    state['incomplete'].append(label+':scope_or_page_unverified');break
++                signature=(item['observed_at_kst'],total)
++                if first is not None and signature!=first:
++                    state['incomplete'].append(label+':pagination_snapshot_changed');break
++                first=signature;count+=len(rows)
++                if not more:
++                    state['observations'].append({'host':host,'view':view,'observed_at_kst':item['observed_at_kst'],
++                        'total':total,'returned_rows':count,'scope':'loaded_units' if view=='services' else 'docker_containers',
++                        'component_identity_verified':False})
++                    break
++                offset=nxt
++            else:state['incomplete'].append(label+':page_budget_exhausted')
++    return state
++
++
+ def service_journal_continuations(request, receipts):
+     """Offer earlier bounded reads from actual truncated excerpts, never run them.
+ 
+@@ -1025,6 +1117,8 @@
+     plan=service_history_plan(request,question,requested_at)
+     if (not plan or not plan['compact_scope'] or not receipts or len(receipts)>32
+             or service_history_state(plan,receipts,now)['incomplete']):return None
++    identity=service_identity_state(request,question,receipts,now)
++    if identity['pending']:return None
+     name='mcp__system_diagnostics__get_system_diagnostics'
+     for row in receipts:
+         if row.get('is_error') is True:
+@@ -1055,6 +1149,7 @@
+                'current_companions':list(plan['current_companions']),
+                'window_policy':'Question-bound history windows; snapshot requested_since/until describe that snapshot, not the requested incident period.'},
+            'untrusted_completed_reads':copy.deepcopy(receipts)}
++    if identity['missing_units']:value['service_identity_discovery']=identity
+     if failed:value['untrusted_failed_read_attempts']=copy.deepcopy(failed)
+     continuations=service_journal_continuations(request,receipts)
+     if continuations:value['journal_continuation_options']=continuations
+@@ -1071,7 +1166,7 @@
+                 'message':message,'message_state':entry['message_state'],
+                 'record_sha256':entry['record_sha256'],'receipt_sha256':row.get('receipt_sha256')})
+     if structured:value['untrusted_journal_structured_messages']=structured
+-    if not failed and service_lookup_scope(plan,question):
++    if not failed and not identity['missing_units'] and service_lookup_scope(plan,question):
+         # Extra/changed reads are not silently discarded to fit a lookup.
+         exact=lambda r:(r['tool'],json.dumps(r['arguments'],sort_keys=True,allow_nan=False))
+         required={exact(r) for r in plan['requirements']}
+@@ -1770,6 +1865,15 @@
+         return out
+     unit=data.get('unit')
+     if isinstance(unit,str) and re.fullmatch(r'[A-Za-z0-9@_.-]{1,150}\.service',unit):out['unit']=unit
++    properties=data.get('properties')
++    if isinstance(properties,dict) and 'unit' in out:
++        stamps={k:properties[k] for k in ('ExecMainStartTimestampMonotonic','ExecMainExitTimestampMonotonic')
++            if type(properties.get(k)) is int and 0<=properties[k]<2**64}
++        load=properties.get('LoadState')
++        out['unit_execution']={'load_state':load if isinstance(load,str) and re.fullmatch('[a-z][a-z-]{0,39}',load) else None,
++            'main_start_observed':stamps.get('ExecMainStartTimestampMonotonic',0)>0,
++            'main_exit_observed':stamps.get('ExecMainExitTimestampMonotonic',0)>0}
++        if stamps:out['unit_execution']['monotonic_timestamps_us']=stamps
+     exits=[];codes=[];instants=[]
+     rows=data.get('recent_errors',[])
+     for item in rows[:50] if isinstance(rows,list) else ():
+@@ -2075,6 +2179,57 @@
+     return sorted(issues)
+ 
+ 
++def diagnostic_execution_claim_violations(text, facts):
++    """A default Result does not establish execution or another object's state."""
++    issues=set()
++    success=(r'(?:정상(?:적으로)?\s*|성공(?:적으로)?\s*)(?:시작|실행|종료|끝(?:났|남))|'
++        r'(?:실행|시작|종료)(?:이|가|은|는|을|를)?\s*(?:성공|완료)|'
++        r'\b(?:ran|started|exited|terminated)\s+successfully\b')
++    process=(r'(?:프로세스|서비스)(?:가|는|도|의)?\s*(?:현재\s*|지금\s*)?'
++        r'(?:실행(?:\s*중이)?지?\s*않|실행되지\s*않|돌고\s*있지\s*않|중지|정지|비활성화|미실행)|'
++        r'(?:실행\s*중이\s*아|기동되지\s*않|가동되지\s*않)|(?:실행|기동|가동)\s*불가|'
++        r'(?:실행|기동|가동)\s*(?:중|되지)|\bprocess\s+(?:is\s+)?(?:not\s+running|stopped|running)\b')
++    def asserted(after):
++        after=re.sub(r'^\s*(?:하였|되었|했|됐|하|되)(?=다고|다는|다면|는지|을)', '',after)
++        if re.match(r'\s*(?:는지|는지는|었는지|었는지는)\s*(?:미확인|확인|알|판단|단정)',after):return False
++        if re.match(r'\s*을\s*(?:가능성|수)',after):return False
++        proof=re.match(r'\s*(?:의|이라는)?\s*(?:증거|근거)(?:가|는|은|로)?\s*(?:아닙니다|아님|아니며)',after)
++        if proof:
++            return bool(re.match(r'\s*(?:는\s*)?(?:것은|건|것이|뜻은)\s*(?:아니|아닙|아님)',after[proof.end():]))
++        negative=re.match(r'\s*(?:(?:하지|되지)\s*않(?:았)?(?:다는|습니다|음|는|다)?|아니(?:다|며|고)|아닙니다|아님)',after)
++        if negative:
++            return bool(re.match(r'\s*(?:다는\s*)?(?:뜻|것|의미)(?:은|이|는)?\s*(?:아니|아닙|아님)',after[negative.end():]))
++        return claim_modality(after) not in ('not_asserted','conditional_or_unverified','planned_check')
++    for line in text.splitlines():
++        for clause in re.split(r';|(?<=[.!?])\s+',re.sub(r'[*`]', '',line)):
++            rows=[r for r in diagnostic_subjects(clause,facts) if isinstance(r.get('unit'),str)]
++            if not rows:continue
++            for match in re.finditer(success,clause,re.I):
++                if not asserted(clause[match.end():]):continue
++                historical=bool(re.search(r'과거|당시|어제|이력|반환\s*(?:기록|표본)|\bhistorical\b',clause[:match.start()],re.I))
++                supported={}
++                relevant=([r for r in rows if r.get('diagnostic_mode')=='journal_history'] if historical else
++                          [r for r in rows if r.get('diagnostic_mode')!='journal_history'])
++                for row in relevant:
++                    if not isinstance(row.get('unit'),str):continue
++                    key=(row.get('target'),row['unit'])
++                    info=row.get('unit_execution',{});properties=row.get('properties',{});termination=row.get('process_termination',{})
++                    if historical:
++                        value=any(r.get('exit_status')==0 for r in row.get('error_exit_observations',[]))
++                    else:
++                        value=(properties.get('LoadState')!='not-found' and info.get('load_state')!='not-found'
++                            and properties.get('Result')=='success' and termination.get('kind')=='exited'
++                            and type(termination.get('exit_status')) is int and termination['exit_status']==0)
++                    supported[key]=supported.get(key,False) or value
++                if not supported or not all(supported.values()):issues.add('diagnostic_execution_success_unverified')
++            unloaded=[r for r in rows if r.get('properties',{}).get('LoadState')=='not-found'
++                or r.get('unit_execution',{}).get('load_state')=='not-found']
++            if unloaded:
++                for match in re.finditer(process,clause,re.I):
++                    if asserted(clause[match.end():]):issues.add('diagnostic_unloaded_unit_not_process_state')
++    return sorted(issues)
++
++
+ _DIAGNOSTIC_CURRENT_MARKER=(r'현재|지금|\bcurrent\b|\bnow\b|'
+     r'오늘(?:\([^()\n]{1,24}\))?\s*(?:수집|조회|관측)\s*(?:시각|시점|스냅샷)\s*기준')
+ 
+@@ -2579,6 +2734,7 @@
+         and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
+     if not web and not targets:return []
+     issues=set(diagnostic_lifecycle_claim_violations(text,facts))
++    issues.update(diagnostic_execution_claim_violations(text,facts))
+     issues.update(diagnostic_pipeline_claim_violations(text,facts))
+     issues.update(diagnostic_history_return_violations(text,facts))
+     issues.update(diagnostic_report_text_violations(text,facts))
+--- a/infra/hermes/query-completion/__init__.py
++++ b/infra/hermes/query-completion/__init__.py
+@@ -19,10 +19,10 @@
+ import time
+ from types import ModuleType, SimpleNamespace
+ 
+-VERSION = "groot-query-completion:1.19.146"
++VERSION = "groot-query-completion:1.19.147"
+ # One canonical implementation is also embedded in the root management gate.
+ # The installer ships it verbatim here; reject drift before executing it.
+-EVIDENCE_SOURCE_SHA256 = '5156269d3e1846ec678fbd72e720f95574d4dce8af7f57f4ae5fc173e6536a57'
++EVIDENCE_SOURCE_SHA256 = 'af460bf461956efbd5753ffe841f2c47045833724fdd92c3900494ffc5fe763f'
+ 
+ 
+ def publish_load_receipt(installed):
+--- a/infra/hermes/query-completion/alignment.py
++++ b/infra/hermes/query-completion/alignment.py
+@@ -364,7 +364,11 @@
+             agent._capstone_alignment_partial=True
+             return result
+         incident_scope = harness.incident_selection_scope(request, calls,reference)
+-        scope = incident_scope or harness.tool_scope(request, calls)
++        identity=harness.CONTRACT.service_identity_state(result.api_kwargs,request,
++            harness.service_report_receipts(calls) or []) if not reference else {'pending':[],'incomplete':[]}
++        agent._capstone_service_identity=(turn,request,identity)
++        scope = ({r['tool'] for r in identity['pending']} if identity['pending'] else
++                 incident_scope or harness.tool_scope(request, calls))
+         agent._capstone_read_selection = None
+         # Respect the native investigative read-first lease; ordinary explicit
+         # read requests use the same scope as the other chat adapter.
+@@ -425,6 +429,7 @@
+             if targets: agent._capstone_alignment_diagnostic_targets = targets
+             targets = getattr(agent, '_capstone_alignment_diagnostic_targets', targets)
+             pending = harness.missing_reads(request, calls, targets)
++            pending+=identity['incomplete']
+             if reference:pending+=harness.card_evidence_gaps(reference,calls)
+             data.setdefault('messages', []).append({'role': 'user', 'content': (harness.READ.guidance(plan, calls) if plan else harness.guidance(request,include_workflows=False))
+                 + '\n아직 미확인: ' + ', '.join(pending)})
+@@ -435,7 +440,7 @@
+                     props['target'] = {**props['target'], 'enum': ['a:suricata']}
+                 if agent_ids and 'agent_id' in props:
+                     props['agent_id'] = {**props['agent_id'], 'enum': agent_ids}
+-            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets, harness.card_reference(kw.get('original_user_message',''),request))
++            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets, harness.card_reference(kw.get('original_user_message',''),request),identity_options=identity['pending'])
+             agent._capstone_read_terminal = (turn, bool(pending and not schemas))
+             if pending and schemas:
+                 used = getattr(agent, '_capstone_read_selection_count', (None, 0))
+@@ -454,9 +459,10 @@
+                         + json.dumps(schema, ensure_ascii=False)})
+                     agent._capstone_read_selection = (turn, schema, used)
+             else:
+-                rendered = harness.lookup_report(request, calls, targets)
++                rendered = harness.lookup_report(request, calls, targets,identity=(getattr(agent,'_capstone_service_identity',(None,None,None))[2] if getattr(agent,'_capstone_service_identity',(None,None,None))[:2]==(getattr(agent,'_current_turn_id',None),request) else None))
+                 if rendered:
+                     agent._capstone_query_completion_local_format = (turn, rendered)
++                    agent._capstone_alignment_partial=bool(identity.get('missing_units'))
+         if scope == {"mcp__rule_a__get_service_action_target"}:
+             for tool in data.get("tools", []):
+                 target = tool.get("function", {}).get("parameters", {}).get("properties", {}).get("target")
+@@ -721,14 +727,18 @@
+                          "_pending_verification_response", "_pending_verification_response_previewed")
+                 return native.FinalResponseVerdict(action="continue", final_response=None,
+                     codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
+-            rendered = harness.lookup_report(request, calls, targets)
++            rendered = harness.lookup_report(request, calls, targets,identity=(getattr(agent,'_capstone_service_identity',(None,None,None))[2] if getattr(agent,'_capstone_service_identity',(None,None,None))[:2]==(getattr(agent,'_current_turn_id',None),request) else None))
+             if rendered:
+                 text = rendered
+             elif harness.violations(request, text, calls):
+                 text = harness.fallback(request, calls)
+             if missing:
+                 text += "\n미확인 대상: " + ", ".join(missing)
+-            agent._capstone_alignment_partial = bool(missing)
++            identity=getattr(agent,'_capstone_service_identity',(None,None,None))
++            identity_unresolved=(isinstance(identity,tuple) and len(identity)==3
++                and identity[:2]==(getattr(agent,'_current_turn_id',None),request)
++                and isinstance(identity[2],dict) and bool(identity[2].get('missing_units')))
++            agent._capstone_alignment_partial = bool(missing) or identity_unresolved
+         else:
+             if action_issues:
+                 return original(agent, **query._with_final_text(kw, text))
+--- a/infra/hermes/skills/soc-investigate/SKILL.md
++++ b/infra/hermes/skills/soc-investigate/SKILL.md
+@@ -51,6 +51,8 @@
+ 
+ ## 서비스 원인 조사
+ 
++- `LoadState=not-found`는 그 systemd unit이 발견되지 않은 관측이다. `inactive/dead`, 기본 `Result=success`, 종료값0만으로 실제 프로세스 정지·과거 실행/성공·자동시작 비활성화를 설명하지 않는다. 실행 시각·유효한 종료 관측과 같은 대상/시각을 확인한다. 논리 서비스의 unit이 없으면 같은 호스트의 등록된 `get_host_inventory` 서비스·컨테이너 목록과 실제 페이지를 읽어 종류와 이름을 확인한다. 이름을 발견하기 전 Docker로 바꾸거나 다른 호스트로 옮기지 않는다. 명시된 `.service` 요청은 unit 범위를 유지한다. 목록 표본·loaded unit·Docker 목록을 전체 설치/모든 프로세스의 부재로 확대하지 않는다.
++
+ - `errors` journal과 오류 이력은 고정 문자열·출처 이름으로 선택한 후보다. 정상 시작 메시지도 포함될 수 있으므로 반환 행 전부를 실패·장애로 세지 않는다. 실제 메시지의 시작·종료·오류 사실, unit과 시각을 구분하고 원인 미확인을 오류 부재로 바꾸지 않는다. 현재 `LoadState=not-found`는 해당 systemd unit이 로드되지 않았다는 관측이며 같은 이름의 Docker 서비스 상태를 뜻하지 않는다. 필요하면 같은 호스트의 등록된 컨테이너 목록·상세·로그에서 정확한 대상을 확인한다.
+ 
+ - 카탈로그가 호스트 시스템 journal을 지원하면 `a:systemd`·`b:systemd`·`c:systemd`의 `view=journal`로 해당 호스트의 시스템 로그를 실제 조회한다. 현재 failed unit 집계와 과거 로그는 별도 근거다. 호스트 journal은 사용자 journal과 개별 서비스의 정제 오류 색인을 포함한다고 표시하지 않는다. `journal_target_scope=host_system`, 요청 구간, 반환 행의 `source_units`·`source_transport`를 함께 보고하고, 출처 필드가 없으면 그대로 표시한다. 일반 앱이 남긴 UNIT 필드나 로그 문구만으로 원인·실행 주체를 확정하지 않는다. 호스트가 불명확하면 한 번 확인하며, 다른 서버나 특정 서비스로 임의 대체하지 않는다.
+--- a/infra/hermes/skills/soc-query/SKILL.md
++++ b/infra/hermes/skills/soc-query/SKILL.md
+@@ -60,6 +60,8 @@
+ 
+ ### 짧은 조회와 주제별 표본
+ 
++- 논리 서비스의 등록 unit이 `LoadState=not-found`이면 현재 unit 원값을 보존하고 같은 호스트의 서비스·컨테이너 목록을 실제로 확인한다. 실제 반환된 이름과 종류를 사용하며 첫 행·추정 이름으로 상세/로그를 읽지 않는다. 직접 지정한 `.service`는 Docker로 대체하지 않는다. 기본 `Result=success`·`inactive/dead`·종료값0은 실행 이력이나 프로세스 상태를 증명하지 않는다. 페이지의 수집 시각이 다르면 전수 목록으로 합치지 않는다.
++
+ - ‘봐줘’, ‘볼래’, ‘확인해 줄래’도 조회 의도로 읽되 원래 장비·대상·기간·부정문을 유지한다. 짧다는 이유로 요청하지 않은 룰 정의를 가져오거나 로그 요청을 현재 상태로 대신하지 않는다.
+ - DNS 경보 단순 목록은 Suricata 경보 표본의 DNS 질문 필드·signature 표기를 근거로 관련 행을 구분한다. 서버에 없는 DNS 필터를 전달하지 않으며 전체 반환 표본 수와 주제 관련 표시 수를 함께 밝힌다. DNS 포트만으로 정상/악성·DNS 사건을 단정하지 않는다. 빈 표본·표본 안 관련 행 없음은 전체 DNS 경보 부재가 아니다. 명시한 다른 센서·기간·IP·조건·위험 판단은 이 단순 선별로 대체하지 않는다.
+ - 서비스·systemd 로그는 실제 journal·수집된 로그와 현재 snapshot을 구분한다. 등록되지 않은 집계 대상의 과거 로그는 해당 unit·수집 자산을 확인한 뒤 조회하고, 시도하지 않은 과거 조회를 ‘실패’로 꾸미지 않는다.
+--- a/infra/hermes/soc_management_run.py
++++ b/infra/hermes/soc_management_run.py
+@@ -2812,7 +2812,8 @@
+     if chat:
+         plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst'])
+         return (diagnostic_contract().service_history_state(plan,receipts)['pending']
+-                +diagnostic_contract().service_current_refresh_reads(plan,receipts))
++                +diagnostic_contract().service_current_refresh_reads(plan,receipts)
++                +diagnostic_contract().service_identity_state(request,chat['request'],receipts)['pending'])
+     if not readonly_incident_review() or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1':return []
+     context=compact_controller_context()
+     return diagnostic_contract().operator_diagnostic_options(request,context,receipts) if context else []
+@@ -2821,7 +2822,11 @@
+ def chat_diagnostic_state(request, receipts=()):
+     chat=chat_read_context()
+     plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst']) if chat else None
+-    return diagnostic_contract().service_history_state(plan,receipts)
++    state=diagnostic_contract().service_history_state(plan,receipts)
++    if chat:
++        identity=diagnostic_contract().service_identity_state(request,chat['request'],receipts)
++        state['pending']+=identity['pending'];state['incomplete']+=identity['incomplete']
++    return state
+ 
+ 
+ def required_sensor_input_rejection(name, arguments, requirements, receipts):
+@@ -4531,7 +4536,7 @@
+                 component_read_names.add(('mcp__system_diagnostics__' if bare=='get_system_diagnostics' else 'mcp__security_events__')+bare)
+                 receipt=sensor_read_receipt(bare,params,NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))]))
+                 if receipt:sensor_receipts.append(receipt)
+-        if name in ('get_system_diagnostics','list_blocks') and isinstance(arguments,dict):
++        if name in ('get_system_diagnostics','get_host_inventory','list_blocks') and isinstance(arguments,dict):
+             data={}
+             try:
+                 blocks=getattr(result,'content',[])
+@@ -4592,7 +4597,7 @@
+         native_read_catalog[:]=copy.deepcopy(scope_catalog)
+         self._capstone_registered_read_conditions=(getattr(self,'_current_turn_id',None),{
+             t['function']['name']:copy.deepcopy(t['function']['parameters']) for t in scope_catalog
+-            if t['function']['name'] in ('mcp__system_diagnostics__get_system_diagnostics','mcp__resp__list_blocks') or
++            if t['function']['name'] in ('mcp__system_diagnostics__get_system_diagnostics','mcp__system_diagnostics__get_host_inventory','mcp__resp__list_blocks') or
+                 t['function']['name'] in {'mcp__security_events__'+n for n in
+                     ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}})
+         base=management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self)
+--- a/infra/ollama-trial/harness.py
++++ b/infra/ollama-trial/harness.py
+@@ -1103,10 +1103,10 @@
+     return missing
+ 
+ 
+-def lookup_report(question, calls, diagnostic_targets=(), *, include_diagnostics=True):
++def lookup_report(question, calls, diagnostic_targets=(), *, include_diagnostics=True, identity=None):
+     """One renderer order for SDK, Native and shared-channel reads."""
+     return (soc_overview_report(question, calls, diagnostic_targets) or host_inventory_report(question, calls) or read_report(question, calls) or inventory(question, calls) or service_report(question, calls)
+-            or (diagnostic_report(question, calls, diagnostic_targets) if include_diagnostics else None)
++            or (diagnostic_report(question, calls, diagnostic_targets,identity=identity) if include_diagnostics else None)
+             or event_report(question, calls))
+ 
+ 
+@@ -2908,10 +2908,20 @@
+     return []
+ 
+ 
+-def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), reference=None):
++def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), reference=None, *, identity_options=()):
+     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
+     calls=evidence_reads(calls)
+     result = json.loads(json.dumps(schemas))
++    if identity_options:
++        from jsonschema import Draft202012Validator
++        narrowed={}
++        for option in identity_options:
++            name=option['tool'];args=option['arguments'];schema=result.get(name)
++            if name!=HOST_INVENTORY_TOOL or schema is None or not Draft202012Validator(schema).is_valid(args):continue
++            branch={'type':'object','additionalProperties':False,'required':list(args),
++                'properties':{k:{'const':v} for k,v in args.items()}}
++            narrowed.setdefault(name,{'anyOf':[]})['anyOf'].append(branch)
++        return narrowed
+     if soc_overview_request(question):
+         from jsonschema import Draft202012Validator
+         narrowed={}
+@@ -3567,9 +3577,10 @@
+     return value.replace('\r', ' ').replace('\n', ' ')
+ 
+ 
+-def diagnostic_report(question, calls, targets):
++def diagnostic_report(question, calls, targets, *, identity=None):
+     if tool_scope(question) != {'mcp__system_diagnostics__get_system_diagnostics'}:
+         return None
++    if isinstance(identity,dict) and identity.get('pending'):return None
+     selected, unsupported = diagnostic_scope(question, targets)
+     catalog = list(targets)
+     targets = selected
+@@ -3613,6 +3624,18 @@
+         '', '**조치 및 다음 단계**',
+         '- inactive/dead인 oneshot과 failed를 구분해야 합니다. 위 표의 상태값을 임의로 정상/장애로 바꾸지 않았습니다.',
+         '- 표시된 수집 시각 기준 자료이며 실시간 journal 전체 조회가 아닙니다. 현재 장애 원인·미수집 구간은 미확인입니다.'])
++    if any(load=='not-found' for _,load,_ in configurations):
++        rows.extend(['','`LoadState=not-found`는 해당 systemd unit이 수집 시각에 발견되지 않았다는 뜻입니다. '
++            '함께 반환된 inactive/dead·Result=success는 실제 프로세스 정지·과거 실행 성공의 증거가 아닙니다.'])
++        if isinstance(identity,dict) and identity.get('missing_units'):
++            observations=identity.get('observations',[])
++            if observations:
++                rows.extend(['','**같은 호스트의 구성요소 조회 범위**','',*READ.table(
++                    ['호스트','종류','조회된 목록 행','관측 시각 KST'],[(r['host'],
++                        'loaded systemd unit' if r['view']=='services' else 'Docker 컨테이너',
++                        str(r['returned_rows'])+' / '+str(r['total']),r['observed_at_kst']) for r in observations])])
++            rows.append('목록 조회와 논리 서비스의 실제 구성요소 식별은 별개입니다. 전체 설치·프로세스 부재나 기능 정상을 뜻하지 않습니다.'
++                +(' 같은 호스트의 구성요소 조회에는 미확인 범위가 남았습니다.' if identity.get('incomplete') else ''))
+     return '\n'.join(rows)
+ 
+ 
+--- a/infra/ollama-trial/runtime.py
++++ b/infra/ollama-trial/runtime.py
+@@ -202,6 +202,7 @@
+     class ReadAdapter(LangChainAdapter):
+         async def create_all(self, current_client):
+             self.tools, self.resources, self.prompts = [], [], []
++            self.identity_tools=[]
+             catalog = []
+             report['_policy_tools'] = []
+             for server, session in current_client.get_all_active_sessions().items():
+@@ -217,7 +218,14 @@
+                                     'schema_sha256': digest(schema)})
+                     if name == 'mcp__system_diagnostics__get_system_diagnostics':
+                         report['diagnostic_targets'] = schema['properties']['target']['enum']
+-                    if chosen is not None and name not in chosen:
++                    # Keep one existing same-server read callable in reserve
++                    # for a logical service whose registered unit is not found.
++                    # Explicit caller tool lists are never expanded.
++                    identity_only=(chosen is not None and name not in chosen
++                        and request.get('tools') is None
++                        and name==harness.HOST_INVENTORY_TOOL
++                        and 'mcp__system_diagnostics__get_system_diagnostics' in chosen)
++                    if chosen is not None and name not in chosen and not identity_only:
+                         continue
+                     if harness.EVIDENCE.allowed(name,'verify'):
+                         report.setdefault('_service_catalog',{'tools':[]})['tools'].append(
+@@ -310,9 +318,10 @@
+                                     emit_progress('analyzing')
+                         return call
+                     call = make_call(server, tool.name, connector, schema)
+-                    self.tools.append(StructuredTool(name=name, description=tool.description or name,
++                    wrapped=StructuredTool(name=name, description=tool.description or name,
+                         args_schema=schema, coroutine=call,
+-                        return_direct=bool(read_plan or harness.inventory_question(current) and tool.name == 'get_rule_change_target')))
++                        return_direct=bool(read_plan or harness.inventory_question(current) and tool.name == 'get_rule_change_target'))
++                    (self.identity_tools if identity_only else self.tools).append(wrapped)
+             require(len(catalog) == sum(len(available[s]) for s in active_servers), 'catalog_count')
+             report['catalog'] = sorted(catalog, key=lambda x: x['alias'])
+             report['exposed_tools'] = [t.name for t in self.tools]
+@@ -369,7 +378,7 @@
+                         if attempt:raise
+                         selection_messages.append(('human',canonical({'selection_rejected':str(exc.validator),
+                             'executed':False,'instruction':'표시된 index를 중복·누락 없이 선택하세요. 형식 검사에 통과하기 전에는 도구가 실행되지 않습니다.'})))
+-                selected_tools={t.name:t for t in agent.adapter.tools}
++                selected_tools={t.name:t for t in agent.adapter.tools+agent.adapter.identity_tools}
+                 require(all(o['tool'] in selected_tools for o in options),'service_read_tool_unavailable')
+                 selection_active=True
+                 try:
+@@ -378,6 +387,17 @@
+                         await selected_tools[option['tool']].ainvoke(option['arguments'])
+                 finally:selection_active=False
+                 return selection
++            async def complete_service_identity_reads():
++                for _ in range(steps):
++                    receipts=harness.service_report_receipts(report['calls'])
++                    if receipts is None:return
++                    state=harness.CONTRACT.service_identity_state(report.get('_service_catalog',{}),current,receipts)
++                    report['service_identity_discovery']=state
++                    if not state['pending']:return
++                    options=state['pending'][:4]
++                    require(len(options)<=budget.limit-budget.used,'service_identity_read_budget_exhausted')
++                    await select_required_service_reads(options,'service_identity_discovery')
++                raise RuntimeError('service_identity_read_budget_exhausted')
+             if service_plan:
+                 options=service_plan['requirements']
+                 selection=await select_required_service_reads(options,'initial_required_reads')
+@@ -408,6 +428,8 @@
+                             report['unqueried']=harness.missing_reads(current,report['calls'],
+                                 report.get('diagnostic_targets',()),reference,service_plan)
+                             raise RuntimeError(report['stop_reason'])
++                    await complete_service_identity_reads()
++                    receipts=harness.service_report_receipts(report['calls'])
+                     service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
+                         report['at_kst'],receipts,background=service_background,allowed_reads=set(readable))
+                         if service_plan and receipts is not None else None)
+@@ -512,10 +534,11 @@
+                 if final is None:
+                     final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
+             if not report['protected_calls']:
++                await complete_service_identity_reads()
+                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
+                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan))
+                 literal = harness.lookup_report(current, report['calls'], report.get('diagnostic_targets', ()),
+-                           include_diagnostics=not service_plan)
++                           include_diagnostics=not service_plan,identity=report.get('service_identity_discovery'))
+                 issues = [] if literal else (harness.violations(current, str(final), report['calls'],reference,service_plan, attempts=read_attempt_snapshot()) + harness.card_answer_issues(reference,str(final),report['calls']))
+                 audit = harness.incident_judgment_check(current, str(final), report['calls'],reference,service_plan, attempts=read_attempt_snapshot())
+                 if audit:
+@@ -586,6 +609,7 @@
+                                 await selected_tools[choice['tool']].ainvoke(choice['arguments'])
+                         finally:
+                             selection_active = False
++                        await complete_service_identity_reads()
+                         if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference,service_plan):
+                             final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'], attempts=read_attempt_snapshot())+harness.read_background(question,current)), 180)
+                         else:
+@@ -606,7 +630,7 @@
+                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan)
+                     issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference,service_plan, attempts=read_attempt_snapshot()) + harness.card_answer_issues(reference,str(final),report['calls']))
+                 rendered = harness.lookup_report(current, report['calls'], report.get('diagnostic_targets', ()),
+-                            include_diagnostics=not service_plan)
++                            include_diagnostics=not service_plan,identity=report.get('service_identity_discovery'))
+                 issues = (harness.violations(current, str(final), report['calls'],reference,service_plan, attempts=read_attempt_snapshot()) + harness.card_answer_issues(reference,str(final),report['calls']))
+                 if not isinstance(final,str) or not final.strip():issues.append('empty_model_answer')
+                 still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()),reference,service_plan)
+@@ -646,7 +670,8 @@
+             final = harness.EVIDENCE.kst_display(harness.footer_free(str(final)))
+             report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(agent_role='ollama'), 'model_steps': steps, 'tool_calls': budget.limit}
+             unresolved_service=(report.get('service_judgment',{}).get('assessment')=='unresolved'
+-                or report.get('service_judgment',{}).get('status') in ('needs_review','awaiting_approval','monitor'))
++                or report.get('service_judgment',{}).get('status') in ('needs_review','awaiting_approval','monitor')
++                or bool(report.get('service_identity_discovery',{}).get('missing_units')))
+             report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') or unresolved_service else 'completed', final_response=final,
+                           conversation_seconds=time.perf_counter() - tick)
+             if not report['protected_calls'] and report['calls'] and all(

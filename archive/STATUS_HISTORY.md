@@ -12798,3 +12798,7 @@ B 후보MCP/SDK4요청에서5실제읽기·12모델완료·모두partial. 37.57/
 ## 진단 시각·등록 대상 후보와 실제 응답 (2026-11-16)
 
 소수초 실제 성공/미래·보존·외부clock 거절과 모델0 대상 확인을 검증했다. SDK3요청 전부partial이며 not-found/default Result 해석 오류가 남아 미승격이다. Mac1084/Hermes1167 회귀와 실제 의미를 구분한다. [전체 검증](../infra/validation/diagnostic-read-boundaries/README.md). 이전 STATUS 전체는 Git `04f2baf9d91576f2fcc69a6023996e8adb04af8d:STATUS.md`, SHA256 `3336419acfaabbb02e538215fbad783a52d7768bc10c1d97f3c9251a586bdc48`로 복구한다. 기존 정확19/journal9 계획·논문56쪽·다른9작업은 보존했다.
+
+## 2026-11-16 서비스 타입·실행 근거 공통 후보
+
+이전 현재 상태는 Git `fdcc58aacdb9c0c2d97e1a8aeda2ed218007e5c4:STATUS.md`로 복구한다. 새8소스 후보는 실제 inventory/실행 오해를 보완했으나 의미·요약 문제로 미승격이다. [검증/현재](../infra/validation/typed-service/README.md)·[STATUS](../STATUS.md).

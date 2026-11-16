@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-16T04:14:16.852547+09:00",
+  "updated_at_kst": "2026-11-16T12:52:21.890541+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -806,6 +806,39 @@
           "record_sha256": "31b419e76d243210bef9a7da8e57bc69cbd3a55f65ba7e079b6af011d5a68099",
           "visible_input_sha256": "7da80c0f5ece1f9fa9d07be971e5110c73ffc686d2aa82dbf8ae8de7654bb169",
           "nonassistant_input_sha256": "ebf3d5fc7c7bdf39baae38d9553b190a188345c8221ebcaff639f6f4ce9fbff9"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "typed-service-development",
+      "data_sha256": "33165597cf90ec13a4e1d1990ca9def0f75935f6f099c0e6fb22ff3150b4e295",
+      "records": 4,
+      "evidence": "infra/validation/typed-service/validation.json",
+      "evidence_sha256": "abc2bc680013298cc4a46c0073c501a306546f5640a13cf7ff89a171be994615",
+      "consumed_at_kst": "2026-11-16T05:54:12.531893+09:00",
+      "task": "Observed development SDK question/final-answer fixtures, including deterministic displays and model prose. Known semantic/reporting defects; never gold/SFT or new held-out SOC evidence.",
+      "fingerprint_scope": "Question/final-answer only, not complete actual runtime wire prompts/tools/policy/evidence.",
+      "fingerprints": [
+        {
+          "record_sha256": "cc6046ce434d9032d9f9b64d5b675c046e57b17494d71b133023b5f510eaa461",
+          "visible_input_sha256": "e575600ea89beefbb461a9c059828bc04437d3c2f2240dd25fe6d5930f64683f",
+          "nonassistant_input_sha256": "a3b013b3de021823a73cdb80e3af76aab99c274e40a17d696da15aefdf1bae61"
+        },
+        {
+          "record_sha256": "893f13c0670afccd7b6485a4a9c470b93ce315d9ec9ad3f119009c52635951bb",
+          "visible_input_sha256": "fcdc0f5e79d9e6ee3e4db8d53d0363f9a34369a3207947bde12b4ef8e1314be0",
+          "nonassistant_input_sha256": "e5464224a58b052c79364904aefe5cb15f0ec0b4e3470d0910913b6f26e7078e"
+        },
+        {
+          "record_sha256": "be77307d982aa92511fbcef8c4ad2bbbcd6cc2cf8217bcce9a66cb747e56c8d6",
+          "visible_input_sha256": "0e8708e9d3d65087abadd3903a63e8a067ce61d1e562668f8e2ef949bdbeddff",
+          "nonassistant_input_sha256": "b96e3971230636ac326696b39497a36c8d6c102efaa1f44f6353f6aa0b6bc2d3"
+        },
+        {
+          "record_sha256": "2662cd516af3bca31710366d00067ce82d547e44ca47a0327e2d975113460f7c",
+          "visible_input_sha256": "5254c4e7901bfff7784479f61e1e0a6a774e7ac894840f825cc4bad2acdf4025",
+          "nonassistant_input_sha256": "7ac13fdcfa47be67a44a9f2ee63b70067a1818a475602d40a8fc7a5a643c3297"
         }
       ]
     }

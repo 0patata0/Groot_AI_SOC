@@ -408,3 +408,7 @@ B24h는1/2worker모두20초제한·CPU우세였다. 좁은prefix1000진단의fst
 ## 진단 경계 반례와 남은 기본값 해석 (2026-11-16)
 
 같은초과거until거절/30일경계완화를µs로정정하고기존30일/24h/미래금지·권한/20초/12초/128MiBTasks8을유지했다. 첫SDKsnapshot 로그혼입·중첩인용을정정했으며실제데이터/모델미전송이었다. 신규fixture의Vector C오가정을실제A/B등록으로정정하고명확한최근/지난상대기간계획공백을보완했다. 첫Linux시각검사는비교MCP원본누락1오류였고원본추가뒤해당13검사통과했다. 실제Started1행은시작기록으로설명했으나범위전체부재문장이제외됐고Vector not-found의Result success를과거실행으로해석한미검출오류가남았다. [원문지문·분모·미적용](../infra/validation/diagnostic-read-boundaries/README.md).
+
+## 2026-11-16 서비스 타입·실행 근거 공통 후보
+
+B05:18:24 같은 스냅샷 loaded187/컨테이너7에 Vector 항목 없음·등록unit not-found/실행0/not_recorded. 전체 파일/프로세스 부재 아님. 새4요청은20.303/28.916/13.875/26.407초, SDK시간이며 Mattermost/통제AB 아님. 이전 잘못된 실행 문장3개를 검출하고 Started 문장은 보존했다. 새 미확인0 요약·물리파일부재/재시작·Canceled 원인/resolve번역은 잔여다. Docker500은 실제원문4행에 있으며 잘린 표시만 읽은 initial private 검토의 부재 판단을 정정·원본 보존했다. 시각 일치만으로 시험 원인/현재 지속 장애를 단정하지 않는다. Linux 초기 manifest 자기참조는 검사 전 거절/자체 staging 수정. Mac ps 샌드박스거절 뒤 같은검토 cleanup에 명시승인 사용. [전체 근거](../infra/validation/typed-service/README.md).

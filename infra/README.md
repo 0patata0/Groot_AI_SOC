@@ -1,5 +1,9 @@
 # infra — 서버 구성·배포
 
+<!-- typed-service:start -->
+[서비스 타입·실행 근거 후보](validation/typed-service/README.md)에서 query147/common91의 미적용8소스 후보를 확인합니다. 실제 같은 호스트 inventory/페이지·명시 unit·기본 Result의 실행 해석을 보완했고 SDK4요청/13읽기·모델완료10·13.875~28.916초를 관측했습니다. Mac1120(기존6생략)/Hermes1203·신규36생략0·공식Harness²를 구분하며 의미·요약 문제가 남아 운영 승격하지 않습니다. 정본/설치 query137·권한/모델·기존 정확 승인안은 보존합니다. 네 관측은 개발 소비이며 정답/SFT·새 독립 평가가 아닙니다.
+<!-- typed-service:end -->
+
 [실제OS조회후속](validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 
 현재 역할은 B의 두 에이전트·MCP와 Thor의 학습본 추론이며, DGX는 학습을 담당한다. [OS 대상·범위 서술 후보](validation/read-target-binding/README.md)는 기존 Hermes840회귀/공식Harness²·과거 응답 검출을 확인한 **미적용 격리 후보**다. 17:52 KST B24소스/45schema·학습본digest·기존 PID/timer 불변을 확인했고 운영/초기설치 입력은 변경하지 않았다. 매뉴얼형 논문56쪽과 현재 승인 대기 범위는 [STATUS](../STATUS.md)를 따른다. 아래 모델·도구 수·날짜별 내용은 당시 기록이다.

@@ -1768,3 +1768,7 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 관리자231 경유 B의30설치SHA/45스키마·모델/권한과reader927/ticks7043을 대조했다. 자체657입력의기존Hermes격리검사→비교원본MCP1파일추가/해당13재검사, 별도67입력의mcpUID/cap0 IPC와root고정reader로실제wire/SDK를검증했다. supervisor가자체unit2개를중지·원문69파일/전체SHA보존뒤자체일반785파일/소켓2개·11,908,183B를제거했다. 운영서비스/파일·정본/초기설치·보호호출/실채팅/공격/학습0·기존후보/백업보존. [근거](../infra/validation/diagnostic-read-boundaries/README.md).
 
 2026-11-16T04:51:08.311759+09:00 마감: 실제 시험 source59와 공개 동결643트리의 SHA 일치·worker manifest 결속을 확인했다. Mac자체13652파일/207960500B와생성transport7개도소스11·검수근거보존뒤제거했다. 기존원격모델/설정과reader927/ticks7043·두정확계획·논문15SHA/다른9불변이다.
+
+## 2026-11-16 서비스 타입·실행 근거 공통 후보
+
+운영 배포0. 자체 시험 unit2개/root고정reader·기존mcpUID IPC로 실제SDK4요청13읽기/모델완료10·별도smoke2읽기·초기MCP7읽기를 수행했다. source59/입력66+manifest·원문210/SHA 보존 뒤 원격777+90일반/2socket·12,597,037B, Mac16245/247,114,429B·transport10을 제거했다.12:49 관리자231 경유32소스/45schema/설정/모델/reader 불변·자체경로 부재 확인. 신규 설치·운영 로드·새 채팅·공격·학습0.

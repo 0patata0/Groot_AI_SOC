@@ -1,5 +1,9 @@
 # OS·Docker 읽기와 호스트별 표
 
+<!-- typed-service:start -->
+[논리 서비스의 실제 추가 조회](../validation/typed-service/README.md)에서 query147/common91의 미적용8소스 후보를 확인합니다. 실제 같은 호스트 inventory/페이지·명시 unit·기본 Result의 실행 해석을 보완했고 SDK4요청/13읽기·모델완료10·13.875~28.916초를 관측했습니다. Mac1120(기존6생략)/Hermes1203·신규36생략0·공식Harness²를 구분하며 의미·요약 문제가 남아 운영 승격하지 않습니다. 정본/설치 query137·권한/모델·기존 정확 승인안은 보존합니다. 네 관측은 개발 소비이며 정답/SFT·새 독립 평가가 아닙니다.
+<!-- typed-service:end -->
+
 2026-11-08 KST. A/B/C의 `get_host_inventory`를 공통 `soc-query`와 `soc-output`에 연결했다. 조회는 승인 없이 가능하며 기존 보호 변경 승인 절차는 유지한다. 일반 셸·sudo·Docker 실행 권한을 모델에 주는 기능은 아니다.
 
 ## 제공 범위

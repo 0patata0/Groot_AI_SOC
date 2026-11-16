@@ -50,3 +50,7 @@ SOC_BOUNDARIES_ROOT=/private/tmp/new-diagnostic-replay/candidate \
 운영 소스30개·기존 reader PID/ticks·모델/권한 설정을 보존했다. 자체 시험 unit2개는 supervisor가 종료했고 근거 보존 뒤 원격 자체2폴더만 제거했다. Mac 자체13,652파일/207,960,500B·생성transport7개도 소스/근거 보존 뒤 제거·부재 확인했다. 기존 정확19/journal9 승인 계획·백업·논문15파일·다른9작업·G_Harness2·자료/가중치는 유지한다.
 
 다음은 not-found/default Result와 실제 실행 증거를 구분하고, 필요한 경우 등록된 같은 호스트의 typed inventory·컨테이너 로그로 이어 읽도록 공통 경로를 보완하는 것이다. 그 후 Harness²·회귀·새 실제 모델을 다시 확인한 다음 정확 후보/복구 계획·승인·운영 로드·새 실제 채팅 순서로 진행한다. 현재 후보로 실전 품질 완료를 선언하지 않는다.
+
+## 서비스 타입·실행 근거 후속
+
+[후속 후보](../typed-service/README.md)는 같은 호스트의 실제 inventory·페이지와 실행 기본값 해석을 보완했다. SDK4요청/13읽기·모델완료10과 Mac1120/Hermes1203 회귀를 확인했으나 의미/요약 문제가 남아 미승격이다. 이 부모의 과거 결과·미적용 상태를 소급해서 성공으로 바꾸지 않는다.

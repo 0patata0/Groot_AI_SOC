@@ -1,5 +1,9 @@
 # 근거 기반 응답 가드레일
 
+<!-- typed-service:start -->
+[실행 근거 후속 검증](../validation/typed-service/README.md)에서 query147/common91의 미적용8소스 후보를 확인합니다. 실제 같은 호스트 inventory/페이지·명시 unit·기본 Result의 실행 해석을 보완했고 SDK4요청/13읽기·모델완료10·13.875~28.916초를 관측했습니다. Mac1120(기존6생략)/Hermes1203·신규36생략0·공식Harness²를 구분하며 의미·요약 문제가 남아 운영 승격하지 않습니다. 정본/설치 query137·권한/모델·기존 정확 승인안은 보존합니다. 네 관측은 개발 소비이며 정답/SFT·새 독립 평가가 아닙니다.
+<!-- typed-service:end -->
+
 두 봇의 관제 판단은 실제 MCP 결과에 연결한다. `SOUL.groot.md`의 필수 역할에 증거 기준을 두고, 공통 `chat_contract.py`와 `soc_management_run.py`가 답변을 내보내기 전 확인 가능한 주장·상태를 검사한다. 프롬프트 준수와 코드 검사 통과는 전체 정확성을 보장하지 않는다.
 
 | 계층 | 적용 기준 | 한계 |

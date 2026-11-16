@@ -1,8 +1,8 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-<!-- factual-service:start -->
-[SDK 실제10회와 남은 오류](../validation/factual-service/README.md) — query148/common92 미적용5소스 후보에서 등록 이름/기간의 단순 조회와 로그 명사 조사를 보완했습니다. 최종 SDK4요청14.479~26.601초·Mac1149(기존6생략)/Hermes1232·신규29·공식Harness²를 확인했습니다. 타입·관계 오해와 인용 반례가 남아 미승격이며 정본/설치 query137·권한/모델·기존 정확 승인안을 유지합니다. 총10회/7질문 문자열은 개발 소비이며 실제 채팅·독립 정확도가 아닙니다.
-<!-- factual-service:end -->
+<!-- service-provenance:start -->
+[SDK 실제5회와 남은 오류](../validation/service-provenance/README.md) — query149/common93 미적용8소스 후보로 미등록 unit의 실제 프로세스/관계 추정과 인증 원문 인용 오탐을 보완했습니다. Mac1190(1184통과/기존6생략)/Hermes1273·신규41·공식Harness²35구성/상시 증가0·643복원을 확인했습니다. 실제SDK 후보4요청9.160~18.970초이나 원인 요청이 오류 필터0뒤 추가조회하지 않아 미승격입니다. 같은구간 all12행·HTTP500 4행과 errors0을 구분합니다. 정본/설치 query137·모델/권한·기존 정확 승인안은 유지하며5실행/4문자열은 개발 소비입니다.
+<!-- service-provenance:end -->
 
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../validation/diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.

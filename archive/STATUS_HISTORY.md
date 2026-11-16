@@ -12806,3 +12806,7 @@ B 후보MCP/SDK4요청에서5실제읽기·12모델완료·모두partial. 37.57/
 ## 2026-11-16 사실 조회·미확인 공통 후보
 
 이전 현재 상태는 Git `47681876a3e7b2fc6e4fab70211df92a78a46151:STATUS.md`, SHA256 `0697904377031a753588dc68d1de188aa8b8795cba80639e8b4e3e905e21f5ff`로 복구한다. 새 사실조회5소스는 단순 범위/요약·원문 필수 읽기를 보완했으나 의미·인용 반례가 남아 미승격이다. [새 근거](../infra/validation/factual-service/README.md)·[현재](../STATUS.md).
+
+## 2026-11-16 서비스 출처·미확인 조회 후보
+
+이전 현재 상태는 Git `6fa7a05a3ce321278e161ad4faf03e37d973bb50:STATUS.md`, SHA256 `ffe03f718ab49364e6ffbfdf08a40de91554dfde39c96c90f732be113fbcb22a`로 복구한다. [후속8소스](../infra/validation/service-provenance/README.md)에서 타입/관계·인용과 확인용 입력을 보완했지만 오류 필터/추가조사 누락으로 미승격이다. [현재](../STATUS.md).

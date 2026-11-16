@@ -1,0 +1,1016 @@
+{
+  "schema": "groot-service-provenance-validation-v1",
+  "status": "partially_improved_not_applied",
+  "recorded_at_kst": "2026-11-16T14:45:30.466373+09:00",
+  "versions": {
+    "candidate_query": "1.19.149",
+    "candidate_common": "1.5.93",
+    "candidate_mcp_unchanged_from_parent": "1.4.4",
+    "canonical_and_installed_query_last_confirmed": "1.19.137"
+  },
+  "source_tree_files": 643,
+  "changed_sources": [
+    "infra/hermes/chat_contract.py",
+    "infra/hermes/query-completion/__init__.py",
+    "infra/hermes/skills/soc-investigate/SKILL.md",
+    "infra/hermes/skills/soc-query/SKILL.md",
+    "infra/hermes/soc_management_run.py",
+    "infra/hermes/workflow_contract.py",
+    "infra/ollama-trial/harness.py",
+    "infra/ollama-trial/runtime.py"
+  ],
+  "live_revalidation": {
+    "at_kst": "2026-11-16T14:43:17.849288+09:00",
+    "route": "Mac-admin231-A-B",
+    "installed_sources_verified": 32,
+    "changed_sources": [],
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "reader_properties": "MainPID=927\nMemoryMax=134217728\nTasksMax=8\nUser=root\nGroup=capstone-diagnostics\nActiveState=active\nSubState=running\n",
+    "reader_start_ticks": 7043,
+    "native_module_present": false,
+    "registered_schema_snapshot": {
+      "at_kst": "2026-11-16T14:05:06.510685+09:00",
+      "schemas": {
+        "get_system_diagnostics": "d7945b1f1d9d81c90844434a259b453809e41d966d66d0829b529a2e114ec44b",
+        "calculate_time": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd",
+        "get_host_inventory": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+      },
+      "actual_initial_reads": 2
+    },
+    "sdk_catalog": {
+      "case_count": 5,
+      "tools_each": 45,
+      "identical": true,
+      "entries": [
+        {
+          "server": "resp",
+          "name": "block_ip",
+          "alias": "mcp__resp__block_ip",
+          "schema_sha256": "2db8467344c286662cf6d592861ee6ec816434c13327eaf3d82d2a05f9284bcc"
+        },
+        {
+          "server": "resp",
+          "name": "get_firewall_rules",
+          "alias": "mcp__resp__get_firewall_rules",
+          "schema_sha256": "7fa8b4032b741e4f7304e0e29a295729f784a7fb8bb8ad096a0a7cfce0ffd4b9"
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "alias": "mcp__resp__list_blocks",
+          "schema_sha256": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+        },
+        {
+          "server": "resp",
+          "name": "unblock_ip",
+          "alias": "mcp__resp__unblock_ip",
+          "schema_sha256": "d2757c986eb71d19d278ea58f244cde2a18726ded60e703c0b7056f2865f218c"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_operation_status",
+          "alias": "mcp__rule_a__get_operation_status",
+          "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_rule_change_status",
+          "alias": "mcp__rule_a__get_rule_change_status",
+          "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_rule_change_target",
+          "alias": "mcp__rule_a__get_rule_change_target",
+          "schema_sha256": "2a6f8fb87bee70fbfd547caae6c852e2b3732485a5b1cd161880a93e19b4abbc"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_security_rules",
+          "alias": "mcp__rule_a__get_security_rules",
+          "schema_sha256": "b8942e215610f15dacdd690fbbed743e8131710e6374e9449f81a6b6fc3ef569"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_service_action_target",
+          "alias": "mcp__rule_a__get_service_action_target",
+          "schema_sha256": "33ab82fa645d230a4cf9f9c3a528de27085c49b9df7aaf34bf36333b3ef34a29"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_operation_status",
+          "alias": "mcp__rule_b__get_operation_status",
+          "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_rule_change_status",
+          "alias": "mcp__rule_b__get_rule_change_status",
+          "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_rule_change_target",
+          "alias": "mcp__rule_b__get_rule_change_target",
+          "schema_sha256": "30704ddf5e621a2614d0409f799392de3278e18b51d7735212a878a7f65fa3e6"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_security_rules",
+          "alias": "mcp__rule_b__get_security_rules",
+          "schema_sha256": "a119df10763394dd2f070f47642f255e76ac7702b7b15f9c9f2fdb565ad52758"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_service_action_target",
+          "alias": "mcp__rule_b__get_service_action_target",
+          "schema_sha256": "ce8ddc679710991d1eb3ddbebeb420581c736ff4874fe351f2e2ad6fffe9e852"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_rule_change",
+          "alias": "mcp__rule_write_a__propose_rule_change",
+          "schema_sha256": "1f11effc78733c4c873771a73c5f8bee88d02cd8446d58f7bd69c3b67b72d8a7"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_rule_edit",
+          "alias": "mcp__rule_write_a__propose_rule_edit",
+          "schema_sha256": "26f3f9915f39dbe4ca65dbf4880975741e249397bc9472efdd71a12b76e272d2"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_service_action",
+          "alias": "mcp__rule_write_a__propose_service_action",
+          "schema_sha256": "e5a30a54836d7fd4293836a94c6782db1a7803ab205ac093afacfb94e25328e1"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "temporarily_contain_ip",
+          "alias": "mcp__rule_write_a__temporarily_contain_ip",
+          "schema_sha256": "24b48bac70c7d9d10753e766d1f4c4e1ea7a4220baaf78ce57da072c564859f5"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_rule_change",
+          "alias": "mcp__rule_write_b__propose_rule_change",
+          "schema_sha256": "f1b266192a5f044b0d1208cdc8ad61a871ec84ce662b242bf3d7f0e06f647a23"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_rule_edit",
+          "alias": "mcp__rule_write_b__propose_rule_edit",
+          "schema_sha256": "8792ca851742064af6bdbb86f6a16ae9ef777b11b2018cff0e5865b6a3a04ab0"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_service_action",
+          "alias": "mcp__rule_write_b__propose_service_action",
+          "schema_sha256": "54e33dd43f8b235eefcda42ec355b5ee9e142cb831279eeaba8e13ab9e06e2cc"
+        },
+        {
+          "server": "security-events",
+          "name": "collect_incident_evidence",
+          "alias": "mcp__security_events__collect_incident_evidence",
+          "schema_sha256": "42cc9207fd1102663d1544b16a510d2ccff3214e7855440b0929ca8a79999c6e"
+        },
+        {
+          "server": "security-events",
+          "name": "get_wazuh_sca_checks",
+          "alias": "mcp__security_events__get_wazuh_sca_checks",
+          "schema_sha256": "ace06898df3b679080c092dc7ab36d9aa5378f7ab74180f97ff10f3ebacb8465"
+        },
+        {
+          "server": "security-events",
+          "name": "get_web_service_target",
+          "alias": "mcp__security_events__get_web_service_target",
+          "schema_sha256": "5a49221857f37ab059d1bf777639dddb23c409589a9a96d21b8ec0a727bed07f"
+        },
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "alias": "mcp__security_events__search_modsecurity_alerts",
+          "schema_sha256": "d297a9bd8776b8d726d2f230fe00f12f69cc7f4be3b75e4fe68e72d7b705e644"
+        },
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "alias": "mcp__security_events__search_suricata_alerts",
+          "schema_sha256": "ae64c793c525cc313e24b8a9bef7029b20913e79bce3a558a00e62159b607695"
+        },
+        {
+          "server": "security-events",
+          "name": "search_wazuh_alerts",
+          "alias": "mcp__security_events__search_wazuh_alerts",
+          "schema_sha256": "c3d595745a1c29cc350d08dca6a378a124434853f8ef1a231261a578cb3fcddd"
+        },
+        {
+          "server": "security-events",
+          "name": "search_web_access",
+          "alias": "mcp__security_events__search_web_access",
+          "schema_sha256": "d9a8ccb011e5390b284e21a6553e7b07f094b7e61d27b33435eb72da7b2e509a"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "calculate_time",
+          "alias": "mcp__system_diagnostics__calculate_time",
+          "schema_sha256": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_host_inventory",
+          "alias": "mcp__system_diagnostics__get_host_inventory",
+          "schema_sha256": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "alias": "mcp__system_diagnostics__get_system_diagnostics",
+          "schema_sha256": "ff393819a29aec5c1553b535217fad217ee9050dfc3d174f38871c5bcb619ca5"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agent_ports",
+          "alias": "mcp__wazuh_ro__get_wazuh_agent_ports",
+          "schema_sha256": "f164d1dc38e74c75cf8479bdae81db180d12b2d3d452f9cb447fd632b632388b"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agent_processes",
+          "alias": "mcp__wazuh_ro__get_wazuh_agent_processes",
+          "schema_sha256": "d37ade4172205381a042a725d80986549b7f3e1d6caf3a665087e5c811146451"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agents",
+          "alias": "mcp__wazuh_ro__get_wazuh_agents",
+          "schema_sha256": "9bac6275361289b4ea6da82340fabf7e0b373c929dd3d8302032522163f00b16"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_alert_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_alert_summary",
+          "schema_sha256": "bc38bd71ddf5aaa5d54bfdf5e1a2af72d9a346897b31e553d1ad6fe8fec3af0e"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_cluster_health",
+          "alias": "mcp__wazuh_ro__get_wazuh_cluster_health",
+          "schema_sha256": "2fec25025417b8d71603cb950c3f4676067314d0bcfad2d80ce14509ae65b627"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_cluster_nodes",
+          "alias": "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+          "schema_sha256": "f1962fa4cf4f3ca1ad9533226903112a2343e69f959ea8e27ec2c8dd2410b71c"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_critical_vulnerabilities",
+          "alias": "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+          "schema_sha256": "4f30a9c89d28e39faef2a854ace2fd9da943434c5e13e5cce9b4a6bd3b89ad73"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_log_collector_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_log_collector_stats",
+          "schema_sha256": "a00dee00abe89f1727e696ad8603edffd4427a3e92eee2aec19fea399c56bc0d"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_manager_error_logs",
+          "alias": "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+          "schema_sha256": "59d25ac259370c9653bf1c4a3fa750e115cc2d0705a6caf3e1e28aeba90d5abb"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_remoted_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_remoted_stats",
+          "schema_sha256": "aa5d97fc1a8e4b567c56679a5ee8bc6b858b8c5e34fd72af1f795836d1f234fc"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_rules_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_rules_summary",
+          "schema_sha256": "d1c9c0f4a273b252f3657474cf0aa5356939d870ef2aa618762c67bcfeaac1a3"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_vulnerability_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+          "schema_sha256": "1aeb260afe5339a55ec9f0d41ac7ed54b67c7ce987a84ae7262c80d20a1078f5"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_weekly_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_weekly_stats",
+          "schema_sha256": "1fdb4dc04498135b5c770f1193c8d4db4fbdfbfb727e8fcd9afb7c8241755ac0"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "search_wazuh_manager_logs",
+          "alias": "mcp__wazuh_ro__search_wazuh_manager_logs",
+          "schema_sha256": "2394e43913adbdab776e232ae02c8323324c263ce95d36660ed39371a3d79ff2"
+        }
+      ]
+    }
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "scripts/sdk_runtime.py",
+        "scripts/workflow_contract.py",
+        "skills/soc-investigate/SKILL.md",
+        "skills/soc-query/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "scope": "Official structure only, not model quality, deployment or real chat."
+  },
+  "regressions": {
+    "mac": {
+      "profiles": 21,
+      "run": 1190,
+      "passed": 1184,
+      "skipped": 6
+    },
+    "existing_hermes_image": {
+      "profiles": 21,
+      "run": 1273,
+      "passed": 1273,
+      "skipped": 0,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "uid": 10001,
+      "network_connect_denied": true
+    },
+    "new_counterexamples": 41,
+    "public_reconstruction": {
+      "source_files_verified": 643,
+      "framework": "official Harness2",
+      "new_test_run": 41,
+      "new_test_skipped": 0,
+      "parent_compat_test_run": 36,
+      "parent_assertions_unchanged": true,
+      "operating_apply": false,
+      "tool_result": "Both exec commands exit0;41/36 passed against public reconstruction. Logs from prepublication run are in mac-regressions/new-provenance; exact source SHA verified."
+    },
+    "parent36_compatibility": {
+      "parent_source_sha256": "092bdbfbc58bc43a6a7d21470c6c7cc40175795602768a38b427e69bc883038b",
+      "change": "Schema-aware const response in mock factory only; exact original36 assertions unchanged."
+    },
+    "scope": "Deterministic regression/source reconstruction, not independent operational SOC quality."
+  },
+  "actual_sdk_trial": {
+    "cases": [
+      {
+        "arm": "base",
+        "id": "factual-host",
+        "question": "B systemd 지난 9분 로그 표로 보여줘.",
+        "at_kst": "2026-11-16T14:33:46.208310+09:00",
+        "worker_elapsed_seconds": 27.46,
+        "status": "completed",
+        "service_lookup_complete": true,
+        "model_calls": [
+          {
+            "seconds": 0.6755926200421527,
+            "usage": {
+              "input_tokens": 258,
+              "output_tokens": 7,
+              "total_tokens": 265
+            },
+            "ollama": {
+              "total_duration": 667389834,
+              "load_duration": 4276852,
+              "prompt_eval_count": 258,
+              "prompt_eval_duration": 400712000,
+              "eval_count": 7,
+              "eval_duration": 231258000
+            }
+          },
+          {
+            "seconds": 17.98589319898747,
+            "usage": {
+              "input_tokens": 16010,
+              "output_tokens": 67,
+              "total_tokens": 16077
+            },
+            "ollama": {
+              "total_duration": 17980849288,
+              "load_duration": 8107374,
+              "prompt_eval_count": 16010,
+              "prompt_eval_duration": 14983696000,
+              "eval_count": 67,
+              "eval_duration": 2902903000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T14:24:46.208310+09:00",
+              "until_kst": "2026-11-16T14:33:46.208310+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "ec5e55ab22912af67c9063a1b6ed1abf1cd4312302a46b06c8a194b937581514",
+            "result_bytes": 26728
+          }
+        ],
+        "report": [
+          {
+            "response": {
+              "more_evidence": false,
+              "report": {
+                "assessment": "observed",
+                "evidence_indexes": [
+                  0
+                ],
+                "scope": "verified_service_lookup",
+                "status": "resolved"
+              }
+            },
+            "repair": false,
+            "read_result_sha256": [
+              "ec5e55ab22912af67c9063a1b6ed1abf1cd4312302a46b06c8a194b937581514"
+            ]
+          }
+        ],
+        "file_sha256": "b6567e54ec38ed15ae2d3349fee8c80dbc964b62501cfd2c8faec6c0f5a3fd29"
+      },
+      {
+        "arm": "candidate",
+        "id": "logical-history",
+        "question": "B Vector 지금 상태랑 최근 4분 로그만 표로 보여줘.",
+        "at_kst": "2026-11-16T14:34:14.714289+09:00",
+        "worker_elapsed_seconds": 15.89,
+        "status": "partial",
+        "service_lookup_complete": false,
+        "model_calls": [
+          {
+            "seconds": 1.0721448889817111,
+            "usage": {
+              "input_tokens": 313,
+              "output_tokens": 11,
+              "total_tokens": 324
+            },
+            "ollama": {
+              "total_duration": 1062312093,
+              "load_duration": 4265908,
+              "prompt_eval_count": 313,
+              "prompt_eval_duration": 564245000,
+              "eval_count": 11,
+              "eval_duration": 379346000
+            }
+          },
+          {
+            "seconds": 0.6687636689748615,
+            "usage": {
+              "input_tokens": 230,
+              "output_tokens": 9,
+              "total_tokens": 239
+            },
+            "ollama": {
+              "total_duration": 664527968,
+              "load_duration": 5197456,
+              "prompt_eval_count": 230,
+              "prompt_eval_duration": 334139000,
+              "eval_count": 9,
+              "eval_duration": 288551000
+            }
+          },
+          {
+            "seconds": 0.72371849702904,
+            "usage": {
+              "input_tokens": 191,
+              "output_tokens": 7,
+              "total_tokens": 198
+            },
+            "ollama": {
+              "total_duration": 719490033,
+              "load_duration": 4188669,
+              "prompt_eval_count": 191,
+              "prompt_eval_duration": 408069000,
+              "eval_count": 7,
+              "eval_duration": 272537000
+            }
+          },
+          {
+            "seconds": 4.403764017042704,
+            "usage": {
+              "input_tokens": 1632,
+              "output_tokens": 71,
+              "total_tokens": 1703
+            },
+            "ollama": {
+              "total_duration": 4399268864,
+              "load_duration": 5496937,
+              "prompt_eval_count": 1632,
+              "prompt_eval_duration": 1800517000,
+              "eval_count": 71,
+              "eval_duration": 2546878000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:vector"
+            },
+            "is_error": false,
+            "result_sha256": "cf5f344c809f33a8639849acc566630b2f06b44e13c93813ea77a0339b45fe9e",
+            "result_bytes": 2168
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:vector",
+              "since_kst": "2026-11-16T14:30:14.714289+09:00",
+              "until_kst": "2026-11-16T14:34:14.714289+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "efb94e57fd9a1ef8e6e65004f6b8d443b9b20a400cf35b8b0227582aa7f64feb",
+            "result_bytes": 843
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:collection"
+            },
+            "is_error": false,
+            "result_sha256": "dfce801534fae29d83069d4656849d09542e13080a4c3f31ce7b1516775c1b67",
+            "result_bytes": 627
+          },
+          {
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            },
+            "is_error": false,
+            "result_sha256": "90eacbbf8acec093abb3c4e1fa2587a77b9a8729a1907b71a2d663a9385a5486",
+            "result_bytes": 9750
+          },
+          {
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "b",
+              "view": "containers",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            },
+            "is_error": false,
+            "result_sha256": "89839453770b61657e185d4fc618dc0fedbe69d9b1defaef6b5c82fdcbdbb8c5",
+            "result_bytes": 2004
+          },
+          {
+            "name": "get_host_inventory",
+            "arguments": {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 100
+            },
+            "is_error": false,
+            "result_sha256": "d2ba1281e60f237c82ed5df14eb827ee1b5705d31729c86343db7d93451e7739",
+            "result_bytes": 8700
+          }
+        ],
+        "report": [
+          {
+            "response": {
+              "more_evidence": false,
+              "report": {
+                "assessment": "unresolved",
+                "evidence_indexes": [
+                  0,
+                  1
+                ],
+                "scope": "unresolved_service_lookup",
+                "status": "needs_review"
+              }
+            },
+            "repair": false,
+            "read_result_sha256": [
+              "cf5f344c809f33a8639849acc566630b2f06b44e13c93813ea77a0339b45fe9e",
+              "efb94e57fd9a1ef8e6e65004f6b8d443b9b20a400cf35b8b0227582aa7f64feb",
+              "dfce801534fae29d83069d4656849d09542e13080a4c3f31ce7b1516775c1b67",
+              "90eacbbf8acec093abb3c4e1fa2587a77b9a8729a1907b71a2d663a9385a5486",
+              "89839453770b61657e185d4fc618dc0fedbe69d9b1defaef6b5c82fdcbdbb8c5",
+              "d2ba1281e60f237c82ed5df14eb827ee1b5705d31729c86343db7d93451e7739"
+            ]
+          }
+        ],
+        "file_sha256": "a8c96cd0db2498ebe8af546fa7369552cf76acd46423205e4e53fcf04b44f9cb"
+      },
+      {
+        "arm": "candidate",
+        "id": "factual-host",
+        "question": "B systemd 지난 9분 로그 표로 보여줘.",
+        "at_kst": "2026-11-16T14:34:30.611114+09:00",
+        "worker_elapsed_seconds": 9.16,
+        "status": "completed",
+        "service_lookup_complete": true,
+        "model_calls": [
+          {
+            "seconds": 0.7034232500009239,
+            "usage": {
+              "input_tokens": 258,
+              "output_tokens": 7,
+              "total_tokens": 265
+            },
+            "ollama": {
+              "total_duration": 697745277,
+              "load_duration": 4290298,
+              "prompt_eval_count": 258,
+              "prompt_eval_duration": 413129000,
+              "eval_count": 7,
+              "eval_duration": 225816000
+            }
+          },
+          {
+            "seconds": 3.8148672159877606,
+            "usage": {
+              "input_tokens": 818,
+              "output_tokens": 67,
+              "total_tokens": 885
+            },
+            "ollama": {
+              "total_duration": 3808472562,
+              "load_duration": 4635567,
+              "prompt_eval_count": 818,
+              "prompt_eval_duration": 1127731000,
+              "eval_count": 67,
+              "eval_duration": 2629090000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T14:25:30.611114+09:00",
+              "until_kst": "2026-11-16T14:34:30.611114+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "ebd0702221f6a9ab621c24dec3001f605405b582ac046bce63dd7d10817fc6a6",
+            "result_bytes": 27299
+          }
+        ],
+        "report": [
+          {
+            "response": {
+              "more_evidence": false,
+              "report": {
+                "assessment": "observed",
+                "evidence_indexes": [
+                  0
+                ],
+                "scope": "verified_service_lookup",
+                "status": "resolved"
+              }
+            },
+            "repair": false,
+            "read_result_sha256": [
+              "ebd0702221f6a9ab621c24dec3001f605405b582ac046bce63dd7d10817fc6a6"
+            ]
+          }
+        ],
+        "file_sha256": "a88fbd793e97c3f0199d8624e0fe1205ccd3dfb8ab698c1cae79ed811e20ca4a"
+      },
+      {
+        "arm": "candidate",
+        "id": "past-error-lookup",
+        "question": "B Docker 오늘 05:50~05:53 KST 로그와 지금 상태 표로 보여줘.",
+        "at_kst": "2026-11-16T14:34:39.785499+09:00",
+        "worker_elapsed_seconds": 9.242,
+        "status": "completed",
+        "service_lookup_complete": true,
+        "model_calls": [
+          {
+            "seconds": 0.8035276309819892,
+            "usage": {
+              "input_tokens": 283,
+              "output_tokens": 9,
+              "total_tokens": 292
+            },
+            "ollama": {
+              "total_duration": 797745805,
+              "load_duration": 4367058,
+              "prompt_eval_count": 283,
+              "prompt_eval_duration": 451872000,
+              "eval_count": 9,
+              "eval_duration": 286891000
+            }
+          },
+          {
+            "seconds": 3.4091642450075597,
+            "usage": {
+              "input_tokens": 893,
+              "output_tokens": 66,
+              "total_tokens": 959
+            },
+            "ollama": {
+              "total_duration": 3403021630,
+              "load_duration": 5068603,
+              "prompt_eval_count": 893,
+              "prompt_eval_duration": 750312000,
+              "eval_count": 66,
+              "eval_duration": 2594331000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "3c538e1834d056300e53b06afdc8a2c4fa340cae23d8d76272844ff4795234d4",
+            "result_bytes": 2181
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "4f3dbef1b83302c0bc95c728d7ba45ebb50b78180f4fa5c0b687a62bc8a7e0ae",
+            "result_bytes": 8547
+          }
+        ],
+        "report": [
+          {
+            "response": {
+              "more_evidence": false,
+              "report": {
+                "assessment": "observed",
+                "evidence_indexes": [
+                  0
+                ],
+                "scope": "verified_service_lookup",
+                "status": "resolved"
+              }
+            },
+            "repair": false,
+            "read_result_sha256": [
+              "3c538e1834d056300e53b06afdc8a2c4fa340cae23d8d76272844ff4795234d4",
+              "4f3dbef1b83302c0bc95c728d7ba45ebb50b78180f4fa5c0b687a62bc8a7e0ae"
+            ]
+          }
+        ],
+        "file_sha256": "1d3099eb073701434f1074287ab97efcc344f254721a7aee020f34d400d8e49a"
+      },
+      {
+        "arm": "candidate",
+        "id": "past-error-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "at_kst": "2026-11-16T14:34:49.036165+09:00",
+        "worker_elapsed_seconds": 18.97,
+        "status": "partial",
+        "service_lookup_complete": false,
+        "model_calls": [
+          {
+            "seconds": 0.8043982210219838,
+            "usage": {
+              "input_tokens": 281,
+              "output_tokens": 9,
+              "total_tokens": 290
+            },
+            "ollama": {
+              "total_duration": 797432346,
+              "load_duration": 4558214,
+              "prompt_eval_count": 281,
+              "prompt_eval_duration": 457049000,
+              "eval_count": 9,
+              "eval_duration": 282386000
+            }
+          },
+          {
+            "seconds": 13.559876852028538,
+            "usage": {
+              "input_tokens": 8831,
+              "output_tokens": 231,
+              "total_tokens": 9062
+            },
+            "ollama": {
+              "total_duration": 13551598836,
+              "load_duration": 14482514,
+              "prompt_eval_count": 8831,
+              "prompt_eval_duration": 8089007000,
+              "eval_count": 231,
+              "eval_duration": 5259552000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "0c497a1ba04b6e16737d0552d3ce5ebc71a6f66a3e789edfac1ac5532ff1f614",
+            "result_bytes": 2181
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "72193f221d2df24d234d0a9df6f4d8145ebcffe65cb4dfed4290f1909dba2c67",
+            "result_bytes": 841
+          }
+        ],
+        "report": [
+          {
+            "response": {
+              "more_evidence": false,
+              "report": {
+                "assessment": "unresolved",
+                "basis": "요청 구간(2026-11-16 05:50~05:53 KST)의 journal 오류 표본 0건입니다. 현재 서비스 상태는 ActiveState=active, SubState=running으로 관측됩니다.",
+                "current_observation": "ActiveState=active, SubState=running(관측 시각 2026-11-16T14:34:53+09:00)",
+                "evidence_indexes": [
+                  0
+                ],
+                "limitations": [
+                  "요청 기간의 실제 오류 원인은 미확인입니다. journal 조회는 고정된 오류 후보를 반환하며, 해당 구간에서 오류 표본이 0건이라는 사실은 전체 정상이나 문제 부재를 증명하지 않습니다."
+                ],
+                "next_steps": [],
+                "status": "needs_review"
+              }
+            },
+            "repair": false,
+            "read_result_sha256": [
+              "0c497a1ba04b6e16737d0552d3ce5ebc71a6f66a3e789edfac1ac5532ff1f614",
+              "72193f221d2df24d234d0a9df6f4d8145ebcffe65cb4dfed4290f1909dba2c67"
+            ]
+          }
+        ],
+        "file_sha256": "b8d5aebdc1877b85446b17738e41d21b1d4338c366f74205c78b810ff0a069c6"
+      }
+    ],
+    "totals": {
+      "executions": 5,
+      "distinct_question_strings": 4,
+      "sdk_mcp_reads": 12,
+      "recorded_model_completions": 12,
+      "protected_dispatches": 0,
+      "chat_posts": 0
+    },
+    "paired_factual_host": {
+      "parent_seconds": 27.46,
+      "candidate_seconds": 9.16,
+      "parent_synthesis_input_tokens": 16010,
+      "candidate_synthesis_input_tokens": 818,
+      "scope": "One sequential same-question pair; journal contents/time differ. Parent is unapplied factual148/common92, not installed baseline. No controlled latency/quality or Mattermost claim."
+    },
+    "separate_wire_smoke_reads": 2,
+    "separate_initial_operating_mcp_reads": 2,
+    "scope": "Parent1/candidate4 with same35B and permissions; real bounded reads. Not operating baseline, native Hermes inference, Mattermost delivery, controlled benchmark or independent accuracy."
+  },
+  "observed_improvements": [
+    "Typed unresolved identity cannot generate process/relationship prose or resolve a security incident.",
+    "Exact authenticated diagnostic source quotation is separated from newly generated prose; modified/adjoined claims and original control/citation checks remain enforced.",
+    "Factual scope confirmation sees bounded receipts/identity, not the raw journal. Full raw bytes/hash and deterministic display remain in the audit process. Genuine cause requests retain full evidence."
+  ],
+  "historical_docker": {
+    "all_scope_entries": 12,
+    "http500_entries": 4,
+    "http500_priorities": [
+      6
+    ],
+    "fixed_errors_scope_entries": 0,
+    "current_state": "active/running snapshot",
+    "caller_cause_current_impact_recovery_verified": false
+  },
+  "remaining_findings": [
+    {
+      "priority": "P1",
+      "id": "bounded-error-filter-misses-docker",
+      "finding": "Same historical service/window: all returns12 including4 HTTP500 rows at priority6, errors returns0. Cause request used errors then stopped unresolved without an all-scope follow-up.",
+      "not_claimed": "No inference of lost retention, resolved incident, network cause, correct full root cause, or caller identity.",
+      "next": "Broaden registered bounded evidence when fixed error candidates do not explain an actual reported error; keep time/service/limits and causal uncertainty. Review fixed collector/filter behavior separately."
+    },
+    {
+      "priority": "P2",
+      "id": "snapshot-default-window-verbosity",
+      "finding": "Current property rows still show the snapshot default15min interval, separate from the explicitly requested history interval. Vector also displays collection observations; output remains verbose.",
+      "next": "Keep property age/current snapshot scope separate from requested history; shorten ancillary fields without hiding missing identity or failed receipts."
+    },
+    {
+      "priority": "P1",
+      "id": "no-operating-promotion-proof",
+      "finding": "Candidate and all parents are unapplied. Native request/renderer mocked integration and SDK real reads do not establish actual Hermes/Mattermost delivery, production approval application, independent quality, or initial-install acceptance.",
+      "next": "Validated composite application/recovery plan, exact administrator approval, installed load check, then fresh actual chat and independent operational acceptance."
+    }
+  ],
+  "staging_corrections": [
+    "Initial Native fixture catalog included calculate_time absent from that mock agent list; restricted fixture to its two declared tools without widening production.",
+    "Partial template introduction was interpreted by an old property guard as a positive process assertion; wording made explicit and full-gate regression added.",
+    "Actual SDK violation wrapper normalized configuration terms before source attribution; attribution now precedes optional normalization. Exact source row accepted, appended/modified claim refused.",
+    "Original parent36 mock returned prose incompatible with new typed partial schema; exact-SHA compatibility adapter changes only mock response factory, preserving all36 assertions."
+  ],
+  "cleanup": {
+    "remote_roots": [
+      {
+        "root": "/var/lib/capstone-service-provenance-em6et7s3",
+        "regular_files": 156,
+        "socket_files": 2,
+        "bytes": 4389353,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-service-provenance-em6et7s3-tests",
+        "regular_files": 706,
+        "socket_files": 0,
+        "bytes": 9946985,
+        "matched_preserved_export": true
+      }
+    ],
+    "remote_roots_absent": true,
+    "own_units_stopped": 2,
+    "own_pid_count_absent": 5,
+    "remote_regular_files_removed": 862,
+    "remote_sockets_removed": 2,
+    "remote_bytes_removed": 14336338,
+    "mac_files_removed": 21483,
+    "mac_bytes_removed": 324233173,
+    "mac_transport_scripts_removed": 7,
+    "redundant_transmission_wrappers_removed": 1,
+    "mac_temporary_root_absent": true,
+    "mac_process_scope": "All owned local command sessions and SSH wrappers completed. Own remote supervisor/workers absent and2 test units stopped. No system-wide process census claimed.",
+    "new_mac_packages": 0,
+    "g_harness2_preserved": true,
+    "paper15_and_original9_preserved": true
+  },
+  "authority": {
+    "changed": false,
+    "protected_dispatches": 0,
+    "chat_posts": 0,
+    "operating_apply": false,
+    "new_attacks": 0,
+    "new_training": 0,
+    "existing_exact_approval_plans_reused": false
+  },
+  "review": {
+    "method": "Manual defect-first full final prose/raw receipts/model metadata review plus41 deterministic counterexamples. Not a review-agent tool or independent gold evaluation.",
+    "review_agent_original_found": false,
+    "semgrep": "not_run_no_mac_install"
+  },
+  "promotion_blocked_by_known_findings": true
+}

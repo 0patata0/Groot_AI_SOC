@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-16T13:49:10.920495+09:00",
+  "updated_at_kst": "2026-11-16T14:45:30.466373+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -903,6 +903,45 @@
           "record_sha256": "7428903bb3690f60b81677deb91a786b4559ec4514d84751718135554f41a748",
           "visible_input_sha256": "5da1db9fdca73d3fbc7a348f0bc985ed7a2ccbbef423093acf055038d3307627",
           "nonassistant_input_sha256": "f175ba9233307af402a1da7983caf2aa87e2a886a8287f99a41c413f1139df43"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "service-provenance-development",
+      "data_sha256": "412a8d0c71609c631dbeb3a3607add3e419859802b57d35c8a06ba073fd81d14",
+      "records": 5,
+      "distinct_question_strings": 4,
+      "evidence": "infra/validation/service-provenance/validation.json",
+      "evidence_sha256": "3a1f717f8577683bc2d9296a28ea99bbf1c18e3e6a87d05baaba51ee2be7d73c",
+      "consumed_at_kst": "2026-11-16T14:35:08.529820+09:00",
+      "task": "Observed development question/final answers: parent1/candidate4. Typed missing identity and compact factual confirmation improve; fixed errors filter misses actual Docker500/cause follow-up. Never gold/SFT/new independent SOC score.",
+      "fingerprint_scope": "Question/final-answer only, not actual wire policy/tools/context/evidence.",
+      "fingerprints": [
+        {
+          "record_sha256": "e4952b57a67c29cb104644b9c57636127d210b7f97a07db14c686901c3268dcd",
+          "visible_input_sha256": "2f4637b724709ac4a2d2dba699533c175e9b8b8ff007cfd353c8eb7effafbeab",
+          "nonassistant_input_sha256": "04a6ee80db3dc8f44bd8b8582f7042f7edabe45d1a014b909212332e08e4b91a"
+        },
+        {
+          "record_sha256": "ef6186a99032afde76d279f18ac314e88d123b5d1bf3727ecf61cf21e85074e3",
+          "visible_input_sha256": "8088b983595fabb960980a363b034454db0eaa2a3a1b368156047c9137553c99",
+          "nonassistant_input_sha256": "595dc71e5572aaf33f642683a84df618f9e5ce2e8edb039d211272b0ca850725"
+        },
+        {
+          "record_sha256": "e04c72dbdf8e7136896883ac20c8e60b668041718c2d39d7c7cf496664b2fb21",
+          "visible_input_sha256": "2f4637b724709ac4a2d2dba699533c175e9b8b8ff007cfd353c8eb7effafbeab",
+          "nonassistant_input_sha256": "04a6ee80db3dc8f44bd8b8582f7042f7edabe45d1a014b909212332e08e4b91a"
+        },
+        {
+          "record_sha256": "6a6ca3b0874139066121a351672453e13bc2b88115cb9970260d0304453cbc7a",
+          "visible_input_sha256": "24100c3b8b118c873e85fcff45bd2142f9c6b0eed9cd00973e9970f84ee0a806",
+          "nonassistant_input_sha256": "aa11c6fec26f9545ce859635b2962d60d246b1ead694d031ffce0ccccebb3d58"
+        },
+        {
+          "record_sha256": "66868865d11f55c45986725701fcfc4cbee66cbdc6905d08b50c9d9740d635ae",
+          "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
+          "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
         }
       ]
     }

@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-**현재:** [서비스·호스트 journal 통합/캐시 검증](infra/validation/journal-composition/README.md):34소스 후보는 운영 미적용입니다.40배포 대상 초안과 캐시 복구 모듈의 환경별40회귀·실제 사본 원복·128MiB/Tasks8을 확인했지만 A/B 수집 잘림과 일관 배포 실행기가 남았습니다. 논문은 후임자용 절차·검증·복구를 갖춘 MD/PDF/DOCX66쪽 검수본을 유지합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
+**현재:** [수집 보완 후보/검증](infra/validation/journal-composition/README.md)은 A/B의 실제4시간 잘림을 격리 읽기에서 해소했고 Mac1,410/기존6생략·기존 Hermes 이미지1,493/생략0을 확인했습니다. 운영 미적용이며 수집기 자원 제한·소스/캐시 조정·정확 승인·실제 MCP/새 채팅은 남습니다. 논문은 후임자용 실행·확인·복구 매뉴얼66쪽 MD/PDF/DOCX 검수본을 유지합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

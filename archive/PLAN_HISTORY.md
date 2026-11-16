@@ -6436,3 +6436,8 @@ MCP 기본 소스와 실제 core/journal2차이를 확인해 직접 배포하지
 ## 소스 대조·진단 캐시 복구 준비 (2026-11-16)
 
 이전 활성 계획은 Git `03ab2249b1d1ec5aade2bb2b47e9f84092d676d5:PLAN.md`, SHA256 `76d0f95bd9cde013b52a0b62a845544df5023c48daf5004f8412412830868afa`에 보존한다. A/B 수집 상한 보완→소스/캐시 조정 실행기/출처 영수증→최종 정확 승인/로드/재스캔/새 채팅 순서로 구체화했다. 단순 캐시 모듈 통과를 운영 완료로 세지 않는다. [검증/절차](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+
+## 수집 상한 선점 공백 보완 (2026-11-16)
+
+이전 계획 Git `b5e7b0757bd881a7242c3511ea624d8bb8842e04:PLAN.md`, SHA256 `65551a693f3eb406c3a9ee9bc7c801f017481abc286ca0a58e89b19ac4638bee`. 수집잘림 보완단위를 마치고 유한collector자원/초기설치→소스·캐시 조정/독립원복/영수증→정확승인/로드/재스캔/실제MCP·양봇새채팅을 다음으로 둔다. 의미·승인·IPS/혼합·논문/발표 전체목표는 active. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).

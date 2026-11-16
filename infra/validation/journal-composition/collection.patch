@@ -1,0 +1,344 @@
+--- a/infra/mcp/system_diagnostics.py
++++ b/infra/mcp/system_diagnostics.py
+@@ -96 +96,3 @@
+-            'parsed', 'encode', 'trusted_parents', 'root_file', 'bounded_command', 'history_library', 'is_error_candidate')})
++            'parsed', 'encode', 'trusted_parents', 'root_file', 'bounded_command', 'history_library', 'is_error_candidate',
++            'classify_message', 'validate_error', 'LOOKBACK', 'MAX_JOURNAL_ROWS',
++            'MAX_COMBINED_JOURNAL_ROWS', 'ERROR_POLICY_REVISION')})
+@@ -112 +114,2 @@
+-            'parsed', 'encode', 'classify_message', 'validate_error', 'trusted_parents', 'bounded_command')})
++            'parsed', 'encode', 'classify_message', 'validate_error', 'trusted_parents', 'bounded_command',
++            'collect_journal_metadata')})
+@@ -114,0 +118,5 @@
++
++
++def collect_journal_metadata(role, since, until, now=None):
++    """Root-only fixed metadata source, shared by snapshot and backfill."""
++    return journal_library().native_library().collect_metadata(role, since, until, now)
+@@ -233,2 +241,3 @@
+-    checked_native = argv == ['/usr/bin/python3', '-I', '-B',
+-        str(Path(__file__).with_name('diagnostic_journal_native.py')), '--worker']
++    checked_native = any(argv == ['/usr/bin/python3', '-I', '-B',
++        str(Path(__file__).with_name('diagnostic_journal_native.py')), mode]
++        for mode in ('--worker', '--collector-worker'))
+@@ -457,0 +467,5 @@
++    return summarize_errors(by_unit), truncated
++
++
++def summarize_errors(by_unit):
++    """Shared bounded snapshot summary of already-classified metadata."""
+@@ -469 +483 @@
+-    return result, truncated
++    return result
+@@ -582,17 +596,31 @@
+-        prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
+-            '--output-fields=__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
+-            '--since=@' + str(now - LOOKBACK * 60), '--until=@' + str(now),
+-            '--lines=' + str(MAX_JOURNAL_ROWS), *('--unit=' + unit for unit in profile.values())]
+-        parts, batches, truncated = [], [], False
+-        # Service stderr can have journal priority info. Keep that stream only
+-        # when a fixed error classifier pattern matches; ordinary bodies never
+-        # become error observations. The priority ranges are disjoint.
+-        for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + ERROR_PATTERN]):
+-            code, raw = runner(prefix + filters, MAX_JOURNAL_QUERY, 8)
+-            need(code == 0, 'journal_query_failed')
+-            lines = raw.splitlines()
+-            need(len(lines) <= MAX_JOURNAL_ROWS, 'journal_row_bound')
+-            truncated |= len(lines) == MAX_JOURNAL_ROWS
+-            parts.extend(lines)
+-            batches.append(raw)
+-        errors, truncated = journal_errors(b'\n'.join(parts), profile.values(), now, truncated)
++        since, until = (now - LOOKBACK * 60) * 1000000, now * 1000000
++        if runner is bounded_command:
++            batch = collect_journal_metadata(role, since, until, now)
++            collected, truncated = batch['events'], batch['truncated']
++            by_unit = {unit: [] for unit in profile.values()}
++            for event in collected:
++                by_unit[event['unit']].append(event['error'])
++            errors = summarize_errors(by_unit)
++        else:
++            prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
++                '--output-fields=__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
++                '--since=@' + str(now - LOOKBACK * 60), '--until=@' + str(now),
++                '--lines=' + str(MAX_JOURNAL_ROWS), *('--unit=' + unit for unit in profile.values())]
++            parts, batches, truncated = [], [], False
++            # Service stderr can have journal priority info. Keep that stream only
++            # when a fixed error classifier pattern matches; ordinary bodies never
++            # become error observations. The priority ranges are disjoint.
++            for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + ERROR_PATTERN]):
++                code, raw = runner(prefix + filters, MAX_JOURNAL_QUERY, 8)
++                need(code == 0, 'journal_query_failed')
++                lines = raw.splitlines()
++                need(len(lines) <= MAX_JOURNAL_ROWS, 'journal_row_bound')
++                truncated |= len(lines) == MAX_JOURNAL_ROWS
++                parts.extend(lines)
++                batches.append(raw)
++            errors, truncated = journal_errors(b'\n'.join(parts), profile.values(), now, truncated)
++            collected = []
++            if history_output is not None:
++                history = history_library()
++                collected = [row for raw in batches for row in history.normalize(
++                    raw, set(profile.values()), (now - LOOKBACK * 60) * 1000000, now * 1000000)[0]]
+@@ -602,5 +630,2 @@
+-            history = history_library()
+-            collected = [row for raw in batches for row in history.normalize(
+-                raw, set(profile.values()), (now - LOOKBACK * 60) * 1000000, now * 1000000)[0]]
+-            history_output.update(host=ROLE_HOST[role], since=(now - LOOKBACK * 60) * 1000000,
+-                                  until=now * 1000000, events=collected, truncated=truncated)
++            history_output.update(host=ROLE_HOST[role], since=since, until=until,
++                                  events=collected, truncated=truncated)
+--- a/infra/mcp/diagnostic_history.py
++++ b/infra/mcp/diagnostic_history.py
+@@ -173,3 +172,0 @@
+-        prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json', '--output-fields=' + FIELDS,
+-                  '--since=@' + str(since), '--until=@' + str(until), '--lines=' + str(core.MAX_JOURNAL_ROWS),
+-                  *('--unit=' + unit for unit in profile.values())]
+@@ -178,6 +175,2 @@
+-            for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + core.ERROR_PATTERN]):
+-                code, raw = core.bounded_command(prefix + filters, core.MAX_JOURNAL_QUERY, 8)
+-                core.need(code == 0, 'history_journal_unavailable')
+-                rows, limited = normalize(raw, set(profile.values()), since * 1000000, until * 1000000)
+-                events.extend(rows)
+-                clipped |= limited
++            result = core.collect_journal_metadata(role, since * 1000000, until * 1000000, now)
++            events, clipped = result['events'], result['truncated']
+--- a/infra/mcp/diagnostic_journal_native.py
++++ b/infra/mcp/diagnostic_journal_native.py
+@@ -20,0 +21,2 @@
++MAX_METADATA_PACKET = 1048576
++COLLECTION_QUERY_TIMEOUT = 16
+@@ -179,0 +182,19 @@
++def reverse_stamps(reader, since, until):
++    """Shared native cursor walk; supervised callers own time/memory bounds."""
++    for name in ('_previous', '_get', '_get_all', '_get_realtime', '_get_cursor'):
++        core.need(callable(getattr(reader, name, None)), 'journal_native_binding_api')
++    reader.data_threshold = 0
++    reader.seek_realtime(until + 1)
++    previous = None
++    while reader._previous():
++        stamp = reader._get_realtime()
++        core.need(type(stamp) is int and stamp >= 0, 'journal_native_timestamp')
++        core.need(previous is None or stamp <= previous, 'journal_native_source_order')
++        previous = stamp
++        if stamp > until:
++            continue
++        if stamp < since:
++            break
++        yield stamp
++
++
+@@ -183,2 +203,0 @@
+-        for name in ('_previous', '_get', '_get_all', '_get_realtime', '_get_cursor'):
+-            core.need(callable(getattr(reader, name, None)), 'journal_native_binding_api')
+@@ -187 +205,0 @@
+-        reader.data_threshold = 0
+@@ -195,11 +213,2 @@
+-        reader.seek_realtime(until + 1)  # integer microseconds, no float conversion
+-        rows = {}; previous = None
+-        while reader._previous():
+-            stamp = reader._get_realtime()
+-            core.need(type(stamp) is int and stamp >= 0, 'journal_native_timestamp')
+-            core.need(previous is None or stamp <= previous, 'journal_native_source_order')
+-            previous = stamp
+-            if stamp > until:
+-                continue
+-            if stamp < since:
+-                break
++        rows = {}
++        for stamp in reverse_stamps(reader, since, until):
+@@ -231,0 +241,146 @@
++
++
++def collection_request(job, now=None):
++    """Private collector protocol, never accepted by the MCP/reader request."""
++    core.need(isinstance(job, dict) and set(job) == {'role', 'since_us', 'until_us'},
++              'journal_collection_job')
++    role, since, until = (job[k] for k in ('role', 'since_us', 'until_us'))
++    core.need(isinstance(role, str) and role in core.PROFILES
++              and type(since) is type(until) is int and since > 0
++              and since % 1000000 == until % 1000000 == 0
++              and until - since == core.LOOKBACK * 60 * 1000000,
++              'journal_collection_window')
++    h = core.history_library(); clock = h.query_clock(now)
++    core.need(clock.microseconds - h.RETENTION_DAYS * 86400 * 1000000 <= since
++              and until <= clock.microseconds, 'journal_collection_time')
++    return role, since, until
++
++
++def metadata_row(raw, cursor, stamp, units):
++    """Reuse the collector's fixed classification and journal JSON semantics."""
++    core.need(isinstance(raw, dict), 'journal_collection_entry')
++    fields = {name: json_field(name, raw[name]) for name in ROW_FIELDS if name in raw}
++    matches = {fields[name] for name in ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT')
++               if isinstance(fields.get(name), str) and fields[name] in units}
++    priority = fields.get('PRIORITY')
++    core.need(len(matches) == 1 and isinstance(priority, str) and priority in tuple('0123456'),
++              'journal_collection_fields')
++    if isinstance(cursor, bytes):
++        cursor = cursor.decode('utf-8')
++    core.need(isinstance(cursor, str) and 1 <= len(cursor) <= 2048, 'journal_collection_cursor')
++    unit = matches.pop()
++    error = core.classify_message(fields.get('MESSAGE'), unit, priority=int(priority))
++    if int(priority) > 3 and error['kind'] == 'journal_error':
++        return None
++    return {'record_sha256': hashlib.sha256(cursor.encode()).hexdigest(), 'at_us': stamp,
++            'unit': unit, 'error': {'at': stamp // 1000000, 'priority': int(priority), **error}}
++
++
++def collection_worker(job, *, now=None, factory=reader_factory):
++    role, since, until = collection_request(job, now)
++    units = tuple(core.PROFILES[role].values())
++    events = {}; truncated = False
++    for priorities in (range(4), range(4, 7)):
++        reader = factory()
++        try:
++            for index, unit in enumerate(units):
++                if index:
++                    reader.add_disjunction()
++                unit_matches(reader, unit)
++            reader.add_conjunction()
++            for priority in priorities:
++                reader.add_match(PRIORITY=str(priority))
++            selected = {}
++            for stamp in reverse_stamps(reader, since, until):
++                if priorities.start == 4:
++                    try:
++                        message = reader._get('MESSAGE')
++                    except KeyError:
++                        continue
++                    core.need(isinstance(message, bytes), 'journal_native_message_type')
++                    if not core.is_error_candidate(message.decode('utf-8', errors='replace'), '6'):
++                        continue
++                row = metadata_row(reader._get_all(), reader._get_cursor(), stamp, units)
++                if row is None:
++                    continue
++                core.need(row['error']['priority'] in priorities, 'journal_collection_priority')
++                identity = row['record_sha256']
++                core.need(identity not in events or events[identity] == row,
++                          'journal_collection_cursor_conflict')
++                events[identity] = selected[identity] = row
++                if len(selected) == core.MAX_JOURNAL_ROWS:
++                    truncated = True
++                    break
++        finally:
++            reader.close()
++    packet = {'schema': 1, **job, 'host': core.ROLE_HOST[role],
++              'source_filter_policy': core.ERROR_POLICY_REVISION,
++              'events': sorted(events.values(), key=lambda r: (r['at_us'], r['record_sha256']), reverse=True),
++              'truncated': truncated}
++    core.need(len(core.encode(packet)) <= MAX_METADATA_PACKET, 'journal_collection_packet_bound')
++    return packet
++
++
++def checked_collection_packet(raw, job, now=None):
++    role, since, until = collection_request(job, now)
++    core.need(len(raw) <= MAX_METADATA_PACKET, 'journal_collection_packet_bound')
++    packet = core.parsed(raw)
++    core.need(isinstance(packet, dict) and set(packet) == {
++        'schema', 'role', 'host', 'since_us', 'until_us', 'source_filter_policy', 'events', 'truncated'}
++        and type(packet['schema']) is int and packet['schema'] == 1
++        and all(packet[k] == v for k, v in job.items())
++        and packet['host'] == core.ROLE_HOST[role]
++        and packet['source_filter_policy'] == core.ERROR_POLICY_REVISION
++        and type(packet['truncated']) is bool and isinstance(packet['events'], list)
++        and len(packet['events']) <= core.MAX_COMBINED_JOURNAL_ROWS,
++        'journal_collection_packet')
++    seen = set(); groups = [0, 0]
++    for row in packet['events']:
++        core.need(isinstance(row, dict) and set(row) == {'record_sha256', 'at_us', 'unit', 'error'}
++            and isinstance(row['record_sha256'], str) and re.fullmatch('[0-9a-f]{64}', row['record_sha256'])
++            and row['record_sha256'] not in seen
++            and type(row['at_us']) is int and since <= row['at_us'] <= until
++            and isinstance(row['unit'], str) and row['unit'] in core.PROFILES[role].values(),
++            'journal_collection_record')
++        core.validate_error(row['error'], since // 1000000, until // 1000000)
++        core.need(row['error']['at'] == row['at_us'] // 1000000
++            and (row['error']['priority'] <= 3 or row['error']['kind'] != 'journal_error'),
++            'journal_collection_error')
++        groups[int(row['error']['priority'] > 3)] += 1
++        seen.add(row['record_sha256'])
++    core.need(all(count <= core.MAX_JOURNAL_ROWS for count in groups)
++              and (packet['truncated'] or all(count < core.MAX_JOURNAL_ROWS for count in groups)),
++              'journal_collection_group_bound')
++    core.need(packet['events'] == sorted(packet['events'], key=lambda r: (r['at_us'], r['record_sha256']), reverse=True),
++              'journal_collection_order')
++    return {'events': packet['events'], 'truncated': packet['truncated']}
++
++
++def collection_access(job, deadline):
++    remaining = deadline - time.monotonic()
++    core.need(remaining > 0, 'journal_collection_timeout')
++    argv = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json', '--lines=0',
++            '--since=@' + str(job['since_us'] // 1000000),
++            '--until=@' + str(job['until_us'] // 1000000),
++            *('--unit=' + unit for unit in core.PROFILES[job['role']].values())]
++    code, raw = core.bounded_command(argv, 4096, min(journal.COMMAND_TIMEOUT, remaining))
++    core.need(code == 0 and raw == b'', 'journal_collection_access')
++
++
++def collect_metadata(role, since, until, now=None):
++    core.need(os.getuid() == os.geteuid() == 0, 'journal_collection_root_required')
++    job = {'role': role, 'since_us': since, 'until_us': until}
++    collection_request(job, now)
++    program = Path(__file__); core.root_file(program, 131072)
++    deadline = time.monotonic() + COLLECTION_QUERY_TIMEOUT
++    collection_access(job, deadline)
++    body = core.encode(job); core.need(len(body) <= MAX_JOB, 'journal_native_job_bound')
++    remaining = deadline - time.monotonic()
++    core.need(remaining > 0, 'journal_collection_timeout')
++    code, raw = core.bounded_command(['/usr/bin/python3', '-I', '-B', str(program), '--collector-worker'],
++        MAX_METADATA_PACKET, min(journal.COMMAND_TIMEOUT, remaining), input_data=body)
++    core.need(code == 0, 'journal_collection_worker_unavailable')
++    result = checked_collection_packet(raw, job, now)
++    collection_access(job, deadline)
++    core.need(time.monotonic() <= deadline, 'journal_collection_timeout')
++    return result
+@@ -381 +536 @@
+-    if os.geteuid() != 0 or sys.argv[1:] != ['--worker']:
++    if os.getuid() != 0 or os.geteuid() != 0 or sys.argv[1:] not in (['--worker'], ['--collector-worker']):
+@@ -403 +558 @@
+-    packet = worker(core.parsed(raw))
++    packet = (collection_worker if sys.argv[1] == '--collector-worker' else worker)(core.parsed(raw))
+--- a/infra/mcp/test_diagnostic_history.py
++++ b/infra/mcp/test_diagnostic_history.py
+@@ -191 +191 @@
+-    def test_backfill_accepts_only_fixed_role_and_two_fixed_read_filters(self):
++    def test_backfill_accepts_only_fixed_role_and_bounded_metadata_windows(self):
+@@ -193,3 +193,3 @@
+-        def run(argv,maximum,seconds):
+-            calls.append((argv,maximum,seconds));return 0,b''
+-        with patch.object(d,'bounded_command',run):
++        def read(role,since,until,now):
++            calls.append((role,since,until,now));return {'events':[],'truncated':False}
++        with patch.object(d,'collect_journal_metadata',read):
+@@ -198,8 +198,5 @@
+-        self.assertEqual(len(calls),12)
+-        for argv,maximum,seconds in calls:
+-            self.assertEqual(argv[0],'/usr/bin/journalctl')
+-            since=int(next(a.removeprefix('--since=@') for a in argv if a.startswith('--since=@')))
+-            until=int(next(a.removeprefix('--until=@') for a in argv if a.startswith('--until=@')))
+-            self.assertEqual(until-since,14400)
+-            self.assertEqual((maximum,seconds),(1048576,8))
+-            self.assertTrue(all(a.removeprefix('--unit=') in d.PROFILES['service'].values() for a in argv if a.startswith('--unit=')))
++        self.assertEqual(len(calls),6)
++        for role,since,until,now in calls:
++            self.assertEqual(role,'service');self.assertEqual(now,NOW)
++            self.assertEqual(until-since,14400*US)
++            self.assertTrue((NOW-86400)*US<=since<until<=NOW*US)
+@@ -209,4 +206,4 @@
+-        def run(argv,maximum,seconds):
+-            if '--since=@'+str(NOW-57600) in argv:raise d.DiagnosticError('command_timeout')
+-            return 0,b''
+-        with patch.object(d,'bounded_command',run):result=h.collect('service',NOW,hours=24)
++        def read(role,since,until,now):
++            if since==(NOW-57600)*US:raise d.DiagnosticError('command_timeout')
++            return {'events':[],'truncated':False}
++        with patch.object(d,'collect_journal_metadata',read):result=h.collect('service',NOW,hours=24)
+@@ -215 +212 @@
+-        with patch.object(d,'bounded_command',side_effect=d.DiagnosticError('command_timeout')):
++        with patch.object(d,'collect_journal_metadata',side_effect=d.DiagnosticError('command_timeout')):
+--- a/infra/mcp/test_diagnostic_journal.py
++++ b/infra/mcp/test_diagnostic_journal.py
+@@ -198 +198 @@
+-        bad=[dict(args(),target='b:systemd'),dict(args(),target='c:apache'),
++        bad=[dict(args(),target='b:collection'),dict(args(),target='c:apache'),

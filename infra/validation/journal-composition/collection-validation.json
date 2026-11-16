@@ -1,0 +1,446 @@
+{
+  "status": "collection_gap_fixed_in_isolated_live_reads_not_operating_deployed",
+  "at_kst": "2026-11-16T21:38:05.079656+09:00",
+  "candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908",
+  "runtime_overlay_files": 3,
+  "existing_test_files_updated": 2,
+  "new_tests": 40,
+  "mac": {
+    "groups": 28,
+    "tests": 1410,
+    "passed": 1404,
+    "skipped": 6,
+    "complete": true,
+    "python": "3.12.5"
+  },
+  "linux": {
+    "groups": 28,
+    "tests": 1493,
+    "skipped": 0,
+    "complete": true,
+    "guard": {
+      "at_kst": "2026-11-16T21:29:54.008799+09:00",
+      "uid": 10001,
+      "euid": 10001,
+      "python_version": "3.13.5",
+      "network_interfaces": [
+        "lo"
+      ],
+      "source_files_verified": 2285,
+      "rc": 0,
+      "operating_changes": 0,
+      "model_calls": 0,
+      "mcp_calls": 0,
+      "chat_posts": 0,
+      "complete": true,
+      "tests": 1493,
+      "skipped": 0,
+      "groups": 28
+    },
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "network": "none, lo only; socket connections denied in runners",
+    "source_mount": "read only, no operating credentials or config copied"
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 37,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 22,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 37,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 22,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/extra_test_diagnostic_history.py",
+        "scripts/extra_test_diagnostic_journal.py",
+        "scripts/mcp/diagnostic_history.py",
+        "scripts/mcp/diagnostic_journal_native.py",
+        "scripts/mcp/system_diagnostics.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908",
+    "scope": "Official structure and exact source restoration; not runtime accuracy, deployment or chat acceptance",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "hosts": {
+    "a": {
+      "at_kst": "2026-11-16T21:19:03.277290+09:00",
+      "clock": 1794831543,
+      "collectors": {
+        "baseline": {
+          "seconds": 2.1450550659792498,
+          "journal_status": {
+            "a:vector": "observed",
+            "a:wazuh-agent": "observed",
+            "a:rule-worker": "observed",
+            "a:raw-waf": "observed",
+            "a:raw-suricata": "observed",
+            "a:certificate-monitor": "observed",
+            "a:storage-monitor": "observed",
+            "a:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": true,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        },
+        "candidate": {
+          "seconds": 4.511721781978849,
+          "journal_status": {
+            "a:vector": "observed",
+            "a:wazuh-agent": "observed",
+            "a:rule-worker": "observed",
+            "a:raw-waf": "observed",
+            "a:raw-suricata": "observed",
+            "a:certificate-monitor": "observed",
+            "a:storage-monitor": "observed",
+            "a:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": false,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        }
+      },
+      "cgroup": {
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 27852800,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "historical": null,
+      "cache": null,
+      "operating_sources_observed_at_kst": "2026-11-16T21:35:00.512636+09:00",
+      "operating_sources_and_protected_unchanged": true,
+      "reader": {
+        "MainPID": "885",
+        "ActiveState": "active",
+        "start_ticks": 2569
+      },
+      "cleanup_at_kst": "2026-11-16T21:36:08.725008+09:00",
+      "own_root_removed": true,
+      "own_units_removed": 1
+    },
+    "b": {
+      "at_kst": "2026-11-16T21:19:07.646251+09:00",
+      "clock": 1794831547,
+      "collectors": {
+        "baseline": {
+          "seconds": 2.0641688049654476,
+          "journal_status": {
+            "b:soc-bot": "observed",
+            "b:management": "observed",
+            "b:rule-worker": "observed",
+            "b:vector": "observed",
+            "b:wazuh-agent": "observed",
+            "b:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": true,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        },
+        "candidate": {
+          "seconds": 3.8917240840382874,
+          "journal_status": {
+            "b:soc-bot": "observed",
+            "b:management": "observed",
+            "b:rule-worker": "observed",
+            "b:vector": "observed",
+            "b:wazuh-agent": "observed",
+            "b:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": false,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        }
+      },
+      "cgroup": {
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 28327936,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "historical": {
+        "seconds": 5.65242630202556,
+        "source_rows_in_three_minutes": 12,
+        "selected_errors_in_three_minutes": 4,
+        "selected_in_four_hours": 6,
+        "source_truncated": false,
+        "matching_record_ids": [
+          "21be38dd6bb7e64276d5cc7bfbb25ae0ee2b8fb5260f5c4ab7ec514ae2629354",
+          "2e158b9e80f3abfef0ea5b20d8727489d566e778be54903df74c4949a81ff1f3",
+          "53eef2ce16f409d3178ec8cb4874f495dad3c69d29a363db80d67c8d47905238",
+          "f9f86c74f473793e86fc4c51deb1010866752f72a622af43c80323cc22bd2eb4"
+        ],
+        "raw_cli_sha256": "52f4075b0b34de383ac8a38cad9aaf342da3cc3621863633fa924e93c231b94b",
+        "raw_messages_returned": false,
+        "scope": "Existing observed development interval, not an independent incident or attack label"
+      },
+      "cache": {
+        "passed": true,
+        "before": {
+          "sha256": "0a26354d44e47fa047a62b2a0616e9ee50028046bd5925b739bb9f93287c1131",
+          "bytes": 1093632,
+          "host": "b",
+          "metadata": {
+            "schema": "1",
+            "host": "b",
+            "observed_at_us": "1794831527000000",
+            "retained_since_us": "1792239527000000"
+          },
+          "counts": {
+            "metadata": 4,
+            "events": 920,
+            "windows": 12798
+          },
+          "table_sha256": {
+            "metadata": "2d44477cdb690073ab9c350e71471d72afa04d4f109bcdf29431f243d119c254",
+            "events": "c843c1dd4bb13b9d97332b8946136362a6cba9dad23cde6361e5beb47e5f0ade",
+            "windows": "cf9e66e0a176e553ae5ff7e88eac3682ea5554a0ef70487390020c29e65c3a63"
+          },
+          "logical_sha256": "8e71a164ea5beda935e449e8f4bf14e0b77c1a466bd9bbe45e3ecaa425810d51"
+        },
+        "after": {
+          "sha256": "e5b4d5e9d6f9fd6b0e1b906db39890cffef2c51ecfd92b075ca7b8ca175e1418",
+          "bytes": 1093632,
+          "host": "b",
+          "metadata": {
+            "schema": "1",
+            "host": "b",
+            "observed_at_us": "1794831547000000",
+            "retained_since_us": "1792239547000000",
+            "source_filter_policy": "application-severity-v1"
+          },
+          "counts": {
+            "metadata": 5,
+            "events": 926,
+            "windows": 2
+          },
+          "table_sha256": {
+            "metadata": "29e382882f6d8e9f7a53d639a0e9145bfcb377749cfb73c9612d94eee5bfdc79",
+            "events": "ee375a44637a73a97f4684c4ce0602f3181d3db51dfb3a449ce53c7600116dcb",
+            "windows": "48816dc27f56f251293244fd621f6b71b6930ec58af73f1e4d57001a869f5df0"
+          },
+          "logical_sha256": "9fa9f7b2c293aa2b45c24cbdf47b173dc36e5425d71c4ecbb5447ebd9742d57a"
+        },
+        "restoration": {
+          "changed": true,
+          "baseline_sha256": "0a26354d44e47fa047a62b2a0616e9ee50028046bd5925b739bb9f93287c1131",
+          "post_sha256": "e5b4d5e9d6f9fd6b0e1b906db39890cffef2c51ecfd92b075ca7b8ca175e1418",
+          "post_preserved": true
+        },
+        "before_selected_error_count": 0,
+        "after_selected_error_count": 4,
+        "after_requested_window_scanned": true,
+        "new_observations_preserved": true,
+        "exact_original_bytes_restored": true,
+        "scope": "Actual cache read-only export, modified only in an isolated copy"
+      },
+      "operating_sources_observed_at_kst": "2026-11-16T21:35:01.727671+09:00",
+      "operating_sources_and_protected_unchanged": true,
+      "reader": {
+        "MainPID": "927",
+        "ActiveState": "active",
+        "start_ticks": 7043
+      },
+      "cleanup_at_kst": "2026-11-16T21:36:10.501622+09:00",
+      "own_root_removed": true,
+      "own_units_removed": 4
+    },
+    "c": {
+      "at_kst": "2026-11-16T21:19:03.600493+09:00",
+      "clock": 1794831543,
+      "collectors": {
+        "baseline": {
+          "seconds": 2.046065689995885,
+          "journal_status": {
+            "c:lab-api": "observed",
+            "c:lab-broker": "observed",
+            "c:lab-guard": "observed",
+            "c:lab-terminal": "observed",
+            "c:terminal-guard": "observed",
+            "c:terminal-status": "observed",
+            "c:sudo-status": "observed",
+            "c:sudo-user-manager": "observed",
+            "c:apache": "observed",
+            "c:wazuh-agent": "observed",
+            "c:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": false,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        },
+        "candidate": {
+          "seconds": 2.1549053579801694,
+          "journal_status": {
+            "c:lab-api": "observed",
+            "c:lab-broker": "observed",
+            "c:lab-guard": "observed",
+            "c:lab-terminal": "observed",
+            "c:terminal-guard": "observed",
+            "c:terminal-status": "observed",
+            "c:sudo-status": "observed",
+            "c:sudo-user-manager": "observed",
+            "c:apache": "observed",
+            "c:wazuh-agent": "observed",
+            "c:docker": "observed"
+          },
+          "history_prepared": true,
+          "history_truncated": false,
+          "events": 0,
+          "record_ids": [],
+          "scope": "Same fixed current four-hour interval and registered units; no publication"
+        }
+      },
+      "cgroup": {
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 27582464,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "historical": null,
+      "cache": null,
+      "operating_sources_observed_at_kst": "2026-11-16T21:35:00.787792+09:00",
+      "operating_sources_and_protected_unchanged": true,
+      "reader": {
+        "MainPID": "888",
+        "ActiveState": "active",
+        "start_ticks": 2976
+      },
+      "cleanup_at_kst": "2026-11-16T21:36:09.110873+09:00",
+      "own_root_removed": true,
+      "own_units_removed": 1
+    }
+  },
+  "remote_cleanup": {
+    "roots": 3,
+    "transient_units": 6,
+    "regular_files": 4711,
+    "bytes": 78385678,
+    "own_failed_states_cleared_after_evidence_preserved": 2,
+    "complete": true
+  },
+  "initial_failures": [
+    {
+      "phase": "read_only_preflight",
+      "reason": "Timer has no MainPID field; corrected probe to require PID only on services. All three terminated rc1; originals preserved."
+    },
+    {
+      "phase": "linux_R1",
+      "reason": "Operator driver assumed /usr/bin/docker, but actual CLI is /usr/local/bin/docker. No test container was created; corrected only the driver."
+    },
+    {
+      "phase": "linux_R2",
+      "tests_reached": 944,
+      "reason": "One old negative test treated allowed fixed b:systemd journal as forbidden. Replaced only that entry with b:collection, preserved all remaining negative assertions and added an explicit pure-validation positive/negative case. Earlier pass is not proof of this contract; why it passed earlier was not reproduced."
+    }
+  ],
+  "remaining_gates": [
+    "Complete finite resource limits for the operating collector and corresponding initial-install path; 128MiB/Tasks8 proof belongs to isolated read probes, not the full runtime collector.",
+    "Coordinated source/cache quiescence, independent rollback and fresh proof-bound commit; reconcile preserved installation provenance.",
+    "Refresh actual schema/model/authority evidence and bind exact source/receipt/unit payloads to administrator approval.",
+    "Load, rescan, real MCP and new both-bot chats, semantic correctness and rollback/confirm checks."
+  ],
+  "scope_notes": [
+    "The new40 tests, including normal-burst fixtures, are project fixtures, not institution datasets or independent SOC incidents.",
+    "The4 matching application errors are a reused development interval, not new labels or SFT inputs.",
+    "Root probe runtime4-source SHA matches final candidate; R3 changed fixtures only after the real reads.",
+    "Memory peaks include each complete baseline/candidate/recovery probe; not isolated candidate-only memory measurements.",
+    "Current4h zero selected events means the fixed classification scope, not absence of all host errors or security incidents.",
+    "A/B complete policy-scoped collection costs A4.51/B3.89s versus baseline A2.15/B2.06s truncated reads in this one sequential sample; not a latency speedup or messenger benchmark.",
+    "Operating collector MemoryMax=infinity/TasksMax7012 was observed earlier; a finite full-collector quota is an unapplied release condition.",
+    "Operating source/cache/model/MCP/chat/training/attack changes0. Native remains uninstalled; exact old approvals are not reused."
+  ],
+  "operating_source_changes": 0,
+  "operating_cache_writes": 0,
+  "model_calls": 0,
+  "mcp_calls": 0,
+  "chat_posts": 0,
+  "source_sha256": {
+    "collection-manifest.json": "aa922a2267287a7b653130546e897f264c5240c6479f8abb5a3190ffa30c0284",
+    "collection.patch": "183264faab5403083f3f7bb9b7e2d113d49047087c6fe5904eaee1784d63a01e",
+    "test_collection.py": "9ab578e74a89b66a443690a9d89b0639499d5561f37c602d3f4f1a6e856b1d98",
+    "reproduce_collection.py": "862a77ed1c891fe6ed4dcc759d1048217bcc45980b6dd6177b5fe2d2a318ab35",
+    "run_collection_regressions.py": "2a717921bfa7dedd4c18f99bf65f297ad5a4bef7834af5a2a5ec4a8b4964f449",
+    "collection-release-inventory.json": "f3671e2bfa13b0fd3e00fa5b644817d024baded2cec3f3f8f8a9edfaedb75fcb"
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-16T21:51:12.138193+09:00",
+    "removed": true,
+    "regular_files": 18342,
+    "bytes": 331685699,
+    "public_replay_verified": true,
+    "driver_sources_and_all_evidence_preserved": true,
+    "own_marked_processes": 0
+  },
+  "review": {
+    "procedure": "review-agent read-only defect-first review by main agent, no delegation",
+    "result": "No findings.",
+    "scope": "Complete5-file overlay,40 supplemental fixtures and replay/regression drivers, surrounding callers/permissions and final actual read/cgroup/cache evidence",
+    "residual_gates": [
+      "Complete finite resource limits for the operating collector and corresponding initial-install path; 128MiB/Tasks8 proof belongs to isolated read probes, not the full runtime collector.",
+      "Coordinated source/cache quiescence, independent rollback and fresh proof-bound commit; reconcile preserved installation provenance.",
+      "Refresh actual schema/model/authority evidence and bind exact source/receipt/unit payloads to administrator approval.",
+      "Load, rescan, real MCP and new both-bot chats, semantic correctness and rollback/confirm checks."
+    ],
+    "initial_source_lookup_corrected": true
+  }
+}

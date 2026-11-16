@@ -1,7 +1,7 @@
 # 구축·운영 가이드
 
 <!-- journal-composition:start -->
-[통합 후보·캐시 검증](../infra/validation/journal-composition/README.md) — 34소스 후보는 운영 미적용입니다.40배포 대상 초안·환경별40캐시 회귀·실제 격리 사본 복구·128MiB/Tasks8을 확인했습니다. A/B 수집 잘림과 일관된 소스/캐시 배포 실행기·정확 승인·새 실제 채팅은 남았습니다. 초기 설치·추론/학습 모델·권한을 바꾸지 않았습니다.
+[수집 오버레이 검증](../infra/validation/journal-composition/README.md) — 기본34소스 위 런타임3/시험2·새40회귀로 A/B의 실제4h 잘림을 보완했습니다. Mac1410/기존6생략·기존 Hermes 이미지의 격리 컨테이너1493/생략0·과거4ID 캐시 편입/원복을 확인했습니다. 운영 미적용이며 수집기 유한 자원 설정·초기 설치/배포 조정·정확 승인·새 MCP/채팅은 남습니다. 모델/학습/권한은 바꾸지 않았습니다.
 <!-- journal-composition:end -->
 
 

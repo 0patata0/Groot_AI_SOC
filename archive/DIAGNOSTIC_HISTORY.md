@@ -449,3 +449,10 @@ Mac1190(1184통과/기존6생략)/Hermes1273·신규41·부모36mock호환(원�
 ## 소스 대조·진단 캐시 복구 준비 (2026-11-16)
 
 실제 캐시 RO 내보내기 격리 사본 A9/B920/C12 이벤트의 논리SHA·원본 바이트 복구/변경뒤 보존·재복구를 검증. 최종40회귀 Mac/A/B/C 생략0(160독립아님). Native24h A1/B42/C1, 실제 cgroup128MiB/Tasks8·peak37789696/38088704/38080512B·OOM/pids한도0. A/B수집 history_truncated=true·준비0을 전구간완료로세지않음. A기존캐시11/12정체·exit0/실제필터8초timeout. 초기files=[]가용성점검은잘못된probe입력으로실패/정정,driver오류아님. R1 38과최종40구분. 자체원격6폴더108파일/17461629B·유닛9정리20:41·운영소스/보호SHA불변. 수동결함검토/review-agent부재/Semgrep미수행·모델/채팅/공격/학습0. [검증/절차](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+
+## 수집 상한 선점 공백 보완 (2026-11-16)
+
+R1Mac1409/기존6생략·새39. timerMainPID/고정DockerCLI경로가정점검오류정정. LinuxR2 944진행/journal85내1실패:허용b:systemd를구음성에서금지기대. b:collection으로그1입력만교체·다른거절assert불변/명시양성·음성추가→최종40·Mac1410(1404통과/6생략)/실제이미지1493/생략0. 공식37/5면/상시16917증가0·공개SHA재현. 실제A/B현재4h잘림true→false·Cfalse·B과거4h6선택/3분raw12→app4ID·격리cache0→4/원본복구/새관측보존.128MiB/Tasks8의비교·복구peak26.56/27.02/26.30MiB·OOM/pids0. 루트Source/reader3PID/ticks21:36불변. 자체3폴더4711파일/78385678B·유닛6(실패2원문보존후상태만정리)/격리container2자동제거·운영변경0. 예전통과의정확원인미재현·권한경로가가렸다는해석은추정. 수동결함검토/review-agent부재·Semgrep미실행. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+후속 정정: 숨김 `.system/review-agent/SKILL.md` 원본을 확인해 읽기 전용 절차로 전체5파일/추가 시험·재현기를 검토했다. 초기 미발견 설명은 정정하며 추가 결함 없음과 운영 배포 조건 미완료를 구분한다. Mac 자체 임시18,342파일/331,685,699B 정리·부재를 확인했다.

@@ -691,3 +691,8 @@ journal 우선순위와 앱 선언 수준을 구분한다. JSON/logfmt 최상위
 ## 소스 대조·진단 캐시 복구 준비 (2026-11-16)
 
 변경 뒤 관측을 잃는 단순 DB 덮어쓰기 대신 before/after 불변 사본·논리/바이트 SHA·root 고정 경로·정책/스키마·원자 교체·재복구 검증을 택했다. 서비스 제어/일반 권한을 helper에 넣지 않았다. CLI 후보 정상 로그 상한 문제는 grep을 좁혀 escaped severity를 누락시키는 대안으로 해결하지 않는다. 의미 분류 선행·한도/실제 A/B 검증 필요. [검증/절차](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+
+## 수집 상한 선점 공백 보완 (2026-11-16)
+
+grep축소 대신공통Native순회·등록unit표현식/분류후상한을택했다. snapshot/backfill이같은root전용메타데이터함수/공통요약검증을쓴다. JSONescape/중복/노이즈·기존byte/row/time/원문차단·정책v1 유지. UI필드/roleprompt복제/새스킬·도구0. 잘린CLI보다실제순차A2.15→4.51/B2.06→3.89초로느려졌으나범위검증이강화됐고채팅속도향상으로세지않음. 전체collector자원은격리read128/8과별도검증. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).

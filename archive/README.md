@@ -72,3 +72,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 소스40대상 초안·캐시 복구 모듈의 격리 검증과 A/B 수집 잘림·영수증 불일치·미배포 범위는 유형별5이력과 [후속 원장](../infra/validation/journal-composition/README.md)에 보존합니다. 운영 승인/적용 완료와 구분합니다.
+
+
+수집 오버레이의 실제 A/B 잘림 보완·과거4ID/격리 캐시 인수·초기 실패/최종 회귀·미배포 범위는 유형별5이력과 [수집 원장](../infra/validation/journal-composition/collection-validation.json)을 따릅니다. 이전 캐시 준비와 기본 통합 기록은 당시 사실로 보존합니다.

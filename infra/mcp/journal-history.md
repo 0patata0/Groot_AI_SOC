@@ -1,7 +1,7 @@
 # 사건 당시 서비스 오류 조회
 
 <!-- journal-release-preparation:start -->
-[수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. 실제 캐시 격리 사본의 이벤트 보존/복구는 확인했지만 A/B의 수집 잘림과 일관 배포 절차가 남습니다. collector exit0·오류0건만으로 전 구간 완료를 판정하지 않습니다. 아래 설치/사용 절차와 새 후보 능력을 구분합니다.
+[수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. A/B의4시간 수집 잘림은 격리 읽기에서 보완했고 기존 앱 오류4ID의 캐시 편입/복구를 확인했습니다. 수집기 자원/초기 설치·일관 배포·정확 승인·실제 MCP/새 채팅이 남습니다. 아래 현재 설치/사용 절차와 후보 능력을 구분합니다.
 <!-- journal-release-preparation:end -->
 
 

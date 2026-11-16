@@ -1807,3 +1807,8 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 ## 소스 대조·진단 캐시 복구 준비 (2026-11-16)
 
 운영 배포0.40대상은 A4+B32+C4의 inventory_draft_not_approval_ready다. B코드30/영수증2, 이미일치1·부재선택별칭9제외. 신규 Native는 운영 부재. SDK조회스킬 영수증1개/초기 설치 core영수증3개의 선행 불일치 원본 보존·명시적 새 배포 연결 필요. 구정확19/9계획 불변/승인 재사용0. 소스/캐시 일관 정지/독립원복/증거결속확정은 미완료. [검증/절차](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+
+## 수집 상한 선점 공백 보완 (2026-11-16)
+
+운영배포0. 기본34위 런타임3/시험2 overlay·정제메타데이터 private4h/root프로토콜·일반MCP/권한/포트/모델변경0. 실제소스4SHA는R3시험정정후도동일. 기존40소스투영은unit/quota/조정범위미포함 초안. 운영collector Infinity/병렬4를고려한유한자원과초기설치동기화 필요. 구19/9정확계획/캐시준비영수증보존·승인재사용0. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).

@@ -205,5 +205,19 @@
     },
     "inventory_status": "inventory_draft_not_approval_ready",
     "live_cache_publication": false
+  },
+  "collection_overlay": {
+    "scope": "Frozen34-source composition plus3runtime/2existing-test overlay; original composition and operator-cache receipts preserved",
+    "candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908",
+    "files": {
+      "collection-manifest.json": "aa922a2267287a7b653130546e897f264c5240c6479f8abb5a3190ffa30c0284",
+      "collection.patch": "183264faab5403083f3f7bb9b7e2d113d49047087c6fe5904eaee1784d63a01e",
+      "test_collection.py": "9ab578e74a89b66a443690a9d89b0639499d5561f37c602d3f4f1a6e856b1d98",
+      "reproduce_collection.py": "862a77ed1c891fe6ed4dcc759d1048217bcc45980b6dd6177b5fe2d2a318ab35",
+      "run_collection_regressions.py": "2a717921bfa7dedd4c18f99bf65f297ad5a4bef7834af5a2a5ec4a8b4964f449",
+      "collection-release-inventory.json": "f3671e2bfa13b0fd3e00fa5b644817d024baded2cec3f3f8f8a9edfaedb75fcb",
+      "collection-validation.json": "a372d68d2e8f6ca03a025a3fdfa921ef8199228877377502902979bab228486a"
+    },
+    "operating_deployed": false
   }
 }

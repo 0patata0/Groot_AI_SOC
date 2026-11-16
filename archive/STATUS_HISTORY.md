@@ -12837,3 +12837,8 @@ MD/PDF/DOCX66쪽·MD850/DOCX892항목 누락0·목차/캡션128·표45/그림7·
 ## 소스 대조·진단 캐시 복구 준비 (2026-11-16)
 
 이전 현재 상태는 Git `03ab2249b1d1ec5aade2bb2b47e9f84092d676d5:STATUS.md`, SHA256 `747f4a6dba97250b0fe94296234aa1c7b98584307540c4a3c34fbde2c1340cb1`로 복구한다. 후속40대상 초안·캐시 복구 모듈40회귀/4환경·실제 캐시 사본/제한 읽기를 확인했으나 A/B 수집 잘림으로 운영 미적용이다. [검증/절차](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+
+## 수집 상한 선점 공백 보완 (2026-11-16)
+
+이전 요약 Git `b5e7b0757bd881a7242c3511ea624d8bb8842e04:STATUS.md`, SHA256 `c108946af168dbdeaf0f30a3d2f432223110ee27d8ef3c13b955c36aaac1cbf5` 보존. A/B 상한 선점 공백은 신규 수집 오버레이의 격리 실제 읽기에서보완. Mac1410/6생략·Hermes이미지1493/0생략·공식37/5/증가0·실제4ID/격리cache0→4·원복. 운영미적용/논문66쪽15SHA보존. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).

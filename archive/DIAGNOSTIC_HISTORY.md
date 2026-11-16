@@ -436,3 +436,7 @@ Mac1190(1184통과/기존6생략)/Hermes1273·신규41·부모36mock호환(원�
 ## 앱 선언 오류와 정책별 수집 범위 (2026-11-16)
 
 실제 등록 MCP3읽기와 직접 원문으로 과거4개 앱 오류 누락을 확인했다. 메모리 내 normalize/수집 재처리/CLI/Native 각4·원문ID 일치, 실제 캐시는0/legacy partial·쓰기0이다. 새24검사는 형식/본문·중복·한도·정책 이전/복구를 다룬다. 초기 선택 소스 사본의 XML/canary/root참조 누락과 Mac OpenAI/2소비자 fixture를 보완했고 실패 원문을 보존했다. 첫 Mac incomplete가 Linux 준비를 막지 못한 실수는 격리4프로필에서 종료·모델/배포0이었다. 최종 Mac complete 후 Linux381전체를 확인했다. 공식 카운트는 구분자 포함16917/증가0이며 단순 문자열 합16915와 구분한다. [근거](../infra/validation/application-error-filter/README.md).
+
+## 조회·조사 소스 통합 (2026-11-16)
+
+스킬25243B 로딩 실패→24456B; 설명기대값만정확3문장보정(원시13검사·입력/자원유지). 점검스크립트의과거clock/private slice/timerPID 가정오류를정정. unsafe_parent는보호검사성공이며root전용14소스로대조. R1실패/1452와최종R2 1453/실제3읽기를구분. 모델/채팅·운영DB게시0. [근거](../infra/validation/journal-composition/README.md).

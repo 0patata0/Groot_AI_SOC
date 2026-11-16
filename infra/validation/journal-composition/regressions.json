@@ -1,0 +1,352 @@
+{
+  "groups": [
+    {
+      "group": "new-targets",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/read-target-binding/test_targets.py"
+      },
+      "mac_tests": 39,
+      "hermes_tests": 39
+    },
+    {
+      "group": "new-intents",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/read-intent-scope/test_intents.py"
+      },
+      "mac_tests": 16,
+      "hermes_tests": 16
+    },
+    {
+      "group": "new",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/read-attempt-binding/test_attempts.py"
+      },
+      "mac_tests": 40,
+      "hermes_tests": 40
+    },
+    {
+      "group": "prior-claim",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/claim-modality/test_claims.py"
+      },
+      "mac_tests": 28,
+      "hermes_tests": 28
+    },
+    {
+      "group": "root",
+      "cwd": "infra/hermes",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_soc_management_evidence",
+          "test_zero_claim_sentences",
+          "test_sensor_abbreviation_boundary",
+          "test_report_repair_diagnosis",
+          "test_diagnostic_claim_scope",
+          "test_soc_management_incident_context",
+          "test_soc_management_repair",
+          "test_control_status_repair",
+          "test_incident_completion_contract"
+        ]
+      },
+      "mac_tests": 236,
+      "hermes_tests": 236
+    },
+    {
+      "group": "sdk",
+      "cwd": "infra/ollama-trial",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_current_diagnostic_selection",
+          "test_diagnostic_grounding",
+          "test_firewall_scope",
+          "test_harness",
+          "test_host_lookup",
+          "test_investigation_scope",
+          "test_read_claim_boundaries",
+          "test_service_read_schema"
+        ]
+      },
+      "mac_tests": 106,
+      "hermes_tests": 106
+    },
+    {
+      "group": "native",
+      "cwd": "infra/hermes/query-completion",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_alignment",
+          "test_completion",
+          "test_expanded_reads",
+          "test_time_ids"
+        ]
+      },
+      "mac_tests": 181,
+      "hermes_tests": 181
+    },
+    {
+      "group": "common-new",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/common-read-contract/test_contract.py"
+      },
+      "mac_tests": 22,
+      "hermes_tests": 22
+    },
+    {
+      "group": "workflow",
+      "cwd": "infra/hermes",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_query_scope",
+          "test_workflow_contract"
+        ]
+      },
+      "mac_tests": 12,
+      "hermes_tests": 12
+    },
+    {
+      "group": "sdk-flow",
+      "cwd": "infra/ollama-trial",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_runtime",
+          "test_incident_bundle",
+          "test_incident_reasoning",
+          "test_incident_closure",
+          "test_workflow_selection",
+          "test_event_lookup"
+        ]
+      },
+      "mac_tests": 66,
+      "hermes_tests": 66
+    },
+    {
+      "group": "root-flow",
+      "cwd": "infra/hermes",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_soc_management_run",
+          "test_soc_management_grounding",
+          "test_soc_management_bundle"
+        ]
+      },
+      "mac_tests": 94,
+      "hermes_tests": 94
+    },
+    {
+      "group": "host-journal",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/host-journal-cost/test_host_compat.py"
+      },
+      "mac_tests": 19,
+      "hermes_tests": 19
+    },
+    {
+      "group": "journal",
+      "cwd": "infra/mcp",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_diagnostic_journal",
+          "test_diagnostic_journal_native",
+          "test_diagnostic_history"
+        ]
+      },
+      "mac_tests": 85,
+      "hermes_tests": 85
+    },
+    {
+      "group": "installation",
+      "cwd": "deployment",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "tests.test_soc_diagnostics",
+          "tests.test_soc_monitoring"
+        ]
+      },
+      "mac_tests": 30,
+      "hermes_tests": 30
+    },
+    {
+      "group": "common-service-mac",
+      "cwd": "infra/hermes",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_service_history_contract.ServiceHistory",
+          "test_service_history_contract.DirectServicePlan",
+          "test_service_history_contract.JournalEvidence",
+          "test_service_history_contract.ServiceLookupBoundary"
+        ]
+      },
+      "mac_tests": 64,
+      "hermes_tests": 147,
+      "hermes_command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_service_history_contract"
+        ]
+      }
+    },
+    {
+      "group": "partitions",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/host-journal-cost/test_partitions.py"
+      },
+      "mac_tests": 16,
+      "hermes_tests": 16
+    },
+    {
+      "group": "new-scope",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/diagnostic-read-boundaries/test_scope.py"
+      },
+      "mac_tests": 17,
+      "hermes_tests": 17
+    },
+    {
+      "group": "new-clock",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "artifact",
+        "path": "test_clock_compat.py"
+      },
+      "mac_tests": 13,
+      "hermes_tests": 13
+    },
+    {
+      "group": "new-typed",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/service-provenance/test_typed_compat.py"
+      },
+      "mac_tests": 36,
+      "hermes_tests": 36
+    },
+    {
+      "group": "new-factual",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/factual-service/test_factual_service.py"
+      },
+      "mac_tests": 29,
+      "hermes_tests": 29
+    },
+    {
+      "group": "new-provenance",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/service-provenance/test_service_provenance.py"
+      },
+      "mac_tests": 41,
+      "hermes_tests": 41
+    },
+    {
+      "group": "new-errors",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/service-error-coverage/test_error_coverage.py"
+      },
+      "mac_tests": 49,
+      "hermes_tests": 49
+    },
+    {
+      "group": "new-app",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "root",
+        "path": "infra/validation/application-error-filter/test_application_errors.py"
+      },
+      "mac_tests": 24,
+      "hermes_tests": 24
+    },
+    {
+      "group": "new-composition",
+      "cwd": ".",
+      "command": {
+        "kind": "script",
+        "origin": "artifact",
+        "path": "test_composition.py"
+      },
+      "mac_tests": 16,
+      "hermes_tests": 16
+    },
+    {
+      "group": "diagnostic-core",
+      "cwd": "infra/mcp",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_system_diagnostics"
+        ]
+      },
+      "mac_tests": 43,
+      "hermes_tests": 43
+    },
+    {
+      "group": "runtime-health",
+      "cwd": "infra/mcp",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_runtime_health"
+        ]
+      },
+      "mac_tests": 33,
+      "hermes_tests": 33
+    },
+    {
+      "group": "host-inventory",
+      "cwd": "infra/mcp",
+      "command": {
+        "kind": "unittest",
+        "arguments": [
+          "test_host_inventory"
+        ]
+      },
+      "mac_tests": 15,
+      "hermes_tests": 15
+    }
+  ],
+  "scope": "Regression executions; mac root allows only the observed dependency skips, Hermes requires no skips; no model/MCP/live calls"
+}

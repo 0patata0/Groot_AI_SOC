@@ -1,8 +1,9 @@
 # 호스트 시스템 journal의 전체 구간 검색 후보
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../application-error-filter/README.md) — 앱의 정보 우선순위 오류가 고정 선택에서 빠지는 문제를 메모리 내 공통 경로로 보완했습니다. 정책/범위·4행 동일성 검증이며 전체 호스트 journal 인수·실제 설치·모델 정확도의 증명이 아닙니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- diagnostic-read-boundaries:start -->

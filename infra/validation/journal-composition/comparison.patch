@@ -1,0 +1,148 @@
+--- a/infra/mcp/diagnostic_history.py
++++ b/infra/mcp/diagnostic_history.py
+@@ -39,12 +39,18 @@
+     return (datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(microseconds=micros)).astimezone(KST).isoformat()
+ 
+ 
+-def request(value, now=None):
++def request(value, now=None, *, host_journal=False):
+     now = int(time.time()) if now is None else now
+     core.need(isinstance(value, dict) and {'target', 'since_kst', 'until_kst'} <= set(value)
+               <= {'target', 'since_kst', 'until_kst', 'limit'}, 'history_arguments_invalid')
+     target = value['target']
+-    core.need(isinstance(target, str) and isinstance(core.TARGETS.get(target), str), 'history_unit_target_required')
++    # Only the trusted journal adapter enables a fixed system-journal target.
++    # This private keyword is never read from JSON. Archived metadata remains
++    # restricted to registered units; runtime/coverage targets are not history.
++    aggregate = (host_journal and isinstance(target, str) and target in {h + ':systemd' for h in core.ROLE_HOST.values()}
++                 and target in core.TARGETS and core.TARGETS[target] is None)
++    core.need(isinstance(target, str) and (isinstance(core.TARGETS.get(target), str) or aggregate),
++              'history_unit_target_required')
+     since, until = instant(value['since_kst']), instant(value['until_kst'])
+     core.need(0 < until - since <= 86400 * 1000000, 'history_window_must_be_at_most_24_hours')
+     core.need((now - RETENTION_DAYS * 86400) * 1000000 <= since and until <= now * 1000000,
+--- a/infra/mcp/system-diagnostics-mcp.py
++++ b/infra/mcp/system-diagnostics-mcp.py
+@@ -203,7 +203,8 @@
+             'For a past incident, supply BOTH since_kst and until_kst (+09:00) to read archived sanitized journal error metadata for a registered systemd unit; '
+             'the interval is at most24 hours within30 days. Do not supply lookback_minutes with explicit bounds. Runtime/coverage targets do not support history. '
+             'History returns no current service state, raw journal or security clearance; inspect history_coverage and publisher_stale. '
+-            'For actual journal message excerpts use view="journal" with BOTH since_kst/until_kst and a registered unit target. '
++            'For actual journal message excerpts use view="journal" with BOTH since_kst/until_kst and a registered unit target, '
++            'or a:systemd/b:systemd/c:systemd for that fixed host system journal (not per-user journals or an archived metadata index). '
+             'message_excerpt contains the returned text: message_state="unchanged" means the original message bytes are preserved; "redacted" means secrets were masked. '
+             'raw_messages_returned=false means no unrestricted raw dump; it does not mean excerpts are absent. redacted_excerpts_returned=true does not mean every row was changed. '
+             'A null message_excerpt with message_size_bound/non_text_message/invalid_text_message means only that row body was withheld. '
+@@ -217,6 +218,9 @@
+         'inputSchema': {'type': 'object', 'additionalProperties': False, 'required': ['target'],
+             'properties': {'target': {'type': 'string', 'enum': sorted(library().TARGETS),
+                 'x-capstone-service-labels': service_labels(),
++                'x-capstone-host-journal-targets': {
++                    host + ':systemd': {'host':host, 'scope':'host_system', 'labels':['systemd', '시스템 journal', '시스템 로그']}
++                    for host in sorted(library().ROLE_HOST.values())},
+                 'x-capstone-current-companions': {
+                     'b:management':['b:management-pipeline'],
+                     'a:vector':['a:collection'], 'b:vector':['b:collection']},
+@@ -225,6 +229,7 @@
+                     '. Current runtime: b:management-pipeline=SOC report delivery/case processing/review queue; '
+                     'use alongside b:management when checking current controller impact. '
+                     'b:wazuh-manager is the Wazuh manager, not capstone-management.service. '
++                    'a:systemd/b:systemd/c:systemd additionally support a bounded host system journal only with view=journal. '
+                     'Other enum values are current runtime snapshots only; never substitute a different unit.'},
+                 'lookback_minutes': {'type': 'integer', 'minimum': 1, 'maximum': 240, 'default': 15},
+                 'since_kst': {'type':'string', 'maxLength':40, 'description':'Historical interval start with seconds and +09:00; requires until_kst, excludes lookback_minutes.'},
+@@ -238,7 +243,11 @@
+                 {'if':{'required':['view']}, 'then':{'required':['since_kst','until_kst']}},
+                 {'if':{'required':['journal_scope']}, 'then':{'required':['view']}},
+                 {'if':{'required':['since_kst']}, 'then':{'properties':{'target':{'enum':sorted(
+-                    k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
++                    k for k,v in library().TARGETS.items() if isinstance(v,str) or k in {
++                        host + ':systemd' for host in library().ROLE_HOST.values()})}}}},
++                {'if':{'allOf':[{'required':['since_kst']}, {'not':{'required':['view']}}]},
++                 'then':{'properties':{'target':{'enum':sorted(
++                     k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
+         'annotations': {'title': 'Read fixed system diagnostics', 'readOnlyHint': True,
+             'destructiveHint': False, 'idempotentHint': True},
+     }, TIME_TOOL, INVENTORY_TOOL]
+@@ -529,7 +538,7 @@
+             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
+         protocol = params.get('protocolVersion')
+         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
+-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.2'}}
++            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.3'}}
+     elif method == 'ping':
+         value = {}
+     elif method == 'tools/list':
+--- a/infra/mcp/diagnostic_journal_native.py
++++ b/infra/mcp/diagnostic_journal_native.py
+@@ -15,7 +15,7 @@
+ core = journal = None
+ MAX_PACKET = 65536
+ MAX_JOB = 4096
+-ROW_FIELDS = ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT', 'PRIORITY', 'MESSAGE')
++ROW_FIELDS = ('_SYSTEMD_UNIT', 'UNIT', 'OBJECT_SYSTEMD_UNIT', 'PRIORITY', 'MESSAGE', '_TRANSPORT')
+ 
+ 
+ def key(row):
+@@ -41,14 +41,16 @@
+     return text
+ 
+ 
+-def reader_factory():
++def reader_factory(*, system_only=False):
+     try:
+         from systemd import journal as binding
+     except ImportError:
+         raise core.DiagnosticError('journal_native_dependency_unavailable') from None
+     core.need(str(binding.__version__) == '235', 'journal_native_binding_version')
+-    # LOCAL_ONLY matches journalctl without --merge, not SYSTEM_ONLY.
+-    return binding.Reader(flags=binding.LOCAL_ONLY)
++    # Unit reads retain the previous local source. Fixed host aggregates match
++    # journalctl --system and exclude per-user journals, without remote merge.
++    flags = binding.LOCAL_ONLY | (binding.SYSTEM_ONLY if system_only else 0)
++    return binding.Reader(flags=flags)
+ 
+ 
+ def unit_matches(reader, unit):
+@@ -82,16 +84,18 @@
+ 
+ 
+ def read_group(unit, since, until, limit, priorities, literals, factory):
+-    reader = factory()
++    reader = factory(system_only=True) if unit is None else factory()
+     try:
+         for name in ('_previous', '_get', '_get_all', '_get_realtime', '_get_cursor'):
+             core.need(callable(getattr(reader, name, None)), 'journal_native_binding_api')
+         # Match against the full MESSAGE, as journalctl --grep does. Memory/time
+         # remain confined by the existing service and supervised child process.
+         reader.data_threshold = 0
+-        unit_matches(reader, unit)
++        if unit is not None:
++            unit_matches(reader, unit)
+         if priorities is not None:
+-            reader.add_conjunction()
++            if unit is not None:
++                reader.add_conjunction()
+             for priority in priorities:
+                 reader.add_match(PRIORITY=str(priority))
+         reader.seek_realtime(until + 1)  # integer microseconds, no float conversion
+@@ -170,7 +174,8 @@
+         and packet['scope'] == scope and type(packet['source_limited']) is bool
+         and type(packet['size_limited']) is bool, 'journal_native_packet_invalid')
+     maximum = (2 if scope == 'errors' else 1) * (limit + 1)
+-    journal.validate_entries(packet['entries'], since, until, maximum)
++    journal.validate_entries(packet['entries'], since, until, maximum,
++                             host_journal=core.TARGETS[target] is None)
+     core.need(packet['entries'] == sorted(packet['entries'], key=key, reverse=True),
+               'journal_native_packet_order')
+     h = core.history_library()
+@@ -197,7 +202,8 @@
+     core.need(remaining > 0, 'journal_query_timeout')
+     args = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json', '--lines=0',
+         '--since=@' + f'{start // 1000000}.{start % 1000000:06d}',
+-        '--until=@' + f'{end // 1000000}.{end % 1000000:06d}', '--unit=' + unit]
++        '--until=@' + f'{end // 1000000}.{end % 1000000:06d}']
++    args += ['--system'] if unit is None else ['--unit=' + unit]
+     code, raw = core.bounded_command(args, 4096, min(journal.COMMAND_TIMEOUT, remaining))
+     core.need(code == 0 and raw == b'', 'journal_native_access_check')
+ 

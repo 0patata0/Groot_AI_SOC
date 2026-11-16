@@ -1,8 +1,9 @@
 # 근거 기반 응답 가드레일
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 실제 과거 오류4건의 누락을 입력 경로에서 보완하는 후보입니다. 근거 없는 데이터 손실/DNS 일시성 추정을 해결했다고 표시하지 않습니다. 메타데이터/필터 표본0과 전체 부재, 선언 수준과 현재 영향을 계속 구분합니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

@@ -1,8 +1,9 @@
 # 제한된 서비스 journal 조회
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 앱 선언 오류의 공통 선택과 source_filter_policy 후보를 검증했습니다. 같은 원문4행의 CLI/Native/정제 일치를 확인했지만 새 정책 게시·재스캔·실제 서비스 로드는 미수행입니다. 잘린 전처리 표본과 지원 형식 한계는 유지합니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

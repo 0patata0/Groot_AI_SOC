@@ -1,5 +1,9 @@
 # 호스트 시스템 journal 읽기·공통 계획 후보
 
+<!-- journal-composition:start -->
+[통합 후보 검증](../journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
 <!-- diagnostic-read-boundaries:end -->

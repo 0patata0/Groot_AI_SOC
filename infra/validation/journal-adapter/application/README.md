@@ -1,5 +1,9 @@
 # journal native 운영 적용·원복 후보
 
+<!-- journal-composition:start -->
+[통합 후보 검증](../../journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 **A/B/C의 정확 후보·원본 백업과 회귀·복제 경로 검증을 준비했다. 운영 적용과 원복 타이머 실행은 아직 하지 않았다.** [정확 계획](plan.json) · [검증 원장](validation.json) · [어댑터 구현](../README.md) · [현재 상태](../../../../STATUS.md).
 
 승인에 결속할 전체 계획 SHA256:

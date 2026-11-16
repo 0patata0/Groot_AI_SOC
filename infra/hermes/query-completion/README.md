@@ -1,8 +1,9 @@
 # Mattermost 조회 응답 보완
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../../validation/application-error-filter/README.md) — MCP 앱 오류/정책 구분 후보는 Native 소비자147검사를 기존 Hermes에서 생략 없이 통과했습니다. 플러그인 설치·역할·승인·실제 모델/채팅은 미변경이며 앞선 조사 후보와 통합 검증이 남았습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

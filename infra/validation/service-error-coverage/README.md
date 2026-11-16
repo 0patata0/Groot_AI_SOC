@@ -1,8 +1,9 @@
 # 서비스 오류 원문과 조사 완료 조건
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../application-error-filter/README.md) — 앞서 남긴 같은 구간 errors0/all12 문제를 실제 보관 색인까지 대조했고 공통 후보로4행을 확인했습니다. 실제 DB/운영에는 미적용이며 이 조사 후보의 의미 오류와 별도로 통합 검증해야 합니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 **오류 후보 표본 뒤 실제 원문 조회와 형식 정정을 보완한 미적용 후보**다. 최종 실제4요청은21.028~43.559초였지만 근거 없는 데이터 손실·DNS 영향 추정이 남아 운영 승격하지 않는다. 부모 [출처 후보](../service-provenance/README.md)와 선행 조합도 미적용이다.

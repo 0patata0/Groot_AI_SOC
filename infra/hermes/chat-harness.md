@@ -1,8 +1,9 @@
 # 두 봇의 공통 하네스
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 앱 선언 오류는 원인/영향/공격 성공이 아닙니다. 공통 MCP 후보의 같은 원문4행 검증과 새 정책 범위를 기록했으며 실제 소비자/모델 의미·새 채팅은 별도입니다. 스킬/역할/권한 문구를 늘리지 않았습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

@@ -67,3 +67,5 @@ shasum -a 256 /private/tmp/groot-old-status.md
 현재 매뉴얼 전달본은60쪽이다. 작업 진입점·단계/명령·판독·복구와123목차/캡션을 검수하고 직전56쪽18파일 복구본은 로컬에 보존했다. 이전56쪽 기록은 당시 사실로 유지한다. 유형별 이력과 현재 STATUS를 따른다.
 
 [앱 선언 오류/색인 정책 후보](../infra/validation/application-error-filter/README.md)의 실제 누락·4행 메모리 대조·381검사·미적용과 초기 실패/정정을 유형별 이력에 보존했다. 현황은 STATUS를 따른다.
+
+서비스/호스트 journal 통합 후보의 설계·실패·검증·미적용 범위는 유형별 이력과 [통합 원장](../infra/validation/journal-composition/README.md)을 함께 확인합니다.

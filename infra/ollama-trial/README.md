@@ -1,8 +1,9 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 공통 진단 후보의3입력 스키마는 실제 등록 목록과 같으며 새 권한을 추가하지 않았습니다. 같은 원문의 CLI/Native/정제4행 일치이며 SDK 모델 답변·Mattermost 성공으로 환산하지 않습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

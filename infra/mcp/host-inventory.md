@@ -1,8 +1,9 @@
 # OS·Docker 읽기와 호스트별 표
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../validation/application-error-filter/README.md) — 호스트 목록 권한·입력은 유지했습니다. 같은 공통 진단 라이브러리의 앱 오류/색인 정책 후보만 격리 검증했고 설치본은 바꾸지 않았습니다. inventory 상태로 과거 오류나 기능 복구를 대신 판정하지 않습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

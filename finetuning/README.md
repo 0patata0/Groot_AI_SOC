@@ -1,8 +1,9 @@
 # SOC 모델 파인튜닝 준비 폴더
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../infra/validation/application-error-filter/README.md) — 앱 오류 누락의 원인은 고정 도구/수집 경로에서 확인했습니다. 추가24검사·실제 메모리 내4행 대조는 코드 검증이며 새 학습/평가 점수/가중치 변화가 아닙니다. 같은 개발 구간을 독립 사건 정답으로 다시 세지 않습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../infra/validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

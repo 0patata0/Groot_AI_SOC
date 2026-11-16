@@ -1,0 +1,224 @@
+{
+  "status": "composed_candidate_not_applied",
+  "base_commit": "cdcba710c497e4400a0e39e6cd57fa25d9ed05e5",
+  "base_tree_file_count": 2266,
+  "candidate_tree_file_count": 2271,
+  "base_tree_sha256": "12e7aa3d495246c1f3a2930d18b862630757678a53c971b57824ad178e39ec89",
+  "candidate_tree_sha256": "1b4818f049c05bfa5a41c677605d84f757bb42e09df9687e71f2ba1e0465ca97",
+  "patch_sha256": "52ebc615baeccc25f51371a31650a00bfcfa4d44498afbd2b74c888d252b5f7b",
+  "comparison_patch_sha256": "36359233c70d06dd8587a6622ec9e47deb698bd3d75d4e112e3dd77cf8f5f27d",
+  "sources": {
+    "deployment/soc_diagnostics.py": {
+      "before_sha256": "6d40706fb8b820a37176233f53583590becff764649010f96199ba43e32234c3",
+      "candidate_sha256": "9daf0b1e4d3a06c8e83753e4b5316f94ce2ed17391d241b9d519e1516fabc5c7"
+    },
+    "deployment/tests/test_soc_diagnostics.py": {
+      "before_sha256": "7419eef5d7568872893d44dc9440f15fe8871a9098e935a7bbaab8a75ab4349c",
+      "candidate_sha256": "7ddd402db647c58ebd4421cfd4af801cd74b8161b81173cf2f7daad3fcd752e3"
+    },
+    "deployment/tests/test_soc_management.py": {
+      "before_sha256": "1dca91138477d014c33b68b2cdd7edf6a1011b9af28262aab301e96188fd4bac",
+      "candidate_sha256": "d12831efb6f744949660c08fd921bad0f622b97e9c783304ae0e77ed7d5548ab"
+    },
+    "infra/hermes/chat_contract.py": {
+      "before_sha256": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "candidate_sha256": "eb666037b19d7ab676ba1ed4076c8a471468bc454cc2b0ac25230d828bd2418a"
+    },
+    "infra/hermes/query-completion/__init__.py": {
+      "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "candidate_sha256": "99427da74372b9dec416b3683b4246e99ca228c79c05147c6abce57f4f1bd7d0"
+    },
+    "infra/hermes/query-completion/alignment.py": {
+      "before_sha256": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+      "candidate_sha256": "b051164d3209d199a37404f5181c65fa9a051df93a6f19449003440acd4b49f2"
+    },
+    "infra/hermes/query-completion/test_load_receipt.py": {
+      "before_sha256": null,
+      "candidate_sha256": "97a8e2f7f98431552f803875c54d9b4d9424fc3fd22f30ebd510660ee735a9f9"
+    },
+    "infra/hermes/read_contract.py": {
+      "before_sha256": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "candidate_sha256": "f787caa9ca4049adb23d653a33bf16087b68534c3c014356e6cfef8e3473d331"
+    },
+    "infra/hermes/review_channel.py": {
+      "before_sha256": "6e759551ac0397998f1fa5d079c7b945d8a621615f13da4370fa446d78114c1a",
+      "candidate_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217"
+    },
+    "infra/hermes/review_channel_worker.py": {
+      "before_sha256": "c7dd65bbd24696a033fb4d49e5af230fdc43d1c4ec51a311c9b48c1cc5d49e3c",
+      "candidate_sha256": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205"
+    },
+    "infra/hermes/skills/soc-investigate/SKILL.md": {
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "candidate_sha256": "590bf162e53f759e93dcac876584c4eec9959b361cd209bd16bc2f56a590d4a0"
+    },
+    "infra/hermes/skills/soc-query/SKILL.md": {
+      "before_sha256": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "candidate_sha256": "36629dc3d8fcb0f196bce552cd20bda4ee95d13ea6ae58d85bd1852992721697"
+    },
+    "infra/hermes/soc_management_controller.py": {
+      "before_sha256": "cac00f196406230051704062276995b35cacf3e1fb2cefd7098e9a80c0e50c38",
+      "candidate_sha256": "8415d4941a7dfd7568577306bd0b7c23f3b46742c09f8fa8d026250f553c08af"
+    },
+    "infra/hermes/soc_management_run.py": {
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "candidate_sha256": "4355bd9b0fc127fdd1d7d58ce7595decd076670bd4cf732541627ef692e00369"
+    },
+    "infra/hermes/test_control_status_repair.py": {
+      "before_sha256": null,
+      "candidate_sha256": "9b2203672f75283fd35f7cca7a8d4b391f6bd86ba8ef893eb29040034a9df5e8"
+    },
+    "infra/hermes/test_disposition_workflow_contract.py": {
+      "before_sha256": null,
+      "candidate_sha256": "1fa1fc83d7c5fd06b0f26adc05d40c253bb61f6ab837b30b7548c1f9e34e61fa"
+    },
+    "infra/hermes/test_incident_completion_contract.py": {
+      "before_sha256": null,
+      "candidate_sha256": "c212186f347438efbbeac3393a0df86a4c22dd79ff929cf906b89fe02fba3e04"
+    },
+    "infra/hermes/test_peer_text_schema.py": {
+      "before_sha256": null,
+      "candidate_sha256": "5ef63a79b3c2689397b2997bb8c5082ed2def332cc6b33f0b35fda55ae46f5e6"
+    },
+    "infra/hermes/test_report_repair_diagnosis.py": {
+      "before_sha256": "6ab693ab9b3a2f11dc63ec1f3a2a5593db27780cdad26b23274dd5905bc98f34",
+      "candidate_sha256": "711883641d800767deb43a4475059699032928c30537c4dd3118a4217edb80f3"
+    },
+    "infra/hermes/test_review_channel.py": {
+      "before_sha256": "658218fc8278c5856384d02e055165fdb35ecfec155ebedf19c370cdca515148",
+      "candidate_sha256": "628dca5a3cbf3bb3967885d6ea1f143ab7d75791efb3f5684bae10a56ed47b05"
+    },
+    "infra/hermes/test_service_history_contract.py": {
+      "before_sha256": "c351fc96f08718476e617d2e351e3ea3afefcfa2b610c28c570eec75df8143b9",
+      "candidate_sha256": "aab887d710b7e82534ae2ad8f051183c27a4c71c159c3af958e9888d6c7c9b9d"
+    },
+    "infra/hermes/test_soc_management_controller.py": {
+      "before_sha256": "36d0b615b8ed60f16fb4341e5111f7f3471e776328dbe8e89f977735b0aab569",
+      "candidate_sha256": "b31b93224658202bc6cb1cb1a173274c76f61f0b96b0706af007158755e42bdb"
+    },
+    "infra/hermes/test_soc_management_evidence.py": {
+      "before_sha256": "17edb25fd19aa4bf32c6e7ffe72d8574f53a7a869278b097e317c2689addf9f1",
+      "candidate_sha256": "03c8a1d6f280473969f71bea5a137c07f877d37d5bda85a76a1c1eddf06584d9"
+    },
+    "infra/hermes/workflow_contract.py": {
+      "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+      "candidate_sha256": "4962fda5c15af25caa2025687c9f8864c2f4b09c742c9641b2f953e490f50b3f"
+    },
+    "infra/mcp/diagnostic_history.py": {
+      "before_sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+      "candidate_sha256": "780a23bd29365c0a36cd8bb46fdc0da7531fef9aab552b0ce02456e34727310d"
+    },
+    "infra/mcp/diagnostic_journal.py": {
+      "before_sha256": "db0028225c8b36bf0f54a3a88f898b5eb5cf63f3350530ea5b231530e447c3e6",
+      "candidate_sha256": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac"
+    },
+    "infra/mcp/diagnostic_journal_native.py": {
+      "before_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+      "candidate_sha256": "dff3432c12f633b332189796ee42559bf621089096a64af7fa1f391e748686e2"
+    },
+    "infra/mcp/system-diagnostics-mcp.py": {
+      "before_sha256": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+      "candidate_sha256": "81bb24ffa355646ca2d19cd99f2b694f45430c03f3d35bc20b7aab41094a695a"
+    },
+    "infra/mcp/system_diagnostics.py": {
+      "before_sha256": "5fd3b9802930858d1002dc4d3c6af801ca25cb19b7beae94238eb995807ea142",
+      "candidate_sha256": "9684e9af89de8a04b526ba25a81d7e42e7d090d642d3c105da78712dbe8dbb1a"
+    },
+    "infra/mcp/test_diagnostic_history.py": {
+      "before_sha256": "1be24761dbb96db57f228d54d4f37d6ec15ca172e18ff8ce4a0e81f6f42d8154",
+      "candidate_sha256": "6dfcd2f56ace7d67ce7dac9986cd91c849f978c6204fee931e0f939d5ce3b4d0"
+    },
+    "infra/mcp/test_diagnostic_journal.py": {
+      "before_sha256": "dbc106d58941ba971b90a2a5683b4ba31b18e92bf74d9c127dab4696d6ad0c7b",
+      "candidate_sha256": "5b3cbd6a49aef281e5822b9164f7ad8f2e44b244b418f8055554858c1dc799c8"
+    },
+    "infra/mcp/test_diagnostic_journal_native.py": {
+      "before_sha256": "17a0739c222e12e80afc757491d1e2ee0c283146e101536878fc6b43beec6c96",
+      "candidate_sha256": "4a8aaa1977ec0ac09e0a18f3962f6a43cdb85bb8e826f297480438afee50de59"
+    },
+    "infra/ollama-trial/harness.py": {
+      "before_sha256": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "candidate_sha256": "3915ac370d7fd3277f68414f6e228b53f5bbe150991e96a816bc2f79b72469a7"
+    },
+    "infra/ollama-trial/runtime.py": {
+      "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+      "candidate_sha256": "c0a3bb3ca99add39bfac55d258a9900c21925dc5e3fa4fd41c6de5f724eddb03"
+    }
+  },
+  "comparison_sources": {
+    "infra/mcp/diagnostic_history.py": {
+      "before_sha256": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+      "comparison_sha256": "ae5b23973ab7d0dff1cbcce093aae3a9dfab334d9ded0cb4617a71234cbeb314"
+    },
+    "infra/mcp/system-diagnostics-mcp.py": {
+      "before_sha256": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+      "comparison_sha256": "89f1731bd6b1a2f6c87affd5a5df664dc40f564dfaf19bee0e77ac35c49b2705"
+    },
+    "infra/mcp/diagnostic_journal_native.py": {
+      "before_sha256": "cd0667698bd62ab62320e8e684ae2e57c467dce757527d28ce5a9e432d07d67a",
+      "comparison_sha256": "e0244ac8bc6641b52162ca5fbc236399bcd24ca87934f10944b8c1deef54e3fd"
+    }
+  },
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "component_mapping": {
+    "systemprompt.md": "infra/hermes/SOUL.groot.md",
+    "scripts/chat_contract.py": "infra/hermes/chat_contract.py",
+    "scripts/read_contract.py": "infra/hermes/read_contract.py",
+    "scripts/output_contract.py": "infra/hermes/output_contract.py",
+    "scripts/workflow_contract.py": "infra/hermes/workflow_contract.py",
+    "scripts/channel_policy.py": "infra/hermes/review_channel_policy.py",
+    "scripts/native_query.py": "infra/hermes/query-completion/__init__.py",
+    "scripts/evidence_gate.py": "infra/hermes/soc_management_run.py",
+    "scripts/management_controller.py": "infra/hermes/soc_management_controller.py",
+    "scripts/channel_controller.py": "infra/hermes/review_channel.py",
+    "scripts/sdk_chat.py": "infra/ollama-trial/chat.py",
+    "scripts/sdk_chat_policy.py": "infra/ollama-trial/chat_policy.py",
+    "scripts/sdk_authority.py": "infra/ollama-trial/policy.py",
+    "skills/soc-investigate/SKILL.md": "infra/hermes/skills/soc-investigate/SKILL.md",
+    "skills/soc-change/SKILL.md": "infra/hermes/skills/soc-change/SKILL.md",
+    "skills/soc-recover/SKILL.md": "infra/hermes/skills/soc-recover/SKILL.md",
+    "scripts/sdk_harness.py": "infra/ollama-trial/harness.py",
+    "scripts/chat_markdown.py": "infra/hermes/chat_markdown.py",
+    "scripts/soc_bot.py": "infra/mcp/soc_bot.py",
+    "skills/soc-output/SKILL.md": "infra/hermes/skills/soc-output/SKILL.md",
+    "skills/soc-query/SKILL.md": "infra/hermes/skills/soc-query/SKILL.md",
+    "scripts/sdk_runtime.py": "infra/ollama-trial/runtime.py",
+    "scripts/native_alignment.py": "infra/hermes/query-completion/alignment.py",
+    "scripts/channel_worker.py": "infra/hermes/review_channel_worker.py",
+    "scripts/mcp/system_diagnostics.py": "infra/mcp/system_diagnostics.py",
+    "scripts/mcp/diagnostic_history.py": "infra/mcp/diagnostic_history.py",
+    "scripts/mcp/diagnostic_journal.py": "infra/mcp/diagnostic_journal.py",
+    "scripts/mcp/diagnostic_journal_native.py": "infra/mcp/diagnostic_journal_native.py",
+    "scripts/mcp/system-diagnostics-mcp.py": "infra/mcp/system-diagnostics-mcp.py",
+    "scripts/mcp/read-system-diagnostics.py": "infra/mcp/read-system-diagnostics.py",
+    "scripts/install/soc_diagnostics.py": "deployment/soc_diagnostics.py",
+    "scripts/install/soc_monitoring.py": "deployment/soc_monitoring.py",
+    "scripts/extra_test_diagnostic_history.py": "infra/mcp/test_diagnostic_history.py",
+    "scripts/extra_test_diagnostic_journal.py": "infra/mcp/test_diagnostic_journal.py",
+    "scripts/errors_test_service_history_contract.py": "infra/hermes/test_service_history_contract.py",
+    "scripts/application_test_diagnostic_journal_native.py": "infra/mcp/test_diagnostic_journal_native.py"
+  },
+  "audit_index": "Audit index only: workflow_contract selects soc-query, soc-investigate, soc-change, soc-recover. output_contract loads soc-output. Fixed journal MCP/reader and installer are inspected, not delegated. No authority or production prompt is replaced.\n",
+  "always_on_characters": {
+    "base": 16917,
+    "candidate": 16917
+  },
+  "input_schema_changes": "Existing diagnostics tool enables fixed a/b/c:systemd journal with explicit view; no arbitrary unit/path/command/clock or additional tool/port",
+  "candidate_mcp_version": "1.4.6",
+  "error_filter_policy": "application-severity-v1",
+  "shared_skill_bytes": 24456,
+  "source_parent_provenance": {
+    "infra/validation/service-error-coverage/candidate.patch": "9cc979968854da111c5bd24ae721912254c1c379aa49c9dba6b90cdb57864341",
+    "infra/validation/application-error-filter/candidate.patch": "7a4b3a0928ea70dcd1169f74e62caeb1fa5c80677a32434b399a0148ab0ced5e"
+  },
+  "operating_changes": 0,
+  "model_calls": 0,
+  "operating_database_writes": 0,
+  "tests_sha256": {
+    "test_composition.py": "f02efc298937b40265de92ca2f8ae9de2a11fe2e6ac88bf28621e723c2cebcdd",
+    "test_clock_compat.py": "c066cfab649790f19c533d92d57d3c6add2f167d6c315983e92a7b238e2160cb",
+    "regressions.json": "f6247c724474d24077bc0b3cfc88c56e68ab60d2f8a6eacea1dcac0a01490620",
+    "reproduce.py": "2d0771c38a410b0af13a32070dc63f12783e4d2ef417dd82fcd6720cc5b747e1",
+    "run_regressions.py": "d5c5cc59dacdfce6412eb1a13c9d894ad95073877fff2a0b8310e73a7d96b0f4"
+  }
+}

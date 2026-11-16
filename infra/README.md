@@ -1,8 +1,9 @@
 # infra — 서버 구성·배포
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](validation/application-error-filter/README.md) — 실제 Docker 앱 오류4행의 필터/색인 누락을 확인한 공통 후보입니다. 메모리 내4경로·Hermes381검증이며 운영/모델/권한은 바꾸지 않았습니다. 설치 core/journal2차이와 앞선 후보 통합이 남았습니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 <!-- service-error-coverage:start -->

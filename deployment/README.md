@@ -1,8 +1,9 @@
 # 구축·운영 가이드
 
-<!-- application-error-filter:start -->
-[앱 오류 필터 검증](../infra/validation/application-error-filter/README.md) — 앱 필터/보관 정책5소스 후보는 기존 단일 설치 경로23검사를 통과했고 새 패키지/포트를 요구하지 않습니다. 운영 core/journal과 차이가 있어 직접 덮지 않으며 정확 소스·DB 백업/원복·승인/재스캔이 필요합니다. 새 OS 전체 설치는 미수행입니다.
-<!-- application-error-filter:end -->
+<!-- journal-composition:start -->
+[통합 후보 검증](../infra/validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+<!-- journal-composition:end -->
+
 
 
 로컬 매뉴얼형 논문은 설치 plan/check/apply/verify의 입력·위치·통과 기준과 실패 시 부분 설치 확인을 보강했다. 동일60쪽 MD/PDF/DOCX 문서 검수이며 신규 OS 전체 설치나 운영 변경은 수행하지 않았다. [현재 상태](../STATUS.md)를 따른다.

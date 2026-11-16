@@ -12824,3 +12824,7 @@ B 후보MCP/SDK4요청에서5실제읽기·12모델완료·모두partial. 37.57/
 ## 앱 선언 오류와 정책별 수집 범위 (2026-11-16)
 
 실제 같은3분 Docker metadata0/errors0/all12·app level=error/HTTP5004·스캔233구간을 확인했다. 공통 후보 정제/수집 재처리/CLI/Native의4ID가 일치했고 실제 캐시는 읽기 전용 legacy partial이다. Mac381 중370통과/11의존성 생략, 기존 Hermes381생략0·추가24·공식37구성/8면/상시16917 증가0. 운영 미적용·논문60쪽15SHA 유지. [근거](../infra/validation/application-error-filter/README.md).
+
+## 조회·조사 소스 통합 (2026-11-16)
+
+통합34소스·공통 소비자/스킬·MCP1.4.6 후보. Mac1370(6생략)/Hermes1453·통합16/재사용앱24·공식37/23면/증가0. Docker4ID와B호스트CLI0+has_more/Native42를 실제 대조. 운영미적용·논문60쪽15SHA유지. [근거](../infra/validation/journal-composition/README.md).

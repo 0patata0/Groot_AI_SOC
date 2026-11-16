@@ -1,0 +1,469 @@
+{
+  "status": "composed_candidate_not_applied",
+  "mac": {
+    "complete": true,
+    "groups": 27,
+    "tests": 1370,
+    "skipped": 6
+  },
+  "existing_hermes": {
+    "groups": 27,
+    "tests": 1453,
+    "skipped": 0,
+    "complete": true,
+    "at_kst": "2026-11-16T18:49:28.444601+09:00",
+    "uid": 10001,
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "installed_sources_unchanged": true,
+    "source_manifest_sha256": "829599678c406e6b10cc4081dd314362f7efd61298506532277d090936b3ba3b",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "regression_scope": "Test executions across27 profiles; mac common consumer subset64 vs full147 on Hermes, not independent SOC incident scores",
+  "additional_composition_methods": 16,
+  "reused_application_methods": 24,
+  "official_harness2": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "components": 37,
+    "changed_surfaces": 23,
+    "always_on_chars": 16917,
+    "always_on_delta": 0,
+    "scope": "Structure only"
+  },
+  "actual_read": {
+    "at_kst": "2026-11-16T18:50:00.036848+09:00",
+    "same_unit_source_ids": true,
+    "unit_direct_rows": 12,
+    "unit_normalized": 4,
+    "unit_cli": 4,
+    "unit_native": 4,
+    "unit_memory_cache": 4,
+    "unit_memory_consumer_apps": 4,
+    "actual_cache_indexed": 0,
+    "actual_cache_policy": "legacy-unversioned",
+    "actual_cache_coverage": "partial_or_unavailable",
+    "host_cli_rows": 0,
+    "host_cli_has_more": true,
+    "host_cli_seconds": 0.5666034999885596,
+    "host_native_rows": 42,
+    "host_native_has_more": false,
+    "host_native_seconds": 3.0663921020459384,
+    "host_consumer_valid": true,
+    "unit_total_seconds": 0.3469130910234526,
+    "operating_db_writes": 0,
+    "model_or_chat_calls": 0,
+    "source_manifest_sha256": "829599678c406e6b10cc4081dd314362f7efd61298506532277d090936b3ba3b",
+    "scope": "Frozen R2, actual journal and SQLite memory-only rehearsal; not operating release/model quality/controlled latency"
+  },
+  "operating_observation": {
+    "b_at_kst": "2026-11-16T19:00:16.537538+09:00",
+    "installed32_sha_unchanged": true,
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "reader_start_ticks": 7043,
+    "native_installed": false
+  },
+  "a_c_preflight": [
+    {
+      "host": "a",
+      "at_kst": "2026-11-16T18:41:57.268793+09:00",
+      "expected_plan_sources_match": true,
+      "protected_sha_match": true,
+      "native_dependency": {
+        "binding": "235",
+        "files_parameter": true
+      }
+    },
+    {
+      "host": "c",
+      "at_kst": "2026-11-16T18:41:57.324285+09:00",
+      "expected_plan_sources_match": true,
+      "protected_sha_match": true,
+      "native_dependency": {
+        "binding": "235",
+        "files_parameter": true
+      }
+    }
+  ],
+  "input_schema_changes": {
+    "names": [
+      "calculate_time",
+      "get_host_inventory",
+      "get_system_diagnostics"
+    ],
+    "differences": {
+      "calculate_time": [],
+      "get_host_inventory": [],
+      "get_system_diagnostics": [
+        {
+          "path": "/allOf",
+          "before": [
+            {
+              "not": {
+                "required": [
+                  "lookback_minutes",
+                  "since_kst"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "lookback_minutes",
+                  "until_kst"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "view"
+                ]
+              },
+              "then": {
+                "required": [
+                  "since_kst",
+                  "until_kst"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "journal_scope"
+                ]
+              },
+              "then": {
+                "required": [
+                  "view"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "since_kst"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "target": {
+                    "enum": [
+                      "a:certificate-monitor",
+                      "a:docker",
+                      "a:raw-suricata",
+                      "a:raw-waf",
+                      "a:rule-worker",
+                      "a:storage-monitor",
+                      "a:vector",
+                      "a:wazuh-agent",
+                      "b:docker",
+                      "b:management",
+                      "b:rule-worker",
+                      "b:soc-bot",
+                      "b:vector",
+                      "b:wazuh-agent",
+                      "c:apache",
+                      "c:docker",
+                      "c:lab-api",
+                      "c:lab-broker",
+                      "c:lab-guard",
+                      "c:lab-terminal",
+                      "c:sudo-status",
+                      "c:sudo-user-manager",
+                      "c:terminal-guard",
+                      "c:terminal-status",
+                      "c:wazuh-agent"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "after": [
+            {
+              "not": {
+                "required": [
+                  "lookback_minutes",
+                  "since_kst"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "lookback_minutes",
+                  "until_kst"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "view"
+                ]
+              },
+              "then": {
+                "required": [
+                  "since_kst",
+                  "until_kst"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "journal_scope"
+                ]
+              },
+              "then": {
+                "required": [
+                  "view"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "since_kst"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "target": {
+                    "enum": [
+                      "a:certificate-monitor",
+                      "a:docker",
+                      "a:raw-suricata",
+                      "a:raw-waf",
+                      "a:rule-worker",
+                      "a:storage-monitor",
+                      "a:systemd",
+                      "a:vector",
+                      "a:wazuh-agent",
+                      "b:docker",
+                      "b:management",
+                      "b:rule-worker",
+                      "b:soc-bot",
+                      "b:systemd",
+                      "b:vector",
+                      "b:wazuh-agent",
+                      "c:apache",
+                      "c:docker",
+                      "c:lab-api",
+                      "c:lab-broker",
+                      "c:lab-guard",
+                      "c:lab-terminal",
+                      "c:sudo-status",
+                      "c:sudo-user-manager",
+                      "c:systemd",
+                      "c:terminal-guard",
+                      "c:terminal-status",
+                      "c:wazuh-agent"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "allOf": [
+                  {
+                    "required": [
+                      "since_kst"
+                    ]
+                  },
+                  {
+                    "not": {
+                      "required": [
+                        "view"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "then": {
+                "properties": {
+                  "target": {
+                    "enum": [
+                      "a:certificate-monitor",
+                      "a:docker",
+                      "a:raw-suricata",
+                      "a:raw-waf",
+                      "a:rule-worker",
+                      "a:storage-monitor",
+                      "a:vector",
+                      "a:wazuh-agent",
+                      "b:docker",
+                      "b:management",
+                      "b:rule-worker",
+                      "b:soc-bot",
+                      "b:vector",
+                      "b:wazuh-agent",
+                      "c:apache",
+                      "c:docker",
+                      "c:lab-api",
+                      "c:lab-broker",
+                      "c:lab-guard",
+                      "c:lab-terminal",
+                      "c:sudo-status",
+                      "c:sudo-user-manager",
+                      "c:terminal-guard",
+                      "c:terminal-status",
+                      "c:wazuh-agent"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "path": "/properties/target/description",
+          "before": "Fixed host:target = systemd unit mappings (history supported): a:certificate-monitor=capstone-cert-monitor.service; a:docker=docker.service; a:raw-suricata=capstone-raw-operations@suricata.service; a:raw-waf=capstone-raw-operations@modsecurity.service; a:rule-worker=rule-change-worker.service; a:storage-monitor=capstone-storage-monitor.service; a:vector=capstone-vector.service; a:wazuh-agent=wazuh-agent.service; b:docker=docker.service; b:management=capstone-management.service; b:rule-worker=rule-change-worker.service; b:soc-bot=soc-bot.service; b:vector=capstone-vector.service; b:wazuh-agent=wazuh-agent.service; c:apache=apache2.service; c:docker=docker.service; c:lab-api=capstone-offline-labs.service; c:lab-broker=capstone-offline-labs-broker.service; c:lab-guard=capstone-offline-labs-guard.service; c:lab-terminal=capstone-nonweb-terminal.service; c:sudo-status=capstone-sudo-status.service; c:sudo-user-manager=user@1991.service; c:terminal-guard=capstone-nonweb-guard.service; c:terminal-status=capstone-nonweb-status.service; c:wazuh-agent=wazuh-agent.service. Current runtime: b:management-pipeline=SOC report delivery/case processing/review queue; use alongside b:management when checking current controller impact. b:wazuh-manager is the Wazuh manager, not capstone-management.service. Other enum values are current runtime snapshots only; never substitute a different unit.",
+          "after": "Fixed host:target = systemd unit mappings (history supported): a:certificate-monitor=capstone-cert-monitor.service; a:docker=docker.service; a:raw-suricata=capstone-raw-operations@suricata.service; a:raw-waf=capstone-raw-operations@modsecurity.service; a:rule-worker=rule-change-worker.service; a:storage-monitor=capstone-storage-monitor.service; a:vector=capstone-vector.service; a:wazuh-agent=wazuh-agent.service; b:docker=docker.service; b:management=capstone-management.service; b:rule-worker=rule-change-worker.service; b:soc-bot=soc-bot.service; b:vector=capstone-vector.service; b:wazuh-agent=wazuh-agent.service; c:apache=apache2.service; c:docker=docker.service; c:lab-api=capstone-offline-labs.service; c:lab-broker=capstone-offline-labs-broker.service; c:lab-guard=capstone-offline-labs-guard.service; c:lab-terminal=capstone-nonweb-terminal.service; c:sudo-status=capstone-sudo-status.service; c:sudo-user-manager=user@1991.service; c:terminal-guard=capstone-nonweb-guard.service; c:terminal-status=capstone-nonweb-status.service; c:wazuh-agent=wazuh-agent.service. Current runtime: b:management-pipeline=SOC report delivery/case processing/review queue; use alongside b:management when checking current controller impact. b:wazuh-manager is the Wazuh manager, not capstone-management.service. a:systemd/b:systemd/c:systemd additionally support a bounded host system journal only with view=journal. Other enum values are current runtime snapshots only; never substitute a different unit."
+        },
+        {
+          "path": "/properties/target/x-capstone-host-journal-targets",
+          "before": null,
+          "after": {
+            "a:systemd": {
+              "host": "a",
+              "scope": "host_system",
+              "labels": [
+                "systemd",
+                "시스템 journal",
+                "시스템 로그"
+              ]
+            },
+            "b:systemd": {
+              "host": "b",
+              "scope": "host_system",
+              "labels": [
+                "systemd",
+                "시스템 journal",
+                "시스템 로그"
+              ]
+            },
+            "c:systemd": {
+              "host": "c",
+              "scope": "host_system",
+              "labels": [
+                "systemd",
+                "시스템 journal",
+                "시스템 로그"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "new_tools": 0,
+    "new_ports": 0,
+    "clock_or_path_or_command_input_added": false,
+    "scope": "Fixed host journal view enabled under existing diagnostics tool; inspect precise enum/conditional differences"
+  },
+  "early_failures": {
+    "composition_conflicts": [
+      "Policy validation vs precise QueryClock bound",
+      "Backend version1.4.4 vs1.4.5"
+    ],
+    "resolutions": "merge-resolutions.json",
+    "consumer_first_run": {
+      "tests": 15,
+      "errors": 1,
+      "code": "soc_workflow_size",
+      "skill_bytes": 25243,
+      "loader_limit": 24576
+    },
+    "consumer_corrected": {
+      "tests": 15,
+      "errors": 0,
+      "skill_bytes": 24456,
+      "loader_limit": 24576
+    },
+    "assertions_deleted": 0,
+    "operating_changes": 0,
+    "first_full_mac": {
+      "stopped_group": "new-clock",
+      "tests_in_group": 13,
+      "failures": 1,
+      "cause": "Frozen old test compared entire tools including descriptions; composed backend intentionally adds exact3 app/coverage sentences",
+      "resolution": "Pinned original clock assertions retained with only explicit expected description insertion; input schemas and resource budgets still exact"
+    },
+    "linux_stage_preflight": {
+      "status": "Local builder refused before any remote preparation",
+      "cause": "Pinned comparison source nested under service reconstruction",
+      "correction": "Use explicit service/parent path; no remote process or model started"
+    },
+    "first_actual_probe": {
+      "unit": "Retrospective collector used current4h clock on13h-old raw log; refused journal_time. Corrected to observed raw-window end",
+      "host_native": "Probe called private slice worker with24h; correctly refused journal_native_slice_window. Corrected to full bounded native.answer orchestrator",
+      "host_cli": "Succeeded,0 selected rows/has_more=true/validated consumer; preserved and not rerun",
+      "runtime_source_changes": 0,
+      "all_first_child_handles_terminal": true
+    },
+    "second_actual_probe": {
+      "unit_and_host_native": "Native parent refused unsafe_parent because generic test root is inside non-root-owned Hermes data path",
+      "resolution": "Keep native root-file/parent checks; exact14+ hash-pinned sources copied to new root-only /var/lib work root",
+      "no_runtime_source_changes": true,
+      "failed_children_terminal": true
+    },
+    "host_metadata_probe": {
+      "a_and_c": "Timer units do not expose MainPID; probe initially indexed it as a service field",
+      "correction": "PID handling only when actual MainPID exists; no synthetic timer PID field added",
+      "operating_changes": 0
+    },
+    "defect_first_followup": {
+      "priority_invariant": "Classifier creates new app metadata only forpriority4..6; align schema/consumer rejection with this invariant",
+      "period_invariant": "Historical application metadata must remain inside actual requested KST window",
+      "new_test_methods": 1,
+      "reason": "Manual review found forged/high-priority relabel and out-of-period consumer gaps; operating sources untouched"
+    }
+  },
+  "scope": {
+    "operating_source_changes": 0,
+    "operating_database_writes": 0,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "new_training": 0,
+    "attacks": 0,
+    "new_mac_packages": 0,
+    "new_tools": 0,
+    "new_ports": 0,
+    "fixed_host_journal_read_scope_extended": true
+  },
+  "cleanup": {
+    "remote_roots_removed": 4,
+    "remote_files_removed": 4732,
+    "remote_bytes_removed": 75838496,
+    "own_marker_pids_absent": true,
+    "mac_temp": {
+      "removed": true,
+      "regular_files": 23475,
+      "bytes": 384095110,
+      "at_kst": "2026-11-16T19:12:16.315671+09:00",
+      "receipts_preserved": true
+    }
+  },
+  "unproven": [
+    "Exact source/cache release and rollback; existing19/9 plans unchanged",
+    "Actual installed load, rescan and fresh both-bot Mattermost interaction",
+    "Data loss/DNS impact hallucination, independent incident accuracy and model superiority",
+    "128MiB deployed cgroup behavior is not replaced by read-process RSS or structural budgets",
+    "A/C preflight is metadata/dependency verification, not full-day candidate reads on those hosts"
+  ],
+  "public_replay": {
+    "source_and_official_structure": true,
+    "final_strict_regression_runner": {
+      "complete": true,
+      "tests": 1370,
+      "skipped": 6,
+      "profiles": 27,
+      "socket_connects_denied": true
+    },
+    "tree_files": 2271,
+    "comparison_files": 3
+  }
+}

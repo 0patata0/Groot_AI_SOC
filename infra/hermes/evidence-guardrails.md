@@ -1,8 +1,8 @@
 # 근거 기반 응답 가드레일
 
-<!-- service-provenance:start -->
-[인증 원문·생성 주장 경계](../validation/service-provenance/README.md) — query149/common93 미적용8소스 후보로 미등록 unit의 실제 프로세스/관계 추정과 인증 원문 인용 오탐을 보완했습니다. Mac1190(1184통과/기존6생략)/Hermes1273·신규41·공식Harness²35구성/상시 증가0·643복원을 확인했습니다. 실제SDK 후보4요청9.160~18.970초이나 원인 요청이 오류 필터0뒤 추가조회하지 않아 미승격입니다. 같은구간 all12행·HTTP500 4행과 errors0을 구분합니다. 정본/설치 query137·모델/권한·기존 정확 승인안은 유지하며5실행/4문자열은 개발 소비입니다.
-<!-- service-provenance:end -->
+<!-- service-error-coverage:start -->
+[근거 주장과 남은 미검출](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
+<!-- service-error-coverage:end -->
 
 두 봇의 관제 판단은 실제 MCP 결과에 연결한다. `SOUL.groot.md`의 필수 역할에 증거 기준을 두고, 공통 `chat_contract.py`와 `soc_management_run.py`가 답변을 내보내기 전 확인 가능한 주장·상태를 검사한다. 프롬프트 준수와 코드 검사 통과는 전체 정확성을 보장하지 않는다.
 

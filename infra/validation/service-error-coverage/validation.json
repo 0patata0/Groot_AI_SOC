@@ -1,0 +1,1868 @@
+{
+  "schema": "groot-service-error-validation-v1",
+  "status": "partially_improved_not_applied",
+  "recorded_at_kst": "2026-11-16T16:11:34.240181+09:00",
+  "versions": {
+    "R1": "query150/common94",
+    "R2": "query151/common95",
+    "final": "query152/common96",
+    "candidate_mcp_inherited_unchanged": "1.4.4",
+    "canonical_and_installed_query_last_confirmed": "1.19.137"
+  },
+  "source_tree_files": 643,
+  "changed_sources": [
+    "infra/hermes/chat_contract.py",
+    "infra/hermes/query-completion/__init__.py",
+    "infra/hermes/skills/soc-investigate/SKILL.md",
+    "infra/hermes/test_service_history_contract.py",
+    "infra/ollama-trial/runtime.py"
+  ],
+  "live_revalidation": {
+    "at_kst": "2026-11-16T16:03:20.300676+09:00",
+    "route": "Mac-admin231-A-B",
+    "installed_sources_verified": 32,
+    "changed_sources": [],
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "reader_properties": "MainPID=927\nMemoryMax=134217728\nTasksMax=8\nUser=root\nGroup=capstone-diagnostics\nActiveState=active\nSubState=running\n",
+    "reader_start_ticks": 7043,
+    "native_module_present": false,
+    "operating_probe": {
+      "at_kst": "2026-11-16T14:55:34.930541+09:00",
+      "schemas": {
+        "get_system_diagnostics": "d7945b1f1d9d81c90844434a259b453809e41d966d66d0829b529a2e114ec44b",
+        "calculate_time": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd",
+        "get_host_inventory": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+      },
+      "reads": 2
+    },
+    "isolated_sdk_catalog": {
+      "trials": 14,
+      "tools_each": 45,
+      "identical": true,
+      "entries": [
+        {
+          "server": "resp",
+          "name": "block_ip",
+          "alias": "mcp__resp__block_ip",
+          "schema_sha256": "2db8467344c286662cf6d592861ee6ec816434c13327eaf3d82d2a05f9284bcc"
+        },
+        {
+          "server": "resp",
+          "name": "get_firewall_rules",
+          "alias": "mcp__resp__get_firewall_rules",
+          "schema_sha256": "7fa8b4032b741e4f7304e0e29a295729f784a7fb8bb8ad096a0a7cfce0ffd4b9"
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "alias": "mcp__resp__list_blocks",
+          "schema_sha256": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+        },
+        {
+          "server": "resp",
+          "name": "unblock_ip",
+          "alias": "mcp__resp__unblock_ip",
+          "schema_sha256": "d2757c986eb71d19d278ea58f244cde2a18726ded60e703c0b7056f2865f218c"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_operation_status",
+          "alias": "mcp__rule_a__get_operation_status",
+          "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_rule_change_status",
+          "alias": "mcp__rule_a__get_rule_change_status",
+          "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_rule_change_target",
+          "alias": "mcp__rule_a__get_rule_change_target",
+          "schema_sha256": "2a6f8fb87bee70fbfd547caae6c852e2b3732485a5b1cd161880a93e19b4abbc"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_security_rules",
+          "alias": "mcp__rule_a__get_security_rules",
+          "schema_sha256": "b8942e215610f15dacdd690fbbed743e8131710e6374e9449f81a6b6fc3ef569"
+        },
+        {
+          "server": "rule-a",
+          "name": "get_service_action_target",
+          "alias": "mcp__rule_a__get_service_action_target",
+          "schema_sha256": "33ab82fa645d230a4cf9f9c3a528de27085c49b9df7aaf34bf36333b3ef34a29"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_operation_status",
+          "alias": "mcp__rule_b__get_operation_status",
+          "schema_sha256": "71f332e49f3c0dbe952df4821fd0bfb8c86361502b0c590e1dc9841c15bf899d"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_rule_change_status",
+          "alias": "mcp__rule_b__get_rule_change_status",
+          "schema_sha256": "3c7a63366f22bfe45292b916291c9ecbfdbd498bf83cd50e19e1064d3c291b52"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_rule_change_target",
+          "alias": "mcp__rule_b__get_rule_change_target",
+          "schema_sha256": "30704ddf5e621a2614d0409f799392de3278e18b51d7735212a878a7f65fa3e6"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_security_rules",
+          "alias": "mcp__rule_b__get_security_rules",
+          "schema_sha256": "a119df10763394dd2f070f47642f255e76ac7702b7b15f9c9f2fdb565ad52758"
+        },
+        {
+          "server": "rule-b",
+          "name": "get_service_action_target",
+          "alias": "mcp__rule_b__get_service_action_target",
+          "schema_sha256": "ce8ddc679710991d1eb3ddbebeb420581c736ff4874fe351f2e2ad6fffe9e852"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_rule_change",
+          "alias": "mcp__rule_write_a__propose_rule_change",
+          "schema_sha256": "1f11effc78733c4c873771a73c5f8bee88d02cd8446d58f7bd69c3b67b72d8a7"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_rule_edit",
+          "alias": "mcp__rule_write_a__propose_rule_edit",
+          "schema_sha256": "26f3f9915f39dbe4ca65dbf4880975741e249397bc9472efdd71a12b76e272d2"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "propose_service_action",
+          "alias": "mcp__rule_write_a__propose_service_action",
+          "schema_sha256": "e5a30a54836d7fd4293836a94c6782db1a7803ab205ac093afacfb94e25328e1"
+        },
+        {
+          "server": "rule-write-a",
+          "name": "temporarily_contain_ip",
+          "alias": "mcp__rule_write_a__temporarily_contain_ip",
+          "schema_sha256": "24b48bac70c7d9d10753e766d1f4c4e1ea7a4220baaf78ce57da072c564859f5"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_rule_change",
+          "alias": "mcp__rule_write_b__propose_rule_change",
+          "schema_sha256": "f1b266192a5f044b0d1208cdc8ad61a871ec84ce662b242bf3d7f0e06f647a23"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_rule_edit",
+          "alias": "mcp__rule_write_b__propose_rule_edit",
+          "schema_sha256": "8792ca851742064af6bdbb86f6a16ae9ef777b11b2018cff0e5865b6a3a04ab0"
+        },
+        {
+          "server": "rule-write-b",
+          "name": "propose_service_action",
+          "alias": "mcp__rule_write_b__propose_service_action",
+          "schema_sha256": "54e33dd43f8b235eefcda42ec355b5ee9e142cb831279eeaba8e13ab9e06e2cc"
+        },
+        {
+          "server": "security-events",
+          "name": "collect_incident_evidence",
+          "alias": "mcp__security_events__collect_incident_evidence",
+          "schema_sha256": "42cc9207fd1102663d1544b16a510d2ccff3214e7855440b0929ca8a79999c6e"
+        },
+        {
+          "server": "security-events",
+          "name": "get_wazuh_sca_checks",
+          "alias": "mcp__security_events__get_wazuh_sca_checks",
+          "schema_sha256": "ace06898df3b679080c092dc7ab36d9aa5378f7ab74180f97ff10f3ebacb8465"
+        },
+        {
+          "server": "security-events",
+          "name": "get_web_service_target",
+          "alias": "mcp__security_events__get_web_service_target",
+          "schema_sha256": "5a49221857f37ab059d1bf777639dddb23c409589a9a96d21b8ec0a727bed07f"
+        },
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "alias": "mcp__security_events__search_modsecurity_alerts",
+          "schema_sha256": "d297a9bd8776b8d726d2f230fe00f12f69cc7f4be3b75e4fe68e72d7b705e644"
+        },
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "alias": "mcp__security_events__search_suricata_alerts",
+          "schema_sha256": "ae64c793c525cc313e24b8a9bef7029b20913e79bce3a558a00e62159b607695"
+        },
+        {
+          "server": "security-events",
+          "name": "search_wazuh_alerts",
+          "alias": "mcp__security_events__search_wazuh_alerts",
+          "schema_sha256": "c3d595745a1c29cc350d08dca6a378a124434853f8ef1a231261a578cb3fcddd"
+        },
+        {
+          "server": "security-events",
+          "name": "search_web_access",
+          "alias": "mcp__security_events__search_web_access",
+          "schema_sha256": "d9a8ccb011e5390b284e21a6553e7b07f094b7e61d27b33435eb72da7b2e509a"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "calculate_time",
+          "alias": "mcp__system_diagnostics__calculate_time",
+          "schema_sha256": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_host_inventory",
+          "alias": "mcp__system_diagnostics__get_host_inventory",
+          "schema_sha256": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "alias": "mcp__system_diagnostics__get_system_diagnostics",
+          "schema_sha256": "ff393819a29aec5c1553b535217fad217ee9050dfc3d174f38871c5bcb619ca5"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agent_ports",
+          "alias": "mcp__wazuh_ro__get_wazuh_agent_ports",
+          "schema_sha256": "f164d1dc38e74c75cf8479bdae81db180d12b2d3d452f9cb447fd632b632388b"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agent_processes",
+          "alias": "mcp__wazuh_ro__get_wazuh_agent_processes",
+          "schema_sha256": "d37ade4172205381a042a725d80986549b7f3e1d6caf3a665087e5c811146451"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_agents",
+          "alias": "mcp__wazuh_ro__get_wazuh_agents",
+          "schema_sha256": "9bac6275361289b4ea6da82340fabf7e0b373c929dd3d8302032522163f00b16"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_alert_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_alert_summary",
+          "schema_sha256": "bc38bd71ddf5aaa5d54bfdf5e1a2af72d9a346897b31e553d1ad6fe8fec3af0e"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_cluster_health",
+          "alias": "mcp__wazuh_ro__get_wazuh_cluster_health",
+          "schema_sha256": "2fec25025417b8d71603cb950c3f4676067314d0bcfad2d80ce14509ae65b627"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_cluster_nodes",
+          "alias": "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+          "schema_sha256": "f1962fa4cf4f3ca1ad9533226903112a2343e69f959ea8e27ec2c8dd2410b71c"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_critical_vulnerabilities",
+          "alias": "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+          "schema_sha256": "4f30a9c89d28e39faef2a854ace2fd9da943434c5e13e5cce9b4a6bd3b89ad73"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_log_collector_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_log_collector_stats",
+          "schema_sha256": "a00dee00abe89f1727e696ad8603edffd4427a3e92eee2aec19fea399c56bc0d"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_manager_error_logs",
+          "alias": "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+          "schema_sha256": "59d25ac259370c9653bf1c4a3fa750e115cc2d0705a6caf3e1e28aeba90d5abb"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_remoted_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_remoted_stats",
+          "schema_sha256": "aa5d97fc1a8e4b567c56679a5ee8bc6b858b8c5e34fd72af1f795836d1f234fc"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_rules_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_rules_summary",
+          "schema_sha256": "d1c9c0f4a273b252f3657474cf0aa5356939d870ef2aa618762c67bcfeaac1a3"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_vulnerability_summary",
+          "alias": "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+          "schema_sha256": "1aeb260afe5339a55ec9f0d41ac7ed54b67c7ce987a84ae7262c80d20a1078f5"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "get_wazuh_weekly_stats",
+          "alias": "mcp__wazuh_ro__get_wazuh_weekly_stats",
+          "schema_sha256": "1fdb4dc04498135b5c770f1193c8d4db4fbdfbfb727e8fcd9afb7c8241755ac0"
+        },
+        {
+          "server": "wazuh-ro",
+          "name": "search_wazuh_manager_logs",
+          "alias": "mcp__wazuh_ro__search_wazuh_manager_logs",
+          "schema_sha256": "2394e43913adbdab776e232ae02c8323324c263ce95d36660ed39371a3d79ff2"
+        }
+      ],
+      "scope": "Candidate fixed diagnostic socket replaces only3 reads for isolation; other registered tools/permissions retained, extra worker denies protected calls. Not installed MCP/native promotion."
+    }
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 36,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 21,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 36,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 21,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/errors_test_service_history_contract.py",
+        "scripts/native_query.py",
+        "scripts/sdk_runtime.py",
+        "skills/soc-investigate/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "index_note": "Existing changed core regression file added to audit representation, yielding36 components; no new runtime plugin.",
+    "scope": "Official structure only, not model quality, installed application or real chat."
+  },
+  "regressions": {
+    "mac": {
+      "profiles": 22,
+      "run": 1239,
+      "passed": 1233,
+      "skipped": 6
+    },
+    "existing_hermes_image": {
+      "profiles": 22,
+      "run": 1322,
+      "passed": 1322,
+      "skipped": 0,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "uid": 10001,
+      "network_connect_denied": true
+    },
+    "new_counterexamples": 49,
+    "public_reconstruction": {
+      "source_files": 643,
+      "new_tests": 49,
+      "skipped": 0,
+      "verified": true
+    },
+    "scope": "Deterministic source/wire/mock regressions, not independent SOC cases."
+  },
+  "actual_sdk_trials": {
+    "rounds": {
+      "R1": {
+        "base_executions": 2,
+        "candidate_executions": 4,
+        "sdk_reads": 11,
+        "recorded_model_completions": 20
+      },
+      "R2": {
+        "base_executions": 0,
+        "candidate_executions": 4,
+        "sdk_reads": 9,
+        "recorded_model_completions": 15
+      },
+      "R3": {
+        "base_executions": 0,
+        "candidate_executions": 4,
+        "sdk_reads": 9,
+        "recorded_model_completions": 12
+      }
+    },
+    "cases": [
+      {
+        "round": "R1",
+        "arm": "base",
+        "id": "raw-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 20.964,
+        "model_calls": [
+          {
+            "seconds": 0.8499833780224435,
+            "usage": {
+              "input_tokens": 281,
+              "output_tokens": 9,
+              "total_tokens": 290
+            },
+            "ollama": {
+              "total_duration": 841689580,
+              "load_duration": 4272394,
+              "prompt_eval_count": 281,
+              "prompt_eval_duration": 508370000,
+              "eval_count": 9,
+              "eval_duration": 289617000
+            }
+          },
+          {
+            "seconds": 11.25980936200358,
+            "usage": {
+              "input_tokens": 8836,
+              "output_tokens": 233,
+              "total_tokens": 9069
+            },
+            "ollama": {
+              "total_duration": 11253703399,
+              "load_duration": 16322822,
+              "prompt_eval_count": 8836,
+              "prompt_eval_duration": 5636869000,
+              "eval_count": 233,
+              "eval_duration": 5395647000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "69141e4506ddd035e9f9778e33fa9a2fa28343fefee976232379f1e8580b11f0"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "561920c905982f96f1308dcdb9c2d5ee002b835abd997a0f92dfc20481c3669e"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R1",
+        "arm": "base",
+        "id": "filtered-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 오류 로그로 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 47.02,
+        "model_calls": [
+          {
+            "seconds": 0.8404707849840634,
+            "usage": {
+              "input_tokens": 280,
+              "output_tokens": 9,
+              "total_tokens": 289
+            },
+            "ollama": {
+              "total_duration": 833573596,
+              "load_duration": 5871609,
+              "prompt_eval_count": 280,
+              "prompt_eval_duration": 452295000,
+              "eval_count": 9,
+              "eval_duration": 291024000
+            }
+          },
+          {
+            "seconds": 10.601169653993566,
+            "usage": {
+              "input_tokens": 8826,
+              "output_tokens": 213,
+              "total_tokens": 9039
+            },
+            "ollama": {
+              "total_duration": 10588284830,
+              "load_duration": 11330105,
+              "prompt_eval_count": 8826,
+              "prompt_eval_duration": 5633669000,
+              "eval_count": 213,
+              "eval_duration": 4736078000
+            }
+          },
+          {
+            "seconds": 13.072797444008756,
+            "usage": {
+              "input_tokens": 9421,
+              "output_tokens": 192,
+              "total_tokens": 9613
+            },
+            "ollama": {
+              "total_duration": 13065014436,
+              "load_duration": 15089044,
+              "prompt_eval_count": 9421,
+              "prompt_eval_duration": 8731889000,
+              "eval_count": 192,
+              "eval_duration": 4108638000
+            }
+          },
+          {
+            "seconds": 13.194503556005657,
+            "usage": {
+              "input_tokens": 9246,
+              "output_tokens": 214,
+              "total_tokens": 9460
+            },
+            "ollama": {
+              "total_duration": 13188244705,
+              "load_duration": 14015366,
+              "prompt_eval_count": 9246,
+              "prompt_eval_duration": 8574951999,
+              "eval_count": 214,
+              "eval_duration": 4370834000
+            }
+          },
+          {
+            "seconds": 4.524744110996835,
+            "usage": {
+              "input_tokens": 9246,
+              "output_tokens": 214,
+              "total_tokens": 9460
+            },
+            "ollama": {
+              "total_duration": 4518137987,
+              "load_duration": 15742710,
+              "prompt_eval_count": 9246,
+              "prompt_eval_duration": 80849000,
+              "eval_count": 214,
+              "eval_duration": 4256750000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "393909b0dec51e6cbc23c0fd0c60acafc903cbb0baabad1f68838336c64a2b29"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "f1f85526635bfbbdfe194db2f46c89ee6e0119a7e9019cb5dbdf8b13567ac58b"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "diagnostic_snapshot_is_not_functional_health",
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ]
+        ]
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "raw-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 28.216,
+        "model_calls": [
+          {
+            "seconds": 0.9035928869852796,
+            "usage": {
+              "input_tokens": 286,
+              "output_tokens": 9,
+              "total_tokens": 295
+            },
+            "ollama": {
+              "total_duration": 892192749,
+              "load_duration": 4368393,
+              "prompt_eval_count": 286,
+              "prompt_eval_duration": 518739000,
+              "eval_count": 9,
+              "eval_duration": 285538000
+            }
+          },
+          {
+            "seconds": 18.44964078097837,
+            "usage": {
+              "input_tokens": 13241,
+              "output_tokens": 251,
+              "total_tokens": 13492
+            },
+            "ollama": {
+              "total_duration": 18442950816,
+              "load_duration": 16437824,
+              "prompt_eval_count": 13241,
+              "prompt_eval_duration": 12344100000,
+              "eval_count": 251,
+              "eval_duration": 5881473000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "d2a24e8bef8e8bd87cadd5b256cdc4b6bffd7827927b69cbf332817693eeb027"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "9fcdb5a9549e65e1aa8a082904201427e5a73c3ee8c9d384d4bfbd83f9313eec"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "filtered-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 오류 로그로 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 47.815,
+        "model_calls": [
+          {
+            "seconds": 0.8566639309865423,
+            "usage": {
+              "input_tokens": 280,
+              "output_tokens": 9,
+              "total_tokens": 289
+            },
+            "ollama": {
+              "total_duration": 851065824,
+              "load_duration": 4748616,
+              "prompt_eval_count": 280,
+              "prompt_eval_duration": 450099000,
+              "eval_count": 9,
+              "eval_duration": 298587000
+            }
+          },
+          {
+            "seconds": 14.117148547957186,
+            "usage": {
+              "input_tokens": 9242,
+              "output_tokens": 217,
+              "total_tokens": 9459
+            },
+            "ollama": {
+              "total_duration": 14110442246,
+              "load_duration": 16003007,
+              "prompt_eval_count": 9242,
+              "prompt_eval_duration": 8643257000,
+              "eval_count": 217,
+              "eval_duration": 5261601000
+            }
+          },
+          {
+            "seconds": 13.337450521998107,
+            "usage": {
+              "input_tokens": 9540,
+              "output_tokens": 194,
+              "total_tokens": 9734
+            },
+            "ollama": {
+              "total_duration": 13330597102,
+              "load_duration": 14227015,
+              "prompt_eval_count": 9540,
+              "prompt_eval_duration": 8878114000,
+              "eval_count": 194,
+              "eval_duration": 4228522000
+            }
+          },
+          {
+            "seconds": 7.478653708007187,
+            "usage": {
+              "input_tokens": 9541,
+              "output_tokens": 256,
+              "total_tokens": 9797
+            },
+            "ollama": {
+              "total_duration": 7472526662,
+              "load_duration": 16260944,
+              "prompt_eval_count": 9541,
+              "prompt_eval_duration": 1992662000,
+              "eval_count": 256,
+              "eval_duration": 5298651000
+            }
+          },
+          {
+            "seconds": 6.878356234054081,
+            "usage": {
+              "input_tokens": 9481,
+              "output_tokens": 206,
+              "total_tokens": 9687
+            },
+            "ollama": {
+              "total_duration": 6872447101,
+              "load_duration": 15131869,
+              "prompt_eval_count": 9481,
+              "prompt_eval_duration": 1946160000,
+              "eval_count": 206,
+              "eval_duration": 4746718000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "5714253a62e13bcd7be1ee8b70b7d360889e28442a767d02c16d2bc477f3f01d"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "2d00c9b8e47c516de5f80242e087acb16d8b19f01d33f36db527a57117bd9abe"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ]
+        ]
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "implicit-cause",
+        "question": "B Docker 오류 원인과 현재 상태 알려줘.",
+        "status": "partial",
+        "seconds": 18.832,
+        "model_calls": [
+          {
+            "seconds": 0.8359899350325577,
+            "usage": {
+              "input_tokens": 276,
+              "output_tokens": 9,
+              "total_tokens": 285
+            },
+            "ollama": {
+              "total_duration": 829763110,
+              "load_duration": 6103349,
+              "prompt_eval_count": 276,
+              "prompt_eval_duration": 444644000,
+              "eval_count": 9,
+              "eval_duration": 284392000
+            }
+          },
+          {
+            "seconds": 13.237539691035636,
+            "usage": {
+              "input_tokens": 9283,
+              "output_tokens": 313,
+              "total_tokens": 9596
+            },
+            "ollama": {
+              "total_duration": 13231065433,
+              "load_duration": 15162163,
+              "prompt_eval_count": 9283,
+              "prompt_eval_duration": 6108993000,
+              "eval_count": 313,
+              "eval_duration": 6899158000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "9810d95f334464d7458c07108c29ad5779dfaaf367982819c50df90fa203e263"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-15T15:14:55.135866+09:00",
+              "until_kst": "2026-11-16T15:14:55.135866+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "b365158ba01ece353920b9ac77d2813c5a4deb4a8138ca85041f90e50e70ff98"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "host-cause",
+        "question": "B systemd 최근 2분 실제 로그에서 실패 원인 확인해줘.",
+        "status": "partial",
+        "seconds": 63.979,
+        "model_calls": [
+          {
+            "seconds": 0.7386496309773065,
+            "usage": {
+              "input_tokens": 263,
+              "output_tokens": 7,
+              "total_tokens": 270
+            },
+            "ollama": {
+              "total_duration": 732533979,
+              "load_duration": 4144828,
+              "prompt_eval_count": 263,
+              "prompt_eval_duration": 425866000,
+              "eval_count": 7,
+              "eval_duration": 221970000
+            }
+          },
+          {
+            "seconds": 25.76151292200666,
+            "usage": {
+              "input_tokens": 23018,
+              "output_tokens": 270,
+              "total_tokens": 23288
+            },
+            "ollama": {
+              "total_duration": 25755073578,
+              "load_duration": 17190407,
+              "prompt_eval_count": 23018,
+              "prompt_eval_duration": 18895300000,
+              "eval_count": 270,
+              "eval_duration": 6615895000
+            }
+          },
+          {
+            "seconds": 26.923509618034586,
+            "usage": {
+              "input_tokens": 23564,
+              "output_tokens": 223,
+              "total_tokens": 23787
+            },
+            "ollama": {
+              "total_duration": 26917297849,
+              "load_duration": 19743363,
+              "prompt_eval_count": 23564,
+              "prompt_eval_duration": 21923451000,
+              "eval_count": 223,
+              "eval_duration": 4660371000
+            }
+          },
+          {
+            "seconds": 4.897288787004072,
+            "usage": {
+              "input_tokens": 23564,
+              "output_tokens": 223,
+              "total_tokens": 23787
+            },
+            "ollama": {
+              "total_duration": 4891042182,
+              "load_duration": 18601695,
+              "prompt_eval_count": 23564,
+              "prompt_eval_duration": 90666000,
+              "eval_count": 223,
+              "eval_duration": 4586274000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T15:13:13.981365+09:00",
+              "until_kst": "2026-11-16T15:15:13.981365+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "2ec1a07a80ebd7de68d27dda465d8b2910a0ff36138f521bbd8a2bb70ad00c4b"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "diagnostic_snapshot_is_not_functional_health"
+          ],
+          [
+            "diagnostic_snapshot_is_not_functional_health"
+          ]
+        ]
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "raw-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 66.521,
+        "model_calls": [
+          {
+            "seconds": 0.7973691579536535,
+            "usage": {
+              "input_tokens": 286,
+              "output_tokens": 9,
+              "total_tokens": 295
+            },
+            "ollama": {
+              "total_duration": 789544713,
+              "load_duration": 5049382,
+              "prompt_eval_count": 286,
+              "prompt_eval_duration": 445867000,
+              "eval_count": 9,
+              "eval_duration": 303428000
+            }
+          },
+          {
+            "seconds": 16.884226502967067,
+            "usage": {
+              "input_tokens": 11153,
+              "output_tokens": 289,
+              "total_tokens": 11442
+            },
+            "ollama": {
+              "total_duration": 16877920929,
+              "load_duration": 15357573,
+              "prompt_eval_count": 11153,
+              "prompt_eval_duration": 10203935000,
+              "eval_count": 289,
+              "eval_duration": 6465361000
+            }
+          },
+          {
+            "seconds": 16.50984423403861,
+            "usage": {
+              "input_tokens": 11800,
+              "output_tokens": 267,
+              "total_tokens": 12067
+            },
+            "ollama": {
+              "total_duration": 16415505626,
+              "load_duration": 11211192,
+              "prompt_eval_count": 11800,
+              "prompt_eval_duration": 10900136000,
+              "eval_count": 267,
+              "eval_duration": 5273266000
+            }
+          },
+          {
+            "seconds": 16.037898860988207,
+            "usage": {
+              "input_tokens": 11606,
+              "output_tokens": 255,
+              "total_tokens": 11861
+            },
+            "ollama": {
+              "total_duration": 16026022778,
+              "load_duration": 11619766,
+              "prompt_eval_count": 11606,
+              "prompt_eval_duration": 10710937000,
+              "eval_count": 255,
+              "eval_duration": 5084966000
+            }
+          },
+          {
+            "seconds": 7.031019471003674,
+            "usage": {
+              "input_tokens": 11595,
+              "output_tokens": 253,
+              "total_tokens": 11848
+            },
+            "ollama": {
+              "total_duration": 7021359190,
+              "load_duration": 11351536,
+              "prompt_eval_count": 11595,
+              "prompt_eval_duration": 2007769000,
+              "eval_count": 253,
+              "eval_duration": 4823867000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "3a00a8bfa34b3a27d8b3906f93a245436d8b17f7c1686a404dbd35f3ab9d655d"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "e5e6067041077aafa605b819fe486b15e5f0affcb2d4f064c3f40f74a9d36618"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "diagnostic_file_loss_unverified",
+            "diagnostic_snapshot_is_not_functional_health"
+          ],
+          [
+            "diagnostic_file_loss_unverified"
+          ],
+          [
+            "diagnostic_file_loss_unverified"
+          ]
+        ]
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "filtered-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 오류 로그로 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 38.948,
+        "model_calls": [
+          {
+            "seconds": 0.865489220013842,
+            "usage": {
+              "input_tokens": 280,
+              "output_tokens": 9,
+              "total_tokens": 289
+            },
+            "ollama": {
+              "total_duration": 859199627,
+              "load_duration": 6297375,
+              "prompt_eval_count": 280,
+              "prompt_eval_duration": 462720000,
+              "eval_count": 9,
+              "eval_duration": 295516000
+            }
+          },
+          {
+            "seconds": 0.7603946189628914,
+            "usage": {
+              "input_tokens": 261,
+              "output_tokens": 7,
+              "total_tokens": 268
+            },
+            "ollama": {
+              "total_duration": 755514073,
+              "load_duration": 4928474,
+              "prompt_eval_count": 261,
+              "prompt_eval_duration": 438851000,
+              "eval_count": 7,
+              "eval_duration": 272448000
+            }
+          },
+          {
+            "seconds": 12.990619377000257,
+            "usage": {
+              "input_tokens": 11590,
+              "output_tokens": 204,
+              "total_tokens": 11794
+            },
+            "ollama": {
+              "total_duration": 12983631119,
+              "load_duration": 16072332,
+              "prompt_eval_count": 11590,
+              "prompt_eval_duration": 8039108000,
+              "eval_count": 204,
+              "eval_duration": 4717423000
+            }
+          },
+          {
+            "seconds": 12.765105266997125,
+            "usage": {
+              "input_tokens": 11981,
+              "output_tokens": 211,
+              "total_tokens": 12192
+            },
+            "ollama": {
+              "total_duration": 12758245383,
+              "load_duration": 14656449,
+              "prompt_eval_count": 11981,
+              "prompt_eval_duration": 8171150000,
+              "eval_count": 211,
+              "eval_duration": 4309043000
+            }
+          },
+          {
+            "seconds": 6.510985665023327,
+            "usage": {
+              "input_tokens": 11986,
+              "output_tokens": 209,
+              "total_tokens": 12195
+            },
+            "ollama": {
+              "total_duration": 6504865167,
+              "load_duration": 14912542,
+              "prompt_eval_count": 11986,
+              "prompt_eval_duration": 2071379000,
+              "eval_count": 209,
+              "eval_duration": 4241856000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "c72302abf7843c840226d9b2f752b16ceaa1a258b0d0ee536d9f658f682e5d53"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "05c77a2793166c879926c14ad9a8c98b472784b60817000bb41c2a6690201524"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "88eabc90f66a09a48c05b4c40919b810b26b44392c4fef3ee70b97a18e81346c"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "diagnostic_file_loss_unverified"
+          ],
+          [
+            "diagnostic_file_loss_unverified"
+          ]
+        ]
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "implicit-cause",
+        "question": "B Docker 오류 원인과 현재 상태 알려줘.",
+        "status": "partial",
+        "seconds": 26.541,
+        "model_calls": [
+          {
+            "seconds": 0.8528320880141109,
+            "usage": {
+              "input_tokens": 276,
+              "output_tokens": 9,
+              "total_tokens": 285
+            },
+            "ollama": {
+              "total_duration": 846675389,
+              "load_duration": 6281671,
+              "prompt_eval_count": 276,
+              "prompt_eval_duration": 442285000,
+              "eval_count": 9,
+              "eval_duration": 293438000
+            }
+          },
+          {
+            "seconds": 0.648985710053239,
+            "usage": {
+              "input_tokens": 257,
+              "output_tokens": 7,
+              "total_tokens": 264
+            },
+            "ollama": {
+              "total_duration": 644007164,
+              "load_duration": 4451751,
+              "prompt_eval_count": 257,
+              "prompt_eval_duration": 381576000,
+              "eval_count": 7,
+              "eval_duration": 219007000
+            }
+          },
+          {
+            "seconds": 19.47821250697598,
+            "usage": {
+              "input_tokens": 12241,
+              "output_tokens": 525,
+              "total_tokens": 12766
+            },
+            "ollama": {
+              "total_duration": 19469962597,
+              "load_duration": 15401588,
+              "prompt_eval_count": 12241,
+              "prompt_eval_duration": 8562723000,
+              "eval_count": 525,
+              "eval_duration": 10654168000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "907b4a85ac04ee7b9ae8b1a2f75614b6d638ee9c3ffcc28109dbea8766cc7a7b"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-15T15:39:14.707023+09:00",
+              "until_kst": "2026-11-16T15:39:14.707023+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "912fbb053b882e02747e80d9354c17ad847eabd298331c9033c5b330b4c5bfb3"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-15T15:39:14.707023+09:00",
+              "until_kst": "2026-11-16T15:39:14.707023+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "03ba8341260afcd0980723f43421a4d98427800cf09471332c6a7dab2abcdcfa"
+          }
+        ],
+        "error_type": "ValidationError",
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "host-cause",
+        "question": "B systemd 최근 3분 실제 로그에서 실패 원인 확인해줘.",
+        "status": "partial",
+        "seconds": 24.249,
+        "model_calls": [
+          {
+            "seconds": 0.8021906620124355,
+            "usage": {
+              "input_tokens": 263,
+              "output_tokens": 7,
+              "total_tokens": 270
+            },
+            "ollama": {
+              "total_duration": 796783358,
+              "load_duration": 4314157,
+              "prompt_eval_count": 263,
+              "prompt_eval_duration": 485407000,
+              "eval_count": 7,
+              "eval_duration": 187485000
+            }
+          },
+          {
+            "seconds": 18.866013488033786,
+            "usage": {
+              "input_tokens": 13205,
+              "output_tokens": 280,
+              "total_tokens": 13485
+            },
+            "ollama": {
+              "total_duration": 18856198678,
+              "load_duration": 14564670,
+              "prompt_eval_count": 13205,
+              "prompt_eval_duration": 12177554000,
+              "eval_count": 280,
+              "eval_duration": 6416731000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T15:36:41.257969+09:00",
+              "until_kst": "2026-11-16T15:39:41.257969+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "116031d32e7cede73509009f4933633c9e81097159393fcbd3b34671cea87922"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R3",
+        "arm": "candidate",
+        "id": "raw-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 25.446,
+        "model_calls": [
+          {
+            "seconds": 0.805959619989153,
+            "usage": {
+              "input_tokens": 286,
+              "output_tokens": 9,
+              "total_tokens": 295
+            },
+            "ollama": {
+              "total_duration": 797535723,
+              "load_duration": 4547461,
+              "prompt_eval_count": 286,
+              "prompt_eval_duration": 454874000,
+              "eval_count": 9,
+              "eval_duration": 302859000
+            }
+          },
+          {
+            "seconds": 15.294133405026514,
+            "usage": {
+              "input_tokens": 11257,
+              "output_tokens": 204,
+              "total_tokens": 11461
+            },
+            "ollama": {
+              "total_duration": 15287497210,
+              "load_duration": 15317598,
+              "prompt_eval_count": 11257,
+              "prompt_eval_duration": 10235588000,
+              "eval_count": 204,
+              "eval_duration": 4840098000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "307534bb490059c23541f073f2a251d0987e973063fd5e2e78c3d6590833fe7b"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "3d2a841192405f630ace025395907cc024389bd4894e0a0488c8ebd5e9e152f0"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R3",
+        "arm": "candidate",
+        "id": "filtered-cause",
+        "question": "B Docker 오늘 05:50~05:53 KST 오류 로그로 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 21.028,
+        "model_calls": [
+          {
+            "seconds": 0.844813373987563,
+            "usage": {
+              "input_tokens": 280,
+              "output_tokens": 9,
+              "total_tokens": 289
+            },
+            "ollama": {
+              "total_duration": 838352749,
+              "load_duration": 4394513,
+              "prompt_eval_count": 280,
+              "prompt_eval_duration": 451026000,
+              "eval_count": 9,
+              "eval_duration": 292063000
+            }
+          },
+          {
+            "seconds": 0.7110978050041012,
+            "usage": {
+              "input_tokens": 261,
+              "output_tokens": 7,
+              "total_tokens": 268
+            },
+            "ollama": {
+              "total_duration": 705928154,
+              "load_duration": 4480188,
+              "prompt_eval_count": 261,
+              "prompt_eval_duration": 436730000,
+              "eval_count": 7,
+              "eval_duration": 229137000
+            }
+          },
+          {
+            "seconds": 14.400240276998375,
+            "usage": {
+              "input_tokens": 11681,
+              "output_tokens": 258,
+              "total_tokens": 11939
+            },
+            "ollama": {
+              "total_duration": 14390349854,
+              "load_duration": 12186525,
+              "prompt_eval_count": 11681,
+              "prompt_eval_duration": 8037301000,
+              "eval_count": 258,
+              "eval_duration": 6120469000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "388c38a1eb7685364f79e9ef21a83cb5524c5e4a3ac8c3bd7cf7f29976e2402b"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "60d3be80a6efab10b413fce024a3e28882af3965e32bb87a12dae48e6b3761d1"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T05:50:00+09:00",
+              "until_kst": "2026-11-16T05:53:00+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "76e3495bf260020212fb9a22b2ff7bf015411db08522d6d2511e6bba81c0b0e4"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R3",
+        "arm": "candidate",
+        "id": "implicit-cause",
+        "question": "B Docker 오류 원인과 현재 상태 알려줘.",
+        "status": "partial",
+        "seconds": 24.228,
+        "model_calls": [
+          {
+            "seconds": 0.7914243370178156,
+            "usage": {
+              "input_tokens": 276,
+              "output_tokens": 9,
+              "total_tokens": 285
+            },
+            "ollama": {
+              "total_duration": 785102361,
+              "load_duration": 5478955,
+              "prompt_eval_count": 276,
+              "prompt_eval_duration": 444323000,
+              "eval_count": 9,
+              "eval_duration": 236206000
+            }
+          },
+          {
+            "seconds": 0.7067364240065217,
+            "usage": {
+              "input_tokens": 257,
+              "output_tokens": 7,
+              "total_tokens": 264
+            },
+            "ollama": {
+              "total_duration": 702737414,
+              "load_duration": 4369986,
+              "prompt_eval_count": 257,
+              "prompt_eval_duration": 387263000,
+              "eval_count": 7,
+              "eval_duration": 275982000
+            }
+          },
+          {
+            "seconds": 17.44321132998448,
+            "usage": {
+              "input_tokens": 12332,
+              "output_tokens": 382,
+              "total_tokens": 12714
+            },
+            "ollama": {
+              "total_duration": 17432784446,
+              "load_duration": 11707139,
+              "prompt_eval_count": 12332,
+              "prompt_eval_duration": 8586549000,
+              "eval_count": 382,
+              "eval_duration": 8610512000
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker"
+            },
+            "is_error": false,
+            "result_sha256": "81a6b87e8e66ade18116db3269b9cac66762ed8c117cb73bbd53f7a7fac3f3bd"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-15T15:57:12.759074+09:00",
+              "until_kst": "2026-11-16T15:57:12.759074+09:00",
+              "view": "journal",
+              "limit": 50
+            },
+            "is_error": false,
+            "result_sha256": "6e2ee9ee6b3630414afb72b1cd1def1de3b6304128d1ef1b3089ec7f7bb4368b"
+          },
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:docker",
+              "since_kst": "2026-11-15T15:57:12.759074+09:00",
+              "until_kst": "2026-11-16T15:57:12.759074+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "9db68ce60abf8a840e9521e9cd63e23416a4ff713d7adeaedef7b9cbd5dcf209"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": []
+      },
+      {
+        "round": "R3",
+        "arm": "candidate",
+        "id": "host-cause",
+        "question": "B systemd 최근 3분 실제 로그에서 실패 원인 확인해줘.",
+        "status": "partial",
+        "seconds": 43.559,
+        "model_calls": [
+          {
+            "seconds": 0.7491225619451143,
+            "usage": {
+              "input_tokens": 263,
+              "output_tokens": 7,
+              "total_tokens": 270
+            },
+            "ollama": {
+              "total_duration": 743150646,
+              "load_duration": 4123653,
+              "prompt_eval_count": 263,
+              "prompt_eval_duration": 423676000,
+              "eval_count": 7,
+              "eval_duration": 222514000
+            }
+          },
+          {
+            "seconds": 16.370268927013967,
+            "usage": {
+              "input_tokens": 13298,
+              "output_tokens": 285,
+              "total_tokens": 13583
+            },
+            "ollama": {
+              "total_duration": 16361732996,
+              "load_duration": 18335909,
+              "prompt_eval_count": 13298,
+              "prompt_eval_duration": 9385755000,
+              "eval_count": 285,
+              "eval_duration": 6727525000
+            }
+          },
+          {
+            "seconds": 17.214565717964433,
+            "usage": {
+              "input_tokens": 13762,
+              "output_tokens": 197,
+              "total_tokens": 13959
+            },
+            "ollama": {
+              "total_duration": 17208256852,
+              "load_duration": 15731864,
+              "prompt_eval_count": 13762,
+              "prompt_eval_duration": 12698279000,
+              "eval_count": 197,
+              "eval_duration": 4259996000
+            }
+          },
+          {
+            "seconds": 4.489577528031077,
+            "usage": {
+              "input_tokens": 13762,
+              "output_tokens": 197,
+              "total_tokens": 13959
+            },
+            "ollama": {
+              "total_duration": 4483557299,
+              "load_duration": 15288301,
+              "prompt_eval_count": 13762,
+              "prompt_eval_duration": 78659000,
+              "eval_count": 197,
+              "eval_duration": 4206805999
+            }
+          }
+        ],
+        "reads": [
+          {
+            "name": "get_system_diagnostics",
+            "arguments": {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T15:54:36.997682+09:00",
+              "until_kst": "2026-11-16T15:57:36.997682+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "is_error": false,
+            "result_sha256": "3e679c1d48605d6d3e130339d82a49baba4c1127eeb115b9c647cf7bdf896407"
+          }
+        ],
+        "error_type": null,
+        "schema_repairs": 0,
+        "claim_rejections": [
+          [
+            "sample_zero_presented_as_absence"
+          ],
+          [
+            "sample_zero_presented_as_absence"
+          ]
+        ]
+      }
+    ],
+    "totals": {
+      "executions": 14,
+      "distinct_question_strings": 5,
+      "sdk_mcp_reads": 29,
+      "recorded_model_completions": 47
+    },
+    "separate_wire_smoke_reads": 6,
+    "separate_initial_operating_reads": 2,
+    "scope": "Development14 executions/5 distinct strings; parent2/candidate4 then candidate4/candidate4. Same trained35B and permissions, changing source/log times. Not controlled benchmark, native Hermes inference or Mattermost."
+  },
+  "observed_improvements": [
+    "Raw-log requests no longer narrowed solely by cause/error words; explicit error-only constraints preserved.",
+    "R3 filtered/implicit causes actually dispatch same-target/window all after errors0.",
+    "R3 final4 executions25.446/21.028/24.228/43.559s; no generic fallback or ValidationError in those4. Status remains partial/unresolved.",
+    "Host priority claim checked against full actual sample:50/50 priority6. Whole requested period remains unverified.",
+    "Per-row hashes omitted only from model input; message/time/source/priority/state and full original audit preserved. Cached snapshot sample grouped separately."
+  ],
+  "schema_repair_scope": {
+    "mock_retry_verified": true,
+    "final_actual_schema_repairs": 0,
+    "previous_actual_schema_failure": "R2 implicit cause basis584 chars exceeded512; no previous SDK retry.",
+    "scope": "Final actual4 did not trigger the new schema repair branch; mock test proves bounded retry/no repeat reads. Native actual retry parity unverified."
+  },
+  "remaining_findings": [
+    {
+      "priority": "P1",
+      "id": "unsupported-data-loss-and-dns-transience",
+      "finding": "Final R3 filtered answer infers storage data loss/access inability from lstat/Cancelled; implicit answer infers DNS issue is transient/query-limited from active Docker. Narrow file-loss guards miss these broader unsupported causal/impact claims."
+    },
+    {
+      "priority": "P1",
+      "id": "fixed-filter-capture-gap",
+      "finding": "Same historical journal window: errors returns0 while all returns Docker application level=error rows at journal priority6 (and the24h all view also finds DNS timeouts). Current-turn fallback does not alter the underlying fixed filter. Shared collector code suggests a related concern, but current default15min snapshot0 is a different interval and does not prove a collector miss; same-window metadata verification remains pending."
+    },
+    {
+      "priority": "P2",
+      "id": "host-sample-scope-and-unread-window",
+      "finding": "R3 host returned50 rows are actually all priority6. The truncated tail/has_more does not establish the whole requested3min. It declined earlier continuation without establishing that the remaining range cannot explain the question."
+    },
+    {
+      "priority": "P2",
+      "id": "verbose-cache-and-eight-log-groups",
+      "finding": "Default15min cached sample still appears in output; full receipt table/eight log groups remain verbose although model input separates scopes."
+    },
+    {
+      "priority": "P1",
+      "id": "no-operating-or-independent-promotion-proof",
+      "finding": "Native mock/common regressions and isolated real SDK calls do not prove installed load, actual Hermes/Mattermost delivery, independent SOC quality, approval/OS operations E2E or full initial install."
+    }
+  ],
+  "staging_corrections": [
+    "Initial error-log spelling case and Native mock endpoint corrected before R1 freeze.",
+    "Core temporal/filter tests updated to expected all scope; default-filter fixture kept independent and continuation expects actual requested scope. No tests removed.",
+    "Initial server wrapper rc0 contained incomplete full147 regression; local gate rejected it, but subsequent build attempts ran and refused missing preparation files. Model launches0. Later orchestration stops on exit_code/inner rc/complete, runner itself returns nonzero on incomplete tests.",
+    "Preserved709-file failed stage then changed only owned core test+manifest and verified664 inputs before final R1 run.",
+    "R2 unknown file-loss cause wording was over-rejected; R3 checks positive predicates and preserves uncertainty. Actual R2 drafts retained.",
+    "Fixture opaque marker was masked as designed; projection checks compare actual returned message text, without changing redaction."
+  ],
+  "cleanup": {
+    "remote_roots": [
+      {
+        "root": "/var/lib/capstone-service-errors-dq252bfc",
+        "regular_files": 159,
+        "socket_files": 2,
+        "bytes": 4433279,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-service-errors-dq252bfc-tests",
+        "regular_files": 709,
+        "socket_files": 0,
+        "bytes": 9962760,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/var/lib/capstone-service-errors-dq252bfc-r2",
+        "regular_files": 152,
+        "socket_files": 2,
+        "bytes": 4331331,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-service-errors-dq252bfc-tests-r2",
+        "regular_files": 709,
+        "socket_files": 0,
+        "bytes": 9975774,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/var/lib/capstone-service-errors-dq252bfc-r3",
+        "regular_files": 152,
+        "socket_files": 2,
+        "bytes": 4283684,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-service-errors-dq252bfc-tests-r3",
+        "regular_files": 709,
+        "socket_files": 0,
+        "bytes": 9983762,
+        "matched_preserved_export": true
+      }
+    ],
+    "remote_roots_absent": true,
+    "own_units_stopped": 6,
+    "own_pid_count_absent": 15,
+    "remote_regular_files_removed": 2590,
+    "remote_sockets_removed": 6,
+    "remote_bytes_removed": 42970590,
+    "mac_files_removed": 49592,
+    "mac_bytes_removed": 740037433,
+    "mac_transport_scripts_removed": 15,
+    "redundant_transmission_wrappers_removed": 4,
+    "mac_temporary_root_absent": true,
+    "mac_process_scope": "All owned local command sessions and SSH wrappers completed. Own remote supervisor/workers absent and6 test units stopped. No system-wide process census claimed.",
+    "new_mac_packages": 0,
+    "g_harness2_preserved": true,
+    "paper15_and_original9_preserved": true
+  },
+  "authority": {
+    "changed": false,
+    "protected_dispatches": 0,
+    "chat_posts": 0,
+    "operating_apply": false,
+    "new_attacks": 0,
+    "new_training": 0,
+    "existing_exact_approval_plans_reused": false
+  },
+  "review": {
+    "method": "Manual defect-first full final answer/receipts/source/repair audit. Not review-agent execution or independent gold evaluation.",
+    "review_agent_original_found": false,
+    "semgrep": "not_run_no_mac_install"
+  },
+  "promotion_blocked_by_known_findings": true
+}

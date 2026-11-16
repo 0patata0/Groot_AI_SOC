@@ -68,3 +68,7 @@ SOC_TYPED_TEST=/private/tmp/new-provenance-replay/parent-artifacts/test_typed_se
 후보 미채택 상태여서 운영 원복은 실행하지 않았다. 기존 관리19/journal9 정확 승인안·백업은 불변이며 새 후보에 승인을 재사용하지 않는다. 원문/SHA를 보존한 뒤 자체2유닛 종료·5PID부재, 원격2폴더862일반파일/2socket·14,336,338B와 Mac21,483파일·324,233,173B·transport7개·중복 전송wrapper1개를 정리했다. 전역 프로세스 조사 주장은 하지 않는다. G_Harness2·논문15SHA·기존9작업·자료/가중치·복구본은 보존한다.
 
 이번5응답은 [평가 사용 원장](../../../finetuning/EVALUATION_USAGE.json)의 개발 소비다. 정답/SFT·새 독립 평가로 재사용하지 않는다. 운영 적용/보호 dispatch/채널 게시/공격/새 학습/새 Mac 패키지0이다. 수동 결함 우선 검토이며 review-agent 실행이나 Semgrep 수행으로 표시하지 않는다.
+
+## 오류 원문·조사 완료 조건 후속
+
+[후속 후보](../service-error-coverage/README.md)는 오류 후보0 뒤 같은 대상/기간 원문 실제 조회와 SDK 형식 정정을 보완했다. 최종 Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²·R3 실제4응답21.028~43.559초다. 전체14실행/5문자열·29읽기/47모델완료는 개발 소비다. 데이터 손실·DNS 영향 추정이 남아 운영 미승격이며 이 부모의 과거 관측·실패/해시를 소급해 바꾸지 않는다.

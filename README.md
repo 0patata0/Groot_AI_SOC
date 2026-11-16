@@ -3,7 +3,7 @@
 <!-- current-work-summary:start -->
 현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 무엇·방법·이유·준비·실행·확인·복구를 설명하는 매뉴얼형 MD/PDF/DOCX56쪽·15SHA 검수본이며 사진/학번은 공란·로컬 전용입니다.
 
-[서비스 출처·미확인 조회](infra/validation/service-provenance/README.md): query149/common93 미적용8소스 후보로 미등록 unit의 실제 프로세스/관계 추정과 인증 원문 인용 오탐을 보완했습니다. Mac1190(1184통과/기존6생략)/Hermes1273·신규41·공식Harness²35구성/상시 증가0·643복원을 확인했습니다. 실제SDK 후보4요청9.160~18.970초이나 원인 요청이 오류 필터0뒤 추가조회하지 않아 미승격입니다. 같은구간 all12행·HTTP500 4행과 errors0을 구분합니다. 정본/설치 query137·모델/권한·기존 정확 승인안은 유지하며5실행/4문자열은 개발 소비입니다.
+[서비스 오류 원문·완료 조건](infra/validation/service-error-coverage/README.md): query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

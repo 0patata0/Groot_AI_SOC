@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-16T14:45:30.466373+09:00",
+  "updated_at_kst": "2026-11-16T16:11:34.240181+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -942,6 +942,90 @@
           "record_sha256": "66868865d11f55c45986725701fcfc4cbee66cbdc6905d08b50c9d9740d635ae",
           "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
           "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "service-error-coverage-development",
+      "data_sha256": "8de01d508739c820b562c8e26f6ff6d28d697109265f521da33bae67f5694e2f",
+      "records": 14,
+      "distinct_question_strings": 5,
+      "evidence": "infra/validation/service-error-coverage/validation.json",
+      "evidence_sha256": "8da5a8f4d575d5a9a42312b720a3bd1a0d59c4646a70bfd9a018921d4fd6b8a1",
+      "consumed_at_kst": "2026-11-16T15:58:20.954587+09:00",
+      "task": "Observed R1 parent2/candidate4, R2 candidate4, final R3 candidate4. Known unsupported data-loss/DNS-impact claims remain. Never gold/SFT/new independent SOC score.",
+      "fingerprint_scope": "Question/final-answer only, not actual runtime wire policy/tools/context/evidence.",
+      "fingerprints": [
+        {
+          "record_sha256": "ac9538655b8f2d9f52dbb5c97364a0a3e11a98cea7a392308da53243df482766",
+          "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
+          "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
+        },
+        {
+          "record_sha256": "0e027b03322f33f1fceb7fcabf7bd4251e5265aec4a4df553d4c285386928275",
+          "visible_input_sha256": "bd8a5a891bbb1dabba91d888349112a1f2fe7cdd70b66216072fc30712b4dc2d",
+          "nonassistant_input_sha256": "cfc1b40170b23ca3ae57ef74e2f79da78af6c2bedc39990b9b321f47d78d3a48"
+        },
+        {
+          "record_sha256": "f650ce965ff643fce1a3c6f2cbf23ab967b13b914924cfb392b347496f8adf19",
+          "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
+          "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
+        },
+        {
+          "record_sha256": "543dbc6bc533c83d91d7840b96e3055c4cce22bda38008f25476315ecb413a67",
+          "visible_input_sha256": "bd8a5a891bbb1dabba91d888349112a1f2fe7cdd70b66216072fc30712b4dc2d",
+          "nonassistant_input_sha256": "cfc1b40170b23ca3ae57ef74e2f79da78af6c2bedc39990b9b321f47d78d3a48"
+        },
+        {
+          "record_sha256": "2e6b7825901ef1e379a84409ab67783070b3933ccd56568d31b7b5e78962fb07",
+          "visible_input_sha256": "42db403e920fd80e53786afaf85597f3e53e57bfbf57c4718b7b372c49c83188",
+          "nonassistant_input_sha256": "4f7409c97cfd97f34fd022fc7da1e52da862b974f632194ace53dccfe8189fea"
+        },
+        {
+          "record_sha256": "16bc159b5e01f7265649169ef7f880f7ea020439d46d29fbdff602d57a5e60e7",
+          "visible_input_sha256": "133ef773f16c0d06e4d71dd7203a5a780dafe4da90758a5fb794a5db90b38669",
+          "nonassistant_input_sha256": "5046331aec6d953f0065465988db787ea4a429bed4729fd57ae7d7a825b388f9"
+        },
+        {
+          "record_sha256": "e890a57c972caf7d82a1abd484a41b6b0ae3e690925910e1d5fe72b5f4341749",
+          "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
+          "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
+        },
+        {
+          "record_sha256": "11957dc2f86ce528c18ae3ed168f9c263312a9758b132c7d9af13721c345f90e",
+          "visible_input_sha256": "bd8a5a891bbb1dabba91d888349112a1f2fe7cdd70b66216072fc30712b4dc2d",
+          "nonassistant_input_sha256": "cfc1b40170b23ca3ae57ef74e2f79da78af6c2bedc39990b9b321f47d78d3a48"
+        },
+        {
+          "record_sha256": "311f65b3d10a1cc49c4eb12add790c391b249d7fbd28373ed676dc17893fb61b",
+          "visible_input_sha256": "42db403e920fd80e53786afaf85597f3e53e57bfbf57c4718b7b372c49c83188",
+          "nonassistant_input_sha256": "4f7409c97cfd97f34fd022fc7da1e52da862b974f632194ace53dccfe8189fea"
+        },
+        {
+          "record_sha256": "574fffb15709b75991cbdfc47d3f0f9f812c3602070ea145475c3603f4c698e3",
+          "visible_input_sha256": "bb2183878a66d562a979b617ebb1780564fce581d304255159b7ff48ca2b99c8",
+          "nonassistant_input_sha256": "7cc22140669c854ee8bd3a3a15d673e19686330a20e5500ffe8bd7faf3f95a24"
+        },
+        {
+          "record_sha256": "d1e0003ed26e332e36bb7dc7def4195a33f2b517aa929552ee9454737b86e175",
+          "visible_input_sha256": "82b93fc3d0b8bf8f9b978c0eab11b77217625a594fefeb633bf7bc80537b4bca",
+          "nonassistant_input_sha256": "52cb95469fecb9f314a1d6e8aebbc35d9d4aad850d7070e9b5e18c366f27fa3d"
+        },
+        {
+          "record_sha256": "6c3cad7cacd329d7dd346be5565ab41343dfb9440ad48807ecaa1bcd84287014",
+          "visible_input_sha256": "bd8a5a891bbb1dabba91d888349112a1f2fe7cdd70b66216072fc30712b4dc2d",
+          "nonassistant_input_sha256": "cfc1b40170b23ca3ae57ef74e2f79da78af6c2bedc39990b9b321f47d78d3a48"
+        },
+        {
+          "record_sha256": "e36f49a97f747255d2414ab28e1444e2a0cecf544d4769c43c4eca050f7bbdd9",
+          "visible_input_sha256": "42db403e920fd80e53786afaf85597f3e53e57bfbf57c4718b7b372c49c83188",
+          "nonassistant_input_sha256": "4f7409c97cfd97f34fd022fc7da1e52da862b974f632194ace53dccfe8189fea"
+        },
+        {
+          "record_sha256": "de389e69c78b3c1129b38c28e636df92345a679585426a779ec0b13db3630468",
+          "visible_input_sha256": "bb2183878a66d562a979b617ebb1780564fce581d304255159b7ff48ca2b99c8",
+          "nonassistant_input_sha256": "7cc22140669c854ee8bd3a3a15d673e19686330a20e5500ffe8bd7faf3f95a24"
         }
       ]
     }

@@ -1,8 +1,8 @@
 # OS·Docker 읽기와 호스트별 표
 
-<!-- service-provenance:start -->
-[목록 관측과 구성요소 식별](../validation/service-provenance/README.md) — query149/common93 미적용8소스 후보로 미등록 unit의 실제 프로세스/관계 추정과 인증 원문 인용 오탐을 보완했습니다. Mac1190(1184통과/기존6생략)/Hermes1273·신규41·공식Harness²35구성/상시 증가0·643복원을 확인했습니다. 실제SDK 후보4요청9.160~18.970초이나 원인 요청이 오류 필터0뒤 추가조회하지 않아 미승격입니다. 같은구간 all12행·HTTP500 4행과 errors0을 구분합니다. 정본/설치 query137·모델/권한·기존 정확 승인안은 유지하며5실행/4문자열은 개발 소비입니다.
-<!-- service-provenance:end -->
+<!-- service-error-coverage:start -->
+[현재 속성과 기능 영향](../validation/service-error-coverage/README.md) — query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
+<!-- service-error-coverage:end -->
 
 2026-11-08 KST. A/B/C의 `get_host_inventory`를 공통 `soc-query`와 `soc-output`에 연결했다. 조회는 승인 없이 가능하며 기존 보호 변경 승인 절차는 유지한다. 일반 셸·sudo·Docker 실행 권한을 모델에 주는 기능은 아니다.
 

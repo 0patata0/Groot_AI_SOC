@@ -1,10 +1,10 @@
 # 설치 후 접속·검증·장애 진단
 
-native journal 후보는 systemd255/binding235 API·root helper/영수증을 검사하며 실패를 빈 결과로 바꾸지 않는다. [정확 적용안](../infra/validation/journal-adapter/application/README.md)은 원본6개·33회귀/9복제원복/18중간load와 PREPARED를 확인했지만 운영 적용/원복 timer·실MCP/새채팅은 미수행이다. 관측 timeout에는 같은 unit/state를 확인하고 재시작으로 대신하지 않는다.
+native journal 후보는 systemd255/binding235 API·root helper/영수증을 검사하며 실패를 빈 결과로 바꾸지 않는다. [정확 적용안](../infra/validation/journal-adapter/application/README.md)은 원본6개·33회귀/9복제원복/18중간load와 PREPARED를 확인했지만 운영 적용/원복 timer·실MCP/새채팅은 미수행이다. 관측이 timeout되면 같은 unit/state를 확인한다. 상태 확인을 재시작으로 대신하지 않는다.
 
 ## B 호스트 수집과 manager 컨테이너 구분
 
-새 설치 `deploy.sh`는 `capstone-siem-host`를 별도 등록한다. 운영 이름은 `groot-siem-host`이며 ID는 등록/조회 결과에서 확인하고 고정000/003으로 가정하지 않는다. Wazuh agent000의 Amazon Linux 결과는 manager 컨테이너이고 B Ubuntu24.04 호스트 결과가 아니다.
+새 설치 `deploy.sh`는 `capstone-siem-host`를 별도 등록한다. 운영 이름은 `groot-siem-host`이며 ID는 등록/조회 결과에서 확인하고 고정000/003으로 가정하지 않는다. Wazuh agent000의 Amazon Linux 결과는 manager 컨테이너를 가리킨다. B Ubuntu24.04 호스트의 결과와 구분한다.
 
 - 호스트에서 `systemctl is-active wazuh-agent`와 `/var/ossec/var/run/wazuh-agentd.state`의 connected·최근 갱신을 확인한다. `/var/lib/capstone-siem-host-agent/receipt.json`에는 비밀 없는 ID·설정 SHA·등록 KST가 있다. client.keys는 출력하지 않는다.
 - 두 봇의 `get_wazuh_agents`에서 이름·ID·OS를 확인하고 `get_wazuh_sca_checks`로 정책 목록→정확 policy/check·스캔 시각을 조회한다. `b:wazuh-agent`는 호스트 unit, `b:wazuh-manager`는 컨테이너다.

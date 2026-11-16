@@ -4,7 +4,7 @@
 
 ## 2026-10-24 보안 경계와 오프라인 준비
 
-패키지 다운로드는 외부 준비 환경에서만 수행한다. 대상 서버에는 서명/해시를 검증한 deb와 의존성을 반입하고, 설치기는 전용 임시 캐시·빈 저장소 목록·`--no-download --no-remove`로 설치한다. Mac에는 패키지를 설치하지 않으며 반입/해시 확인 후 작업용 deb를 삭제한다. [반입 목록과 버전 기준](setup-packages-artifacts.md)을 함께 준비한다. host sudo 최소 `.4`, SIEM nginx 최소 `1.24.0-2ubuntu7.18`을 검사한다.
+패키지 다운로드는 외부 준비 환경에서만 수행한다. 대상 서버에는 서명/해시를 검증한 deb와 의존성을 반입한다. 설치기는 전용 임시 캐시·빈 저장소 목록·`--no-download --no-remove`로 설치한다. Mac에는 패키지를 설치하지 않으며 반입/해시 확인 후 작업용 deb를 삭제한다. [반입 목록과 버전 기준](setup-packages-artifacts.md)을 함께 준비한다. host sudo 최소 `.4`, SIEM nginx 최소 `1.24.0-2ubuntu7.18`을 검사한다.
 
 SIEM 기본 구성 뒤 전용 비권한 nginx가 **8444→같은 호스트 Mattermost8065**, **8445→loopback 승인8090** TLS를 제공한다. 기존 SIEM CA로 전용 DNS/IP 인증서를 만들며 CA 개인키는 SIEM에만 남긴다. 공개 CA만 SSH 파이프로 security의 운영체제 신뢰 저장소에 전달한 후 SOC 연결을 시작한다. SIEM의 일반 nginx 기본80 서비스는 masked로 유지한다. 최종 `--verify`에는 TLS와 호스트 격리가 포함된다. 기존 운영 A의 채팅/대시보드 프록시도 CA·이름 검증을 사용한다.
 
@@ -18,7 +18,7 @@ A의 필수 WAF·Suricata와 TLS 프록시는 재부팅 때 복구되도록 `res
 
 ## 실행 순서와 범위
 
-관리 controller와 gate, 진단 MCP는 같은 원본 소스에서 렌더한다. 초기 사건 DB는 run별 `report_outbox`를 함께 만들며, 기존 운영 서버의 최소 이관은 원본 SHA·유휴 상태·root 복구/DB 백업을 먼저 확인하고 빈 전달 테이블만 추가한다. 과거 사건·대화나 미전달 보고를 초기화·자동 재전송하지 않는다. 전송 실패·모델 불완료 알림과 `--no-deliver` 의미는 [진단·보고 계약](../infra/mcp/system-diagnostics.md)을 따른다. 추가 패키지·포트·자격은 필요하지 않다.
+관리 controller와 gate, 진단 MCP는 같은 원본 소스에서 렌더한다. 초기 사건 DB는 run별 `report_outbox`를 함께 만들며, 기존 운영 서버를 최소 이관할 때에는 원본 SHA·유휴 상태·root 복구/DB 백업을 먼저 확인한 뒤 빈 전달 테이블만 추가한다. 과거 사건·대화나 미전달 보고를 초기화·자동 재전송하지 않는다. 전송 실패·모델 불완료 알림과 `--no-deliver` 의미는 [진단·보고 계약](../infra/mcp/system-diagnostics.md)을 따른다. 추가 패키지·포트·자격은 필요하지 않다.
 
 1. 입력과 검증된 SSH host key를 확인하고 서버 3대의 machine-id가 서로 다른지 확인한다.
 2. 각 서버의 `/opt/capstone-prereqs/artifacts.json`과 모든 파일 해시를 검사한다. 하나라도 다르면 패키지 설치 전에 중단한다.

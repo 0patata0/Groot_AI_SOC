@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-**현재:** [수집 보완 후보/검증](infra/validation/journal-composition/README.md)은 A/B의 실제4시간 잘림을 격리 읽기에서 해소했고 Mac1,410/기존6생략·기존 Hermes 이미지1,493/생략0을 확인했습니다. 운영 미적용이며 수집기 자원 제한·소스/캐시 조정·정확 승인·실제 MCP/새 채팅은 남습니다. 논문은 후임자용 실행·확인·복구 매뉴얼66쪽 MD/PDF/DOCX 검수본을 유지합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
+**현재:** [수집 보완 후보/검증](infra/validation/journal-composition/README.md)에서 A/B의 실제4시간 잘림을 격리 읽기로 해소했습니다. 검사는 Mac1,410회 중 기존6개를 생략했습니다. 기존 Hermes 이미지1,493회에서는 생략0개였습니다. 운영 미적용이며 수집기 자원 제한·소스/캐시 조정·정확 승인·실제 MCP/새 채팅은 남습니다. 논문은 후임자용 실행·확인·복구 매뉴얼이며, 윤문한 66쪽 MD·PDF·DOCX의 내용과 전 페이지를 다시 검수했습니다. [STATUS](STATUS.md)를 기준으로 봅니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.
@@ -727,7 +727,7 @@ cp deployment/config.example.conf deployment/site.local.conf
 bash deploy.sh --apply --batch --config deployment/site.local.conf
 ```
 
-이 진입점 하나가 **반입물 검사 → 로컬 패키지/이미지 설치 → 역할 사전검사 → SIEM → 공통 키 전달 → service → security → 승인·대응/로그 처리/대시보드 → 전체 검증**을 호출합니다. 패키지·이미지는 인터넷에서 자동 다운로드하지 않고 서버에 반입한 파일만 사용합니다. 전체 저장소가 필요하며 내부 helper를 사용자가 따로 실행하지 않습니다. 향후 서버 변경 시 설치기·반입 목록·설정 예제·검증도 같은 작업에서 갱신합니다.
+이 진입점 하나가 **반입물 검사 → 로컬 패키지/이미지 설치 → 역할 사전검사 → SIEM → 공통 키 전달 → service → security → 승인·대응/로그 처리/대시보드 → 전체 검증**을 호출합니다. 패키지·이미지는 인터넷에서 자동 다운로드하지 않고 서버에 반입한 파일만 사용합니다. 전체 저장소를 함께 사용해야 합니다. 사용자가 내부 helper를 따로 실행하지 않습니다. 서버를 변경할 때에는 설치기·반입 목록·설정 예제·검증도 같은 작업에서 갱신합니다.
 
 | 역할 | 초기 구성 |
 |---|---|

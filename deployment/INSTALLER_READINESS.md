@@ -1,6 +1,6 @@
 # 초기 설치·통합 패키지 준비 상태
 
-[native journal 후보](../infra/validation/journal-adapter/README.md)의 단일deploy.sh/helper·systemd255/binding235 API·오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은33회귀·9복제원복/18중간load·A/B/C PREPARED/원본6개를 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용/원복timer/새채팅·새 OS 전체 설치는 미수행이다. 아래 날짜별 설명은 당시 범위다.
+[native journal 후보](../infra/validation/journal-adapter/README.md)에서 사용하는 단일 deploy.sh/helper, systemd255/binding235 API와 오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 회귀33회·복제 원복9회·중간 load18회를 거쳤다. A/B/C의 PREPARED 상태와 원본6개도 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용과 원복 timer, 새 채팅과 새 OS 전체 설치는 아직 수행하지 않았다. 아래 날짜별 설명은 당시 범위다.
 
 2026-11-08: 현재 단일deploy.sh에는 host_inventory.py·진단MCP1.4.0·공통 조회/출력 스킬·비특권 읽기 검증(36개)이 연결됐습니다. 고정 root collector만 AF_NETLINK를 추가로 허용하며 신규 패키지/공개 포트/키는 없습니다. 운영 증분 검증과 새 OS 전체 설치는 구분합니다. [범위·검증](../infra/mcp/host-inventory.md).
 

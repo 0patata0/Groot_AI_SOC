@@ -12842,3 +12842,7 @@ MD/PDF/DOCX66쪽·MD850/DOCX892항목 누락0·목차/캡션128·표45/그림7·
 ## 수집 상한 선점 공백 보완 (2026-11-16)
 
 이전 요약 Git `b5e7b0757bd881a7242c3511ea624d8bb8842e04:STATUS.md`, SHA256 `c108946af168dbdeaf0f30a3d2f432223110ee27d8ef3c13b955c36aaac1cbf5` 보존. A/B 상한 선점 공백은 신규 수집 오버레이의 격리 실제 읽기에서보완. Mac1410/6생략·Hermes이미지1493/0생략·공식37/5/증가0·실제4ID/격리cache0→4·원복. 운영미적용/논문66쪽15SHA보존. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+## 문서 윤문과 출력 검수 (2026-11-16)
+
+이전 현재 요약은 Git `e804a0b0fabfd0afe11850c07456cc9bd0fee338:STATUS.md`, SHA256 `84ee26d22c5d3889b5e1c95f75626bdd8ee3804f57360651d4c8f7621ca89a40`로 복구한다. 후속 작업은 문체와 산출물 검수이며 수집 후보의 운영 미적용·정확 승인·자원 제한·새 MCP/채팅 검증 조건은 그대로다. 논문66쪽 MD/PDF/DOCX를 동기화했고 기술적 수치·명령·승인·과거 기록은 보존했다. [현재 상태](../STATUS.md).

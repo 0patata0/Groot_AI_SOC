@@ -1,7 +1,7 @@
 # 구축·운영 가이드
 
 <!-- journal-composition:start -->
-[수집 오버레이 검증](../infra/validation/journal-composition/README.md) — 기본34소스 위 런타임3/시험2·새40회귀로 A/B의 실제4h 잘림을 보완했습니다. Mac1410/기존6생략·기존 Hermes 이미지의 격리 컨테이너1493/생략0·과거4ID 캐시 편입/원복을 확인했습니다. 운영 미적용이며 수집기 유한 자원 설정·초기 설치/배포 조정·정확 승인·새 MCP/채팅은 남습니다. 모델/학습/권한은 바꾸지 않았습니다.
+[수집 오버레이 검증](../infra/validation/journal-composition/README.md) — 기본 소스34개에 런타임3개와 시험2개를 덧붙이고 새 회귀40개를 실행해 A/B의 실제4h 잘림을 보완했습니다. Mac에서는 1410회 검사 중 기존6개를 생략했습니다. 기존 Hermes 이미지의 격리 컨테이너에서는 1493회 검사에서 생략0개를 확인했습니다. 과거4ID의 캐시 편입과 원복도 확인했습니다. 운영 미적용이며 수집기 유한 자원 설정·초기 설치/배포 조정·정확 승인·새 MCP/채팅은 남습니다. 모델/학습/권한은 바꾸지 않았습니다.
 <!-- journal-composition:end -->
 
 
@@ -23,7 +23,7 @@
 
 [주장 결속 개발 후보](../infra/validation/claim-modality/README.md)는 실제 DNS 근거 오류가 남아 미채택이며 단일 deploy.sh의 정본/설치 입력에 넣지 않았다. 기존19파일·journal9코드의 정확 적용 계획도 불변이다. 개발 패치 재구성을 운영 설치/새 OS 검증으로 사용하지 않는다.
 
-[native journal 후보](../infra/validation/journal-adapter/README.md)의 단일deploy.sh/helper·systemd255/binding235 API·오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은33회귀·9복제원복/18중간load·A/B/C PREPARED/원본6개를 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용/원복timer/새채팅·새 OS 전체 설치는 미수행이다. 아래 날짜별 설명은 당시 범위다.
+[native journal 후보](../infra/validation/journal-adapter/README.md)에서 사용하는 단일 deploy.sh/helper, systemd255/binding235 API와 오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 회귀33회·복제 원복9회·중간 load18회를 거쳤다. A/B/C의 PREPARED 상태와 원본6개도 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용과 원복 timer, 새 채팅과 새 OS 전체 설치는 아직 수행하지 않았다. 아래 날짜별 설명은 당시 범위다.
 
 [정확 적용·복구 후보](../infra/validation/control-status/application/README.md)는 현재 프로필로 내장 gate와19파일·영수증·유휴 확인·15분 원복을 준비했다. 설치 회귀46과 격리 원복은 통과했지만 정본·초기 설치 입력은 유지한다. 운영 적용은 정확 승인 후이며 실제 콜드 재시작/새 채팅·새 OS 전체 설치는 아직 미수행이다. 단일 deploy.sh 진입점도 유지한다.
 
@@ -39,7 +39,7 @@
 
 웹 백엔드 읽기는 기존 service diag-apply가 `web_access_deploy.py`를 내부 호출하고 SIEM 역할이 보조소스2개를 설치한다. C 전용 강제 reader/정제 publisher를 추가하며 새 패키지·공개 포트·private key 반출은 없다. [고정 범위·한계·실제 검증·복구](../infra/mcp/web-evidence.md). 새 서버 전체 설치 시험은 미실행이다.
 
-2026-11-04 KST. 신규 설치의 사용자 진입점은 루트 `deploy.sh` 하나다. 운영 중인 A/B/C는 초기 설치기로 덮어쓰지 않는다. 현재 구축·운영의 전 항목 정합과 전체 새 서버 설치를 완료한 상태는 아니다.
+2026-11-04 KST. 신규 설치의 사용자 진입점은 루트 `deploy.sh` 하나다. 운영 중인 A/B/C는 초기 설치기로 덮어쓰지 않는다. 구축·운영의 모든 항목이 일치하는지 확인하는 작업과 새 서버 전체 설치는 아직 완료하지 않았다.
 
 | 목적 | 기준 문서 |
 |---|---|
@@ -54,7 +54,7 @@
 
 UI/API를 포함한 WAF 경로는 On을 기준으로 한다. 공개 열람 허용과 실행·중지·터미널 제어 권한을 구분하며, 제어에는 관리자 CIDR과 HMAC 인증이 모두 필요하다. 과거 차단 검사 면제 세션 설명은 현행 사용법이 아니다.
 
-단순 조회는 기본 Ollama 담당, 복합 사건/변경은 Hermes 우선이며 직접 태그를 존중한다. 모델·MCP·승인·서비스 동작과 실제 공격 E2E는 각각 검증한다. 새 서버 전체 설치는 사용자 조건으로 실행하지 않았다. 오프라인 전체 패키지·WAF 증거 초기등록·기관별 보존/복구 등 미완료는 준비도/현황에 남긴다.
+단순 조회는 기본적으로 Ollama가 담당하고 복합 사건/변경은 Hermes가 우선 맡는다. 사용자가 직접 태그한 봇을 존중한다. 모델·MCP·승인·서비스 동작과 실제 공격 E2E는 각각 검증한다. 새 서버 전체 설치는 사용자 조건으로 실행하지 않았다. 오프라인 전체 패키지·WAF 증거 초기등록·기관별 보존/복구 등 미완료는 준비도/현황에 남긴다.
 
 이전 날짜별 설치 확장 설명과 시험 수치는 [과거 기록](../archive/DEPLOYMENT_HISTORY.md#source-252038d31234088c)에 보존한다. 과거 모델/API 주소·버전·권한·검사 면제·시험 성공 문구를 현재 환경에 그대로 적용하지 않는다.
 

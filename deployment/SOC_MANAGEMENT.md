@@ -89,13 +89,13 @@ Ubuntu의 Python·OpenSSH·sudo·systemd·shadow·iproute2·Docker를 사용하�
 신규 synthetic 회귀는 상수 변환·정확 승인 유지·full CID·도구 권한·관리자 CIDR·nft 변조 거부·
 multi-root AR·재실행 무변경·Wazuh live/source 교체와 복원을 검사한다.
 기존 MCP/containment 및 Hermes 관리 회귀도 별도로 실행한다.
-이는 실제 신규 3서버 설치, Mattermost 실제 승인 클릭, 공격 E2E, 장애·서비스 재시작 E2E를 증명하지 않는다.
+이 검사만으로 실제 신규 3서버 설치, Mattermost 실제 승인 클릭, 공격 E2E와 장애·서비스 재시작 E2E를 증명하지 않는다.
 
 임시 차단 대상 destination은 설치의 세 서버 주소로 고정한다. 별도 NAT/public alias는 자동 추정하지 않는다.
 현재 IP 차단 검사는 인터페이스·gateway·DNS·활성 SSH 연결도 보호한다.
 kernel TTL은 브로커 장애와 무관하게 만료하며, 재부팅 뒤 임시 차단을 자동 재생성하지 않는다.
 과거 로그 일괄 전송, 일반 백업/복구, 장기 장애 backfill, 모델 판단 정확도 평가는 별도 과제다.
-승인으로 룰 원문이 바뀐 뒤 초기 역할의 원본 SHA 검증과 운영 변경 영수증을 조정하는 일반 업데이트 기능도 별도다.
+승인받아 룰 원문을 바꾼 뒤 초기 역할의 원본 SHA 검증과 운영 변경 영수증을 조정하는 일반 업데이트 기능은 별도 과제다.
 
 ## 2026-11-04 실제 포함 gate와 참조 결속
 

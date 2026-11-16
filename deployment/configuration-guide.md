@@ -2,7 +2,7 @@
 
 > **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-5f5f782f6b670953).
 
-새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
+새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 취급하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
 
 [네트워크·SSH 준비](setup-network-ssh.md), [오프라인 반입·설치 흐름](bootstrap-guide.md), [Hermes 이미지 준비](hermes-image.md)를 먼저 확인한다. 예시 `192.0.2.0/24`는 문서용이며 실제 할당 주소로 바꾼다. 설치기는 IP·라우팅·DNS·SSH를 자동 변경하지 않는다.
 
@@ -116,7 +116,7 @@ LLM_MODEL=qwen3.6:35b
 
 `LAB_ADMIN_KEY_FILE`은 controller의 고정 전달 경로이며 설정 파일의 입력 키가 아니다. `LAB_ADMIN_KEY`나 비밀번호 값도 넣지 않는다. 구형 `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`은 더 이상 쓰지 않으며 값이 있으면 거절한다. schema9은 준비된 관리형 이미지로 실행하고 초기 설치 중 Java JAR를 빌드·마운트하지 않는다. 기존 schema6·7·8 서비스는 자동으로 인수하지 않는다.
 
-설정은 LF의 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, 변수 확장, `~`, 명령 치환을 넣지 않는다. 맨 앞 `#`만 주석이며 알 수 없는 키는 거절한다. 파일을 shell `source`로 실행하지 않는다. 설정 파일에 정의한 경로를 controller가 서버로 업로드하는 것은 아니다.
+설정은 LF의 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, 변수 확장, `~`, 명령 치환을 넣지 않는다. 맨 앞 `#`만 주석이며 알 수 없는 키는 거절한다. 파일을 shell `source`로 실행하지 않는다. 설정 파일에 경로를 정의해도 controller가 그 경로의 파일을 서버로 업로드하지는 않는다.
 
 ## 3. SIEM 초기 계정 작성 — siem 서버 콘솔
 
@@ -196,7 +196,7 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 적용 순서는 다음과 같다.
 
 1. 세 호스트의 SSH·machine-id와 각 `artifacts.json`/SHA를 모두 검사한다.
-2. 각 서버의 승인된 로컬 deb를 `apt-get --no-download --no-remove`로 설치하고 이미지 archive를 load한다. 목록 외 패키지·다운그레이드·기존 다른 이미지 태그를 거절한다. 그 다음 세 역할의 사전검사를 수행한다.
+2. 각 서버의 승인된 로컬 deb를 `apt-get --no-download --no-remove`로 설치하고 이미지 archive를 load한다. 목록 외 패키지·다운그레이드·기존 다른 이미지 태그를 거절한다. 그런 다음 세 역할의 사전검사를 수행한다.
 3. SIEM을 구성·검증한 뒤 등록 CA·암호를 security/service로 SSH 파이프 전달한다.
 4. Dashboard `admin`의 `indexer_password`를 service의 `/opt/capstone-prereqs/lab-admin.key` root:root0600에 직접 전달한다. Mac 디스크·명령 인수·로그에 저장하지 않는다.
 5. service에 콘솔·broker·nft guard와 별도 sudo rootless 환경을 설치하고, 독립 DVWA/MariaDB·gateway·Wazuh agent를 구성·검증한다.

@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-[native journal 후보](../infra/validation/journal-adapter/README.md)의 단일deploy.sh/helper·systemd255/binding235 API·오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은33회귀·9복제원복/18중간load·A/B/C PREPARED/원본6개를 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용/원복timer/새채팅·새 OS 전체 설치는 미수행이다. 아래 날짜별 설명은 당시 범위다.
+[native journal 후보](../infra/validation/journal-adapter/README.md)에서 사용하는 단일 deploy.sh/helper, systemd255/binding235 API와 오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 회귀33회·복제 원복9회·중간 load18회를 거쳤다. A/B/C의 PREPARED 상태와 원본6개도 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용과 원복 timer, 새 채팅과 새 OS 전체 설치는 아직 수행하지 않았다. 아래 날짜별 설명은 당시 범위다.
 
 2026-11-08: 현재 OS·Docker 상세 조회는 승인 없이 사용하며, 변경은 기존 정확 후보 승인 경계를 유지합니다. 서비스 목록은 호스트별로 나누고 Docker 상세·로그, OS 자원·네트워크·디스크까지 조회합니다. [질문 예·조회 한계·복구](../infra/mcp/host-inventory.md). 아래 버전별 단락은 당시 검증 기록입니다.
 
@@ -32,7 +32,7 @@
 
 ## 점검 주기와 미완료
 
-위 시작 점검은 운영 시작/장애 후 복귀/보호 변경 후의 확인 절차다. 정기 보존·용량 검토, 백업 복원 시험, 접근권한/도구/메모리·구성요소 취약점 검토의 담당·주기·보관 기간은 도입 기관 기준과 자원 실측에 따라 확정해야 한다. 이 문서를 만든 것만으로 새 정기 작업이 설치되거나 로그1년 보존이 설정된 것은 아니다.
+위 시작 점검은 운영을 시작할 때, 장애 후 복귀할 때와 보호 변경을 마친 뒤에 수행하는 확인 절차다. 정기 보존·용량 검토, 백업 복원 시험, 접근권한/도구/메모리·구성요소 취약점 검토의 담당·주기·보관 기간은 도입 기관 기준과 자원 실측에 따라 확정해야 한다. 이 문서를 만든 것만으로 새 정기 작업이 설치되거나 로그1년 보존이 설정된 것은 아니다.
 
 신규3VM 전체 설치는 사용자 조건으로 실행하지 않는다. 실제 사건 종결·다른 공격/승인·재차단·B/C 관리 경로·장기 무손실/복구와 전체 오프라인 패키지의 잔여는 STATUS에 유지한다. LLM 관제 연구 결과를 정부 관제 인력 요건 충족이나 모든 공격 무누락 보장으로 제시하지 않는다.
 
@@ -58,7 +58,7 @@
 
 A는 기존 ip nat/filter/raw와 inet capstone_fw를 사용한다. 관리자 정책·차단/예외는 capstone_fw, Docker 경로는 자동 테이블에 유지한다. NAT3규칙은 기본 nat로 통합했고 IPv6 전용 테이블은 A/B/C에서 제거했다. 유지보수는 root deploy.sh --firewall-nat/--ipv4-only로 하며 LLM 일반 sudo를 추가하지 않는다. [운영 검증·복구·미시험](../infra/mcp/fw-consolidation.md).
 
-HTTP Wazuh는같은호스트HTTPS308,관리ACL유지다. 웹 보호의429는요청제한이며그자체로IP차단/악성판정이아니다. 임시차단카드의검증근거와요청자판단사유를구분한다. 공격시험은사용자재지시전중단한다. [운영값·복구](../infra/validation/web-traffic/README.md) · [사유/조회](../infra/mcp/containment-display.md).
+HTTP Wazuh는 같은 호스트의 HTTPS로 308을 반환하며 관리ACL은 유지한다. 웹 보호의 429는 요청 제한이며 그 자체로 IP차단이나 악성 판정을 뜻하지 않는다. 임시차단 카드의 검증 근거와 요청자의 판단 사유를 구분한다. 공격 시험은 사용자가 다시 지시하기 전까지 중단한다. [운영값·복구](../infra/validation/web-traffic/README.md) · [사유/조회](../infra/mcp/containment-display.md).
 
 복합 사건1.19.62 당시 기록은 [반복 입력 보완](../infra/hermes/review-payload.md)을 따른다. 단일containment 웹 verify의 이력/문맥이 온전히 담길 때만 새 Native 세션을 쓰며 이전 DB·승인·trace를 보존한다. 쓰기·다중제안·누락/초과는 기존 경로다. 실제 잘못된 대상은 남은 등록 후보에서 모델이 다시 선택한다. 단일deploy.sh source복사/gate렌더·설치41검사, 새 사용자 설정/의존성/포트0. 12turn/180·210초·승인/TTL·현재 근거 검사를 유지한다.30초 최종 보고·자연 발생 자동 스케줄/전체 채팅 평균은 미완료다.
 

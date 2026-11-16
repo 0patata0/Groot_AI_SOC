@@ -54,3 +54,7 @@ SOC_BOUNDARIES_ROOT=/private/tmp/new-diagnostic-replay/candidate \
 ## 서비스 타입·실행 근거 후속
 
 [후속 후보](../typed-service/README.md)는 같은 호스트의 실제 inventory·페이지와 실행 기본값 해석을 보완했다. SDK4요청/13읽기·모델완료10과 Mac1120/Hermes1203 회귀를 확인했으나 의미/요약 문제가 남아 미승격이다. 이 부모의 과거 결과·미적용 상태를 소급해서 성공으로 바꾸지 않는다.
+
+## 사실 조회·미확인 후속
+
+[후속 후보](../factual-service/README.md)는 단순 조회의 이름/기간·로그 조사·요약을 보완했다. 최종 Mac1149/Hermes1232·실제SDK4요청14.479~26.601초를 확인했으나 타입/관계 표현·인용 반례가 남아 미승격이다. 이 부모의 과거 관측/실패와 미적용 상태를 소급해 바꾸지 않는다.

@@ -1,0 +1,670 @@
+{
+  "schema": "groot-factual-service-validation-v1",
+  "status": "partially_improved_not_applied",
+  "recorded_at_kst": "2026-11-16T13:49:10.920495+09:00",
+  "versions": {
+    "candidate_query": "1.19.148",
+    "candidate_common": "1.5.92",
+    "candidate_mcp_unchanged_from_parent": "1.4.4",
+    "canonical_and_installed_query_last_confirmed": "1.19.137"
+  },
+  "source_tree_files": 643,
+  "changed_sources": [
+    "infra/hermes/chat_contract.py",
+    "infra/hermes/query-completion/__init__.py",
+    "infra/hermes/skills/soc-investigate/SKILL.md",
+    "infra/hermes/skills/soc-query/SKILL.md",
+    "infra/ollama-trial/harness.py"
+  ],
+  "live_revalidation": {
+    "at_kst": "2026-11-16T13:43:54.731215+09:00",
+    "route": "Mac-admin231-A-B",
+    "installed_sources_verified": 32,
+    "changed_sources": [],
+    "actual_schema_snapshot": {
+      "at_kst": "2026-11-16T13:06:05.277623+09:00",
+      "schemas": {
+        "get_system_diagnostics": "d7945b1f1d9d81c90844434a259b453809e41d966d66d0829b529a2e114ec44b",
+        "calculate_time": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd",
+        "get_host_inventory": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+      },
+      "scope": "three registered diagnostic/time/inventory schemas only; previous45 catalog at12:49 was not re-read here"
+    },
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_digest": "7ac2a1dc6aa17746f522e81804ba2a76b25fc01e69d2460a083a0ec5cfa207c3",
+    "config_sha256": "731a89cc4ef25aa72a7119186dcd3ceee471b813d9abccfc7f298cec5639b9fe",
+    "reader_properties": "MainPID=927\nMemoryMax=134217728\nTasksMax=8\nUser=root\nGroup=capstone-diagnostics\nActiveState=active\nSubState=running\n",
+    "reader_start_ticks": 7043,
+    "native_module_present": false
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "census": {
+      "base": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 35,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 20,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/chat_contract.py",
+        "scripts/native_query.py",
+        "scripts/sdk_harness.py",
+        "skills/soc-investigate/SKILL.md",
+        "skills/soc-query/SKILL.md"
+      ],
+      "always_on_char_delta": 0
+    },
+    "scope": "official structure only, not semantic accuracy or promotion"
+  },
+  "regressions": {
+    "mac": {
+      "profiles": 20,
+      "run": 1149,
+      "passed": 1143,
+      "skipped": 6
+    },
+    "existing_hermes_image": {
+      "profiles": 20,
+      "run": 1232,
+      "passed": 1232,
+      "skipped": 0,
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "uid": 10001,
+      "network_connect_denied": true
+    },
+    "new_factual_tests": 29,
+    "public_reconstruction": {
+      "source_files": 643,
+      "verified": true,
+      "new_test_run": 29,
+      "new_test_skipped": 0
+    },
+    "scope": "regressions are not independent SOC incidents. Additional missed-claim/quotation counterexamples remain failing review findings."
+  },
+  "actual_sdk_trial": {
+    "rounds": {
+      "R1": {
+        "manifest_sha256": "1ef98af7af4dd163cf25472562f761d2bfb4c0119a11d1f8a6fff4dabbb063a5",
+        "requests": {
+          "base": [
+            {
+              "id": "factual-unit",
+              "question": "B Docker 현재 상태와 최근 3분 로그 표로 보여줘."
+            },
+            {
+              "id": "factual-host",
+              "question": "B systemd 최근 7분 로그 간단히 보여줘."
+            }
+          ],
+          "candidate": [
+            {
+              "id": "factual-unit",
+              "question": "B Docker 현재 상태와 최근 3분 로그 표로 보여줘."
+            },
+            {
+              "id": "factual-host",
+              "question": "B systemd 최근 7분 로그 간단히 보여줘."
+            },
+            {
+              "id": "logical-current",
+              "question": "B Vector 현재 상태 표로 보여줘."
+            },
+            {
+              "id": "real-cause",
+              "question": "B Docker 최근 10분 실제 로그에서 오류 원인과 지금 상태 확인해줘."
+            }
+          ]
+        },
+        "source_files": 126
+      },
+      "R2": {
+        "manifest_sha256": "889a3319cb556dcaee831402900a6cbd1306d7a37641d552b86e6aae9ca3773c",
+        "requests": {
+          "base": [],
+          "candidate": [
+            {
+              "id": "factual-unit",
+              "question": "B Docker 현재 상태와 최근 4분 로그 표로 보여줘."
+            },
+            {
+              "id": "factual-host",
+              "question": "B systemd 최근 8분 로그도 간단히 보여줘."
+            },
+            {
+              "id": "logical-history",
+              "question": "B Vector 지금 상태랑 최근 6분 로그 간단히 보여줘."
+            },
+            {
+              "id": "real-cause",
+              "question": "B Docker 최근 10분 실제 로그에서 오류 원인과 지금 상태 확인해줘."
+            }
+          ]
+        },
+        "source_files": 126
+      }
+    },
+    "cases": [
+      {
+        "round": "R1",
+        "arm": "base",
+        "id": "factual-unit",
+        "question": "B Docker 현재 상태와 최근 3분 로그 표로 보여줘.",
+        "status": "partial",
+        "seconds": 24.21,
+        "reads": 2,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T13:18:52.644280+09:00",
+              "until_kst": "2026-11-16T13:21:52.644280+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": false,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R1",
+        "arm": "base",
+        "id": "factual-host",
+        "question": "B systemd 최근 7분 로그 간단히 보여줘.",
+        "status": "partial",
+        "seconds": 29.236,
+        "reads": 1,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T13:15:16.862220+09:00",
+              "until_kst": "2026-11-16T13:22:16.862220+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": false,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "factual-unit",
+        "question": "B Docker 현재 상태와 최근 3분 로그 표로 보여줘.",
+        "status": "completed",
+        "seconds": 14.448,
+        "reads": 2,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T13:19:47.235195+09:00",
+              "until_kst": "2026-11-16T13:22:47.235195+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": true,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "factual-host",
+        "question": "B systemd 최근 7분 로그 간단히 보여줘.",
+        "status": "completed",
+        "seconds": 23.178,
+        "reads": 1,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T13:16:01.689085+09:00",
+              "until_kst": "2026-11-16T13:23:01.689085+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": true,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "logical-current",
+        "question": "B Vector 현재 상태 표로 보여줘.",
+        "status": "partial",
+        "seconds": 15.851,
+        "reads": 4,
+        "recorded_model_completions": 3,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:vector"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "containers",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 100
+            }
+          ]
+        ],
+        "lookup_complete": null,
+        "final_guard_codes": [
+          "diagnostic_period_coverage_unverified"
+        ]
+      },
+      {
+        "round": "R1",
+        "arm": "candidate",
+        "id": "real-cause",
+        "question": "B Docker 최근 10분 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 19.748,
+        "reads": 2,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T13:13:40.733441+09:00",
+              "until_kst": "2026-11-16T13:23:40.733441+09:00"
+            }
+          ]
+        ],
+        "lookup_complete": false,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "factual-unit",
+        "question": "B Docker 현재 상태와 최근 4분 로그 표로 보여줘.",
+        "status": "completed",
+        "seconds": 14.479,
+        "reads": 2,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T13:32:21.604542+09:00",
+              "until_kst": "2026-11-16T13:36:21.604542+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": true,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "factual-host",
+        "question": "B systemd 최근 8분 로그도 간단히 보여줘.",
+        "status": "completed",
+        "seconds": 23.601,
+        "reads": 1,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:systemd",
+              "since_kst": "2026-11-16T13:28:36.088828+09:00",
+              "until_kst": "2026-11-16T13:36:36.088828+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ]
+        ],
+        "lookup_complete": true,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "logical-history",
+        "question": "B Vector 지금 상태랑 최근 6분 로그 간단히 보여줘.",
+        "status": "partial",
+        "seconds": 26.601,
+        "reads": 6,
+        "recorded_model_completions": 4,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:vector"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:vector",
+              "since_kst": "2026-11-16T13:30:59.698760+09:00",
+              "until_kst": "2026-11-16T13:36:59.698760+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:collection"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "containers",
+              "state": "all",
+              "limit": 100,
+              "offset": 0
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_host_inventory",
+            {
+              "host": "b",
+              "view": "services",
+              "state": "all",
+              "limit": 100,
+              "offset": 100
+            }
+          ]
+        ],
+        "lookup_complete": false,
+        "final_guard_codes": []
+      },
+      {
+        "round": "R2",
+        "arm": "candidate",
+        "id": "real-cause",
+        "question": "B Docker 최근 10분 실제 로그에서 오류 원인과 지금 상태 확인해줘.",
+        "status": "partial",
+        "seconds": 18.934,
+        "reads": 2,
+        "recorded_model_completions": 2,
+        "tools": [
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker"
+            }
+          ],
+          [
+            "system-diagnostics",
+            "get_system_diagnostics",
+            {
+              "target": "b:docker",
+              "since_kst": "2026-11-16T13:27:26.308598+09:00",
+              "until_kst": "2026-11-16T13:37:26.308598+09:00",
+              "view": "journal",
+              "limit": 50
+            }
+          ]
+        ],
+        "lookup_complete": false,
+        "final_guard_codes": []
+      }
+    ],
+    "totals": {
+      "sdk_request_executions": 10,
+      "distinct_question_strings": 7,
+      "sdk_mcp_reads": 23,
+      "recorded_model_completions": 23,
+      "wire_smoke_reads": 4,
+      "initial_operating_mcp_reads": 3
+    },
+    "scope": "R1 parent2/candidate4, R2 final candidate4; seven distinct strings across10 executions. Same35B/permissions, isolated real reads. Not Mattermost/Hermes delivery, controlled benchmark or independent accuracy."
+  },
+  "improvements_observed": [
+    "R1 paired factual requests complete lookup in14.448/23.178s vs parent24.210/29.236s; changing source stages are kept distinct.",
+    "R1 logical-current summary explicitly says component identity unverified.",
+    "R2 final source factual unit/host requests complete in14.479/23.601s.",
+    "R2 real-cause reads journal_excerpt; R1 same question read only cached history due missing Korean postposition handling."
+  ],
+  "remaining_findings": [
+    {
+      "id": "typed-state-attribution",
+      "severity": "high",
+      "evidence": "R2 logical-history: unit not-found followed by 현재 프로세스 실행 상태는 ActiveState=inactive/SubState=dead. Existing execution guard misses this property-as-process attribution.",
+      "next": "Common typed partial lookup report; keep observed unit values distinct from physical process and component identity."
+    },
+    {
+      "id": "unbound-component-relation",
+      "severity": "high",
+      "evidence": "R2 logical-history calls observed Docker rows 관련 컨테이너 although component_identity_verified is false; no actual Vector/container mapping exists.",
+      "next": "Render catalog scope and unresolved identity without invented relation; extend structured claim provenance."
+    },
+    {
+      "id": "literal-quote-boundary",
+      "severity": "medium",
+      "evidence": "Constructed verified source quotation is rejected by new physical-file phrase guard. Not found in the real four R2 answers.",
+      "next": "Separate authenticated rendered source cells from model claims; do not exempt arbitrary tables."
+    },
+    {
+      "id": "concise-question-answer",
+      "severity": "medium",
+      "evidence": "R1 current-only output still shows default15m snapshot error window; R2 factual host synthesis sends16374 input tokens for72 output tokens.",
+      "next": "Use question-bound literal evidence fields and bounded verified scope summaries for factual confirmation."
+    }
+  ],
+  "additional_counterexamples": {
+    "observed_property_as_process_claim": {
+      "text": "현재 프로세스 실행 상태는 ActiveState=inactive, SubState=dead이며, 종료값(exit_status)은 기록되지 않음.",
+      "expected": "diagnostic_unloaded_unit_not_process_state",
+      "actual": [],
+      "missed": true
+    },
+    "literal_quote_false_positive": {
+      "text": "| 로그 발췌 1 / 1행 | b:vector의 물리 유닛 파일이 없습니다. | 2026-11-16T13:43:00.408834+09:00; excerpt |",
+      "expected": "No new physical-file assertion rejection for a verified quotation",
+      "actual": [
+        "diagnostic_unit_file_existence_unverified"
+      ],
+      "false_positive": true,
+      "scope": "constructed source-quote counterexample; not actual server log"
+    }
+  },
+  "docker_500_followup": {
+    "old_error_is_real": true,
+    "old_error_at_kst": "2026-11-16T05:51:47+09:00",
+    "current_observation_at_kst": "2026-11-16T13:06:05.277623+09:00",
+    "docker_snapshot": "active/running",
+    "recent15m_returned_journal_rows": 0,
+    "containers_returned": 7,
+    "inventory_source_sha256": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
+    "inventory_ps_requests_size": false,
+    "cause_current_impact_caller_verified": false,
+    "scope": "No new row in bounded recent sample is not historical recovery or all-container functional health."
+  },
+  "staging_corrections": [
+    "Initial new fixture bound actual projected facts, trusted history module and exact QueryClock; operating clock/ownership guards were not relaxed.",
+    "R1 source29 predecessor27 and1230 regressions are kept separately from final29/1232.",
+    "R2 own stage sync refused because its manifest excluded nested files named manifest.json. The refusal was not checked before an old-source run; that failure is preserved and excluded.",
+    "After preserving the old source/run bytes, all700 old files matched their export, only owned chat_contract/manifest were replaced,39 archived outputs removed, all660 inputs verified before final1232 pass."
+  ],
+  "cleanup": {
+    "remote_roots": [
+      {
+        "root": "/var/lib/capstone-factual-service-hwrxlbft",
+        "regular_files": 159,
+        "socket_files": 2,
+        "bytes": 4363009,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-factual-service-hwrxlbft-tests",
+        "regular_files": 702,
+        "socket_files": 0,
+        "bytes": 9911998,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/var/lib/capstone-factual-service-hwrxlbft-r2",
+        "regular_files": 152,
+        "socket_files": 2,
+        "bytes": 4145008,
+        "matched_preserved_export": true
+      },
+      {
+        "root": "/opt/hermes-data/.capstone-factual-service-hwrxlbft-r2-tests",
+        "regular_files": 702,
+        "socket_files": 0,
+        "bytes": 9913594,
+        "matched_preserved_export": true
+      }
+    ],
+    "remote_roots_absent": true,
+    "own_units_stopped": 4,
+    "own_pid_count_absent": 10,
+    "remote_regular_files_removed": 1715,
+    "remote_sockets_removed": 4,
+    "remote_bytes_removed": 28333609,
+    "mac_files_removed": 29062,
+    "mac_bytes_removed": 445314540,
+    "mac_transport_scripts_removed": 14,
+    "redundant_transmission_wrappers_removed": 4,
+    "mac_temporary_root_absent": true,
+    "mac_process_scope": "All owned local command sessions completed and SSH wrappers returned; own remote supervisor/workers absent and four test units stopped. No system-wide process census is claimed.",
+    "new_mac_packages": 0,
+    "g_harness2_preserved": true,
+    "paper15_and_original9_preserved": true
+  },
+  "authority": {
+    "changed": false,
+    "protected_dispatches": 0,
+    "chat_posts": 0,
+    "operating_apply": false,
+    "new_attacks": 0,
+    "new_training": 0,
+    "existing_exact_approval_plans_reused": false
+  },
+  "review": {
+    "method": "manual defect-first source/full receipts/final prose review; not review-agent tool execution",
+    "review_agent_original_found": false,
+    "semgrep": "not_run_no_mac_install"
+  },
+  "promotion_blocked_by_known_findings": true
+}

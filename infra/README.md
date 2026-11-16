@@ -1,8 +1,8 @@
 # infra — 서버 구성·배포
 
-<!-- typed-service:start -->
-[서비스 타입·실행 근거 후보](validation/typed-service/README.md)에서 query147/common91의 미적용8소스 후보를 확인합니다. 실제 같은 호스트 inventory/페이지·명시 unit·기본 Result의 실행 해석을 보완했고 SDK4요청/13읽기·모델완료10·13.875~28.916초를 관측했습니다. Mac1120(기존6생략)/Hermes1203·신규36생략0·공식Harness²를 구분하며 의미·요약 문제가 남아 운영 승격하지 않습니다. 정본/설치 query137·권한/모델·기존 정확 승인안은 보존합니다. 네 관측은 개발 소비이며 정답/SFT·새 독립 평가가 아닙니다.
-<!-- typed-service:end -->
+<!-- factual-service:start -->
+[사실 조회·미확인 검증](validation/factual-service/README.md) — query148/common92 미적용5소스 후보에서 등록 이름/기간의 단순 조회와 로그 명사 조사를 보완했습니다. 최종 SDK4요청14.479~26.601초·Mac1149(기존6생략)/Hermes1232·신규29·공식Harness²를 확인했습니다. 타입·관계 오해와 인용 반례가 남아 미승격이며 정본/설치 query137·권한/모델·기존 정확 승인안을 유지합니다. 총10회/7질문 문자열은 개발 소비이며 실제 채팅·독립 정확도가 아닙니다.
+<!-- factual-service:end -->
 
 [실제OS조회후속](validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 

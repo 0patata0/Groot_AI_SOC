@@ -1,9 +1,9 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·실행·확인·복구와 하네스/학습의 방법·이유를 설명하는 매뉴얼형 MD와56쪽 PDF·DOCX 검수본이며 사진/학번은 공란·로컬 전용입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 목적·준비·실행·확인·복구와 하네스/학습의 방법·이유를 설명하는 매뉴얼형 MD/PDF/DOCX56쪽·15SHA 검수본이며 사진/학번은 공란·로컬 전용입니다.
 
-[서비스 타입·실행 근거 후보](infra/validation/typed-service/README.md)는 같은 호스트의 실제 목록/페이지와 unit 기본값 해석을 보완했습니다. SDK4요청/13읽기·모델완료10·13.875~28.916초를 확인했으나 의미·요약 문제가 남아 운영 승격하지 않습니다. Mac1120/Hermes1203·신규36과 공식Harness²는 회귀/구조 근거이며 실제 채팅·독립 정확도를 대신하지 않습니다. 정본/설치 query137·모델/권한·기존19/journal9 승인안은 유지합니다.
+[사실 조회·미확인 검증](infra/validation/factual-service/README.md): query148/common92 미적용5소스 후보에서 등록 이름/기간의 단순 조회와 로그 명사 조사를 보완했습니다. 최종 SDK4요청14.479~26.601초·Mac1149(기존6생략)/Hermes1232·신규29·공식Harness²를 확인했습니다. 타입·관계 오해와 인용 반례가 남아 미승격이며 정본/설치 query137·권한/모델·기존 정확 승인안을 유지합니다. 총10회/7질문 문자열은 개발 소비이며 실제 채팅·독립 정확도가 아닙니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

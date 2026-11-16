@@ -1,6 +1,6 @@
 {
   "schema": "groot-evaluation-usage-v1",
-  "updated_at_kst": "2026-11-16T12:52:21.890541+09:00",
+  "updated_at_kst": "2026-11-16T13:49:10.920495+09:00",
   "scope": "Verified exposure lower bound only; absence from this ledger never proves unused/pretraining/source-family independence. No prompts or answers are stored here.",
   "consumed": [
     {
@@ -839,6 +839,70 @@
           "record_sha256": "2662cd516af3bca31710366d00067ce82d547e44ca47a0327e2d975113460f7c",
           "visible_input_sha256": "5254c4e7901bfff7784479f61e1e0a6a774e7ac894840f825cc4bad2acdf4025",
           "nonassistant_input_sha256": "7ac13fdcfa47be67a44a9f2ee63b70067a1818a475602d40a8fc7a5a643c3297"
+        }
+      ]
+    },
+    {
+      "status": "consumed",
+      "source": "factual-service-development",
+      "data_sha256": "b231228fa68ba3a95cf159ad19bea927f99b75163554a5bedc30ffde6c600a61",
+      "records": 10,
+      "distinct_question_strings": 7,
+      "evidence": "infra/validation/factual-service/validation.json",
+      "evidence_sha256": "7f1e35112d84ba8bd982577a0a32490efb9b666ed2aa30c91468be78e1f71402",
+      "consumed_at_kst": "2026-11-16T13:37:45.650039+09:00",
+      "task": "Observed development question/final answers across R1 parent2/candidate4 and R2 candidate4; known semantic misses and source-quote counterexample. Never gold/SFT or new independent SOC score.",
+      "fingerprint_scope": "Question/final-answer only, not entire actual runtime wire prompts/tools/policy/evidence.",
+      "fingerprints": [
+        {
+          "record_sha256": "48979cc28e379ad83724b449cce3f2b9131975866278b66850c247a83ebdb9dc",
+          "visible_input_sha256": "cb1c7a7c0e4b9103901ca9c510b8793354307b8062c4c4c25b8cc674903fd12c",
+          "nonassistant_input_sha256": "e6b733a43b07c1be48a881eb8a02031cd70ab15bdb49bd0548bc052eec4c59aa"
+        },
+        {
+          "record_sha256": "4344cb089c3c9827e9cdbf20018ce300f14f853357e80b12ff4a2710d8bace78",
+          "visible_input_sha256": "43b5857e82bce55c7d6a4ec2d8937b088cee6056653ec13af41e40ed17b1ca08",
+          "nonassistant_input_sha256": "7b8593c0543515fd8ef5284f3b4b5c03a6cfe4d87396d026d7b47ad3978249d2"
+        },
+        {
+          "record_sha256": "ef0bd6060f2a99b67b7ea6082b51dfe0fd5192eaa183908d2ff76ba8374d8ea0",
+          "visible_input_sha256": "cb1c7a7c0e4b9103901ca9c510b8793354307b8062c4c4c25b8cc674903fd12c",
+          "nonassistant_input_sha256": "e6b733a43b07c1be48a881eb8a02031cd70ab15bdb49bd0548bc052eec4c59aa"
+        },
+        {
+          "record_sha256": "0c77702506fe2c1d2393c4b4e10ba2b8a54460316078181375fa65825427f503",
+          "visible_input_sha256": "43b5857e82bce55c7d6a4ec2d8937b088cee6056653ec13af41e40ed17b1ca08",
+          "nonassistant_input_sha256": "7b8593c0543515fd8ef5284f3b4b5c03a6cfe4d87396d026d7b47ad3978249d2"
+        },
+        {
+          "record_sha256": "d2ac693b3092d5f0726d4356c1be548b16f9c6112c4fdcb4858ddda24ca99497",
+          "visible_input_sha256": "a95b319344b00fe6e1839421b05765621af3bffd8e485f81a997e2a0365bc060",
+          "nonassistant_input_sha256": "ed3240d97ff8469277b789c177616ee18df93f58a9f02d03e2debae7771ebd77"
+        },
+        {
+          "record_sha256": "57061cea05e10a6cf9d33812753f622312010d33a62a9da3d2cf4c5b937a97d7",
+          "visible_input_sha256": "5da1db9fdca73d3fbc7a348f0bc985ed7a2ccbbef423093acf055038d3307627",
+          "nonassistant_input_sha256": "f175ba9233307af402a1da7983caf2aa87e2a886a8287f99a41c413f1139df43"
+        },
+        {
+          "record_sha256": "29c587b131bfb12fec16694b68b492691d39a26ac486a9dca557fd125dbabf9b",
+          "visible_input_sha256": "96097fc4282d1e504d1e883901ad94cdf25ea707c0e1b356c5f830565f78643d",
+          "nonassistant_input_sha256": "d3e1eaa34861f8a1eede12f4c98de640900eba33f85ecdfa397dd2e030212ec1"
+        },
+        {
+          "record_sha256": "5fa4b183829fc787729aa53183b9653cb79a68cc920eac63ce012ea24311a329",
+          "visible_input_sha256": "9ec79703cb4f6968e150a62e281f58d100015b1f7e6c437ef2d3fa8142addcbb",
+          "nonassistant_input_sha256": "16f21dd5fb4e126e0e1c12f309925da273d5f9dc58989e8ba4854f66e57a0614"
+        },
+        {
+          "record_sha256": "909662339b4818ee0a04a5b89e330695c663bbd99f7b811cab08470fc66e5a40",
+          "visible_input_sha256": "311f04065ec60205f2d7a56f5051273061b9d34bd4b1febe9546cd882cd0bd21",
+          "nonassistant_input_sha256": "9eabaa1e17ff460a89ee044195c2050ba5a109edd4630ba25c0d4c0fd423354d"
+        },
+        {
+          "record_sha256": "7428903bb3690f60b81677deb91a786b4559ec4514d84751718135554f41a748",
+          "visible_input_sha256": "5da1db9fdca73d3fbc7a348f0bc985ed7a2ccbbef423093acf055038d3307627",
+          "nonassistant_input_sha256": "f175ba9233307af402a1da7983caf2aa87e2a886a8287f99a41c413f1139df43"
         }
       ]
     }

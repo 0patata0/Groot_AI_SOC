@@ -2,6 +2,8 @@
 
 현재 요약은 [STATUS](../STATUS.md), 활성 작업은 [PLAN](../PLAN.md)을 따른다. [실행기의 정리·현재 설치 검증](../infra/validation/journal-composition/COORDINATOR.md)과 [관리대역 전역 요구사항](../infra/mcp/management-policy.md)을 유형별 이력에 기록했다. 소스와 구조/격리 검사, 실제 운영 인수는 구분하며 이전 미완료 문구는 당시 관측으로 보존한다.
 
+A의 운영 Native NAT와 다른 미커밋 통합 대안을 구분해 기록했다. 복수 대역·영구 로더25검사/격리9조건은 미배포 개발 근거이며 전체 보안장비 whitelist의 운영 완료가 아니다.
+
 관리대역의 공통 registry·14적용면·34검사는 소스 계약의 검증 이력으로 남긴다. 장비별 실제 whitelist 반영과 전역 MCP의 운영 완료는 아직 아니다.
 
 [전체 수집 자원 시험](../infra/validation/journal-composition/RESOURCES.md)의 호스트별1회 관측·운영 미적용과 문서 갱신 후 윤문 규칙을 현황·계획·진단 이력에 남겼다. 유한 한도 확정과 초기 설치 동기화는 남아 있다.

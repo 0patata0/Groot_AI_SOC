@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-17T08:28:24.328269+09:00",
+  "status": "native_nat_and_durable_loader_candidates_verified_not_deployed",
+  "source_sha256": {
+    "deployment/firewall_native_nat.py": "214d2e8ad35d274580c93ea0a4a0b635ceabb0f96d8da4f439f480910a115f42",
+    "deployment/management_policy_render.py": "fbab4a4fc266430a9ee6010e40983296d37c2f252a128fb8894fd39683a50c34",
+    "deployment/tests/test_firewall_native_nat.py": "0afce20e19e1a01a923291d10b7c62f36cb6ded9338e5a83e0ead4fdec9a6d5a",
+    "deployment/tests/test_management_policy_render.py": "ad1f6d83a1489b862eb7853ec60d5f01d3ca9798100f78ef185b64911719aaf9"
+  },
+  "shared_contract_sha256": "950c169813cae7a68fd218f03499473f613b0ce5bee390af8bc900c90ef5235f",
+  "operating_nat_baseline_sha256": "dca094465332bb97917674e31f3560ccb63ae8598bf65c79d0032f2d4376ee66",
+  "baseline_loader_sha256": "9ff669c07f48dfc84247f12daeb074c504972c6fe7547cb6bb4366053c1324dd",
+  "mac_regressions": [
+    {
+      "profile": "test_firewall_native_nat.py",
+      "tests": 18,
+      "exit": 0
+    },
+    {
+      "profile": "test_management_policy_render.py",
+      "tests": 7,
+      "exit": 0
+    }
+  ],
+  "tests": 25,
+  "skipped": 0,
+  "linux_native_phases": [
+    {
+      "name": "actual_baseline_three_rules",
+      "passed": true
+    },
+    {
+      "name": "native_restore_syntax_no_mutation",
+      "passed": true
+    },
+    {
+      "name": "two_source_update_foreign_handles_and_ttl_preserved",
+      "passed": true
+    },
+    {
+      "name": "repeated_request_noop",
+      "passed": true
+    },
+    {
+      "name": "wrong_current_source_refused",
+      "passed": true
+    },
+    {
+      "name": "foreign_interleaving_refused_without_update",
+      "passed": true
+    },
+    {
+      "name": "inverse_restores_original_sources_without_resetting_ttl",
+      "passed": true
+    },
+    {
+      "name": "durable_loader_multisource_bash_syntax",
+      "passed": true
+    },
+    {
+      "name": "loader_array_to_native_cli_flags",
+      "passed": true
+    }
+  ],
+  "linux_scope": "private Linux network and mount namespace; native iptables/nft parser and transactions, no packets sent",
+  "owned_server_work_removed": true,
+  "native_masquerade_handles_preserved": true,
+  "native_timed_block_handle_preserved": true,
+  "native_block_remaining_before": 119,
+  "native_block_remaining_after": 119,
+  "operating_changes": 0,
+  "model_calls": 0,
+  "mcp_registered": false,
+  "approval_created": false,
+  "packets_sent": 0,
+  "unrelated_nat_candidate_changed": false,
+  "known_unfinished": [
+    "Other fixed device adapters and trusted full coverage collection",
+    "Global MCP, exact card approval, durable multi-host worker and independent recovery",
+    "Installer/safe operating deployment and actual both-bot acceptance"
+  ],
+  "scope": "Native private namespace kernel/restore verification plus pure durable-loader renderer. No live whitelist, service or model change. The operating ip-nat helper and older uncommitted inet-merge candidate are distinct.",
+  "host_kernel_policy_unchanged": true,
+  "first_failure_preserved": "Initial synthetic nft chain/set declaration lacked a statement separator; fixed only the private fixture and reran. First host fingerprint and cleanup both passed.",
+  "review": {
+    "method": "main-agent defect-first review, source/ownership checks and native private-namespace counterexamples",
+    "review_agent_skill_available": false,
+    "semgrep_executed": false,
+    "harness2_executed_this_unit": false,
+    "harness2_scope": "No bot prompt, model, MCP schema or deployed harness file was changed; prior coordinator Harness2 evidence is separate."
+  }
+}

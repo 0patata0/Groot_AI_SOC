@@ -1,5 +1,10 @@
 # 고정 읽기 전용 시스템 진단
 
+<!-- journal-release-preparation:start -->
+[수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. 실제 캐시 격리 사본의 이벤트 보존/복구는 확인했지만 A/B의 수집 잘림과 일관 배포 절차가 남습니다. collector exit0·오류0건만으로 전 구간 완료를 판정하지 않습니다. 아래 설치/사용 절차와 새 후보 능력을 구분합니다.
+<!-- journal-release-preparation:end -->
+
+
 ## 2026-11-06 과거 사건 시간 범위
 
 기존 get_system_diagnostics에 since_kst/until_kst 양끝을 추가했다. 등록 systemd25대상의 정제 오류 이력을 최근30일 안 최대24시간/50행으로 읽으며 현재 상태와 분리한다. 초기 설치·권한·부분 수집·실제 MCP 지연과 미검증 범위는 [이력 조회 계약](journal-history.md)을 따른다. 도구2개·기존 최신 snapshot 조회는 유지한다.

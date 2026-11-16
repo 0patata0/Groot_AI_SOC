@@ -69,3 +69,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 [앱 선언 오류/색인 정책 후보](../infra/validation/application-error-filter/README.md)의 실제 누락·4행 메모리 대조·381검사·미적용과 초기 실패/정정을 유형별 이력에 보존했다. 현황은 STATUS를 따른다.
 
 서비스/호스트 journal 통합 후보의 설계·실패·검증·미적용 범위는 유형별 이력과 [통합 원장](../infra/validation/journal-composition/README.md)을 함께 확인합니다.
+
+
+소스40대상 초안·캐시 복구 모듈의 격리 검증과 A/B 수집 잘림·영수증 불일치·미배포 범위는 유형별5이력과 [후속 원장](../infra/validation/journal-composition/README.md)에 보존합니다. 운영 승인/적용 완료와 구분합니다.

@@ -1,5 +1,10 @@
 # 사건 당시 서비스 오류 조회
 
+<!-- journal-release-preparation:start -->
+[수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. 실제 캐시 격리 사본의 이벤트 보존/복구는 확인했지만 A/B의 수집 잘림과 일관 배포 절차가 남습니다. collector exit0·오류0건만으로 전 구간 완료를 판정하지 않습니다. 아래 설치/사용 절차와 새 후보 능력을 구분합니다.
+<!-- journal-release-preparation:end -->
+
+
 2026-11-06. 복합 조사에서 과거 사건을 묻는데 최근4시간 스냅샷만 조회하던 공백을 보완했다. 기존 `get_system_diagnostics`에 KST 양끝 시각을 추가했다. 새 도구·서비스·포트·키·패키지·일반 셸/sudo 권한은 없다. 최종 보고30초 달성과는 별도이며 [실측 원장](journal-history.validation.json)과 [현재 상태](../../STATUS.md)를 따른다.
 
 후속 MCP1.2.1은 이력 지원25단위를 조건부 schema에 명시한다. 현재/과거 조회의 서버 동작은 동일하며 [봇 요청 범위 결속](../hermes/request-scope.md)과 함께 검증했다.

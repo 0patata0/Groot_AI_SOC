@@ -1,7 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
 <!-- journal-composition:start -->
-[통합 후보 검증](../validation/journal-composition/README.md) — 서비스/호스트 journal/앱 오류34소스와 공통 소비자·스킬을 합쳤습니다. 서버1,453회귀·실제4ID/호스트42행을 확인했고, 현재 Native/운영 DB·봇에는 미적용입니다. 정확 소스·캐시 복구안/승인·로드·새 채팅이 남습니다.
+[통합 후보·캐시 검증](../validation/journal-composition/README.md) — 34소스 후보는 운영 미적용입니다.40배포 대상 초안·환경별40캐시 회귀·실제 격리 사본 복구·128MiB/Tasks8을 확인했습니다. A/B 수집 잘림과 일관된 소스/캐시 배포 실행기·정확 승인·새 실제 채팅은 남았습니다. 초기 설치·추론/학습 모델·권한을 바꾸지 않았습니다.
 <!-- journal-composition:end -->
 
 

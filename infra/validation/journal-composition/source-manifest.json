@@ -194,5 +194,16 @@
     "/opt/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
     "/opt/capstone-diagnostics/host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204",
     "/opt/capstone-ollama-trial/read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5"
+  },
+  "operator_release_preparation": {
+    "scope": "Standalone operator helper/inventory evidence, outside and without changing the frozen34 runtime sources or prior official structure receipt",
+    "files": {
+      "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
+      "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc",
+      "release_inventory.json": "d1fbab2ab7e121be1b4fce54f316eb63c3d54649b7861d4e22758937f2eb05ab",
+      "cache_validation.json": "3572209a30f49218b7e4578497ac021360bb3b4821219759075da83ca24b3a9a"
+    },
+    "inventory_status": "inventory_draft_not_approval_ready",
+    "live_cache_publication": false
   }
 }

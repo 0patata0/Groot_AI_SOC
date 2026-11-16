@@ -1,0 +1,379 @@
+{
+  "status": "isolated_cache_recovery_verified_operating_release_incomplete",
+  "at_kst": "2026-11-16T20:43:44.823754+09:00",
+  "source_base_commit": "03ab2249b1d1ec5aade2bb2b47e9f84092d676d5",
+  "frozen_runtime_candidate_tree_sha256": "1b4818f049c05bfa5a41c677605d84f757bb42e09df9687e71f2ba1e0465ca97",
+  "operator_source_sha256": {
+    "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
+    "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc",
+    "release_inventory.json": "d1fbab2ab7e121be1b4fce54f316eb63c3d54649b7861d4e22758937f2eb05ab"
+  },
+  "test_driver_sha256": {
+    "probe.py": "34139330308379faa945f36a2293a2b53d4dd7bf2b06bc3d1d68b849f1adcece",
+    "quota_probe.py": "42b166985a47d15293b7af38a50a58b867b75fe220fbd9923f92b0d527aa83e4"
+  },
+  "local_tests": {
+    "at_kst": "2026-11-16T20:42:46.688460+09:00",
+    "count": 40,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "returncode": 0,
+    "scope": "isolated fixture; no operating source/service/cache access"
+  },
+  "hosts": {
+    "a": {
+      "observed_at_kst": "2026-11-16T20:25:05.595293+09:00",
+      "tests": {
+        "count": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "cache_snapshot": {
+        "before_sha256": "04f48fd70186c3a609815a60fea1aac222cef81bb70b9eaf03956e90fc86f252",
+        "before_bytes": 249856,
+        "before_counts": {
+          "metadata": 4,
+          "events": 9,
+          "windows": 4070
+        },
+        "after_sha256": "257011ea79468ff4ac298039285791cea2007e27e019aa6071a6f2dd220f4138",
+        "after_counts": {
+          "metadata": 5,
+          "events": 9,
+          "windows": 1
+        },
+        "events_logical_sha256_preserved": true,
+        "restored_exact_bytes": true,
+        "post_snapshot_preserved": true,
+        "repeat_restore_verified": true,
+        "scope": "Read-only export of the real metadata cache, exercised only on an isolated copy"
+      },
+      "native_24h": {
+        "passed": true,
+        "arguments": {
+          "target": "a:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T20:25:06.414335+09:00",
+          "until_kst": "2026-11-16T20:25:06.414335+09:00",
+          "journal_scope": "errors",
+          "limit": 50
+        },
+        "entries": 1,
+        "has_more": false,
+        "seconds": 8.484099121007603,
+        "response_sha256": "f9cacac13a896236302d67d1749bbb009edb17774277dd5198ddfb4ca3ff38a7"
+      },
+      "collector_read_only": {
+        "passed": true,
+        "seconds": 2.640662855003029,
+        "journal_status": {
+          "a:vector": "observed",
+          "a:wazuh-agent": "observed",
+          "a:rule-worker": "observed",
+          "a:raw-waf": "observed",
+          "a:raw-suricata": "observed",
+          "a:certificate-monitor": "observed",
+          "a:storage-monitor": "observed",
+          "a:docker": "observed"
+        },
+        "prepared_events": 0,
+        "history_truncated": true,
+        "unit_truncated": {
+          "a:vector": true,
+          "a:wazuh-agent": true,
+          "a:rule-worker": true,
+          "a:raw-waf": true,
+          "a:raw-suricata": true,
+          "a:certificate-monitor": true,
+          "a:storage-monitor": true,
+          "a:docker": true
+        }
+      },
+      "live_cgroup": {
+        "host": "a",
+        "at_kst": "2026-11-16T20:33:23.060662+09:00",
+        "cgroup": "/sys/fs/cgroup/system.slice/capstone-journal-release-75212ab22c-a-r2-quota.service",
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 37789696,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "rows": 1,
+        "has_more": false,
+        "seconds": 8.597195155045483,
+        "complete": true,
+        "operating_source_changes": 0,
+        "operating_cache_writes": 0,
+        "model_calls": 0
+      },
+      "cleanup_at_kst": "2026-11-16T20:41:55.563593+09:00",
+      "own_test_roots_removed": true,
+      "own_test_units_stopped": true,
+      "operating_sources_and_protected_unchanged": true
+    },
+    "b": {
+      "observed_at_kst": "2026-11-16T20:25:07.027194+09:00",
+      "tests": {
+        "count": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "cache_snapshot": {
+        "before_sha256": "7461dda17c2a8809e6169fb359946fcb88ce67a819959b9fb24b675ce52cb411",
+        "before_bytes": 1089536,
+        "before_counts": {
+          "metadata": 4,
+          "events": 920,
+          "windows": 12730
+        },
+        "after_sha256": "51a285292c2555b6e8475727e4fbaadd08d571c9ca5ea63484652e224639b24b",
+        "after_counts": {
+          "metadata": 5,
+          "events": 920,
+          "windows": 1
+        },
+        "events_logical_sha256_preserved": true,
+        "restored_exact_bytes": true,
+        "post_snapshot_preserved": true,
+        "repeat_restore_verified": true,
+        "scope": "Read-only export of the real metadata cache, exercised only on an isolated copy"
+      },
+      "native_24h": {
+        "passed": true,
+        "arguments": {
+          "target": "b:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T20:25:08.234467+09:00",
+          "until_kst": "2026-11-16T20:25:08.234467+09:00",
+          "journal_scope": "errors",
+          "limit": 50
+        },
+        "entries": 42,
+        "has_more": false,
+        "seconds": 3.0521710600005463,
+        "response_sha256": "5725f776632aa138c4bfc46f0939ed9dc27d8db7f375fc406b4e064d54118668"
+      },
+      "collector_read_only": {
+        "passed": true,
+        "seconds": 1.8078266830416396,
+        "journal_status": {
+          "b:soc-bot": "observed",
+          "b:management": "observed",
+          "b:rule-worker": "observed",
+          "b:vector": "observed",
+          "b:wazuh-agent": "observed",
+          "b:docker": "observed"
+        },
+        "prepared_events": 0,
+        "history_truncated": true,
+        "unit_truncated": {
+          "b:soc-bot": true,
+          "b:management": true,
+          "b:rule-worker": true,
+          "b:vector": true,
+          "b:wazuh-agent": true,
+          "b:docker": true
+        }
+      },
+      "live_cgroup": {
+        "host": "b",
+        "at_kst": "2026-11-16T20:33:18.813178+09:00",
+        "cgroup": "/sys/fs/cgroup/system.slice/capstone-journal-release-75212ab22c-b-r2-quota.service",
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 38088704,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "rows": 42,
+        "has_more": false,
+        "seconds": 3.0534398519666865,
+        "complete": true,
+        "operating_source_changes": 0,
+        "operating_cache_writes": 0,
+        "model_calls": 0
+      },
+      "cleanup_at_kst": "2026-11-16T20:41:55.973838+09:00",
+      "own_test_roots_removed": true,
+      "own_test_units_stopped": true,
+      "operating_sources_and_protected_unchanged": true
+    },
+    "c": {
+      "observed_at_kst": "2026-11-16T20:25:08.234210+09:00",
+      "tests": {
+        "count": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "cache_snapshot": {
+        "before_sha256": "a71a946c358171afebf38630bbb97cc283605b08925e418eaa768adb0f3955b4",
+        "before_bytes": 737280,
+        "before_counts": {
+          "metadata": 4,
+          "events": 12,
+          "windows": 13069
+        },
+        "after_sha256": "8feaa9f7c3b0711f4026078a3173c935f52af2edb6b1e8f631ba2ab4cc9e1fb9",
+        "after_counts": {
+          "metadata": 5,
+          "events": 12,
+          "windows": 1
+        },
+        "events_logical_sha256_preserved": true,
+        "restored_exact_bytes": true,
+        "post_snapshot_preserved": true,
+        "repeat_restore_verified": true,
+        "scope": "Read-only export of the real metadata cache, exercised only on an isolated copy"
+      },
+      "native_24h": {
+        "passed": true,
+        "arguments": {
+          "target": "c:systemd",
+          "view": "journal",
+          "since_kst": "2026-11-15T20:25:09.309362+09:00",
+          "until_kst": "2026-11-16T20:25:09.309362+09:00",
+          "journal_scope": "errors",
+          "limit": 50
+        },
+        "entries": 1,
+        "has_more": false,
+        "seconds": 2.2929713459452614,
+        "response_sha256": "4551248503575dbabbfb0045f17c5c1da4126c9a848c2ca99cb394b698270ba9"
+      },
+      "collector_read_only": {
+        "passed": true,
+        "seconds": 1.8951988199842162,
+        "journal_status": {
+          "c:lab-api": "observed",
+          "c:lab-broker": "observed",
+          "c:lab-guard": "observed",
+          "c:lab-terminal": "observed",
+          "c:terminal-guard": "observed",
+          "c:terminal-status": "observed",
+          "c:sudo-status": "observed",
+          "c:sudo-user-manager": "observed",
+          "c:apache": "observed",
+          "c:wazuh-agent": "observed",
+          "c:docker": "observed"
+        },
+        "prepared_events": 0,
+        "history_truncated": false,
+        "unit_truncated": {
+          "c:lab-api": false,
+          "c:lab-broker": false,
+          "c:lab-guard": false,
+          "c:lab-terminal": false,
+          "c:terminal-guard": false,
+          "c:terminal-status": false,
+          "c:sudo-status": false,
+          "c:sudo-user-manager": false,
+          "c:apache": false,
+          "c:wazuh-agent": false,
+          "c:docker": false
+        }
+      },
+      "live_cgroup": {
+        "host": "c",
+        "at_kst": "2026-11-16T20:33:19.232940+09:00",
+        "cgroup": "/sys/fs/cgroup/system.slice/capstone-journal-release-75212ab22c-c-r2-quota.service",
+        "limits": {
+          "memory_max": 134217728,
+          "pids_max": 8
+        },
+        "memory_peak_bytes": 38080512,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        },
+        "rows": 1,
+        "has_more": false,
+        "seconds": 2.357813901035115,
+        "complete": true,
+        "operating_source_changes": 0,
+        "operating_cache_writes": 0,
+        "model_calls": 0
+      },
+      "cleanup_at_kst": "2026-11-16T20:41:55.862982+09:00",
+      "own_test_roots_removed": true,
+      "own_test_units_stopped": true,
+      "operating_sources_and_protected_unchanged": true
+    }
+  },
+  "cleanup": {
+    "remote_roots": 6,
+    "transient_units": 9,
+    "regular_files": 108,
+    "bytes": 17461629,
+    "complete": true
+  },
+  "observed_gaps": [
+    {
+      "type": "collector_prefilter_tail_cap",
+      "hosts": [
+        "a",
+        "b"
+      ],
+      "finding": "Normal structured messages fill the journalctl candidate cap before semantic parsing. Zero prepared events plus history_truncated=true does not prove error absence or full coverage."
+    },
+    {
+      "type": "operating_a_history_stale",
+      "finding": "The A cache was last observed at 2026-11-12 KST although the one-shot exits0; a fixed legacy warning/info scan timed out at8s. The current candidate read completes but still truncates on A/B."
+    },
+    {
+      "type": "preexisting_receipt_drift",
+      "finding": "One SDK query-skill receipt entry differs from the actual file. Three legacy diagnostic installation core receipts already differ from installed source. Preserve provenance; do not silently relabel as a new installation."
+    }
+  ],
+  "remaining_gates": [
+    "Fix prefilter truncation without losing escaped structured severities and validate bounded collection on A/B.",
+    "Implement coordinated source/cache quiescence, independent rollback and fresh proof-bound commit; helper alone does not stop collectors/readers.",
+    "Review exact source/receipt inventory, prepare final approval-bound payload and obtain exact administrator approval.",
+    "Perform actual load, cache rescan, MCP/schema and new both-bot chat checks, then confirm or rollback."
+  ],
+  "non_claims": [
+    "No operating source deployment or live-cache publication.",
+    "No model inference, new chat, attack, training or new-OS installation.",
+    "40 repeated module tests in each environment are not160 distinct tests or independent SOC incidents.",
+    "Direct24h journal reads and cgroup peaks are not messenger latency or complete host error/attack coverage.",
+    "The frozen34-source runtime candidate and its official Harness2 record were not changed or rerun in this helper-only unit."
+  ],
+  "operating_source_changes": 0,
+  "operating_cache_writes_by_this_work": 0,
+  "model_calls": 0,
+  "chat_posts": 0
+}

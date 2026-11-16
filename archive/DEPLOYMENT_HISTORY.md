@@ -1,5 +1,9 @@
 # 설치·웹 정책 이력
 
+## 2026-11-17 운영 미적용 조정 후보
+
+root 고정 진입점과 서비스/캐시/소스 전환 연결·격리 검증. 모델/MCP 등록·일반 sudo 위임·운영 소스/서비스 변경0. 기존 설치 영수증은 보존했고 새 출처 검증은 미연결이다. 이전 관리19/journal9 승인은 재사용하지 않는다. [검증 범위](../infra/validation/journal-composition/COORDINATOR.md).
+
 ## 정본 동기화와 실제 배포의 분리 (2026-11-17)
 
 초기 설치기가 읽는 정본32파일을 검증한 바이트로 맞췄다. 설치기 자체는 이미 같았고 선택36파일의 SHA가 동결본과 일치했다. 실제 새 OS 설치나 운영 source/cache/service 변경은0이다. 기존 초기 설치 core3·SDK skill1 영수증 불일치의 출처 보존과 새 release 검증은 별도로 연결해야 한다. [설치 준비 범위](../infra/validation/journal-composition/CANONICAL.md).

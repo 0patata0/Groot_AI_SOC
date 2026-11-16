@@ -1,6 +1,6 @@
 # 과거 기록과 복원 안내
 
-[정본·초기 설치 소스 동기화](../infra/validation/journal-composition/CANONICAL.md)의 차이·현재 정본 회귀·이전 Linux 근거·미배포 범위를5유형 이력에 보존했다. 현재 상태·계획은 STATUS·PLAN을 따르며 이전 절의 미완료 표기는 당시 단계다.
+현재 요약은 [STATUS](../STATUS.md), 활성 작업은 [PLAN](../PLAN.md)을 따른다. 정본 동기화와 [조정 실행기의 격리 검증](../infra/validation/journal-composition/COORDINATOR.md)을 유형별 이력에 기록했다. 코드 연결·구조/격리 검사·실제 운영 적용과 인수는 구분한다. 이전 단계의 미완료 문구는 당시 관측으로 보존한다.
 
 [전체 수집 자원 시험](../infra/validation/journal-composition/RESOURCES.md)의 호스트별1회 관측·운영 미적용과 문서 갱신 후 윤문 규칙을 현황·계획·진단 이력에 남겼다. 유한 한도 확정과 초기 설치 동기화는 남아 있다.
 

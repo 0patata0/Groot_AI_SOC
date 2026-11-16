@@ -1,5 +1,9 @@
 # 진단 탐색 이력
 
+## 2026-11-17 복구 반례와 실제 실행 경로
+
+준비 원복 완료 응답 유실 뒤 정상 서비스 정지 가능 경로를 고쳤다. 실제 B Docker는/usr/local/bin/docker로 확인해 명령 정정. 재현기의 Mac 그룹 상속·flat 경로·Path.chown 실패를 보존하고 os.chown/전용 임시 폴더로 수정. 최종 Mac220·Linux220/생략0, 운영 변경0이다. [검증 범위](../infra/validation/journal-composition/COORDINATOR.md).
+
 ## 실제 라이프사이클 대조에서 확인한 차이 (2026-11-17)
 
 세 서버의 read-snapshot은281바이트 셸이고 Python reader는 별도 파일이었다. B의 읽기 MCP PID19071은 UID999 SSH 세션으로 Hermes 밖에서 실행됐다. 컨테이너 정지만으로 quiescence를 확인할 수 없으며 재접속 차단·별도 drain이 필요하다. source/core를 직접 읽는 A observe·B model/ingestion도 전환 범위에 포함해야 한다. 모두 관리자 경유 읽기이며 실제 종료/변경은0이다.

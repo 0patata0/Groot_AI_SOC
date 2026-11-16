@@ -1,7 +1,7 @@
 # infra — 서버 구성·배포
 
 <!-- journal-composition:start -->
-[정본 동기화](validation/journal-composition/CANONICAL.md) — 검증 후보와 다른32파일을 맞추고 선택36파일 SHA·현재 정본1,427검사/기존6생략·공식40구성/22변경면/상시 증가0을 확인했습니다. 이전 Linux1,510은 동일 동결 바이트의 근거입니다. 운영에는 미적용이며 일관 정지·부팅 차단·독립 원복·정확 승인·실제 MCP/새 채팅은 남습니다.
+후속 조정 실행기는50소스·39제어 문서를 연결한 격리 후보다. 같은 소스로 Mac220·Linux220/생략0·공식78구성/추가30/상시 증가0을 확인했다. 운영 적용·MCP·새 채팅은 미확인이다. 임시 장치 정리·현재 설치 출처·실제 systemd/독립 복구·정확 승인이 남았다. [현재 조정 범위](validation/journal-composition/COORDINATOR.md).
 <!-- journal-composition:end -->
 
 

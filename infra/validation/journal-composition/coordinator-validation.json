@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "status": "isolated_candidate_verified_operating_application_not_ready",
+  "at_kst": "2026-11-17T05:59:00.982901+09:00",
+  "manifest_sha256": "87d7e33266130de5d31c886b5b49a88a8adf731afdc6699cbd61700ff8dcb36a",
+  "source_files": 30,
+  "operator_modules": 14,
+  "operator_helper_files": 18,
+  "source_targets": {
+    "a": 7,
+    "b": 36,
+    "c": 7,
+    "total": 50
+  },
+  "generated_control_documents": {
+    "a": 10,
+    "b": 21,
+    "c": 8,
+    "total": 39
+  },
+  "regressions": {
+    "mac": {
+      "python": "3.12.5",
+      "platform": "darwin",
+      "tests": 220,
+      "skipped": 0,
+      "complete": true,
+      "source_unchanged": true,
+      "own_work_removed": true,
+      "scope": "14 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; not native systemd, independent recovery, production CLI or bot/detection accuracy."
+    },
+    "linux": {
+      "python": "3.13.5",
+      "platform": "linux",
+      "tests": 220,
+      "skipped": 0,
+      "complete": true,
+      "source_unchanged": true,
+      "own_work_removed": true,
+      "scope": "14 isolated filesystem/SQLite/fixed-backend profiles. Cache42 includes 40 inherited cases; not native systemd, independent recovery, production CLI or bot/detection accuracy."
+    }
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before_components": 48,
+    "candidate_components": 78,
+    "added": 30,
+    "modified": 0,
+    "removed": 0,
+    "always_on_chars": 16917,
+    "always_on_char_delta": 0
+  },
+  "fixes": [
+    "Retry staged-only rollback from durable pending.from_phase; preserve services_untouched and avoid peer/resume side effects.",
+    "Pin actual B Docker path /usr/local/bin/docker after administrator-route read, not an assumed /usr/bin path.",
+    "Use owned current-GID temporary fixtures and support a flat isolated source mount in the unprivileged regression runner."
+  ],
+  "isolated_linux": {
+    "network": "none",
+    "user": "10001:10001",
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "memory_bytes": 268435456,
+    "pids_limit": 64,
+    "readonly_source": true,
+    "all_capabilities_dropped": true,
+    "no_new_privileges": true,
+    "oom_killed": false,
+    "cleanup": {
+      "container_removed": true,
+      "own_root_removed": true,
+      "operating_container_unchanged": true
+    },
+    "not_native_systemd": true
+  },
+  "first_failures_preserved": [
+    "staged-only lost acknowledgement counterexample",
+    "missing /usr/bin/docker before container creation",
+    "Mac fixture group inheritance after clearing TMPDIR",
+    "flat /check source path and incorrect Path.chown runner API"
+  ],
+  "review": {
+    "method": "main-agent defect-first review and targeted counterexamples",
+    "review_agent_skill_available": false,
+    "semgrep_executed": false
+  },
+  "operating_source_changes": 0,
+  "operating_services_restarted": 0,
+  "model_calls": 0,
+  "chat_posts": 0,
+  "attack_tests": 0,
+  "training_runs": 0,
+  "initial_installation_receipts_rewritten": false,
+  "known_unfinished": [
+    "Cleanup and current-installation receipt/provenance integration are not connected.",
+    "Native systemd, reboot fences, independent recovery and root-entry success have not been validated.",
+    "Fresh exact operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain."
+  ],
+  "evidence_sha256": {
+    "mac_result": "0083ef48107b9f0bd9549c43a6de9135f06f56350ddb652ca24a49df885c63fb",
+    "linux_result": "eda013a025fb07cf0fcb3ec8b6d9ae48b19cb1c50008aeb43c64548846dd73ce",
+    "harness2": "d4215b512c418f6b63d4fa32d6adae9a85ba6769f12d81b0bc280eab20412d0f",
+    "linux_operator_observation": "2b992e157de7b602c3b2acc15591f1516cbb704595d09717740fe68bd97e3131"
+  }
+}

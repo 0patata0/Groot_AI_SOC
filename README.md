@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-**현재:** [정본·초기 설치 소스 동기화](infra/validation/journal-composition/CANONICAL.md)로 검증 후보와 다른32파일을 맞췄습니다. 선택36파일 SHA 일치·현재 정본1,427검사/기존6생략·공식40구성/22변경면을 확인했습니다. 운영은 미적용이며 실제 정지·부팅 차단·독립 원복/확정 실행기는 계속 작성 중입니다. 논문66쪽 MD/PDF/DOCX와 기존 작업을 보존합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
+조정 실행기14모듈의 소스·캐시·소비자 전환을 연결하고 같은 소스로 Mac220·Linux220/생략0·공식 Harness²78구성/추가30/상시 증가0을 확인했다. 운영 적용 준비는 계속 진행 중이다. 임시 장치 정리·설치 출처·실제 systemd/독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. [검증 범위](infra/validation/journal-composition/COORDINATOR.md) · [현재 상태](STATUS.md).
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

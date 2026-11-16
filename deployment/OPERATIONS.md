@@ -1,5 +1,7 @@
 # SOC 운영 절차
 
+[수집기 유한 한도 후보](../infra/validation/journal-composition/LIMITS.md)는 정기 수집과 초기24시간 이력을 제한한다. 초기 설치 소스·회귀·격리 실행을 확인했으며 운영은 미적용이다. 기존 서버에는 초기 설치기를 재실행하지 않고 소스·캐시 백업, 소비자 조정, 독립 원복과 정확 승인을 거친다. 부분 수집을 성공으로 처리하거나 임의로 타이머를 켜서 설치 실패를 넘기지 않는다.
+
 [native journal 후보](../infra/validation/journal-adapter/README.md)에서 사용하는 단일 deploy.sh/helper, systemd255/binding235 API와 오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 회귀33회·복제 원복9회·중간 load18회를 거쳤다. A/B/C의 PREPARED 상태와 원본6개도 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용과 원복 timer, 새 채팅과 새 OS 전체 설치는 아직 수행하지 않았다. 아래 날짜별 설명은 당시 범위다.
 
 2026-11-08: 현재 OS·Docker 상세 조회는 승인 없이 사용하며, 변경은 기존 정확 후보 승인 경계를 유지합니다. 서비스 목록은 호스트별로 나누고 Docker 상세·로그, OS 자원·네트워크·디스크까지 조회합니다. [질문 예·조회 한계·복구](../infra/mcp/host-inventory.md). 아래 버전별 단락은 당시 검증 기록입니다.

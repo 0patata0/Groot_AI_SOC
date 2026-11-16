@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+[수집기 한도 후보](../infra/validation/journal-composition/LIMITS.md)의 반입 소스는 deployment/soc_diagnostics.py와 infra/mcp/system_diagnostics.py이며 기존 source_bundle을 사용한다. 추가 deb/wheel/image·공개 포트·키·설정 입력은0이다. 기존 systemd255/binding235의 SYSTEM_ONLY와 Reader files API를 검사하고 수집·초기 이력·타이머·reader의4개 unit을 생성한다. [정확한 생성 내용·SHA](../infra/validation/journal-composition/limits-units.json)를 확인한다. 새 OS 전체 설치는 미검증이다.
+
 [정확 journal9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 기존 Python/systemd·이미 설치된 native binding을 사용해 추가 deb/wheel/image/포트/키0이다. operator-only 파일 트랜잭션/실행기는 root 전용 준비 폴더에 보관하며 MCP·초기 설치기의 새 진입점으로 등록하지 않는다. 초기설치의6개 local source/helper·의존 검사와 별도로 기존운영의 정확 승인·백업·독립 원복·실MCP/새채팅·확정을 수행한다. 현재는 준비/복제검사까지만 완료했다.
 
 **현재 native journal 후보의 추가 의존성:** 각 역할 A/B/C에 Ubuntu24.04의 `python3-systemd` binding235와 systemd/libsystemd0 major255가 필요하다. 실제 세 서버의 기존 버전은 `235-1build4`/`255.4-1ubuntu8.18`이며 설치0이다. 새 환경에 없으면 같은 배포판·아키텍처의 서명 검토된 deb와 전이 의존성을 역할별 artifacts.json의 실제 package/version/architecture/SHA로 등록한 뒤 기존 오프라인 설치기로 반입한다. Mac 설치·온라인 pip/apt fallback은 없다. 이 문서에서 관측한 버전에 맞추려고 보안 업데이트 revision을 자동으로 다운그레이드하지 않는다.

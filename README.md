@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-**현재:** [수집 보완 후보/검증](infra/validation/journal-composition/README.md)에서 A/B의 실제4시간 잘림을 격리 읽기로 해소했습니다. 검사는 Mac1,410회 중 기존6개를 생략했습니다. 기존 Hermes 이미지1,493회에서는 생략0개였습니다. [전체 수집·24시간 이력의 격리 자원 시험](infra/validation/journal-composition/RESOURCES.md)도 세 서버에서256MiB/Tasks64로 완료했습니다. 운영은 미적용이며 한도 확정·초기 설치 동기화·소스/캐시 조정·정확 승인·실제 MCP/새 채팅은 남습니다. 논문은 후임자용 실행·확인·복구 매뉴얼이며, 윤문한 66쪽 MD·PDF·DOCX의 내용과 전 페이지를 다시 검수했습니다. [STATUS](STATUS.md)를 기준으로 봅니다.
+**현재:** [수집기 한도·초기 이력 후보](infra/validation/journal-composition/LIMITS.md)의 Mac1,427(기존6생략)·격리 Linux1,510(생략0)·세 서버 제한 실행과 B 커널 음성 시험을 확인했습니다. 초기 설치 소스와 생성 유닛을 함께 맞췄으며 운영은 미적용입니다. 다음은 소스·캐시의 조정 배포·독립 원복·정확 승인·실제 MCP/새 채팅입니다. 논문은 검수한 매뉴얼66쪽 MD/PDF/DOCX를 유지합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

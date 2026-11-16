@@ -40,8 +40,11 @@ LOCAL_SOURCES = ('system_diagnostics.py', 'diagnostic_history.py', 'diagnostic_j
 SOURCES = (*LOCAL_SOURCES, 'system-diagnostics-mcp.py',
            'read-system-diagnostics.py', 'run-system-diagnostics.sh')
 SERVICE = 'capstone-system-diagnostics.service'
+BACKFILL_SERVICE = 'capstone-diagnostic-history-backfill.service'
 TIMER = 'capstone-system-diagnostics.timer'
 JOURNAL_SERVICE = 'capstone-journal-reader.service'
+COLLECTION_RESOURCES = ('MemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\n'
+                        'TasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\n')
 FIXED_ENV = common.FIXED_ENV
 need = common.need
 
@@ -88,7 +91,15 @@ def unit_documents(role):
         'UMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\n'
         'ReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\n'
         + ('ReadWritePaths=-/var/lib/capstone-management\n' if role == 'siem' else '') +
-        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nTimeoutStartSec=85\nTimeoutStopSec=5\n')
+        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\n'
+        + COLLECTION_RESOURCES + 'TimeoutStartSec=85\nTimeoutStopSec=5\n')
+    backfill = ('[Unit]\nDescription=Bounded initial Capstone diagnostic history backfill\n'
+        'After=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\n'
+        'ExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --backfill-history --role ' + role + '\n'
+        'UMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\n'
+        'ReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\n'
+        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\n'
+        + COLLECTION_RESOURCES + 'TimeoutStartSec=150\nTimeoutStopSec=5\n')
     timer = ('[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n'
         '[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=' + SERVICE + '\n'
         '[Install]\nWantedBy=timers.target\n')
@@ -102,7 +113,22 @@ def unit_documents(role):
         'RestrictSUIDSGID=yes\nLockPersonality=yes\nKillMode=control-group\n'
         'MemoryMax=128M\nTasksMax=8\nLimitNOFILE=1024\nTimeoutStopSec=10\n'
         'Restart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target\n')
-    return {SERVICE: service.encode(), TIMER: timer.encode(), JOURNAL_SERVICE:journal.encode()}
+    return {SERVICE: service.encode(), BACKFILL_SERVICE: backfill.encode(), TIMER: timer.encode(), JOURNAL_SERVICE:journal.encode()}
+
+
+def verify_collection_resources():
+    # Check manager-loaded properties before starting either publisher. A
+    # matching unit file alone does not rule out a drop-in overriding limits.
+    for unit, timeout in ((SERVICE, '1min 25s'), (BACKFILL_SERVICE, '2min 30s')):
+        expected = {'LoadState': 'loaded', 'Type': 'oneshot', 'MemoryAccounting': 'yes',
+                    'MemoryMax': '268435456', 'MemoryHigh': '201326592', 'MemorySwapMax': '0',
+                    'TasksAccounting': 'yes', 'TasksMax': '64', 'LimitNOFILE': '1024',
+                    'KillMode': 'control-group', 'TimeoutStartUSec': timeout, 'TimeoutStopUSec': '5s'}
+        raw = common.run(['/usr/bin/systemctl', 'show', '--no-pager',
+                          '--property=' + ','.join(expected), unit], timeout=10).decode()
+        lines = [line.split('=', 1) for line in raw.splitlines()]
+        need(all(len(line) == 2 for line in lines) and len(lines) == len(expected)
+             and dict(lines) == expected, 'diagnostic_collection_resource_mismatch')
 
 
 def account_absent(name, kind):
@@ -119,13 +145,15 @@ def native_dependencies():
     version = common.run(['/usr/bin/journalctl', '--version']).decode().splitlines()
     need(version and re.match(r'^systemd 255(?:\s|\.)', version[0]),
          'diagnostic_native_requires_systemd255')
-    code = """import json
+    code = """import inspect, json
 from systemd import journal
 assert str(journal.__version__) == '235'
 required = ('_previous', '_get', '_get_all', '_get_realtime', '_get_cursor',
             'close', 'seek_realtime', 'add_match', 'add_conjunction', 'add_disjunction')
 assert all(callable(getattr(journal.Reader, name, None)) for name in required)
 assert hasattr(journal.Reader, 'data_threshold') and type(journal.LOCAL_ONLY) is int
+assert type(journal.SYSTEM_ONLY) is int and journal.SYSTEM_ONLY > 0
+assert 'files' in inspect.signature(journal.Reader).parameters
 print(json.dumps({'binding': '235', 'api': True}))
 """
     result = common.parse(common.run(['/usr/bin/python3', '-I', '-B', '-c', code]))
@@ -148,6 +176,7 @@ def check(s, role):
              'partial_diagnostic_installation_requires_review')
         return {'status': 'existing_requires_verify', 'role': role}
     for path in (CODE, ROUTER_CONFIG, KEYDIR, Path('/etc/systemd/system') / SERVICE,
+                 Path('/etc/systemd/system') / BACKFILL_SERVICE,
                  Path('/etc/systemd/system') / TIMER, Path('/etc/systemd/system') / JOURNAL_SERVICE,
                  Path('/run/capstone-journal'), Path('/etc/ssh/sshd_config.d/63-capstone-diagnostics.conf')):
         need(not os.path.lexists(path), 'unmanaged_diagnostic_namespace_exists')
@@ -191,8 +220,9 @@ def install_common(s, role):
     for name, raw in unit_documents(role).items():
         common.write(Path('/etc/systemd/system') / name, raw, 0o644)
     common.run(['/usr/bin/systemctl', 'daemon-reload'])
+    verify_collection_resources()
     common.run(['/usr/bin/systemctl', 'start', SERVICE], timeout=100)
-    common.run(['/usr/bin/python3', '-IB', str(CODE / 'system_diagnostics.py'), '--backfill-history', '--role', role], timeout=110)
+    common.run(['/usr/bin/systemctl', 'start', BACKFILL_SERVICE], timeout=165)
     common.run(['/usr/bin/systemctl', 'enable', '--now', TIMER])
     common.run(['/usr/bin/systemctl', 'enable', '--now', JOURNAL_SERVICE])
     return gid
@@ -481,7 +511,10 @@ def verify(s, role):
         need(installed_record(path) == record, 'diagnostic_installed_file_changed')
     need(all(str(CODE / name) in saved['files'] for name in LOCAL_SOURCES),
          'diagnostic_native_source_receipt_missing')
+    need(all(str(Path('/etc/systemd/system') / name) in saved['files'] for name in unit_documents(role)),
+         'diagnostic_unit_receipt_missing')
     native_dependencies()
+    verify_collection_resources()
     common.run(['/usr/bin/systemctl', 'is-enabled', TIMER])
     common.run(['/usr/bin/systemctl', 'is-active', TIMER])
     common.run(['/usr/bin/systemctl', 'is-enabled', JOURNAL_SERVICE])

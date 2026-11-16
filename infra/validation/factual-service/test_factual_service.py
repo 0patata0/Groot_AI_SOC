@@ -1,6 +1,6 @@
 """Factual service scope, source limits and reporting; no model or network."""
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime,timedelta
 from unittest.mock import patch
 import copy,hashlib,importlib.util,json,os,sys,unittest
 ROOT=Path(os.environ['SOC_FACTUAL_ROOT']).resolve()
@@ -42,6 +42,14 @@ def context(q,rows=None):
   now=NOW,allowed_reads={DIAG,INV})
 
 class FactualScope(unittest.TestCase):
+ def absolute_scope(self,q,at):
+  # The reference instant belongs to this fixture, never the wall-clock hour.
+  instant=datetime.fromisoformat(at)
+  class Clock(datetime):
+   @classmethod
+   def now(cls,tz=None):return instant.astimezone(tz) if tz else instant.replace(tzinfo=None)
+  with patch.object(C,'datetime',Clock):
+   return C.service_lookup_scope(C.service_history_plan(F.catalog(),q,at),q)
  def test_observed_short_state_and_recent_logs_are_a_lookup(self):
   self.assertTrue(scope('B Docker 현재 상태와 최근 5분 로그 보여줘.'))
  def test_all_registered_short_labels_use_actual_catalog(self):
@@ -64,7 +72,13 @@ class FactualScope(unittest.TestCase):
    with self.subTest(period=period):self.assertFalse(scope('B Docker '+period+' 로그 보여줘'))
  def test_natural_absolute_period_uses_the_same_parse(self):
   for period in ['오늘 오전 1시 10분부터 오전 1시 20분까지','오늘 01:10~01:20 KST']:
-   with self.subTest(period=period):self.assertTrue(scope('B Docker '+period+' 로그 보여줘'))
+   with self.subTest(period=period):self.assertTrue(self.absolute_scope('B Docker '+period+' 로그 보여줘','2026-11-16T12:00:00+09:00'))
+ def test_today_future_period_stays_outside_factual_completion(self):
+  for period in ['오늘 오전 1시 10분부터 오전 1시 20분까지','오늘 01:10~01:20 KST']:
+   with self.subTest(period=period):self.assertFalse(self.absolute_scope('B Docker '+period+' 로그 보여줘','2026-11-16T00:30:00+09:00'))
+ def test_yesterday_period_is_valid_on_both_sides_of_midnight(self):
+  for at in ['2026-11-16T23:30:00+09:00','2026-11-17T00:30:00+09:00']:
+   with self.subTest(at=at):self.assertTrue(self.absolute_scope('B Docker 어제 01:10~01:20 KST 로그 보여줘',at))
  def test_plain_style_and_conjunctions_do_not_require_causal_prose(self):
   for style in ['간단히','간단하게','짧게','표로']:
    with self.subTest(style=style):self.assertTrue(scope('B Vector 지금 상태랑 최근 5분 로그 '+style+' 보여줘'))

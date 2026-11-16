@@ -1,5 +1,7 @@
 # 단일 Bash 초기 설치
 
+진단 설치 단계는 수집→고정24시간 이력→타이머/reader 활성화 순서다. 초기 이력도 제한된 systemd unit 안에서 실행하며 실패·잘림이 있으면 보고와 부분 캐시를 보존하고 멈춘다. 일부 설치가 남으면 원인과 보존 파일을 먼저 검토한다. 사용자 진입점은 계속 deploy.sh 하나다. [한도·검증·남은 범위](../infra/validation/journal-composition/LIMITS.md).
+
 > **2026-11-04 현행 웹 제어:** 공개 열람은 `LAB_ALLOWED_CIDRS`, 실습 실행·중지·터미널은 `MANAGEMENT_ALLOWED_CIDRS`에서 설치한 관리자 CIDR과 HMAC 인증이 모두 필요하다. UI/API 포함4개 경로는 WAF On을 유지하며 이전 검사 예외는 제거했다. 기존 운영은 [증분 유지보수/복구](../infra/validation/web-policy/README.md)를 따른다. 과거 설명은 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-6da49272bde6c9e3)을 참조한다. [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md).
 
 ## 2026-10-24 보안 경계와 오프라인 준비

@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
+
 <!-- journal-composition:start -->
 [수집 오버레이 검증](../infra/validation/journal-composition/README.md) — 기본 소스34개에 런타임3개와 시험2개를 덧붙이고 새 회귀40개를 실행해 A/B의 실제4h 잘림을 보완했습니다. Mac에서는 1410회 검사 중 기존6개를 생략했습니다. 기존 Hermes 이미지의 격리 컨테이너에서는 1493회 검사에서 생략0개를 확인했습니다. 과거4ID의 캐시 편입과 원복도 확인했습니다. 운영 미적용이며 수집기 유한 자원 설정·초기 설치/배포 조정·정확 승인·새 MCP/채팅은 남습니다. 모델/학습/권한은 바꾸지 않았습니다.
 <!-- journal-composition:end -->

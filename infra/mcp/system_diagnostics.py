@@ -571,7 +571,12 @@ def main():
         journal_library().serve(args.role)
         return
     if args.backfill_history:
-        print(json.dumps(history_library().collect(args.role, hours=24), sort_keys=True))
+        result = history_library().collect(args.role, hours=24)
+        print(json.dumps(result, sort_keys=True))
+        # Preserve partial coverage in the cache/report, but never let an
+        # incomplete bootstrap look like a successful systemd start.
+        if result['failed_window_count'] != 0 or result['source_truncated'] is not False:
+            raise SystemExit(1)
         return
     if args.collect:
         need(os.getuid() == os.geteuid() == 0, 'collector_root_required')

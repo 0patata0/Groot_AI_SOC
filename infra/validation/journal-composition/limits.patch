@@ -1,0 +1,243 @@
+--- a/deployment/soc_diagnostics.py
++++ b/deployment/soc_diagnostics.py
+@@ -42,0 +43 @@
++BACKFILL_SERVICE = 'capstone-diagnostic-history-backfill.service'
+@@ -44,0 +46,2 @@
++COLLECTION_RESOURCES = ('MemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\n'
++                        'TasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\n')
+@@ -91 +94,9 @@
+-        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nTimeoutStartSec=85\nTimeoutStopSec=5\n')
++        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\n'
++        + COLLECTION_RESOURCES + 'TimeoutStartSec=85\nTimeoutStopSec=5\n')
++    backfill = ('[Unit]\nDescription=Bounded initial Capstone diagnostic history backfill\n'
++        'After=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\n'
++        'ExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --backfill-history --role ' + role + '\n'
++        'UMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\n'
++        'ReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\n'
++        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\n'
++        + COLLECTION_RESOURCES + 'TimeoutStartSec=150\nTimeoutStopSec=5\n')
+@@ -105 +116,16 @@
+-    return {SERVICE: service.encode(), TIMER: timer.encode(), JOURNAL_SERVICE:journal.encode()}
++    return {SERVICE: service.encode(), BACKFILL_SERVICE: backfill.encode(), TIMER: timer.encode(), JOURNAL_SERVICE:journal.encode()}
++
++
++def verify_collection_resources():
++    # Check manager-loaded properties before starting either publisher. A
++    # matching unit file alone does not rule out a drop-in overriding limits.
++    for unit, timeout in ((SERVICE, '1min 25s'), (BACKFILL_SERVICE, '2min 30s')):
++        expected = {'LoadState': 'loaded', 'Type': 'oneshot', 'MemoryAccounting': 'yes',
++                    'MemoryMax': '268435456', 'MemoryHigh': '201326592', 'MemorySwapMax': '0',
++                    'TasksAccounting': 'yes', 'TasksMax': '64', 'LimitNOFILE': '1024',
++                    'KillMode': 'control-group', 'TimeoutStartUSec': timeout, 'TimeoutStopUSec': '5s'}
++        raw = common.run(['/usr/bin/systemctl', 'show', '--no-pager',
++                          '--property=' + ','.join(expected), unit], timeout=10).decode()
++        lines = [line.split('=', 1) for line in raw.splitlines()]
++        need(all(len(line) == 2 for line in lines) and len(lines) == len(expected)
++             and dict(lines) == expected, 'diagnostic_collection_resource_mismatch')
+@@ -152,0 +179 @@
++                 Path('/etc/systemd/system') / BACKFILL_SERVICE,
+@@ -195,0 +223 @@
++    verify_collection_resources()
+@@ -197 +225 @@
+-    common.run(['/usr/bin/python3', '-IB', str(CODE / 'system_diagnostics.py'), '--backfill-history', '--role', role], timeout=110)
++    common.run(['/usr/bin/systemctl', 'start', BACKFILL_SERVICE], timeout=165)
+@@ -485,0 +514,2 @@
++    need(all(str(Path('/etc/systemd/system') / name) in saved['files'] for name in unit_documents(role)),
++         'diagnostic_unit_receipt_missing')
+@@ -486,0 +517 @@
++    verify_collection_resources()
+--- a/deployment/tests/test_soc_diagnostics.py
++++ b/deployment/tests/test_soc_diagnostics.py
+@@ -46,0 +47 @@
++             mock.patch.object(d, 'verify_collection_resources', side_effect=lambda:calls.append(['limits_checked'])), \
+@@ -55 +56,2 @@
+-        backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
++        backfill = ['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]
++        self.assertLess(calls.index(['limits_checked']), calls.index(['/usr/bin/systemctl','start',d.SERVICE]))
+@@ -121 +123 @@
+-            self.assertEqual(set(docs), {d.SERVICE, d.TIMER, d.JOURNAL_SERVICE})
++            self.assertEqual(set(docs), {d.SERVICE, d.BACKFILL_SERVICE, d.TIMER, d.JOURNAL_SERVICE})
+@@ -157,0 +160,107 @@
++
++
++class CollectionResources(unittest.TestCase):
++    def properties(self, unit, **changes):
++        values={'LoadState':'loaded','Type':'oneshot','MemoryAccounting':'yes','MemoryMax':'268435456',
++                'MemoryHigh':'201326592','MemorySwapMax':'0','TasksAccounting':'yes','TasksMax':'64','LimitNOFILE':'1024',
++                'KillMode':'control-group','TimeoutStartUSec':'1min 25s' if unit==d.SERVICE else '2min 30s',
++                'TimeoutStopUSec':'5s'}
++        values.update(changes)
++        return ''.join(k+'='+v+'\n' for k,v in values.items()).encode()
++
++    def install(self, run):
++        with mock.patch.object(d,'check'),mock.patch.object(Path,'exists',return_value=False), \
++             mock.patch.object(d,'group_setup',return_value=997),mock.patch.object(d.common,'mkdir'), \
++             mock.patch.object(d,'profile',return_value={}), \
++             mock.patch.object(d,'source_bundle',return_value={n:b'# source' for n in d.SOURCES}), \
++             mock.patch.object(d.common,'write'),mock.patch.object(d.common,'run',side_effect=run):
++            return d.install_common(settings(),'service')
++
++    def test_loaded_limits_are_checked_for_both_fixed_publishers(self):
++        calls=[]
++        def run(argv,**kw):
++            calls.append((argv,kw));return self.properties(argv[-1])
++        with mock.patch.object(d.common,'run',side_effect=run):d.verify_collection_resources()
++        self.assertEqual([x[0][-1] for x in calls],[d.SERVICE,d.BACKFILL_SERVICE])
++        self.assertTrue(all(x[0][:3]==['/usr/bin/systemctl','show','--no-pager'] and x[1]['timeout']==10 for x in calls))
++
++    def test_manager_override_or_missing_property_is_rejected(self):
++        for unit in (d.SERVICE,d.BACKFILL_SERVICE):
++            for key,value in [('MemoryMax','infinity'),('MemoryHigh','infinity'),('MemorySwapMax','infinity'),('TasksMax','infinity'),
++                              ('MemoryAccounting','no'),('TasksAccounting','no'),('Type','simple'),
++                              ('KillMode','process'),('TimeoutStartUSec','infinity'),('TimeoutStopUSec','infinity'),
++                              ('LimitNOFILE','524288'),('LoadState','not-found')]:
++                with self.subTest(unit=unit,property=key):
++                    def run(argv,**kw):return self.properties(argv[-1],**({key:value} if argv[-1]==unit else {}))
++                    with mock.patch.object(d.common,'run',side_effect=run),self.assertRaisesRegex(ValueError,'resource_mismatch'):
++                        d.verify_collection_resources()
++        good=self.properties(d.SERVICE)
++        for raw in (b'',good.replace(b'TasksMax=64\n',b''),good+b'TasksMax=64\n',good+b'badline\n'):
++            with self.subTest(raw=raw),mock.patch.object(d.common,'run',return_value=raw),self.assertRaises(ValueError):
++                d.verify_collection_resources()
++
++    def test_resource_mismatch_stops_install_before_any_publisher_or_timer(self):
++        calls=[]
++        def run(argv,**kw):
++            calls.append(argv)
++            if 'show' in argv:return self.properties(argv[-1],MemoryMax='infinity')
++            return b''
++        with self.assertRaisesRegex(ValueError,'resource_mismatch'):self.install(run)
++        self.assertFalse(any('start' in x or 'enable' in x for x in calls))
++
++    def test_failed_or_timed_out_backfill_does_not_enable_timer_or_reader(self):
++        for error in (d.common.Refused('failed'),subprocess.TimeoutExpired('systemctl',165)):
++            calls=[]
++            def run(argv,**kw):
++                calls.append((argv,kw))
++                if 'show' in argv:return self.properties(argv[-1])
++                if argv==['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]:raise error
++                return b''
++            with self.subTest(error=type(error).__name__),self.assertRaises(type(error)):self.install(run)
++            self.assertFalse(any('enable' in x[0] for x in calls))
++            starts=[x for x in calls if x[0][:2]==['/usr/bin/systemctl','start']]
++            self.assertEqual([x[0][-1] for x in starts],[d.SERVICE,d.BACKFILL_SERVICE])
++            self.assertGreater(starts[-1][1]['timeout'],150+5)
++
++    def test_collect_failure_never_starts_backfill(self):
++        calls=[]
++        def run(argv,**kw):
++            calls.append(argv)
++            if 'show' in argv:return self.properties(argv[-1])
++            if argv==['/usr/bin/systemctl','start',d.SERVICE]:raise d.common.Refused('failed')
++            return b''
++        with self.assertRaises(ValueError):self.install(run)
++        self.assertNotIn(['/usr/bin/systemctl','start',d.BACKFILL_SERVICE],calls)
++        self.assertFalse(any('enable' in x for x in calls))
++
++    def test_only_complete_bounded_bootstrap_precedes_normal_timer(self):
++        calls=[]
++        def run(argv,**kw):
++            calls.append(argv)
++            return self.properties(argv[-1]) if 'show' in argv else b''
++        self.assertEqual(self.install(run),997)
++        self.assertLess(calls.index(['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]),calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
++        self.assertFalse(any(x[0]=='/usr/bin/python3' for x in calls))
++
++    def test_backfill_has_no_network_or_general_command_grant(self):
++        for role in d.ROLE_HOST:
++            docs=d.unit_documents(role)
++            for name in (d.SERVICE,d.BACKFILL_SERVICE):
++                unit=docs[name].decode()
++                for value in ('MemoryMax=256M','MemoryHigh=192M','MemorySwapMax=0','TasksMax=64','LimitNOFILE=1024','KillMode=control-group'):
++                    self.assertIn(value,unit)
++            unit=docs[d.BACKFILL_SERVICE].decode()
++            self.assertIn('RestrictAddressFamilies=AF_UNIX\n',unit)
++            self.assertIn('--backfill-history --role '+role+'\n',unit)
++            self.assertIn('TimeoutStartSec=150\n',unit)
++            for forbidden in ('AF_INET','/bin/sh','sudo ','docker ','[Install]','/var/lib/capstone-management'):
++                self.assertNotIn(forbidden,unit)
++
++    def test_missing_unit_receipt_is_not_treated_as_verified(self):
++        saved={'profile':{},'files':{str(d.CODE/n):{} for n in d.LOCAL_SOURCES}}
++        with mock.patch.object(d.common,'read',return_value=json.dumps(saved).encode()), \
++             mock.patch.object(d,'profile',return_value={}),mock.patch.object(d,'installed_record',return_value={}), \
++             mock.patch.object(d,'native_dependencies') as native,mock.patch.object(d.common,'run') as run, \
++             self.assertRaisesRegex(ValueError,'unit_receipt_missing'):
++            d.verify(settings(),'service')
++        native.assert_not_called();run.assert_not_called()
+--- a/infra/mcp/system_diagnostics.py
++++ b/infra/mcp/system_diagnostics.py
+@@ -674 +674,6 @@
+-        print(json.dumps(history_library().collect(args.role, hours=24), sort_keys=True))
++        result = history_library().collect(args.role, hours=24)
++        print(json.dumps(result, sort_keys=True))
++        # Preserve partial coverage in the cache/report, but never let an
++        # incomplete bootstrap look like a successful systemd start.
++        if result['failed_window_count'] != 0 or result['source_truncated'] is not False:
++            raise SystemExit(1)
+--- a/infra/mcp/test_system_diagnostics.py
++++ b/infra/mcp/test_system_diagnostics.py
+@@ -534,0 +535,40 @@
++class BackfillCompletion(unittest.TestCase):
++    def invoke(self, report, role='service'):
++        history=types.SimpleNamespace(collect=unittest.mock.Mock(return_value=report))
++        output=io.StringIO()
++        with patch.object(d.sys,'argv',['system_diagnostics.py','--backfill-history','--role',role]), \
++             patch.object(d,'history_library',return_value=history),patch.object(d.sys,'stdout',output):
++            try:d.main();code=0
++            except SystemExit as ex:code=ex.code
++        history.collect.assert_called_once_with(role,hours=24)
++        self.assertEqual(json.loads(output.getvalue()),report)
++        return code
++
++    def test_complete_empty_window_succeeds_for_each_fixed_role(self):
++        for role in d.PROFILES:
++            with self.subTest(role=role):
++                self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':False,'collected_rows':0},role),0)
++
++    def test_complete_nonempty_window_succeeds_without_claiming_attack(self):
++        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':False,'collected_rows':7}),0)
++
++    def test_one_failed_window_is_nonzero_and_preserves_partial_report(self):
++        self.assertEqual(self.invoke({'failed_window_count':1,'source_truncated':False,'collected_rows':3}),1)
++
++    def test_truncated_empty_result_is_not_bootstrap_success(self):
++        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':True,'collected_rows':0}),1)
++
++    def test_truncated_nonempty_result_is_not_bootstrap_success(self):
++        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':True,'collected_rows':5}),1)
++
++    def test_failed_and_truncated_result_remains_failed(self):
++        self.assertEqual(self.invoke({'failed_window_count':2,'source_truncated':True,'collected_rows':1}),1)
++
++    def test_storage_or_reader_failure_cannot_return_success(self):
++        for failure in (d.DiagnosticError('history_no_window_available'),OSError('unavailable')):
++            with self.subTest(failure=type(failure).__name__),patch.object(d.sys,'argv',['collector','--backfill-history','--role','service']), \
++                 patch.object(d,'history_library',return_value=types.SimpleNamespace(collect=unittest.mock.Mock(side_effect=failure))), \
++                 self.assertRaises(type(failure)):
++                d.main()
++
++
+--- a/infra/validation/factual-service/test_factual_service.py
++++ b/infra/validation/factual-service/test_factual_service.py
+@@ -3 +3 @@
+-from datetime import timedelta
++from datetime import datetime,timedelta
+@@ -44,0 +45,8 @@
++ def absolute_scope(self,q,at):
++  # The reference instant belongs to this fixture, never the wall-clock hour.
++  instant=datetime.fromisoformat(at)
++  class Clock(datetime):
++   @classmethod
++   def now(cls,tz=None):return instant.astimezone(tz) if tz else instant.replace(tzinfo=None)
++  with patch.object(C,'datetime',Clock):
++   return C.service_lookup_scope(C.service_history_plan(F.catalog(),q,at),q)
+@@ -67 +75,7 @@
+-   with self.subTest(period=period):self.assertTrue(scope('B Docker '+period+' 로그 보여줘'))
++   with self.subTest(period=period):self.assertTrue(self.absolute_scope('B Docker '+period+' 로그 보여줘','2026-11-16T12:00:00+09:00'))
++ def test_today_future_period_stays_outside_factual_completion(self):
++  for period in ['오늘 오전 1시 10분부터 오전 1시 20분까지','오늘 01:10~01:20 KST']:
++   with self.subTest(period=period):self.assertFalse(self.absolute_scope('B Docker '+period+' 로그 보여줘','2026-11-16T00:30:00+09:00'))
++ def test_yesterday_period_is_valid_on_both_sides_of_midnight(self):
++  for at in ['2026-11-16T23:30:00+09:00','2026-11-17T00:30:00+09:00']:
++   with self.subTest(at=at):self.assertTrue(self.absolute_scope('B Docker 어제 01:10~01:20 KST 로그 보여줘',at))

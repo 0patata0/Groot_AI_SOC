@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+[수집기 한도·초기 이력 보완](../validation/journal-composition/LIMITS.md)은 실행 코드의 유한 자원과 부트스트랩 실패 처리를 보완한 후보다. 추가 MCP 도구/인자·일반 sudo/Docker 권한은0이며 기존 등록 읽기를 승인 없이 유지한다. 소스 회귀와 격리 검증을 완료했지만 운영 소스·캐시·연동 사본의 조정 배포와 실제 MCP/양봇 새 채팅은 남아 있다.
+
 <!-- journal-composition:start -->
 [수집 오버레이 검증](../validation/journal-composition/README.md) — 기본 소스34개에 런타임3개와 시험2개를 덧붙이고 새 회귀40개를 실행해 A/B의 실제4h 잘림을 보완했습니다. Mac에서는 1410회 검사 중 기존6개를 생략했습니다. 기존 Hermes 이미지의 격리 컨테이너에서는 1493회 검사에서 생략0개를 확인했습니다. 과거4ID의 캐시 편입과 원복도 확인했습니다. 운영 미적용이며 수집기 유한 자원 설정·초기 설치/배포 조정·정확 승인·새 MCP/채팅은 남습니다. 모델/학습/권한은 바꾸지 않았습니다.
 <!-- journal-composition:end -->

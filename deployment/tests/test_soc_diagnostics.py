@@ -44,6 +44,7 @@ class Profiles(unittest.TestCase):
              mock.patch.object(d, 'group_setup', return_value=997), mock.patch.object(d.common, 'mkdir'), \
              mock.patch.object(d, 'profile', return_value={}), \
              mock.patch.object(d, 'source_bundle', return_value={name:b'# source' for name in d.SOURCES}), \
+             mock.patch.object(d, 'verify_collection_resources', side_effect=lambda:calls.append(['limits_checked'])), \
              mock.patch.object(d.common, 'write', side_effect=lambda path,*a:written.append(str(path))), \
              mock.patch.object(d.common, 'run', side_effect=lambda argv,**kw:calls.append(argv)):
             d.install_common(settings(), 'service')
@@ -52,7 +53,8 @@ class Profiles(unittest.TestCase):
         self.assertIn(str(d.CODE / 'diagnostic_journal_native.py'), written)
         self.assertIn(str(d.CODE / 'host_inventory.py'), written)
         self.assertIn(['/usr/bin/systemctl','enable','--now',d.JOURNAL_SERVICE], calls)
-        backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
+        backfill = ['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]
+        self.assertLess(calls.index(['limits_checked']), calls.index(['/usr/bin/systemctl','start',d.SERVICE]))
         self.assertLess(calls.index(backfill), calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
 
     def test_native_dependencies_require_reviewed_binding_api_and_systemd_major(self):
@@ -63,6 +65,8 @@ class Profiles(unittest.TestCase):
         with mock.patch.object(d.common, 'run', side_effect=run): d.native_dependencies()
         self.assertEqual(calls[1][:4], ['/usr/bin/python3','-I','-B','-c'])
         self.assertIn("'_previous'", calls[1][4])
+        self.assertIn('type(journal.SYSTEM_ONLY) is int and journal.SYSTEM_ONLY > 0', calls[1][4])
+        self.assertIn("'files' in inspect.signature(journal.Reader).parameters", calls[1][4])
         self.assertNotIn('pip', calls[1][4])
         for raw in (b'', b'systemd 254 (254.0)\n', b'systemd 2550\n'):
             with mock.patch.object(d.common,'run',return_value=raw), self.assertRaises(ValueError):
@@ -116,7 +120,7 @@ class Profiles(unittest.TestCase):
     def test_units_collect_only_the_fixed_role_and_write_only_snapshot_state(self):
         for role in d.ROLE_HOST:
             docs = d.unit_documents(role)
-            self.assertEqual(set(docs), {d.SERVICE, d.TIMER, d.JOURNAL_SERVICE})
+            self.assertEqual(set(docs), {d.SERVICE, d.BACKFILL_SERVICE, d.TIMER, d.JOURNAL_SERVICE})
             service, timer = docs[d.SERVICE].decode(), docs[d.TIMER].decode()
             self.assertIn('--collect --role ' + role + '\n', service)
             self.assertIn('ReadWritePaths=/var/lib/capstone-diagnostics\n', service)
@@ -153,6 +157,113 @@ class Profiles(unittest.TestCase):
              mock.patch.object(d, 'account_absent'), mock.patch.object(d.common, 'run') as run:
             self.assertEqual(d.check(settings(), 'service')['files_written'], 0)
         run.assert_not_called()
+
+
+class CollectionResources(unittest.TestCase):
+    def properties(self, unit, **changes):
+        values={'LoadState':'loaded','Type':'oneshot','MemoryAccounting':'yes','MemoryMax':'268435456',
+                'MemoryHigh':'201326592','MemorySwapMax':'0','TasksAccounting':'yes','TasksMax':'64','LimitNOFILE':'1024',
+                'KillMode':'control-group','TimeoutStartUSec':'1min 25s' if unit==d.SERVICE else '2min 30s',
+                'TimeoutStopUSec':'5s'}
+        values.update(changes)
+        return ''.join(k+'='+v+'\n' for k,v in values.items()).encode()
+
+    def install(self, run):
+        with mock.patch.object(d,'check'),mock.patch.object(Path,'exists',return_value=False), \
+             mock.patch.object(d,'group_setup',return_value=997),mock.patch.object(d.common,'mkdir'), \
+             mock.patch.object(d,'profile',return_value={}), \
+             mock.patch.object(d,'source_bundle',return_value={n:b'# source' for n in d.SOURCES}), \
+             mock.patch.object(d.common,'write'),mock.patch.object(d.common,'run',side_effect=run):
+            return d.install_common(settings(),'service')
+
+    def test_loaded_limits_are_checked_for_both_fixed_publishers(self):
+        calls=[]
+        def run(argv,**kw):
+            calls.append((argv,kw));return self.properties(argv[-1])
+        with mock.patch.object(d.common,'run',side_effect=run):d.verify_collection_resources()
+        self.assertEqual([x[0][-1] for x in calls],[d.SERVICE,d.BACKFILL_SERVICE])
+        self.assertTrue(all(x[0][:3]==['/usr/bin/systemctl','show','--no-pager'] and x[1]['timeout']==10 for x in calls))
+
+    def test_manager_override_or_missing_property_is_rejected(self):
+        for unit in (d.SERVICE,d.BACKFILL_SERVICE):
+            for key,value in [('MemoryMax','infinity'),('MemoryHigh','infinity'),('MemorySwapMax','infinity'),('TasksMax','infinity'),
+                              ('MemoryAccounting','no'),('TasksAccounting','no'),('Type','simple'),
+                              ('KillMode','process'),('TimeoutStartUSec','infinity'),('TimeoutStopUSec','infinity'),
+                              ('LimitNOFILE','524288'),('LoadState','not-found')]:
+                with self.subTest(unit=unit,property=key):
+                    def run(argv,**kw):return self.properties(argv[-1],**({key:value} if argv[-1]==unit else {}))
+                    with mock.patch.object(d.common,'run',side_effect=run),self.assertRaisesRegex(ValueError,'resource_mismatch'):
+                        d.verify_collection_resources()
+        good=self.properties(d.SERVICE)
+        for raw in (b'',good.replace(b'TasksMax=64\n',b''),good+b'TasksMax=64\n',good+b'badline\n'):
+            with self.subTest(raw=raw),mock.patch.object(d.common,'run',return_value=raw),self.assertRaises(ValueError):
+                d.verify_collection_resources()
+
+    def test_resource_mismatch_stops_install_before_any_publisher_or_timer(self):
+        calls=[]
+        def run(argv,**kw):
+            calls.append(argv)
+            if 'show' in argv:return self.properties(argv[-1],MemoryMax='infinity')
+            return b''
+        with self.assertRaisesRegex(ValueError,'resource_mismatch'):self.install(run)
+        self.assertFalse(any('start' in x or 'enable' in x for x in calls))
+
+    def test_failed_or_timed_out_backfill_does_not_enable_timer_or_reader(self):
+        for error in (d.common.Refused('failed'),subprocess.TimeoutExpired('systemctl',165)):
+            calls=[]
+            def run(argv,**kw):
+                calls.append((argv,kw))
+                if 'show' in argv:return self.properties(argv[-1])
+                if argv==['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]:raise error
+                return b''
+            with self.subTest(error=type(error).__name__),self.assertRaises(type(error)):self.install(run)
+            self.assertFalse(any('enable' in x[0] for x in calls))
+            starts=[x for x in calls if x[0][:2]==['/usr/bin/systemctl','start']]
+            self.assertEqual([x[0][-1] for x in starts],[d.SERVICE,d.BACKFILL_SERVICE])
+            self.assertGreater(starts[-1][1]['timeout'],150+5)
+
+    def test_collect_failure_never_starts_backfill(self):
+        calls=[]
+        def run(argv,**kw):
+            calls.append(argv)
+            if 'show' in argv:return self.properties(argv[-1])
+            if argv==['/usr/bin/systemctl','start',d.SERVICE]:raise d.common.Refused('failed')
+            return b''
+        with self.assertRaises(ValueError):self.install(run)
+        self.assertNotIn(['/usr/bin/systemctl','start',d.BACKFILL_SERVICE],calls)
+        self.assertFalse(any('enable' in x for x in calls))
+
+    def test_only_complete_bounded_bootstrap_precedes_normal_timer(self):
+        calls=[]
+        def run(argv,**kw):
+            calls.append(argv)
+            return self.properties(argv[-1]) if 'show' in argv else b''
+        self.assertEqual(self.install(run),997)
+        self.assertLess(calls.index(['/usr/bin/systemctl','start',d.BACKFILL_SERVICE]),calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
+        self.assertFalse(any(x[0]=='/usr/bin/python3' for x in calls))
+
+    def test_backfill_has_no_network_or_general_command_grant(self):
+        for role in d.ROLE_HOST:
+            docs=d.unit_documents(role)
+            for name in (d.SERVICE,d.BACKFILL_SERVICE):
+                unit=docs[name].decode()
+                for value in ('MemoryMax=256M','MemoryHigh=192M','MemorySwapMax=0','TasksMax=64','LimitNOFILE=1024','KillMode=control-group'):
+                    self.assertIn(value,unit)
+            unit=docs[d.BACKFILL_SERVICE].decode()
+            self.assertIn('RestrictAddressFamilies=AF_UNIX\n',unit)
+            self.assertIn('--backfill-history --role '+role+'\n',unit)
+            self.assertIn('TimeoutStartSec=150\n',unit)
+            for forbidden in ('AF_INET','/bin/sh','sudo ','docker ','[Install]','/var/lib/capstone-management'):
+                self.assertNotIn(forbidden,unit)
+
+    def test_missing_unit_receipt_is_not_treated_as_verified(self):
+        saved={'profile':{},'files':{str(d.CODE/n):{} for n in d.LOCAL_SOURCES}}
+        with mock.patch.object(d.common,'read',return_value=json.dumps(saved).encode()), \
+             mock.patch.object(d,'profile',return_value={}),mock.patch.object(d,'installed_record',return_value={}), \
+             mock.patch.object(d,'native_dependencies') as native,mock.patch.object(d.common,'run') as run, \
+             self.assertRaisesRegex(ValueError,'unit_receipt_missing'):
+            d.verify(settings(),'service')
+        native.assert_not_called();run.assert_not_called()
 
 
 class PublicTransport(unittest.TestCase):

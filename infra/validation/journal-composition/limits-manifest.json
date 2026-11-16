@@ -1,0 +1,60 @@
+{
+  "collection_manifest_sha256": "aa922a2267287a7b653130546e897f264c5240c6479f8abb5a3190ffa30c0284",
+  "base_candidate_tree_sha256": "01b8eee22dff9a5d44a0119ad85b8e3fc9665751b3f74bd60307a9e44cabf908",
+  "candidate_tree_file_count": 2271,
+  "candidate_tree_sha256": "0f625eaa82fc247b18446446d12fd170370d2586ed64f7ada172fbfa794bdd40",
+  "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+  "patch_format": "zero context; whole-tree and source-before SHA required; git apply --unidiff-zero",
+  "patch_sha256": "51807d620d136b30ce6b40b79b795d73407844ef6ded9ecd54d51ed64c783fa4",
+  "sources": {
+    "deployment/soc_diagnostics.py": {
+      "before_sha256": "9daf0b1e4d3a06c8e83753e4b5316f94ce2ed17391d241b9d519e1516fabc5c7",
+      "candidate_sha256": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9"
+    },
+    "deployment/tests/test_soc_diagnostics.py": {
+      "before_sha256": "7ddd402db647c58ebd4421cfd4af801cd74b8161b81173cf2f7daad3fcd752e3",
+      "candidate_sha256": "45c285b330d38d6247f620853bc821a236726dcf4ab25167767ff998eec6f84f"
+    },
+    "infra/mcp/system_diagnostics.py": {
+      "before_sha256": "fba641ba794d4b0efaffacb7a113c2d8ade3c393b18e86b628dd95f061543069",
+      "candidate_sha256": "b4a7e91b431d98feb5ccc20ce9af00d718d1db6b8b37e50c7407d08ff1301308"
+    },
+    "infra/mcp/test_system_diagnostics.py": {
+      "before_sha256": "77d23ab3a80a7d85b30bb68ac1859e0d78270c1df43a616c55c12467d0253c1f",
+      "candidate_sha256": "98c54fa434a49aceaea57dc42a8464e1840e2868e0ad00d491696c13ff5e8d5e"
+    },
+    "infra/validation/factual-service/test_factual_service.py": {
+      "before_sha256": "735a84770a9e1a32e043f0a892074d1f48e4c0ed769e8e49a6a63b08b9665451",
+      "candidate_sha256": "66371bb4a7b2a1320ffc184a0c70dd0124a0670f850ea264781afbcc91c6cd07"
+    }
+  },
+  "tools_sha256": {
+    "reproduce_limits.py": "64f22269263b7e0c0c1c5f017b794c07e0de378b0947a49b6ae4314cf6012798",
+    "run_limits_regressions.py": "ed18907f9bebd308723d6fe7fecb1bd956f47c056437416baf07aa125be319bc"
+  },
+  "additional_tests_by_group": {
+    "installation": 8,
+    "diagnostic-core": 7,
+    "new-factual": 2
+  },
+  "new_tests": 17,
+  "canonical_source_sha256": {
+    "deployment/soc_diagnostics.py": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9",
+    "deployment/tests/test_soc_diagnostics.py": "45c285b330d38d6247f620853bc821a236726dcf4ab25167767ff998eec6f84f",
+    "infra/mcp/system_diagnostics.py": "9460f224b496a7cff15c246c1507538ed0acb494673ed5aa193d0ce1bfe51662",
+    "infra/mcp/test_system_diagnostics.py": "98c54fa434a49aceaea57dc42a8464e1840e2868e0ad00d491696c13ff5e8d5e",
+    "infra/validation/factual-service/test_factual_service.py": "66371bb4a7b2a1320ffc184a0c70dd0124a0670f850ea264781afbcc91c6cd07"
+  },
+  "limits": {
+    "memory_max_bytes": 268435456,
+    "memory_high_bytes": 201326592,
+    "memory_swap_max_bytes": 0,
+    "tasks_max": 64,
+    "limit_nofile": 1024,
+    "collect_timeout_seconds": 85,
+    "backfill_timeout_seconds": 150,
+    "stop_timeout_seconds": 5
+  },
+  "scope": "Finite collector and fixed bootstrap history unit; reject incomplete history bootstrap; no production or model/permission change",
+  "operating_changes": 0
+}

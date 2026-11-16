@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "installer_sha256": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9",
+  "scope": "Generated initial-install payload, not operating files or approval",
+  "roles": {
+    "security": {
+      "capstone-system-diagnostics.service": {
+        "sha256": "370b97d6dea075bf8f5ceabc9c9fbf12eb871a4157a5a304a1664636f10347be",
+        "content": "[Unit]\nDescription=Bounded read-only Capstone system diagnostics\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --collect --role security\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=85\nTimeoutStopSec=5\n"
+      },
+      "capstone-diagnostic-history-backfill.service": {
+        "sha256": "7475e7fa254afe5da9760ea54b01dac1d7a0dc958a9daaf3537eb7e79dd8f718",
+        "content": "[Unit]\nDescription=Bounded initial Capstone diagnostic history backfill\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --backfill-history --role security\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=150\nTimeoutStopSec=5\n"
+      },
+      "capstone-system-diagnostics.timer": {
+        "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+        "content": "[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=capstone-system-diagnostics.service\n[Install]\nWantedBy=timers.target\n"
+      },
+      "capstone-journal-reader.service": {
+        "sha256": "bfd2aa60d85636b229f9adf4e764e7739290368e0c3a104990726607fef98a59",
+        "content": "[Unit]\nDescription=Fixed-unit masked journal excerpt reader\nAfter=systemd-journald.service\n[Service]\nType=simple\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --serve-journal --role security\nRuntimeDirectory=capstone-journal\nRuntimeDirectoryMode=0750\nUMask=0007\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateNetwork=yes\nReadWritePaths=/run/capstone-journal\nRestrictAddressFamilies=AF_UNIX\nCapabilityBoundingSet=CAP_DAC_READ_SEARCH\nProtectKernelTunables=yes\nProtectControlGroups=yes\nRestrictSUIDSGID=yes\nLockPersonality=yes\nKillMode=control-group\nMemoryMax=128M\nTasksMax=8\nLimitNOFILE=1024\nTimeoutStopSec=10\nRestart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target\n"
+      }
+    },
+    "siem": {
+      "capstone-system-diagnostics.service": {
+        "sha256": "ca37a1906ef6a2d02c105923de86d804df621455d89b6cef5a83106d7c07a9b8",
+        "content": "[Unit]\nDescription=Bounded read-only Capstone system diagnostics\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --collect --role siem\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\nReadWritePaths=-/var/lib/capstone-management\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=85\nTimeoutStopSec=5\n"
+      },
+      "capstone-diagnostic-history-backfill.service": {
+        "sha256": "c1ae062e6488021dd248b0e19ef68c53ac423b72b59bcffb1487081a46ea4321",
+        "content": "[Unit]\nDescription=Bounded initial Capstone diagnostic history backfill\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --backfill-history --role siem\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=150\nTimeoutStopSec=5\n"
+      },
+      "capstone-system-diagnostics.timer": {
+        "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+        "content": "[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=capstone-system-diagnostics.service\n[Install]\nWantedBy=timers.target\n"
+      },
+      "capstone-journal-reader.service": {
+        "sha256": "d139b899114abf7d273689bd27c7c2e29b4f748d26c3d26347c0ec1c805aebdd",
+        "content": "[Unit]\nDescription=Fixed-unit masked journal excerpt reader\nAfter=systemd-journald.service\n[Service]\nType=simple\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --serve-journal --role siem\nRuntimeDirectory=capstone-journal\nRuntimeDirectoryMode=0750\nUMask=0007\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateNetwork=yes\nReadWritePaths=/run/capstone-journal\nRestrictAddressFamilies=AF_UNIX\nCapabilityBoundingSet=CAP_DAC_READ_SEARCH\nProtectKernelTunables=yes\nProtectControlGroups=yes\nRestrictSUIDSGID=yes\nLockPersonality=yes\nKillMode=control-group\nMemoryMax=128M\nTasksMax=8\nLimitNOFILE=1024\nTimeoutStopSec=10\nRestart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target\n"
+      }
+    },
+    "service": {
+      "capstone-system-diagnostics.service": {
+        "sha256": "671645ed2cd489da113e762104cca50e4701f8ee01490b3e0aef271d62af7df6",
+        "content": "[Unit]\nDescription=Bounded read-only Capstone system diagnostics\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --collect --role service\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=85\nTimeoutStopSec=5\n"
+      },
+      "capstone-diagnostic-history-backfill.service": {
+        "sha256": "e7290ee1fa223c1ed7cc055dc268780caaef11756f51f034844eaaf1678936fe",
+        "content": "[Unit]\nDescription=Bounded initial Capstone diagnostic history backfill\nAfter=systemd-journald.service\n[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --backfill-history --role service\nUMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\nProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nMemoryAccounting=yes\nMemoryHigh=192M\nMemoryMax=256M\nMemorySwapMax=0\nTasksAccounting=yes\nTasksMax=64\nLimitNOFILE=1024\nTimeoutStartSec=150\nTimeoutStopSec=5\n"
+      },
+      "capstone-system-diagnostics.timer": {
+        "sha256": "3e7f147e583b1fc8be87e2d1570293628cfa9ab46ee44fed5866d6858dabf689",
+        "content": "[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=capstone-system-diagnostics.service\n[Install]\nWantedBy=timers.target\n"
+      },
+      "capstone-journal-reader.service": {
+        "sha256": "e2b5a46cd49330ff594bc9cfc56f138ede71f2c792779b78814059c1b1732838",
+        "content": "[Unit]\nDescription=Fixed-unit masked journal excerpt reader\nAfter=systemd-journald.service\n[Service]\nType=simple\nUser=root\nGroup=capstone-diagnostics\nExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --serve-journal --role service\nRuntimeDirectory=capstone-journal\nRuntimeDirectoryMode=0750\nUMask=0007\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateNetwork=yes\nReadWritePaths=/run/capstone-journal\nRestrictAddressFamilies=AF_UNIX\nCapabilityBoundingSet=CAP_DAC_READ_SEARCH\nProtectKernelTunables=yes\nProtectControlGroups=yes\nRestrictSUIDSGID=yes\nLockPersonality=yes\nKillMode=control-group\nMemoryMax=128M\nTasksMax=8\nLimitNOFILE=1024\nTimeoutStopSec=10\nRestart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target\n"
+      }
+    }
+  }
+}

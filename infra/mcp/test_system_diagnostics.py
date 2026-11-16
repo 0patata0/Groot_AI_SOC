@@ -532,5 +532,45 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(d.parsed(output.buffer.getvalue()), value)
 
 
+class BackfillCompletion(unittest.TestCase):
+    def invoke(self, report, role='service'):
+        history=types.SimpleNamespace(collect=unittest.mock.Mock(return_value=report))
+        output=io.StringIO()
+        with patch.object(d.sys,'argv',['system_diagnostics.py','--backfill-history','--role',role]), \
+             patch.object(d,'history_library',return_value=history),patch.object(d.sys,'stdout',output):
+            try:d.main();code=0
+            except SystemExit as ex:code=ex.code
+        history.collect.assert_called_once_with(role,hours=24)
+        self.assertEqual(json.loads(output.getvalue()),report)
+        return code
+
+    def test_complete_empty_window_succeeds_for_each_fixed_role(self):
+        for role in d.PROFILES:
+            with self.subTest(role=role):
+                self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':False,'collected_rows':0},role),0)
+
+    def test_complete_nonempty_window_succeeds_without_claiming_attack(self):
+        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':False,'collected_rows':7}),0)
+
+    def test_one_failed_window_is_nonzero_and_preserves_partial_report(self):
+        self.assertEqual(self.invoke({'failed_window_count':1,'source_truncated':False,'collected_rows':3}),1)
+
+    def test_truncated_empty_result_is_not_bootstrap_success(self):
+        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':True,'collected_rows':0}),1)
+
+    def test_truncated_nonempty_result_is_not_bootstrap_success(self):
+        self.assertEqual(self.invoke({'failed_window_count':0,'source_truncated':True,'collected_rows':5}),1)
+
+    def test_failed_and_truncated_result_remains_failed(self):
+        self.assertEqual(self.invoke({'failed_window_count':2,'source_truncated':True,'collected_rows':1}),1)
+
+    def test_storage_or_reader_failure_cannot_return_success(self):
+        for failure in (d.DiagnosticError('history_no_window_available'),OSError('unavailable')):
+            with self.subTest(failure=type(failure).__name__),patch.object(d.sys,'argv',['collector','--backfill-history','--role','service']), \
+                 patch.object(d,'history_library',return_value=types.SimpleNamespace(collect=unittest.mock.Mock(side_effect=failure))), \
+                 self.assertRaises(type(failure)):
+                d.main()
+
+
 if __name__ == '__main__':
     unittest.main()

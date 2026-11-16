@@ -1,5 +1,7 @@
 # 사건 당시 서비스 오류 조회
 
+초기24시간 이력 수집은 [고정 backfill unit 후보](../validation/journal-composition/LIMITS.md)로 연결했다. 실패 구간·잘림이 있으면 부분 자료는 보존하되 CLI를1로 종료한다. 정기 조회는 기존 캐시 읽기를 유지하며 MCP 요청이 동기24시간 수집을 시작하지 않는다. 신규 설치 소스와 운영 적용·실제 봇 인수는 구분한다.
+
 <!-- journal-release-preparation:start -->
 [수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. A/B의4시간 수집 잘림은 격리 읽기에서 보완했고 기존 앱 오류4ID의 캐시 편입/복구를 확인했습니다. 수집기 자원/초기 설치·일관 배포·정확 승인·실제 MCP/새 채팅이 남습니다. 아래 현재 설치/사용 절차와 후보 능력을 구분합니다.
 <!-- journal-release-preparation:end -->

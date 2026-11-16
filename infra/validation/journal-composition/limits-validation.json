@@ -1,0 +1,759 @@
+{
+  "schema": 1,
+  "candidate_tree_sha256": "0f625eaa82fc247b18446446d12fd170370d2586ed64f7ada172fbfa794bdd40",
+  "patch_sources": {
+    "deployment/soc_diagnostics.py": {
+      "before_sha256": "9daf0b1e4d3a06c8e83753e4b5316f94ce2ed17391d241b9d519e1516fabc5c7",
+      "candidate_sha256": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9"
+    },
+    "deployment/tests/test_soc_diagnostics.py": {
+      "before_sha256": "7ddd402db647c58ebd4421cfd4af801cd74b8161b81173cf2f7daad3fcd752e3",
+      "candidate_sha256": "45c285b330d38d6247f620853bc821a236726dcf4ab25167767ff998eec6f84f"
+    },
+    "infra/mcp/system_diagnostics.py": {
+      "before_sha256": "fba641ba794d4b0efaffacb7a113c2d8ade3c393b18e86b628dd95f061543069",
+      "candidate_sha256": "b4a7e91b431d98feb5ccc20ce9af00d718d1db6b8b37e50c7407d08ff1301308"
+    },
+    "infra/mcp/test_system_diagnostics.py": {
+      "before_sha256": "77d23ab3a80a7d85b30bb68ac1859e0d78270c1df43a616c55c12467d0253c1f",
+      "candidate_sha256": "98c54fa434a49aceaea57dc42a8464e1840e2868e0ad00d491696c13ff5e8d5e"
+    },
+    "infra/validation/factual-service/test_factual_service.py": {
+      "before_sha256": "735a84770a9e1a32e043f0a892074d1f48e4c0ed769e8e49a6a63b08b9665451",
+      "candidate_sha256": "66371bb4a7b2a1320ffc184a0c70dd0124a0670f850ea264781afbcc91c6cd07"
+    }
+  },
+  "limits": {
+    "memory_max_bytes": 268435456,
+    "memory_high_bytes": 201326592,
+    "memory_swap_max_bytes": 0,
+    "tasks_max": 64,
+    "limit_nofile": 1024,
+    "collect_timeout_seconds": 85,
+    "backfill_timeout_seconds": 150,
+    "stop_timeout_seconds": 5
+  },
+  "new_tests": 17,
+  "mac": {
+    "environment": "mac",
+    "complete": true,
+    "groups": [
+      {
+        "group": "new-targets",
+        "rc": 0,
+        "tests": 39,
+        "expected_tests": 39,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.246
+      },
+      {
+        "group": "new-intents",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.205
+      },
+      {
+        "group": "new",
+        "rc": 0,
+        "tests": 40,
+        "expected_tests": 40,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.567
+      },
+      {
+        "group": "prior-claim",
+        "rc": 0,
+        "tests": 28,
+        "expected_tests": 28,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.278
+      },
+      {
+        "group": "root",
+        "rc": 0,
+        "tests": 236,
+        "expected_tests": 236,
+        "skipped": 6,
+        "passed": true,
+        "seconds": 0.802
+      },
+      {
+        "group": "sdk",
+        "rc": 0,
+        "tests": 106,
+        "expected_tests": 106,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.619
+      },
+      {
+        "group": "native",
+        "rc": 0,
+        "tests": 181,
+        "expected_tests": 181,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 1.015
+      },
+      {
+        "group": "common-new",
+        "rc": 0,
+        "tests": 22,
+        "expected_tests": 22,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.218
+      },
+      {
+        "group": "workflow",
+        "rc": 0,
+        "tests": 12,
+        "expected_tests": 12,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.135
+      },
+      {
+        "group": "sdk-flow",
+        "rc": 0,
+        "tests": 66,
+        "expected_tests": 66,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.612
+      },
+      {
+        "group": "root-flow",
+        "rc": 0,
+        "tests": 94,
+        "expected_tests": 94,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.349
+      },
+      {
+        "group": "host-journal",
+        "rc": 0,
+        "tests": 19,
+        "expected_tests": 19,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.232
+      },
+      {
+        "group": "journal",
+        "rc": 0,
+        "tests": 85,
+        "expected_tests": 85,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.62
+      },
+      {
+        "group": "installation",
+        "rc": 0,
+        "tests": 38,
+        "expected_tests": 38,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.105
+      },
+      {
+        "group": "common-service-mac",
+        "rc": 0,
+        "tests": 64,
+        "expected_tests": 64,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.407
+      },
+      {
+        "group": "partitions",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.1
+      },
+      {
+        "group": "new-scope",
+        "rc": 0,
+        "tests": 17,
+        "expected_tests": 17,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.455
+      },
+      {
+        "group": "new-clock",
+        "rc": 0,
+        "tests": 13,
+        "expected_tests": 13,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.095
+      },
+      {
+        "group": "new-typed",
+        "rc": 0,
+        "tests": 36,
+        "expected_tests": 36,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.79
+      },
+      {
+        "group": "new-factual",
+        "rc": 0,
+        "tests": 31,
+        "expected_tests": 31,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.394
+      },
+      {
+        "group": "new-provenance",
+        "rc": 0,
+        "tests": 41,
+        "expected_tests": 41,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.696
+      },
+      {
+        "group": "new-errors",
+        "rc": 0,
+        "tests": 49,
+        "expected_tests": 49,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.693
+      },
+      {
+        "group": "new-app",
+        "rc": 0,
+        "tests": 24,
+        "expected_tests": 24,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.123
+      },
+      {
+        "group": "new-composition",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.134
+      },
+      {
+        "group": "diagnostic-core",
+        "rc": 0,
+        "tests": 50,
+        "expected_tests": 50,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.422
+      },
+      {
+        "group": "runtime-health",
+        "rc": 0,
+        "tests": 33,
+        "expected_tests": 33,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.116
+      },
+      {
+        "group": "host-inventory",
+        "rc": 0,
+        "tests": 15,
+        "expected_tests": 15,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.081
+      },
+      {
+        "group": "native-collection",
+        "rc": 0,
+        "tests": 40,
+        "expected_tests": 40,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.257
+      }
+    ],
+    "tests": 1427,
+    "skipped": 6,
+    "model_calls": 0,
+    "operating_changes": 0,
+    "scope": "Frozen source regressions, not independent SOC incidents or operating acceptance"
+  },
+  "hermes": {
+    "at_kst": "2026-11-17T00:21:29.874082+09:00",
+    "uid": 10001,
+    "euid": 10001,
+    "python_version": "3.13.5",
+    "network_interfaces": [
+      "lo"
+    ],
+    "source_files_verified": 2304,
+    "rc": 0,
+    "operating_changes": 0,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "chat_posts": 0,
+    "complete": true,
+    "tests": 1510,
+    "skipped": 0,
+    "groups": 28
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 40,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 25,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 40,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 25,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [],
+      "removed": [],
+      "modified": [
+        "scripts/install/soc_diagnostics.py",
+        "scripts/limits_test_bootstrap.py",
+        "scripts/limits_test_cli.py",
+        "scripts/limits_test_factual_time.py",
+        "scripts/mcp/system_diagnostics.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "candidate_tree_sha256": "0f625eaa82fc247b18446446d12fd170370d2586ed64f7ada172fbfa794bdd40",
+    "scope": "Exact resource overlay restoration and official structure; not operating deployment, chat or SOC accuracy",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "hosts": {
+    "a": {
+      "source_tree_at_probe": "f6d3b0e6d0c9dc7125d17e86244469035e95b652bb7cbe4f41a4f57b3b8b0a09",
+      "final_runtime_sources_match": true,
+      "final_installer_matches": true,
+      "source_sha256": {
+        "system_diagnostics.py": "b4a7e91b431d98feb5ccc20ce9af00d718d1db6b8b37e50c7407d08ff1301308",
+        "diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+        "diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+        "diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+        "runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+        "host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204"
+      },
+      "collect": {
+        "phase": "collect",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "checked_at": 1794841712,
+          "expires_at": 1794841892,
+          "host": "a",
+          "schema": 1,
+          "status": "ready",
+          "units": 8
+        },
+        "runtime_targets": 4,
+        "runtime_unavailable": [],
+        "inventory_unavailable": [],
+        "complete": true,
+        "seconds": 6.9212611059774645,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 51732480,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 43,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "backfill": {
+        "phase": "backfill",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "collected_rows": 0,
+          "failed_window_count": 0,
+          "host": "a",
+          "observed_at_kst": "2026-11-17T00:08:39+09:00",
+          "source_truncated": false
+        },
+        "complete": true,
+        "seconds": 31.34147159999702,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 27471872,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 2,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "actual_manager_resource_checker_passed": true,
+      "actual_native_dependency_checker_passed": true,
+      "management_scope": "not applicable",
+      "operating_observed_at_kst": "2026-11-17T00:38:33.105686+09:00",
+      "operating_memory_max": "infinity",
+      "operating_native_module_present": false,
+      "reader_identity_unchanged": true
+    },
+    "b": {
+      "source_tree_at_probe": "0f625eaa82fc247b18446446d12fd170370d2586ed64f7ada172fbfa794bdd40",
+      "final_runtime_sources_match": true,
+      "final_installer_matches": true,
+      "source_sha256": {
+        "system_diagnostics.py": "b4a7e91b431d98feb5ccc20ce9af00d718d1db6b8b37e50c7407d08ff1301308",
+        "diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+        "diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+        "diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+        "runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+        "host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204"
+      },
+      "collect": {
+        "phase": "collect",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "checked_at": 1794842453,
+          "expires_at": 1794842633,
+          "host": "b",
+          "schema": 1,
+          "status": "ready",
+          "units": 6
+        },
+        "runtime_targets": 10,
+        "runtime_unavailable": [],
+        "inventory_unavailable": [],
+        "complete": true,
+        "seconds": 8.02353349403711,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 59461632,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 54,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "backfill": {
+        "phase": "backfill",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "collected_rows": 7,
+          "failed_window_count": 0,
+          "host": "b",
+          "observed_at_kst": "2026-11-17T00:21:02+09:00",
+          "source_truncated": false
+        },
+        "complete": true,
+        "seconds": 28.154301121016033,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 27332608,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 2,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "actual_manager_resource_checker_passed": true,
+      "actual_native_dependency_checker_passed": true,
+      "management_scope": {
+        "kind": "read-only SQLite backup bound inside private mount namespace",
+        "copy_sha256": "e4ad0aad22d81e9e320a3632e2b4858b91de7ce6c2c7df58bed9122d36970190",
+        "operating_rows_written": 0
+      },
+      "operating_observed_at_kst": "2026-11-17T00:38:33.751804+09:00",
+      "operating_memory_max": "infinity",
+      "operating_native_module_present": false,
+      "reader_identity_unchanged": true
+    },
+    "c": {
+      "source_tree_at_probe": "f6d3b0e6d0c9dc7125d17e86244469035e95b652bb7cbe4f41a4f57b3b8b0a09",
+      "final_runtime_sources_match": true,
+      "final_installer_matches": true,
+      "source_sha256": {
+        "system_diagnostics.py": "b4a7e91b431d98feb5ccc20ce9af00d718d1db6b8b37e50c7407d08ff1301308",
+        "diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+        "diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+        "diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+        "runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+        "host_inventory.py": "d3e6276349c2c04aa5e80e04cbaca6616c6b44e67c8cd2042bf2cb5c7e6ed204"
+      },
+      "collect": {
+        "phase": "collect",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "checked_at": 1794841713,
+          "expires_at": 1794841893,
+          "host": "c",
+          "schema": 1,
+          "status": "ready",
+          "units": 11
+        },
+        "runtime_targets": 2,
+        "runtime_unavailable": [],
+        "inventory_unavailable": [],
+        "complete": true,
+        "seconds": 4.577646037971135,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 52432896,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 46,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "backfill": {
+        "phase": "backfill",
+        "inference_generation_calls": 0,
+        "operating_cache_writes": 0,
+        "report": {
+          "collected_rows": 0,
+          "failed_window_count": 0,
+          "host": "c",
+          "observed_at_kst": "2026-11-17T00:08:38+09:00",
+          "source_truncated": false
+        },
+        "complete": true,
+        "seconds": 12.466427092964295,
+        "exit_code": 0,
+        "memory_max": 268435456,
+        "memory_high": 201326592,
+        "memory_swap_max": 0,
+        "memory_peak": 26955776,
+        "tasks_max": 64,
+        "kernel_tasks_peak": 2,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_kill": "0",
+          "oom_group_kill": "0"
+        },
+        "pids_events": {
+          "max": "0"
+        }
+      },
+      "actual_manager_resource_checker_passed": true,
+      "actual_native_dependency_checker_passed": true,
+      "management_scope": "not applicable",
+      "operating_observed_at_kst": "2026-11-17T00:38:33.733948+09:00",
+      "operating_memory_max": "infinity",
+      "operating_native_module_present": false,
+      "reader_identity_unchanged": true
+    }
+  },
+  "bounded_negative_probes": {
+    "memory": {
+      "complete": true,
+      "state": {
+        "MainPID": "0",
+        "Result": "success",
+        "ControlGroup": "",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "exited"
+      },
+      "result": {
+        "kind": "memory",
+        "child_rc": -9,
+        "child_timed_out": false,
+        "memory_events": {
+          "low": "0",
+          "high": "0",
+          "max": "35",
+          "oom": "1",
+          "oom_kill": "1",
+          "oom_group_kill": "0"
+        },
+        "memory_peak": 268435456,
+        "test_memory_high": 268435456,
+        "production_memory_high": 201326592,
+        "hard_limit_test_raises_soft_high_to_hard_max": true,
+        "complete": true,
+        "seconds": 0.2144348690053448,
+        "memory_swap_max": 0
+      }
+    },
+    "tasks": {
+      "complete": true,
+      "state": {
+        "MainPID": "0",
+        "Result": "success",
+        "ControlGroup": "",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "exited"
+      },
+      "result": {
+        "kind": "tasks",
+        "created_threads": 63,
+        "denied": true,
+        "pids_events": {
+          "max": "1"
+        },
+        "kernel_tasks_peak": 64,
+        "complete": true,
+        "seconds": 0.009512207994703203,
+        "memory_swap_max": 0
+      }
+    },
+    "timeout": {
+      "complete": true,
+      "state": {
+        "MainPID": "0",
+        "Result": "timeout",
+        "ControlGroup": "",
+        "LoadState": "loaded",
+        "ActiveState": "failed",
+        "SubState": "failed"
+      },
+      "original_parent_and_child_not_running": true,
+      "test_timeout_seconds": 2
+    }
+  },
+  "negative_probe_scope": "B only. Hard-memory test raises MemoryHigh to MemoryMax; timeout test uses 2s rather than production 85/150s. Normal probes use actual candidate limits.",
+  "cleanup": [
+    {
+      "run": "host-a-r1",
+      "removed_files": 16,
+      "removed_bytes": 789828,
+      "root_absent": true
+    },
+    {
+      "run": "host-b-r1",
+      "removed_files": 16,
+      "removed_bytes": 1677627,
+      "root_absent": true
+    },
+    {
+      "run": "host-c-r1",
+      "removed_files": 16,
+      "removed_bytes": 1265119,
+      "root_absent": true
+    },
+    {
+      "run": "host-b-r2",
+      "removed_files": 23,
+      "removed_bytes": 12335795,
+      "root_absent": true
+    },
+    {
+      "run": "linux-r1",
+      "removed_files": 2370,
+      "removed_bytes": 38183150,
+      "root_absent": true
+    },
+    {
+      "run": "linux-r2",
+      "removed_files": 2354,
+      "removed_bytes": 38160004,
+      "root_absent": true
+    },
+    {
+      "run": "linux-r3",
+      "removed_files": 2370,
+      "removed_bytes": 38186428,
+      "root_absent": true
+    }
+  ],
+  "runtime_sources_unchanged_after_clock_fixture_fix": true,
+  "limitations": [
+    "One successful observation per A/C; B rerun with read-only management DB backup mounted privately",
+    "Docker daemon, in-container exec and external API backend resources are outside collector cgroup",
+    "No whole fresh-OS install, production deployment, independent SOC accuracy or new chat acceptance",
+    "Runtime all-target availability and configured quotas do not prove absence of all faults/attacks or sufficient capacity for every future load"
+  ],
+  "operating_changes": 0,
+  "inference_generation_calls": 0,
+  "read_only_api_status_reads_included": true,
+  "chat_posts": 0,
+  "new_training": 0,
+  "attack_tests": 0,
+  "mac_cleanup": {
+    "at_kst": "2026-11-17T00:50:47.625596+09:00",
+    "root_absent": true,
+    "removed_files": 22884,
+    "removed_bytes": 456397904,
+    "matching_processes": 0,
+    "skill_or_Harness2_deleted": false
+  }
+}

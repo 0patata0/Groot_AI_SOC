@@ -6,7 +6,7 @@
 
 
 
-로컬 매뉴얼형 논문은 설치 plan/check/apply/verify의 입력·위치·통과 기준과 실패 시 부분 설치 확인을 보강했다. 동일60쪽 MD/PDF/DOCX 문서 검수이며 신규 OS 전체 설치나 운영 변경은 수행하지 않았다. [현재 상태](../STATUS.md)를 따른다.
+로컬 매뉴얼형 논문은 설치 plan/check/apply/verify의 입력·위치·통과 기준과 실패 시 부분 설치 확인을 보강했다. 동일66쪽 MD/PDF/DOCX 문서 검수이며 운영 시작·정확 카드/원복·후임 인수 절차도 연결했다. 신규 OS 전체 설치나 운영 변경은 수행하지 않았다. [현재 상태](../STATUS.md)를 따른다.
 
 
 <!-- service-error-coverage:start -->

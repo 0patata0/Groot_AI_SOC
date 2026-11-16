@@ -341,6 +341,12 @@ def request_wrapper(original, query, harness):
             agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))
             agent._capstone_query_completion_local_format = (turn, prior or '같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.')
             return result
+        supplied_time = harness.supplied_time_report(request)
+        if supplied_time:
+            agent._capstone_read_selection = None
+            agent._capstone_query_completion_local_format = (turn, supplied_time)
+            agent._capstone_alignment_partial = False
+            return result
         policy_answer = harness.policy_explanation(request, getattr(agent, 'tools', []))
         if policy_answer:
             agent._capstone_read_selection = None
@@ -349,8 +355,20 @@ def request_wrapper(original, query, harness):
             return result
         plan = harness.read_plan(request)
         reference=harness.card_reference(kw.get('original_user_message',''),request)
+        notice=(harness.CONTRACT.service_scope_notice(result.api_kwargs,request)
+                if not calls and not reference and not harness.READ.wants_write(harness.normalized(request)) else None)
+        agent._capstone_scope_clarification=(turn,request,notice)
+        if notice:
+            agent._capstone_read_selection=None
+            agent._capstone_query_completion_local_format=(turn,notice)
+            agent._capstone_alignment_partial=True
+            return result
         incident_scope = harness.incident_selection_scope(request, calls,reference)
-        scope = incident_scope or harness.tool_scope(request, calls)
+        identity=harness.CONTRACT.service_identity_state(result.api_kwargs,request,
+            harness.service_report_receipts(calls) or []) if not reference else {'pending':[],'incomplete':[]}
+        agent._capstone_service_identity=(turn,request,identity)
+        scope = ({r['tool'] for r in identity['pending']} if identity['pending'] else
+                 incident_scope or harness.tool_scope(request, calls))
         agent._capstone_read_selection = None
         # Respect the native investigative read-first lease; ordinary explicit
         # read requests use the same scope as the other chat adapter.
@@ -411,6 +429,7 @@ def request_wrapper(original, query, harness):
             if targets: agent._capstone_alignment_diagnostic_targets = targets
             targets = getattr(agent, '_capstone_alignment_diagnostic_targets', targets)
             pending = harness.missing_reads(request, calls, targets)
+            pending+=identity['incomplete']
             if reference:pending+=harness.card_evidence_gaps(reference,calls)
             data.setdefault('messages', []).append({'role': 'user', 'content': (harness.READ.guidance(plan, calls) if plan else harness.guidance(request,include_workflows=False))
                 + '\n아직 미확인: ' + ', '.join(pending)})
@@ -421,7 +440,7 @@ def request_wrapper(original, query, harness):
                     props['target'] = {**props['target'], 'enum': ['a:suricata']}
                 if agent_ids and 'agent_id' in props:
                     props['agent_id'] = {**props['agent_id'], 'enum': agent_ids}
-            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets, harness.card_reference(kw.get('original_user_message',''),request))
+            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets, harness.card_reference(kw.get('original_user_message',''),request),identity_options=identity['pending'])
             agent._capstone_read_terminal = (turn, bool(pending and not schemas))
             if pending and schemas:
                 used = getattr(agent, '_capstone_read_selection_count', (None, 0))
@@ -440,9 +459,10 @@ def request_wrapper(original, query, harness):
                         + json.dumps(schema, ensure_ascii=False)})
                     agent._capstone_read_selection = (turn, schema, used)
             else:
-                rendered = harness.lookup_report(request, calls, targets)
+                rendered = harness.lookup_report(request, calls, targets,identity=(getattr(agent,'_capstone_service_identity',(None,None,None))[2] if getattr(agent,'_capstone_service_identity',(None,None,None))[:2]==(getattr(agent,'_current_turn_id',None),request) else None))
                 if rendered:
                     agent._capstone_query_completion_local_format = (turn, rendered)
+                    agent._capstone_alignment_partial=bool(identity.get('missing_units'))
         if scope == {"mcp__rule_a__get_service_action_target"}:
             for tool in data.get("tools", []):
                 target = tool.get("function", {}).get("parameters", {}).get("properties", {}).get("target")
@@ -599,6 +619,9 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         request=harness.resolve_card_request(user,request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
         notice = harness.scope_notice(request)
+        clarification=getattr(agent,'_capstone_scope_clarification',None)
+        if (not notice and clarification and clarification[:2]==(getattr(agent,'_current_turn_id',None),request)):
+            notice=clarification[2]
         if notice and not calls:
             agent._capstone_alignment_partial = True
             return original(agent, **query._with_final_text(kw, notice))
@@ -704,14 +727,18 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                          "_pending_verification_response", "_pending_verification_response_previewed")
                 return native.FinalResponseVerdict(action="continue", final_response=None,
                     codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
-            rendered = harness.lookup_report(request, calls, targets)
+            rendered = harness.lookup_report(request, calls, targets,identity=(getattr(agent,'_capstone_service_identity',(None,None,None))[2] if getattr(agent,'_capstone_service_identity',(None,None,None))[:2]==(getattr(agent,'_current_turn_id',None),request) else None))
             if rendered:
                 text = rendered
             elif harness.violations(request, text, calls):
                 text = harness.fallback(request, calls)
             if missing:
                 text += "\n미확인 대상: " + ", ".join(missing)
-            agent._capstone_alignment_partial = bool(missing)
+            identity=getattr(agent,'_capstone_service_identity',(None,None,None))
+            identity_unresolved=(isinstance(identity,tuple) and len(identity)==3
+                and identity[:2]==(getattr(agent,'_current_turn_id',None),request)
+                and isinstance(identity[2],dict) and bool(identity[2].get('missing_units')))
+            agent._capstone_alignment_partial = bool(missing) or identity_unresolved
         else:
             if action_issues:
                 return original(agent, **query._with_final_text(kw, text))

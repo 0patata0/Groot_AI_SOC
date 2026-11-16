@@ -526,7 +526,8 @@ def validate_peer_claims(value, source, observed):
             raise PeerClaimRefused('peer_claim_kind', n, claim)
         kind, text = claim['kind'], claim.get('text')
         quote, field = claim.get('other_quote'), claim.get('missing_field', '')
-        if not isinstance(text, str) or not 1 <= len(text) <= 400 or '\n' in text:
+        if (not isinstance(text, str) or not 1 <= len(text) <= 400
+                or not text.strip() or '\n' in text or '\r' in text):
             raise PeerClaimRefused('peer_claim_text', n, claim)
         if kind in ('agree', 'disagree') or quote:
             if not isinstance(quote, str) or not quote.strip() or quote not in source['other_agent_answer']:
@@ -690,7 +691,7 @@ async def review_answer(config, request, report):
     schema = {'type':'object','properties':{'claims':{'type':'array','minItems':1,'maxItems':5,
         'items':{'type':'object','properties':{
             'kind':{'type':'string','enum':['agree','disagree','omission','unverified']},
-            'text':{'type':'string','maxLength':400},
+            'text':{'type':'string','minLength':1,'maxLength':400},
             'source_ref':{'type':'string','enum':['']+[x['id'] for x in catalog['answers']]},
             'evidence_ref':{'type':'string','enum':[x['id'] for x in catalog['evidence']]},
             'missing_field':{'type':'string'}},
@@ -859,6 +860,11 @@ def main():
             store.db.commit()
             case = dict(store.db.execute('SELECT * FROM cases WHERE id=?', (cid,)).fetchone())
             case['chat_task'] = request['phase']
+            # Reuse the common intent resolver. The root controller persists
+            # this completion requirement across sessions; it grants no tool.
+            case['incident_disposition_required'] = bool(request['phase'] == 'lead'
+                and not lookup_scope
+                and harness.EVIDENCE.incident_investigation_request(current))
             case['review_response_write'] = request['phase'] == 'lead' and not readonly
             # A factual retry must retain the peer's comparison task and the
             # explicitly untrusted original answer, not become an inventory.

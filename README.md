@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-**현재:** [전환 상태 대조·재개 판정](infra/validation/journal-composition/WITNESS.md)을 구현해 신규66+기존40반례, Mac106/102통과·Linux 전용4생략, Linux106통과/생략0·공식48구성/추가8을 확인했습니다. 운영 소스·유닛·reader는 유지했으며 실제 정지·독립 원복·확정 실행기 연결이 다음 작업입니다. 직전 수집기 한도·초기 설치 후보와 매뉴얼66쪽 MD/PDF/DOCX도 보존합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
+**현재:** [정본·초기 설치 소스 동기화](infra/validation/journal-composition/CANONICAL.md)로 검증 후보와 다른32파일을 맞췄습니다. 선택36파일 SHA 일치·현재 정본1,427검사/기존6생략·공식40구성/22변경면을 확인했습니다. 운영은 미적용이며 실제 정지·부팅 차단·독립 원복/확정 실행기는 계속 작성 중입니다. 논문66쪽 MD/PDF/DOCX와 기존 작업을 보존합니다. [STATUS](STATUS.md)를 기준으로 봅니다.
 <!-- current-work-summary:end -->
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

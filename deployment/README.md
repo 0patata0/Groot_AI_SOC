@@ -3,7 +3,7 @@
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 
 <!-- journal-composition:start -->
-[전환 상태 대조·재개 판정](../infra/validation/journal-composition/WITNESS.md) — 고정46경로·캐시 정책·배포 단계를 읽고 세 서버의 새 근거가 일치할 때만 재개를 허용하도록 판정합니다. 신규66+기존40반례·Mac106/102통과·Linux 전용4생략·Linux106/생략0·공식48구성/추가8을 확인했습니다. 운영에는 미설치이며 서비스 정지·독립 원복·정확 승인·실제 MCP/새 채팅은 남습니다. 직전 수집기 한도·초기 설치 후보는 보존했습니다.
+[정본 동기화](../infra/validation/journal-composition/CANONICAL.md) — 검증 후보와 다른32파일을 맞추고 선택36파일 SHA·현재 정본1,427검사/기존6생략·공식40구성/22변경면/상시 증가0을 확인했습니다. 이전 Linux1,510은 동일 동결 바이트의 근거입니다. 운영에는 미적용이며 일관 정지·부팅 차단·독립 원복·정확 승인·실제 MCP/새 채팅은 남습니다.
 <!-- journal-composition:end -->
 
 

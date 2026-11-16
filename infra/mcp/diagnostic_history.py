@@ -3,6 +3,7 @@
 Loaded by system_diagnostics.history_library(), which binds the verified core.
 Original journal messages/cursors never enter this cache or an MCP response.
 """
+from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from contextlib import contextmanager
 import grp
@@ -22,6 +23,22 @@ MAX_EVENTS = 100000
 RETENTION_DAYS = 30
 KST = timezone(timedelta(hours=9))
 FIELDS = '__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE'
+QueryClock = namedtuple('QueryClock', ('seconds', 'microseconds'))
+
+
+def query_clock(now=None):
+    """Freeze exact wall time; existing explicit test clocks remain seconds.
+
+    This private object never comes from MCP arguments or a reader job. Keep
+    whole-second ages/counting separate from the microsecond query boundary.
+    """
+    if type(now) is QueryClock:
+        core.need(type(now.seconds) is int and type(now.microseconds) is int
+                  and now.seconds == now.microseconds // 1000000, 'history_clock_invalid')
+        return now
+    core.need(now is None or type(now) is int, 'history_clock_invalid')
+    micros = time.time_ns() // 1000 if now is None else now * 1000000
+    return QueryClock(micros // 1000000, micros)
 
 
 def instant(value):
@@ -39,15 +56,22 @@ def shown(micros):
     return (datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(microseconds=micros)).astimezone(KST).isoformat()
 
 
-def request(value, now=None):
-    now = int(time.time()) if now is None else now
+def request(value, now=None, *, host_journal=False):
+    clock = query_clock(now)
     core.need(isinstance(value, dict) and {'target', 'since_kst', 'until_kst'} <= set(value)
               <= {'target', 'since_kst', 'until_kst', 'limit'}, 'history_arguments_invalid')
     target = value['target']
-    core.need(isinstance(target, str) and isinstance(core.TARGETS.get(target), str), 'history_unit_target_required')
+    # Only the trusted journal adapter enables a fixed system-journal target.
+    # This private keyword is never read from JSON. Archived metadata remains
+    # restricted to registered units; runtime/coverage targets are not history.
+    aggregate = (host_journal and isinstance(target, str) and target in {h + ':systemd' for h in core.ROLE_HOST.values()}
+                 and target in core.TARGETS and core.TARGETS[target] is None)
+    core.need(isinstance(target, str) and (isinstance(core.TARGETS.get(target), str) or aggregate),
+              'history_unit_target_required')
     since, until = instant(value['since_kst']), instant(value['until_kst'])
     core.need(0 < until - since <= 86400 * 1000000, 'history_window_must_be_at_most_24_hours')
-    core.need((now - RETENTION_DAYS * 86400) * 1000000 <= since and until <= now * 1000000,
+    core.need(clock.microseconds - RETENTION_DAYS * 86400 * 1000000 <= since
+              and until <= clock.microseconds,
               'history_window_outside_retention_or_future')
     limit = value.get('limit', 20)
     core.need(type(limit) is int and 1 <= limit <= 50, 'limit must be an integer from 1 to 50')
@@ -71,7 +95,7 @@ def normalize(raw, units, since, until):
                   and isinstance(priority, str) and priority in tuple('0123456'), 'history_journal_fields')
         at = int(stamp)
         core.need(since <= at <= until, 'history_journal_time')
-        classified = core.classify_message(value.get('MESSAGE'),next(iter(matches)))
+        classified = core.classify_message(value.get('MESSAGE'),next(iter(matches)),priority=int(priority))
         if int(priority) > 3 and classified['kind'] == 'journal_error':
             continue  # Same fixed error-classifier scope as current diagnostics.
         record = {'at': at // 1000000, 'priority': int(priority), **classified}
@@ -146,17 +170,10 @@ def collect(role, now=None, *, hours=4):
     # installation work, never performed synchronously by an MCP reader.
     for since in range(now - hours * 3600, now, 4 * 3600):
         until = min(now, since + 4 * 3600)
-        prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json', '--output-fields=' + FIELDS,
-                  '--since=@' + str(since), '--until=@' + str(until), '--lines=' + str(core.MAX_JOURNAL_ROWS),
-                  *('--unit=' + unit for unit in profile.values())]
         events, clipped = [], False
         try:
-            for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + core.ERROR_PATTERN]):
-                code, raw = core.bounded_command(prefix + filters, core.MAX_JOURNAL_QUERY, 8)
-                core.need(code == 0, 'history_journal_unavailable')
-                rows, limited = normalize(raw, set(profile.values()), since * 1000000, until * 1000000)
-                events.extend(rows)
-                clipped |= limited
+            result = core.collect_journal_metadata(role, since * 1000000, until * 1000000, now)
+            events, clipped = result['events'], result['truncated']
         except (core.DiagnosticError, OSError):
             failed += 1
             continue  # No coverage or zero-result publication for a failed scan.
@@ -177,6 +194,10 @@ def publish(host, since, until, events, truncated):
         db.execute('BEGIN IMMEDIATE')
         previous = dict(db.execute('SELECT key,value FROM metadata'))
         core.need(not previous or previous.get('host') == host and previous.get('schema') == '1', 'history_host_mismatch')
+        if previous.get('source_filter_policy') != core.ERROR_POLICY_REVISION:
+            # Preserve observations, invalidate coverage earned by another policy.
+            # The surrounding transaction rolls this back on a failed batch.
+            db.execute('DELETE FROM windows')
         for row in events:
             core.need(set(row) == {'record_sha256', 'at_us', 'unit', 'error'}
                       and re.fullmatch('[0-9a-f]{64}', row['record_sha256'])
@@ -201,20 +222,24 @@ def publish(host, since, until, events, truncated):
         db.execute('UPDATE OR IGNORE windows SET since_us=? WHERE since_us<?', (cutoff, cutoff))
         if until >= cutoff:
             db.execute('INSERT OR REPLACE INTO windows VALUES(?,?,?)', (max(since, cutoff), until, int(truncated)))
-        for key, value in {'schema':'1', 'host':host, 'observed_at_us':str(latest), 'retained_since_us':str(cutoff)}.items():
+        for key, value in {'schema':'1', 'host':host, 'observed_at_us':str(latest), 'retained_since_us':str(cutoff),
+                           'source_filter_policy':core.ERROR_POLICY_REVISION}.items():
             db.execute('INSERT OR REPLACE INTO metadata VALUES(?,?)', (key, value))
 
 
 def answer(value, host, now=None):
-    now = int(time.time()) if now is None else now
-    target, since, until, limit = request(value, now)
+    clock = query_clock(now); now = clock.seconds
+    target, since, until, limit = request(value, clock)
     core.need(target.startswith(host + ':'), 'history_host_mismatch')
     with connection() as db:
         db.execute('BEGIN')  # One consistent read snapshot while the collector publishes.
         metadata = dict(db.execute('SELECT key,value FROM metadata'))
         core.need(metadata.get('schema') == '1' and metadata.get('host') == host, 'history_host_mismatch')
         observed, retained = int(metadata['observed_at_us']), int(metadata['retained_since_us'])
-        core.need(observed <= (now + 5) * 1000000, 'history_future_publication')
+        policy = metadata.get('source_filter_policy', 'legacy-unversioned')
+        core.need(isinstance(policy, str) and re.fullmatch('[a-z][a-z0-9-]{0,63}', policy),
+                  'history_filter_policy_invalid')
+        core.need(observed <= clock.microseconds + 5000000, 'history_future_publication')
         rows = db.execute('SELECT id,at_us,error FROM events WHERE unit=? AND at_us>=? AND at_us<=? ORDER BY at_us DESC,id DESC LIMIT ?',
                           (core.TARGETS[target], since, until, limit + 1)).fetchall()
         count = db.execute('SELECT count(*) FROM events WHERE unit=? AND at_us>=? AND at_us<=?',
@@ -225,7 +250,7 @@ def answer(value, host, now=None):
     for start, stop, clipped in windows:
         if not clipped and max(start, retained) <= scanned_until:
             scanned_until = max(scanned_until, stop)
-    covered = since >= retained and scanned_until >= until
+    covered = policy == core.ERROR_POLICY_REVISION and since >= retained and scanned_until >= until
     errors = []
     for digest, at, raw in rows[:limit]:
         item = core.parsed(raw)
@@ -239,15 +264,16 @@ def answer(value, host, now=None):
         'requested_window_total_count':None, 'has_more':len(rows)>limit,
         'history_coverage':{'status':'scanned_sample' if covered else 'partial_or_unavailable',
             'retained_since_kst':shown(retained), 'source_filters':'priority0..3_or_fixed_error_classifier4..6',
-            'scanned_window_count':len(windows), 'untruncated_requested_window_scanned':covered},
+            'scanned_window_count':len(windows), 'untruncated_requested_window_scanned':covered,
+            'source_filter_policy':policy},
         'evidence_scope_ko':'정확 요청 구간으로 먼저 검색한 보관 오류 메타데이터입니다. 현재 서비스 상태·사건 당시 전체 journal·침해 부재의 증거가 아닙니다. '
             'indexed_error_count는 이 정제 색인의 일치 건수이며 전체 journal 오류 건수가 아닙니다. 표본0이나 구간 스캔 성공을 정상으로 판정하지 마세요.',
         'raw_messages_returned':False, 'mutation_performed':False, 'untrusted_evidence':True}
 
 
 def validate_answer(result, value, host, now=None):
-    now = int(time.time()) if now is None else now
-    target, since, until, limit = request(value, now)
+    clock = query_clock(now); now = clock.seconds
+    target, since, until, limit = request(value, clock)
     fields = {'schema','kind','target','host','unit','observed_at_kst','requested_since_kst','requested_until_kst',
         'age_seconds','publisher_stale','recent_errors','returned_error_count','indexed_error_count',
         'requested_window_total_count','has_more','history_coverage','evidence_scope_ko',
@@ -256,7 +282,7 @@ def validate_answer(result, value, host, now=None):
               and result['kind'] == 'journal_history' and result['target'] == target and result['host'] == host
               and result['unit'] == core.TARGETS[target] and target.startswith(host + ':'), 'history_response_identity')
     core.need(instant(result['requested_since_kst']) == since and instant(result['requested_until_kst']) == until
-              and instant(result['observed_at_kst']) <= (now + 5) * 1000000, 'history_response_time')
+              and instant(result['observed_at_kst']) <= clock.microseconds + 5000000, 'history_response_time')
     errors, count, total = result['recent_errors'], result['returned_error_count'], result['indexed_error_count']
     core.need(isinstance(errors, list) and type(count) is int and len(errors) == count and 0 <= count <= limit
               and type(total) is int and count <= total <= MAX_EVENTS and result['requested_window_total_count'] is None
@@ -268,10 +294,14 @@ def validate_answer(result, value, host, now=None):
               and len(result['evidence_scope_ko']) <= 1024, 'history_response_scope')
     coverage = result['history_coverage']
     core.need(isinstance(coverage, dict) and set(coverage) == {'status','retained_since_kst','source_filters',
-              'scanned_window_count','untruncated_requested_window_scanned'}
+              'scanned_window_count','untruncated_requested_window_scanned','source_filter_policy'}
               and type(coverage['untruncated_requested_window_scanned']) is bool
               and coverage['status'] == ('scanned_sample' if coverage['untruncated_requested_window_scanned'] else 'partial_or_unavailable')
               and coverage['source_filters'] == 'priority0..3_or_fixed_error_classifier4..6'
+              and isinstance(coverage['source_filter_policy'], str)
+              and re.fullmatch('[a-z][a-z0-9-]{0,63}', coverage['source_filter_policy'])
+              and (coverage['source_filter_policy'] == core.ERROR_POLICY_REVISION
+                   or not coverage['untruncated_requested_window_scanned'])
               and type(coverage['scanned_window_count']) is int and 0 <= coverage['scanned_window_count'] <= 100000,
               'history_response_coverage')
     instant(coverage['retained_since_kst'])

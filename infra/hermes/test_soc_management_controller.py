@@ -173,6 +173,7 @@ class ControllerTests(unittest.TestCase):
                  'sensor_references_complete':True,
                  'proposals':[{'id':'a'*32,'target':'a:incident-ip'}]}
         store=mock.Mock();store.context.return_value=context
+        store.requires_incident_disposition.return_value=True
         case={'id':'case','mode':'verify','session_id':None}
         prepared=m.verification_case(store,case,at)
         self.assertTrue(prepared['web_impact_review'])
@@ -714,7 +715,9 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(trace.finish(0)['state'],'needs_review')
         row=self.store.db.execute('select detail,final_text from cases where id=?',(trace.case['id'],)).fetchone()
         self.assertEqual(row[0],'incident_disposition_missing')
-        self.assertEqual(row[1],text)  # preserve the failed model claim
+        self.assertNotEqual(row[1],text)  # Only the private native trace keeps the rejected closing claim.
+        self.assertNotIn('MANAGEMENT_STATUS: resolved',row[1])
+        self.assertEqual(trace.result['text'],text)
         self.assertEqual(self.store.db.execute('select count(*) from proposals').fetchone()[0],0)
 
     def test_sensor_disposition_requires_real_successful_reads_and_unambiguous_fields(self):

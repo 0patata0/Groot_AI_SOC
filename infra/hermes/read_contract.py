@@ -36,10 +36,84 @@ FEATURES = ((r'프로세스|process', 'get_wazuh_agent_processes'),
             (r'로그\s*수집기?[^.!?\n]{0,35}통계|log.?collector', 'get_wazuh_log_collector_stats'))
 
 
+def host_mentions(text):
+    """Explicit project host qualifiers with offsets, never live identities.
+
+    Formal names are case insensitive. A standalone uppercase A/B/C is a
+    short host label; a lowercase English article, unit, path or address is not.
+    Callers remove quoted instructions and excluded subjects before planning.
+    """
+    names = {'groot-sec': 'a', 'groot-siem-host': 'b', 'groot-web': 'c'}
+    found = [(m.start(), m.end(), names[name])
+             for pattern, name in ASSET_PATTERNS if name in names
+             for m in re.finditer(r'(?<![A-Za-z0-9_.:/@-])(?:' + pattern + r')(?![A-Za-z0-9_.:/@-])', text, re.I)]
+    for match in re.finditer(r'(?<![A-Za-z0-9_.:/@-])([ABC])(?=$|[\s,;/·]|(?:의|은|는|도|만)(?![A-Za-z]))', text):
+        if not any(a <= match.start() and match.end() <= b for a, b, _ in found):
+            found.append((match.start(), match.end(), match[1].lower()))
+    return sorted(set(found))
+
+
+def without_hosts(text):
+    for start, end, _ in reversed(host_mentions(text)):
+        text = text[:start] + ' ' * (end - start) + text[end:]
+    return text
+
+
+def time_calculation_required(text, aware_time):
+    """Time arithmetic/conversion intent, distinct from already-KST display."""
+    if not isinstance(text, str) or not 0 < len(text) <= 20000:
+        return False
+    text = without_prohibitions(text)
+    if wants_write(text) or re.search(r'도구\s*(?:없이|쓰지|사용하지)|도구.{0,8}말', text):
+        return False
+    stamps = aware_time.findall(text)
+    if not stamps:
+        return False
+    intent = re.sub(r'(?:계산|재?변환)(?:은|는)?\s*(?:하지\s*(?:말고|마|마세요)|없이)', '', text)
+    if re.search(r'시간\s*차|시각\s*차|차이|간격|경과|지났|남았|순서|정렬|계산|시간\s*순|elapsed|duration|chronological|timeline', intent, re.I):
+        return True
+    # The supplied offset is authoritative. No inferred "now" is needed just
+    # to display +09:00/+0900/KST, including an explicit no-op KST conversion.
+    is_kst = lambda value: bool(re.search(r'(?:\+09:?00| KST)$', value, re.I))
+    to_utc = bool(re.search(r'UTC(?:으)?로\s*(?:변환|바꿔|바꾸)', intent, re.I))
+    return (to_utc and any(is_kst(s) for s in stamps) or
+            any(not is_kst(s) for s in stamps) and
+            bool(re.search(r'시간|시각|KST|한국\s*시간|변환', intent, re.I)))
+
+
+def supplied_kst_display(text, aware_time):
+    """Pure formatting of supplied KST values; never a current observation.
+
+    Decline mixed operational requests, arithmetic, unknown restrictions and
+    requested JSON. Preserve every original value and its fractional seconds.
+    """
+    if not isinstance(text, str) or len(text) > 20000 or time_calculation_required(text, aware_time):
+        return None
+    stamps = aware_time.findall(text)
+    if not 1 <= len(stamps) <= 32 or any(not re.search(r'(?:\+09:?00| KST)$', s, re.I) for s in stamps):
+        return None
+    try:
+        if any(datetime.fromisoformat(s.replace(' KST', '+09:00')).utcoffset() != timedelta(hours=9) for s in stamps):
+            return None
+    except ValueError:
+        return None
+    rest = aware_time.sub('', text)
+    rest = re.sub(r'(?:계산|재?변환)(?:은|는)?\s*하지\s*(?:말고|마세요|마)', '', rest)
+    rest = re.sub(r'KST|한국\s*시간|시각|시간|날짜|시작|종료|제공한|이(?:미|\s*시각)?|해당|원본|아래|그대로|그냥|다시|표(?:로)?|목록|정리(?:해줘|해주세요)?|표시(?:해줘|해주세요)?|보여(?:줘|주세요)|출력(?:해줘|해주세요)?|변환(?:해줘|해주세요)?|바꿔(?:줘|주세요)?|는|은|를|을|이|가|로|의|와|과', '', rest, flags=re.I)
+    if re.sub(r'[\s:;,.!?？·/`"\'()\[\]-]+', '', rest):
+        return None
+    return '\n'.join(['**제공된 시각 (KST)**', '',
+        *table(['항목', 'KST 원시각'], [(i + 1, stamp) for i, stamp in enumerate(stamps)]), '',
+        '사용자가 제공한 시각을 그대로 표시했습니다. 실시간 서버 조회·시각 계산은 수행하지 않았습니다.'])
+
+
 def asset_mentions(text):
-    mentions = sorted((m.start(), m.end(), name, None)
-                      for pattern, name in ASSET_PATTERNS
-                      for m in re.finditer(pattern, text, re.I))
+    names = {'a': 'groot-sec', 'b': 'groot-siem-host', 'c': 'groot-web'}
+    mentions = [(start, end, names[host], None) for start, end, host in host_mentions(text)]
+    mentions += [(m.start(), m.end(), name, None)
+                 for pattern, name in ASSET_PATTERNS if name == 'wazuh.manager'
+                 for m in re.finditer(pattern, text, re.I)]
+    mentions.sort()
     result = []
     for i, mention in enumerate(mentions):
         # "B 서버의 Wazuh Manager" names a container's location, whereas
@@ -72,7 +146,12 @@ def exclusion_spans(text):
 
 def scope_text(text):
     if wants_write(text): return text
-    for start, end in reversed(exclusion_spans(text)):
+    spans = exclusion_spans(text)
+    for start, end, _ in host_mentions(text):
+        excluded = re.match(r'\s*(?:은|는|을|를)?\s*(?:말고|빼(?:고|줘|주세요)|제외(?:해|하고|하세요))', text[end:])
+        if excluded:
+            spans.append((start, end + excluded.end()))
+    for start, end in sorted(set(spans), reverse=True):
         text = text[:start] + ' ' * (end - start) + text[end:]
     return text
 
@@ -156,7 +235,7 @@ def _single_plan(question, aware_time):
     if block:
         return block
     stamps = aware_time.findall(text)
-    if stamps and re.search(r'시간|시각|계산|KST|UTC|timeline', text, re.I):
+    if time_calculation_required(text, aware_time):
         return {'kind': 'time', 'stamps': stamps, 'question': question}
     ids = re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', text)
     if ids and re.search(r'요청|작업|operation', text, re.I) and re.search(r'재시작|재로드|reload|restart|임시\s*차단|containment', text, re.I):

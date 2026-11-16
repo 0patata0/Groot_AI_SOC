@@ -764,7 +764,7 @@ class Tests(unittest.TestCase):
             return {'completed':False,'state':'needs_review','text':'미완료','run_id':'d'*32}
         controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
             run_hermes=run,prompt_for=lambda *a:'prompt')
-        harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},guidance=lambda _:'read only',read_plan=lambda _:None)
+        harness=SimpleNamespace(EVIDENCE=SimpleNamespace(incident_investigation_request=lambda _:False),scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},guidance=lambda _:'read only',read_plan=lambda _:None)
         request={'id':'a'*32,'phase':'lead','question':'FW 룰'}
         with mock.patch.dict(sys.modules,{'harness':harness,'soc_management_controller':controller}), \
              mock.patch.object(sys,'argv',['worker','hermes']), \
@@ -797,7 +797,7 @@ class Tests(unittest.TestCase):
             result={'completed':True,'state':model_state,'text':'model text','run_id':'d'*32}
             controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
                 run_hermes=lambda *a:result,prompt_for=lambda *a:'prompt')
-            harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},
+            harness=SimpleNamespace(EVIDENCE=SimpleNamespace(incident_investigation_request=lambda _:False),scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},
                 guidance=lambda _:'read only',read_plan=lambda _:None,lookup_report=lambda *a,**kw:'verified or incomplete facts',
                 missing_reads=lambda *a:[] if verified else ['FW incomplete'])
             request={'id':'a'*32,'phase':'lead','question':'FW 룰'};output=io.StringIO()

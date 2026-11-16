@@ -203,12 +203,16 @@ def tools():
             'For a past incident, supply BOTH since_kst and until_kst (+09:00) to read archived sanitized journal error metadata for a registered systemd unit; '
             'the interval is at most24 hours within30 days. Do not supply lookback_minutes with explicit bounds. Runtime/coverage targets do not support history. '
             'History returns no current service state, raw journal or security clearance; inspect history_coverage and publisher_stale. '
-            'For actual journal message excerpts use view="journal" with BOTH since_kst/until_kst and a registered unit target. '
+            'For actual journal message excerpts use view="journal" with BOTH since_kst/until_kst and a registered unit target, '
+            'or a:systemd/b:systemd/c:systemd for that fixed host system journal (not per-user journals or an archived metadata index). '
             'message_excerpt contains the returned text: message_state="unchanged" means the original message bytes are preserved; "redacted" means secrets were masked. '
             'raw_messages_returned=false means no unrestricted raw dump; it does not mean excerpts are absent. redacted_excerpts_returned=true does not mean every row was changed. '
             'A null message_excerpt with message_size_bound/non_text_message/invalid_text_message means only that row body was withheld. '
             'journal_scope="errors" (default) selects fixed error candidates including info-priority known errors; "all" includes all priorities. '
             'Check message_state, has_more, source message SHA, limits and retention uncertainty. No shell, file path, arbitrary filter or service mutation is allowed. '
+            'application_error records a parsed top-level application severity (logfmt/JSON), independent of journal priority. '
+            'Declared severity is not proof of attack, data loss, root cause, current impact or recovery. '
+            'History coverage is bound to source_filter_policy; legacy or different-policy windows are partial until rescanned. '
             'known_error_code controller_already_running is the controller reporting a failed exclusive-lock acquisition. '
             'It does not prove the lock owner is healthy or progressing. Ordinary status=deferred timer runs are not failure records. '
             'limit is an integer 1..50 (default 20), not a duration. Without explicit bounds, lookback_minutes is 1..240. '
@@ -217,6 +221,9 @@ def tools():
         'inputSchema': {'type': 'object', 'additionalProperties': False, 'required': ['target'],
             'properties': {'target': {'type': 'string', 'enum': sorted(library().TARGETS),
                 'x-capstone-service-labels': service_labels(),
+                'x-capstone-host-journal-targets': {
+                    host + ':systemd': {'host':host, 'scope':'host_system', 'labels':['systemd', '시스템 journal', '시스템 로그']}
+                    for host in sorted(library().ROLE_HOST.values())},
                 'x-capstone-current-companions': {
                     'b:management':['b:management-pipeline'],
                     'a:vector':['a:collection'], 'b:vector':['b:collection']},
@@ -225,6 +232,7 @@ def tools():
                     '. Current runtime: b:management-pipeline=SOC report delivery/case processing/review queue; '
                     'use alongside b:management when checking current controller impact. '
                     'b:wazuh-manager is the Wazuh manager, not capstone-management.service. '
+                    'a:systemd/b:systemd/c:systemd additionally support a bounded host system journal only with view=journal. '
                     'Other enum values are current runtime snapshots only; never substitute a different unit.'},
                 'lookback_minutes': {'type': 'integer', 'minimum': 1, 'maximum': 240, 'default': 15},
                 'since_kst': {'type':'string', 'maxLength':40, 'description':'Historical interval start with seconds and +09:00; requires until_kst, excludes lookback_minutes.'},
@@ -238,7 +246,11 @@ def tools():
                 {'if':{'required':['view']}, 'then':{'required':['since_kst','until_kst']}},
                 {'if':{'required':['journal_scope']}, 'then':{'required':['view']}},
                 {'if':{'required':['since_kst']}, 'then':{'properties':{'target':{'enum':sorted(
-                    k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
+                    k for k,v in library().TARGETS.items() if isinstance(v,str) or k in {
+                        host + ':systemd' for host in library().ROLE_HOST.values()})}}}},
+                {'if':{'allOf':[{'required':['since_kst']}, {'not':{'required':['view']}}]},
+                 'then':{'properties':{'target':{'enum':sorted(
+                     k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
         'annotations': {'title': 'Read fixed system diagnostics', 'readOnlyHint': True,
             'destructiveHint': False, 'idempotentHint': True},
     }, TIME_TOOL, INVENTORY_TOOL]
@@ -355,13 +367,14 @@ def audit(outcome, target=None):
 
 def query(value):
     d = library()
-    now = int(time.time())
     journal = isinstance(value, dict) and bool(set(value) & {'view','journal_scope'})
     historical = isinstance(value, dict) and bool(set(value) & {'since_kst', 'until_kst'})
+    clock = d.history_library().query_clock() if journal or historical else None
+    now = clock.seconds if clock is not None else int(time.time())
     if journal:
-        target, _, _, _, _ = d.journal_library().request(value, now)
+        target, _, _, _, _ = d.journal_library().request(value, clock)
     elif historical:
-        target, _, _, limit = d.history_library().request(value, now)
+        target, _, _, limit = d.history_library().request(value, clock)
     else:
         target, minutes, limit = arguments(value)
     with _rate_lock:
@@ -384,12 +397,12 @@ def query(value):
         history = d.history_library()
         host = target[0]
         if host == 'b':
-            answer = history.answer(value, host, now)
+            answer = history.answer(value, host, clock)
         else:
             code, raw = d.bounded_command(remote_command(host, route_config()), MAX_RESULT, 12, input_data=d.encode(value))
             d.need(code == 0, 'history_remote_unavailable')
             answer = d.parsed(raw)
-        history.validate_answer(answer, value, host, now)
+        history.validate_answer(answer, value, host, clock)
         d.need(len(d.encode(answer)) <= MAX_RESULT, 'history_result_bound')
         audit('history_observed', target)
         return answer
@@ -529,7 +542,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.2'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.4.6'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

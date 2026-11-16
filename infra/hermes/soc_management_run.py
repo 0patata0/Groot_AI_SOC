@@ -12,6 +12,7 @@ import functools
 from datetime import datetime, timedelta, timezone
 import hashlib
 import importlib
+import importlib.util
 import ipaddress
 import json
 import os
@@ -1192,7 +1193,7 @@ EPISTEMIC_INABILITY = (r'(?:알|판단할|배제할|단정할|확정할|확인�
                        r'결론\s*(?:내릴|지을))\s*수\s*없[가-힣]*')
 
 
-def claim_sentences(text):
+def claim_sentences(text, *, identifier_spans=()):
     """Sentences as separate claims, each with the qualifier scope that belongs to it.
 
     A sentence ends at . ! ? ; or a line end, so a qualifier in another sentence
@@ -1202,7 +1203,13 @@ def claim_sentences(text):
     A period between digits (22:22:30.915, 172.17.0.2, 1.5) does not end one.
     Yields (sentence, sentence plus its attached parenthetical).
     """
-    parts = re.split(r'([\n!?;]|\.(?![0-9])|(?<![0-9])\.|[。！？])', text)
+    boundaries=list(re.finditer(r'[\n!?;]|\.(?![0-9])|(?<![0-9])\.|[。！？]',text))
+    spans=[(a,b) for a,b in identifier_spans if type(a) is int and type(b) is int and 0<=a<b<=len(text)]
+    parts=[];position=0
+    for match in boundaries:
+        if match[0]=='.' and any(a<=match.start()<b for a,b in spans):continue
+        parts.extend((text[position:match.start()],match[0]));position=match.end()
+    parts.append(text[position:])
     sentences, ends = parts[0::2], parts[1::2]
     for i, sentence in enumerate(sentences):
         attached = None
@@ -1211,24 +1218,405 @@ def claim_sentences(text):
         yield sentence, sentence + (' ' + attached.group(1) if attached else '')
 
 
-def evidence_claim_violations(text, facts, successful_reads=None):
+def unobserved_event_source_violations(text, observed_sources):
+    """Bind an asserted event proposition to its own named sensor group.
+
+    A preceding count from a different subject, or a later investigation plan,
+    is not a measurement for this sensor. The same actual-read requirement is
+    kept for scalar counts, absence, detection and normality claims.
+    """
+    tokens = re.compile('(?P<suricata>' + SURICATA_NAMES + ')|(?P<modsecurity>' + MODSECURITY_NAMES +
+        r')|(?P<wazuh>(?<![A-Za-z0-9_])(?:Wazuh|와주)(?![A-Za-z0-9_]))', re.I)
+    coordinated = r'[\s`*()/·,&]*(?:(?:및|와|과|또는|혹은|and|or)[\s`*()/·,&]*)?'
+    event = re.compile(r'경보|이벤트|탐지|스캔')
+    predicate = re.compile(r'(?<![0-9])[0-9][0-9,]*\s*건|없(?:었|습|음|다|는|으며|고|어|으므로|으나)?|정상|'
+        r'(?:확인|발견|관측|탐지|발생|포착)(?:됐|되었|했|됨)')
+    issues = set()
+    contract = diagnostic_contract()
+    for sentence, _ in claim_sentences(text):
+        named = list(tokens.finditer(sentence))
+        groups = []
+        for match in named:
+            if groups and re.fullmatch(coordinated, sentence[groups[-1][-1].end():match.start()], re.I):
+                groups[-1].append(match)
+            else:
+                groups.append([match])
+        for i, group in enumerate(groups):
+            missing = {m.lastgroup for m in group} - set(observed_sources) - {'wazuh'}
+            if not missing:
+                continue
+            start = group[-1].end()
+            stop = groups[i + 1][0].start() if i + 1 < len(groups) else len(sentence)
+            clause = sentence[start:stop]
+            for noun in event.finditer(clause):
+                tail = clause[noun.end():]
+                for value in predicate.finditer(tail[:80]):
+                    between = tail[:value.start()]
+                    if (re.search(r'모드|규칙|설정|정책|엔진|근거|증거|원인|이유|미조회|조회하지|조회.{0,8}못|'
+                            r'확인\s*불가|확인되지', between)
+                            or re.search(r'[.!?;]', between)):
+                        continue
+                    after = tail[value.end():]
+                    connective = bool(re.fullmatch(r'없(?:으며|고|어|으므로|으나)', value[0]))
+                    if not connective and contract.claim_modality(after) in ('not_asserted', 'conditional_or_unverified', 'planned_check'):
+                        continue
+                    issues.update('unobserved_event_source:' + source for source in missing)
+    return sorted(issues)
+
+
+def read_receipt_scope(tool, arguments, data):
+    """Typed request/receipt selectors only, never a health or success verdict."""
+    out={'selectors':{},'requested_mode':None,'observed_mode':None,'scope_verified':False}
+    for key in ('target','host','unit','container','view','journal_scope'):
+        value=arguments.get(key)
+        if isinstance(value,str) and 1<=len(value)<=248 and re.fullmatch(r'[A-Za-z0-9@_.:-]+',value):
+            out['selectors'][key]=value
+    if tool=='mcp__system_diagnostics__get_system_diagnostics':
+        out['requested_mode']=('journal_excerpt' if arguments.get('view')=='journal' else
+            'history' if 'since_kst' in arguments or 'until_kst' in arguments else
+            'error_sample' if 'lookback_minutes' in arguments else 'snapshot')
+    if not isinstance(data,dict):return out
+    target=data.get('target')
+    if isinstance(target,str) and re.fullmatch(r'[abc]:[A-Za-z0-9_.-]{1,150}',target):
+        if 'target' not in arguments:out['selectors']['target']=target
+        if 'target' in arguments and arguments['target']!=target:return out
+        out['selectors'].setdefault('host',target[0])
+    unit=data.get('unit')
+    if isinstance(unit,str) and re.fullmatch(r'[A-Za-z0-9@_.-]{1,150}\.service',unit):out['selectors'].setdefault('unit',unit)
+    if tool!='mcp__system_diagnostics__get_system_diagnostics':return out
+    if type(data.get('schema')) is not int or data['schema']!=1 or data.get('target')!=arguments.get('target'):return out
+    if 'host' in data and data['host']!=str(data.get('target',''))[:1]:return out
+    start,end=map(parse_instant,(data.get('requested_since_kst'),data.get('requested_until_kst')))
+    bounds=bool(start and end and start<end)
+    if data.get('kind')=='journal_excerpt':
+        fields=diagnostic_contract().diagnostic_observation_fields(data)
+        if fields.get('journal_valid') is not True:return out
+        mode='journal_excerpt'
+    elif data.get('kind')=='journal_history':
+        if not bounds:return out
+        mode='history'
+    elif data.get('lookback_scope')=='latest_snapshot_only_not_requested_history' or data.get('kind')=='runtime':mode='snapshot'
+    elif bounds and isinstance(data.get('recent_errors'),list):mode='error_sample'
+    else:mode='snapshot'
+    for key in ('since_kst','until_kst'):
+        if key in arguments and parse_instant(arguments[key])!=parse_instant(data.get('requested_'+key)):return out
+    if arguments.get('view')=='journal' and (mode!='journal_excerpt' or data.get('journal_scope')!=arguments.get('journal_scope','errors')):return out
+    if 'since_kst' in arguments and mode not in ('history','journal_excerpt'):return out
+    out.update(observed_mode=mode,observed_modes=([mode,'snapshot'] if mode=='error_sample' else [mode]),scope_verified=True)
+    if bounds:out['requested_since_kst']=data['requested_since_kst'];out['requested_until_kst']=data['requested_until_kst']
+    return out
+
+
+def read_claim_subjects(sentence, rows):
+    """Resolve literal read subjects; do not guess an unregistered host/unit."""
+    exact=re.compile(r'(?<![A-Za-z0-9_])(?:mcp__[A-Za-z0-9_]+__(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+|(?:get|search|list|collect|calculate)_[A-Za-z0-9_]+)(?![A-Za-z0-9_])')
+    mentions=[{'start':m.start(),'end':m.end(),'names':{m[0]},'selectors':{},'label':m[0],'reset':True} for m in exact.finditer(sentence)]
+    sensors=((SURICATA_NAMES,{'mcp__security_events__search_suricata_alerts'}),
+        (MODSECURITY_NAMES,{'mcp__security_events__search_modsecurity_alerts'}),
+        (r'(?<![A-Za-z0-9_])(?:Wazuh|와주)(?![A-Za-z0-9_])',{'mcp__security_events__search_wazuh_alerts','mcp__wazuh_ro__get_wazuh_alert_summary'}))
+    for pattern,names in sensors:
+        for m in re.finditer(pattern,sentence,re.I):
+            if re.search(r'경보|로그|이벤트',sentence[m.end():m.end()+36]):
+                mentions.append({'start':m.start(),'end':m.end(),'names':names,'selectors':{},'label':sorted(names)[0],'reset':True})
+    # An explicit selector can refine a named method without losing that method.
+    selector=r'(?<![A-Za-z0-9_])(target|host|unit|container|view|journal_scope|since_kst|until_kst|lookback_minutes|limit)\s*[:=]\s*[\"\x27]?([A-Za-z0-9@_.:+-]+)'
+    for m in re.finditer(selector,sentence):
+        value=m[2].rstrip('.')
+        mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{m[1]:value},'label':m[1]+':'+value,'reset':False})
+    patterns=[(r'(?<![A-Za-z0-9_:])([abc]:[a-z][a-z0-9_.-]*)(?![A-Za-z0-9_])','target'),
+        (r'(?<![A-Za-z0-9@_.:-])([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_.:-])','unit'),
+        (r'(?:컨테이너|\bcontainer)\s+([A-Za-z0-9][A-Za-z0-9_.-]{0,127})','container')]
+    for pattern,key in patterns:
+        for m in re.finditer(pattern,sentence):
+            if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
+            value=m[1].rstrip('.')
+            mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{key:value},'label':key+':'+value,'reset':False})
+    # A human host+systemd label names the aggregate runtime target, not an
+    # arbitrary .service. Do not turn a bare lowercase English article into A.
+    for m in re.finditer(r'(?<![A-Za-z0-9가-힣_:])([ABC])(?:\s*(?:서버|호스트))?\s*(?:의\s*)?systemd(?![A-Za-z0-9_])',sentence,re.I):
+        if not re.search(r'서버|호스트',m[0]) and m[1] not in 'ABC':continue
+        if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
+        target=m[1].lower()+':systemd'
+        mentions.append({'start':m.start(),'end':m.end(),'names':{'mcp__system_diagnostics__get_system_diagnostics'},'selectors':{'target':target},'label':'target:'+target,'reset':True})
+    for m in re.finditer(r'(?<![A-Za-z0-9가-힣_:])([ABC])\s*(?:서버|호스트)(?=\s|의|$)',sentence,re.I):
+        if any(a['start']<=m.start() and m.end()<=a['end'] for a in mentions):continue
+        mentions.append({'start':m.start(),'end':m.end(),'names':set(),'selectors':{'host':m[1].lower()},'label':'host:'+m[1].lower(),'reset':False})
+    mentions.sort(key=lambda a:(a['start'],-a['end']))
+    active_names=set();active_selectors={};active_host=None;result=[]
+    for item in mentions:
+        if result and item['start']<result[-1]['end']:continue
+        selectors=item['selectors']
+        if item['reset']:
+            gap=sentence[result[-1]['end']:item['start']] if result else ''
+            preserve=bool(active_selectors and not re.search(r'조회|읽기|검색|호출|질의|[;.!?]',gap))
+            active_names=set(item['names'])
+            if not preserve:active_selectors={};active_host=None
+        if 'host' in selectors:active_host=selectors['host']
+        if 'target' in selectors and re.fullmatch('[abc]:[A-Za-z0-9_.-]+',selectors['target']):active_host=selectors['target'][0]
+        # A new target/entity starts its own entity clause; a view or host
+        # qualifies the current one. Explicit method identity remains bound.
+        if set(selectors)&{'target','unit','container'}:
+            gap=sentence[result[-1]['end']:item['start']] if result else ''
+            if 'target' in selectors or set(selectors)&set(active_selectors) or re.search(r'조회|읽기|검색|호출|질의',gap):active_selectors={}
+            if active_host:active_selectors['host']=active_host
+        active_selectors.update(selectors)
+        result.append({**item,'names':set(active_names),'selectors':dict(active_selectors)})
+    return result
+
+
+def read_attempt_view(records, *, complete=True):
+    """Bound actual read attempts, independently of successful evidence facts.
+
+    The adapters supply records from their actual dispatch/message boundary.
+    A returned response does not prove healthy state or complete evidence.
+    No exception or input rejection is invented as a server result.
+    """
+    view = {'complete': complete is True, 'rows': []}
+    if not isinstance(records, list) or len(records) > 128:
+        return {'complete': False, 'rows': []}
+    for i, record in enumerate(records):
+        try:
+            if not isinstance(record, dict):raise ValueError('record')
+            name, arguments = record.get('tool'), record.get('arguments')
+            if not allowed(name, 'verify') or not isinstance(arguments, dict) or not all(isinstance(k,str) for k in arguments):raise ValueError('tool_arguments')
+            encoded = json.dumps(arguments, ensure_ascii=False, sort_keys=True, allow_nan=False)
+            if len(encoded.encode()) > 8192:raise ValueError('arguments_bound')
+            phase = record.get('phase', 'returned')
+            if phase not in ('returned', 'input_rejected', 'transport_error', 'pending'):raise ValueError('phase')
+            flag = record.get('is_error', False)
+            if type(flag) is not bool:raise ValueError('protocol_error')
+            row = {'index': len(view['rows']), 'tool': name, 'arguments': json.loads(encoded), 'phase': phase,
+                   'outcome': phase, 'result_sha256': None, 'error_codes': []}
+            row['receipt_scope']=read_receipt_scope(name,arguments,None)
+            if phase in ('transport_error', 'pending'):
+                if record.get('output') is not None or record.get('result_sha256') is not None:raise ValueError('synthetic_result')
+                error_type = record.get('error_type')
+                if phase == 'transport_error':
+                    if not isinstance(error_type, str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.]{0,79}', error_type):raise ValueError('exception_type')
+                    row['error_codes'] = [error_type]
+                else:view['complete'] = False
+            else:
+                raw = record.get('output')
+                if not isinstance(raw, str) or len(raw.encode()) > MAX_EVENT_AUDIT_BYTES:raise ValueError('output_bound')
+                sha = hashlib.sha256(raw.encode()).hexdigest()
+                if record.get('result_sha256') != sha:raise ValueError('receipt_hash')
+                row['result_sha256'] = sha
+                failed = flag
+                # Opaque text is still a real response; do not guess an error
+                # from an arbitrary word within a log or message body.
+                def unique(pairs):
+                    result = {}
+                    for key, value in pairs:
+                        if key in result:raise ValueError('duplicate_error_envelope')
+                        result[key] = value
+                    return result
+                try:data = json.loads(raw, object_pairs_hook=unique,
+                    parse_constant=lambda _: (_ for _ in ()).throw(ValueError('nonfinite_error_envelope')))
+                except json.JSONDecodeError:data = None
+                for _ in range(5):
+                    if not isinstance(data, dict):break
+                    failed = failed or bool(data.get('error') or data.get('isError') or data.get('is_error'))
+                    for key in ('error', 'error_type', 'code'):
+                        value = data.get(key)
+                        if isinstance(value, str) and re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.:-]{0,127}', value):
+                            row['error_codes'].append(value)
+                    if set(data) <= {'result', 'isError'} and isinstance(data.get('result'), str):
+                        try:data = json.loads(data['result'], object_pairs_hook=unique)
+                        except json.JSONDecodeError:break
+                    else:break
+                row['outcome'] = ('input_rejected' if phase == 'input_rejected' else
+                                  'reported_error' if failed else 'returned')
+                row['error_codes'] = list(dict.fromkeys(row['error_codes']))[:8]
+                row['receipt_scope']=read_receipt_scope(name,arguments,data)
+            view['rows'].append(row)
+            if name == BUNDLE_TOOL and phase == 'returned' and row['outcome'] == 'returned':
+                parts = incident_bundle_reads(arguments, data)
+                if parts is None:
+                    view['complete'] = False
+                else:
+                    for part in parts:
+                        child_tool = ('mcp__system_diagnostics__' if part['tool'] == 'get_system_diagnostics'
+                                      else 'mcp__security_events__') + part['tool']
+                        child_raw = json.dumps(part['result'], ensure_ascii=False, allow_nan=False)
+                        child = read_attempt_view([{'tool': child_tool, 'arguments': part['arguments'],
+                            'output': child_raw, 'result_sha256': hashlib.sha256(child_raw.encode()).hexdigest(),
+                            'is_error': part['is_error'], 'phase': 'returned'}])
+                        view['complete'] = view['complete'] and child['complete']
+                        for child_row in child['rows']:
+                            child_row['index'] = len(view['rows'])
+                            child_row['bundle_component'] = {'transport_tool': BUNDLE_TOOL,
+                                'parent_result_sha256': row['result_sha256'], 'index': part['index'],
+                                'source_result_sha256': part['result_sha256']}
+                            view['rows'].append(child_row)
+        except (TypeError, ValueError, UnicodeError, RecursionError):
+            # Incomplete provenance is not the same as no calls.
+            view['complete'] = False
+    return view
+
+
+def read_attempts_from_messages(messages):
+    """Read only same-turn, unique ID-linked native tool replies."""
+    if not isinstance(messages, list) or len(messages) > 512:
+        return {'complete': False, 'rows': []}
+    calls, used, records, complete = {}, set(), [], True
+    def unique_arguments(pairs):
+        value={}
+        for key,item in pairs:
+            if key in value:raise ValueError('duplicate_arguments')
+            value[key]=item
+        return value
+    for message in messages:
+        if not isinstance(message, dict):
+            complete = False;continue
+        if message.get('role') == 'assistant':
+            items = message.get('tool_calls', []) or []
+            if not isinstance(items, list):complete = False;continue
+            for call in items:
+                if not isinstance(call, dict) or not isinstance(call.get('function'), dict):complete = False;continue
+                cid, fn = call.get('id'), call['function']
+                if not isinstance(cid, str) or not cid or cid in calls:
+                    complete = False;continue
+                if not allowed(fn.get('name'), 'verify'):
+                    # Protected operations keep their original native path;
+                    # they are never imported as an allowed read receipt.
+                    calls[cid] = None;continue
+                try:
+                    arguments = fn.get('arguments', {})
+                    if isinstance(arguments, str):arguments = json.loads(arguments,object_pairs_hook=unique_arguments)
+                    if not isinstance(arguments, dict):raise ValueError('arguments')
+                    calls[cid] = (fn['name'], arguments)
+                except (TypeError, ValueError, RecursionError):complete = False
+        elif message.get('role') == 'tool':
+            cid = message.get('tool_call_id')
+            if cid not in calls or cid in used:complete = False;continue
+            used.add(cid)
+            if calls[cid] is None:continue
+            name, arguments = calls[cid];raw = message.get('content')
+            records.append({'tool': name, 'arguments': arguments, 'output': raw,
+                'result_sha256': hashlib.sha256(raw.encode()).hexdigest() if isinstance(raw, str) else None,
+                'phase': 'returned', 'is_error': message.get('is_error', False)})
+    if any(cid not in used and value is not None for cid, value in calls.items()):complete = False
+    return read_attempt_view(records, complete=complete)
+
+
+def read_attempt_claim_violations(text, attempts):
+    """Bind named outcomes to actual method, entity, view and query arguments."""
+    if attempts is None or not isinstance(text,str):return []
+    if not isinstance(attempts,dict) or type(attempts.get('complete')) is not bool or not isinstance(attempts.get('rows'),list):return ['read_attempt_provenance_unverified']
+    rows=attempts['rows']
+    if any(not isinstance(row,dict) or not allowed(row.get('tool'),'verify') or not isinstance(row.get('arguments'),dict)
+            or row.get('outcome') not in ('returned','reported_error','input_rejected','transport_error','pending') for row in rows):return ['read_attempt_provenance_unverified']
+    issues=set();contract=diagnostic_contract()
+    query=(r'(?:조회|검색|읽기|질의|호출)(?:가|이|는|에|을|를)?\s*'
+           r'(?:(?:중에?|도중|과정(?:에서)?|시도(?:에서)?)\s*)?')
+    outcome=re.compile(query+r'(?P<failed>실패(?:했|하였|함|됨|했습니다|입니다|다)?|불가|거절|오류)|'
+        r'(?:도구|API|MCP)(?:에서|가|이|는|에)?\s*(?P<error>오류|에러|실패)|'+query+
+        r'(?P<returned>성공|완료|했습니다|했음|했으며|했지만|결과)',re.I)
+    clean=re.sub(r'[*`]', '', text)
+    protected=[(m.start(),m.end()) for m in re.finditer(r'(?<![A-Za-z0-9@_.:-])(?:[abc]:)?[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',clean)]
+    for m in re.finditer(r'\b(?:container|unit|target)\s*[:=]\s*[\"\x27]?([A-Za-z0-9@_.:-]+)',clean):
+        protected.append((m.start(1),m.start(1)+len(m[1].rstrip('.'))))
+    for sentence,_ in claim_sentences(clean,identifier_spans=protected):
+        mentions=read_claim_subjects(sentence,rows)
+        for j,subject in enumerate(mentions):
+            last=j
+            while last+1<len(mentions):
+                a,b=mentions[last],mentions[last+1]
+                same_entity=any(k in a['selectors'] and k in b['selectors'] for k in ('target','unit','container'))
+                if not same_entity or not re.fullmatch(r'[\s/·,&]*(?:(?:및|와|과|그리고|and|or)[\s/·,&]*)?',sentence[a['end']:b['start']],re.I):break
+                last+=1
+            stop=mentions[last+1]['start'] if last+1<len(mentions) else len(sentence)
+            clause=sentence[mentions[last]['end']:stop]
+            for match in outcome.finditer(clause):
+                after=clause[match.end():]
+                if match['returned']=='결과' and not subject['selectors']:continue
+                if contract.claim_modality(after) in ('not_asserted','conditional_or_unverified','planned_check'):continue
+                if not attempts['complete']:issues.add('read_attempt_provenance_unverified');continue
+                def selectors(row):
+                    scope=row.get('receipt_scope',{});scope=scope if isinstance(scope,dict) else {}
+                    values={**scope.get('selectors',{}),**{k:v for k,v in row['arguments'].items() if k in ('target','host','unit','container','view','journal_scope','since_kst','until_kst','lookback_minutes','limit')}}
+                    target=values.get('target')
+                    if isinstance(target,str) and re.fullmatch('[abc]:[A-Za-z0-9_.-]+',target):values.setdefault('host',target[0])
+                    return values
+                def selected(row,key,value):
+                    actual=selectors(row).get(key)
+                    if key in ('since_kst','until_kst'):return bool(parse_instant(actual) and parse_instant(actual)==parse_instant(value))
+                    if key in ('limit','lookback_minutes'):return type(actual) is int and str(actual)==value
+                    return actual==value
+                matching=[r for r in rows if (not subject['names'] or any(r['tool']==n or not n.startswith('mcp__') and r['tool'].endswith('__'+n) for n in subject['names']))
+                    and all(selected(r,k,v) for k,v in subject['selectors'].items())]
+                prefix=sentence[subject['start']:subject['end']]+clause[:match.start()]
+                modes=[(m.start(),'history') for m in re.finditer(r'과거|이력|history|최근\s*\d+\s*(?:분|시간|일)',prefix,re.I)]
+                modes += [(m.start(),'journal_excerpt') for m in re.finditer(r'journal|원문|발췌',prefix,re.I)]
+                modes += [(m.start(),'snapshot') for m in re.finditer(r'현재|지금|최종|마지막|스냅샷|snapshot',prefix,re.I)]
+                mode=max(modes)[1] if modes else None
+                failed=bool(match['failed'] or match['error'])
+                scoped=[]
+                for row in matching:
+                    scope=row.get('receipt_scope',{});scope=scope if isinstance(scope,dict) else {}
+                    actual=scope.get('observed_mode') if row['outcome']=='returned' else scope.get('requested_mode')
+                    actual_modes=scope.get('observed_modes',[actual]) if row['outcome']=='returned' else ([actual,'snapshot'] if actual=='error_sample' else [actual])
+                    if mode is None or row['tool']!='mcp__system_diagnostics__get_system_diagnostics' or (any(m in ('history','journal_excerpt','error_sample') for m in actual_modes) if mode=='history' else mode in actual_modes):scoped.append(row)
+                durations=re.findall(r'최근\s*([1-9][0-9]*)\s*(분|시간|일)',prefix)
+                if len(durations)==1:
+                    amount,unit=durations[0];seconds=int(amount)*{'분':60,'시간':3600,'일':86400}[unit]
+                    def period_matches(row):
+                        scope=row.get('receipt_scope',{});args=row['arguments']
+                        if row['outcome']=='returned':start,end=map(parse_instant,(scope.get('requested_since_kst'),scope.get('requested_until_kst')))
+                        else:start,end=map(parse_instant,(args.get('since_kst'),args.get('until_kst')))
+                        return bool(start and end and abs((end-start).total_seconds()-seconds)<1 or row['outcome']!='returned' and type(args.get('lookback_minutes')) is int and args['lookback_minutes']*60==seconds)
+                    scoped=[row for row in scoped if period_matches(row)]
+                if re.search(r'현재|지금|최종|마지막',prefix):scoped=scoped[-1:]
+                label=subject['label'];needed={'reported_error','transport_error','input_rejected'} if failed else {'returned'}
+                eligible=[row for row in scoped if row['outcome'] in needed]
+                if not eligible:
+                    issues.add(('unobserved_read_failure:' if failed else 'unobserved_read_success:')+label)
+                elif failed and re.search(r'서버|MCP',clause[:match.end()],re.I) and all(row['outcome']=='input_rejected' for row in eligible):
+                    issues.add('read_failure_stage_mismatch:'+label)
+                if not failed and subject['selectors'] and any(r['tool']=='mcp__system_diagnostics__get_system_diagnostics' and r.get('receipt_scope',{}).get('scope_verified') is not True for r in eligible):
+                    issues.add('read_receipt_scope_unverified:'+label)
+                # A claim about supplied arguments is distinct from tool/schema
+                # documentation. Only an asserted read outcome activates it.
+                supplied=re.findall(r'\b(lookback_minutes|since_kst|until_kst|limit|view|journal_scope)(?:을|를|만)?\s*(?:제공|전달|지정|사용)(?:했|하였|하고|하여|함|됨)',clause)
+                if supplied and eligible and not any(all(k in row['arguments'] for k in supplied) for row in eligible):issues.add('read_arguments_not_supplied:'+label)
+    return sorted(issues)
+
+
+def diagnostic_claim_surface(text, facts):
+    """Exclude exact authenticated diagnostic display rows from prose checks.
+
+    Only this deterministic renderer can supply the allowed rows. Arbitrary
+    tables, modified cells and appended claims remain subject to the checks.
+    Authority/control/citation checks continue to see the original full text.
+    """
+    if not isinstance(text,str) or not any(line.startswith('| ') and line.endswith(' |') for line in text.splitlines()):return text
+    rows=[f for f in facts if isinstance(f,dict) and f.get('kind')=='diagnostics']
+    if not rows:return text
+    try:source=literal_evidence_table(rows)
+    except (ValueError,TypeError,KeyError,AttributeError,IndexError):return text
+    allowed={line for line in source.splitlines()[2:] if line.startswith('| ') and line.endswith(' |')}
+    return '\n'.join('' if line in allowed else line for line in text.splitlines())
+
+
+def evidence_claim_violations(text, facts, successful_reads=None, *, read_attempts=None, normalize_configuration_terms=False):
     """Narrow checks of known evidence limits; no incident classification rules."""
     if not isinstance(text, str):
         return []
+    if type(normalize_configuration_terms) is not bool:raise ValueError('configuration_term_mode_invalid')
+    original=text;diagnostic_text=diagnostic_claim_surface(original,facts)
+    if normalize_configuration_terms:
+        # SDK's existing terminology normalization runs after exact source
+        # attribution; it cannot change an authenticated row into model prose.
+        pattern=r'탐지\s*(?:모드|규칙|룰|설정|정책)'
+        text=re.sub(pattern,'설정',text);diagnostic_text=re.sub(pattern,'설정',diagnostic_text)
     issues = set(event_field_violations(text, facts) + event_window_violations(text, facts) +
                  incident_binding_violations(text, facts) + containment_time_violations(text, facts) +
-                 disposition_citation_violations(text, successful_reads) +
+                 disposition_citation_violations(original, successful_reads) +
                  brief_kst_violations(text, facts) + waf_action_violations(text, facts) + web_evidence_violations(text,facts) +
-                 snapshot_health_violations(text,facts) + redetection_violations(text,facts) + closure_uncertainty_violations(text))
+                 snapshot_health_violations(diagnostic_text,facts) + redetection_violations(text,facts) + closure_uncertainty_violations(original))
     observed_event_sources = {x.get('source') for x in facts if x.get('kind') == 'events'}
-    for source, names in (('suricata', SURICATA_NAMES), ('modsecurity', MODSECURITY_NAMES)):
-        if source in observed_event_sources:
-            continue
-        for line in text.splitlines():
-            if (re.search(names, line, re.I) and re.search(r'경보|이벤트|탐지|스캔', line) and
-                    re.search(r'[0-9]+\s*건|없|정상|확인됐|확인했|발견됐|관측됐', line) and
-                    not re.search(r'미조회|조회하지|조회.{0,8}못|알\s*수\s*없|확인\s*불가|확인되지', line)):
-                issues.add('unobserved_event_source:' + source)
+    issues.update(unobserved_event_source_violations(text, observed_event_sources))
+    issues.update(read_attempt_claim_violations(text, read_attempts))
     unknown = any((x.get('kind') == 'events' and x.get('indexed_window_total_count') is None) or
                   (x.get('kind') == 'diagnostics' and x.get('requested_window_total_count') is None) or
                   (x.get('kind') == 'web_access' and x.get('actual_request_total_count') is None) for x in facts)
@@ -1262,12 +1650,25 @@ def evidence_claim_violations(text, facts, successful_reads=None):
             # "경보 가능성을 배제할 수 없으며" and "공격 여부는 알 수 없음" were read
             # as absence. Remove only such epistemic verb phrases; "찾을/발견할/볼
             # 수 없음", "있을 수 없다" and "경보 수 없음" stay claims.
-            scope_line = re.sub(EPISTEMIC_INABILITY, '', scope_line)
+            epistemic = list(re.finditer(EPISTEMIC_INABILITY, scope_line))
             # Connective endings are absence claims too: 11-14 01:02 "WAF의 경우
             # 경보가 없으며" passed while only its qualified table rows failed.
-            if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:(?<![0-9])0\s*건|없(?:었|습|음|다|는|으며|고|어|으므로|으나)|전혀\s*없)', scope_line) and
-                    not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', scope)):
-                issues.add('sample_zero_presented_as_absence')
+            pattern = r'(?:경보|이벤트|오류|공격).{0,15}?(?P<predicate>(?<![0-9])0\s*건|없(?:었|습|음|다|는|으며|고|어|으므로|으나)|전혀\s*없)'
+            for claim in re.finditer(pattern, scope_line):
+                if any(m.start() <= claim.start('predicate') < m.end() for m in epistemic):
+                    continue
+                modality = diagnostic_contract().claim_modality(scope_line[claim.end():])
+                connective = bool(re.fullmatch(r'없(?:으며|고|어|으므로|으나)', claim['predicate']))
+                if not connective and modality in ('not_asserted', 'conditional_or_unverified', 'planned_check'):
+                    continue
+                # An earlier finite proposition's sample qualifier cannot
+                # license an independent absence claim later on the same line.
+                before = re.split(r'(?:건이고|나왔고|됐고|했고|있고|없고|이며|으며|지만|는데|으나|으므로|어서|[;,])\s*',
+                                  scope_line[:claim.start()])[-1]
+                claim_scope = before + scope_line[claim.start():] + scope[len(line):]
+                if (modality == 'double_negative' or not re.search(
+                        r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', claim_scope)):
+                    issues.add('sample_zero_presented_as_absence')
     if unknown:
         for line in text.splitlines():
             if (re.search(r'(?:경보|이벤트).{0,25}[0-9]+\s*건.{0,6}(?:발생|있음|있습니다)', line) and
@@ -1717,10 +2118,15 @@ def factual_review_report(facts):
             literal_evidence_table(facts)+'\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review')
 
 
-def render_model_review(report, facts):
+def render_model_review(report, facts, *, lookup_identity=None):
     """Model owns judgment; receipts supply the table without model retyping."""
     if report.get('scope')=='verified_service_lookup':
+        if isinstance(lookup_identity,dict) and lookup_identity.get('missing_units'):raise ValueError('service_lookup_identity_not_verified')
         return diagnostic_contract().service_lookup_report(literal_evidence_table(facts))
+    if report.get('scope')=='unresolved_service_lookup':
+        if lookup_identity is None:raise ValueError('service_lookup_identity_required')
+        if report.get('assessment')!='unresolved' or report.get('status')!='needs_review':raise ValueError('service_lookup_identity_status_invalid')
+        return diagnostic_contract().service_lookup_report(literal_evidence_table(facts),identity=lookup_identity)
     contract=diagnostic_contract()
     if contract.diagnostic_facts_only(facts) and contract.diagnostic_report_field_violations(report):
         raise ValueError('diagnostic_report_empty_field')
@@ -1827,6 +2233,28 @@ def disposition_status_conflict(text):
         return False
     value, error = parse_incident_disposition(text)
     return error is None and value.get('assessment') == 'unresolved'
+
+
+def incident_completion_required():
+    """Root controller metadata cannot be enabled by chat or tool prose."""
+    flag = os.environ.get('CAPSTONE_INCIDENT_DISPOSITION_REQUIRED')
+    if flag not in (None, '1'):
+        raise RuntimeError('incident_completion_flag_invalid')
+    return flag == '1'
+
+
+def incident_completion_error(text, successful_reads, *, required=None):
+    """A closing report needs the model's own bound judgment; never choose it."""
+    required = incident_completion_required() if required is None else required
+    if type(required) is not bool:
+        raise ValueError('incident_completion_flag_invalid')
+    if not required or management_status(text) != 'resolved':
+        return None
+    decision, error = parse_incident_disposition(text, successful_reads)
+    if error:
+        return error
+    return ('unresolved_disposition_marked_resolved'
+            if decision['assessment'] == 'unresolved' else None)
 
 
 def rejected_report_lines(text, facts, successful_reads, issues, limit=4):
@@ -1942,6 +2370,140 @@ LITERAL_REPAIR_ISSUES = frozenset({
 })
 
 
+CONTROL_STATUS_ISSUES = frozenset({'missing_or_invalid_management_status',
+                                  'unresolved_disposition_marked_resolved'})
+
+
+def control_status_scope():
+    """Bind the formatting lease to root-supplied request/read metadata."""
+    keys = ('CAPSTONE_MANAGEMENT_MODE', 'CAPSTONE_INCIDENT_DISPOSITION_REQUIRED',
+            'CAPSTONE_CHAT_READ_JSON', 'CAPSTONE_REVIEW_CONTEXT_JSON',
+            'CAPSTONE_REQUIRED_STATUS_JSON', 'CAPSTONE_REQUIRED_SENSOR_JSON')
+    return hashlib.sha256(json.dumps([os.environ.get(k) for k in keys],
+        ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
+
+
+def control_status_context(report, reads, issues, turn, question):
+    """Retain an existing model judgment; never construct one from facts."""
+    if (os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
+            or not incident_completion_required() or not issues
+            or not set(issues) <= CONTROL_STATUS_ISSUES
+            or not isinstance(turn, str) or not turn
+            or not isinstance(question, str) or not 1 <= len(question) <= 16384
+            or not isinstance(report, str) or not 1 <= len(report.encode()) <= MAX_EVENT_AUDIT_BYTES - 128
+            or any(line.lstrip().startswith(('```', '~~~')) for line in report.splitlines())
+            or not isinstance(reads, (set, frozenset, tuple, list))
+            or not all(isinstance(n, str) for n in reads)):
+        return None
+    names = sorted(set(reads) - {'mcp__system_diagnostics__calculate_time'})
+    if not 1 <= len(names) <= 64 or any(not allowed(n, 'verify') for n in names):
+        return None
+    decision, error = parse_incident_disposition(report, names)
+    if error:
+        return None
+    return {'turn': turn, 'report': report, 'decision': decision, 'reads': names,
+            'question': question, 'scope': control_status_scope(),
+            'report_sha256': hashlib.sha256(report.encode()).hexdigest()}
+
+
+def control_status_bound(context, agent):
+    """Recheck current wire/completion bookkeeping before request and decode."""
+    state = getattr(agent, '_capstone_control_status_read_state', None)
+    if (not isinstance(context, dict) or set(context) != {
+            'turn', 'report', 'decision', 'reads', 'question', 'scope', 'report_sha256'}
+            or not isinstance(state, dict)
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
+            or not incident_completion_required()
+            or getattr(agent, 'provider', None) != 'custom'
+            or getattr(agent, 'api_mode', None) != 'chat_completions'
+            or str(getattr(agent, 'base_url', '')).rstrip('/') != 'http://10.200.10.10:11435/v1'
+            or getattr(agent, '_interrupt_requested', False)
+            or not verified_runtime_model(agent, getattr(agent, 'model', None))
+            or not context['turn'] or context['turn'] != getattr(agent, '_current_turn_id', None)
+            or state.get('turn') != context['turn'] or state.get('pending') is not False
+            or state.get('complete') is not True or state.get('has_errors') is not False
+            or type(state.get('completed_reads')) is not int or state['completed_reads'] < 1
+            or type(state.get('receipt_count')) is not int or not 1 <= state['receipt_count'] <= 32
+            or context['scope'] != control_status_scope() or state.get('scope') != context['scope']
+            or not isinstance(context['report'], str)
+            or hashlib.sha256(context['report'].encode()).hexdigest() != context['report_sha256']
+            or not isinstance(context['reads'], list) or not 1 <= len(context['reads']) <= 64
+            or not all(isinstance(n, str) and allowed(n, 'verify') for n in context['reads'])
+            or context['reads'] != state.get('reads')
+            or not set(context['reads']) <= set(getattr(agent, 'valid_tool_names', ()))):
+        return False
+    decision, error = parse_incident_disposition(context['report'], context['reads'])
+    return error is None and decision == context['decision']
+
+
+def control_status_projection(context, status):
+    """Change only control-state lines, preserving all other report bytes."""
+    states = {'monitor', 'needs_review', 'awaiting_approval'}
+    if context['decision']['assessment'] != 'unresolved':
+        states.add('resolved')
+    if status not in states:
+        raise ValueError('management_control_status_not_authorized')
+    kept = [line for line in context['report'].splitlines(keepends=True)
+            if not line.startswith('MANAGEMENT_STATUS:')
+            and not formatted_control_line(line, 'MANAGEMENT_STATUS')]
+    body = ''.join(kept)
+    result = body + ('' if body.endswith('\n') else '\n') + 'MANAGEMENT_STATUS: ' + status
+    decision, error = parse_incident_disposition(result, context['reads'])
+    if error or decision != context['decision'] or management_status(result) != status:
+        raise ValueError('management_control_status_projection_invalid')
+    return result
+
+
+def control_status_request(request, agent):
+    """Use the existing Native selection/decoder lease for a status-only choice."""
+    context = vars(agent).pop('_capstone_control_status_repair', None)
+    if (not control_status_bound(context, agent) or not isinstance(request, dict)
+            or request.get('model') != getattr(agent, 'model', None)
+            or request.get('reasoning_effort') != 'none'
+            or request.get('tool_choice') not in (None, 'auto')
+            or not isinstance(request.get('messages'), list)):
+        return request
+    previous = [r for r in request['messages'] if isinstance(r, dict) and r.get('role') == 'assistant']
+    if (not previous or previous[-1].get('content') != context['report']
+            or previous[-1].get('tool_calls')):
+        return request
+    states = ['monitor', 'needs_review', 'awaiting_approval']
+    if context['decision']['assessment'] != 'unresolved':
+        states.insert(0, 'resolved')
+    nonce = uuid.uuid4().hex
+    common = {'type': 'string', 'const': nonce}
+    schema = {'anyOf': [
+        {'type': 'object', 'additionalProperties': False,
+         'required': ['request_nonce', 'more_evidence', 'status'],
+         'properties': {'request_nonce': common, 'more_evidence': {'const': True}, 'status': {'type': 'null'}}},
+        {'type': 'object', 'additionalProperties': False,
+         'required': ['request_nonce', 'more_evidence', 'status'],
+         'properties': {'request_nonce': common, 'more_evidence': {'const': False},
+                        'status': {'type': 'string', 'enum': states}}}]}
+    from jsonschema import Draft202012Validator
+    Draft202012Validator.check_schema(schema)
+    result = copy.deepcopy(request)
+    result.pop('tools', None); result.pop('tool_choice', None)
+    extra = result.get('extra_body')
+    if isinstance(extra, dict):
+        if set(extra) & {'model', 'messages'}:
+            raise RuntimeError('management_control_status_body_override')
+        for key in ('tools', 'tool_choice', 'response_format'):
+            extra.pop(key, None)
+    result['response_format'] = {'type': 'json_schema', 'json_schema': {
+        'name': 'soc_control_status', 'strict': True, 'schema': schema}}
+    result['messages'].append({'role': 'user', 'content': json.dumps({
+        'phase_policy': diagnostic_contract().workflow_policy(('soc-investigate',), section='control-status'),
+        'prior_report_sha256': context['report_sha256'], 'bound_model_decision': context['decision'],
+        'current_successful_tools': context['reads'], 'original_request': context['question'],
+        'schema': schema}, ensure_ascii=False, separators=(',', ':'))})
+    agent._capstone_management_selection = {'turn': context['turn'], 'nonce': nonce,
+        'schema': copy.deepcopy(schema), 'control_status_repair': True,
+        'control_status_context': context,
+        'receipt_count': agent._capstone_control_status_read_state['receipt_count']}
+    return result
+
+
 def citation_name_repair(text, successful_reads, catalog):
     """Unknown citation spellings are not a demand to repeat successful reads.
 
@@ -2045,7 +2607,7 @@ def completed_web_review_request(request, agent, successful_reads, *, requiremen
     return result
 
 
-def arm_literal_repair(agent, turn, issues):
+def arm_literal_repair(agent, turn, issues, *, report=None, successful_reads=None, question=None):
     'One verified read-only formatting/evidence correction, never risk reasoning.'
     build = getattr(agent, '_build_api_kwargs', None)
     if (os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or not callable(build)
@@ -2053,6 +2615,7 @@ def arm_literal_repair(agent, turn, issues):
         return False
     own = '_build_api_kwargs' in getattr(agent, '__dict__', {})
     old = agent.__dict__.get('_build_api_kwargs') if own else None
+    context = control_status_context(report, successful_reads, issues, turn, question)
 
     def restore():
         if getattr(agent, '_build_api_kwargs', None) is once:
@@ -2068,6 +2631,8 @@ def arm_literal_repair(agent, turn, issues):
         if getattr(agent, '_current_turn_id', None) != turn or getattr(agent, '_interrupt_requested', False):
             return value
         result = management_reasoning(value, agent, required_read_phase=True)
+        if context is not None and control_status_bound(context, agent):
+            agent._capstone_control_status_repair = context
         if result is not value and result.get('reasoning_effort') == 'none':
             sys.stderr.write('management_literal_repair_profile ' + json.dumps({
                 'issues': sorted(set(issues)), 'reasoning_effort': 'none', 'max_tokens': result.get('max_tokens'),
@@ -2275,7 +2840,8 @@ def operator_diagnostic_options(request, receipts=()):
     if chat:
         plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst'])
         return (diagnostic_contract().service_history_state(plan,receipts)['pending']
-                +diagnostic_contract().service_current_refresh_reads(plan,receipts))
+                +diagnostic_contract().service_current_refresh_reads(plan,receipts)
+                +diagnostic_contract().service_identity_state(request,chat['request'],receipts)['pending'])
     if not readonly_incident_review() or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1':return []
     context=compact_controller_context()
     return diagnostic_contract().operator_diagnostic_options(request,context,receipts) if context else []
@@ -2284,7 +2850,11 @@ def operator_diagnostic_options(request, receipts=()):
 def chat_diagnostic_state(request, receipts=()):
     chat=chat_read_context()
     plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst']) if chat else None
-    return diagnostic_contract().service_history_state(plan,receipts)
+    state=diagnostic_contract().service_history_state(plan,receipts)
+    if chat:
+        identity=diagnostic_contract().service_identity_state(request,chat['request'],receipts)
+        state['pending']+=identity['pending'];state['incomplete']+=identity['incomplete']
+    return state
 
 
 def required_sensor_input_rejection(name, arguments, requirements, receipts):
@@ -2323,13 +2893,18 @@ def chat_read_schema(name, schema):
               {'not':{'required':['lookback_minutes','until_kst']}}]
     journal_conditions=[{'if':{'required':['view']},'then':{'required':['since_kst','until_kst']}},
                         {'if':{'required':['journal_scope']},'then':{'required':['view']}}]
-    journal=(len(rules)==5 and rules[2:4]==journal_conditions
+    aggregate_condition={'allOf':[{'required':['since_kst']},{'not':{'required':['view']}}]}
+    host_journal=(len(rules)==6 and rules[5].get('if')==aggregate_condition
+                  and diagnostic_contract().diagnostic_journal_catalog(schema) is not None
+                  and bool(schema.get('properties',{}).get('target',{}).get('x-capstone-host-journal-targets')))
+    journal=((len(rules)==5 or host_journal) and rules[2:4]==journal_conditions
              and schema.get('properties',{}).get('view',{}).get('enum')==['journal']
              and schema.get('properties',{}).get('journal_scope',{}).get('enum')==['errors','all'])
-    if (not (len(rules)==3 or journal) or rules[:2]!=expected or rules[-1].get('if')!={'required':['since_kst']}
+    history_rule=rules[4] if host_journal else rules[-1] if rules else {}
+    if (not (len(rules)==3 or journal) or rules[:2]!=expected or history_rule.get('if')!={'required':['since_kst']}
             or schema.get('dependentRequired')!={'since_kst':['until_kst'],'until_kst':['since_kst']}):return schema
     if not journal and {'view','journal_scope'} & set(schema.get('properties',{})):return schema
-    condition=rules[-1].get('then',{})
+    condition=history_rule.get('then',{})
     history=condition.get('properties',{}).get('target',{}).get('enum')
     if (set(condition)-{'properties','type','required'} or condition.get('required',[])
             or condition.get('type','object')!='object'
@@ -2349,6 +2924,9 @@ def chat_read_schema(name, schema):
         excerpt=copy.deepcopy(past)
         excerpt['required']=list(dict.fromkeys(excerpt['required']+['view']))
         for key in ('view','journal_scope'):past['properties'].pop(key)
+        if host_journal:
+            units,_=diagnostic_contract().diagnostic_journal_catalog(schema)
+            past['properties']['target']['enum']=[x for x in past['properties']['target']['enum'] if x in units]
         branches.append(excerpt)
     return {'anyOf':branches}
 
@@ -2632,7 +3210,7 @@ def arm_grounding_read(agent, turn, required_reads=None, *, required_read_phase=
 
 
 def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None, successful_reads=None,
-                      status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=(), attempted_reads=()):
+                      status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=(), attempted_reads=(), *, read_attempts=None):
     @functools.wraps(original)
     def wrapped(agent, **kw):
         restore = getattr(agent, '_capstone_grounding_restore', None)
@@ -2643,7 +3221,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         count, maximum, counter = kw.get('api_call_count'), getattr(agent, 'max_iterations', None), kw.get('codex_ack_continuations')
         remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
         content = getattr(message, 'content', None)
-        issues = evidence_claim_violations(content, facts or [], successful_reads)
+        attempt_view = read_attempts() if callable(read_attempts) else read_attempts
+        issues = evidence_claim_violations(content, facts or [], successful_reads, read_attempts=attempt_view)
         inquiry=getattr(agent,'_capstone_more_evidence_turn',None)==turn and isinstance(turn,str)
         if inquiry:
             agent._capstone_more_evidence_turn=None
@@ -2658,6 +3237,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             issues.append('missing_or_invalid_management_status')
         if completed_calls and disposition_status_conflict(content):
             issues.append('unresolved_disposition_marked_resolved')
+        completion = incident_completion_error(content, successful_reads) if completed_calls else None
+        if completion and completion not in issues:
+            issues.append(completion)
         verify=os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
         pending_status=[r for r in status_requirements if not any(f.get('kind')=='proposal_status' and
             f.get('proposal_id')==r['proposal_id'] and f.get('target')==r['target'] for f in status_receipts)] if verify else []
@@ -2749,7 +3331,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             else:setattr(agent, marker, turn)
             if not missing_evidence:
                 arm_literal_repair(agent, turn, ['invalid_disposition_tool_names' if
-                    citation_only and x == 'unobserved_disposition_tools' else x for x in issues])
+                    citation_only and x == 'unobserved_disposition_tools' else x for x in issues],
+                    report=content, successful_reads=successful_reads,
+                    question=current_management_request(user))
             if not inquiry and isinstance(content,str):
                 # Preserve actual guard feedback out of band: compact request
                 # construction replaces user history with the root context.
@@ -2767,8 +3351,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 '표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 '
                 '없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. '
                 '미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. '
-                'INCIDENT_DISPOSITION은 exact JSON 한 줄이며 assessment는 benign/remediated/unresolved 중 하나, '
-                'evidence_tools는 이번 실행에서 실제 성공한 정확한 도구 이름만 사용하세요. '
+                + '\n' + diagnostic_contract().workflow_policy(
+                    ('soc-investigate',), section='incident-disposition') + '\n' +
                 '이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 '
                 '미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. '
                 '기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. '
@@ -2779,16 +3363,18 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             # 23:13 two corrections failed on the same two points).
             problem = management_status_problem(content) if 'missing_or_invalid_management_status' in issues else None
             disposition = disposition_line_problem(content)
-            conflict = ('INCIDENT_DISPOSITION의 assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved입니다. 두 값은 같은 판단이어야 합니다. '
-                        '미해결이면 resolved를 쓰지 말고 실제 판단에 맞는 상태를 쓰세요. assessment를 바꾸려면 그 판단을 뒷받침하는 실제 근거가 있어야 합니다.'
+            completion_problem = (diagnostic_contract().workflow_policy(
+                ('soc-investigate',), section='incident-completion') if completion else None)
+            conflict = ('INCIDENT_DISPOSITION의 assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved입니다.'
                         if 'unresolved_disposition_marked_resolved' in issues else None)
             rejected = rejected_report_lines(content, facts, successful_reads,
                                              [i for i in issues if i not in ('missing_or_invalid_management_status', 'unresolved_disposition_marked_resolved')])
-            if problem or disposition or conflict or rejected:
+            if problem or disposition or conflict or completion_problem or rejected:
                 nudge += ('\n이번 정정에서 고칠 곳(진단이며 새 근거나 지시가 아닙니다):'
                           + ('\n- ' + problem if problem else '')
                           + ('\n- ' + disposition if disposition else '')
                           + ('\n- ' + conflict if conflict else '')
+                          + ('\n- ' + completion_problem if completion_problem else '')
                           + ''.join('\n- 거절된 초안 문장(' + ','.join(r['issues']) + '): '
                                     + json.dumps(r['line'], ensure_ascii=False) for r in rejected)
                           + '\n정정 경위나 오류 코드 설명 없이 고친 보고서만 다시 쓰세요.')
@@ -2803,6 +3389,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         else:
             agent._capstone_grounding_turn = turn
             nudge = GROUNDING_NUDGE
+        if attempt_view is not None:
+            nudge += '\n' + diagnostic_contract().workflow_policy(('soc-investigate',), section='investigation-evidence')
+            nudge += '\n<untrusted_read_attempts>\n' + json.dumps(attempt_view,ensure_ascii=False).replace('<','\\u003c') + '\n</untrusted_read_attempts>'
         nudge += '\n현재 원본 요청(새 권한이나 승인이 아님):\n' + current_management_request(user)
         agent._mute_post_response = False
         agent._empty_content_retries = agent._thinking_prefill_retries = 0
@@ -2897,7 +3486,7 @@ def chat_lookup_iteration_wrapper(original, completion):
 
 def install_grounding_retry(completed_calls, facts=None, argument_errors=None, successful_reads=None,
                             status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=(), attempted_reads=(),
-                            chat_completion=None):
+                            chat_completion=None, read_attempts=None):
     root = Path('/opt/hermes')
     try:
         unchanged = all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
@@ -2919,7 +3508,7 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None, s
     native.finish_text_response = loop.finish_text_response = grounding_wrapper(
         native.finish_text_response, native, metadata.append_message,
         context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads,
-        status_requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_reads)
+        status_requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_reads,read_attempts=read_attempts)
     if chat_completion is not None:
         iteration=importlib.import_module('agent.turn_iteration_prep')
         if loop.begin_iteration is not iteration.begin_iteration:raise RuntimeError('management_native_iteration_alias_changed')
@@ -3566,6 +4155,7 @@ def management_report_request(request, agent, snapshot):
             schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts,
                 read_schemas={n:chat_read_schema(n,s) for n,s in catalog.items()} if direct else catalog,
                 lookup_only=service.get('lookup_only') is True,
+                lookup_incomplete=service.get('lookup_incomplete') is True,
                 direct_reads=(4 if more_allowed else 0) if direct else None,allow_more=more_allowed)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
@@ -3577,6 +4167,7 @@ def management_report_request(request, agent, snapshot):
             agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':schema,
                 'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
                 'receipt_count':len(receipts),'compact_citations':citations,'service_report':True,
+                'service_lookup_identity':copy.deepcopy(service.get('service_identity_discovery')) if service.get('lookup_incomplete') is True else None,
                 'direct_service_reads':direct,'completed_service_reads':copy.deepcopy(service['untrusted_completed_reads'])}
             agent._capstone_review_feedback=None
             return result
@@ -3700,7 +4291,9 @@ def management_selection_response(response, selection, agent):
         if removed:
             print('management_service_tool_names_deduplicated '+json.dumps({'turn':selection['turn'],'removed':removed,'dispatched':False}),file=sys.stderr)
     else:Draft202012Validator(selection['schema']).validate(value)
-    if 'compact_citations' in selection:
+    if selection.get('control_status_repair') and not control_status_bound(selection.get('control_status_context'), agent):
+        raise ValueError('management_control_status_context_changed')
+    if 'compact_citations' in selection or selection.get('control_status_repair'):
         if value.get('more_evidence') and not selection.get('direct_service_reads'):
             if selection.get('service_report'):
                 agent._capstone_service_inquiry_tools=(agent._current_turn_id,list(value['read_tools']))
@@ -3713,12 +4306,17 @@ def management_selection_response(response, selection, agent):
         if value.get('report') is not None:
             indexes=value['report'].pop('evidence_indexes')
             value['report']['evidence_tools']=[selection['compact_citations'][i] for i in indexes]
+    if selection.get('control_status_repair'):
+        result = copy.deepcopy(response)
+        result.choices[0].message.content = control_status_projection(selection['control_status_context'], value['status'])
+        return result, 0
     if 'report_facts' in selection and value.get('report') is not None:
         if any(n not in selection['report_reads'] or n not in getattr(agent,'valid_tool_names',())
                or not allowed(n,'verify') for n in value['report']['evidence_tools']):
             raise ValueError('management_report_citation_not_authorized')
         result=copy.deepcopy(response)
-        result.choices[0].message.content=render_model_review(value['report'],selection['report_facts'])
+        result.choices[0].message.content=render_model_review(value['report'],selection['report_facts'],
+            lookup_identity=selection.get('service_lookup_identity'))
         return result,0
     if 'indexed_options' in selection:
         value={'calls':[copy.deepcopy(selection['indexed_options'][i]) for i in value['reads']]}
@@ -3777,7 +4375,9 @@ def management_selection_request_wrapper(original):
         conditioned=restore_registered_read_conditions(result.api_kwargs,agent)
         data=management_read_request(conditioned,agent,pending=active)
         if not active and kw.get('turn_id')==getattr(agent,'_current_turn_id',None):
-            data=management_report_request(data,agent,getattr(agent,'_capstone_management_report',None))
+            controlled=control_status_request(data,agent)
+            data=(management_report_request(data,agent,getattr(agent,'_capstone_management_report',None))
+                  if controlled is data else controlled)
         if data is result.api_kwargs:return result
         return replace(result,api_kwargs=data,api_messages=data['messages'],
             _original_api_kwargs=copy.deepcopy(data))
@@ -3839,6 +4439,7 @@ def main():
         raise SystemExit('management_identity_or_mode_invalid')
     if os.environ.get('HERMES_HOME') != '/opt/data/management':
         raise SystemExit('management_home_invalid')
+    incident_completion_required()  # Reject malformed root metadata before discovery.
     if any(x in sys.argv for x in ('--yolo', '--safe-mode', '--ignore-user-config', '-z')):
         raise SystemExit('management_cli_override_refused')
     structured_stdout = sys.stdout
@@ -3872,6 +4473,28 @@ def main():
     native_read_catalog=[]
     argument_errors = []
     output_lock = threading.Lock()
+    read_attempt_records = []
+    read_attempt_records_complete = True
+
+    def remember_read_attempt(name, arguments, output=None, *, phase='returned', error_type=None):
+        nonlocal read_attempt_records_complete
+        if not allowed(name, 'verify'):return
+        try:
+            raw = (output if isinstance(output,str) else json.dumps(output,ensure_ascii=False,allow_nan=False)) if phase in ('returned','input_rejected') else None
+            record = {'tool':name,'arguments':copy.deepcopy(arguments),'output':raw,'phase':phase,
+                'result_sha256':hashlib.sha256(raw.encode()).hexdigest() if isinstance(raw,str) else None,
+                'is_error':phase=='input_rejected'}
+            if error_type is not None:record['error_type']=error_type
+            if raw is not None and len(raw.encode())>MAX_EVENT_AUDIT_BYTES:raise ValueError('attempt_output_bound')
+            with output_lock:
+                if len(read_attempt_records)<128:read_attempt_records.append(record)
+                else:read_attempt_records_complete=False
+        except (ValueError,TypeError,UnicodeError,RecursionError):read_attempt_records_complete=False
+
+    def read_attempt_snapshot():
+        with output_lock:
+            rows=list(read_attempt_records);complete=read_attempt_records_complete
+        return read_attempt_view(rows,complete=complete)
 
     def structured_emit(self, value):
         # CLI startup notices are diagnostics. Only native emitter events reach
@@ -3893,8 +4516,14 @@ def main():
                 rejection=required_sensor_input_rejection(name,args,sensor_requirements,sensor_receipts)
             if rejection:
                 argument_errors.append(name)
-                return json.dumps(rejection,ensure_ascii=False)
-        result=dispatch(name, args, **kwargs)
+                raw_rejection=json.dumps(rejection,ensure_ascii=False)
+                remember_read_attempt(name,args,raw_rejection,phase='input_rejected')
+                return raw_rejection
+        try:result=dispatch(name, args, **kwargs)
+        except Exception as exc:
+            remember_read_attempt(name,args,phase='transport_error',error_type=type(exc).__name__)
+            raise
+        remember_read_attempt(name,args,result)
         if mode=='verify' and allowed(name,'verify'):
             row=read_ledger_entry(name,args,result)
             with output_lock:
@@ -3938,7 +4567,7 @@ def main():
                 component_read_names.add(('mcp__system_diagnostics__' if bare=='get_system_diagnostics' else 'mcp__security_events__')+bare)
                 receipt=sensor_read_receipt(bare,params,NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))]))
                 if receipt:sensor_receipts.append(receipt)
-        if name in ('get_system_diagnostics','list_blocks') and isinstance(arguments,dict):
+        if name in ('get_system_diagnostics','get_host_inventory','list_blocks') and isinstance(arguments,dict):
             data={}
             try:
                 blocks=getattr(result,'content',[])
@@ -3980,6 +4609,7 @@ def main():
 
     @functools.wraps(builder)
     def restricted_builder(self, *args, **kwargs):
+        self._capstone_control_status_repair = None
         self.tools = permitted_tools(self.tools, mode)
         self.valid_tool_names = {tool['function']['name'] for tool in self.tools}
         if len(args) > 1 and args[1] is not None:
@@ -3998,7 +4628,7 @@ def main():
         native_read_catalog[:]=copy.deepcopy(scope_catalog)
         self._capstone_registered_read_conditions=(getattr(self,'_current_turn_id',None),{
             t['function']['name']:copy.deepcopy(t['function']['parameters']) for t in scope_catalog
-            if t['function']['name'] in ('mcp__system_diagnostics__get_system_diagnostics','mcp__resp__list_blocks') or
+            if t['function']['name'] in ('mcp__system_diagnostics__get_system_diagnostics','mcp__system_diagnostics__get_host_inventory','mcp__resp__list_blocks') or
                 t['function']['name'] in {'mcp__security_events__'+n for n in
                     ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}})
         base=management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self)
@@ -4016,14 +4646,22 @@ def main():
             pending=impact is not value
             value=impact
         self._capstone_management_pending_read=(getattr(self,'_current_turn_id',None),pending)
+        service_reads={t['function']['name'] for t in scope_catalog if allowed(t['function']['name'],'verify')}
+        service_receipts=(diagnostic_contract().bind_service_read_attempts(read_ledger,current_receipts,service_reads)
+            if not pending and receipts_complete and read_ledger_complete else None)
+        self._capstone_control_status_read_state = {
+            'turn': getattr(self, '_current_turn_id', None),
+            'reads': sorted(n for n in successful_read_names if allowed(n, 'verify')
+                            and n != 'mcp__system_diagnostics__calculate_time'),
+            'completed_reads': len(completed_wire_calls), 'receipt_count': len(current_receipts),
+            'complete': service_receipts is not None,
+            'has_errors': service_receipts is None or any(r['is_error'] for r in service_receipts),
+            'pending': bool(pending), 'scope': control_status_scope()}
         self._capstone_management_report=None
         if pending:return management_reasoning(value,self,required_read_phase=True)
         cited=completed_citation_request(value,successful_read_names,citation_notes)
         result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements),component_reads=component_read_names)
         chat=chat_read_context()
-        service_reads={t['function']['name'] for t in scope_catalog if allowed(t['function']['name'],'verify')}
-        service_receipts=(diagnostic_contract().bind_service_read_attempts(read_ledger,current_receipts,service_reads)
-            if receipts_complete and read_ledger_complete else None)
         service=(diagnostic_contract().service_report_context({'tools':scope_catalog},chat['request'],chat['requested_at_kst'],
             service_receipts,background=chat['background'],allowed_reads=service_reads)
             if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and chat and service_receipts is not None else None)
@@ -4042,14 +4680,16 @@ def main():
         guard.begin_turn('SOC 사건 판단과 검증 결과를 한국어로 보고한다.')
         guard.set_turn_evidence([{'role': 'user', 'content': '한국어 SOC 보고'}] + evidence)
         text = data.get('final_response') or ''
-        unfinished_report=bool(read_facts) and management_status(text) is None
+        unfinished_report=bool(completed_wire_calls) and (
+            bool(read_facts) and management_status(text) is None
+            or incident_completion_error(text, successful_read_names))
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
         web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_observation_reads,sensor_requirements).get('tool_choice')=='required'
         web_pending=web_pending or bool(operator_diagnostic_options({'tools':native_read_catalog},diagnostic_receipts)) or bool(chat_diagnostic_state({'tools':native_read_catalog},diagnostic_receipts)['incomplete'])
         data['final_response'] = factual_review_report(read_facts) if (unfinished_report or missing_sensor_reads(sensor_requirements,sensor_receipts) or web_pending
-            or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
+            or evidence_claim_violations(text, read_facts, successful_read_names, read_attempts=read_attempt_snapshot())) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
@@ -4105,11 +4745,11 @@ def main():
         ctx=chat_read_context()
         if not ctx or not ctx['tools'] or not read_ledger:return None
         text=literal_chat_lookup(ctx,read_ledger,current_receipts,chat_lookup_harness())
-        if text and evidence_claim_violations(text,read_facts,successful_read_names):return None
+        if text and evidence_claim_violations(text,read_facts,successful_read_names,read_attempts=read_attempt_snapshot()):return None
         return text
     install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names,
                             requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_observation_reads,
-                            chat_completion=complete_chat_lookup if chat_read_context() else None)
+                            chat_completion=complete_chat_lookup if chat_read_context() else None, read_attempts=read_attempt_snapshot)
     from hermes_cli.main import main as native_main
     native_main()
 

@@ -186,7 +186,7 @@ class ServiceReadContinuation(unittest.TestCase):
         row=f.receipt();row['data']['has_more']=True;before=copy.deepcopy(row)
         option=c.service_journal_continuations(catalog(),[row])[0]
         args=option['call']['arguments'];earliest=min(r['at_kst'] for r in row['data']['entries'])
-        self.assertEqual(args,dict(row['arguments'],until_kst=earliest,journal_scope='errors',limit=50))
+        self.assertEqual(args,dict(row['arguments'],until_kst=earliest,journal_scope='all',limit=50))
         self.assertEqual(row,before)
         self.assertEqual(c.service_journal_continuations(catalog(),[row,option['call']]),[])
         for mutation in ({'has_more':False},{'requested_until_kst':'2026-11-06T16:39:00+09:00'},
@@ -219,7 +219,10 @@ class CompletedReadIdentity(unittest.TestCase):
         self.assertEqual(c.service_repeated_calls([same],[]),[])
 
     def test_registered_defaults_and_empty_subwindows_do_not_repeat(self):
-        f=JournalEvidence();f.setUp();done=f.receipt(f.data(messages=[]))
+        f=JournalEvidence();f.setUp()
+        # Exercise the registered errors default independently of raw-log planning.
+        f.args.pop('journal_scope',None)
+        done=f.receipt(f.data(messages=[]))
         schemas={NAME:m.tools()[0]['inputSchema']}
         same={'tool':NAME,'arguments':copy.deepcopy(done['arguments'])};same['arguments'].pop('limit')
         narrower=copy.deepcopy(same);narrower['arguments']['since_kst']='2026-11-06T16:30:00+09:00'
@@ -705,7 +708,7 @@ class ServiceHistory(unittest.TestCase):
                 plan=c.service_history_plan(catalog(),q,at);self.assertIsNotNone(plan)
                 reads=plan['requirements'];self.assertEqual(len(reads),4)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end}},reads)
-                self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end,'view':'journal','limit':50}},reads)
+                self.assertIn({'tool':NAME,'arguments':{'target':'b:management','since_kst':start,'until_kst':end,'view':'journal','limit':50,'journal_scope':'all'}},reads)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management'}},reads)
                 self.assertIn({'tool':NAME,'arguments':{'target':'b:management-pipeline'}},reads)
 
@@ -1526,14 +1529,15 @@ class JournalEvidence(unittest.TestCase):
         self.plan=c.service_history_plan(catalog(),self.q,self.at)
         self.args=self.plan['requirements'][2]['arguments']
 
-    def data(self, messages=None):
+    def data(self, messages=None, *, scope=None):
         if messages is None:messages=['{"status":"failed","error":"controller_already_running"}']*2
         def runner(*args):
             rows=[{'_SYSTEMD_UNIT':'capstone-management.service','__REALTIME_TIMESTAMP':str(int(
                 datetime.fromisoformat('2026-11-06T16:24:00+09:00').timestamp()*1000000)+i),
                 '__CURSOR':'fixture'+str(i),'PRIORITY':'6','MESSAGE':msg} for i,msg in enumerate(messages)]
             return 0,('\n'.join(json.dumps(x) for x in rows)+('\n' if rows else '')).encode()
-        return d.journal_library().answer(self.args,'b',int(self.now.timestamp()),runner=runner)
+        request=self.args if scope is None else {**self.args,'journal_scope':scope}
+        return d.journal_library().answer(request,'b',int(self.now.timestamp()),runner=runner)
 
     def receipt(self,data=None):
         return {**copy.deepcopy(self.plan['requirements'][2]),'is_error':False,'data':data or self.data()}
@@ -1607,7 +1611,7 @@ class JournalEvidence(unittest.TestCase):
     def test_wrong_unit_window_scope_staleness_and_error_cannot_complete(self):
         for changes in ({'unit':'other.service'},{'target':'a:nginx'},
                         {'requested_since_kst':'2026-11-06T16:21:00+09:00'},
-                        {'journal_scope':'all'},{'observed_at_kst':'2026-11-08T02:00:00+09:00'}):
+                        {'journal_scope':'errors'},{'observed_at_kst':'2026-11-08T02:00:00+09:00'}):
             row=self.receipt();row['data'].update(changes)
             self.assertTrue(any(x.startswith('b:management:journal:') for x in c.service_history_state(self.plan,[row],self.now)['incomplete']))
         row=self.receipt();row['is_error']=True
@@ -1626,7 +1630,7 @@ class JournalEvidence(unittest.TestCase):
             with self.subTest(change=change):self.assertFalse(c.diagnostic_journal_fields(data)['journal_valid'])
 
     def test_masked_and_withheld_messages_remain_explicit_unknowns(self):
-        data=self.data(['password=fixture-secret-value', 'x'*8193, [1,2,3]])
+        data=self.data(['password=fixture-secret-value', 'x'*8193, [1,2,3]],scope='all')
         facts=c.diagnostic_observation_fields(data)
         self.assertTrue(facts['journal_valid'])
         self.assertEqual({r['message_state'] for r in facts['journal_entries']},{'redacted','message_size_bound','non_text_message'})
@@ -1647,7 +1651,7 @@ class JournalEvidence(unittest.TestCase):
         self.assertNotIn('ActiveState',table);self.assertEqual(data,before)
 
     def test_many_groups_and_long_text_show_display_limits_not_evidence_loss(self):
-        data=self.data([('different message '+str(i)+' ')*30 for i in range(10)])
+        data=self.data([('different message '+str(i)+' ')*30 for i in range(10)],scope='all')
         facts=c.diagnostic_journal_fields(data);self.assertTrue(facts['journal_valid'])
         rows=c.diagnostic_evidence_rows({'target':'b:management',**facts},str)
         self.assertEqual(len(rows),10)

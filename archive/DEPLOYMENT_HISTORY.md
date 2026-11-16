@@ -1,5 +1,9 @@
 # 설치·웹 정책 이력
 
+## 정본 동기화와 실제 배포의 분리 (2026-11-17)
+
+초기 설치기가 읽는 정본32파일을 검증한 바이트로 맞췄다. 설치기 자체는 이미 같았고 선택36파일의 SHA가 동결본과 일치했다. 실제 새 OS 설치나 운영 source/cache/service 변경은0이다. 기존 초기 설치 core3·SDK skill1 영수증 불일치의 출처 보존과 새 release 검증은 별도로 연결해야 한다. [설치 준비 범위](../infra/validation/journal-composition/CANONICAL.md).
+
 ## 운영자용 읽기 기능의 미설치 검증 (2026-11-17)
 
 관리자231 경유 A/B/C 읽기와 B의 기존 Hermes 이미지·UID10001·네트워크 없는 격리 시험만 수행했다. 운영 source/unit/reader와 Hermes 컨테이너는 전후 같았다. 임시 reader 중계·root 소켓은 운영 미설치이며 서비스 재시작·캐시 게시·MCP/모델/채팅 변경0이다. 시험4폴더38파일·시험 컨테이너를 정리했다. 초기 설치기와 기존 서버를 덮어쓰지 않았다. [검증](../infra/validation/journal-composition/witness-validation.json).

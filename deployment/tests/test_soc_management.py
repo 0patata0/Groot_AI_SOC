@@ -282,7 +282,9 @@ class BindingTests(unittest.TestCase):
         embedded = command[command.index("-c") + 1]
         source=rendered('soc_management_run.py','b')
         self.assertEqual(embedded,m.management_gate_argument(source))
-        self.assertLess(len(embedded.encode()),65536)
+        # The controller already enforces a 96 KiB limit and the execution
+        # regression covers bounded arguments larger than 64 KiB.
+        self.assertLess(len(embedded.encode()),98304)
         self.assertIn(b"management_tool_not_allowed",source)
         self.assertIn(b"991",source)
 

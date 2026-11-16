@@ -158,7 +158,7 @@ class DispositionStatusConflict(unittest.TestCase):
         nudge = h.kw['messages'][-1]['content']
         self.assertIn('unresolved_disposition_marked_resolved', nudge)
         self.assertIn('assessment가 unresolved인데 MANAGEMENT_STATUS가 resolved', nudge)
-        self.assertIn('실제 근거가 있어야', nudge)
+        self.assertIn('판단을 정상·해결로 바꾸지 않는다', nudge)
 
     def test_consistent_report_is_not_repaired_for_this(self):
         h = grounding_fixtures.Grounding(); h.setUp(); h.completed.append('search_wazuh_alerts')

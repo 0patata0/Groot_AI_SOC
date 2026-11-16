@@ -93,7 +93,9 @@ def journal_library():
         module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
             'need', 'DiagnosticError', 'TARGETS', 'PROFILES', 'ROLE_HOST', 'ERROR_PATTERN',
             'ERROR_CODES', 'STRUCTURED_ERROR_CODES', 'SOURCE_NAMES',
-            'parsed', 'encode', 'trusted_parents', 'root_file', 'bounded_command', 'history_library')})
+            'parsed', 'encode', 'trusted_parents', 'root_file', 'bounded_command', 'history_library', 'is_error_candidate',
+            'classify_message', 'validate_error', 'LOOKBACK', 'MAX_JOURNAL_ROWS',
+            'MAX_COMBINED_JOURNAL_ROWS', 'ERROR_POLICY_REVISION')})
         _journal = module
     return _journal
 
@@ -108,10 +110,16 @@ def history_library():
         exec(compile(source, str(path), 'exec'), module.__dict__)
         module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
             'need', 'DiagnosticError', 'TARGETS', 'PROFILES', 'ROLE_HOST', 'TTL', 'ERROR_PATTERN',
-            'MAX_JOURNAL_QUERY', 'MAX_JOURNAL_ROWS', 'MAX_COMBINED_JOURNAL_ROWS',
-            'parsed', 'encode', 'classify_message', 'validate_error', 'trusted_parents', 'bounded_command')})
+            'MAX_JOURNAL_QUERY', 'MAX_JOURNAL_ROWS', 'MAX_COMBINED_JOURNAL_ROWS', 'ERROR_POLICY_REVISION',
+            'parsed', 'encode', 'classify_message', 'validate_error', 'trusted_parents', 'bounded_command',
+            'collect_journal_metadata')})
         _history = module
     return _history
+
+
+def collect_journal_metadata(role, since, until, now=None):
+    """Root-only fixed metadata source, shared by snapshot and backfill."""
+    return journal_library().native_library().collect_metadata(role, since, until, now)
 
 
 def runtime_library():
@@ -132,7 +140,7 @@ NUMBER_PROPERTIES = ('ExecMainCode', 'ExecMainStatus', 'NRestarts',
 PROPERTIES = TEXT_PROPERTIES + NUMBER_PROPERTIES
 KINDS = frozenset(('journal_error', 'python_traceback', 'python_exception', 'python_location',
                    'process_exit', 'unit_result', 'start_step', 'permission_denied',
-                   'not_found', 'address_in_use', 'read_only_filesystem', 'operation_denied', 'known_error_code'))
+                   'not_found', 'address_in_use', 'read_only_filesystem', 'operation_denied', 'known_error_code', 'application_error'))
 ERROR_CODES = frozenset(('publication_failed', 'pam_uid_transition_failed', 'terminal_operation_failed',
                         'sudo_operation_failed', 'sudo_root_attestation_mismatch', 'diagnostics_unavailable'))
 # Exact controller error envelopes only. A quoted/body occurrence or an
@@ -149,10 +157,19 @@ RESULTS = frozenset(('success', 'exit-code', 'signal', 'core-dump', 'watchdog', 
     'start-limit-hit', 'resources', 'protocol', 'oom-kill', 'dependency', 'assert', 'condition'))
 STEPS = frozenset(('CHDIR', 'EXEC', 'USER', 'GROUP', 'NAMESPACE', 'CAPABILITIES',
     'LIMITS', 'STDIN', 'STDOUT', 'STDERR', 'SECCOMP', 'APPARMOR', 'SELINUX_CONTEXT'))
-ERROR_PATTERN = '|'.join(re.escape(item) for item in (*sorted(ERROR_CODES), *sorted(STRUCTURED_ERROR_CODES), *sorted(EXCEPTIONS), 'Traceback',
-    'Main process exited', 'Failed with result', 'Failed at step', 'Permission denied',
-    'No such file or directory', 'Address already in use', 'Read-only file system',
-    'Operation not permitted', *sorted(SOURCE_NAMES)))
+LEGACY_ERROR_LITERALS = (*sorted(ERROR_CODES), *sorted(STRUCTURED_ERROR_CODES), *sorted(EXCEPTIONS),
+    'Traceback', 'Main process exited', 'Failed with result', 'Failed at step',
+    'Permission denied', 'No such file or directory', 'Address already in use',
+    'Read-only file system', 'Operation not permitted', *sorted(SOURCE_NAMES))
+APPLICATION_LEVEL_KEYS = frozenset(('level', 'severity', 'log.level'))
+APPLICATION_ERROR_LEVELS = frozenset(('error', 'fatal', 'panic', 'critical', 'alert', 'emergency', 'emerg'))
+# A deliberately broad, finite prefilter. The shared parser below is the
+# authority for a new application-severity match; quoted/body tokens alone
+# must never become an error observation. Source row/byte/time bounds remain.
+APPLICATION_PREFILTER_LITERALS = ('=', '{')
+ERROR_POLICY_REVISION = 'application-severity-v1'
+ERROR_PATTERN = '|'.join(re.escape(item) for item in (*LEGACY_ERROR_LITERALS, *APPLICATION_PREFILTER_LITERALS))
+
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/nonexistent', 'LANG': 'C',
        'LC_ALL': 'C', 'SYSTEMD_COLORS': '0', 'SYSTEMD_PAGER': 'cat',
        'PYTHONDONTWRITEBYTECODE': '1'}
@@ -221,8 +238,9 @@ def bounded_command(argv, maximum, seconds, input_data=None, docker_logs=False, 
              'docker_log_command_invalid')
     checked_journal = argv[:4] == ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json']
     checked_grep = checked_journal and argv[-2:] == ['--priority=warning..info', '--grep=' + ERROR_PATTERN]
-    checked_native = argv == ['/usr/bin/python3', '-I', '-B',
-        str(Path(__file__).with_name('diagnostic_journal_native.py')), '--worker']
+    checked_native = any(argv == ['/usr/bin/python3', '-I', '-B',
+        str(Path(__file__).with_name('diagnostic_journal_native.py')), mode]
+        for mode in ('--worker', '--collector-worker'))
     checked_streams = checked_journal or checked_native
     need(cancel is None or callable(cancel), 'command_cancel_invalid')
     need(cancel is None or not cancel(), 'command_cancelled')
@@ -314,7 +332,66 @@ def parse_properties(raw, unit):
         raise DiagnosticError('properties_encoding') from None
 
 
-def classify_message(message, unit=None):
+def application_error(message):
+    """Observe declared top-level severity, never infer attack/cause or return payloads."""
+    if not isinstance(message, str) or not 0 < len(message) <= 16384:
+        return None
+    text = message.strip()
+    if text.startswith('{'):
+        try:
+            fields = parsed(text)
+        except DiagnosticError:
+            return None
+        if not isinstance(fields, dict) or len(fields) > 64:
+            return None
+        form = 'json'
+    else:
+        double = r'"(?:\\.|[^"\\])*"'
+        single = r"'(?:\\.|[^'\\])*'"
+        token = re.compile(r'([A-Za-z_][A-Za-z0-9_.-]*)=(' + double + '|' + single + r'|[^\s"\']+)')
+        fields = {}; position = 0
+        while position < len(text):
+            match = token.match(text, position)
+            if not match or match[1] in fields or len(fields) >= 64:
+                return None
+            value = match[2]
+            if value.startswith('"'):
+                try:
+                    value = parsed(value)
+                except DiagnosticError:
+                    return None
+            elif value.startswith("'"):
+                if '\\' in value:
+                    return None
+                value = value[1:-1]
+            fields[match[1]] = value
+            position = match.end()
+            if position < len(text) and not text[position].isspace():
+                return None
+            while position < len(text) and text[position].isspace():
+                position += 1
+        form = 'logfmt'
+    levels = [value for key, value in fields.items()
+              if isinstance(key, str) and key.lower() in APPLICATION_LEVEL_KEYS]
+    if len(levels) != 1 or not isinstance(levels[0], str):
+        return None
+    level = levels[0].lower()
+    if level not in APPLICATION_ERROR_LEVELS:
+        return None
+    return {'kind': 'application_error', 'format': form, 'level': level}
+
+
+def is_error_candidate(message, priority, unit=None):
+    """Keep legacy literal candidates; add only parsed application severity."""
+    if isinstance(priority, str) and priority in tuple('0123'):
+        return True
+    if not isinstance(message, str):
+        return False
+    return (any(term in message for term in LEGACY_ERROR_LITERALS)
+            or application_error(message) is not None)
+
+
+def classify_message(message, unit=None, *, priority=None):
     # Never return raw MESSAGE, quoted command arguments, paths, headers,
     # HTTP bodies, credentials, or instructions carried in journal text.
     if not isinstance(message, str) or len(message) > 16384:
@@ -358,6 +435,9 @@ def classify_message(message, unit=None):
                         ('Operation not permitted', 'operation_denied')):
         if token in text:
             return {'kind': kind}
+    declared = application_error(text) if type(priority) is int and 4 <= priority <= 6 else None
+    if declared is not None:
+        return declared
     return {'kind': 'journal_error'}
 
 
@@ -379,11 +459,16 @@ def journal_errors(raw, units, now, source_truncated=None):
              and isinstance(priority, str) and priority in tuple('0123456'), 'journal_fields')
         at = int(stamp) // 1000000
         need(now - LOOKBACK * 60 <= at <= now, 'journal_time')
-        classified = classify_message(value.get('MESSAGE'),unit)
+        classified = classify_message(value.get('MESSAGE'),unit,priority=int(priority))
         if int(priority) > 3 and classified['kind'] == 'journal_error':
             continue
         by_unit[unit].append({'at': at, 'priority': int(priority), **classified})
     truncated = len(lines) >= MAX_JOURNAL_ROWS if source_truncated is None else source_truncated
+    return summarize_errors(by_unit), truncated
+
+
+def summarize_errors(by_unit):
+    """Shared bounded snapshot summary of already-classified metadata."""
     newest = sorted(((row['at'], unit, index) for unit, rows in by_unit.items()
                      for index, row in enumerate(rows)), reverse=True)[:MAX_RETAINED_ERRORS]
     retained = {(unit, index) for _, unit, index in newest}
@@ -395,7 +480,7 @@ def journal_errors(raw, units, now, source_truncated=None):
             'error_observations': {'count': len(rows), 'first_at': min((row['at'] for row in rows), default=None),
                 'last_at': max((row['at'] for row in rows), default=None), 'scope': 'bounded_journal_sample'},
             'retained_errors_truncated': len(selected) < len(rows)}
-    return result, truncated
+    return result
 
 
 def validate_error(value, since, until):
@@ -403,10 +488,14 @@ def validate_error(value, since, until):
     base = {'at', 'priority', 'kind'}
     fields = {'python_exception': {'exception'}, 'python_location': {'source', 'line'},
               'process_exit': {'exit_code', 'exit_kind'}, 'unit_result': {'result'},
-              'start_step': {'step'}, 'known_error_code': {'code'}}.get(value['kind'], set())
+              'start_step': {'step'}, 'known_error_code': {'code'},
+              'application_error': {'format', 'level'}}.get(value['kind'], set())
     need(set(value) == base | fields and type(value['at']) is int and since <= value['at'] <= until
          and type(value['priority']) is int and 0 <= value['priority'] <= 6, 'error_schema')
     if fields:
+        if value['kind'] == 'application_error':
+            need(4 <= value['priority'] <= 6 and value['format'] in ('logfmt', 'json') and isinstance(value['level'], str)
+                 and value['level'] in APPLICATION_ERROR_LEVELS, 'error_value')
         if value['kind'] == 'python_exception': need(isinstance(value['exception'], str) and value['exception'] in EXCEPTIONS, 'error_value')
         if value['kind'] == 'python_location':
             need(isinstance(value['source'], str) and value['source'] in SOURCE_NAMES and type(value['line']) is int
@@ -504,31 +593,42 @@ def collect(role, runner=bounded_command, now=None, include_runtime=None, histor
             'error_observations': {'count': None, 'first_at': None, 'last_at': None, 'scope': 'bounded_journal_sample'},
             'retained_errors_truncated': False}
     try:
-        prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
-            '--output-fields=__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
-            '--since=@' + str(now - LOOKBACK * 60), '--until=@' + str(now),
-            '--lines=' + str(MAX_JOURNAL_ROWS), *('--unit=' + unit for unit in profile.values())]
-        parts, batches, truncated = [], [], False
-        # Service stderr can have journal priority info. Keep that stream only
-        # when a fixed error classifier pattern matches; ordinary bodies never
-        # become error observations. The priority ranges are disjoint.
-        for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + ERROR_PATTERN]):
-            code, raw = runner(prefix + filters, MAX_JOURNAL_QUERY, 8)
-            need(code == 0, 'journal_query_failed')
-            lines = raw.splitlines()
-            need(len(lines) <= MAX_JOURNAL_ROWS, 'journal_row_bound')
-            truncated |= len(lines) == MAX_JOURNAL_ROWS
-            parts.extend(lines)
-            batches.append(raw)
-        errors, truncated = journal_errors(b'\n'.join(parts), profile.values(), now, truncated)
+        since, until = (now - LOOKBACK * 60) * 1000000, now * 1000000
+        if runner is bounded_command:
+            batch = collect_journal_metadata(role, since, until, now)
+            collected, truncated = batch['events'], batch['truncated']
+            by_unit = {unit: [] for unit in profile.values()}
+            for event in collected:
+                by_unit[event['unit']].append(event['error'])
+            errors = summarize_errors(by_unit)
+        else:
+            prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
+                '--output-fields=__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
+                '--since=@' + str(now - LOOKBACK * 60), '--until=@' + str(now),
+                '--lines=' + str(MAX_JOURNAL_ROWS), *('--unit=' + unit for unit in profile.values())]
+            parts, batches, truncated = [], [], False
+            # Service stderr can have journal priority info. Keep that stream only
+            # when a fixed error classifier pattern matches; ordinary bodies never
+            # become error observations. The priority ranges are disjoint.
+            for filters in (['--priority=err'], ['--priority=warning..info', '--grep=' + ERROR_PATTERN]):
+                code, raw = runner(prefix + filters, MAX_JOURNAL_QUERY, 8)
+                need(code == 0, 'journal_query_failed')
+                lines = raw.splitlines()
+                need(len(lines) <= MAX_JOURNAL_ROWS, 'journal_row_bound')
+                truncated |= len(lines) == MAX_JOURNAL_ROWS
+                parts.extend(lines)
+                batches.append(raw)
+            errors, truncated = journal_errors(b'\n'.join(parts), profile.values(), now, truncated)
+            collected = []
+            if history_output is not None:
+                history = history_library()
+                collected = [row for raw in batches for row in history.normalize(
+                    raw, set(profile.values()), (now - LOOKBACK * 60) * 1000000, now * 1000000)[0]]
         for row in value['units'].values():
             row.update(**errors[row['unit']], journal_status='observed', journal_truncated=truncated)
         if history_output is not None:
-            history = history_library()
-            collected = [row for raw in batches for row in history.normalize(
-                raw, set(profile.values()), (now - LOOKBACK * 60) * 1000000, now * 1000000)[0]]
-            history_output.update(host=ROLE_HOST[role], since=(now - LOOKBACK * 60) * 1000000,
-                                  until=now * 1000000, events=collected, truncated=truncated)
+            history_output.update(host=ROLE_HOST[role], since=since, until=until,
+                                  events=collected, truncated=truncated)
     except (DiagnosticError, OSError):
         pass
     if include_runtime is True or (include_runtime is None and runner is bounded_command and Path('/etc/capstone-diagnostics/runtime.json').exists()):

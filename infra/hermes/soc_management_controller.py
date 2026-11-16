@@ -247,6 +247,38 @@ class Store:
     def set_meta(self, key, value):
         self.db.execute("INSERT INTO meta VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, str(value)))
 
+    def requires_incident_disposition(self, case_id):
+        """A durable completion requirement, never an execution permission."""
+        if not isinstance(case_id, str) or not re.fullmatch('[0-9a-f]{32}', case_id):
+            raise ControllerError('incident_completion_case_invalid')
+        raw = self.meta('incident_completion/' + case_id, '')
+        if not raw:
+            return False
+        try:
+            value = json.loads(raw)
+            if (not isinstance(value, dict) or set(value) != {'version','required','origin'}
+                    or type(value['version']) is not int or value['version'] != 1
+                    or value['required'] is not True
+                    or value['origin'] not in ('sensor_event','chat_investigation')
+                    or canonical(value) != raw):
+                raise ValueError()
+        except (TypeError, ValueError):
+            raise ControllerError('incident_completion_contract_invalid') from None
+        return True
+
+    def require_incident_disposition(self, case_id, origin):
+        """Persist only a stricter requirement; later runs cannot clear it."""
+        if origin not in ('sensor_event','chat_investigation'):
+            raise ControllerError('incident_completion_origin_invalid')
+        with self.db:
+            required = self.requires_incident_disposition(case_id)
+            if not self.db.execute('SELECT 1 FROM cases WHERE id=?', (case_id,)).fetchone():
+                raise ControllerError('incident_completion_case_missing')
+            if not required:
+                self.db.execute('INSERT OR IGNORE INTO meta VALUES(?,?)',
+                    ('incident_completion/' + case_id,
+                     canonical({'version':1,'required':True,'origin':origin})))
+
     def new_case(self, key, mode="manage", priority=10):
         cid, now = digest(key)[:32], self.clock()
         self.db.execute("INSERT OR IGNORE INTO cases(id,state,mode,created,updated,due,priority) VALUES(?,?,?,?,?,?,?)",
@@ -1075,6 +1107,9 @@ class Trace:
             self.required_sensor_reads=sensor_read_requirements(canonical(required))
         self.pending_required_sensor_errors=set()
         self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
+        self.incident_disposition_required = bool(self.sensor_requirements
+            or store.requires_incident_disposition(case['id'])
+            or dict(case).get('incident_disposition_required') is True)
         self.sensor_receipts = set()
         self.impact_receipts = set()
         self.bundle_impact_receipts = set()
@@ -1304,6 +1339,9 @@ class Trace:
                 "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_error=0", (self.run_id,))
                 if row[0] not in CALCULATION_TOOLS}
             decision_error = sensor_disposition_error(text, successful_tools,self.bundle_sensor_receipts,self.sensor_requirements) if self.sensor_requirements else None
+            if self.incident_disposition_required and disposition == 'resolved':
+                from soc_management_run import incident_completion_error
+                decision_error = decision_error or incident_completion_error(text, successful_tools, required=True)
             missing_bound_read = any(not verified_proposal(
                 tuple(p[k] for k in ("id", "status", "result_status", "target")),
                 self.read_receipts, self.later_proposals) for p in proposals)
@@ -1349,6 +1387,10 @@ class Trace:
                 state, detail, due = "completed", "model_completed_investigation", now
             else:
                 state, detail, due = "needs_review", "model_" + disposition, now
+            if disposition == 'resolved' and self.incident_disposition_required and decision_error:
+                # Preserve read/approval routing and the private native trace,
+                # but never publish a closing claim that failed its contract.
+                text = incomplete_report(decision_error, self.case['id'])
         with db:
             db.execute("UPDATE runs SET state=?,finished=?,detail=? WHERE id=?", ("completed" if success else "outcome_unknown", now, detail, self.run_id))
             db.execute("UPDATE cases SET state=?,updated=?,due=?,detail=?,final_text=?,delivered=0,monitor_count=monitor_count+?,mode=CASE WHEN ?='waiting_approval' OR (?='monitor' AND EXISTS(SELECT 1 FROM proposals WHERE case_id=cases.id)) THEN 'verify' ELSE mode END WHERE id=?",
@@ -1866,12 +1908,17 @@ def automatic_review_case(store, case, evidence):
 
 def command_for(case):
     case=dict(case)
+    required = case.get('incident_disposition_required', False)
+    if type(required) is not bool:
+        raise ControllerError('incident_completion_flag_invalid')
     command = ["/usr/local/bin/docker", "exec", "-i", "-u", "995:986", "-e", "HERMES_HOME=/opt/data/management",
                "-e", "CAPSTONE_MANAGEMENT_MODE=" + case["mode"], "-w", "/opt/data/management", "hermes",
                "/usr/bin/timeout", "--signal=TERM", "--kill-after=5s", "280s",
                "/opt/hermes/.venv/bin/python", "/opt/data/management-code/run.py", "chat", "--query-file", "-",
                "--format", "stream-json", "--oneshot", "--max-turns", "12", "--run-budget", "250",
                "--source", "capstone-management", "-t", ",".join(TOOLSETS)]
+    if required:
+        command[2:2] = ['-e', 'CAPSTONE_INCIDENT_DISPOSITION_REQUIRED=1']
     chat_read=(dict(case).get('chat_task')=='lead' and case['mode']=='verify'
         and not dict(case).get('operator_review') and not dict(case).get('review_response_write')
         and dict(case).get('run_count')==0 and case.get('session_id') is None)
@@ -1967,10 +2014,19 @@ def verified_management_command(case):
 
 def verification_case(store, case, at=None):
     """Bind current reads for automatic and operator verification alike."""
+    case = dict(case)
+    explicit = case.get('incident_disposition_required', False)
+    if type(explicit) is not bool:
+        raise ControllerError('incident_completion_flag_invalid')
+    evidence = store.context(case['id'])
+    if sensor_review_requirements(evidence):
+        store.require_incident_disposition(case['id'], 'sensor_event')
+    elif explicit:
+        store.require_incident_disposition(case['id'], 'chat_investigation')
+    case['incident_disposition_required'] = store.requires_incident_disposition(case['id'])
     if case['mode']=='verify':
         # Authenticated controller metadata reaches the wrapper out of band.
         # The model still selects the required read's tool/arguments and disposition.
-        evidence=store.context(case['id'])
         case = dict(case, required_status_reads=[{"proposal_id": p["id"], "target": p["target"]}
             for p in evidence["proposals"]])
         at=at or (datetime.fromisoformat(case['incident_read_at'])

@@ -134,7 +134,9 @@ class Native(unittest.TestCase):
         self.assertEqual(self.work([e, e2])['entries'], [])
 
     def test_error_selection_keeps_severity_and_all_fixed_info_literals(self):
-        for i, literal in enumerate(n.fixed_literals()):
+        self.assertTrue({term.encode() for term in d.LEGACY_ERROR_LITERALS} <= set(n.fixed_literals()))
+        for i, term in enumerate(d.LEGACY_ERROR_LITERALS):
+            literal = term.encode()
             result = self.work([event(message=b'prefix '+literal+b' suffix', cursor=str(i))])
             self.assertEqual(len(result['entries']), 1)
         self.assertEqual(len(self.work([event(message=b'ordinary', priority=b'3')])['entries']), 1)
@@ -204,7 +206,7 @@ class Native(unittest.TestCase):
 
     def test_job_cannot_select_command_path_regex_another_host_or_unknown_fields(self):
         jobs = [dict(value=args(), host='a'), dict(value=args(), host='b', path='/etc/shadow'),
-                dict(value=dict(args(), target='b:systemd'), host='b'),
+                dict(value=dict(args(), target='b:collection'), host='b'),
                 dict(value=dict(args(), command='id'), host='b')]
         for job in jobs:
             with self.assertRaises(ValueError):n.worker(job, now=NOW, factory=self.factory([]))

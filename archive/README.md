@@ -1,6 +1,6 @@
 # 과거 기록과 복원 안내
 
-[전환 상태 대조·재개 판정](../infra/validation/journal-composition/WITNESS.md)의 소스·회귀·실제 읽기·초기 실패·미설치 범위를5유형 이력에 보존했다. 현재 상태·계획은 STATUS·PLAN이 기준이며 이전 절의 미완료 표기는 당시 단계다.
+[정본·초기 설치 소스 동기화](../infra/validation/journal-composition/CANONICAL.md)의 차이·현재 정본 회귀·이전 Linux 근거·미배포 범위를5유형 이력에 보존했다. 현재 상태·계획은 STATUS·PLAN을 따르며 이전 절의 미완료 표기는 당시 단계다.
 
 [전체 수집 자원 시험](../infra/validation/journal-composition/RESOURCES.md)의 호스트별1회 관측·운영 미적용과 문서 갱신 후 윤문 규칙을 현황·계획·진단 이력에 남겼다. 유한 한도 확정과 초기 설치 동기화는 남아 있다.
 

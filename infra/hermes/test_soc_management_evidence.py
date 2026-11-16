@@ -219,7 +219,7 @@ class LiteralEvidence(unittest.TestCase):
         self.assertIn('unverified_engine_loading_claimed',m.evidence_claim_violations(
             '실제 적재를 확인했습니다. 일부 검사는 미확인입니다.',facts))
 
-    def test_model_can_repair_missing_status_once_without_another_forced_read(self):
+    def test_model_can_repair_missing_status_with_existing_literal_cap_without_forcing_read(self):
         h=grounding_fixtures.Grounding();h.setUp();h.completed.append('list_blocks')
         h.kw['assistant_message'].content='현재 차단 목록은 비어 있습니다.'
         call=m.grounding_wrapper(lambda agent,**kw:'original',
@@ -230,6 +230,10 @@ class LiteralEvidence(unittest.TestCase):
         self.assertIs(h.agent._build_api_kwargs,h.builder)
         self.assertIn('missing_or_invalid_management_status',h.kw['messages'][-1]['content'])
         h.kw['codex_ack_continuations']=1
+        second=call(h.agent,**h.kw)
+        self.assertEqual(second.action,'continue')  # Existing second literal-only repair, not a new budget.
+        self.assertIs(h.agent._build_api_kwargs,h.builder)
+        h.kw['codex_ack_continuations']=2
         self.assertEqual(call(h.agent,**h.kw),'original')
         h.kw['assistant_message'].content+='\nMANAGEMENT_STATUS: monitor'
         self.assertEqual(m.management_status(h.kw['assistant_message'].content),'monitor')

@@ -42,6 +42,7 @@ class HistoryTests(unittest.TestCase):
                     for name in ('st_uid','st_gid','st_mode','st_nlink','st_size')})
             return value
         for item in (patch.object(h,'DATABASE',self.path), patch.object(h.grp,'getgrnam',return_value=NS(gr_gid=gid)),
+                     patch.object(h.time,'time_ns',return_value=NOW*1000000000),
                      patch.object(h.os,'getuid',return_value=0), patch.object(h.os,'geteuid',return_value=0),
                      patch.object(h.os,'fchown'), patch.object(d,'trusted_parents'), patch.object(Path,'lstat',metadata),
                      patch.object(d,'_history',h)):
@@ -187,31 +188,28 @@ class HistoryTests(unittest.TestCase):
         h.publish(**captured)
         self.assertEqual(h.answer(query(since=NOW-120,until=NOW),'c',NOW)['indexed_error_count'],1)
 
-    def test_backfill_accepts_only_fixed_role_and_two_fixed_read_filters(self):
+    def test_backfill_accepts_only_fixed_role_and_bounded_metadata_windows(self):
         calls=[]
-        def run(argv,maximum,seconds):
-            calls.append((argv,maximum,seconds));return 0,b''
-        with patch.object(d,'bounded_command',run):
+        def read(role,since,until,now):
+            calls.append((role,since,until,now));return {'events':[],'truncated':False}
+        with patch.object(d,'collect_journal_metadata',read):
             result=h.collect('service',NOW,hours=24)
             with self.assertRaises(d.DiagnosticError):h.collect('service',NOW,hours=25)
-        self.assertEqual(len(calls),12)
-        for argv,maximum,seconds in calls:
-            self.assertEqual(argv[0],'/usr/bin/journalctl')
-            since=int(next(a.removeprefix('--since=@') for a in argv if a.startswith('--since=@')))
-            until=int(next(a.removeprefix('--until=@') for a in argv if a.startswith('--until=@')))
-            self.assertEqual(until-since,14400)
-            self.assertEqual((maximum,seconds),(1048576,8))
-            self.assertTrue(all(a.removeprefix('--unit=') in d.PROFILES['service'].values() for a in argv if a.startswith('--unit=')))
+        self.assertEqual(len(calls),6)
+        for role,since,until,now in calls:
+            self.assertEqual(role,'service');self.assertEqual(now,NOW)
+            self.assertEqual(until-since,14400*US)
+            self.assertTrue((NOW-86400)*US<=since<until<=NOW*US)
         self.assertFalse(result['source_truncated'])
 
     def test_failed_backfill_window_does_not_publish_zero_or_full_coverage(self):
-        def run(argv,maximum,seconds):
-            if '--since=@'+str(NOW-57600) in argv:raise d.DiagnosticError('command_timeout')
-            return 0,b''
-        with patch.object(d,'bounded_command',run):result=h.collect('service',NOW,hours=24)
+        def read(role,since,until,now):
+            if since==(NOW-57600)*US:raise d.DiagnosticError('command_timeout')
+            return {'events':[],'truncated':False}
+        with patch.object(d,'collect_journal_metadata',read):result=h.collect('service',NOW,hours=24)
         self.assertEqual(result['failed_window_count'],1)
         self.assertEqual(h.answer(query(),'c',NOW)['history_coverage']['status'],'partial_or_unavailable')
-        with patch.object(d,'bounded_command',side_effect=d.DiagnosticError('command_timeout')):
+        with patch.object(d,'collect_journal_metadata',side_effect=d.DiagnosticError('command_timeout')):
             with self.assertRaisesRegex(d.DiagnosticError,'no_window_available'):h.collect('service',NOW,hours=24)
 
     def test_reader_history_does_not_require_a_current_snapshot(self):

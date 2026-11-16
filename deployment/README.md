@@ -1,5 +1,8 @@
 # 구축·운영 가이드
 
+로컬 매뉴얼형 논문은 설치 plan/check/apply/verify의 입력·위치·통과 기준과 실패 시 부분 설치 확인을 보강했다. 동일60쪽 MD/PDF/DOCX 문서 검수이며 신규 OS 전체 설치나 운영 변경은 수행하지 않았다. [현재 상태](../STATUS.md)를 따른다.
+
+
 <!-- service-error-coverage:start -->
 [원문·조사 후보](../infra/validation/service-error-coverage/README.md)는 미적용 patch/재현기다. 정본·설치기를 승격하지 않았으며 실제 새 OS 설치·운영 로드/새 채팅은 미수행이다. 후보의 추가 읽기는 기존 등록 함수/대상/기간/한도 안에서 이루어지고 권한/승인/보호/TTL을 확대하지 않는다. 기존19/journal9 적용안은 별개로 보존한다.
 <!-- service-error-coverage:end -->

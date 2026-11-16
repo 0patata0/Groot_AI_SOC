@@ -6,7 +6,7 @@
 
 [실제OS조회후속](validation/read-target-live/README.md): 같은학습본/SDK·2질문×2비교본4요청·실제7읽기/모델13완료에서 집계systemd필수계획 공백과 무조회 로그 생성을 확인했다. 대상검사기가허위주장을거절했지만실제조회미완수로후보미채택이다. 현재snapshot/unit이력/원문/색인경보의실제capability를공통계획에맞추는보완이필요하다. 20:52 KST B24소스/45허용schema/config/modeldigest/PID/timer불변·운영/채팅/보호호출0이다. 아래새생성0은이전동결회귀단위의기록이다.
 
-현재 역할은 B의 두 에이전트·MCP와 Thor의 학습본 추론이며, DGX는 학습을 담당한다. [OS 대상·범위 서술 후보](validation/read-target-binding/README.md)는 기존 Hermes840회귀/공식Harness²·과거 응답 검출을 확인한 **미적용 격리 후보**다. 17:52 KST B24소스/45schema·학습본digest·기존 PID/timer 불변을 확인했고 운영/초기설치 입력은 변경하지 않았다. 매뉴얼형 논문56쪽과 현재 승인 대기 범위는 [STATUS](../STATUS.md)를 따른다. 아래 모델·도구 수·날짜별 내용은 당시 기록이다.
+현재 역할은 B의 두 에이전트·MCP와 Thor의 학습본 추론이며, DGX는 학습을 담당한다. [OS 대상·범위 서술 후보](validation/read-target-binding/README.md)는 기존 Hermes840회귀/공식Harness²·과거 응답 검출을 확인한 **미적용 격리 후보**다. 17:52 KST B24소스/45schema·학습본digest·기존 PID/timer 불변을 확인했고 운영/초기설치 입력은 변경하지 않았다. 매뉴얼형 논문60쪽과 현재 승인 대기 범위는 [STATUS](../STATUS.md)를 따른다. 아래 모델·도구 수·날짜별 내용은 당시 기록이다.
 
 현재 journal 읽기는 [native 어댑터 후보](validation/journal-adapter/README.md)166검사/실제격리8건과 [정확9코드 적용안](validation/journal-adapter/application/README.md)33회귀/9복제원복·18중간load를 확인했다. A/B/C PREPARED·원본6개를 보관하며 운영 적용·원복timer/실제MCP·새채팅은 미수행이다. 아래 날짜별 구성은 당시 이력이며 현재 상태는 [STATUS](../STATUS.md)를 따른다.
 

@@ -1,7 +1,7 @@
 # Groot_AI_SOC
 
 <!-- current-work-summary:start -->
-현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 무엇·방법·이유·준비·실행·확인·복구를 설명하는 매뉴얼형 MD/PDF/DOCX56쪽·15SHA 검수본이며 사진/학번은 공란·로컬 전용입니다.
+현재 완료·미완료는 [STATUS](STATUS.md)·[PLAN](PLAN.md)을 기준으로 합니다. 논문은 무엇·방법·이유·준비·실행·확인·복구를 설명하는 매뉴얼형 MD/PDF/DOCX60쪽·15SHA 검수본이며 사진/학번은 공란·로컬 전용입니다.
 
 [서비스 오류 원문·완료 조건](infra/validation/service-error-coverage/README.md): query152/common96 미적용5소스 후보로 errors0 뒤 같은 범위 원문 조회·형식 정정을 보완했습니다. Mac1239(기존6생략)/Hermes1322·신규49·공식Harness²36구성/상시 증가0·643복원을 확인했습니다. 최종SDK4응답21.028~43.559초이나 데이터 손실·DNS 영향 추정이 남아 미승격입니다. 총14실행/5문자열·29읽기/47모델완료는 개발 소비이며 운영/실제 채팅·독립 점수가 아닙니다. 정본/설치 query137·학습 모델/권한·기존 정확 승인안 유지.
 <!-- current-work-summary:end -->

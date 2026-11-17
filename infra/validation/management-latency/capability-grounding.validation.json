@@ -1,0 +1,353 @@
+{
+  "schema": 1,
+  "topic": "Inventory activation claims, registered-read evidence limits and bounded inquiry/report contracts",
+  "observed_at_kst": "2026-11-18T04:45:05.209374+09:00",
+  "candidate": {
+    "installed_copy_files": 16,
+    "plan_sha256": "ad71af5346b272ba9d24eff8d7256e66518e588793ed7bf7e293c6aca4c06e2d",
+    "canonical_sources": {
+      "infra/hermes/chat_contract.py": "06d0da8f94cc91c581ec7412f2127c3e6cd956ceb41bc83fdcf2fe6026d2e070",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "ce79d42e5f7f208b3ae24a0684fac76d169bbb0bdca6eb496dac14bffe50542d",
+      "infra/ollama-trial/harness.py": "5e446a3943a006366dd2457f091178259589ccd05c4bcccfd909e61304604b7b",
+      "infra/ollama-trial/runtime.py": "06e695faadb5fe9e93665fa825b683d705b8858693e7bc24a957ac85b1f2c3dc",
+      "infra/ollama-trial/test_evidence_runtime.py": "7b75b6c23b81372724c960673e70c3db9491370f459b5b1543ceb313ab97e692",
+      "infra/ollama-trial/test_capability_grounding.py": "e3a7a82c4052ad23a85a8994b7f155724dc12ee036658e4b61a8239dafddab00"
+    },
+    "canonical_input_hashes": {
+      "infra/hermes/chat_contract.py": "06d0da8f94cc91c581ec7412f2127c3e6cd956ceb41bc83fdcf2fe6026d2e070",
+      "infra/hermes/read_contract.py": "16a9e711a057f811c9949ad850de575e4987ac26dfcb8ad8eb094a92c8459620",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "ce79d42e5f7f208b3ae24a0684fac76d169bbb0bdca6eb496dac14bffe50542d",
+      "infra/ollama-trial/harness.py": "5e446a3943a006366dd2457f091178259589ccd05c4bcccfd909e61304604b7b",
+      "infra/ollama-trial/runtime.py": "06e695faadb5fe9e93665fa825b683d705b8858693e7bc24a957ac85b1f2c3dc",
+      "infra/ollama-trial/test_capability_grounding.py": "e3a7a82c4052ad23a85a8994b7f155724dc12ee036658e4b61a8239dafddab00",
+      "infra/ollama-trial/test_companion_reads.py": "e2fd2e423607be02a70d9d123d889735387320800a163ddbb9ed0a094d847c94",
+      "infra/ollama-trial/test_diagnostic_grounding.py": "0b79705b7c7e49db3b4bf22c54cb1645bb8d370e1a2189b6a7b047b255153df3",
+      "infra/ollama-trial/test_evidence_comparison.py": "b6b2581ef888d2acfd62c7438d9df68481022088a76f91ed7e1c692c4a1a4286",
+      "infra/ollama-trial/test_evidence_report.py": "db0cf5f87aa5c2fe42b7b27683fa6885427248ce665425c35ae28d1c1763eafd",
+      "infra/ollama-trial/test_evidence_runtime.py": "7b75b6c23b81372724c960673e70c3db9491370f459b5b1543ceb313ab97e692",
+      "infra/ollama-trial/test_initial_event_day.py": "14b1ae7e88255ea412d5588372daf285c58d9505965f14e2198f22715af2e06d"
+    },
+    "base_commit": "bce2ed9cc1fcdd32184852056f08b9e0d58dbc0d",
+    "operating_applied": false,
+    "new_mcp_tools": 0,
+    "model_or_permissions_or_approval_or_protection_or_ttl_changed": false,
+    "flag": "CAPSTONE_EVIDENCE_REPORT_COMPACT",
+    "evidence_phase_default": 0,
+    "flag_scope": "New SDK structured evidence phase only. Common input/format/checker code is a separate candidate; none installed operating.",
+    "native_evidence_execution_connected": false,
+    "initial_installation": "Existing deploy.sh source-copy paths; no new packages or automatic experimental activation."
+  },
+  "operating": {
+    "source_count": 59,
+    "all_source_hashes_unchanged": true,
+    "source_observed_at_kst": "2026-11-18T04:42:34.285147+09:00",
+    "harness2_observed_at_kst": "2026-11-18T04:42:53.139973+09:00",
+    "harness2_status": "passed",
+    "harness2_sources": 50,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "prior_13_file_operating_fix_preserved": true,
+    "service_restarts": 0
+  },
+  "changes": {
+    "activation": "An IP inventory is not feature activation proof; attached unknown/negative modality and separate finite claims are distinguished. A full FW read remains separate evidence.",
+    "coverage": "Reuse existing read classifiers and actual registered catalog. Known available/completed/failed reads require evidence-scope review rather than a feature-absence claim; aggregate count needs are not established by sample search. This is a limited checker, not complete semantic verification.",
+    "negative_http": "Use shared modality including evidence/proof noun phrases and coordinated outcome negation; keep positive/double-negative outcome rejection.",
+    "feedback": "Bounded executor issue codes plus actual registered-read ordinal/hash/error/list cardinality. Prior model output remains untrusted and raw response audit retained.",
+    "pending_steps": "While actual read budget remains, final next_steps has minItems=0/maxItems=0; needed actual reads still use more_evidence/calls, real limitations stay limitations. After budget exhaustion pending read proposals or unsupported-scope needs remain possible and unexecuted.",
+    "display": "An unmet-evidence step no longer automatically declares feature development necessary."
+  },
+  "checks": {
+    "actual_installed_copy_mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 213,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 176,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "actual_installed_copy_linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 213,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 176,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.366s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.553s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "official_framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "official_framework_files": 140,
+    "actual_tool_schema_hashes_verified": true,
+    "always_on_char_delta": {
+      "native": 0,
+      "sdk": 0,
+      "management": 0
+    },
+    "canonical": {
+      "results": {
+        "native": {
+          "rc": 0,
+          "summary": {
+            "run": 430,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "sdk": {
+          "rc": 1,
+          "summary": {
+            "run": 477,
+            "failures": [
+              "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+              "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+              "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+            ],
+            "errors": [
+              "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+            ],
+            "skipped": 0
+          }
+        }
+      },
+      "same_preexisting_sdk_findings": true
+    },
+    "initial_installation_copy_failure": "Missing existing canonical claim_modality function: native 3 errors / sdk 5 errors; fixed by exact scoped transplant and full installed-copy retest.",
+    "direct_code_review": "Main agent; no delegated code review; no remaining introduced-code finding after fixes. Behavioral completeness below remains open."
+  },
+  "actual_isolated_sdk": [
+    {
+      "trial": "initial",
+      "at_kst": "2026-11-18T04:05:02.943345+09:00",
+      "plan_sha256": "daff45b5b8b2800a0f45470ddd8dc2d22ccaf51ae1bb4a2c4168038dab97b448",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 46.9678770530154,
+      "model_calls": 2,
+      "mcp_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "claim_repairs": 0,
+      "status": "partial",
+      "stop_reason": null,
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "raw_result_sha256": "8fea8df1e0787cfea29ab23070bab3315a934df691ec3bef09230d52faf3d308",
+      "note": "Already completed current block list was mislabeled capability gap.",
+      "is_mattermost_roundtrip": false
+    },
+    {
+      "trial": "scope-check",
+      "at_kst": "2026-11-18T04:16:12.059164+09:00",
+      "plan_sha256": "d09f502f2730642342ef63d272e629ce86b03c38c33d413331edcd0164c6fe91",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 64.2198933599866,
+      "model_calls": 4,
+      "mcp_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "claim_repairs": 2,
+      "status": "partial",
+      "stop_reason": "evidence_report_claim_repair_budget_exhausted",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "raw_result_sha256": "83ba00b7fd4f2cd2e8128f60229ef6de3df34dcc356582b89ead1f6fe3dbdac4",
+      "note": "Correct negative HTTP explanation falsely rejected; same capability step repeated; bounded incomplete report.",
+      "is_mattermost_roundtrip": false
+    },
+    {
+      "trial": "negative-fix",
+      "at_kst": "2026-11-18T04:29:25.294943+09:00",
+      "plan_sha256": "73dffb4514e65b3d8534ca7f009fd100dbc69680719de3fd9b63e646b1bb853d",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 63.96129434695467,
+      "model_calls": 4,
+      "mcp_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "claim_repairs": 2,
+      "status": "partial",
+      "stop_reason": "evidence_report_claim_repair_budget_exhausted",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "raw_result_sha256": "89d976c1ae007caaacab7a2360255324fd4b19375fb313cb73e46bf2dc70e6f9",
+      "note": "Negative explanation passes; repeated capability step still rejected; bounded incomplete report.",
+      "is_mattermost_roundtrip": false
+    },
+    {
+      "trial": "final-short",
+      "at_kst": "2026-11-18T04:35:52.274880+09:00",
+      "plan_sha256": "ad71af5346b272ba9d24eff8d7256e66518e588793ed7bf7e293c6aca4c06e2d",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 48.04379553499166,
+      "model_calls": 2,
+      "mcp_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "claim_repairs": 0,
+      "status": "partial",
+      "stop_reason": null,
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "raw_result_sha256": "a3c20bcdfd996588feb17e1e997f82327e54ffa5768191796024d1a0fc054df0",
+      "note": "Requested factual calendar/sensor comparison/current-membership scope verified, unresolved risk retained.",
+      "is_mattermost_roundtrip": false
+    },
+    {
+      "trial": "final-expanded",
+      "at_kst": "2026-11-18T04:38:00.806722+09:00",
+      "plan_sha256": "ad71af5346b272ba9d24eff8d7256e66518e588793ed7bf7e293c6aca4c06e2d",
+      "question": "어제 WAF·IDS 공격 경보를 조사해줘. 출발지가 겹쳤는지, 웹 요청이 실제 차단됐는지 근거로 구분해줘. 현재 임시 IP 차단도 확인해줘.",
+      "seconds": 47.57076351903379,
+      "model_calls": 2,
+      "mcp_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "claim_repairs": 0,
+      "status": "partial",
+      "stop_reason": null,
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "raw_result_sha256": "69240dcbb8065a12b0faba05992e9bc2874c6ec1d210ade525428db335b9da95",
+      "note": "Honest uncertainty but actual per-service access/context reads missing; requested investigation incomplete.",
+      "is_mattermost_roundtrip": false
+    }
+  ],
+  "quality": {
+    "short": {
+      "at_kst": "2026-11-18T04:35:04.228780+09:00",
+      "result_sha256": "a3c20bcdfd996588feb17e1e997f82327e54ffa5768191796024d1a0fc054df0",
+      "quality_scope": "This short question: calendar reads, literal source comparison and current list with honest limits; not incident closure or operating verification.",
+      "passed": true,
+      "checks": {
+        "calendar_day_bounds_exact": true,
+        "requested_three_reads_observed": true,
+        "source_matrix_present": true,
+        "no_disabled_claim": true,
+        "no_redundant_capability_step": true,
+        "unresolved_risk_not_closed": true,
+        "canonical_report_matches_presentation_after_intended_metadata_removal": true,
+        "no_protected_call": true
+      },
+      "initial_recheck_note": "Checking the metadata-free presentation alone returned incident_disposition_missing. Re-rendered the actual accepted model decision with the same verified receipts; its footer-free body exactly matches the stored presentation and canonical checks pass. No new decision or evidence was synthesized."
+    },
+    "expanded": {
+      "at_kst": "2026-11-18T04:41:49.008758+09:00",
+      "result_sha256": "69240dcbb8065a12b0faba05992e9bc2874c6ec1d210ade525428db335b9da95",
+      "factual_honesty_checks_passed": true,
+      "requested_investigation_complete": false,
+      "missing_actual_reads": [
+        "search_web_access for affected service targets (request_path hints include DVWA and Log4Shell)",
+        "get_web_service_target or equivalent registered target/context verification"
+      ],
+      "observed_actual_reads": [
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "list_blocks"
+      ],
+      "notes": [
+        "Only initial two sensor samples and current list were read. HTTP403 limitations are honest, but real available access/context reads were not performed.",
+        "This is not a completed web-block outcome investigation or a full quality pass.",
+        "Potential service names are hints from returned request_path fields, not independently verified routing or actual backend reachability."
+      ]
+    },
+    "whole_operating_quality_passed": false
+  },
+  "comparison_limits": [
+    "Different candidate hashes/query times are not controlled speedup measurements. Only final two trials share one source candidate and their questions differ.",
+    "48.044s is the verified short factual query scope, not full incident closure or actual chat SLA.",
+    "47.571s expanded answer remains investigation-incomplete despite honest limits.",
+    "Regression case counts are not independent security cases or model accuracy scores."
+  ],
+  "remaining": [
+    "Require actual per-target web access and registered target/context reads when the user requests web request-block evidence; observed request_path hints include both lab services.",
+    "Keep route hints separate from independently verified backend reachability and WAF intervention proof.",
+    "Connect new evidence/report/inquiry seam to Native; verify exact candidate through admin231 and fresh two-bot chats before operating promotion.",
+    "Existing canonical SDK 8 failure entries and 1 error remain."
+  ],
+  "not_performed": [
+    "Operating candidate application",
+    "New Mattermost posts",
+    "Attack tests",
+    "New training or DGX training-status polling",
+    "Fresh OS full installation",
+    "Physical power-loss recovery"
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-18T04:42:20.650922+09:00",
+    "roots_removed": 10,
+    "files_removed": 3230,
+    "bytes_removed": 123044703,
+    "remaining_owned_roots": 0,
+    "never_started_roots_verified_absent": 3,
+    "operating_model_or_backups_touched": false,
+    "exported_artifacts": 55,
+    "full_inventory_sha256": "8c690f17c743eef9bdbed33becec5e69b9f553c91e90649d4d0d76991291555a",
+    "all_owned_worker_units_terminal_before_removal": true,
+    "mac_package_installs": 0,
+    "mac_package_downloads": 0,
+    "official_framework_skill_and_operating_backups_preserved": true
+  },
+  "source_reference": {
+    "related": "evidence-followup.validation.json",
+    "malvex": "https://github.com/JoasASantos/Malvex/tree/75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "use": "Stage receipts and hypothesis/evidence/judgment separation; no framework installation or server-tool architecture replacement."
+  },
+  "documentation": {
+    "affected_public_documents": 15,
+    "humanize_run": "_workspace/2026-11-18-005-6624",
+    "humanize_route": "light",
+    "state": "humanized_verified_pending_publication",
+    "gate_exit": 0,
+    "change_rate": 0.0006,
+    "grade": "B",
+    "self_check": "6/6"
+  },
+  "publication": {
+    "state": "not_yet_committed",
+    "foreign_paths_preserved": 23
+  }
+}

@@ -118,4 +118,27 @@ class EvidenceRuntime(unittest.TestCase):
         self.assertIn('**출발지 표본 비교**',result['final_response'])
         self.assertIn('유효 출발지 IP는 0개',result['final_response'])
 
+    def test_activation_claim_is_repaired_inside_same_phase_without_rereading(self):
+        bad=report();bad['report']['limitations']=['임시 IP 차단은 현재 비활성 상태입니다.']
+        result,prompts,calls=self.execute([bad,report()])
+        self.assertEqual(calls,['search_modsecurity_alerts']);self.assertEqual(prompts,[])
+        self.assertEqual(result['evidence_claim_repairs'],1)
+        self.assertIn('block_inventory_does_not_verify_activation',result['evidence_report_audit'][0]['issues'])
+        self.assertNotIn('비활성',result['final_response']);self.assertEqual(result['protected_calls'],0)
+
+    def test_unattempted_registered_read_gap_is_returned_to_model_then_actually_read(self):
+        bad=report();bad['report']['next_steps']=[{'kind':'capability_gap','needed_evidence':EXTRA+' 원문 경보'}]
+        result,prompts,calls=self.execute([bad,inquiry(),report((0,1))])
+        self.assertEqual(calls,['search_modsecurity_alerts','search_wazuh_alerts']);self.assertEqual(prompts,[])
+        self.assertEqual(result['evidence_schema_repairs'],1);self.assertEqual(result['evidence_inquiry_count'],1)
+        self.assertTrue(result['evidence_report_audit'][0]['rejected_before_dispatch'])
+        self.assertEqual(result['protected_calls'],0);self.assertFalse(result.get('remaining_issues'))
+
+    def test_persistent_claim_failure_stays_incomplete_without_a_fake_report(self):
+        bad=report();bad['report']['limitations']=['임시 차단 기능은 활성화되었습니다.']
+        result,_,calls=self.execute([bad])
+        self.assertEqual(calls,['search_modsecurity_alerts']);self.assertEqual(result['status'],'partial')
+        self.assertEqual(result['stop_reason'],'evidence_report_claim_repair_budget_exhausted')
+        self.assertNotIn('활성화되었습니다',result['final_response']);self.assertEqual(result['protected_calls'],0)
+
 if __name__=='__main__':unittest.main()

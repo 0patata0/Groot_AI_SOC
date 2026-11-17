@@ -1469,7 +1469,7 @@ def service_follow_up_lines(steps):
             lines.append('추가 조회 제안(미실행·미예약): '+step['tool']+' · '+
                 json.dumps(step['arguments'],ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False))
         elif isinstance(step,dict) and set(step)=={'kind','needed_evidence'} and step['kind']=='capability_gap':
-            lines.append('현재 도구로 확보하지 못한 추가 근거(기능 보완 필요): '+step['needed_evidence'])
+            lines.append('추가 근거 필요(현재 도구의 해당 범위 지원 여부 미확인): '+step['needed_evidence'])
         else:raise ValueError('service_follow_up_invalid')
     return lines
 
@@ -1500,13 +1500,11 @@ def evidence_report_schema(citations, available_reads=(), *, allow_more=True, re
         for key in ('limitations','next_steps'):
             fields[key]['maxItems']=2
             if fields[key]['items'].get('type')=='string':fields[key]['items']['maxLength']=200
-        # Available reads belong to the executable inquiry branch. After its
-        # budget is exhausted, a final pending proposal can still be honest.
+        # While reads can execute, choose inquiry or report, not a pending
+        # feature/read proposal. True evidence limits remain in limitations.
+        # After the inquiry budget, pending follow-ups stay explicitly pending.
         if allow_more and type(direct_reads) is int and direct_reads>0:
-            choices=fields['next_steps']['items'].get('anyOf',[])
-            if choices:
-                fields['next_steps']['items']['anyOf']=[p for p in choices
-                    if p.get('properties',{}).get('kind',{}).get('const')!='read_proposal']
+            fields['next_steps'].update(minItems=0,maxItems=0)
         report=branch['properties']['report']
         open_report=copy.deepcopy(report);closed_report=copy.deepcopy(report)
         open_report['properties']['assessment']={'const':'unresolved'}
@@ -1521,7 +1519,26 @@ def evidence_report_messages(context, *, agent_role, feedback=None):
     if not isinstance(context,dict) or context.get('format')!='current_read_report_v1':
         raise ValueError('evidence_report_context_invalid')
     body=copy.deepcopy(context)
-    if feedback is not None:body['untrusted_report_feedback']=copy.deepcopy(feedback)
+    if feedback is not None:
+        body['untrusted_report_feedback']=copy.deepcopy(feedback)
+        rejected=feedback.get('issues',()) if isinstance(feedback,dict) else ()
+        rejected=rejected if isinstance(rejected,(list,tuple)) else ()
+        codes=[c for c in rejected if isinstance(c,str) and
+            re.fullmatch(r'[a-z][a-z0-9_]*(?::[A-Za-z0-9_:-]+)?',c) and len(c)<=240][:16]
+        checks=[]
+        for name in context.get('available_read_tools',()):
+            if 'registered_read_needs_evidence_scope_check:'+name not in codes:continue
+            attempts=[]
+            for key in ('untrusted_completed_reads','untrusted_failed_reads'):
+                for row in context.get(key,()):
+                    if row['tool']!=name:continue
+                    data=row.get('data')
+                    sizes={k:len(v) for k,v in data.items() if isinstance(v,list)
+                        and re.fullmatch(r'[A-Za-z][A-Za-z0-9_]{0,63}',k)} if isinstance(data,dict) else {}
+                    attempts.append({'read_ordinal':row['read_ordinal'],'receipt_sha256':row['receipt_sha256'],
+                        'is_error':row['is_error'],'returned_list_sizes':dict(list(sizes.items())[:8])})
+            checks.append({'tool':name,'registered':True,'current_attempts':attempts[-4:]})
+        body['report_validation']={'issues':codes,'registered_read_checks':checks[:4]}
     raw=json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c')
     return [{'role':'system','content':system_prompt(read_only=True,agent_role=agent_role,phase='evidence-judgment')},
             {'role':'user','content':raw}]
@@ -2551,7 +2568,8 @@ def claim_modality(after):
     prefix=(r'\s*(?:(?:상태|현상|상황|문제)\s*)?'
             r'(?:(?:이라는|이라고|이란|다는|다고|라고|라는|으로|를|을|이|가|은|는|고)\s*)?'
             r'(?:(?:한|된)\s*)?'
-            r'(?:(?:것|사실|주장|판정|결론)(?:을|은|는|이|임을)?\s*)?')
+            r'(?:(?:것|사실|주장|판정|결론)(?:을|은|는|이|임을)?\s*)?'
+            r'(?:(?:의\s*)?(?:증거|근거)(?:가|이|은|는)?\s*)?')
     if re.match(prefix+r'(?:한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
         return 'conditional_or_unverified'
     if re.match(prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):

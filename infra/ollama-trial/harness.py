@@ -1437,11 +1437,13 @@ def incident_field_violations(answer, calls):
         causal=(re.search(r'이므로|으므로|때문|뜻|의미|시사|보여|나타|따라서|보아|통해',line)
                 and re.search(r'(?:WAF|ModSecurity).{0,35}(?:차단|거부|리다이렉트)|'
                               r'(?:침해|명령\s*실행|공격).{0,15}(?:성공|실패)',line,re.I))
-        block_assertion=(re.search(r'WAF|ModSecurity',line,re.I)
-                and re.search(r'차단(?:이|을|은|는)?\s*(?:입증|확인|성공|됨|됐|되었|되었습니다|했다|했습니다|중)|'
-                              r'(?:요청|트래픽|접근|공격).{0,25}차단(?:되|된|됐|하|했)',line)
+        block_matches=list(re.finditer(r'차단(?:이|을|은|는)?\s*(?:입증|확인|성공|됨|됐|되었|되었습니다|했다|했습니다|중)|'
+                              r'(?:요청|트래픽|접근|공격).{0,25}차단(?:되|된|됐|하|했)',line))
+        block_assertion=(re.search(r'WAF|ModSecurity',line,re.I) and block_matches
                 and not re.search(r'차단.{0,8}(?:않|못)|확인해야|확인할\s*필요',line))
-        if http_status and (causal or block_assertion) and not uncertain:
+        asserted_block=not block_matches or any(CONTRACT.claim_modality(line[m.end():])
+            not in ('not_asserted','conditional_or_unverified','planned_check') for m in block_matches)
+        if http_status and (causal or block_assertion) and not uncertain and asserted_block:
             issues.add('http_status_used_as_security_outcome')
         # Bind source claims to their own sensor, not the union of both sensors.
         # Other cells' sample/count caveats cannot qualify a positive address cell.
@@ -1620,6 +1622,39 @@ def evidence_source_comparison(context):
         for label,r in zip(labels,rows)]))
     return ('**출발지 표본 비교**\n'+(table if ips else '조회에서 반환된 유효 출발지 IP는 0개입니다.')+
             '\n\n'+scope+'\n반환 표본끼리의 비교입니다. 표본에 없는 IP의 전체 부재·같은 흐름/사건·실제 호스트 신원은 증명하지 않습니다.')
+
+
+def evidence_capability_gap_violations(review, context):
+    """A registered read needs scope review, not a capability denial.
+
+    Reuse the common read classifiers; this never chooses or dispatches a call,
+    proves all requested coverage, or treats an attempted read as successful.
+    """
+    available=set(context.get('available_read_tools',()))
+    issues=set()
+    for step in review.get('next_steps',()):
+        if not isinstance(step,dict) or step.get('kind')!='capability_gap':continue
+        text=step.get('needed_evidence','')
+        if not isinstance(text,str):continue
+        candidates=set()
+        for name in available:
+            if any(re.search(r'(?<![A-Za-z0-9_])'+re.escape(n)+r'(?![A-Za-z0-9_])',text)
+                   for n in (name,name.split('__')[-1])):candidates.add(name)
+        for part in re.split(r'\n|;|(?<=[.!?])\s+|\s+(?:및|그리고)\s+',text):
+            if READ.wants_write(normalized(part)):continue
+            # A sample-search capability does not establish aggregate counts.
+            # Preserve this evidence gap instead of demanding another sample.
+            if re.search(r'전체|전수|\btotal\b',part,re.I) and re.search(r'건수|개수|\bcount',part,re.I):continue
+            candidates.update(tool_scope(part) or ())
+            plan=read_plan(part)
+            if plan:candidates.update(READ.scope(plan))
+            if (READ.companion_block_request(normalized(context.get('question','')))
+                    and re.search(r'(?:임시\s*)?차단\s*(?:목록|리스트|IP|아이피)',part,re.I)
+                    and not re.search(r'과거|어제|이력|당시|지난|\d{4}[-년]',part)):
+                candidates.add(READ.BLOCKS)
+        issues.update('registered_read_needs_evidence_scope_check:'+name
+                      for name in candidates & available)
+    return sorted(issues)
 
 
 def evidence_report_text(review, calls, context):
@@ -2084,6 +2119,19 @@ def action_claim_violations(question, answer, calls):
         block_subject = (r'차단\s*(?:목록|리스트)|(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
                          r'\s*(?:IPv[46]|IP|아이피|주소)(?:들)?')
         hypothetical = re.search(r'(?:없|있)(?:다면|으면)|조회\s*(?:전(?![가-힣])|시(?![가-힣])|하면)|정책\s*설명|가정', clean)
+        # Membership is not activation, regardless of whether the list has
+        # zero or many entries. A complete live FW read is a different proof.
+        if not (fw and fw.get('verified_complete')):
+            for clause in re.split(r';|(?<=[.!?])\s+|하지만|그러나',clean):
+                subject=re.search(r'(?:임시\s*(?:(?:IP|아이피)\s*)?차단|(?:IP|아이피)\s*임시\s*차단|'
+                                  r'동적\s*차단|자동\s*차단|차단\s*기능)',clause,re.I)
+                if not subject:continue
+                for state in re.finditer(r'비활성(?:화)?|활성화|중지|중단|꺼져|켜져|\b(?:disabled|enabled|inactive|active|off|on)\b',clause[subject.end():],re.I):
+                    after=clause[subject.end()+state.end():]
+                    if (CONTRACT.claim_modality(after) in ('not_asserted','conditional_or_unverified','planned_check')
+                            or re.match(r'\s*(?:인지|여부|인가|일지)',after)):
+                        continue
+                    issues.add('block_inventory_does_not_verify_activation')
         if (not block_reads and not unobserved and not hypothetical and re.search(block_subject, clean, re.I)
                 and re.search(r'없|비어|포함|등록|있습니다|있음|확인했|0\s*(?:건|개)|(?:현재|지금).*(?:목록|리스트)(?:은|는|입니다)', clean)):
             issues.add('unobserved_block_list_claim')

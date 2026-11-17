@@ -121,3 +121,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [후속 조회 검증](../infra/validation/management-latency/evidence-followup.validation.json)에 5실제 시험의 추가 조회·비교표·KST 범위와 실패를 기록했다. 마지막 48.320초도 미확인 표현 오류가 남아 품질 미통과이며 16사본 후보는 운영 미적용이다.
+
+
+[목록·가용성 검증](../infra/validation/management-latency/capability-grounding.validation.json)의 5실제 시험과 정정 실패를 유형별 원장에 기록했다. 마지막 짧은 요청의 사실 범위는 확인했으나 확장 조사의 실제 접근·대상 조회는 미완료이며 운영에 적용하지 않았다.

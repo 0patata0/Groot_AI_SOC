@@ -590,8 +590,20 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if not value['more_evidence']:
                         review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
                         review['evidence_tools']=[citations[i] for i in indexes]
+                        rendered=harness.evidence_report_text(review,report['calls'],context)
+                        issues=(harness.violations(current,rendered,report['calls'])+
+                            harness.evidence_capability_gap_violations(review,context))
+                        if issues:
+                            audit['rejected_before_publication']=True;audit['issues']=sorted(set(issues))
+                            count=report.get('evidence_claim_repairs',0)
+                            if count>=harness.CONTRACT.REPAIR_PASSES:
+                                report['stop_reason']='evidence_report_claim_repair_budget_exhausted'
+                                raise RuntimeError(report['stop_reason'])
+                            report['evidence_claim_repairs']=count+1
+                            feedback={'issues':sorted(set(issues)),'untrusted_rejected_report':review}
+                            continue
                         report['last_evidence_review']=copy.deepcopy(review)
-                        return harness.evidence_report_text(review,report['calls'],context)
+                        return rendered
                     plan={'calls':value['calls']}
                     plan,_=harness.validated_selection(plan,harness.selection_schema(schemas,budget.limit-budget.used))
                     rejection=harness.CONTRACT.service_inquiry_rejection(plan['calls'],context['untrusted_completed_reads'],

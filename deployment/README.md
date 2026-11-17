@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[양봇 공통 보강 이관](../infra/validation/management-latency/README.md)에서는 운영 B의 Native/SDK8사본과 SDK영수증을20:08 KST 확정했다. Mac·Linux각17검사와 운영 Harness² `passed`를 확인했으며 새 단순 조회4건은11.454~28.963초였다. MCP 구조·모델·권한은 유지한다. WAF 조회 범위 차이·SDK 시간 셀·복합 조사30~60초는 남았고 새 OS 전체 설치·브라우저 시각 검수는 미수행이다.
+[양봇 공통 보강 이관](../infra/validation/management-latency/README.md)의 후속 호명·기간·시간 열 보완을21:18 KST 운영 확정했다. 새6채팅은11.263~29.165초였으며 Native 계산/지표 이름/표와 SDK 명시 호스트 범위 오류는 남았다. Mac/Linux각31·H2각37·설치각37과 운영49소스 passed는 별도 근거다. 모델·MCP·승인 경계는 유지하고 새 OS 전체 설치·실제 브라우저 검수는 미수행이다.
 
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 

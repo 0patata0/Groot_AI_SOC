@@ -1,5 +1,9 @@
 # 현황 이력
 
+## 호명·기간·감사49소스 운영 확정 (2026-11-17)
+
+21:09:55 KST15파일 적용·21:18:12 확정, 보호12SHA·SDK20/review5영수증·동일 Hermes 컨테이너 재시작1회·DB 불변을 확인했다. 새6채팅 표본에서11.263~29.165초를 관측했다. Native 계산/지표 이름·표와 SDK B→A/C 확대는 남았다. 운영 Harness²49소스 passed와 정확도 전체 완료를 구분한다. [검증·범위](../infra/validation/management-latency/README.md).
+
 ## 양봇 사본 이관·새 단순 조회 확인 (2026-11-17)
 
 20:01:23 KST Native/SDK8사본과 SDK영수증을 적용하고20:08:08 확정했다. SDK20·review5source/보호10SHA·양봇 연결·유휴 큐·정지 중 DB 동일·동일 Hermes 컨테이너 계획 재시작1회를 확인했다. 새4질문은11.454~28.963초이며 실제5읽기를 대조했다. 단순 표본을 복합 조사 SLA로 확대하지 않는다. [검증·미완료](../infra/validation/management-latency/README.md).

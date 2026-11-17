@@ -105,7 +105,7 @@ def default_component_paths() -> dict[str, str]:
         "sdk": {name: name + ".py" for name in (*common, "chat_contract", "read_contract",
                 "grounding", "harness", "runtime", "chat", "chat_policy", "policy",
                 "query_grounding", "gateway_health")},
-        "management": {name: name + ".py" for name in (*common, "soc_management_run",
+        "management": {name: name + ".py" for name in (*common, "chat_contract", "read_contract", "soc_management_run",
                        "soc_management_controller")},
     }
     scripts["native"].update(harness="chat_harness.py", query_grounding="__init__.py")

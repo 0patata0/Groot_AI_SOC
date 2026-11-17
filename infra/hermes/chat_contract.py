@@ -153,6 +153,12 @@ def normalize_query_text(text):
     # Ignore it for classification only, keeping literal device labels intact.
     text = re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
                   r'[A-Za-z0-9_.-]{1,64}\]\s+', '', text, count=1, flags=re.I)
+    # A single leading bot address is transport syntax, not a device/filter.
+    # Keep multiple addresses, quoted mentions and the original request intact;
+    # channel routing and protected actions still inspect the original text.
+    address = re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)', text, re.I)
+    if address and not text[address.end():].startswith('@'):
+        text = text[address.end():]
     aliases = ((r'웹\s*방화벽|와프|모드시큐리티', 'WAF'),
                (r'(?<![A-Za-z])(?:F/W|firewall|nftables|iptables)(?![A-Za-z])|방화벽', 'FW'),
                (r'(?<![A-Za-z])IPS(?![A-Za-z])|수리카타', 'Suricata'),

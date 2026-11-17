@@ -1,5 +1,9 @@
 # 설치·웹 정책 이력
 
+## 조회 계약·공통 스킬·감사 목록15파일 (2026-11-17)
+
+21:18:12 KST15파일을 확정했다. 공통 계약/조회 스킬의 Native·SDK·관리 사본과 두 harness 사본·H2 core/config/receipt·SDK receipt만 적용했다. 초기 설치의 고정 목록은47→49이며 기존 패키지·모델·키·포트·도구 권한 변경0이다.15분 독립 원복은 inactive·confirmed no-op, 정확 원본/후보는 보존한다. [검증·범위](../infra/validation/management-latency/README.md).
+
 ## Native·SDK 공통 파일·핀·영수증 운영 확정 (2026-11-17)
 
 운영 설치본에서 gate9c226ae0·adapter e7e16ec9·출력 c005df65·조사 a7fb2f89의 두 사본을 맞추고 SDK영수증을 갱신했다. 조회 스킬은 기존1bd5455 소스와 같은 바이트이므로 영수증만 정정했다.20:08:08 KST 확정·15분 독립 원복 timer inactive/confirmed no-op·복구본 보존. 서비스 유휴 확인 후 동일 Hermes 컨테이너1회와 SDK/review 작업자를 재시작했으며 DB는 복원하지 않았다. 초기 설치 소스는 기존2089706에 있고 새 패키지·포트·키·MCP/권한 변경0이다. [정확 SHA·검증·복구](../infra/validation/management-latency/chat-alignment.validation.json).

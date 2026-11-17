@@ -16,8 +16,9 @@ class Clock(datetime):
     def now(cls, tz=None): return NOW.astimezone(tz) if tz else NOW.replace(tzinfo=None)
 
 
-def receipt(source='modsecurity', **changes):
-    start='2026-11-08T00:00:00+09:00';end='2026-11-08T12:59:30+09:00'
+def receipt(source='modsecurity', *, recent=False, **changes):
+    start='2026-11-08T11:59:30+09:00' if recent else '2026-11-08T00:00:00+09:00'
+    end='2026-11-08T12:59:30+09:00'
     data={'source':source,'applied_filters':{},'window_mode':'explicit_bounds',
           'requested_since_kst':start,'requested_until_kst':end,'returned_count':1,
           'limit':50,'scan_capped':False,'alerts':[{'timestamp':end,'http_status':403,
@@ -80,7 +81,7 @@ class EventLookup(unittest.TestCase):
         for change in ({'maximum':5},{'enum':[20,50]},{'type':'string'}):
             bad=copy.deepcopy(schema);bad[name]['properties']['limit'].update(change)
             with self.subTest(change=change):self.assertEqual(h.refine_read_schemas(q,bad,[]),{})
-        good=receipt('wazuh',limit=10);good['arguments']['limit']=10
+        good=receipt('wazuh',recent=True,limit=10);good['arguments']['limit']=10
         self.assertEqual(h.event_lookup_missing(q,[good]),[])  # Fewer real rows is valid.
         report=h.lookup_report(q,[good]);self.assertIn('반환 표본 1건',report)
         self.assertIn('**Wazuh**',report);self.assertNotIn('미기록',report)
@@ -113,7 +114,7 @@ class EventLookup(unittest.TestCase):
 
     def test_filled_recent_sample_is_complete_but_never_an_exhaustive_window(self):
         q='최근 Wazuh 경보 보여줘'
-        c=receipt('wazuh',limit=1,scanned=1,scan_capped=True)
+        c=receipt('wazuh',recent=True,limit=1,scanned=1,scan_capped=True)
         c['arguments']['limit']=1
         self.assertEqual(h.missing_reads(q,[c]),[])
         text=h.lookup_report(q,[c])

@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "status": "operating_query_window_patch_confirmed_with_residual_chat_errors",
+  "recorded_at_kst": "2026-11-17T21:24:44.533645+09:00",
+  "route": "Mac-admin231-A-B",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_tools": 45,
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "changes": {
+    "/etc/capstone-harness2/audit.json": {
+      "after": "3c51240cf7854df4ecc2a04496e642b7155b34ba393dc02864f80852508188e8",
+      "before": "dc328158ee175e44b1d8c1a647bd965c1c96d578dd8987e68ba9d64c2af434cd",
+      "gid": 0,
+      "mode": 384,
+      "slot": "12",
+      "uid": 0
+    },
+    "/etc/capstone-harness2/installation.json": {
+      "after": "872b8c05121bd37b0830101dca2a17a40a987d1036b03c0e01dcc07c34a5b73f",
+      "before": "d39cac11baf718265c05c713d506b6126a48e35f9a40afa26e106494a6783eb3",
+      "gid": 0,
+      "mode": 384,
+      "slot": "13",
+      "uid": 0
+    },
+    "/etc/capstone-ollama-trial/receipt.json": {
+      "after": "89e45be4a498a93ac1fa771fc8970fd86b5923fb2c550d11e460a79cca9c203b",
+      "before": "91116942df2a2e8701cd436c40ee5d5f60e3f254577e951e3f23890806548a06",
+      "gid": 0,
+      "mode": 384,
+      "slot": "14",
+      "uid": 0
+    },
+    "/opt/capstone-harness2/server_audit.py": {
+      "after": "997404d4bd3da576ac8c4d4effa175409f6b67c98e37cf089361b80fdfecc00b",
+      "before": "05e108ef4ff561cdc195fbcba300fcd6fc4efe56715eada11248ec9000042893",
+      "gid": 0,
+      "mode": 420,
+      "slot": "11",
+      "uid": 0
+    },
+    "/opt/capstone-management/chat_contract.py": {
+      "after": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+      "before": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "gid": 0,
+      "mode": 420,
+      "slot": "6",
+      "uid": 0
+    },
+    "/opt/capstone-management/read_contract.py": {
+      "after": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+      "before": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "gid": 0,
+      "mode": 420,
+      "slot": "7",
+      "uid": 0
+    },
+    "/opt/capstone-management/skill-soc-query.md": {
+      "after": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+      "before": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "gid": 0,
+      "mode": 420,
+      "slot": "8",
+      "uid": 0
+    },
+    "/opt/capstone-ollama-trial/chat_contract.py": {
+      "after": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+      "before": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "gid": 981,
+      "mode": 416,
+      "slot": "3",
+      "uid": 0
+    },
+    "/opt/capstone-ollama-trial/harness.py": {
+      "after": "ea4de422d3bb7aa9c539dd60dd1c9f4ff270e300ac79088ce210cfea4e9256d9",
+      "before": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "gid": 981,
+      "mode": 416,
+      "slot": "9",
+      "uid": 0
+    },
+    "/opt/capstone-ollama-trial/read_contract.py": {
+      "after": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+      "before": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "gid": 981,
+      "mode": 416,
+      "slot": "4",
+      "uid": 0
+    },
+    "/opt/capstone-ollama-trial/skill-soc-query.md": {
+      "after": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+      "before": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "gid": 981,
+      "mode": 416,
+      "slot": "5",
+      "uid": 0
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+      "after": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+      "before": "43fdbb1f98efc5c79487061f18b65451e144d4d59e639cccbc0e455cdc53862e",
+      "gid": 986,
+      "mode": 384,
+      "slot": "0",
+      "uid": 995
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+      "after": "ea4de422d3bb7aa9c539dd60dd1c9f4ff270e300ac79088ce210cfea4e9256d9",
+      "before": "7b427f362e86e3d60eeb156cd01aebd85f66572d395478adf56efefb54123b8a",
+      "gid": 986,
+      "mode": 384,
+      "slot": "10",
+      "uid": 995
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+      "after": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+      "before": "fc79b71dde77408ae58d7bb22fbc0c2f5f1169c8ef77557e397bd76e9e8867a3",
+      "gid": 986,
+      "mode": 384,
+      "slot": "1",
+      "uid": 995
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": {
+      "after": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+      "before": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+      "gid": 986,
+      "mode": 384,
+      "slot": "2",
+      "uid": 995
+    }
+  },
+  "operating_applied": {
+    "status": "applied",
+    "at_kst": "2026-11-17T21:09:55.564292+09:00",
+    "epoch": 1794917395.5643113,
+    "files": 15,
+    "same_container": true,
+    "planned_hermes_restarts": 1,
+    "database_same_while_stopped": true,
+    "protected": 12
+  },
+  "operating_confirmed": {
+    "status": "confirmed",
+    "at_kst": "2026-11-17T21:18:12.441119+09:00",
+    "files": 15,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "protected": 12,
+    "rollback_timer": "inactive"
+  },
+  "protected_files_unchanged": 12,
+  "sdk_receipt_sources_verified": 20,
+  "review_receipt_sources_verified": 5,
+  "harness2": {
+    "pinned_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before_sources": 47,
+    "after_sources": 49,
+    "always_on_char_delta": 0,
+    "report_status": "passed",
+    "report_sha256": "7f6ddeaa680152c134cf938677188902dcb7267f664e3410bbdc31d4ecde3096",
+    "report_observed_at_kst": "2026-11-17T21:11:27.284711+09:00",
+    "census": {
+      "native/base": {
+        "always_on_chars": 16829,
+        "n_files": 18,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "native/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 18,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "sdk/base": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "sdk/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "management/base": {
+        "always_on_chars": 16829,
+        "n_files": 12,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 5,
+        "plugins": 0
+      },
+      "management/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      }
+    }
+  },
+  "tests": {
+    "actual_copy_mac": {
+      "run": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "actual_copy_linux": {
+      "run": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "installed_base_same_suite": {
+      "run": 31,
+      "failed_subassertions": 50,
+      "errors": 1,
+      "not_independent_questions": true
+    },
+    "harness2_mac": 37,
+    "harness2_linux_trusted_path": 37,
+    "installer_mac": 37,
+    "installer_linux": 37,
+    "linux_initial_harness2_failure": "2 fixture errors: existing trusted source reader correctly rejected writable /var/tmp ancestry; same SHA rerun under root-owned /var/lib passed; guard unchanged"
+  },
+  "fresh_chats": [
+    {
+      "engine": "hermes",
+      "case": "waf",
+      "source_id": "z3qgg8nco7d3pb7p49wzbr4tnh",
+      "reply_id": "gydqs76c9fy8fb78o8h1657fqh",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/z3qgg8nco7d3pb7p49wzbr4tnh",
+      "seconds_user_to_final_update": 17.954,
+      "reply_sha256": "7cb30acd106c6f06417cc246f7ef4b294bedd7a553a6b7cabda77cea65b8746a",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "name": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 60,
+            "limit": 2
+          }
+        }
+      ],
+      "api_call_count": 2,
+      "tool_result_sha256": [
+        "349680b9f65367e88c09e59f9f739906d4a549f551454f2a8c0516e3e1a1cde1"
+      ],
+      "verified_final_scope": {
+        "minutes": 60,
+        "limit": 2,
+        "returned_count": 0
+      },
+      "unresolved": [
+        "empty_result_not_tabular"
+      ]
+    },
+    {
+      "engine": "hermes",
+      "case": "ids30",
+      "source_id": "37carf4tgjfwzmefiydxdaqeey",
+      "reply_id": "9d6oywodcinsj8ddaxkbphi4jw",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/37carf4tgjfwzmefiydxdaqeey",
+      "seconds_user_to_final_update": 29.165,
+      "reply_sha256": "cedc913c56a9f838d97651890f4943cbaf0c598fa3e2430e1acf3b3549ca9419",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__calculate_time",
+          "arguments": {
+            "timestamps": [
+              {
+                "id": "now",
+                "value": "2026-11-17T00:00:00KST"
+              }
+            ],
+            "reference": "now"
+          }
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-11-17T23:45:00+09:00",
+            "lookback_minutes": 30,
+            "limit": 2
+          }
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 30
+          }
+        }
+      ],
+      "api_call_count": 4,
+      "tool_result_sha256": [
+        "b3708e8560781b646f7dd6cf691999ce040c03af9ab087c90d8c20c2f8030d16",
+        "91b91834c3e41562c7d4652fd5d3ce6c08a30779d8a0e4d681b076da68f9cf08",
+        "0f0966832dccdfc697df3d9b09170ed44546241e9cf963e57c4d99e930d12951"
+      ],
+      "verified_final_scope": {
+        "minutes": 30,
+        "limit": 2,
+        "returned_count": 0
+      },
+      "unresolved": [
+        "unnecessary_calculate_time_rejected",
+        "future_until_rejected_then_retried",
+        "both_bounds_in_one_cell"
+      ]
+    },
+    {
+      "engine": "hermes",
+      "case": "systemd",
+      "source_id": "pwqjidkws3np9mk3bh3rqf1qea",
+      "reply_id": "izpbyzecdbbqtc1uwtighyf3ae",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/pwqjidkws3np9mk3bh3rqf1qea",
+      "seconds_user_to_final_update": 11.266,
+      "reply_sha256": "7aae5760739c6481b894d5f1a2e9bd98ebca43f5e60140bd349428beebf194a7",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          }
+        }
+      ],
+      "api_call_count": 2,
+      "tool_result_sha256": [
+        "bb6cff70c520f99bcdd45ba83633157c99490938c754b2ee00681f6c9cac6584"
+      ],
+      "verified_final_scope": {
+        "target": "b:systemd",
+        "failed_units_total": 0,
+        "loaded_failed_units_only": true
+      },
+      "unresolved": [
+        "returned_failed_units_labelled_running_units"
+      ]
+    },
+    {
+      "engine": "ollama",
+      "case": "waf",
+      "source_id": "1p4amfa66bbhte9gyxhpuo71co",
+      "reply_id": "64tg1fhsw3rf7xsghd7wum18kc",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/1p4amfa66bbhte9gyxhpuo71co",
+      "seconds_user_to_final_update": 15.185,
+      "reply_sha256": "822430dd35d50b134d583f2e584dd3c9ac0957992fc03a7f73d7e056c0f2b69e",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 60
+          },
+          "is_error": false,
+          "seconds": 0.043088135949801654,
+          "result_sha256": "1c238c32a38aa72a482289d698d33a1035083dd2fa7b6b8a68615a38f22997bc"
+        }
+      ],
+      "sdk_seconds": {
+        "initialization_seconds": 4.342158673971426,
+        "conversation_seconds": 10.705986246990506,
+        "total_seconds": 15.049411488987971
+      },
+      "verified_final_scope": {
+        "minutes": 60,
+        "limit": 2,
+        "returned_count": 0
+      },
+      "unresolved": []
+    },
+    {
+      "engine": "ollama",
+      "case": "ids30",
+      "source_id": "rk3g45fxwffmmf7h5ujtzq8z1e",
+      "reply_id": "6ge1hr6mutftde8t18du3hsoua",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/rk3g45fxwffmmf7h5ujtzq8z1e",
+      "seconds_user_to_final_update": 11.263,
+      "reply_sha256": "d15324442613c5ce4140e1e08af42cbf3f981240f6db4aefde6f28dd7f576fc0",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 30
+          },
+          "is_error": false,
+          "seconds": 0.02717749698786065,
+          "result_sha256": "4e896a84f65d7fc288c1e6cd6798ea71b22e6affca402e2b6125928389f25238"
+        }
+      ],
+      "sdk_seconds": {
+        "initialization_seconds": 0.09866595198400319,
+        "conversation_seconds": 11.077037337992806,
+        "total_seconds": 11.177115430007689
+      },
+      "verified_final_scope": {
+        "minutes": 30,
+        "limit": 2,
+        "returned_count": 0
+      },
+      "unresolved": []
+    },
+    {
+      "engine": "ollama",
+      "case": "systemd",
+      "source_id": "wy45rwkzo7y4ik5eeiwmu97ppw",
+      "reply_id": "54pob48ehfnatdeogtmgxrk63e",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/wy45rwkzo7y4ik5eeiwmu97ppw",
+      "seconds_user_to_final_update": 17.093,
+      "reply_sha256": "0bfd2595862c752e9fbcb3edbd33294a82d08d1cd1c191e04d83fc010b701a56",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "calls": [
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          },
+          "is_error": false,
+          "seconds": 0.12695469002937898,
+          "result_sha256": "5fd768e6c18f0bc2cea3722417570474c0b2dce4e76a91c82f653fc077868f88"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "a:systemd"
+          },
+          "is_error": false,
+          "seconds": 0.9853414539829828,
+          "result_sha256": "16ed2a58ac3119f96f2ea993081059dd287af5a7f1e8563d7e91f2aa68c6934b"
+        },
+        {
+          "server": "system-diagnostics",
+          "name": "get_system_diagnostics",
+          "arguments": {
+            "target": "c:systemd"
+          },
+          "is_error": false,
+          "seconds": 0.6447828519740142,
+          "result_sha256": "e51c474001110c9262e19d761d64813448cc95a46edff01d1941e11e70376e4e"
+        }
+      ],
+      "sdk_seconds": {
+        "initialization_seconds": 0.6542128230212256,
+        "conversation_seconds": 16.357588358980138,
+        "total_seconds": 17.01654032501392
+      },
+      "verified_final_scope": {
+        "target": "b:systemd",
+        "failed_units_total": 0,
+        "loaded_failed_units_only": true,
+        "additional_targets": [
+          "a:systemd",
+          "c:systemd"
+        ]
+      },
+      "unresolved": [
+        "unrequested_a_c_targets_added"
+      ]
+    }
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-17T21:21:25.964831+09:00",
+    "removed": {
+      "/var/lib/capstone-event-window-validation/20261117-9ff4e0bfa0": {
+        "files": 190,
+        "bytes": 10453587
+      },
+      "/var/tmp/capstone-event-window-20261117-9ff4e0bfa0": {
+        "files": 234,
+        "bytes": 13626736
+      }
+    },
+    "logs_exported_and_sha_verified_before_deletion": true,
+    "empty_created_parent_removed": true,
+    "rollback_confirmed_noop": true,
+    "rollback_timer": "inactive",
+    "b_failed_units": 0,
+    "operating_sources_and_recovery_backups_preserved": true,
+    "mac_package_installations": 0
+  },
+  "boundaries": {
+    "new_mcp_tools": 0,
+    "mcp_schema_changes": 0,
+    "new_privileged_grants": 0,
+    "firewall_changes": 0,
+    "attack_transmissions": 0,
+    "new_training": 0,
+    "model_route_changes": 0,
+    "same_hermes_container_restarts": 1
+  },
+  "recovery_root": "/var/lib/capstone-event-window/20261117-9ff4e0bfa0",
+  "limitations": [
+    "Native WAF empty prose, IDS redundant calculations/rejected future bound/time-cell density and wrong systemd metric label remain.",
+    "SDK B systemd request expanded to unrequested A/C; not a successful exact-scope test.",
+    "No browser available: API Markdown checked, actual UI rendering unverified.",
+    "No controlled before/after latency, average/p95 or complex-investigation SLA.",
+    "No full manual restore, reboot/power failure, new OS install or attack E2E.",
+    "Official structure pass does not establish full MCP four-tool workflow or response accuracy."
+  ]
+}

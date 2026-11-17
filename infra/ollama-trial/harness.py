@@ -1089,7 +1089,9 @@ def event_lookup_missing(question, calls):
                 if re.search(r'오늘|금일', normalized(question)):
                     valid = valid and start == now.replace(hour=0,minute=0,second=0,microsecond=0)
                 window = CONTRACT.relative_lookback_minutes(question)
-                if window:  # "최근 30분" is complete only with a 30-minute read.
+                if window is None and not re.search(r'오늘|금일', normalized(question)):
+                    window = 60  # The same default as the offered read schema.
+                if window:
                     valid = valid and abs((end-start).total_seconds()-window*60) < 1
                 for row in rows:
                     if not isinstance(row,dict):
@@ -3731,8 +3733,8 @@ def event_report(question, calls):
             if not records or len(stamps) != len(records):
                 rows.extend(READ.table(['조회 상태','확인 범위'],[['원본 표본 형식 미확인','0건으로 판단하지 않습니다.']])); continue
             ordered = sorted(stamps, key=EVIDENCE.parse_instant)
-            rows.extend(READ.table(['조회 범위','반환 상태'],[[
-                EVIDENCE.kst_time(ordered[0])+' ~ '+EVIDENCE.kst_time(ordered[-1]),
+            rows.extend(READ.table(['표본 첫 시각(KST)','표본 마지막 시각(KST)','반환 상태'],[[
+                EVIDENCE.kst_time(ordered[0]), EVIDENCE.kst_time(ordered[-1]),
                 f'Wazuh 요약은 최신 표본 · 반환 표본 {len(records)}건 · 절대 구간/전체 건수 조회 아님']]))
             rendered=[]
             for record in records:
@@ -3755,8 +3757,8 @@ def event_report(question, calls):
             if source!=expected or not isinstance(alerts,list) or any(not isinstance(a,dict) for a in alerts):
                 rows.extend(READ.table(['조회 상태','확인 범위'],[['반환 형식 미확인','0건으로 판단하지 않습니다.']])); continue
             topic=event_topic(question) if event_lookup_scope(question) else None
-            rows.extend(READ.table(['요청 구간(KST)','반환 상태'],[[
-                str(data.get('requested_since_kst','미확인'))+' ~ '+str(data.get('requested_until_kst','미확인')),
+            rows.extend(READ.table(['조회 시작(KST)','조회 종료(KST)','반환 상태'],[[
+                str(data.get('requested_since_kst','미확인')), str(data.get('requested_until_kst','미확인')),
                 f"반환 표본 {data.get('returned_count','미확인')}건 · "
                 + (f"반환 행 {len(alerts)}건 · " if topic else f"표시 {len(alerts)}건 · ")
                 + ('조회 한도 도달·추가 경보 존재 여부/구간 전체 건수 미확인' if data.get('scan_capped') is True

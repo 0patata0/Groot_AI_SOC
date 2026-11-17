@@ -126,6 +126,19 @@ class AuditTests(unittest.TestCase):
     def run_audit(self, **kwargs):
         return audit.run_audit(self.config, policy=self.policy, now=kwargs.pop("now", NOW), **kwargs)
 
+    def test_management_report_dependencies_are_required_observed_sources(self):
+        for name in ("chat_contract", "read_contract"):
+            key = "management/scripts/" + name + ".py"
+            self.assertEqual(self.originals[key], "/opt/capstone-management/" + name + ".py")
+            path = Path(self.paths[key])
+            original = path.read_bytes()
+            path.unlink()
+            report = self.run_audit()["report"]
+            self.assertEqual(report["sources"][key]["error_code"], "missing_file")
+            self.assertEqual(report["status"], "incomplete")
+            self.assertEqual(report["review_drafts"], [])
+            path.write_bytes(original)
+
     def test_actual_full_official_core_and_source_immutability(self):
         before = {path: (Path(path).read_bytes(), Path(path).stat().st_mtime_ns) for path in self.paths.values()}
         fake = types.ModuleType("harness2.core.tree")
@@ -137,7 +150,7 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["scope"], "structural checks")
         self.assertEqual(report["framework"]["files"], self.lock["files"])
         self.assertEqual(report["framework"]["status"], "verified")
-        self.assertEqual(len(report["sources"]), 47)
+        self.assertEqual(len(report["sources"]), 49)
         self.assertEqual(len(report["framework_diffs"]), 3)
         self.assertTrue(all(s["census"]["skills"] == 5 for s in report["surfaces"].values()))
         self.assertEqual(report["source_snapshot"]["status"], "verified")

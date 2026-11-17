@@ -1038,7 +1038,8 @@ def web_access_report(p,calls):
     if coverage.get('scan_limited') or coverage.get('files_unavailable'):limits.append('파일 읽기 제한/일부 누락')
     if data.get('returned_rows_truncated'):limits.append('반환 행 제한')
     rows=['웹 백엔드 접근 기록의 최근 1시간 조회 결과입니다.','',*table(['항목','조회 근거'],[
-        ('대상',p['target']),('요청 구간',data['requested_since_kst']+' ~ '+data['requested_until_kst']),
+        ('대상',p['target']),('조회 시작(KST)',data['requested_since_kst']),
+        ('조회 종료(KST)',data['requested_until_kst']),
         ('스냅샷 관측',data['observed_at_kst']),('반환/실제 전체','반환 표본 '+str(data['returned_count'])+'행 · 실제 전체 요청 수 미확인'),
         ('근거 제한','; '.join(limits+['로깅 연속성 미검증']))])]
     if data['records']:

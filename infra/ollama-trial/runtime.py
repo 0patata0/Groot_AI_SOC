@@ -559,7 +559,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     remaining=min(4,max(0,budget.limit-budget.used)) if more_allowed else 0
                     nonce=os.urandom(16).hex()
                     schema=harness.CONTRACT.evidence_report_schema(citations,list(schemas),
-                        read_schemas=schemas,direct_reads=remaining,allow_more=more_allowed,nonce=nonce)
+                        read_schemas=schemas,direct_reads=remaining,allow_more=more_allowed,nonce=nonce,
+                        inventory_observed=context.get('current_ip_inventory',{}).get('requested') is True
+                            and context['current_ip_inventory']['read_state']=='observed')
                     context['inquiry_budget']={'additional_rounds_remaining':max(0,harness.CONTRACT.SERVICE_INQUIRY_ROUNDS-report.get('evidence_inquiry_count',0)),
                         'additional_tool_calls_available':remaining,'pending_read_proposals_only_after_inquiry_budget':True}
                     messages=harness.CONTRACT.evidence_report_messages(context,agent_role='ollama',feedback=feedback)
@@ -592,7 +594,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         review['evidence_tools']=[citations[i] for i in indexes]
                         rendered=harness.evidence_report_text(review,report['calls'],context)
                         issues=(harness.violations(current,rendered,report['calls'])+
-                            harness.evidence_capability_gap_violations(review,context))
+                            harness.evidence_capability_gap_violations(review,context)+
+                            harness.evidence_report_scope_violations(review,context))
                         if issues:
                             audit['rejected_before_publication']=True;audit['issues']=sorted(set(issues))
                             count=report.get('evidence_claim_repairs',0)

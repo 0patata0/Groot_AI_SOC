@@ -209,7 +209,8 @@ class WebRuntime(unittest.TestCase):
         plans=[{'calls':[{'tool':n,'arguments':{} if n==r.BLOCK else dict(f.WINDOW)} for n in (MOD,r.SUR,r.BLOCK)]}]
         plans.extend({'calls':[{'tool':BUNDLE,'arguments':bundle((path,),ip)['arguments']}]} for ip,path in actors.items())
         fixture=test_runtime.PreparationLoop()
-        result,prompts,calls=fixture.execute(question=Q,read_incident=True,compact_plans=[report((0,1,2,3))],
+        answer=report((0,1,2,3));answer['report']['unverified_blocking_scope']=None
+        result,prompts,calls=fixture.execute(question=Q,read_incident=True,compact_plans=[answer],
             selector_plans=plans,read_fixtures=fixtures)
         self.assertEqual(calls,['search_modsecurity_alerts','search_suricata_alerts','list_blocks']+['collect_incident_evidence']*3)
         self.assertEqual(len(fixture.selector_prompts),4);self.assertEqual(prompts,[])

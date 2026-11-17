@@ -1594,6 +1594,13 @@ def evidence_report_context(question, calls, requested_at_kst, available_reads=(
                 'common_returned_source_ips':sorted(a&b),'left_only_returned_source_ips':sorted(a-b),
                 'right_only_returned_source_ips':sorted(b-a),
                 'scope':'literal_returned_sets_not_same_flows_or_incidents'})
+    current_ips=READ.block_list_state(calls)
+    inventory_receipt=next((r for r in reversed(receipts) if r['tool']==READ.BLOCKS),None)
+    current_inventory={'requested':READ.companion_block_request(normalized(question)),
+        'read_state':'observed' if current_ips is not None else 'unconfirmed',
+        'returned_ip_count':len(current_ips) if current_ips is not None else None,
+        'tool':READ.BLOCKS,'receipt_sha256':inventory_receipt['receipt_sha256'] if inventory_receipt else None,
+        'scope':'current_dynamic_ip_set_membership_not_historical_request_intervention_or_feature_activation'}
     body={'format':'current_read_report_v1','question':question,'requested_at_kst':requested_at_kst,
           'evidence_tools':dict(enumerate(citations)),
           'available_read_tools':list(available_reads),
@@ -1602,6 +1609,7 @@ def evidence_report_context(question, calls, requested_at_kst, available_reads=(
           'latest_read_states':[{'tool':r['tool'],'arguments':r['arguments'],'read_ordinal':r['read_ordinal'],
               'is_error':r['is_error']} for r in receipts if r['latest_same_input_attempt']],
           'derived_sample_source_sets':sources,'derived_sample_source_comparisons':comparisons,
+          'current_ip_inventory':current_inventory,
           'requested_web_evidence':requested_web_evidence(question,calls)}
     return body if len(untrusted_observation_json(body).encode())<=131072 else None
 
@@ -1668,8 +1676,44 @@ def evidence_capability_gap_violations(review, context):
 
 def evidence_report_text(review, calls, context):
     """Keep the existing raw fact tables and model decision, add requested comparison."""
-    rendered=EVIDENCE.render_model_review(review,facts_for(calls))
+    rendered=EVIDENCE.render_model_review(CONTRACT.report_display(review),facts_for(calls))
+    scope=review.get('unverified_blocking_scope')
+    if (context.get('current_ip_inventory',{}).get('read_state')=='observed'
+            and scope in ('과거 웹 요청의 차단·거부','과거 IP 차단 이력','차단 기능의 활성 설정')):
+        rendered='**판단문의 미확인 차단 범위: '+scope+'**\n현재 동적 IP 목록은 별도 조회 관측값입니다.\n\n'+rendered
     return add_evidence_source_comparison(context,rendered)
+
+
+def evidence_report_scope_violations(review, context):
+    """Known membership cannot become an unqualified unknown blocking state.
+
+    Only model-authored report fields are inspected, never raw log quotations.
+    Unknown historical request intervention, feature mode and impact remain
+    legitimate. This rejects ambiguous wording, not an unresolved risk label.
+    """
+    inventory=context.get('current_ip_inventory',{})
+    if (inventory.get('requested') is not True or inventory.get('read_state')!='observed'
+            or type(inventory.get('returned_ip_count')) is not int):return []
+    text=[review.get('basis',''),*review.get('limitations',())]
+    subject=r'(?:(?:현재|지금)\s*)?(?:(?:임시|동적)\s*)?(?:(?:IP|아이피)\s*)?차단\s*(?:(?:목록|리스트|IP|아이피|상태|현황)\s*)?'
+    unknown=r'(?:은|는|이|가)?\s*(?:아직\s*)?(?:미확인|미검증|확인(?:되지\s*않|하지\s*못|할\s*수\s*없|\s*불가)|알\s*수\s*없)'
+    other_scope=r'과거|어제|당시|이력|요청(?=\s*(?:거부|중재|차단|$))|웹|HTTP|WAF|ModSecurity|기능|활성|엔진|정책|승인|유지|해제|지속|연속'
+    for value in text:
+        if not isinstance(value,str):continue
+        for clause in re.split(r'\n|(?<=[.!?;])\s+',value):
+            for match in re.finditer(subject,clause,re.I):
+                after=clause[match.end():]
+                if not (re.match(unknown,after,re.I) or CONTRACT.claim_modality(after)
+                        in ('conditional_or_unverified','planned_check')):continue
+                prefix=clause[max(0,match.start()-32):match.start()]
+                explicit_current=re.search(r'현재|지금|목록|리스트|\bIP\b|아이피',match.group(),re.I)
+                if re.search(other_scope,prefix,re.I) or (not explicit_current and
+                        re.match(r'.{0,24}\([^)]*(?:'+other_scope+r')',after,re.I)):continue
+                bound=review.get('unverified_blocking_scope') in (
+                    '과거 웹 요청의 차단·거부','과거 IP 차단 이력','차단 기능의 활성 설정')
+                if bound and not explicit_current:continue
+                return ['current_block_inventory_unknown_scope']
+    return []
 
 
 def add_evidence_source_comparison(context, text):

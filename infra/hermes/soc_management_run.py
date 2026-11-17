@@ -3456,6 +3456,35 @@ def chat_lookup_harness():
     return alignment.load_harness()
 
 
+def native_incident_report_context(context, ledger, receipts, catalog, harness):
+    """Join the current native ledger to exact MCP bytes for the shared phase.
+
+    This does not dispatch, select an action, or inherit another turn's state.
+    Failed reads remain failed and original wrapper bytes remain hash-bound.
+    """
+    if (not isinstance(context,dict) or not isinstance(catalog,dict) or not catalog
+            or any(not allowed(n,'verify') for n in catalog)):
+        return None
+    bound=diagnostic_contract().bind_service_read_attempts(ledger,receipts,set(catalog))
+    if bound is None:return None
+    calls=[];unused=list(receipts)
+    for entry,row in zip(ledger,bound):
+        matches=[r for r in unused if r.get('tool')==row['tool'] and r.get('is_error') is row['is_error']
+            and isinstance(r.get('output'),str) and hashlib.sha256(r['output'].encode()).hexdigest()==row['receipt_sha256']]
+        if not matches:return None
+        receipt=matches[0];unused.remove(receipt)
+        match=re.fullmatch(r'mcp__([a-z_]+)__([a-z_]+)',row['tool'])
+        if not match:return None
+        calls.append({'server':match[1].replace('_','-'),'name':match[2],
+            'arguments':copy.deepcopy(entry['arguments']),'result':receipt['output'],
+            'result_sha256':row['receipt_sha256'],'is_error':row['is_error'],'is_write':False})
+    report=harness.evidence_report_context(context.get('request',''),calls,context.get('requested_at_kst',''),catalog)
+    if report is None:return None
+    report['native_read_ledger_sha256']=hashlib.sha256(json.dumps(ledger,ensure_ascii=False,
+        allow_nan=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    return report,calls
+
+
 def literal_chat_lookup(context, ledger, receipts, harness):
     'Render complete plain reads without risk or incident decisions.'
     if not context or not context['tools'] or not ledger or len(ledger)>32 or len(receipts)!=len(ledger):return None

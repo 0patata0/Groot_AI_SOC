@@ -127,3 +127,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [웹 근거 조회 검증](../infra/validation/management-latency/web-evidence-scope.validation.json)의 실제4시험과 두 정정 원인을 유형별 원장에 기록했다. 웹 추가 읽기 누락은 보완했으나 경로 공백·짧은 판단문의 범위 표현·운영 연결은 미완료다.
+
+
+[관측 목록과 미확인 범위](../infra/validation/management-latency/report-scope.validation.json)에 실제5시험·보관 원문3건 재표시·Native 결속 준비를 구분했다. Native 실행 연결·정확 운영 적용·새 채팅은 미완료다.

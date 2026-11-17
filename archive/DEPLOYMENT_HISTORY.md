@@ -1957,3 +1957,8 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 | 비밀정보 검사 | 추적 2389·기존 합성 fixture 10·신규 0 |
 | 운영 적용 | 미적용 |
 | 실험 기본값 | `CAPSTONE_EVIDENCE_REPORT_COMPACT=0` |
+
+
+## 2026-11-18 관측 목록과 미확인 범위
+
+[16사본과 미포함 Native 준비 변경·운영 미적용·임시 정리](STATUS_HISTORY.md#2026-11-18-관측-목록과-미확인-범위).

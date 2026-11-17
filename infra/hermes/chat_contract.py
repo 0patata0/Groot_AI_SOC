@@ -1480,7 +1480,7 @@ def service_follow_up_lines(steps):
 SERVICE_INQUIRY_ROUNDS = 2
 
 
-def evidence_report_schema(citations, available_reads=(), *, allow_more=True, read_schemas=None, direct_reads=None, nonce=None):
+def evidence_report_schema(citations, available_reads=(), *, allow_more=True, read_schemas=None, direct_reads=None, nonce=None, inventory_observed=False):
     """Reuse the report/read split; the model still owns judgment and inquiry."""
     if (not isinstance(citations,list) or not 1<=len(citations)<=16 or len(set(citations))!=len(citations)
             or any(not isinstance(n,str) or not n.startswith('mcp__') for n in citations)):
@@ -1497,6 +1497,11 @@ def evidence_report_schema(citations, available_reads=(), *, allow_more=True, re
         fields['status']['description']='등록 읽기만 수행하는 현재 조사 보고의 상태. 이 단계는 승인 요청을 제출하지 않습니다.'
         fields['basis']['maxLength']=320
         fields['basis']['description']='실제 근거와 한계에 결속한 한국어 판단 1~2문장. 값·시각·주소·ID는 근거 표가 표시한다.'
+        if inventory_observed:
+            fields['unverified_blocking_scope']={'type':['string','null'],
+                'enum':[None,'과거 웹 요청의 차단·거부','과거 IP 차단 이력','차단 기능의 활성 설정'],
+                'description':'판단문에서 미확인으로 남기는 차단 범위. 이미 관측한 현재 동적 IP 목록과 구분한다.'}
+            branch['properties']['report']['required'].append('unverified_blocking_scope')
         for key in ('limitations','next_steps'):
             fields[key]['maxItems']=2
             if fields[key]['items'].get('type')=='string':fields[key]['items']['maxLength']=200
@@ -1512,6 +1517,24 @@ def evidence_report_schema(citations, available_reads=(), *, allow_more=True, re
         closed_report['properties']['assessment']['enum']=['benign','remediated']
         branch['properties']['report']={'anyOf':[open_report,closed_report]}
     return schema
+
+
+def report_display(review):
+    """Remove known policy citation annotations from model prose, not evidence.
+
+    Keep raw reports unchanged. Arbitrary annotation content and machine fields
+    are deliberately not removed, so a marker cannot conceal a factual claim.
+    """
+    value=copy.deepcopy(review)
+    marker=(r'SOC_WORKFLOW_(?:QUERY|INVESTIGATE|CHANGE|RECOVER)_V1|'
+            r'SOC_ROLE_CONTRACT_V1|SOC_OUTPUT_CONTRACT_V1|'
+            r'SOC-environment-policy(?:\s*:\s*웹\s+백엔드\s+근거)?')
+    def clean(text):
+        return re.sub(r'\s*[\[(](?:'+marker+r')[\])]', '',text,flags=re.I)
+    if isinstance(value.get('basis'),str):value['basis']=clean(value['basis'])
+    if isinstance(value.get('limitations'),list):
+        value['limitations']=[clean(s) if isinstance(s,str) else s for s in value['limitations']]
+    return value
 
 
 def evidence_report_messages(context, *, agent_role, feedback=None):
@@ -1539,6 +1562,14 @@ def evidence_report_messages(context, *, agent_role, feedback=None):
                         'is_error':row['is_error'],'returned_list_sizes':dict(list(sizes.items())[:8])})
             checks.append({'tool':name,'registered':True,'current_attempts':attempts[-4:]})
         body['report_validation']={'issues':codes,'registered_read_checks':checks[:4]}
+        if 'current_block_inventory_unknown_scope' in codes:
+            inventory=context.get('current_ip_inventory',{})
+            if inventory.get('requested') is True and inventory.get('read_state')=='observed':
+                body['report_validation']['current_inventory_scope_check']={
+                    'observed_current_inventory':copy.deepcopy(inventory),
+                    'rejection_reason_ko':'차단 상태 미확인의 대상이 관측한 현재 IP 목록과 구분되지 않음',
+                    'not_proven_by_current_inventory_ko':['과거 개별 웹 요청의 차단·거부','차단 기능의 활성 설정'],
+                    'related_model_fields':['basis','limitations']}
     raw=json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c')
     return [{'role':'system','content':system_prompt(read_only=True,agent_role=agent_role,phase='evidence-judgment')},
             {'role':'user','content':raw}]

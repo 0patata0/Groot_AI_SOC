@@ -340,14 +340,17 @@
     "affected_public_documents": 15,
     "humanize_run": "_workspace/2026-11-18-005-6624",
     "humanize_route": "light",
-    "state": "humanized_verified_pending_publication",
+    "state": "humanized_verified_content_published",
     "gate_exit": 0,
     "change_rate": 0.0006,
     "grade": "B",
     "self_check": "6/6"
   },
   "publication": {
-    "state": "not_yet_committed",
-    "foreign_paths_preserved": 23
+    "state": "content_published",
+    "content_commit": "790e38e602eca580aaebd2e985ebfd0c9404776c",
+    "remote_main_at_content_publication": "790e38e602eca580aaebd2e985ebfd0c9404776c",
+    "remote_match_at_kst": "2026-11-18T04:49:01.657827+09:00",
+    "receipt_committed_separately": true
   }
 }

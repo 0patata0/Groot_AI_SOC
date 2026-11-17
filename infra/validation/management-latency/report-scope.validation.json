@@ -701,7 +701,19 @@
     "Canonical SDK505 retains preexisting8 failure entries/1 error; exploratory Native91 has2 unchanged reasoning expectations/66 optional dependency skips."
   ],
   "publication": {
-    "state": "pending_commit_and_push",
-    "private_logs_credentials_weights_excluded": true
+    "state": "content_published",
+    "content_commit": "cdcee3e161b144e41a951bdc7961743fc3b9dfb8",
+    "remote_main_at_content_publication": "cdcee3e161b144e41a951bdc7961743fc3b9dfb8",
+    "remote_match_at_kst": "2026-11-18T06:46:02.006011+09:00",
+    "receipt_committed_separately": true
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-007-a124",
+    "route": "light",
+    "change_rate": 0.0001,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0
   }
 }

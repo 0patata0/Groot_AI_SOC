@@ -1449,6 +1449,14 @@ def incident_field_violations(answer, calls):
         claim=' '.join(cells[:2]) if cells else line
         families={tool.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
                   for pattern,tool in INVESTIGATION_ALERT_TOOLS if re.search(pattern,claim,re.I)}
+        equality=re.search(r'출발지\s*(?:IP|주소)?\s*(?:목록|집합|표본)?\s*(?:은|는|이|가)?\s*'
+                           r'(?:서로\s*)?(?:동일(?:하|합|한|함|$)|일치(?:하|합|함|$)|같(?:습니다|다|으며|고|$))',claim,re.I)
+        if (equality and not uncertain and len(families)>=2 and families<=sensor_sources.keys()
+                and not re.search(r'일부|공통|교집합|부분',claim[:equality.end()])
+                and not re.search(r'않|아니|아님|없|불가|여부|확인할|확인해야|이라면|다면|하면|한\s*경우|가정|틀렸|오류',
+                                  claim[equality.start():equality.end()+24])
+                and len({frozenset(sensor_sources[f]) for f in families})>1):
+            issues.add('sensor_source_sets_falsely_equal')
         if (len(families)==1 and re.search(r'출발지|발신|\bsource\b',line,re.I)
                 and not re.search(r'목적지|도착지|\bdest(?:ination)?\b|→|->',line,re.I)
                 and not re.search(r'미확인|불명|알\s*수\s*없|아님|아니|아닌|가정|제외',claim)):
@@ -1527,6 +1535,64 @@ def service_report_receipts(calls):
             'result_state':'error' if c.get('is_error') else 'returned'})
         outputs.append({'tool':name,'output':c.get('result'),'is_error':c.get('is_error',False)})
     return CONTRACT.bind_service_read_attempts(ledger,outputs,{r['tool'] for r in ledger})
+
+
+def evidence_report_context(question, calls, requested_at_kst, available_reads=()):
+    """Current verified receipts, with no inherited observation or decision."""
+    if (not EVIDENCE.incident_investigation_request(normalized(question))
+            or READ.wants_write(normalized(question)) or not 1<=len(calls)<=40
+            or incident_evidence_gap(question,calls)):
+        return None
+    if not EVIDENCE.parse_instant(requested_at_kst) or not requested_at_kst.endswith('+09:00'):
+        raise ValueError('evidence_report_clock_invalid')
+    receipts=service_report_receipts(calls)
+    if receipts is None:return None
+    if any(not isinstance(n,str) or not EVIDENCE.allowed(n,'verify') for n in available_reads):
+        raise ValueError('evidence_report_read_scope_invalid')
+    citations=sorted({r['tool'] for r in receipts if r['is_error'] is False})
+    if not 1<=len(citations)<=16:return None
+    receipts=copy.deepcopy(receipts)
+    key=lambda r:(r['tool'],json.dumps(r['arguments'],sort_keys=True,ensure_ascii=False))
+    latest={key(r):i for i,r in enumerate(receipts)}
+    for i,r in enumerate(receipts):
+        r['read_ordinal']=i+1
+        r['latest_same_input_attempt']=latest[key(r)]==i
+    sources=[]
+    for r in receipts:
+        data=r['data']
+        if (r['is_error'] is not False or not r['latest_same_input_attempt'] or not isinstance(data,dict)
+                or data.get('source') not in ('modsecurity','suricata','wazuh')
+                or not isinstance(data.get('alerts'),list)):
+            continue
+        family=data['source']
+        if r['tool']!='mcp__security_events__search_'+family+'_alerts':continue
+        addresses=sorted({row['source_ip'] for row in data['alerts'] if isinstance(row,dict)
+                          and EVIDENCE.literal_ip(row.get('source_ip'))})
+        sources.append({'tool':r['tool'],'receipt_sha256':r['receipt_sha256'],
+                        'source':family,'returned_sample_source_ips':addresses,
+                        'arguments':copy.deepcopy(r['arguments']),
+                        'requested_since_kst':data.get('requested_since_kst'),
+                        'requested_until_kst':data.get('requested_until_kst'),
+                        'scope':'returned_sample_not_verified_hosts_or_attackers'})
+    comparisons=[]
+    for i,left in enumerate(sources):
+        for right in sources[i+1:]:
+            if left['source']==right['source']:continue
+            a,b=map(set,(left['returned_sample_source_ips'],right['returned_sample_source_ips']))
+            comparisons.append({'left_receipt_sha256':left['receipt_sha256'],'right_receipt_sha256':right['receipt_sha256'],
+                'left_source':left['source'],'right_source':right['source'],'returned_source_sets_equal':a==b,
+                'common_returned_source_ips':sorted(a&b),'left_only_returned_source_ips':sorted(a-b),
+                'right_only_returned_source_ips':sorted(b-a),
+                'scope':'literal_returned_sets_not_same_flows_or_incidents'})
+    body={'format':'current_read_report_v1','question':question,'requested_at_kst':requested_at_kst,
+          'evidence_tools':dict(enumerate(citations)),
+          'available_read_tools':list(available_reads),
+          'untrusted_completed_reads':[r for r in receipts if r['is_error'] is False],
+          'untrusted_failed_reads':[r for r in receipts if r['is_error'] is True],
+          'latest_read_states':[{'tool':r['tool'],'arguments':r['arguments'],'read_ordinal':r['read_ordinal'],
+              'is_error':r['is_error']} for r in receipts if r['latest_same_input_attempt']],
+          'derived_sample_source_sets':sources,'derived_sample_source_comparisons':comparisons}
+    return body if len(untrusted_observation_json(body).encode())<=131072 else None
 
 
 def incident_required_read_gaps(question, calls):

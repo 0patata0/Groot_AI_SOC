@@ -2,6 +2,7 @@
 import asyncio
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import types
@@ -18,16 +19,18 @@ def unresolved_report(text):
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None, incident_repair_scope=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None, incident_repair_scope=False, compact_plans=None, extra_read_error=False, compact_parse_error=False):
         calls, prompts = [], []
-        self.selector_prompts=[];self.agent_system_prompts=[]
+        self.selector_prompts=[];self.agent_system_prompts=[];self.compact_prompts=[];self.compact_schemas=[]
         selector_prompts=self.selector_prompts;agent_system_prompts=self.agent_system_prompts
+        compact_prompts=self.compact_prompts;compact_schemas=self.compact_schemas
         self.protected_starts = []
         content = '# heading\nbody\n'
         sha = hashlib.sha256(content.encode()).hexdigest()
         available = {'rule-a':['get_rule_change_target'], 'rule-write-a':['propose_rule_edit']}
         if read_incident:
             available['security-events']=['search_modsecurity_alerts']
+            if compact_plans is not None:available['security-events'].append('search_wazuh_alerts')
         class Connector:
             def __init__(self, server): self.server = server
             async def list_tools(self):
@@ -35,13 +38,15 @@ class PreparationLoop(unittest.TestCase):
                     'type':'object','properties':{'target':{'type':'string'}}}) for name in available[self.server]]
             async def call_tool(self, name, arguments, **kw):
                 calls.append(name)
+                if extra_read_error and name=='search_wazuh_alerts':
+                    return types.SimpleNamespace(isError=True,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'fixture unavailable'}))])
                 if incident_read_error and name=='search_modsecurity_alerts' and len(calls)==1:
                     return types.SimpleNamespace(isError=True,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'until_kst must be in the past 90 days'}))])
                 data = ({'target':'a:modsecurity-custom','content':content,'sha256':sha}
                         if name=='get_rule_change_target' else
-                        {'source':'modsecurity','returned_count':0,'alerts':[],
+                        {'source':'wazuh' if name=='search_wazuh_alerts' else 'modsecurity','returned_count':0,'alerts':[],
                          'requested_since_kst':'2026-10-30T12:00:00+09:00','requested_until_kst':'2026-10-30T12:01:00+09:00'}
-                        if name=='search_modsecurity_alerts' else
+                        if name in ('search_modsecurity_alerts','search_wazuh_alerts') else
                         {'target':'a:modsecurity-custom','proposal_id':'1'*32,'before_sha256':sha,
                          'after_sha256':hashlib.sha256(content.replace(arguments['edits'][0]['old_text'],arguments['edits'][0]['new_text']).encode()).hexdigest(),
                          'status':'pending','review_posted':True})
@@ -57,6 +62,17 @@ class PreparationLoop(unittest.TestCase):
         class LLM:
             def __init__(self, **kw): self.callbacks=kw.get('callbacks',[])
             def with_structured_output(self, *a, **kw):
+                if compact_plans is not None and 'anyOf' in a[0]:
+                    async def synthesize(messages):
+                        compact_prompts.append(messages);compact_schemas.append(a[0])
+                        if compact_parse_error and len(compact_prompts)==1:
+                            return {'raw':types.SimpleNamespace(content='{"invalid_json"'),
+                                    'parsed':None,'parsing_error':ValueError('fixture parser error')}
+                        value=json.loads(json.dumps(compact_plans[min(len(compact_prompts)-1,len(compact_plans)-1)]))
+                        value['request_nonce']=a[0]['anyOf'][0]['properties']['request_nonce']['const']
+                        return {'raw':types.SimpleNamespace(content=json.dumps(value,ensure_ascii=False)),
+                                'parsed':value,'parsing_error':None} if kw.get('include_raw') else value
+                    return types.SimpleNamespace(ainvoke=synthesize)
                 if read_incident:
                     async def select(messages):
                         selector_prompts.append(messages)
@@ -121,6 +137,10 @@ class PreparationLoop(unittest.TestCase):
             'langchain_core.tools':{'StructuredTool':Tool},
             'langchain_core.callbacks':{'AsyncCallbackHandler':object},
             'jsonschema':{'Draft202012Validator':Validator,'ValidationError':ValidationError}}
+        if compact_plans is not None:
+            import jsonschema
+            definitions['jsonschema']={'Draft202012Validator':jsonschema.Draft202012Validator,
+                                       'ValidationError':jsonschema.ValidationError}
         modules={}
         for name,attrs in definitions.items():
             module=types.ModuleType(name);module.__dict__.update(attrs);modules[name]=module
@@ -129,7 +149,8 @@ class PreparationLoop(unittest.TestCase):
             if incident_repair_scope and observed:
                 return {'mcp__rule_a__get_rule_change_target'}
             return {'mcp__rule_a__get_rule_change_target'} if narrow_repair and observed else original_scope(question,observed)
-        with patch.dict(sys.modules,modules), patch.object(runtime,'capabilities',return_value=available), \
+        with patch.dict(os.environ,{'CAPSTONE_EVIDENCE_REPORT_COMPACT':'1' if compact_plans is not None else '0'}), \
+             patch.dict(sys.modules,modules), patch.object(runtime,'capabilities',return_value=available), \
              patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools), \
              patch.object(runtime.harness,'tool_scope',side_effect=scope):
             pool = types.SimpleNamespace(borrow=AsyncMock(side_effect=AssertionError('write request entered read pool')))

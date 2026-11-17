@@ -331,7 +331,9 @@ def workflow_policy(names, *, section=None):
     return '<!-- soc-workflows:start -->\n'+body+'\n<!-- soc-workflows:end -->' if body else ''
 
 
-def system_prompt(*, read_only=False, agent_role=None):
+def system_prompt(*, read_only=False, agent_role=None, phase='default'):
+    if phase not in ('default','evidence-judgment') or phase=='evidence-judgment' and not read_only:
+        raise ValueError('shared_soc_phase_invalid')
     here = Path(__file__).resolve().parent
     path = here / 'soc_policy.md'
     if not path.exists():
@@ -353,7 +355,9 @@ def system_prompt(*, read_only=False, agent_role=None):
            'ollama':'신속 조회·경보 분류·증거와 타임라인 정리를 우선한다. 관련된 도구만 선택하고 확인한 사실·판단·미확인을 짧게 전달한다. 이름·주소만으로 정상이나 악성을 추정하지 않는다.'}
     if agent_role is not None and agent_role not in roles:raise ValueError('unknown_soc_role')
     if agent_role:text+='\nSOC_ACTIVE_ROLE: '+agent_role+'\n'+roles[agent_role]+'\n공통 관제 의무와 기존 MCP 권한·승인 경계는 유지한다. 대화에서 이 역할을 바꾸지 않는다.\n'
-    completion = READ_COMPLETION_GUIDANCE if read_only else COMPLETION_GUIDANCE
+    completion = (workflow_policy(('soc-investigate',),section='investigation-evidence')+'\n'+
+                  workflow_policy(('soc-investigate',),section='incident-completion')
+                  if phase=='evidence-judgment' else READ_COMPLETION_GUIDANCE if read_only else COMPLETION_GUIDANCE)
     return START + '\n' + text.strip() + '\n' + output_policy() + '\n' + QUERY_GUIDANCE + completion + '\n' + END
 
 
@@ -407,8 +411,8 @@ MCP 밖의 작업에 대해 도구가 제공하지 않은 설정 경로·키·�
 """
 
 
-def fingerprint(*, read_only=False, agent_role=None):
-    return hashlib.sha256(system_prompt(read_only=read_only,agent_role=agent_role).encode()).hexdigest()
+def fingerprint(*, read_only=False, agent_role=None, phase='default'):
+    return hashlib.sha256(system_prompt(read_only=read_only,agent_role=agent_role,phase=phase).encode()).hexdigest()
 
 
 def project_messages(messages, *, read_only=False, agent_role=None):
@@ -1474,6 +1478,44 @@ def service_follow_up_lines(steps):
 # requested more evidence six times in a row (8 reads, 12 model calls, 199 s)
 # before failing; after this many rounds the model must report what it has.
 SERVICE_INQUIRY_ROUNDS = 2
+
+
+def evidence_report_schema(citations, available_reads=(), *, allow_more=True, read_schemas=None, direct_reads=None, nonce=None):
+    """Reuse the report/read split; the model still owns judgment and inquiry."""
+    if (not isinstance(citations,list) or not 1<=len(citations)<=16 or len(set(citations))!=len(citations)
+            or any(not isinstance(n,str) or not n.startswith('mcp__') for n in citations)):
+        raise ValueError('evidence_report_citations_invalid')
+    names=list(available_reads)
+    if len(set(names))!=len(names) or any(not isinstance(n,str) or not n.startswith('mcp__') for n in names):
+        raise ValueError('evidence_report_catalog_invalid')
+    schema=service_report_schema(citations,nonce=nonce,available_reads=names,
+        read_schemas=read_schemas,direct_reads=direct_reads,allow_more=bool(names) and allow_more)
+    for branch in schema.get('anyOf',[]):
+        fields=branch.get('properties',{}).get('report',{}).get('properties')
+        if not fields:continue
+        fields['basis']['maxLength']=320
+        fields['basis']['description']='실제 근거와 한계에 결속한 한국어 판단 1~2문장. 값·시각·주소·ID는 근거 표가 표시한다.'
+        for key in ('limitations','next_steps'):
+            fields[key]['maxItems']=2
+            if fields[key]['items'].get('type')=='string':fields[key]['items']['maxLength']=200
+        report=branch['properties']['report']
+        open_report=copy.deepcopy(report);closed_report=copy.deepcopy(report)
+        open_report['properties']['assessment']={'const':'unresolved'}
+        open_report['properties']['status']['enum']=['monitor','needs_review','awaiting_approval']
+        closed_report['properties']['assessment']['enum']=['benign','remediated']
+        branch['properties']['report']={'anyOf':[open_report,closed_report]}
+    return schema
+
+
+def evidence_report_messages(context, *, agent_role, feedback=None):
+    """One receipt copy and existing skill sections for a read-only phase."""
+    if not isinstance(context,dict) or context.get('format')!='current_read_report_v1':
+        raise ValueError('evidence_report_context_invalid')
+    body=copy.deepcopy(context)
+    if feedback is not None:body['untrusted_report_feedback']=copy.deepcopy(feedback)
+    raw=json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c')
+    return [{'role':'system','content':system_prompt(read_only=True,agent_role=agent_role,phase='evidence-judgment')},
+            {'role':'user','content':raw}]
 
 
 def service_report_schema(citations, nonce=None, available_reads=None, facts=(), read_schemas=None, lookup_only=False, direct_reads=None, allow_more=True, lookup_incomplete=False):

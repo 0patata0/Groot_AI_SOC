@@ -1,0 +1,390 @@
+{
+  "schema": 1,
+  "topic": "current-read-bound structured evidence judgment; experimental candidate",
+  "observed_at_kst": "2026-11-18T02:29:34.276675+09:00",
+  "candidate": {
+    "installed_file_count": 16,
+    "plan_sha256": "90ce529a107d9be93320a53a0acde6c91cbba853baa69c6f5ab4463f28284d5a",
+    "canonical_sources": {
+      "infra/hermes/chat_contract.py": "1603dc1a52f42fef52d5f1dcd141971982ffbd00d29bb051d151ad2e70e96bde",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "7f2a73dca7e1bb0eb0e2f1e90720a02eb03462c2e2a9b9f5dbadeac7143bc07a",
+      "infra/ollama-trial/harness.py": "e18d7ff4d3eb893142bbdde1f17571a200d4eda844984093df6a6ad5721fb4d7",
+      "infra/ollama-trial/runtime.py": "8438ce35e6d8d0275d651c9a13f9d9c3c91b195836017ece9c79ae3d0fde9848",
+      "infra/ollama-trial/test_runtime.py": "90a986869b7edd3d6765c8eb386107d7f199c75da0899a67224d0fdb6ec221db",
+      "infra/ollama-trial/test_compound_facts.py": "8555a45314c302594572dcbdf2030f2efefb603b6d0ce71aff17533b6ee67ece",
+      "infra/ollama-trial/test_evidence_report.py": "dc822d77c60db97458c17b8f10d01f0f1c8414b8ba71c2a22b959735f06f5b7f",
+      "infra/ollama-trial/test_evidence_runtime.py": "f6fc97cb477be70749ecb20d9f6213aa7cfe3992ab4e0f792194d89d2e98209f"
+    },
+    "installed_sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "f1c064cc7dc8cfa28a417b1300f6804efa65c560816245813a81f7e1ec3ba07d",
+        "bytes": 310253,
+        "kind": "pending compound/field candidate plus authenticated compact current-read report context"
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "f1c064cc7dc8cfa28a417b1300f6804efa65c560816245813a81f7e1ec3ba07d",
+        "bytes": 310253,
+        "kind": "pending compound/field candidate plus authenticated compact current-read report context"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "before_sha256": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "after_sha256": "0e1d40fd89823686963ff8eb7096031e50392f8fa9e2074475e467aba7f80a26",
+        "bytes": 46191,
+        "kind": "current read display projection and one in-turn repair call; audit retained"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "after_sha256": "408279d5443286a2a0be3273ff1209af8412a3e740efe600ecb336e468001f47",
+        "bytes": 56369,
+        "kind": "existing isolated runtime plus opt-in evidence report and whole-batch read dispatch; no operating flag change"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "bytes": 3493,
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "bytes": 3493,
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "bytes": 3493,
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5d79834ecd4cd4c34d25f5a7cbf5205e5ef64fd409c4177683aadb482fa1ec0a",
+        "bytes": 17379,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5d79834ecd4cd4c34d25f5a7cbf5205e5ef64fd409c4177683aadb482fa1ec0a",
+        "bytes": 17379,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5d79834ecd4cd4c34d25f5a7cbf5205e5ef64fd409c4177683aadb482fa1ec0a",
+        "bytes": 17379,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "bytes": 79535,
+        "kind": "common current-block read intent; no new endpoint or permission"
+      },
+      "/opt/capstone-ollama-trial/read_contract.py": {
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "bytes": 79535,
+        "kind": "common current-block read intent; no new endpoint or permission"
+      },
+      "/opt/capstone-management/read_contract.py": {
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "bytes": 79535,
+        "kind": "common current-block read intent; no new endpoint or permission"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "cf968c92eba24a408750bcaac86225f29fdcf092a26afa44338454cab6662751",
+        "bytes": 193048,
+        "kind": "readonly judgment phase and existing report/inquiry schema reuse; default phase unchanged"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "cf968c92eba24a408750bcaac86225f29fdcf092a26afa44338454cab6662751",
+        "bytes": 193048,
+        "kind": "readonly judgment phase and existing report/inquiry schema reuse; default phase unchanged"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "cf968c92eba24a408750bcaac86225f29fdcf092a26afa44338454cab6662751",
+        "bytes": 193048,
+        "kind": "readonly judgment phase and existing report/inquiry schema reuse; default phase unchanged"
+      }
+    },
+    "default_flag": "CAPSTONE_EVIDENCE_REPORT_COMPACT=0",
+    "used_only_in_isolated_sdk": true,
+    "operating_applied": false,
+    "native_execution_connected": false
+  },
+  "operating": {
+    "source_count": 59,
+    "unchanged_from_before": true,
+    "observed_at_kst": "2026-11-18T02:26:14.367777+09:00",
+    "mcp_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_and_authority_changed": false,
+    "harness2_status": "passed",
+    "harness2_sources": 50,
+    "harness2_observed_at_kst": "2026-11-18T02:26:31.723528+09:00",
+    "protected_calls": 0,
+    "service_restarts": 0,
+    "mattermost_posts": 0,
+    "attack_tests": 0,
+    "new_training": 0,
+    "dgx_training_status_polls": 0
+  },
+  "checks": {
+    "mac_actual_installation": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 183,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 141,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_actual_installation": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 183,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 141,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.406s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.588s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "canonical": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 1,
+        "summary": {
+          "run": 445,
+          "failures": [
+            "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+            "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+            "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+          ],
+          "errors": [
+            "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+          ],
+          "skipped": 0
+        }
+      }
+    },
+    "canonical_sdk_baseline_failure_entries": 8,
+    "canonical_sdk_baseline_errors": 1,
+    "new_baseline_failure_names": 0,
+    "official_framework": {
+      "source": "https://github.com/google-research/harness2",
+      "commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "verified_files": 140,
+      "always_on_census_delta": 0,
+      "census_is_not_runtime_accuracy_or_prompt_size_proof": true
+    },
+    "main_agent_review_findings": [],
+    "semgrep": "not run; no Mac package installation"
+  },
+  "prototype": {
+    "basis": "retained earlier real receipts, new model-only request; not fresh MCP/live state or final investigation",
+    "seconds": 17.306891683,
+    "new_mcp_calls": 0,
+    "outcome": "selected registered Wazuh evidence tool name without executing it"
+  },
+  "actual_isolated_sdk": [
+    {
+      "label": "first",
+      "result_sha256": "2dcc92afea3423eb808b3b2ce82548e384d399307354d36d15904d6d9ec122a3",
+      "plan_sha256": "fe31613200feed6ff2e1dabd010c1d2bd01229cc0695ca2993d954927eaed24b",
+      "question_sha256": "cfe23fedb742d2744e8e61c44accce08f1d798c6d78e41a3eee3223e474ec9d7",
+      "at_kst": "2026-11-18T02:06:33.261665+09:00",
+      "seconds": 47.49260570801562,
+      "reads": 3,
+      "model_calls": 2,
+      "protected_calls": 0,
+      "read_seconds_sum": 0.2364304880029522,
+      "model_seconds_sum": 39.585285064938944,
+      "initialization_seconds": 7.301044729014393,
+      "status": "partial",
+      "assessment": "unresolved",
+      "remaining_issues": [],
+      "actual_additional_inquiry_rounds": 0,
+      "schema_repairs": 0,
+      "error_type": null,
+      "raw_model_response_preserved": false,
+      "manual_quality_pass": false,
+      "manual_findings": [
+        "incorrect equality of different sensor source sets",
+        "incorrect plain tool name attribution",
+        "unresolved assessment with resolved status"
+      ],
+      "launch_ack_to_result_seconds": 48.120187,
+      "timer_scope": "runtime.run internal, separately recorded launch-ack-to-result wall time; excludes Mattermost"
+    },
+    {
+      "label": "conditional-schema-repair",
+      "result_sha256": "a389eead92d87d53babebf0f344a096310efda26ef73e3e2754358d7e33fe4b5",
+      "plan_sha256": "b5e83b0976604901bc6c65d88a7aee62e69ea82dd3f8fb0cd1ec7544b36e7734",
+      "question_sha256": "cfe23fedb742d2744e8e61c44accce08f1d798c6d78e41a3eee3223e474ec9d7",
+      "at_kst": "2026-11-18T02:12:37.505228+09:00",
+      "seconds": 67.98440913797822,
+      "reads": 3,
+      "model_calls": 4,
+      "protected_calls": 0,
+      "read_seconds_sum": 0.21376801695441827,
+      "model_seconds_sum": 60.16558957786765,
+      "initialization_seconds": 7.255546674015932,
+      "status": "partial",
+      "assessment": null,
+      "remaining_issues": [],
+      "actual_additional_inquiry_rounds": 0,
+      "schema_repairs": 2,
+      "error_type": "ValueError",
+      "raw_model_response_preserved": false,
+      "manual_quality_pass": false,
+      "manual_findings": [
+        "repeated contradictory resolved status rejected three times; incomplete fallback"
+      ],
+      "launch_ack_to_result_seconds": 68.597834,
+      "timer_scope": "runtime.run internal, separately recorded launch-ack-to-result wall time; excludes Mattermost"
+    },
+    {
+      "label": "final",
+      "result_sha256": "b067fa9d9c2333a73c87b633849e77e5f1d380cac979e8df1a3c71470460f4b3",
+      "plan_sha256": "90ce529a107d9be93320a53a0acde6c91cbba853baa69c6f5ab4463f28284d5a",
+      "question_sha256": "cfe23fedb742d2744e8e61c44accce08f1d798c6d78e41a3eee3223e474ec9d7",
+      "at_kst": "2026-11-18T02:18:26.248028+09:00",
+      "seconds": 46.939835163007956,
+      "reads": 3,
+      "model_calls": 2,
+      "protected_calls": 0,
+      "read_seconds_sum": 0.21016707201488316,
+      "model_seconds_sum": 38.94444923294941,
+      "initialization_seconds": 7.416858600976411,
+      "status": "partial",
+      "assessment": "unresolved",
+      "remaining_issues": [],
+      "actual_additional_inquiry_rounds": 0,
+      "schema_repairs": 0,
+      "error_type": null,
+      "raw_model_response_preserved": true,
+      "manual_quality_pass": false,
+      "manual_findings": [
+        "explicit comparison of source differences omitted",
+        "request-block proof not completed",
+        "registered Wazuh follow-up proposed but not executed"
+      ],
+      "launch_ack_to_result_seconds": 47.567515,
+      "timer_scope": "runtime.run internal, separately recorded launch-ack-to-result wall time; excludes Mattermost"
+    }
+  ],
+  "comparison_limits": [
+    "same model and question but changed candidates and read timestamps",
+    "no controlled before/after speedup, mean, p95 or Mattermost response SLA",
+    "partial investigation time is not completed-investigation latency",
+    "guard pass alone is not semantic accuracy"
+  ],
+  "remaining": [
+    "model-selected follow-up execution verified with substituted SDK boundaries, not selected in these live runs",
+    "explicit source-comparison answer and request-block evidence incomplete",
+    "Native adapter path and fresh two-bot Mattermost evidence remain untested",
+    "operating promotion withheld"
+  ],
+  "cleanup": {
+    "owned_server_roots": 10,
+    "removed_files": 3737,
+    "removed_bytes": 143634101,
+    "exported_result_artifacts": 57,
+    "whole_file_inventory_sha256": "bb5ac69cdfdd090cdb9ae9797d04c13e77115332ca65ce99daf830eceb74b966",
+    "remaining_roots": [],
+    "mac_package_installs": 0,
+    "mac_downloads": 0,
+    "operating_backups_model_and_framework_preserved": true
+  },
+  "source_reference": {
+    "malvex_commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "scope": "reference-only phase/evidence separation; no framework installation or MCP architecture change",
+    "structured_output": "https://reference.langchain.com/python/langchain-ollama/chat_models/ChatOllama/with_structured_output"
+  },
+  "local_driver_review": {
+    "copied_async_guard_corrected_for_future_runs": true,
+    "sync_refusal_test": "passed",
+    "tested_original_script_preserved": true,
+    "live_runs_retested_with_corrected_guard": false,
+    "actual_safety_basis": "explicitly verified 36-read exposure plus independent actual-call audit"
+  },
+  "publication": {
+    "state": "pending",
+    "content_commit": null,
+    "remote_match_at_kst": null
+  },
+  "documentation": {
+    "skill": "humanize-korean v2.3-codex",
+    "run_id": "2026-11-18-003-6923",
+    "route": "standard",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0341,
+    "grade": "B",
+    "self_checks": 6,
+    "gate_exit": 0,
+    "prose_blocks": 20,
+    "public_documents": 15,
+    "fixed_receipt_fields_are_metadata": true
+  }
+}

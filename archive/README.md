@@ -115,3 +115,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 최근 [동반 조회·주장 검증](../infra/validation/management-latency/companion.validation.json)의 실제 2/3/3읽기와 자동 완료 오답, 공통 필드 검사 보완·13파일 후보 미적용을 유형별 원장에 남겼다. 구조/회귀 통과와 실제 판단 품질을 구분한다.
+
+
+[구조화 판단 검증](../infra/validation/management-latency/evidence-judgment.validation.json)의 실제 3읽기와 47.493/67.984/46.940초의 소요 시간, 오답 거절과 미완료 조사를 유형별 원장에 남겼다. 16사본 후보는 기본값 꺼짐·운영 미적용이다.

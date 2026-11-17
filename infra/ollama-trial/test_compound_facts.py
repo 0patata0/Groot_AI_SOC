@@ -68,5 +68,22 @@ class CompoundFactBinding(unittest.TestCase):
             c=dict(self.calls[0],result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
             self.assertEqual(h.incident_field_violations('WAF HTTP 403으로 요청 차단됨',[c]),[])
 
+    def test_shared_address_does_not_make_different_sensor_source_sets_equal(self):
+        for text in ('WAF와 IDS의 출발지 IP는 동일합니다.',
+                     '출발지 IP는 동일하나 WAF·IDS 탐지 유형이 다릅니다.',
+                     '| WAF·IDS 출발지 집합 | 동일함 |',
+                     'WAF/IDS 출발지는 일치합니다.'):
+            self.assertIn('sensor_source_sets_falsely_equal',h.incident_field_violations(text,self.calls),text)
+        for text in ('WAF·IDS의 일부 출발지 IP는 동일합니다.',
+                     'WAF·IDS의 공통 출발지 IP는 동일합니다.',
+                     'WAF·IDS 출발지 IP는 동일하지 않습니다.',
+                     'WAF·IDS 출발지 IP가 동일한지 여부는 미확인입니다.',
+                     'WAF·IDS 출발지 IP가 동일하면 연관 후보로 검토합니다.',
+                     'WAF·IDS 출발지 IP가 동일하다는 주장은 틀렸습니다.',
+                     'WAF와 IDS의 출발지 집합은 다릅니다.'):
+            self.assertNotIn('sensor_source_sets_falsely_equal',h.incident_field_violations(text,self.calls),text)
+        same=[call('modsecurity',['192.0.2.232']),call('suricata',['192.0.2.232'])]
+        self.assertNotIn('sensor_source_sets_falsely_equal',h.incident_field_violations('WAF·IDS 출발지 IP는 동일합니다.',same))
+
 
 if __name__=='__main__':unittest.main()

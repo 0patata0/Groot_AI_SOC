@@ -541,6 +541,75 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     report['service_inquiry_count']=report.get('service_inquiry_count',0)+1
                     feedback=None  # New actual receipts require a fresh judgment.
                 raise RuntimeError('service_inquiry_budget_exhausted')
+            async def evidence_synthesis(feedback=None):
+                nonlocal selection_active
+                if os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')!='1' or service_plan or reference:
+                    return None
+                for _ in range(steps):
+                    if meter.used>=steps:return None
+                    readable={t.name:t for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')}
+                    context=harness.evidence_report_context(current,report['calls'],report['at_kst'],readable)
+                    if context is None:return None
+                    citations=list(context['evidence_tools'].values())
+                    schemas=harness.refine_read_schemas(current,{n:t.args_schema for n,t in readable.items()},
+                        report['calls'],report.get('diagnostic_targets',()))
+                    more_allowed=report.get('evidence_inquiry_count',0)<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS
+                    remaining=min(4,max(0,budget.limit-budget.used)) if more_allowed else 0
+                    nonce=os.urandom(16).hex()
+                    schema=harness.CONTRACT.evidence_report_schema(citations,list(schemas),
+                        read_schemas=schemas,direct_reads=remaining,allow_more=more_allowed,nonce=nonce)
+                    messages=harness.CONTRACT.evidence_report_messages(context,agent_role='ollama',feedback=feedback)
+                    envelope=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema',include_raw=True).ainvoke(messages),90)
+                    require(isinstance(envelope,dict) and {'raw','parsed','parsing_error'}<=set(envelope),'evidence_report_envelope_invalid')
+                    value=envelope['parsed'];raw=getattr(envelope['raw'],'content',None)
+                    raw_bytes=raw.encode() if isinstance(raw,str) else None
+                    audit={'response':copy.deepcopy(value),'read_result_sha256':[c.get('result_sha256') for c in report['calls']],
+                        'raw_response':raw_bytes[:65536].decode('utf-8','ignore') if raw_bytes is not None else None,
+                        'raw_response_truncated':raw_bytes is not None and len(raw_bytes)>65536,
+                        'raw_response_bytes':len(raw_bytes) if raw_bytes is not None else None,
+                        'raw_response_sha256':hashlib.sha256(raw_bytes).hexdigest() if raw_bytes is not None else None,
+                        'parsing_error_type':type(envelope['parsing_error']).__name__ if envelope['parsing_error'] else None}
+                    report.setdefault('evidence_report_audit',[]).append(audit)
+                    report['evidence_report_audit']=report['evidence_report_audit'][-12:]
+                    report['evidence_report_prompt_sha256']=harness.CONTRACT.fingerprint(
+                        read_only=True,agent_role='ollama',phase='evidence-judgment')
+                    try:value,removed=harness.CONTRACT.validated_service_report(value,schema)
+                    except ValidationError:
+                        count=report.get('evidence_schema_repairs',0)
+                        if count>=harness.CONTRACT.REPAIR_PASSES:
+                            report['stop_reason']='evidence_report_schema_repair_budget_exhausted'
+                            raise RuntimeError(report['stop_reason'])
+                        feedback=harness.CONTRACT.service_schema_repair_feedback(value,schema)
+                        report['evidence_schema_repairs']=count+1
+                        audit['rejected_before_dispatch']=True
+                        continue
+                    if removed:report['deduplicated_read_calls']=report.get('deduplicated_read_calls',0)+removed
+                    if not value['more_evidence']:
+                        review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
+                        review['evidence_tools']=[citations[i] for i in indexes]
+                        report['last_evidence_review']=copy.deepcopy(review)
+                        return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
+                    plan={'calls':value['calls']}
+                    plan,_=harness.validated_selection(plan,harness.selection_schema(schemas,budget.limit-budget.used))
+                    rejection=harness.CONTRACT.service_inquiry_rejection(plan['calls'],context['untrusted_completed_reads'],
+                        {n:t.args_schema for n,t in readable.items()})
+                    if rejection:
+                        history=report.setdefault('evidence_inquiry_rejections',[])
+                        if rejection in history:
+                            report['stop_reason']='repeated_evidence_inquiry_rejection'
+                            raise RuntimeError(report['stop_reason'])
+                        history.append(rejection);audit['rejected_before_dispatch']=True
+                        feedback={'issues':[rejection['code']],'untrusted_rejected_reads':rejection}
+                        continue
+                    before=len(report['calls']);selection_active=True
+                    try:
+                        for choice in plan['calls']:
+                            await readable[choice['tool']].ainvoke(choice['arguments'])
+                    finally:selection_active=False
+                    require(len(report['calls'])>before,'evidence_inquiry_no_completed_read')
+                    report['evidence_inquiry_count']=report.get('evidence_inquiry_count',0)+1
+                    feedback=None
+                raise RuntimeError('evidence_inquiry_budget_exhausted')
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference,service_plan))
             agent_context_receipts = None
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
@@ -592,6 +661,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         'untrusted_rejected_sentences':harness.CONTRACT.rejected_claim_sentences(
                             str(final),harness.facts_for(report['calls']),issues)})
                         if service_plan and service_plan.get('compact_scope') and not gap else None)
+                    if compact_final is None and not gap:
+                        compact_final=await evidence_synthesis({'issues':issues,'untrusted_rejected_report':report.get('last_evidence_review')})
                     if compact_final is not None:
                         final=compact_final
                     elif read_scope and not gap and budget.used < budget.limit:
@@ -638,8 +709,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                             selection_active = False
                         await complete_service_identity_reads()
                         if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference,service_plan):
-                            final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'], attempts=read_attempt_snapshot())+harness.read_background(question,current)), 180)
-                            agent_context_receipts = digest(report['calls'])
+                            compact=await evidence_synthesis()
+                            if compact is not None:final=compact
+                            else:
+                                final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'], attempts=read_attempt_snapshot())+harness.read_background(question,current)), 180)
+                                agent_context_receipts = digest(report['calls'])
                         else:
                             final = ''  # Failed/missing reads cannot become observations.
                     else:
@@ -701,7 +775,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             unresolved_service=(report.get('service_judgment',{}).get('assessment')=='unresolved'
                 or report.get('service_judgment',{}).get('status') in ('needs_review','awaiting_approval','monitor')
                 or bool(report.get('service_identity_discovery',{}).get('missing_units')))
-            report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') or unresolved_service else 'completed', final_response=final,
+            unresolved_evidence=(report.get('last_evidence_review',{}).get('assessment')=='unresolved'
+                or report.get('last_evidence_review',{}).get('status') in ('needs_review','awaiting_approval','monitor'))
+            report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') or unresolved_service or unresolved_evidence else 'completed', final_response=final,
                           conversation_seconds=time.perf_counter() - tick)
             if not report['protected_calls'] and report['calls'] and all(
                     harness.EVIDENCE.allowed(alias(c['server'],c['name']),'verify') for c in report['calls']):

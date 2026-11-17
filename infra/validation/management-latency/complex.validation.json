@@ -548,7 +548,7 @@
     "chat_posts": 0
   },
   "operating_last_observation": {
-    "at_kst": "2026-11-18T00:00:38.747996+09:00",
+    "at_kst": "2026-11-18T00:14:14.948321+09:00",
     "sources_unchanged": 59,
     "running_cases": 0,
     "not_promoted": true
@@ -573,8 +573,18 @@
     "Blocked current-IP companion read and evidence-driven follow-up selection remain unresolved; do not weaken gates or force benign/remediated to pass."
   ],
   "publication": {
-    "state": "content_prepared_not_yet_committed",
-    "base_head": "d3b053d2ebc98ccce916665e8425ad16c9db5c52"
+    "state": "content_published",
+    "content_commit": "a6d5ee53b1ae48e58c552c60f9b10847a4e0d741",
+    "remote_main_verified_at_kst": "2026-11-18T00:12:28.214086+09:00",
+    "operating_promotion": false,
+    "credential_handling": "project local token per Git process; helpers and HTTP trace disabled",
+    "tracked_worktree_scan": {
+      "paths": 2376,
+      "unsafe": 0,
+      "known_fixture_findings": 10,
+      "new_findings": 0
+    },
+    "exact_staged_blob_sha_checks": 24
   },
   "operating_last_structure_observation": {
     "at_kst": "2026-11-18T00:05:26.361284+09:00",
@@ -599,6 +609,27 @@
       "self_check": "6/6",
       "gate_exit": 0,
       "finalizer": "not_required"
+    },
+    "receipt_humanize": {
+      "run_id": "2026-11-18-001-174e",
+      "route": "light",
+      "change_rate": 0,
+      "grade": "B",
+      "self_check": "6/6",
+      "gate_exit": 0
     }
+  },
+  "followup_scope_diagnosis": {
+    "basis": "Pure replay of actual installed helper and retained live read receipts; not new MCP",
+    "question": "오늘 WAF와 Suricata 경보의 출발지가 겹치는지 조사하고, 현재 IP 차단과 실제 요청 차단이 확인됐는지 구분해서 알려줘.",
+    "companion_block_request": false,
+    "missing_reads": [],
+    "after_event_selection_scope": null,
+    "tool_scope_after_reads": null,
+    "initial_scope": [
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__security_events__search_suricata_alerts"
+    ],
+    "block_list_in_exposed_tools": true
   }
 }

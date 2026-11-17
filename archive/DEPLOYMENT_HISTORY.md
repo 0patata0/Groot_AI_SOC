@@ -2,6 +2,8 @@
 
 ## 조회 계약·공통 스킬·감사 목록15파일 (2026-11-17)
 
+내용 커밋 `35aa25fdad1c1b92c6969c8f21b4d5d00e74e6c8`·원격 main 일치 `2026-11-17T21:32:35.142830+09:00`·공개23파일·추적2,371/신규 탐지0·stage SHA 일치. 이 영수증의 후속 게시와 구분한다.
+
 21:18:12 KST15파일을 확정했다. 공통 계약/조회 스킬의 Native·SDK·관리 사본과 두 harness 사본·H2 core/config/receipt·SDK receipt만 적용했다. 초기 설치의 고정 목록은47→49이며 기존 패키지·모델·키·포트·도구 권한 변경0이다.15분 독립 원복은 inactive·confirmed no-op, 정확 원본/후보는 보존한다. [검증·범위](../infra/validation/management-latency/README.md).
 
 ## Native·SDK 공통 파일·핀·영수증 운영 확정 (2026-11-17)

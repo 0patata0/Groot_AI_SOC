@@ -94,3 +94,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 논문 구조 재편의 결과·계획·설계·검증은 STATUS_HISTORY·PLAN_HISTORY·DESIGN_ALTERNATIVES·DIAGNOSTIC_HISTORY의 `thesis-structure-20261117` 항목에 기록했다. 실제 배포 변경은 없어 DEPLOYMENT_HISTORY의 새 적용 이력은 추가하지 않았다.
+
+
+논문 전체 소스의 오프라인 복원 보강은 유형별 이력의 `thesis-reproduction-kit-20261117` 항목을 참조한다. 설치·운영 변경은 없어 새 배포 이력은 추가하지 않았다.

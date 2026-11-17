@@ -223,8 +223,11 @@
     "Known canonical SDK failures and environment-dependent exploratory tests are not resolved by these selected tests."
   ],
   "publication": {
-    "state": "pending_commit_and_push",
-    "private_logs_credentials_weights_excluded": true
+    "state": "content_published",
+    "content_commit": "675b5fdad09e14c02dd40ec9ba7c0e83a4fce6f5",
+    "remote_main_at_content_publication": "675b5fdad09e14c02dd40ec9ba7c0e83a4fce6f5",
+    "remote_match_at_kst": "2026-11-18T07:14:33.511943+09:00",
+    "receipt_committed_separately": true
   },
   "initial_selection_source_probe": {
     "basis": "pure request-builder and actual registered schema comparison; no model or MCP execution",
@@ -241,5 +244,14 @@
     "companion_current_list_offered_in_first_batch": false,
     "actual_runtime_wrong_answer_reproduced": false,
     "remaining": "Unify Native initial calendar/companion selection and require current-list evidence before compact reporting; verify actual Native execution."
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-008-6417",
+    "route": "standard",
+    "change_rate": 0.0277,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0
   }
 }

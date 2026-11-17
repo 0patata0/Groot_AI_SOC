@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "scope": "fixed_configuration_observation_and_in_memory_candidates_not_global_prepared_or_operating_approval",
+  "source_sha256": {
+    "deployment/host_security.py": "c9e817f51d7febe2151a2a35f03843bdfcdd5de95933903c0ee2e81010f4f69a",
+    "deployment/management_policy.py": "950c169813cae7a68fd218f03499473f613b0ce5bee390af8bc900c90ef5235f",
+    "deployment/management_policy_observer.py": "65032864a5154aada7b532819687d6f1388f869590b1819e40caab862a301577",
+    "deployment/management_policy_render.py": "508a8eb2b9d4f8bfcb1be3a233878903a759ceec221c1a2a090b9571e5b81ba9",
+    "deployment/tests/test_management_policy.py": "149bc9c29db414b92e88c8e5fced8ad31805d9e2db2a4aa5ad4c50e986803886",
+    "deployment/tests/test_management_policy_device_files.py": "9f65fe62307fac8bf3331fd81e08532e66006b90de12e87a145c4fdd5ac0c8d2",
+    "deployment/tests/test_management_policy_observer.py": "86e95d498ab70d1afba9687ecec11d69a965b493a518e9bbff3a572720879bf1",
+    "deployment/tests/test_management_policy_render.py": "ad1f6d83a1489b862eb7853ec60d5f01d3ca9798100f78ef185b64911719aaf9",
+    "infra/groot-a/chatproxy.nginx.conf": "3ddbb18bd4f85fd89b69eed9415eb939fbe162f74987dabb39e79d0410713b1e",
+    "infra/groot-a/fw-v2/capstone-fw.nft": "f820c798320979788a37f9574fd625ac34fa93971ea6893d226b4f70ad18c9cb",
+    "infra/groot-a/fw-v2/capstone-nat.sh": "9ff669c07f48dfc84247f12daeb074c504972c6fe7547cb6bb4366053c1324dd"
+  },
+  "observed_at_kst": {
+    "a": "2026-11-17T10:09:55.990285+09:00",
+    "b": "2026-11-17T10:09:55.178053+09:00",
+    "c": "2026-11-17T10:09:54.998107+09:00"
+  },
+  "mac_regressions": {
+    "passed": 87,
+    "skipped": 0
+  },
+  "linux_regressions": {
+    "passed": 87,
+    "skipped": 0,
+    "host": "a"
+  },
+  "candidate_file_counts": {
+    "a": 4,
+    "b": 2,
+    "c": 2
+  },
+  "native_parser_checks": {
+    "firewall": "nft -c in private network namespace passed",
+    "loader": "bash -n passed",
+    "wazuh_proxy": "existing container nginx -t passed; no reload",
+    "suricata_threshold": "contract syntax only; engine not run",
+    "wazuh_whitelist": "XML/ownership only; engine not run",
+    "host_guard": "existing schema only; kernel not changed",
+    "lab_environment": "fixed variable only; service not restarted"
+  },
+  "all_live_source_hashes_unchanged": true,
+  "temporary_server_roots_remaining": 0,
+  "owned_nginx_candidate_removed": true,
+  "operating_changes": 0,
+  "registered_mcp_changes": 0,
+  "model_chat_attack_training_calls": 0,
+  "runtime_verified": false,
+  "global_coverage_complete": false,
+  "source_ancestry": {
+    "a_firewall_and_loader": "root ancestry observed",
+    "a_proxy_and_threshold": "untrusted ancestry; not prepared/authorized by observer",
+    "b_c_host_profiles_and_c_env": "root ancestry observed",
+    "wazuh": "container identity pinned before/after; not engine loading proof"
+  },
+  "remaining": [
+    "trusted root installation/source/route bindings",
+    "all fourteen surface evidence including Wazuh event handling and MCP routes",
+    "whole-plan MCP exact approval and bounded multi-host worker/independent recovery",
+    "single initial installer integration",
+    "actual loaded effects and new two-bot chats"
+  ],
+  "local_evidence": "대화기록/검증/2026-11-17-management-policy-device-observers/device-files-{a,b,c}-r3.json",
+  "previous_status_recovery": {
+    "commit": "49a3790a331ce4171f755b257562bc52fda1b7ea",
+    "path": "STATUS.md",
+    "blob_sha1": "c21b1c9034fcd65b1c470f6542e828468de03280"
+  },
+  "publication_scan": {
+    "tracked_files": 2364,
+    "findings": 10,
+    "unchanged_baseline": 9,
+    "new": 1,
+    "new_triage": "controlled synthetic exception-diagnostic test fixture, not a credential",
+    "untriaged_new": 0,
+    "values_or_snippets_saved": false,
+    "scope": "current tracked worktree text; index blobs matched separately; history not scanned"
+  }
+}

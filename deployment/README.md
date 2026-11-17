@@ -3,7 +3,7 @@
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 
 <!-- journal-composition:start -->
-[조정 실행기](../infra/validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리대역 공통14면/34검사에 A Native NAT·영구 로더 후보25검사/격리9조건을 추가했다. 전역 MCP·다른 장비 어댑터·전체 운영 적용/원복은 미연결이다.
+[조정 실행기](../infra/validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리정책의 고정 조회·파일 후보를 A/B/C 실제8설정에서 확인했다. 같은 소스 Mac87·Linux87/생략0과 A의 nft/Bash/nginx 구문 검사는 개발 근거다. 실제 엔진 로드·신뢰된 출처/경로·14면 전체 연결·전역 MCP/정확 카드/독립 원복·초기 설치·두 봇 검증은 남았다.
 <!-- journal-composition:end -->
 
 

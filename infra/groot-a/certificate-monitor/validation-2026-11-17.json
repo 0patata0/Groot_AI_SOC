@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-17T12:22:17.325126+09:00",
+  "route": "Mac -> admin231 -> A; B observations via A",
+  "status": "validated candidate; not applied to operating service",
+  "candidate_sha256": {
+    "monitor.sh": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8",
+    "test-monitor.sh": "c742e7a5aa8174b84487e23a8a8d538801171682275f6db7a36be20d73ee270a",
+    "capstone-cert-monitor.service": "9c9f50343d7671890e8218352fa69922144d9c34fd50f67d1348a2caa314e97c"
+  },
+  "operating_source_sha256": {
+    "/usr/local/sbin/capstone-cert-monitor": "91c0ed1025beb3f7bbc59ec38b58c705add1637c8e5c69216eb489d62e65a540",
+    "/etc/systemd/system/capstone-cert-monitor.service": "d8357b4979398ae4bc2e1f699c1513b5509c447ae0ebd563acf76a2a609e8f64",
+    "/etc/systemd/system/capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+    "/home/groot_a/capstone/chatproxy/tls/chatduck.crt": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794",
+    "/var/lib/capstone-cert-monitor/status.json": "a4ee55976e7b799c85a6fd9b6fed2bd510724255cb7473ef324cae508b77e4c5"
+  },
+  "native_regression": {
+    "pass": 26,
+    "skip": 0,
+    "cases": [
+      "expiry_31",
+      "expiry_30",
+      "expiry_15",
+      "expiry_14",
+      "expiry_8",
+      "expiry_7",
+      "expired_retained_on_tls_failure",
+      "future_certificate",
+      "wrong_hostname",
+      "cn_without_san",
+      "malformed",
+      "tls_failure",
+      "tls_timeout",
+      "malformed_tls_output",
+      "mismatch",
+      "changed_during_probe",
+      "missing",
+      "symlink",
+      "oversized",
+      "badmode",
+      "native_checkend_arguments",
+      "native_CA_hostname_boundary",
+      "native_atomic_publication",
+      "check_no_status_or_journal_write",
+      "private_probe_cleanup",
+      "unsafe_status_target_refused"
+    ]
+  },
+  "syntax": {
+    "bash_monitor_and_tests": true,
+    "systemd_analyze_verify_rc": 0
+  },
+  "isolated_cgroup_cases": [
+    {
+      "tcp_connected": true,
+      "tls_verified": true,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "seconds": 0.035,
+      "case": "unfiltered",
+      "unit": "capstone-tls-observe-4c0cb44445-unfiltered.service",
+      "allow": null,
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tcp_connected": false,
+      "tls_verified": false,
+      "error_type": "TimeoutError",
+      "seconds": 3.0047,
+      "case": "loopback_only",
+      "unit": "capstone-tls-observe-4c0cb44445-loopback-only.service",
+      "allow": [
+        "127.0.0.1/32"
+      ],
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tcp_connected": true,
+      "tls_verified": true,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "seconds": 0.0351,
+      "case": "loopback_and_container",
+      "unit": "capstone-tls-observe-4c0cb44445-loopback-and-container.service",
+      "allow": [
+        "127.0.0.1/32",
+        "172.18.0.3/32",
+        "172.19.0.2/32"
+      ],
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tcp_connected": false,
+      "tls_verified": false,
+      "error_type": "TimeoutError",
+      "seconds": 3.0053,
+      "case": "loopback_static",
+      "endpoint": [
+        "127.0.0.1",
+        443
+      ],
+      "unit": "capstone-tls-observe-784df23ed5-loopback-static.service",
+      "allow": [
+        "127.0.0.1/32",
+        "172.18.0.3/32"
+      ],
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tcp_connected": true,
+      "tls_verified": true,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "seconds": 0.0349,
+      "case": "loopback_chat",
+      "endpoint": [
+        "127.0.0.1",
+        443
+      ],
+      "unit": "capstone-tls-observe-784df23ed5-loopback-chat.service",
+      "allow": [
+        "127.0.0.1/32",
+        "172.19.0.2/32"
+      ],
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tcp_connected": true,
+      "tls_verified": true,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "seconds": 0.0347,
+      "case": "fixed_proxy",
+      "endpoint": [
+        "172.18.0.3",
+        8443
+      ],
+      "unit": "capstone-tls-observe-784df23ed5-fixed-proxy.service",
+      "allow": [
+        "127.0.0.1/32",
+        "172.18.0.3/32"
+      ],
+      "unit_rc": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "native_candidate_helper": {
+    "automatic_renewal": false,
+    "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+    "domain": "chat.grootlab.duckdns.org",
+    "expiry_status": "ok",
+    "not_after_epoch": 1799814312,
+    "not_after_kst": "2027-01-13T13:25:12+09:00",
+    "observed_at_kst": "2026-11-17T12:22:26+09:00",
+    "observed_at_utc": "2026-11-17T03:22:26Z",
+    "probe_status": "verified",
+    "reason": "verified",
+    "schema_version": 1,
+    "seconds_remaining": 4928567,
+    "served_certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427"
+  },
+  "cleanup": {
+    "transient_units_collected": 7,
+    "owned_root_removed": true,
+    "operating_source_status_certificate_unchanged": true
+  },
+  "scope": {
+    "proxy_certificate": true,
+    "public_443_availability": false,
+    "full_installed_main_executed": false,
+    "operating_configuration_applied": false,
+    "proxy_restart": false,
+    "certificate_replaced": false,
+    "private_key_read": false,
+    "new_model_chat_attack_training": false
+  },
+  "systemd_observation": {
+    "at_kst": "2026-11-17T12:15:30.876245+09:00",
+    "returned_events": 5,
+    "event_window": "prior 24h from installed MCP query",
+    "full_window_total_known": false,
+    "all_five_are_prior_owned_probe_units": true,
+    "all_five_current_load_state": "not-found",
+    "all_five_current_active_state": "inactive",
+    "current_B_failed_services": 0,
+    "no_failure_suppression_applied": true
+  },
+  "waf_configuration_read": {
+    "at_kst": "2026-11-17T12:22:17.325126+09:00",
+    "native_nginx_test_rc": 0,
+    "global_engine_modes": [
+      "DetectionOnly"
+    ],
+    "inline_engine_modes": [],
+    "ctl_engine_modes": [],
+    "runtime_attack_blocking_tested": false
+  },
+  "pending": [
+    "exact candidate approval",
+    "independent rollback controller and lifecycle",
+    "single installer connection and offline/install documentation",
+    "actual installed unit/status/journal/index checks",
+    "public endpoint availability check separated from proxy certificate",
+    "trusted probe history vs new fault reporting",
+    "WAF requested blocking policy reconciliation"
+  ],
+  "local_evidence_sha256": {
+    "cert-candidate-native-a.json": "1d9a03bf86449ce65e9b08550fbd367f64ca5012823ab1c07d5da2da6b1ef24d",
+    "tls-cgroup-a.json": "65737ff1318b36a4a7375285820bb2d89c2aa96a7b0a9b9459cb2d6d2b4e04c6",
+    "tls-route-a.json": "151fb698f7265348c5829845f98fa86be026556cf5ce0c96853e85a234747866",
+    "systemd-index-b.json": "f9d0e6f4435b9d8b57fabc89c7b3fda149b5a0f9f5ee2d59fc8adaaee8f0b3e8",
+    "systemd-event-journal-b.json": "b2baffdf287e824df5f25c71e2034ca54a35ca473dbb99d0971bbfa98a4f8f78"
+  }
+}

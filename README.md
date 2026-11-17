@@ -7,6 +7,8 @@
 
 논문·판넬용 기술 로고와 그림은 로컬 전용 `logo/`에 보관한다. 판넬 자료는 `_pan` 접미사로 구분하며 `logos_pan.png`는 로고 미리보기, `method_pan.png`와 `method_pan.svg`는 논리 흐름도다. 출처·SHA는 같은 폴더의 원장에 남기고 폴더 전체를 Git에서 제외한다. 실제 구현·성능 검증의 완료 범위는 [현재 상태](STATUS.md)를 따른다.
 
+논문은 문어체와 확정 서식·기술 로고를 반영한73쪽 MD/PDF/DOCX로 맞추고 전 페이지를 검수했다. TLS 반복 경고는 서비스 IP 제한에서 재현했으며 고정 프록시 후보의 native26검사·실제 TLS helper 검증을 통과했다. 운영 적용·독립 원복·설치 연결은 아직이다. 조회된 systemd5건은 과거 시험 유닛이며 B 현재 failed0을 확인했다. WAF는 실제 전역 DetectionOnly로 읽혔으므로 앞선 차단 요구와 대조해야 한다. [인증서 후보·한계](infra/groot-a/certificate-monitor/README.md) · [현재 상태](STATUS.md).
+
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.
 

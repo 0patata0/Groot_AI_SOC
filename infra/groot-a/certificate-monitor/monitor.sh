@@ -78,10 +78,12 @@ cm_probe() {
         if (( rc==1 )); then CM_EXPIRY=$status; break; fi
         if (( rc!=0 )); then CM_EXPIRY=unknown; CM_REASON=checkend_failed; cm_emit; return; fi
     done
-    # A verified local TLS handshake; no HTTP/application request or chat message.
+    # The compose-pinned chatproxy address avoids host-published DNAT and its
+    # changing chat-net address. Keep CA, hostname, and leaf pin verification.
+    # This checks the proxy certificate; published-port availability is separate.
     rc=0
     "$CM_TIMEOUT" --signal=TERM --kill-after=1s 10s "$CM_OPENSSL" s_client \
-      -connect 127.0.0.1:443 -servername "$CM_DOMAIN" -verify_return_error -verify_hostname "$CM_DOMAIN" \
+      -connect 172.18.0.3:8443 -servername "$CM_DOMAIN" -verify_return_error -verify_hostname "$CM_DOMAIN" \
       -purpose sslserver -CAfile /etc/ssl/certs/ca-certificates.crt -showcerts -no_ign_eof \
       </dev/null > "$scratch/served.pem" 2> "$scratch/tls.stderr" || rc=$?
     if (( rc!=0 )); then

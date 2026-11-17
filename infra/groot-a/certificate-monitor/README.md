@@ -1,5 +1,13 @@
 # 채팅 인증서 만료 감시·수동 갱신
 
+## 현재 수정 후보와 운영 상태
+
+현재 소스의 고정 연결은172.18.0.3:8443이며 서비스는 loopback 외에 해당/32만 허용한다. 운영 감시기는 아직127.0.0.1:443과 loopback 전용 제한을 사용한다. 아래 설치·PID·성공 기록은 각 관측 당시의 이력이다.
+
+관리자231 경유의 격리 재현에서 기존 제한은 timeout을 일으켰다. localhost443의 DNAT 경로가 실제 chat-net 주소를 사용했고 compose에 고정된 waf-evidence 주소로 직접 TLS를 검증하면 성공했다. CA·hostname·SNI·leaf 지문 검증을 유지한 후보는 native26검사·systemd 구문·실제 cm_probe 검증을 통과했다. 상태파일·운영 소스·인증서 SHA는 바꾸지 않았다.
+
+이 후보가 확인하는 것은 프록시의 인증서다. 공개443·DNS·외부 HTTP 가용성은 별도로 검사한다. 정확 후보 승인·독립 원복·설치 경로 연결·실제 운영 unit/status/journal/원격 색인 확인 전에는 해결 완료로 표시하지 않는다. 기존 감시기는 A의 고정 경로·machine-id에 결속되며 단일 deploy.sh의 이식 가능한 설치 기능은 아직 연결하지 않았다. [작은 검증 원장](validation-2026-11-17.json) · [현재 상태](../../../STATUS.md).
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
 > A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.

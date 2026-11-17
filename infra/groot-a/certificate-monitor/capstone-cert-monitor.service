@@ -1,5 +1,5 @@
 [Unit]
-Description=Observe the fixed local ChatDuck TLS certificate
+Description=Observe the fixed ChatDuck proxy TLS certificate
 After=network.target
 
 [Service]
@@ -25,6 +25,8 @@ InaccessiblePaths=-/home/groot_a/capstone/chatproxy/tls/chatduck.key
 RestrictAddressFamilies=AF_INET AF_UNIX
 IPAddressDeny=any
 IPAddressAllow=127.0.0.1/32
+# Fixed waf-evidence address in chatproxy-compose.yml; no bridge-wide allow.
+IPAddressAllow=172.18.0.3/32
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true

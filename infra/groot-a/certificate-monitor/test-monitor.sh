@@ -31,7 +31,7 @@ cat > "$fixture/openssl" <<'SH'
 #!/bin/bash
 set -euo pipefail
 if [[ $1 == s_client ]]; then
-    [[ "$*" == 's_client -connect 127.0.0.1:443 -servername chat.grootlab.duckdns.org -verify_return_error -verify_hostname chat.grootlab.duckdns.org -purpose sslserver -CAfile /etc/ssl/certs/ca-certificates.crt -showcerts -no_ign_eof' ]] || exit 90
+    [[ "$*" == 's_client -connect 172.18.0.3:8443 -servername chat.grootlab.duckdns.org -verify_return_error -verify_hostname chat.grootlab.duckdns.org -purpose sslserver -CAfile /etc/ssl/certs/ca-certificates.crt -showcerts -no_ign_eof' ]] || exit 90
     printf '%s\n' TLS_OPTIONS_EXACT >> "$FIXTURE_CALLS"
     case "$FIXTURE_TLS_MODE" in
       fail) exit 1 ;; timeout) exit 124 ;; invalid) printf 'not PEM\n'; exit 0 ;;

@@ -15,6 +15,7 @@ from unittest import mock
 DEPLOYMENT = Path(__file__).resolve().parents[1]
 ROOT = DEPLOYMENT.parent
 sys.path.insert(0, str(DEPLOYMENT))
+sys.path.insert(0, str(ROOT / 'infra/hermes'))
 import soc_management as install
 import soc_runtime as runtime
 import soc_agent_block as response
@@ -138,6 +139,28 @@ class BindingTests(unittest.TestCase):
         for name in ('soc-query','soc-investigate','soc-change','soc-recover'):
             self.assertEqual(bundle['skill-'+name+'.md'],(ROOT/'infra/hermes/skills'/name/'SKILL.md').read_bytes())
         self.assertIn('workflow_contract.py',bundle)
+
+    def test_host_report_contract_resolves_local_diagnostic_dependencies(self):
+        import importlib.util
+        with mock.patch.object(install,'read',side_effect=lambda p:Path(p).read_bytes()):
+            bundle=install.source_bundle({'source':ROOT})
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            def write_contract(path,raw,mode):
+                self.assertIn(path,('/opt/capstone-management/chat_contract.py',
+                                    '/opt/capstone-management/read_contract.py'))
+                self.assertEqual(mode,0o644)
+                (root/Path(path).name).write_bytes(raw)
+            with mock.patch.object(install,'write',side_effect=write_contract):
+                install.install_controller_diagnostic_contract(bundle)
+            gate_path=root/'soc_management_run.py';gate_path.write_bytes(bundle['soc_management_run.py'])
+            spec=importlib.util.spec_from_file_location('isolated_management_report',gate_path)
+            gate=importlib.util.module_from_spec(spec);spec.loader.exec_module(gate)
+            contract=gate.diagnostic_contract()
+            self.assertEqual(Path(contract.__file__).resolve(),(root/'chat_contract.py').resolve())
+            self.assertEqual(Path(contract.read_contract().__file__).resolve(),(root/'read_contract.py').resolve())
+            text=gate.literal_evidence_table([{'kind':'service','target':'a:waf','runtime':{},'limits':[]}])
+            self.assertIsInstance(text,str)
 
     def test_rendered_inline_gate_matches_the_root_reference_and_rejects_stale_source(self):
         m=module('soc_management_controller.py','b')

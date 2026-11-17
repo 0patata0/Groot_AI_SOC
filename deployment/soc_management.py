@@ -42,7 +42,7 @@ SOURCES = tuple("infra/mcp/" + name for name in (
     "rule_change_executor.py", "rule_change_mcp.py", "security_rule_inventory.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
     "soc_bot.py", "soc_management_events.py", "operations_approval.py", "approval_card_cleanup.py",
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py", "managed_waf_evidence.py", "configure_waf_evidence.py")) + tuple("infra/hermes/" + name for name in (
-    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md", "output_contract.py", "workflow_contract.py", "chat_markdown.py", "skills/soc-output/SKILL.md",
+    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md", "output_contract.py", "workflow_contract.py", "chat_markdown.py", "chat_contract.py", "read_contract.py", "skills/soc-output/SKILL.md",
     "skills/soc-query/SKILL.md", "skills/soc-investigate/SKILL.md", "skills/soc-change/SKILL.md", "skills/soc-recover/SKILL.md",
     "capstone-management.service.example", "capstone-management.timer.example")) + (
     "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py",
@@ -100,6 +100,12 @@ def read(path, limit=4 * 1024 * 1024, secret=False):
 # (infra/groot-b/local_rules.xml, applied 2026-11-13). Seeded once on a fresh
 # state; an operator-set value (including an explicit empty one) is kept.
 CONTROLLER_META_DEFAULTS = {"flood_rule_ids": "100113"}
+
+
+def install_controller_diagnostic_contract(bundle):
+    """The host report renderer needs the same local pure contracts as the agent."""
+    for name in ('chat_contract.py', 'read_contract.py'):
+        write('/opt/capstone-management/' + name, bundle[name], 0o644)
 
 
 def seed_controller_meta(state=Path("/var/lib/capstone-management")):
@@ -531,6 +537,7 @@ def prepare_siem(s):
     write("/opt/capstone-management/soc_alert_watch.prompt", bundle["soc_alert_watch.prompt"], 0o644)
     write("/opt/capstone-management/output_contract.py", bundle["output_contract.py"], 0o644)
     write("/opt/capstone-management/workflow_contract.py", bundle["workflow_contract.py"], 0o644)
+    install_controller_diagnostic_contract(bundle)
     for name in ('soc-query','soc-investigate','soc-change','soc-recover'):
         write('/opt/capstone-management/skill-'+name+'.md',bundle['skill-'+name+'.md'],0o644)
     write("/opt/capstone-management/chat_markdown.py", bundle["chat_markdown.py"], 0o644)

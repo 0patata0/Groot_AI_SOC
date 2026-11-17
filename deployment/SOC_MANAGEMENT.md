@@ -1,5 +1,7 @@
 # 초기 설치의 승인형 SOC 관리 확장
 
+자동 관리의 중단 보고를 위해 `soc_management.py`의 소스 묶음에 공통 `chat_contract.py`·`read_contract.py`를 포함하고 `/opt/capstone-management/`에도 설치한다. 호스트 보고서가 컨테이너 전용 경로에 의존하지 않게 하는 순수 Python 의존성이다. 기존 SQLite에 성공 읽기 체크포인트를 저장하고 중단 복구는 실제 도구 원장과 검증된 근거만 보고하며 작업을 재실행하지 않는다. Mac 설치 회귀47개·호스트 의존성 격리 검사와 운영 B의 실제 기록 재처리·격리 SIGKILL 복구를 확인했다. 추가 패키지·포트·키·MCP 도구·승인 권한은 없으며 새 OS 전체 설치는 미수행이다. [적용·검증·복구의 범위](../infra/validation/management-latency/README.md).
+
 2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).
 
 현재 query1.19.81/common1.5.37·security-events1.3.2는 [무손실 경보 입력](../infra/hermes/event-input-view.md)로 경보의 반복 필드만 줄이고 원문·JSON값/타입/행순서·근거·승인 경계를 보존한다. 고유1,221회귀PASS·skip0, B16파일/보호8SHA·양봇 연결/worker·3서비스를 확인했다. 이전50행 모델 입력26,666→5,504B이나 응답시간 개선율은 아니다. 새 실제채팅126.313초/진행0.117초·MCP4조회2.677초이며 판단 정정 실패로 partial/근거 표만 반환했다. 정확한 최종60초는 미완료다. 기존 deploy.sh 복사·SHA·관리 게이트·설정 예제/오프라인 목록을 유지하며 새 패키지·포트·키0, 새 OS 전체 설치 미실행이다. 아래 날짜/버전별 기록은 당시 범위다.

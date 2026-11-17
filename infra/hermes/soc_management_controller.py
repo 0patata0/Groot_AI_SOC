@@ -461,7 +461,84 @@ class Store:
             self.db.execute("UPDATE cases SET state='outcome_unknown',detail='interrupted_run_requires_review',updated=? WHERE state='running'", (self.clock(),))
             self.db.execute("UPDATE runs SET state='outcome_unknown',detail='interrupted_run_requires_review',finished=? WHERE state='running'", (self.clock(),))
             for row in interrupted:
-                self.queue_report(row["id"], row["case_id"], "outcome_unknown", incomplete_report("interrupted_run_requires_review", row["case_id"]))
+                text = self.interrupted_report(row['id'], row['case_id'], 'interrupted_run_requires_review')
+                self.db.execute('UPDATE cases SET final_text=? WHERE id=?', (text, row['case_id']))
+                self.queue_report(row["id"], row["case_id"], "outcome_unknown", text)
+
+    def save_read_checkpoint(self, run_id, case_id, facts, limited=False):
+        """Persist received facts only; no decision, tool call or resume permission."""
+        row = self.db.execute('SELECT case_id,state FROM runs WHERE id=?', (run_id,)).fetchone()
+        if (row is None or row['case_id'] != case_id
+                or not isinstance(facts, list) or not all(isinstance(f, dict) for f in facts)
+                or type(limited) is not bool):
+            raise ControllerError('read_checkpoint_binding_invalid')
+        if row['state'] != 'running':
+            return False  # A late observation cannot revise a finished run.
+        encoded = canonical(facts)
+        if len(encoded.encode()) > 128 * 1024:
+            raise ControllerError('read_checkpoint_size_invalid')
+        ordinal = self.db.execute('''SELECT max(ordinal) FROM tool_calls
+            WHERE run_id=? AND completed=1 AND is_error=0 AND is_write=0''', (run_id,)).fetchone()[0]
+        if ordinal is None:
+            raise ControllerError('read_checkpoint_requires_received_read')
+        value = {'version': 1, 'run_id': run_id, 'case_id': case_id, 'through_ordinal': ordinal,
+                 'facts': facts, 'facts_sha256': digest(encoded), 'limited': limited}
+        with self.db:
+            self.set_meta('read_checkpoint/' + run_id, canonical(value))
+        return True
+
+    def interrupted_report(self, run_id, case_id, detail, *, facts=None, limited=False):
+        """Rebuild an incomplete report from the durable ledger without any LLM."""
+        from soc_management_run import literal_evidence_table
+        checkpoint_invalid = False
+        if facts is None:
+            facts = []
+            raw = self.meta('read_checkpoint/' + run_id, '')
+            if raw:
+                try:
+                    if len(raw.encode()) > 136 * 1024:
+                        raise ValueError()
+                    value = json.loads(raw)
+                    if (not isinstance(value, dict) or set(value) != {'version', 'run_id', 'case_id',
+                            'through_ordinal', 'facts', 'facts_sha256', 'limited'}
+                            or type(value['version']) is not int or value['version'] != 1
+                            or value['run_id'] != run_id or value['case_id'] != case_id
+                            or type(value['through_ordinal']) is not int or value['through_ordinal'] < 1
+                            or type(value['limited']) is not bool or not isinstance(value['facts'], list)
+                            or not all(isinstance(f, dict) for f in value['facts'])
+                            or len(canonical(value['facts']).encode()) > 128 * 1024
+                            or digest(canonical(value['facts'])) != value['facts_sha256']):
+                        raise ValueError()
+                    row = self.db.execute('''SELECT c.completed,c.is_write,c.is_error,r.case_id
+                        FROM tool_calls c JOIN runs r ON r.id=c.run_id
+                        WHERE c.run_id=? AND c.ordinal=?''', (run_id, value['through_ordinal'])).fetchone()
+                    if (row is None or row['case_id'] != case_id or not row['completed']
+                            or row['is_write'] or row['is_error']):
+                        raise ValueError()
+                    facts, limited = value['facts'], value['limited']
+                except (ValueError, TypeError, KeyError, RecursionError):
+                    checkpoint_invalid = True
+        text = incomplete_report(detail, case_id)
+        calls = self.db.execute('''SELECT name,completed,is_error,is_write FROM tool_calls
+            WHERE run_id=? ORDER BY ordinal''', (run_id,)).fetchall()
+        if calls:
+            rows = ['| 호출 | 실제 처리 상태 |', '| --- | --- |']
+            for row in calls:
+                name = row['name'] if re.fullmatch(r'mcp__[A-Za-z0-9_]+__[A-Za-z0-9_]+', row['name']) else '도구 식별 불가'
+                state = '결과 미확인' if not row['completed'] else '오류 반환' if row['is_error'] else '응답 수신·실행 효과는 별도 확인' if row['is_write'] else '조회 응답 수신'
+                rows.append('| ' + name + ' | ' + state + ' |')
+            text += '\n\n**중단 전 실제 도구 처리**\n\n' + '\n'.join(rows)
+        if facts:
+            text += ('\n\n**중단 전 확보한 조회 근거**\n\n'
+                     '아래는 중단 전 관측이며 현재 상태·위험 해소·승인을 증명하지 않습니다.\n\n'
+                     + literal_evidence_table(facts))
+        if limited:
+            text += '\n\n표시할 조회 근거가 보관 상한을 넘었습니다. 일부 근거는 이 표에 없으며 원문과 해시는 실행 감사 기록에 보존돼 있습니다.'
+        if checkpoint_invalid:
+            text += '\n\n저장된 조회 근거의 무결성·실행 결속을 확인하지 못해 근거 표를 복원하지 않았습니다. 실제 도구 처리 원장과 원문을 확인해야 합니다.'
+        if len(text.encode()) > 128 * 1024:
+            text = incomplete_report(detail, case_id) + '\n\n조회 근거 표가 보고 크기 상한을 넘었습니다. 원문·도구 처리·실패 이력은 해당 실행 감사 기록에 보존돼 있습니다.'
+        return text
 
     def next_case(self):
         now = self.clock()
@@ -1116,6 +1193,37 @@ class Trace:
         self.bundle_sensor_receipts = set()
         self.unblocks_pending_readback = set()
         self.expected_containment_refusals = set()
+        self.completed_read_facts = []
+        self.completed_read_fact_bytes = 0
+        self.completed_read_facts_limited = False
+
+    def remember_read(self, name, arguments, payload):
+        """Retain only typed, successful read facts for an interrupted report."""
+        if name in WRITE_TOOLS or not isinstance(payload, dict):
+            return
+        from types import SimpleNamespace
+        from soc_management_run import observation_facts, invalidate_block_facts
+        short = name.rsplit('__', 1)[-1]
+        result = SimpleNamespace(is_error=False, content=[SimpleNamespace(text=canonical(payload))])
+        facts = observation_facts(short, result, arguments)
+        if not facts:
+            return
+        size = len(canonical(facts).encode())
+        # A newly observed block list invalidates the old one even when its
+        # replacement cannot fit in the bounded report checkpoint.
+        invalidate_block_facts(self.completed_read_facts, short)
+        if self.completed_read_fact_bytes + size > 128 * 1024:
+            self.completed_read_facts_limited = True
+        else:
+            self.completed_read_facts.extend(facts)
+            self.completed_read_fact_bytes += size
+        self.store.save_read_checkpoint(self.run_id, self.case['id'], self.completed_read_facts,
+                                        self.completed_read_facts_limited)
+
+    def interrupted_report(self, detail):
+        """An unfinished investigation still publishes its actual read ledger."""
+        return self.store.interrupted_report(self.run_id, self.case['id'], detail,
+            facts=self.completed_read_facts, limited=self.completed_read_facts_limited)
 
     def record_sensor_read(self,name,arguments,payload):
         source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
@@ -1295,6 +1403,8 @@ class Trace:
                     ips = response_block_ips(event.get('output'))
                     if ips is not None:
                         self.unblocks_pending_readback.difference_update(self.unblocks_pending_readback - ips)
+            if not error and not self.protocol_error:
+                self.remember_read(name, self.arguments[pending[0]['ordinal']], payload)
         elif kind == "result":
             if self.result is not None or not self.session_id or event.get("session_id") != self.session_id:
                 self.protocol_error = True
@@ -1391,11 +1501,12 @@ class Trace:
                 # Preserve read/approval routing and the private native trace,
                 # but never publish a closing claim that failed its contract.
                 text = incomplete_report(decision_error, self.case['id'])
+        published_text = text if success else self.interrupted_report(detail)
         with db:
             db.execute("UPDATE runs SET state=?,finished=?,detail=? WHERE id=?", ("completed" if success else "outcome_unknown", now, detail, self.run_id))
             db.execute("UPDATE cases SET state=?,updated=?,due=?,detail=?,final_text=?,delivered=0,monitor_count=monitor_count+?,mode=CASE WHEN ?='waiting_approval' OR (?='monitor' AND EXISTS(SELECT 1 FROM proposals WHERE case_id=cases.id)) THEN 'verify' ELSE mode END WHERE id=?",
-                       (state, now, due, detail, text if success else "", int(state == "monitor"), state, state, self.case["id"]))
-            self.store.queue_report(self.run_id, self.case["id"], state, text if success else incomplete_report(detail, self.case["id"]))
+                       (state, now, due, detail, published_text, int(state == "monitor"), state, state, self.case["id"]))
+            self.store.queue_report(self.run_id, self.case["id"], state, published_text)
         return {"run_id": self.run_id, "case_id": self.case["id"], "state": state, "completed": success, "text": text if success else ""}
 
 
@@ -1482,7 +1593,10 @@ def prompt_for(base, case, evidence):
                     else datetime.now(timezone(timedelta(hours=9))))
     if requested_at.tzinfo is None:raise ControllerError('incident_reference_time_invalid')
     references = sensor_review_requirements(evidence)
-    current_request = dict(case).get("chat_request", base)
+    # The base policy is already included verbatim at the start of this prompt.
+    # A default automatic incident needs its task label, not a second policy copy.
+    default_request = "chat_request" not in dict(case)
+    current_request = "현재 수신 사건 조사·위험 판단·대응·검증" if default_request else dict(case)["chat_request"]
     if dict(case).get("operator_review"):
         current_request = ("기존 사건 " + case["id"] + "를 읽기 전용으로 재검토한다. "
             "연결 제안이 있으면 해당 ID의 결정/실행 상태와 필요한 현재 대상·후속 변경의 근거를 직접 조회한다. "
@@ -1843,7 +1957,7 @@ must preserve the original review task and its scope.
     from workflow_contract import policy as workflow_policy
     workflows=['soc-investigate'] if references else ['soc-change']
     if case['mode']=='manage' and 'soc-change' not in workflows:workflows.append('soc-change')
-    if re.search(r'장애|복구|systemd|Vector|storage|수집.{0,8}(?:실패|중단)',current_request,re.I):workflows.append('soc-recover')
+    if re.search(r'장애|복구|systemd|Vector|storage|수집.{0,8}(?:실패|중단)',base if default_request else current_request,re.I):workflows.append('soc-recover')
     return (base + "\n" + contract + "\n" + output_policy() + "\n" + workflow_policy(tuple(workflows)) + "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
             "\nUNTRUSTED_EVIDENCE_JSON\n" + canonical(evidence["events"]) +
             "\nTRUSTED_CURRENT_REQUEST_JSON\n" + canonical({"request": current_request}))

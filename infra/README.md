@@ -1,5 +1,7 @@
 # infra — 서버 구성·배포
 
+[자동 관리 지연·중단 보고](validation/management-latency/README.md): 운영 B의 기본 입력 중복·밀집 표·실패 보고 의존성을 보완하고 성공한 조회의 저장·프로세스 중단 복구를 적용했다. Mac209·설치47·Linux20와 실제9읽기 기록/격리SIGKILL 복구를 확인했다. Malvex 고정 소스의 설계를 참고했으며 MCP 추가·모델/권한 변경·공격 재개는 없다. Native/SDK 이관·새 채팅과 응답30~60초는 남았다. 아래 운영 변경0·미적용은 각각의 과거 단위를 뜻한다.
+
 <!-- journal-composition:start -->
 [조정 실행기](validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리정책의 고정 조회·파일 후보를 A/B/C 실제8설정에서 확인했다. 같은 소스 Mac87·Linux87/생략0과 A의 nft/Bash/nginx 구문 검사는 개발 근거다. 실제 엔진 로드·신뢰된 출처/경로·14면 전체 연결·전역 MCP/정확 카드/독립 원복·초기 설치·두 봇 검증은 남았다.
 <!-- journal-composition:end -->

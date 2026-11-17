@@ -521,3 +521,7 @@ R1Mac1409/기존6생략·새39. timerMainPID/고정DockerCLI경로가정점검�
 설치 MCP의24시간 systemd 조회는5건을 반환했고 같은5유닛 journal/현재 상태와 과거 시험 핸들을 대조했다. B 현재 failed0·해당 유닛 not-found/inactive다. 이름만으로 경보를 무시하거나5건을 전체 수로 단정하지 않는다. WAF 실제 전역 DetectionOnly 관측은 차단 기능 성공과 구분한다.
 
 논문73쪽·1,538구간/누락0·130색인·21이미지 SHA·전 페이지를 검수했다. PNG68쪽 잘림은 독립 렌더에서 원본 PDF 정상으로 확인했다. 문어체·맑은 고딕10/14/12/11pt·표/캡션10pt·기술 로고14개를 반영했으며 서식/로고 반영 전66쪽18파일을 보존했다. Safari 표시 원인은 사용자 정정이며 Pages 저장 가설은 철회했다. humanize-korean 보존·Mac 새 패키지/글꼴 설치0·새 모델/채팅/공격/학습0이다.
+
+## 2026-11-17 실패 보고 경로 재현·복구
+
+실제 읽기9건의 원문으로 호스트의 chat_contract.py 누락→컨테이너 경로 대체→FileNotFoundError를 재현했다. unit TimeoutStartSec는6분으로300초 systemd 강제 종료가 원인이 아니다. 공통 모듈 배치 뒤 같은 기록에서14,023B 보고를 복원했고 격리 프로세스 SIGKILL 뒤14,038B/보고1건/쓰기·자동 재실행0을 확인했다. 준비 폴더의 gate 참조 누락을 확인하기 전에 적용한 순서 오류와 백업 검증의 인덱스 오류를 보존·정정하고 실제 결속·백업·재처리 검사 후 확정했다. [검증·한계](../infra/validation/management-latency/README.md).

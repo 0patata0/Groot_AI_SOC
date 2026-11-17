@@ -728,3 +728,7 @@ journal 우선순위와 앱 선언 수준을 구분한다. JSON/logfmt 최상위
 ## 수집 상한 선점 공백 보완 (2026-11-16)
 
 grep축소 대신공통Native순회·등록unit표현식/분류후상한을택했다. snapshot/backfill이같은root전용메타데이터함수/공통요약검증을쓴다. JSONescape/중복/노이즈·기존byte/row/time/원문차단·정책v1 유지. UI필드/roleprompt복제/새스킬·도구0. 잘린CLI보다실제순차A2.15→4.51/B2.06→3.89초로느려졌으나범위검증이강화됐고채팅속도향상으로세지않음. 전체collector자원은격리read128/8과별도검증. [검증/재현](../infra/validation/journal-composition/README.md)·[현재](../STATUS.md).
+
+## Malvex의 선택적 참고
+
+고정커밋75d86748의 실행/파서/판정/skillgen 소스를 검토했다. 단계별 근거 보존·재처리·확인/가설 구분을 기존 실행기와 공통 스킬에 연결한다. 전체 프레임워크·병렬 분석자·자동 도구 설치·confirmed 필드 수용·자동 운영 스킬 등록은 도입하지 않았다. 소스 문서의 목적과 실제 검사 강도를 구분한다. [대조표·출처](../infra/validation/management-latency/README.md).

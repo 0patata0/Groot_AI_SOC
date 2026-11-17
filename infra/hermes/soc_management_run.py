@@ -2044,20 +2044,30 @@ def literal_evidence_table(facts):
     def cell(value):
         return str(value).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('|',r'\|').replace('\r',' ').replace('\n',' ')
     def count(value):return str(value) if type(value) is int and value>=0 else '미확인'
-    rows=[];shown_times=set();deferred=[]
+    rows=[];shown_times=set();deferred=[];sections=[];windows=[];observed=[]
     def stamp(value):
         instant=parse_instant(value)
         if instant:shown_times.add(instant)
         return kst_time(value)
+    def append_table(title,headers,values):
+        if not values:return
+        lines=['**'+cell(title)+'**','',
+               '| '+' | '.join(cell(v) for v in headers)+' |',
+               '| '+' | '.join('---' for _ in headers)+' |']
+        lines+=['| '+' | '.join(cell(v) for v in row)+' |' for row in values]
+        sections.append('\n'.join(lines))
+    def window(label,row):
+        windows.append((label,stamp(row.get('requested_since_kst')),stamp(row.get('requested_until_kst'))))
     for row in display_evidence(facts):
         kind=row.get('kind')
         if kind=='times':deferred.extend(row.get('instants',[]));continue
         if kind in ('web_access','web_service'):
             result=('반환 표본 '+count(row.get('returned_count'))+'행 · 보관 색인 '+count(row.get('retained_index_match_count'))+'행 · 실제 전체 요청 수 미확인'
                     if kind=='web_access' else '고정 서비스의 설정 파일·Apache 프로세스 관측; 앱 상태/프런트 적재 미확인')
-            basis='관측 '+stamp(row.get('observed_at_kst'))+'; 로깅 연속성 미검증'
+            basis='로깅 연속성 미검증'
+            observed.append((str(row.get('target'))+' 웹 근거',stamp(row.get('observed_at_kst'))))
             if kind=='web_access':
-                basis+='; 조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))
+                window(str(row.get('target'))+' 웹 접근',row)
                 coverage=row.get('coverage',{})
                 if coverage.get('rows_truncated'):basis+='; 보관 행 상한으로 잘림'
                 if coverage.get('scan_limited') or coverage.get('files_unavailable'):basis+='; 파일 읽기 제한/일부 누락'
@@ -2066,26 +2076,39 @@ def literal_evidence_table(facts):
         elif kind=='events':
             source={'modsecurity':'WAF','suricata':'IDS','wazuh':'Wazuh'}.get(row.get('source'),'센서')
             result='색인 반환 표본 '+count(row.get('returned_count'))+'건 · 전체 건수 '+count(row.get('indexed_window_total_count'))
-            basis=['조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))]
+            label=source+' 경보 '+str(len(windows)+1)
+            window(label,row)
+            observations=row.get('observations',[])
+            observations=observations if isinstance(observations,list) else []
+            rows.append((source+' 경보',result,
+                         label+' 상세 표; 시각 확인 관측 '+str(len(observations))+'행; 반환 표본 전체와 동일함을 뜻하지 않음'))
+            rules=[]
             for label,key in [('WAF 룰 ID' if source=='WAF' else 'Suricata SID','sensor_rule_ids'),('Wazuh 규칙 ID','wazuh_rule_ids')]:
                 ids=[v for v in row.get(key,[]) if isinstance(v,str) and re.fullmatch('[0-9]{1,10}',v)]
-                if ids:basis.append(label+' '+', '.join(ids))
-            observations=[]
-            for o in row.get('observations',[]):
-                item=' / '.join(str(v) for v in (stamp(o.get('timestamp_kst')),o.get('source_ip'),o.get('sensor_agent')) if v)
-                if item not in observations:observations.append(item)
-            if observations:basis.append('관측 '+ '; '.join(observations))
-            rows.append((source+' 경보',result,'; '.join(basis)))
+                rules.extend((label,value) for value in ids)
+            label=windows[-1][0]
+            append_table(label+' · 개별 관측',('번호','발생 시각(KST)','출발지 IP','목적지 IP','수집 에이전트'),
+                  [(str(i),stamp(o.get('timestamp_kst')),o.get('source_ip') or 'IP 정보 없음',
+                    o.get('destination_ip') or 'IP 정보 없음',o.get('sensor_agent') or '미확인')
+                   for i,o in enumerate(observations,1) if isinstance(o,dict)])
+            append_table(label+' · 반환 표본의 규칙',('규칙 구분','ID'),rules)
+            # Aggregate addresses cannot be paired with a timestamp or rule by
+            # position. Show only those absent from the per-observation table.
+            linked={o.get('source_ip') for o in observations if isinstance(o,dict)}
+            extra=[ip for ip in row.get('source_ips',[]) if ip not in linked]
+            append_table(label+' · 추가 관측 주소(시각 대응 미확인)',('번호','출발지 IP'),
+                         list(enumerate(extra,1)))
         elif kind=='containment_clock':
             state=row.get('live_block_state');state=state if state in ('owned','absent','foreign','unavailable') else '미확인'
             labels=CONTAINMENT_TIME_LABELS
-            by_time={}
+            times=[]
             for key,label in labels.items():
                 v=row.get('times',{}).get(key)
-                if parse_instant(v):by_time.setdefault(stamp(v),[]).append(label)
-            basis=['요청 '+str(row.get('request_id','미확인'))]+['/'.join(names)+' '+value for value,names in by_time.items()]
-            if not row.get('initial_apply_time_verified'):basis.append('최초 적용 확인 시각 미기록·미확인; 기한/TTL 역산 아님')
-            rows.append(('실제 차단 관측',state+' / '+str(row.get('ip','미확인')),'; '.join(basis)))
+                if parse_instant(v):times.append((label,stamp(v)))
+            if not row.get('initial_apply_time_verified'):times.append(('최초 적용 확인 시각 미기록·미확인','기한/TTL 역산 아님'))
+            request_id=str(row.get('request_id','미확인'))
+            rows.append(('실제 차단 관측',state+' / '+str(row.get('ip','미확인')),'요청 '+request_id+'; 시각은 별도 이력 표'))
+            append_table('차단 이력 · '+request_id,('시각 구분','시각(KST)·미확인 범위'),times)
         elif kind=='proposal_status':
             rows.append(('요청 실행 기록',row.get('status','상태 세부값 미확인'),
                          str(row.get('target','미확인'))+' / '+str(row.get('proposal_id','미확인'))+'; 승인·실제 차단 관측과 별개'))
@@ -2095,6 +2118,9 @@ def literal_evidence_table(facts):
                              'ID '+str(agent.get('agent_id',agent.get('id','미확인')))+' / 관측 주소 '+str(agent.get('reported_ip','미확인'))))
         elif kind=='diagnostics':
             rows.extend(diagnostic_contract().diagnostic_evidence_rows(row,stamp))
+        elif kind=='blocks':
+            rows.append(('차단 목록','현재 항목 '+count(row.get('count'))+'개','경보·서비스 상태 조회가 아님'))
+            append_table('현재 차단 주소',('번호','IP 주소'),list(enumerate(row.get('addresses',[]),1)))
         else:
             # Non-event evidence already has bounded, literal labels. Do not
             # expose dictionary repr/JSON or model-provided prose as a table.
@@ -2106,11 +2132,13 @@ def literal_evidence_table(facts):
         if instant and instant not in shown_times:
             rendered=stamp(value)
             if rendered not in remaining:remaining.append(rendered)
-    if remaining:rows.append(('기타 관측 시각','KST','; '.join(remaining)))
+    append_table('조회 구간',('조회 대상','시작(KST)','종료(KST)'),windows)
+    append_table('관측 시점',('관측 대상','관측 시각(KST)'),observed)
+    append_table('기타 관측 시각',('번호','시각(KST)'),list(enumerate(remaining,1)))
     if not rows:rows=[('조회 근거','구조화해 표시할 근거 미확인','누락·실패 원문과 실제 호출 기록 확인 필요')]
     table=['| 확인 항목 | 조회 결과 | 근거·범위 |','| --- | --- | --- |']
     table+=['| '+' | '.join(cell(v) for v in row)+' |' for row in rows]
-    return '\n'.join(table)
+    return '\n\n'.join(['\n'.join(table),*sections])
 
 
 def factual_review_report(facts):
@@ -2351,9 +2379,20 @@ def management_reasoning(request, agent, *, required_read_phase=False):
     service=diagnostic_contract().service_history_plan(catalog,chat['request'],chat['requested_at_kst']) if chat else None
     service_lookup=bool(service and service.get('compact_scope') and not service.get('unavailable_capabilities'))
     if service_lookup:print('management_service_reasoning '+json.dumps({'reasoning_effort':'none','registered_targets':sorted(service['units'])}),file=sys.stderr)
-    if lookup or service_lookup:
+    # A mandatory choice among registered reads has no risk/actuator decision.
+    # Auto choice and any mixed read/write catalog keep the judgment profile.
+    choices=request.get('tools');choice=request.get('tool_choice')
+    read_names=[t.get('function',{}).get('name') for t in choices if isinstance(t,dict)] if isinstance(choices,list) else []
+    required_choice=choice=='required' or (isinstance(choice,dict) and choice.get('type')=='function'
+        and isinstance(choice.get('function'),dict) and choice['function'].get('name') in read_names)
+    selected_read=bool(required_choice and isinstance(choices,list) and 1<=len(choices)<=64
+        and len(read_names)==len(choices) and all(isinstance(n,str) and allowed(n,'verify')
+            and n in getattr(agent,'valid_tool_names',()) for n in read_names)
+        and not {'tools','tool_choice','messages','model'} & set(extra)
+        and os.environ.get('CAPSTONE_MANAGEMENT_MODE') in ('manage','verify'))
+    if lookup or service_lookup or selected_read:
         result.pop('max_completion_tokens',None);result['max_tokens']=2048
-    return {**result, 'reasoning_effort': 'none' if lookup or service_lookup or review and not operator_review else 'medium', 'extra_body': extra}
+    return {**result, 'reasoning_effort': 'none' if lookup or service_lookup or selected_read or review and not operator_review else 'medium', 'extra_body': extra}
 
 
 LITERAL_REPAIR_ISSUES = frozenset({

@@ -362,8 +362,16 @@
     ]
   },
   "git": {
-    "state": "publication_pending",
-    "base_head": "9a2d154c8756bc82e7a3dc86f2f5a2b84bb47d93"
+    "state": "content_published_receipt_follows",
+    "content_commit": "8c4cd452f34abebcde70377b120555a13d126b0a",
+    "remote_main": "8c4cd452f34abebcde70377b120555a13d126b0a",
+    "verified_at_kst": "2026-11-18T01:18:54.877355+09:00",
+    "published_files": 23,
+    "tracked_paths": 2379,
+    "unsafe_paths": 0,
+    "known_synthetic_fixture_findings": 10,
+    "new_secret_findings": 0,
+    "credential_method": "project local PAT in per-Git-process environment; helper and HTTP traces disabled"
   },
   "operating_recheck": {
     "sources": 59,

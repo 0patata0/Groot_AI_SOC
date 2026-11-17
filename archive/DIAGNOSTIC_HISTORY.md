@@ -547,3 +547,9 @@ R1Mac1409/기존6생략·새39. timerMainPID/고정DockerCLI경로가정점검�
 ## 논문 로그 정제 구현 보강 — 2026-11-17T20:41:14.830347+09:00
 
 고정 commit의TOML·VRL·기존 검사 정의를 전체 소스 원장 및 Git blob/SHA에 대조했다. WAF join key에 deployment binding이 직접 포함되지 않는 점, 시각 경계의 포함/초과, WAF의 evidence 제외와 normalized action=observed를 명시했다. 문서의 정적 근거이며 Vector 실행·새 공격·모델 호출·서버 변경은0이다.
+
+
+<a id="thesis-command-check-20261117"></a>
+## 논문 실행 예제 실제 확인 — 2026-11-17T21:00:17.334686+09:00
+
+같은 고정 전체 소스를 새 폴더에 복원해 deploy.sh의 --plan만13회 실행했다. 원래 예제 실패와 수정 후 성공, 부적격9종 거절을 관측했다. 외부/권한 명령 거절 장치의 호출0·shell canary 부재를 확인했다. 이 결과는 macOS의 계획/입력 경로이며 Ubuntu 원격 설치·모델·보안 사건 E2E 검사 결과가 아니다.

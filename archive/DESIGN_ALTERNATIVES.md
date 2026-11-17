@@ -754,3 +754,9 @@ grep축소 대신공통Native순회·등록unit표현식/분류후상한을택�
 ## 논문 로그 정제 구현 보강 — 2026-11-17T20:41:14.830347+09:00
 
 Vector는 WAF 두 입력의 신원·시각을 확인한 뒤 공통 메타데이터와 ready를 만들고 조건을 만족한 Suricata/nftables 부분집합만 evidence에 복사한다. 잘못된 쌍은 quarantine, 정상 access 단독은 의도적 제외다. 세 disk buffer의 block 정책은 공유 입력에 대기를 전파할 수 있고 telemetry는 별도 memory/drop_newest를 사용한다. 이 구조를 도식과 실제 변환 코드로 논문에 연결했다.
+
+
+<a id="thesis-command-check-20261117"></a>
+## 논문 실행 예제 실제 확인 — 2026-11-17T21:00:17.334686+09:00
+
+호스트 식별용 문서 주소와 실습 접근 네트워크는 같은 검증 조건이 아니다. LAB_ALLOWED_CIDRS의 CIDR 목록은 RFC1918·개수·중복·proxy 중첩 조건을 따르며 all은 별도 명시 분기다. 두 번째 에이전트의 read-only 기본값과 hermes-parity 선택을 명시하고 실제 도구/승인 연결 완료와 구분했다.

@@ -100,3 +100,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 논문 로그 정제 구현의 보완은 유형별 `thesis-log-pipeline-20261117` 이력을 참조한다. 설치·운영 설정 변경은 없어 새 배포 이력은 추가하지 않았다.
+
+
+논문 실행 예제의 실제 plan 확인·CIDR 정정은 유형별 `thesis-command-check-20261117` 이력을 참조한다. 운영 소스·설정 변경이나 배포는 없었다.

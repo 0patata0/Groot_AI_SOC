@@ -103,3 +103,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 논문 실행 예제의 실제 plan 확인·CIDR 정정은 유형별 `thesis-command-check-20261117` 이력을 참조한다. 운영 소스·설정 변경이나 배포는 없었다.
+
+
+논문 구조 재현 명령의 Git/Framework 입력과 실제 실행은 유형별 `thesis-harness-reproduction-20261117` 이력을 참조한다. 운영 배포는 없었다.

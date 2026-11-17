@@ -135,7 +135,12 @@ class SharedContract(unittest.TestCase):
         audit=h.agent._capstone_incident_judgment_audit[1][-1]
         self.assertEqual(audit['draft'],'IDS 경보는 0건입니다.')
         self.assertIn('sample_zero_presented_as_absence',audit['issues'])
-        self.assertIn('<untrusted_tool_observations>',h.kw['messages'][-1]['content'])
+        self.assertNotIn('<untrusted_tool_observations>',h.kw['messages'][-1]['content'])
+        self.assertIn('current_read_references',h.kw['messages'][-1]['content'])
+        self.assertIn(call['result_sha256'],h.kw['messages'][-1]['content'])
+        retained = alignment.calls_from_rows(h.kw['messages'][1:],PLUGIN._inventory_payload)
+        self.assertEqual(len(retained),1)
+        self.assertEqual(retained[0]['result_sha256'],call['result_sha256'])
         self.assertIn('위험과 대응 필요성을 직접 판단',h.kw['messages'][-1]['content'])
         h.agent._capstone_incident_repairs=(h.agent._current_turn_id,H.CONTRACT.REPAIR_PASSES)
         result=h.call()

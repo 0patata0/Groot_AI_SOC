@@ -18,7 +18,7 @@ def unresolved_report(text):
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None, incident_repair_scope=False):
         calls, prompts = [], []
         self.selector_prompts=[];self.agent_system_prompts=[]
         selector_prompts=self.selector_prompts;agent_system_prompts=self.agent_system_prompts
@@ -126,6 +126,8 @@ class PreparationLoop(unittest.TestCase):
             module=types.ModuleType(name);module.__dict__.update(attrs);modules[name]=module
         original_scope=runtime.harness.tool_scope
         def scope(question, observed=None):
+            if incident_repair_scope and observed:
+                return {'mcp__rule_a__get_rule_change_target'}
             return {'mcp__rule_a__get_rule_change_target'} if narrow_repair and observed else original_scope(question,observed)
         with patch.dict(sys.modules,modules), patch.object(runtime,'capabilities',return_value=available), \
              patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools), \
@@ -189,7 +191,10 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(report['final_response'],fixed)
         self.assertEqual(calls,['search_modsecurity_alerts'])
         self.assertEqual(len(prompts),2)
-        self.assertIn('<untrusted_tool_observations>',prompts[-1])
+        self.assertIn('<untrusted_tool_observations>',prompts[0])
+        self.assertNotIn('<untrusted_tool_observations>',prompts[-1])
+        self.assertIn('current_read_references',prompts[-1])
+        self.assertIn(report['calls'][0]['result_sha256'],prompts[-1])
         self.assertIn(failed,prompts[-1])
         self.assertEqual(report['judgment_audit'][0]['draft'],failed)
         self.assertIn('sample_zero_presented_as_absence',report['judgment_audit'][0]['issues'])
@@ -206,6 +211,21 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(len(report['judgment_audit']),2)
         self.assertEqual(report['stop_reason'],'repeated_unchanged_judgment')
         self.assertNotIn(failed,report['final_response'])
+
+    def test_independent_repair_selector_receives_actual_observations_without_agent_history(self):
+        sensor = 'mcp__security_events__search_modsecurity_alerts'
+        target = 'mcp__rule_a__get_rule_change_target'
+        with patch.object(runtime.harness, 'refine_read_schemas', side_effect=lambda q, s, *a, **kw: s):
+            report, prompts, calls = self.execute(question='DVWA 공격인지 근거로 조사해줘.',
+                read_incident=True, incident_drafts=['WAF 경보는 0건입니다.'], incident_repair_scope=True,
+                selector_plans=[{'calls': [{'tool': sensor, 'arguments': {'target': 'fixture'}}]},
+                                {'calls': [{'tool': target, 'arguments': {'target': 'a:modsecurity-custom'}}]}])
+        self.assertGreaterEqual(len(self.selector_prompts), 2)
+        instruction = self.selector_prompts[1][1][1]
+        self.assertIn('<untrusted_tool_observations>', instruction)
+        self.assertIn('2026-10-30T12:00:00+09:00', instruction)
+        self.assertIn(sensor, instruction)
+        self.assertEqual(report['protected_calls'], 0)
 
     def test_incident_environment_refusal_is_repaired_without_an_action(self):
         failed='사설 주소이므로 대응이 불필요합니다.'

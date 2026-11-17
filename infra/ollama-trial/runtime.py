@@ -541,6 +541,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     feedback=None  # New actual receipts require a fresh judgment.
                 raise RuntimeError('service_inquiry_budget_exhausted')
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference,service_plan))
+            agent_context_receipts = None
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
                 report['policy_definition_rendered'] = True
@@ -551,6 +552,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 final = await service_synthesis()
                 if final is None:
                     final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
+                    agent_context_receipts = digest(report['calls'])
             if not report['protected_calls']:
                 await complete_service_identity_reads()
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
@@ -581,7 +583,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         instruction = harness.incident_evidence_instruction(current, report['calls'])+'\n카드 미조회 유형: '+', '.join(harness.card_evidence_gaps(reference,report['calls']) if reference else [])
                         report['repair']['incident_evidence_missing'] = True
                     elif audit and issues:
-                        instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues, attempts=read_attempt_snapshot())
+                        instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues,
+                            attempts=read_attempt_snapshot(),
+                            repeat_observations=agent_context_receipts != digest(report['calls']))
                     read_scope = harness.incident_selection_scope(current, report['calls'],reference,service_plan) or harness.tool_scope(current, report['calls'])
                     compact_final=(await service_synthesis({'issues':issues,'untrusted_prior_answer':str(final)[:8192],
                         'untrusted_rejected_sentences':harness.CONTRACT.rejected_claim_sentences(
@@ -590,6 +594,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if compact_final is not None:
                         final=compact_final
                     elif read_scope and not gap and budget.used < budget.limit:
+                        if audit and issues and not incident_gap:
+                            # This selector has no MCPAgent conversation history.
+                            instruction = harness.incident_judgment_instruction(current, str(final),
+                                report['calls'], issues, attempts=read_attempt_snapshot())
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
                         # protected tools, inferred approvals or incident decisions.
@@ -630,10 +638,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         await complete_service_identity_reads()
                         if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference,service_plan):
                             final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'], attempts=read_attempt_snapshot())+harness.read_background(question,current)), 180)
+                            agent_context_receipts = digest(report['calls'])
                         else:
                             final = ''  # Failed/missing reads cannot become observations.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
+                        agent_context_receipts = digest(report['calls'])
                     audit = harness.incident_judgment_check(current, str(final), report['calls'],reference,service_plan, attempts=read_attempt_snapshot())
                     if audit:
                         report.setdefault('judgment_audit', []).append(audit)

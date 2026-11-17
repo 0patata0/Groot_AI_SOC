@@ -1,6 +1,6 @@
 # infra — 서버 구성·배포
 
-[양봇 공통 조회 보완](validation/management-latency/README.md). 학습 모델의 Native 공통 처리 우회와 명시 호스트 선택을 보완해22:27 KST 운영 확정했다. 새8채팅11.397~21.943초·8읽기/거절0, Mac/Linux각145·H2각38·설치각37·정본Native429를 확인했다. 운영 Harness²는 기존 Native 정책 사본을 감사하여50소스 passed다. 모델·MCP·승인 경계는 유지하며 복합 조사·새 OS 전체 설치·브라우저 검수는 미완료다.
+[복합 조사 검증](validation/management-latency/README.md). 새 실제 채팅은 Hermes 149.666초·SDK 116.849초로 두 경로 모두 판단 검증 미완료다. MCP45·모델·권한을 유지하는 10파일 후보의 설치본 Mac/Linux 검사(Native150·SDK60), Harness²38·설치37은 통과했으나 실제 MCP 격리 시험에서도 가짜 차단 조회 주장이 남아 운영에는 적용하지 않았다. 직전 단순 조회 13파일·새 8채팅 11.397~21.943초의 운영 확정과 구분한다.
 
 <!-- journal-composition:start -->
 [조정 실행기](validation/journal-composition/COORDINATOR.md)에 정리·현재 설치 검증을 연결했다. 15모듈·50소스·39제어 문서, 동일 소스 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0은 격리 근거다. root namespace5조건도 실제 서비스 인수가 아니다. 운영 소스/서비스 변경0이며 실제 systemd·독립 복구·정확 승인·MCP/두 봇 채팅이 남았다. 관리정책의 고정 조회·파일 후보를 A/B/C 실제8설정에서 확인했다. 같은 소스 Mac87·Linux87/생략0과 A의 nft/Bash/nginx 구문 검사는 개발 근거다. 실제 엔진 로드·신뢰된 출처/경로·14면 전체 연결·전역 MCP/정확 카드/독립 원복·초기 설치·두 봇 검증은 남았다.

@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[양봇 공통 조회 보완](../infra/validation/management-latency/README.md). 학습 모델의 Native 공통 처리 우회와 명시 호스트 선택을 보완해22:27 KST 운영 확정했다. 새8채팅11.397~21.943초·8읽기/거절0, Mac/Linux각145·H2각38·설치각37·정본Native429를 확인했다. 운영 Harness²는 기존 Native 정책 사본을 감사하여50소스 passed다. 모델·MCP·승인 경계는 유지하며 복합 조사·새 OS 전체 설치·브라우저 검수는 미완료다.
+[복합 조사 검증](../infra/validation/management-latency/README.md). 새 실제 채팅은 Hermes 149.666초·SDK 116.849초로 두 경로 모두 판단 검증 미완료다. MCP45·모델·권한을 유지하는 10파일 후보의 설치본 Mac/Linux 검사(Native150·SDK60), Harness²38·설치37은 통과했으나 실제 MCP 격리 시험에서도 가짜 차단 조회 주장이 남아 운영에는 적용하지 않았다. 직전 단순 조회 13파일·새 8채팅 11.397~21.943초의 운영 확정과 구분한다.
 
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 

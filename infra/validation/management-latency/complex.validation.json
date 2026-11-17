@@ -1,0 +1,604 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T00:04:02.766581+09:00",
+  "state": "candidate_only_quality_promotion_withheld",
+  "operating_source_changes": 0,
+  "service_restarts": 0,
+  "protected_calls": 0,
+  "attack_packets": 0,
+  "training_runs": 0,
+  "new_mcp_tools": 0,
+  "registered_mcp_tools": 45,
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "baseline_actual_chats": {
+    "hermes": {
+      "seconds": 149.666,
+      "answer_sha256": "1273495b8b3af6623e3f35827c24ec54483c3d6fd25ab6df1be187c1572bdacf"
+    },
+    "ollama": {
+      "seconds": 116.849,
+      "answer_sha256": "c7cadd05f0c93162e706f0fc2b7607e67bdda297e893e6df0c95e425c1b82610"
+    }
+  },
+  "baseline_limits": {
+    "native": [
+      10,
+      10
+    ],
+    "sdk": [
+      19,
+      48
+    ]
+  },
+  "baseline_validated_final": false,
+  "candidate": {
+    "files": 10,
+    "plan_sha256": "c3387b064387dec38843e094e618f0762e179a5a5f62b28e8c21d7391bf1e3f7",
+    "canonical_sources": {
+      "infra/hermes/query-completion/alignment.py": "a2efb63d9e983b8fcbbd963e3b07134f52c79f01f1388fefe8b80324d25cf870",
+      "infra/hermes/query-completion/test_alignment.py": "9674885e3a051e0e467c868a4abf7515841d76a361d53adf93ba514448ba5549",
+      "infra/hermes/query-completion/test_incident_projection.py": "03c1e5cb93a1a6ee1957cca4051ccc90b6dd38567873e9bbfefe2edb5025263c",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "f67086e025519ffabef53710dde8143c8311304cd09c39f406beccefeeb54342",
+      "infra/ollama-trial/harness.py": "f7f88190ed466f533808b59e985800264188b17daf86abc72a9c8776e3ef5d8d",
+      "infra/ollama-trial/runtime.py": "a21f3efba1ceabc33cfdad0ab1df8cb355d6ea112526e27eab83a31a7a0da03c",
+      "infra/ollama-trial/test_runtime.py": "a7c83450c0b3e7f07cf472f4ec788f43c6ad65f042f294f28720e3125dad3337",
+      "infra/ollama-trial/test_incident_observation_input.py": "ee8c2491b61f4f1ee3ca43bc7069934d4190172b4a02317dade6ed9a1ef170f2"
+    },
+    "operating_copy_candidates": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "e88b0265f5215fc7f177bfb485380af11f622e4a49851ae89a6a90da13a892c7",
+        "bytes": 299519,
+        "kind": "same declared observation and repair functions + pure JSON helpers"
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "e88b0265f5215fc7f177bfb485380af11f622e4a49851ae89a6a90da13a892c7",
+        "bytes": 299519,
+        "kind": "same declared observation and repair functions + pure JSON helpers"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "before_sha256": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "after_sha256": "0e1d40fd89823686963ff8eb7096031e50392f8fa9e2074475e467aba7f80a26",
+        "bytes": 46191,
+        "kind": "current read display projection and one in-turn repair call; audit retained"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "after_sha256": "e299e77007f7485c988e294cd64dd7f0ed14510d0fd0eda19a617dc7c6f20583",
+        "bytes": 50021,
+        "kind": "retain current audit fingerprint in MCPAgent history; independent selector retains full observations"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "bytes": 3414,
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "bytes": 3414,
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "bytes": 3414,
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5b2ae4614533b8c7b53c24b3b3b78263580eb9b1c5593bc3b740bf463ab141f1",
+        "bytes": 16220,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5b2ae4614533b8c7b53c24b3b3b78263580eb9b1c5593bc3b740bf463ab141f1",
+        "bytes": 16220,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "5b2ae4614533b8c7b53c24b3b3b78263580eb9b1c5593bc3b740bf463ab141f1",
+        "bytes": 16220,
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      }
+    },
+    "source_scope": "Only declared pure display, current wire references, retained-context repairs, two skill sections/mappings. No whole-canonical promotion.",
+    "skill_bytes": 24221,
+    "skill_max_bytes": 24576
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_framework_files": 140,
+    "catalog_tools": 45,
+    "census": {
+      "native/base": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "native/candidate": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "sdk/base": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "sdk/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "management/base": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      },
+      "management/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/alignment.py",
+          "scripts/harness.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/harness.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "actual_mcp_schema_hashes_verified": true,
+    "skill_copy_byte_deltas": {
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": 4452,
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": 4452,
+      "/opt/capstone-management/skill-soc-investigate.md": 4452
+    }
+  },
+  "regressions": {
+    "mac": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 150,
+          "failures": [],
+          "errors": [],
+          "skipped": []
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 60,
+          "failures": [],
+          "errors": [],
+          "skipped": []
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 150,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 60,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.448s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.576s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "canonical": {
+      "sdk": {
+        "rc": 1,
+        "summary": {
+          "run": 402,
+          "failures": [
+            "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+            "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+            "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+            "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+          ],
+          "errors": [
+            "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+          ],
+          "skipped": []
+        }
+      },
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": []
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": {
+          "run": 38,
+          "failures": [],
+          "errors": [],
+          "skipped": []
+        }
+      },
+      "installer": {
+        "rc": 0,
+        "summary": {
+          "run": 37,
+          "failures": [],
+          "errors": [],
+          "skipped": []
+        }
+      }
+    },
+    "canonical_existing_failure_baseline": {
+      "head": "5a7f16d49b7784e2cf8936d3e32f51287d9d3d47",
+      "rc": 1,
+      "summary": {
+        "run": 6,
+        "failures": [
+          "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+          "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+          "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+          "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+          "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+          "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+          "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+          "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+        ],
+        "errors": [
+          "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+        ],
+        "skipped": 0
+      }
+    },
+    "skips": 0
+  },
+  "model_replays": [
+    {
+      "experiment": "replay-check-2",
+      "arm": "base",
+      "status": "guard_passed",
+      "model_tested_plan_sha256": "f9528fd79f68f213b7b1005c83852b0612034eb224c5f9f535c6f38ff6aeb1cf",
+      "calls": [
+        {
+          "seconds": 44.86836353497347,
+          "prompt_chars": 66507,
+          "prompt_sha256": "883622eca779819428303fa55330705f9ee7673d85f03dd30892a220e99d1f25",
+          "draft_sha256": "267c9f5c8354b19c1e4516130bfe6b08650daa291d9b55c4206424630e06ccfc",
+          "issues": [],
+          "usage": {
+            "input_tokens": 30329,
+            "output_tokens": 846,
+            "total_tokens": 31175
+          }
+        }
+      ],
+      "note": "Base guard pass is not fact correctness; manual review found absent WAF destination and unsupported impact/block assertions."
+    },
+    {
+      "experiment": "replay-check-2",
+      "arm": "candidate",
+      "status": "guard_incomplete",
+      "model_tested_plan_sha256": "f9528fd79f68f213b7b1005c83852b0612034eb224c5f9f535c6f38ff6aeb1cf",
+      "calls": [
+        {
+          "seconds": 45.331425940967165,
+          "prompt_chars": 67022,
+          "prompt_sha256": "0216b2905f625d7a8caf208243d0d8016128c0d4ddcdada88fc9ec5504d519a8",
+          "draft_sha256": "f5e506bc48db63c218cacba14a922c250b1fc044180804efd72442b9d5ea2c7f",
+          "issues": [
+            "http_status_used_as_security_outcome",
+            "incident_closure_with_unknown_impact",
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 31183,
+            "output_tokens": 854,
+            "total_tokens": 32037
+          }
+        },
+        {
+          "seconds": 16.918834590003826,
+          "prompt_chars": 75213,
+          "prompt_sha256": "18ae32b7b2f66f02bea8d0c4728b5aeeface506837412b403abb85d197e9bf38",
+          "draft_sha256": "f5e506bc48db63c218cacba14a922c250b1fc044180804efd72442b9d5ea2c7f",
+          "issues": [
+            "http_status_used_as_security_outcome",
+            "incident_closure_with_unknown_impact",
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 35032,
+            "output_tokens": 854,
+            "total_tokens": 35886
+          }
+        }
+      ],
+      "note": "Withheld; protocol correction did not establish impact or block facts."
+    },
+    {
+      "experiment": "replay-r2-check-1",
+      "arm": "candidate",
+      "status": "guard_incomplete",
+      "model_tested_plan_sha256": "b385ee613464a6567ca4f6349039627371a5c25bb17523ab792c1862d72a16be",
+      "calls": [
+        {
+          "seconds": 55.210117483045906,
+          "prompt_chars": 66915,
+          "prompt_sha256": "7d6193465c75e931f60773ab84865e320206c16b9d07da9111761f3d408a67e6",
+          "draft_sha256": "169c35e42ce02b1a8f807347eef7395a7584395d9672f2593d97e4abb10da4ec",
+          "issues": [
+            "http_status_used_as_security_outcome",
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 31158,
+            "output_tokens": 1429,
+            "total_tokens": 32587
+          }
+        },
+        {
+          "seconds": 25.293434710009024,
+          "prompt_chars": 75774,
+          "prompt_sha256": "de6df38f747270dc90333a8432bdc0e157c0822a3ce6ada66c291ab58e1ca8b5",
+          "draft_sha256": "c2ff44dcacd1d4ee9c0c3339f3a04c8f40a0fc0709a31200a2c4022f29c39654",
+          "issues": [
+            "http_status_used_as_security_outcome",
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 35463,
+            "output_tokens": 1403,
+            "total_tokens": 36866
+          }
+        }
+      ],
+      "note": "Withheld; protocol correction did not establish impact or block facts."
+    },
+    {
+      "experiment": "replay-r3-check-1",
+      "arm": "candidate",
+      "status": "guard_incomplete",
+      "model_tested_plan_sha256": "b385ee613464a6567ca4f6349039627371a5c25bb17523ab792c1862d72a16be",
+      "calls": [
+        {
+          "seconds": 28.598471895966213,
+          "prompt_chars": 68257,
+          "prompt_sha256": "2615a442f4b3717b664e08f503ef20873c9e786ad01ff4f4e28ec2119a8c13c1",
+          "draft_sha256": "d10835fcc54a8b070b633e08349d930cbeff367bda855afa2ba743177e1946a6",
+          "issues": [
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 31832,
+            "output_tokens": 1444,
+            "total_tokens": 33276
+          }
+        },
+        {
+          "seconds": 25.76207836897811,
+          "prompt_chars": 76717,
+          "prompt_sha256": "08676c4d048a7d2ab1a373162c1c59a52146a067bda8978e7bb70a5273d9362f",
+          "draft_sha256": "d10835fcc54a8b070b633e08349d930cbeff367bda855afa2ba743177e1946a6",
+          "issues": [
+            "incident_impact_verification_missing"
+          ],
+          "usage": {
+            "input_tokens": 36002,
+            "output_tokens": 1444,
+            "total_tokens": 37446
+          }
+        }
+      ],
+      "note": "Withheld; protocol correction did not establish impact or block facts."
+    }
+  ],
+  "isolated_live_read": {
+    "question": "오늘 WAF와 Suricata 경보의 출발지가 겹치는지 조사하고, 현재 IP 차단과 실제 요청 차단이 확인됐는지 구분해서 알려줘.",
+    "exposed_registered_read_tools": 36,
+    "model_tested_plan_sha256": "b385ee613464a6567ca4f6349039627371a5c25bb17523ab792c1862d72a16be",
+    "status": "partial",
+    "seconds": 126.02726738998899,
+    "model_calls": [
+      {
+        "seconds": 15.389498271979392,
+        "usage": {
+          "input_tokens": 13253,
+          "output_tokens": 181,
+          "total_tokens": 13434
+        }
+      },
+      {
+        "seconds": 59.73229017597623,
+        "usage": {
+          "input_tokens": 40397,
+          "output_tokens": 1076,
+          "total_tokens": 41473
+        }
+      },
+      {
+        "seconds": 21.987994838971645,
+        "usage": {
+          "input_tokens": 44218,
+          "output_tokens": 1054,
+          "total_tokens": 45272
+        }
+      },
+      {
+        "seconds": 20.85833180201007,
+        "usage": {
+          "input_tokens": 48013,
+          "output_tokens": 1054,
+          "total_tokens": 49067
+        }
+      }
+    ],
+    "mcp_calls": [
+      {
+        "server": "security-events",
+        "name": "search_modsecurity_alerts",
+        "arguments": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:46:19.011394+09:00",
+          "limit": 50
+        },
+        "result_sha256": "9019c25806e00bd86909f74536468de5dedc26f3b3995505ea59154d86572cfe"
+      },
+      {
+        "server": "security-events",
+        "name": "search_suricata_alerts",
+        "arguments": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:46:19.011394+09:00",
+          "limit": 50
+        },
+        "result_sha256": "357eaedd2ae45316630cc5d48520d8b12dcaf14542ac838ba6940c6bd21b1b0c"
+      }
+    ],
+    "remaining_issues": [
+      "unobserved_block_list_claim"
+    ],
+    "stop_reason": "repeated_unchanged_judgment",
+    "protected_calls": 0,
+    "chat_posts": 0
+  },
+  "operating_last_observation": {
+    "at_kst": "2026-11-18T00:00:38.747996+09:00",
+    "sources_unchanged": 59,
+    "running_cases": 0,
+    "not_promoted": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T00:01:50.236443+09:00",
+    "roots_removed": 7,
+    "files_removed": 2508,
+    "bytes_removed": 98321254,
+    "exported_original_artifacts": 36,
+    "validation_parent_removed": true,
+    "replay_parent_preserved": "empty root-owned directory; preexisting-parent ownership not inferred",
+    "mac_package_installs": 0
+  },
+  "limitations": [
+    "Same retained evidence replays are not fresh MCP or independent incidents.",
+    "Read-only isolated SDK execution is not Mattermost E2E or Native validation.",
+    "Different sample limits prevent controlled latency comparison.",
+    "Latest retained-context and malformed-input hardening have regression evidence; prior model experiments are explicitly different candidate hashes.",
+    "Static/structure/receipt/citation guards are incomplete semantic validation; base replay passed guards but failed manual fact review.",
+    "No operating candidate apply, fresh post-apply chat, write/approval/attack E2E or new OS installation.",
+    "Blocked current-IP companion read and evidence-driven follow-up selection remain unresolved; do not weaken gates or force benign/remediated to pass."
+  ],
+  "publication": {
+    "state": "content_prepared_not_yet_committed",
+    "base_head": "d3b053d2ebc98ccce916665e8425ad16c9db5c52"
+  },
+  "operating_last_structure_observation": {
+    "at_kst": "2026-11-18T00:05:26.361284+09:00",
+    "status": "passed",
+    "sources": 50,
+    "context_identity": {
+      "status": "observed",
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "access_mode": "hermes-parity",
+      "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+      "observed_at_kst": "2026-11-18T00:05:23.164308+09:00"
+    }
+  },
+  "documentation": {
+    "files": 15,
+    "humanize": {
+      "version": "2.3-codex",
+      "run_id": "2026-11-17-007-e6be",
+      "route": "standard",
+      "change_rate": 0.0207,
+      "grade": "B",
+      "self_check": "6/6",
+      "gate_exit": 0,
+      "finalizer": "not_required"
+    }
+  }
+}

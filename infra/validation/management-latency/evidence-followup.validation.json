@@ -325,15 +325,17 @@
     "prior_evidence": "evidence-judgment.validation.json"
   },
   "publication": {
-    "state": "not_yet_committed",
-    "credential_source": "project-local file, process-scoped token; no credential helper or HTTP trace",
-    "foreign_paths_preserved": 23
+    "state": "content_published",
+    "content_commit": "6968780b2b70b282fb787bd1cb45b98c0818f975",
+    "remote_main_at_content_publication": "6968780b2b70b282fb787bd1cb45b98c0818f975",
+    "remote_match_at_kst": "2026-11-18T03:48:44.329823+09:00",
+    "receipt_committed_separately": true
   },
   "documentation": {
     "affected_public_documents": 15,
     "humanize_run": "_workspace/2026-11-18-004-6163",
     "humanize_route": "light",
-    "state": "humanized_verified_pending_publication",
+    "state": "humanized_verified_content_published",
     "gate_exit": 0,
     "change_rate": 0.0007,
     "grade": "B",

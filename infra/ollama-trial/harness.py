@@ -1445,6 +1445,14 @@ def incident_field_violations(answer, calls):
             not in ('not_asserted','conditional_or_unverified','planned_check') for m in block_matches)
         if http_status and (causal or block_assertion) and not uncertain and asserted_block:
             issues.add('http_status_used_as_security_outcome')
+        # The current event read contract exposes rule matches/mode/response
+        # fields, not a verified mediation receipt. A nominal claim is still a
+        # claim even when the next clause says impact is unknown.
+        for claim in re.finditer(r'(?:WAF|ModSecurity)[^.;\n|]{0,25}?차단\s*'
+                r'(?:관측|사실|이력|기록)(?:이|가|은|는|을)?\s*(?:있|확인(?:했|됐|되었))',line,re.I):
+            if CONTRACT.claim_modality(line[claim.end():]) not in (
+                    'not_asserted','conditional_or_unverified','planned_check'):
+                issues.add('waf_intervention_unverified_by_event_fields')
         # Bind source claims to their own sensor, not the union of both sensors.
         # Other cells' sample/count caveats cannot qualify a positive address cell.
         cells=[s.strip() for s in line.split('|') if s.strip()] if line.lstrip().startswith('|') else []
@@ -1593,7 +1601,8 @@ def evidence_report_context(question, calls, requested_at_kst, available_reads=(
           'untrusted_failed_reads':[r for r in receipts if r['is_error'] is True],
           'latest_read_states':[{'tool':r['tool'],'arguments':r['arguments'],'read_ordinal':r['read_ordinal'],
               'is_error':r['is_error']} for r in receipts if r['latest_same_input_attempt']],
-          'derived_sample_source_sets':sources,'derived_sample_source_comparisons':comparisons}
+          'derived_sample_source_sets':sources,'derived_sample_source_comparisons':comparisons,
+          'requested_web_evidence':requested_web_evidence(question,calls)}
     return body if len(untrusted_observation_json(body).encode())<=131072 else None
 
 
@@ -1664,9 +1673,30 @@ def evidence_report_text(review, calls, context):
 
 
 def add_evidence_source_comparison(context, text):
-    """A model failure cannot erase already verified sample comparisons."""
-    comparison=evidence_source_comparison(context)
-    return comparison+'\n\n'+text if comparison and not text.startswith(comparison) else text
+    """Retain verified sample comparisons and requested web read limitations."""
+    blocks=[evidence_source_comparison(context)]
+    state=context.get('requested_web_evidence',{})
+    if state.get('requested'):
+        scopes=state['scopes'];rows=[];unmapped=[]
+        for s in scopes[:12]:
+            targets=sorted({q['target'] for q in s['queries']})
+            outcome=('반환 검증 실패/일부 조회 오류' if s['errors'] else
+                     '접근 표본 조회: '+', '.join(targets) if targets else
+                     '대응 접근 표본 미확인' if s['attempted'] else '추가 조회 미완료')
+            rows.append([s['source_ip'],s['since_kst'],s['until_kst'],outcome])
+            unmapped.extend([s['source_ip'],p] for p in s['unmapped_path_hints'])
+        block='**웹 근거 조회 범위**\n'
+        block+=('\n'.join(READ.table(['WAF 표본 출발지','시작(KST)','종료(KST)','추가 읽기 결과'],rows))
+                if rows else '유효한 출발지·기간·경로 단서가 없어 웹 근거의 조사 범위를 확정하지 못했습니다.')
+        if len(scopes)>12:block+='\n나머지 '+str(len(scopes)-12)+'개 조회 범위는 이 요약에서 생략했습니다.'
+        if unmapped:
+            block+='\n\n'+ '\n'.join(READ.table(['WAF 표본 출발지','설정 대응·접근 근거 미확인 경로'],unmapped[:12]))
+            if len(unmapped)>12:block+='\n나머지 '+str(len(unmapped)-12)+'개 경로는 이 요약에서 생략했습니다.'
+        block+='\n읽기 시도·설정 경로 대응은 WAF 중재, 실제 프런트 경로, 백엔드 도달·영향의 증명이 아닙니다.'
+        blocks.append(block)
+    for block in reversed(blocks):
+        if block and block not in text:text=block+'\n\n'+text
+    return text
 
 
 def initial_event_day_schemas(question, schemas, calls, requested_at_kst):
@@ -1694,6 +1724,140 @@ def initial_event_day_schemas(question, schemas, calls, requested_at_kst):
     return result
 
 
+def requested_web_evidence(question, calls):
+    """Per-source/window read coverage; paths remain hints, never route proof."""
+    text=READ.without_prohibitions(normalized(question))
+    requested=False
+    for part in re.split(r'\n|;|(?<=[.!?])\s+',text):
+        if re.search(r'(?:웹|HTTP|요청).{0,30}(?:제외|말고|빼고|조회하지|확인하지)',part,re.I):continue
+        if (re.search(r'웹\s*(?:요청|접근|거래)|HTTP|(?:요청|접근).{0,12}(?:차단|거부|도달)|'
+                      r'(?:WAF|ModSecurity).{0,12}(?:차단|거부|막)',part,re.I)
+                and re.search(r'차단|거부|허용|통과|도달|영향|피해|막',part)
+                and re.search(r'근거|증거|실제|확인|조사|분석|판단|성공|실패',part)):
+            requested=True
+    if not requested or READ.wants_write(text) or not EVIDENCE.incident_investigation_request(text):
+        return {'requested':False,'scopes':[],'pending':[]}
+    wire=list(evidence_reads(calls).wire_calls)
+    key=lambda c:(c.get('server'),c.get('name'),json.dumps(c.get('arguments'),sort_keys=True,ensure_ascii=False))
+    last={key(c):i for i,c in enumerate(wire)}
+    view=evidence_reads([c for i,c in enumerate(wire) if last[key(c)]==i])
+    # Different parent bundles can contain the same underlying query. The
+    # newest component attempt also supersedes older component successes.
+    last_rows={key(c):i for i,c in enumerate(view)}
+    rows=[c for i,c in enumerate(view) if last_rows[key(c)]==i]
+    active_parts={(o['parent_result_sha256'],o['index']) for c in rows
+                  if (o:=view.component_origins.get(id(c)))}
+    def decoded(call):
+        data=payload(call)
+        for _ in range(3):
+            if not isinstance(data,dict) or not set(data)<={'result','isError','is_error'} or 'result' not in data:break
+            if data.get('isError') or data.get('is_error') or not isinstance(data['result'],str):return None
+            try:data=json.loads(data['result'])
+            except (ValueError,TypeError):return None
+        return data if isinstance(data,dict) and not any(data.get(k) for k in ('error','isError','is_error')) else None
+    groups={}
+    for call in rows:
+        if call.get('server')!='security-events' or call.get('name')!='search_modsecurity_alerts':continue
+        data=decoded(call)
+        if not data or data.get('source')!='modsecurity' or not isinstance(data.get('alerts'),list):continue
+        start,end=(EVIDENCE.parse_instant(data.get('requested_'+k)) for k in ('since_kst','until_kst'))
+        if not start or not end or not 0<(end-start).total_seconds()<=86400:continue
+        if any(k in call.get('arguments',{}) and EVIDENCE.parse_instant(call['arguments'][k])!=v
+               for k,v in (('since_kst',start),('until_kst',end))):continue
+        start,end=(v.astimezone(timezone(timedelta(hours=9))) for v in (start,end))
+        limit=call.get('arguments',{}).get('limit',data.get('limit',10))
+        if type(limit) is not int or not 1<=limit<=50:continue
+        for row in data['alerts'][:50]:
+            if not isinstance(row,dict) or not EVIDENCE.literal_ip(row.get('source_ip')):continue
+            if call.get('arguments',{}).get('source_ip',row['source_ip'])!=row['source_ip']:continue
+            path=row.get('request_path')
+            if not isinstance(path,str) or not path.startswith('/') or len(path)>1024:continue
+            ip=str(ipaddress.ip_address(row['source_ip']));key=(ip,start.isoformat(),end.isoformat())
+            scope=groups.setdefault(key,{'source_ip':ip,'since_kst':key[1],'until_kst':key[2],
+                'limit':limit,'observed_path_hints':[],'attempted':False,'call_recorded':False,
+                'queries':[],'unmapped_path_hints':[],'errors':[]})
+            if path not in scope['observed_path_hints']:scope['observed_path_hints'].append(path)
+    for scope in groups.values():
+        window={k:scope[k] for k in ('since_kst','until_kst')}
+        configs=[];access=[]
+        for call in rows:
+            if call.get('server')!='security-events':continue
+            data=decoded(call);args=call.get('arguments',{})
+            if not data or data.get('source')!='c_apache_access_snapshot' or data.get('target')!=args.get('target'):continue
+            service=data.get('service',{});prefix=service.get('request_path_prefix') if isinstance(service,dict) else None
+            if not isinstance(prefix,str) or not prefix.startswith('/') or service.get('configured_in_file_snapshot') is not True:continue
+            paths=[p for p in scope['observed_path_hints'] if p.startswith(prefix) or p==prefix.rstrip('/')]
+            if not paths:continue
+            if call.get('name')=='get_web_service_target':configs.append((args['target'],prefix,data.get('configuration_sha256')))
+            if (call.get('name')=='search_web_access' and not args.get('source_ip')
+                    and all(EVIDENCE.parse_instant(args.get(k))==EVIDENCE.parse_instant(v) for k,v in window.items())
+                    and all(EVIDENCE.parse_instant(data.get('requested_'+k))==EVIDENCE.parse_instant(v) for k,v in window.items())
+                    and isinstance(data.get('records'),list)):
+                access.append((args['target'],prefix,data.get('configuration_sha256'),paths))
+        direct=[x for x in access if x[:3] in configs]
+        direct_paths={p for _t,_prefix,_sha,paths in direct for p in paths}
+        if direct_paths>=set(scope['observed_path_hints']):
+            scope.update(attempted=True,call_recorded=True,queries=[{'target':t,'source':'direct_configuration_and_access_reads'} for t,_p,_sha,_v in direct]);continue
+        for call in view.wire_calls:
+            if call.get('server')!='security-events' or call.get('name')!='collect_incident_evidence' or call.get('is_write'):continue
+            raw=call.get('result')
+            if not isinstance(raw,str) or hashlib.sha256(raw.encode()).hexdigest()!=call.get('result_sha256'):continue
+            args=call.get('arguments',{});web=args.get('web_context')
+            if not isinstance(web,dict) or not all(EVIDENCE.parse_instant(web.get(k))==EVIDENCE.parse_instant(v) for k,v in window.items()):continue
+            if not any(isinstance(e,dict) and e.get('sensor')=='modsecurity' and isinstance(e.get('arguments'),dict)
+                and e['arguments'].get('source_ip')==scope['source_ip'] and all(EVIDENCE.parse_instant(e['arguments'].get(k))==EVIDENCE.parse_instant(v) for k,v in window.items())
+                for e in args.get('events',())):continue
+            scope['call_recorded']=True
+            data=decoded(call);parts=EVIDENCE.incident_bundle_reads(args,data) if data else None
+            scope['attempted']=True
+            if call.get('is_error') or data is None:
+                scope['attempted']=True;scope['errors'].append('web_collection_failed');continue
+            if parts is None:scope['errors'].append('web_collection_provenance_invalid');continue
+            prefixes=[]
+            for p in parts:
+                if (call['result_sha256'],p['index']) not in active_parts:continue
+                if p['is_error']:scope['errors'].append(p['tool']+':read_failed');continue
+                d=p['result']
+                if p['tool']=='search_web_access':scope['queries'].append({'target':p['arguments']['target'],'source':'verified_bundle_component','parent_sha256':call['result_sha256'],'component_index':p['index']})
+                if (p['tool']=='get_web_service_target' and isinstance(d.get('service'),dict)
+                        and d['service'].get('configured_in_file_snapshot') is True
+                        and any(a.get('configuration_component')==p['index'] for a in data['candidate_associations'])):
+                    prefix=d['service'].get('request_path_prefix')
+                    if isinstance(prefix,str):prefixes.append(prefix)
+            scope['unmapped_path_hints']=[p for p in scope['observed_path_hints'] if not any(p.startswith(prefix) or p==prefix.rstrip('/') for prefix in prefixes)]
+    scopes=list(groups.values())
+    return {'requested':True,'scopes':scopes,'pending':[s for s in scopes if not s['attempted']],
+        'scope':'read_attempts_not_waf_intervention_frontend_route_or_backend_reachability_proof'}
+
+
+def web_evidence_read_schemas(question, schemas, calls):
+    """Narrow the existing bundle to paired observed scope; never dispatch it."""
+    name=EVIDENCE.BUNDLE_TOOL
+    if set(schemas)!={name}:return None
+    state=requested_web_evidence(question,calls)
+    if not state['requested'] or not state['pending']:return None
+    from jsonschema import Draft202012Validator
+    branches=[]
+    for scope in state['pending'][:4]:
+        if scope['call_recorded']:continue
+        window={k:scope[k] for k in ('since_kst','until_kst','limit')}
+        event={'sensor':'modsecurity','arguments':{**window,'source_ip':scope['source_ip']}}
+        args={'events':[event],'web_context':window}
+        if not Draft202012Validator(schemas[name]).is_valid(args):continue
+        branch=copy.deepcopy(schemas[name]);props=branch.get('properties',{})
+        # Keep an explicit object/array shape for the actual Ollama grammar;
+        # const alone can be serialized as null by typed schema adapters.
+        def exact(value):
+            if isinstance(value,dict):return {'type':'object','additionalProperties':False,
+                'required':list(value),'properties':{k:exact(v) for k,v in value.items()}}
+            return {'type':'integer' if type(value) is int else 'string','enum':[value]}
+        props['events']={**props['events'],'minItems':1,'maxItems':1,'items':exact(event)}
+        props['web_context']=exact(window)
+        branch['required']=list(dict.fromkeys(branch.get('required',[])+['web_context']))
+        branches.append(branch)
+    return {name:{'anyOf':branches}} if branches else {}
+
+
 def incident_required_read_gaps(question, calls):
     """Missing named sensor/current-list reads, not an incident conclusion."""
     calls = evidence_reads(calls)
@@ -1719,6 +1883,8 @@ def incident_required_read_gaps(question, calls):
             required.discard(name)
     if READ.companion_block_request(normalized(question)) and READ.block_list_state(calls) is None:
         required.add('mcp__resp__list_blocks')
+    if not required and requested_web_evidence(question,calls)['pending']:
+        required.add(EVIDENCE.BUNDLE_TOOL)
     return required
 
 
@@ -1811,15 +1977,18 @@ def incident_completion_issues(question,answer,calls,reference=None):
     sensor_context=any(c.get('server')=='security-events' and c.get('name') in
         ('search_modsecurity_alerts','search_suricata_alerts') for c in calls)
     sensor_context|=bool(reference and set(reference.get('families',[]))&{'modsecurity','suricata'})
+    decision,error=EVIDENCE.parse_incident_disposition(answer,reads)
+    if error:return [error]
+    web=requested_web_evidence(question,calls)
+    if decision['assessment']!='unresolved' and web['requested'] and (
+            not web['scopes'] or web['pending'] or any(
+                s['errors'] or s['unmapped_path_hints'] or not s['queries'] for s in web['scopes'])):
+        return ['requested_web_impact_scope_unverified']
     if not sensor_context and not requirements:
         # General Wazuh/OS investigations still need an explicit judgment.
         # This is a protocol check, not sensor attribution or a benign verdict.
-        _decision,error=EVIDENCE.parse_incident_disposition(answer,reads)
-        if error:return [error]
         return (['unresolved_disposition_marked_resolved']
                 if EVIDENCE.disposition_status_conflict(answer) else [])
-    decision,error=EVIDENCE.parse_incident_disposition(answer,reads)
-    if error:return [error]
     sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
     cited_bundle=(EVIDENCE.BUNDLE_TOOL in decision['evidence_tools'] and bool(requirements) and requirements<=bundle_requirements)
     if not (set(decision['evidence_tools'])&sensor_tools or cited_bundle):return ['incident_disposition_evidence_missing']
@@ -3207,6 +3376,8 @@ def missing_reads(question, calls, diagnostic_targets=(), reference=None, servic
         else _missing_reads(question,calls,diagnostic_targets))
     if 'mcp__resp__list_blocks' in incident_required_read_gaps(question,calls):
         missing=list(dict.fromkeys(missing+['list_blocks: 현재 동적 차단 목록 미확인']))
+    for scope in requested_web_evidence(question,calls)['pending']:
+        missing.append('웹 접근 근거 미조회: '+scope['source_ip']+' '+scope['since_kst']+' ~ '+scope['until_kst'])
     return missing
 
 
@@ -3287,6 +3458,8 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    web=web_evidence_read_schemas(question,result,calls)
+    if web is not None:return web
     if identity_options:
         from jsonschema import Draft202012Validator
         narrowed={}

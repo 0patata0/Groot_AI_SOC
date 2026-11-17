@@ -1,0 +1,438 @@
+{
+  "format": "web_evidence_scope_validation_v1",
+  "at_kst": "2026-11-18T05:36:00.238378+09:00",
+  "reference": {
+    "project": "Malvex",
+    "commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "url": "https://github.com/JoasASantos/Malvex/tree/75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "use": "Concepts only: retained read receipts, hypothesis/evidence separation, explicit incomplete stages. No installation or new MCP server/tool."
+  },
+  "scope": {
+    "mcp_tools": 45,
+    "new_tools": 0,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "model_changed": false,
+    "permissions_or_approval_or_block_ttl_changed": false,
+    "management_route": "Mac-admin231-A-B",
+    "attacks": 0,
+    "training": 0,
+    "dgx_training_polls": 0,
+    "operating_source_changes": 0,
+    "actual_chat_posts": 0
+  },
+  "candidate": {
+    "files": 16,
+    "plan_sha256": "ad73b9de8f26b8c08a61d5b9a706184376c3bfac924457068c20915c7189ddcc",
+    "canonical_sources": {
+      "infra/hermes/chat_contract.py": "80e9ce843212b64f35bee88b6e41ffdd5e15434cb32678f7f153c571302b3060",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "3184d9cc9714d1c688bc23520f3c992dc5b0ae96c0d7f73a930e0fe8e981dbcc",
+      "infra/ollama-trial/harness.py": "92a76fb3cf217b9c87c9553a6d3b316b59a58d99b2927847ae592d58fafd53d4",
+      "infra/ollama-trial/runtime.py": "6f74433bd2edffe98f68c68272a56b3a794a240ce6d5d0a705a6cce6ba617094",
+      "infra/ollama-trial/test_runtime.py": "9a67a8e4ace019c76a334f667cd3c9c054ec5338d4df27394e5d18b1c2208e2f",
+      "infra/ollama-trial/test_web_evidence_scope.py": "66dcdf7afc5354b105d142cb8cc8f3b2348e77d4d68ee03703efce2b37e9ec24"
+    },
+    "installed_copies": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "bytes": 331223,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "b8a56479981c05b5457d72bfd44ddc63af7ea605b942083bd982b6edf9186627"
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "bytes": 331223,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "b8a56479981c05b5457d72bfd44ddc63af7ea605b942083bd982b6edf9186627"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "bytes": 46191,
+        "before_sha256": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "after_sha256": "0e1d40fd89823686963ff8eb7096031e50392f8fa9e2074475e467aba7f80a26"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "bytes": 58931,
+        "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "after_sha256": "e7714d345df9ebf8be532f782f6fb253d0358672b074c765bb1946cf5e7ca706"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "bytes": 17447,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "d8db4a92ce142b84652e9ac75785e401042d65d8a555688af0a2bcdddfa99b11"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "bytes": 17447,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "d8db4a92ce142b84652e9ac75785e401042d65d8a555688af0a2bcdddfa99b11"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "bytes": 17447,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "d8db4a92ce142b84652e9ac75785e401042d65d8a555688af0a2bcdddfa99b11"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+        "bytes": 79948,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "a4ca3c89a44b4a46d8d303957a208dc03dd00a66c33c3299fe9a0cf370c3b519"
+      },
+      "/opt/capstone-ollama-trial/read_contract.py": {
+        "bytes": 79948,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "a4ca3c89a44b4a46d8d303957a208dc03dd00a66c33c3299fe9a0cf370c3b519"
+      },
+      "/opt/capstone-management/read_contract.py": {
+        "bytes": 79948,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "a4ca3c89a44b4a46d8d303957a208dc03dd00a66c33c3299fe9a0cf370c3b519"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "bytes": 197568,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "ad3bbc0c9359b984bb6c1421d318bebe5e79bb031ba0faa0059f96ec558ced8d"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "bytes": 197568,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "ad3bbc0c9359b984bb6c1421d318bebe5e79bb031ba0faa0059f96ec558ced8d"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "bytes": 197568,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "ad3bbc0c9359b984bb6c1421d318bebe5e79bb031ba0faa0059f96ec558ced8d"
+      }
+    },
+    "default_compact_flag": 0,
+    "operating_applied": false,
+    "native_compact_execution_connected": false
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_files_verified": 140,
+    "structure": {
+      "native/base": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "native/candidate": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "sdk/base": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "sdk/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "management/base": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      },
+      "management/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/alignment.py",
+          "scripts/chat_contract.py",
+          "scripts/harness.py",
+          "scripts/read_contract.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/harness.py",
+          "scripts/read_contract.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/read_contract.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "operating_after_status": "passed",
+    "operating_sources": 50,
+    "after_kst": "2026-11-18T05:32:54.308271+09:00",
+    "structure_is_not_accuracy_or_latency_proof": true
+  },
+  "tests": {
+    "mac_actual_installation_candidate": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 228,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 192,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_actual_installation_candidate": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 228,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 192,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.407s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.551s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "canonical": {
+      "results": {
+        "native": {
+          "rc": 0,
+          "summary": {
+            "run": 430,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "sdk": {
+          "rc": 1,
+          "summary": {
+            "run": 493,
+            "failures": [
+              "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+              "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+              "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+            ],
+            "errors": [
+              "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+            ],
+            "skipped": 0
+          }
+        }
+      },
+      "same_preexisting_sdk_findings": true
+    },
+    "new_module_cases": 16,
+    "skipped": 0
+  },
+  "live_trials": [
+    {
+      "plan_sha256": "0fb268593bcf74fc0a8c0d70dbdd08c98a80b5d910ef12c6ff63f94bc83d9244",
+      "seconds": 87.77265655703377,
+      "parent_mcp_calls": 4,
+      "model_calls": 5,
+      "protected_calls": 0,
+      "read_omission_fixed": true,
+      "accepted_model_report": false,
+      "status": "partial",
+      "stop_reason": "evidence_report_claim_repair_budget_exhausted",
+      "claim_rejections": [
+        [
+          "http_status_used_as_security_outcome"
+        ],
+        [
+          "http_status_used_as_security_outcome"
+        ],
+        [
+          "http_status_used_as_security_outcome"
+        ]
+      ],
+      "human_review": "Correct attached nominalized proof negation was rejected three times. Backend sample matching/absence statements and cross-sensor identifier wording still need careful scope review; no whole-incident success or operating promotion.",
+      "question_variant": "same expanded request",
+      "raw_private_only": true
+    },
+    {
+      "plan_sha256": "701161753fb7af256cf80cda21fd234b71adb52bb71f470c61534da5ba9615ac",
+      "seconds": 67.06603412103141,
+      "parent_mcp_calls": 4,
+      "model_calls": 3,
+      "protected_calls": 0,
+      "read_omission_fixed": true,
+      "accepted_model_report": true,
+      "status": "partial",
+      "stop_reason": null,
+      "semantic_review_passed": false,
+      "semantic_finding": "WAF 차단 관측은 있으나 asserts mediation not established by exposed response/mode/rule fields. Guard extension required before promotion.",
+      "other_fixed_review_finding": "A later failed same underlying query in a different parent bundle must supersede older component success.",
+      "question_variant": "same expanded request",
+      "raw_private_only": true
+    },
+    {
+      "seconds": 67.65118549100589,
+      "parent_mcp_calls": 4,
+      "model_calls": 3,
+      "protected_calls": 0,
+      "plan_sha256": "ad73b9de8f26b8c08a61d5b9a706184376c3bfac924457068c20915c7189ddcc",
+      "assessment": "unresolved",
+      "status": "partial",
+      "guard_issues": [],
+      "accepted_model_report": true,
+      "read_omission_fixed": true,
+      "speed_target_60s_met": false
+    },
+    {
+      "seconds": 47.57841068896232,
+      "parent_mcp_calls": 3,
+      "model_calls": 2,
+      "protected_calls": 0,
+      "plan_sha256": "ad73b9de8f26b8c08a61d5b9a706184376c3bfac924457068c20915c7189ddcc",
+      "assessment": "unresolved",
+      "status": "partial",
+      "guard_issues": [],
+      "web_extra_not_requested": true,
+      "human_semantic_review_passed": false,
+      "human_semantic_finding": "Literal current list table correctly shows zero, but model basis says 차단 상태는 미확인 without identifying historic request blocking or feature mode. This ambiguous scope remains and must not be reported as complete short-answer accuracy."
+    }
+  ],
+  "web_read_limits": {
+    "existing_fixed_targets": [
+      "c:dvwa",
+      "c:lab-console",
+      "c:lab-java",
+      "c:lab-httpd49",
+      "c:lab-httpd50"
+    ],
+    "unmapped_prefix": "/log4shell/",
+    "unmapped_observed_path_count": 2,
+    "invented_log4shell_target": false,
+    "actual_additional_parent_tool": "mcp__security_events__collect_incident_evidence",
+    "successful_bundle_components": [
+      "search_modsecurity_alerts",
+      "get_web_service_target",
+      "search_web_access",
+      "search_wazuh_alerts"
+    ],
+    "actual_web_target": "c:dvwa",
+    "backend_access_source_filter": "unfiltered; proxy source preservation is unverified",
+    "proof_scope": "Read attempts and configured path candidates only; not WAF intervention, actual frontend routing, backend reachability, complete logging or no compromise."
+  },
+  "after_verification": {
+    "at_kst": "2026-11-18T05:32:35.332303+09:00",
+    "same_operating_source_count": 59,
+    "same_model_catalog_access": true,
+    "different_observation_timestamps_preserved": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T05:33:52.330085+09:00",
+    "roots_removed": 7,
+    "files_removed": 1975,
+    "bytes_removed": 75755148,
+    "remaining_owned_roots": 0,
+    "never_started_roots_verified_absent": 0,
+    "operating_model_or_backups_touched": false,
+    "inactive_model_workers": 4,
+    "exported_artifacts_verified": 37,
+    "local_packages_installed": 0,
+    "mac_package_downloads": 0,
+    "framework_and_skill_preserved": true
+  },
+  "remaining": [
+    "Ambiguous short-answer basis calls blocking state unknown despite a literal current list of zero; factual table and model wording are separate.",
+    "Expanded final67.651s exceeds60s; actual Mattermost transport not included.",
+    "Native execution connection, exact administrator deployment and fresh actual chats unverified.",
+    "Two /log4shell/ hints lack existing configuration/access mapping; do not invent c:log4shell.",
+    "Canonical SDK preexisting8 failure entries plus1 error unchanged; no full-suite pass claim."
+  ],
+  "publication": {
+    "state": "pending_commit_and_push",
+    "weights_credentials_private_logs_included": false
+  }
+}

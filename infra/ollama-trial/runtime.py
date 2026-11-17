@@ -717,6 +717,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                             final=''
                             continue  # No partial dispatch; bounded model repair selects again.
                         report['deduplicated_read_selections'] = report.get('deduplicated_read_selections', 0) + removed
+                        reads_before=len(report['calls'])
                         selection_active = True
                         try:
                             for choice in plan['calls']:
@@ -724,6 +725,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         finally:
                             selection_active = False
                         await complete_service_identity_reads()
+                        if (incident_gap and len(report['calls'])>reads_before
+                                and harness.incident_evidence_gap(current, report['calls'],reference,service_plan)):
+                            # A new bounded read batch is investigation progress,
+                            # not a failed answer repair. Model/tool caps still apply.
+                            repair_passes-=1
+                            report['incident_read_batches']=report.get('incident_read_batches',0)+1
                         if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference,service_plan):
                             compact=await evidence_synthesis()
                             if compact is not None:final=compact

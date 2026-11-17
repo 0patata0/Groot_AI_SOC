@@ -124,3 +124,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [목록·가용성 검증](../infra/validation/management-latency/capability-grounding.validation.json)의 5실제 시험과 정정 실패를 유형별 원장에 기록했다. 마지막 짧은 요청의 사실 범위는 확인했으나 확장 조사의 실제 접근·대상 조회는 미완료이며 운영에 적용하지 않았다.
+
+
+[웹 근거 조회 검증](../infra/validation/management-latency/web-evidence-scope.validation.json)의 실제4시험과 두 정정 원인을 유형별 원장에 기록했다. 웹 추가 읽기 누락은 보완했으나 경로 공백·짧은 판단문의 범위 표현·운영 연결은 미완료다.

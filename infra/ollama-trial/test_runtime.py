@@ -19,7 +19,7 @@ def unresolved_report(text):
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None, incident_repair_scope=False, compact_plans=None, extra_read_error=False, compact_parse_error=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None, incident_repair_scope=False, compact_plans=None, extra_read_error=False, compact_parse_error=False, read_fixtures=None):
         calls, prompts = [], []
         self.selector_prompts=[];self.agent_system_prompts=[];self.compact_prompts=[];self.compact_schemas=[]
         selector_prompts=self.selector_prompts;agent_system_prompts=self.agent_system_prompts
@@ -31,13 +31,22 @@ class PreparationLoop(unittest.TestCase):
         if read_incident:
             available['security-events']=['search_modsecurity_alerts']
             if compact_plans is not None:available['security-events'].append('search_wazuh_alerts')
+        for alias in read_fixtures or {}:
+            server,name=alias.removeprefix('mcp__').split('__');server=server.replace('_','-')
+            available.setdefault(server,[])
+            if name not in available[server]:available[server].append(name)
         class Connector:
             def __init__(self, server): self.server = server
             async def list_tools(self):
-                return [types.SimpleNamespace(name=name,description='fixture',inputSchema={
-                    'type':'object','properties':{'target':{'type':'string'}}}) for name in available[self.server]]
+                return [types.SimpleNamespace(name=name,description='fixture',inputSchema=(read_fixtures or {}).get(
+                    'mcp__'+self.server.replace('-','_')+'__'+name,({'type':'object','properties':{'target':{'type':'string'}}},None))[0])
+                    for name in available[self.server]]
             async def call_tool(self, name, arguments, **kw):
                 calls.append(name)
+                fixture=(read_fixtures or {}).get('mcp__'+self.server.replace('-','_')+'__'+name)
+                if fixture:
+                    data=fixture[1](arguments)
+                    return types.SimpleNamespace(isError=False,content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
                 if extra_read_error and name=='search_wazuh_alerts':
                     return types.SimpleNamespace(isError=True,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'fixture unavailable'}))])
                 if incident_read_error and name=='search_modsecurity_alerts' and len(calls)==1:

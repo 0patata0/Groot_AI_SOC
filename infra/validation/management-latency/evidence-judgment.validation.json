@@ -370,9 +370,11 @@
     "actual_safety_basis": "explicitly verified 36-read exposure plus independent actual-call audit"
   },
   "publication": {
-    "state": "pending",
-    "content_commit": null,
-    "remote_match_at_kst": null
+    "state": "content_published",
+    "content_commit": "8adaed8b6c03bf723cb9a2bb071527087c86d2ae",
+    "remote_main_at_content_publication": "8adaed8b6c03bf723cb9a2bb071527087c86d2ae",
+    "remote_match_at_kst": "2026-11-18T02:39:23.714180+09:00",
+    "receipt_committed_separately": true
   },
   "documentation": {
     "skill": "humanize-korean v2.3-codex",

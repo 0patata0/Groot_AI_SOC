@@ -1894,3 +1894,15 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 ## 2026-11-18 근거 결속 구조화 판단
 
 [16사본 후보·운영 미적용](STATUS_HISTORY.md#2026-11-18-근거-결속-구조화-판단).
+
+
+<!-- evidence-judgment:publication -->
+
+| 게시 항목 | 값 |
+| --- | --- |
+| 내용 커밋 | `8adaed8b6c03bf723cb9a2bb071527087c86d2ae` |
+| 원격 main 일치 | `2026-11-18T02:39:23.714180+09:00` |
+| 공개 파일 | 24 |
+| 비밀정보 검사 | 추적 2382·기존 합성 fixture 10·신규 0 |
+| 운영 적용 | 미적용 |
+| 실험 기본값 | `CAPSTONE_EVIDENCE_REPORT_COMPACT=0` |

@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-자동 관리의 [중단 보고 복구](../infra/validation/management-latency/README.md)는 운영 B에 적용했다. 초기 설치기도 공통 진단 모듈2개를 호스트 관리 경로에 배치하며 기존 Python·SQLite를 사용한다. 설치 회귀47개와 실제 보존 기록·격리 강제 종료 복구는 확인했지만 새 OS 전체 설치·양봇 새 채팅·응답30~60초 달성은 미완료다. 아래 조정 실행기의 미적용 상태와 구분한다.
+[양봇 공통 보강 이관](../infra/validation/management-latency/README.md)에서는 운영 B의 Native/SDK8사본과 SDK영수증을20:08 KST 확정했다. Mac·Linux각17검사와 운영 Harness² `passed`를 확인했으며 새 단순 조회4건은11.454~28.963초였다. MCP 구조·모델·권한은 유지한다. WAF 조회 범위 차이·SDK 시간 셀·복합 조사30~60초는 남았고 새 OS 전체 설치·브라우저 시각 검수는 미수행이다.
 
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 

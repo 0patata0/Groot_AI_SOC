@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "status": "operating_alignment_confirmed",
+  "observed_and_confirmed_at_kst": "2026-11-17T20:08:08.148486+09:00",
+  "operating_route": "Mac-admin231-A-B",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_tools": 45,
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "source_reference_commit": "20897066b25da6a097129d36c4a8a9bbb608e7b2",
+  "changes": {
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "after_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/SKILL.md": {
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "before_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "after_sha256": "c005df65a5be8829206fd37dd70ec39c5627d9a3cb5685574ac356ef26624665"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "after_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "after_sha256": "e7e16ec9c7e435db3ed268f93a973dfd51444f5464f0afc62648b2a596d1c3de"
+    },
+    "/opt/capstone-ollama-trial/grounding.py": {
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "before_sha256": "795af33e90b13669bb313c46bfd034d3221e6350192c2946322a62217e502244",
+      "after_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac"
+    },
+    "/opt/capstone-ollama-trial/SKILL.md": {
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "before_sha256": "973bc95323cca51bc1fffebb40cb2bb64fcd45c5e92a4edc522fabe3ee583926",
+      "after_sha256": "c005df65a5be8829206fd37dd70ec39c5627d9a3cb5685574ac356ef26624665"
+    },
+    "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "before_sha256": "50825f277ea034916546d05ea908d30ed698419e8b519f730ee7357952016c40",
+      "after_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5"
+    },
+    "/opt/capstone-ollama-trial/query_grounding.py": {
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "before_sha256": "eb56d14a7edbe23baa7c5ec65552698a87facaa79f9e707fea0cbcbc29d97eb9",
+      "after_sha256": "e7e16ec9c7e435db3ed268f93a973dfd51444f5464f0afc62648b2a596d1c3de"
+    }
+  },
+  "operating_files": 9,
+  "protected_unchanged": 10,
+  "planned_hermes_restarts": 1,
+  "same_container_and_image": true,
+  "database_unchanged_while_stopped": true,
+  "sdk_receipt_sources": 20,
+  "review_receipt_sources": 5,
+  "query_receipt_reconciliation": {
+    "unchanged_installed_sha256": "fb32b1a6634c2b2acd2585065b06b50c3747a9a705af22881d343e937588e1cb",
+    "provenance_commit": "1bd545512e7817ad69e4b1e8619d8002dbdef3e9"
+  },
+  "tests": {
+    "Mac": {
+      "run": 17,
+      "candidate_failures": 0,
+      "base_failures": 4
+    },
+    "Linux": {
+      "run": 17,
+      "candidate_failures": 0,
+      "base_failures": 4
+    },
+    "official_harness2": {
+      "commit": "6868817518876de8fd170c6a8354daca273b6191",
+      "native_files": 18,
+      "sdk_files": 20,
+      "management_files": 12,
+      "always_on_char_delta": 0,
+      "operating_audit_status": "passed",
+      "report_sha256": "191a82a49f965fb92dbe9df4a241afb1ef8317032cea89dd217d1c5aedb47665",
+      "observed_at_kst": "2026-11-17T20:04:00.595494+09:00"
+    }
+  },
+  "fresh_chat_tests": [
+    {
+      "engine": "Hermes Native",
+      "question": "지금 임시차단 목록 보여줘",
+      "response_seconds": 28.963,
+      "actual_reads": 1,
+      "tools": [
+        "resp.list_blocks"
+      ],
+      "result": "blocks_empty_verified"
+    },
+    {
+      "engine": "Ollama SDK",
+      "question": "지금 임시차단 목록 보여줘",
+      "response_seconds": 14.658,
+      "actual_reads": 1,
+      "tools": [
+        "resp.list_blocks"
+      ],
+      "result": "blocks_empty_verified",
+      "model_seconds": 10.275350124982651,
+      "tool_seconds": 0.14640076796058565,
+      "initialization_seconds": 3.9914652459556237
+    },
+    {
+      "engine": "Hermes Native",
+      "question": "최근 WAF 차단 경보 3건만 표로 보여줘",
+      "response_seconds": 23.1,
+      "actual_reads": 2,
+      "tools": [
+        "security-events.search_modsecurity_alerts"
+      ],
+      "lookback_minutes": [
+        60,
+        480
+      ],
+      "returned_counts": [
+        0,
+        3
+      ],
+      "result": "three_rows_fields_verified_against_actual_tool_messages"
+    },
+    {
+      "engine": "Ollama SDK",
+      "question": "최근 WAF 차단 경보 3건만 표로 보여줘",
+      "response_seconds": 11.454,
+      "actual_reads": 1,
+      "tools": [
+        "security-events.search_modsecurity_alerts"
+      ],
+      "lookback_minutes": [
+        60
+      ],
+      "returned_counts": [
+        0
+      ],
+      "result": "empty_sample_and_scope_limit_verified",
+      "model_seconds": 10.5284884069697,
+      "tool_seconds": 0.032900229038205,
+      "initialization_seconds": 0.785280745010823
+    }
+  ],
+  "limits": [
+    "Four fresh read-only questions; no paired before-after or controlled GPU benchmark.",
+    "Different WAF query windows prevent an equal-coverage comparison.",
+    "SDK window renderer retains two timestamps in one cell; common followup remains.",
+    "Native installed adapter has no persistent load receipt; source/pin, agent alias log and fresh actual tool messages were checked.",
+    "Server audit manifest still omits two separately checked host pure modules.",
+    "Browser visual rendering, complex investigation, approval/write/attack E2E, manual full rollback and new OS installation were not performed."
+  ],
+  "recovery": {
+    "root": "/var/lib/capstone-chat-alignment/20261117-r3-b38a81a626",
+    "independent_timer_minutes": 15,
+    "timer_after_confirm": "inactive",
+    "confirmed_rollback_noop": true,
+    "manual_restore_tested": false,
+    "source_and_receipt_backups_preserved": true
+  },
+  "preparation_failures": {
+    "count": 2,
+    "reason": "nonexistent historical manifest/siem receipt paths",
+    "operating_changes_after_failed_preparation": 0,
+    "raw_failures_preserved": true,
+    "final_guarded_absent_paths": 2
+  },
+  "cleanup": {
+    "server_stage_removed_files": 85,
+    "server_stage_removed_bytes": 6100936,
+    "b_failed_units": 0,
+    "mac_package_installations": 0
+  },
+  "authority_changes": 0,
+  "new_mcp_tools": 0,
+  "attack_tests": 0,
+  "new_training": 0
+}

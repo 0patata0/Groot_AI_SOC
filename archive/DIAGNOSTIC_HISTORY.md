@@ -1,5 +1,9 @@
 # 진단 탐색 이력
 
+## 실제 새 채팅·구조·준비 실패의 구분 (2026-11-17)
+
+설치본 기준 Mac/Linux각17검사는 기존4실패→후보0실패였고 운영 Harness² 사본 차이는 해소됐다. 새 임시차단 조회는 Native28.963초/SDK14.658초, WAF는 Native23.100초/SDK11.454초다. Native는60→480분3표본, SDK는60분0표본으로 범위가 달랐다. 준비2회는 실제 없는 manifest/siem 경로에서 실패해 적용하지 않았으며 실패 기록을 보존했다. 현재 보호10파일·2부재 경로를 확인한 후보만 적용했다. 서버 시험85파일/6,100,936B 제거와 B failed0을 확인했다. [상세·측정 한계](../infra/validation/management-latency/README.md).
+
 ## 실제 Docker·Wazuh 구조·nginx 시험 방식 정정 (2026-11-17)
 
 첫 B 시험은 고정 PATH에 /usr/local/bin이 없어 Docker를 찾지 못했다. 두 설치 경로와 로컬 소켓을 고정했다. 새 설치 예제의 Wazuh volume 경로는 운영에 없었고 실제 관리자 컨테이너에서2개 global/whitelist2개를 확인했다. 한 global만 가정한 코드를 고쳤다. A nginx의 /dev/stdin 검사는 빈 설정으로 읽혀 events 부재로 실패했으나 임시 일반 파일·trap 제거로 바꿔 통과했다. 실패 기록을 보존하고 최종 서버 시험 폴더0을 확인했다.

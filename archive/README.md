@@ -1,5 +1,9 @@
 # 과거 기록과 복원 안내
 
+<!-- chat-alignment:history -->
+
+[양봇 공통 보강](../infra/validation/management-latency/README.md)의 운영 확정·새4채팅·실제5읽기·준비 실패2회·검증/복구/정리를 유형별 이력에 남겼다. Native/SDK 이관·구조 passed와 복합 조사·조회 범위·시간 셀의 미완료를 구분한다. 앞선 미완료 문구는 당시 관측으로 보존한다.
+
 관리정책 고정 조회와 A4/B2/C2 파일 후보의 관측·실패·정정도 유형별 이력에 추가했다. Mac87/Linux87·생략0과 구문 검사는 운영 적용·엔진 로드·전역 MCP/승인/복구 완료와 구분한다.
 
 현재 요약은 [STATUS](../STATUS.md), 활성 작업은 [PLAN](../PLAN.md)을 따른다. [실행기의 정리·현재 설치 검증](../infra/validation/journal-composition/COORDINATOR.md)과 [관리대역 전역 요구사항](../infra/mcp/management-policy.md)을 유형별 이력에 기록했다. 소스와 구조/격리 검사, 실제 운영 인수는 구분하며 이전 미완료 문구는 당시 관측으로 보존한다.

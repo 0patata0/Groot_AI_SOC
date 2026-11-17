@@ -1,5 +1,9 @@
 # 초기 설치의 승인형 SOC 관리 확장
 
+<!-- chat-alignment:current -->
+
+[양봇 공통 보강 이관](../infra/validation/management-latency/README.md)에서는 운영 B의 Native/SDK8사본과 SDK영수증을20:08 KST 확정했다. Mac·Linux각17검사와 운영 Harness² `passed`를 확인했으며 새 단순 조회4건은11.454~28.963초였다. MCP 구조·모델·권한은 유지한다. WAF 조회 범위 차이·SDK 시간 셀·복합 조사30~60초는 남았고 새 OS 전체 설치·브라우저 시각 검수는 미수행이다.
+
 자동 관리의 중단 보고를 위해 `soc_management.py`의 소스 묶음에 공통 `chat_contract.py`·`read_contract.py`를 포함하고 `/opt/capstone-management/`에도 설치한다. 호스트 보고서가 컨테이너 전용 경로에 의존하지 않게 하는 순수 Python 의존성이다. 기존 SQLite에 성공 읽기 체크포인트를 저장하고 중단 복구는 실제 도구 원장과 검증된 근거만 보고하며 작업을 재실행하지 않는다. Mac 설치 회귀47개·호스트 의존성 격리 검사와 운영 B의 실제 기록 재처리·격리 SIGKILL 복구를 확인했다. 추가 패키지·포트·키·MCP 도구·승인 권한은 없으며 새 OS 전체 설치는 미수행이다. [적용·검증·복구의 범위](../infra/validation/management-latency/README.md).
 
 2026-11-08 증거 가드레일: 공통82/query129와 `infra/hermes/SOUL.groot.md`·`chat_contract.py`·`soc_management_run.py`를 기존 `deploy.sh`/source_bundle/역할 복사 경로에 함께 포함한다. 새 패키지·포트·키·일반 권한은 추가하지 않는다. 운영16파일·28manifest 확인과 새 OS 전체 설치는 별개다. [배포·검증·복구·한계](../infra/hermes/evidence-guardrails.md).

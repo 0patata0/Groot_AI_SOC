@@ -1,5 +1,9 @@
 # Harness² 보완 점검
 
+<!-- chat-alignment:current -->
+
+[양봇 공통 보강 이관](../management-latency/README.md)에서는 운영 B의 Native/SDK8사본과 SDK영수증을20:08 KST 확정했다. Mac·Linux각17검사와 운영 Harness² `passed`를 확인했으며 새 단순 조회4건은11.454~28.963초였다. MCP 구조·모델·권한은 유지한다. WAF 조회 범위 차이·SDK 시간 셀·복합 조사30~60초는 남았고 새 OS 전체 설치·브라우저 시각 검수는 미수행이다.
+
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.
 <!-- diagnostic-read-boundaries:end -->

@@ -432,7 +432,19 @@
     "Canonical SDK preexisting8 failure entries plus1 error unchanged; no full-suite pass claim."
   ],
   "publication": {
-    "state": "pending_commit_and_push",
-    "weights_credentials_private_logs_included": false
+    "state": "content_published",
+    "content_commit": "f05307cc75838ac1ae248bb3fd2451d6a67fdfe4",
+    "remote_main_at_content_publication": "f05307cc75838ac1ae248bb3fd2451d6a67fdfe4",
+    "remote_match_at_kst": "2026-11-18T05:42:16.251269+09:00",
+    "receipt_committed_separately": true
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-006-91ff",
+    "route": "light",
+    "change_rate": 0.0001,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0
   }
 }

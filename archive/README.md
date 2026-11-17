@@ -136,3 +136,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·입력형 검증 공백은 유형별 `thesis-mcp-contract-20261117` 이력을 참조한다. 운영 수정과 새 독립 재구현은 별도다.
+
+<a id="thesis-outline-correction-20261118"></a>
+논문 목차 재수정의 결과·완료 범위·구조 선택·출력 검수는 [상태 이력](STATUS_HISTORY.md#thesis-outline-correction-20261118)·[계획 이력](PLAN_HISTORY.md#thesis-outline-correction-20261118)·[설계 이력](DESIGN_ALTERNATIVES.md#thesis-outline-correction-20261118)·[검증 이력](DIAGNOSTIC_HISTORY.md#thesis-outline-correction-20261118)에 보존했다. 운영 배포 변경은 없어 새 배포 이력을 추가하지 않았다.

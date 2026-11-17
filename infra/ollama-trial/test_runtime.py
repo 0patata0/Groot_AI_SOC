@@ -351,5 +351,15 @@ class QuestionScope(unittest.TestCase):
         for request in ({},{'question_scope_reads':False}):
             self.assertIs(runtime.question_scope_schema(request,'mcp__security_events__search_wazuh_alerts',self.WAZUH,self.Q,self.AT),self.WAZUH)
 
+    def test_peer_scope_keeps_explicit_current_block_companion(self):
+        q='WAF와 IDS 경보를 조사하고 현재 IP 차단과 실제 요청 차단을 구분해줘'
+        names=runtime.question_scope_tools({'question_scope_reads':True},q)
+        self.assertEqual(set(names),{'mcp__security_events__search_modsecurity_alerts',
+            'mcp__security_events__search_suricata_alerts','mcp__resp__list_blocks'})
+        self.assertTrue(all(runtime.harness.EVIDENCE.allowed(n,'verify') for n in names))
+        self.assertIsNone(runtime.question_scope_tools({},q))
+        history='WAF와 IDS 경보를 조사하고 어제 차단 이력 확인해줘'
+        self.assertNotIn('mcp__resp__list_blocks',runtime.question_scope_tools({'question_scope_reads':True},history))
+
 
 if __name__=='__main__':unittest.main()

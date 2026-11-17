@@ -1,0 +1,376 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T01:09:13.088628+09:00",
+  "state": "candidate_read_coverage_fixed_quality_promotion_withheld",
+  "operating_source_changes": 0,
+  "service_restarts": 0,
+  "mattermost_posts": 0,
+  "protected_calls": 0,
+  "attack_packets": 0,
+  "training_runs": 0,
+  "new_mcp_tools": 0,
+  "registered_mcp_tools": 45,
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "candidate": {
+    "files": 13,
+    "plan_sha256": "ebcb448bb09d9dc4c9c11acd76168ce34abe2578f53789b32dfc55f8bc5b51af",
+    "canonical_sources": {
+      "infra/hermes/read_contract.py": "c8b06a282314548562cf6ef3ce32aab1d7dd993a432394150c01e68dd189209b",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "c02ff22c470a87df790435484d2a59f2fe27ce2b96836dcdfe26612d34c35939",
+      "infra/ollama-trial/harness.py": "679c3511f3d38be35145a6ae47ac94f3f39e21e0064798545bd7f3590fe22bec",
+      "infra/ollama-trial/runtime.py": "7ffc4220fea78b5a676a812a98607237c7bf59148cc05f486b19a3aba14cba30",
+      "infra/ollama-trial/test_runtime.py": "b02eabc069dd1d5fbf01a2d72bb64ab5f1e4abe4d18080280a0152401ca2be98",
+      "infra/ollama-trial/test_companion_reads.py": "2889ab72891beeb21cc5a0f10835e7515df20c1334f8f9019d8b29b057e33a86",
+      "infra/ollama-trial/test_compound_facts.py": "a52d3035ad5619bce75a6a1aa184649f26b6c7465214472ed20e9a9e63176395"
+    },
+    "operating_candidates": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "bytes": 305165,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "e7f7062b368b3bfeb1d6e8698ca48d0317a2c81378f8b5762604e2a6042219fc",
+        "kind": "observation context plus named sensor/current-list receipt coverage and exact registered selection"
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "bytes": 305165,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "e7f7062b368b3bfeb1d6e8698ca48d0317a2c81378f8b5762604e2a6042219fc",
+        "kind": "observation context plus named sensor/current-list receipt coverage and exact registered selection"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "bytes": 46191,
+        "before_sha256": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "after_sha256": "0e1d40fd89823686963ff8eb7096031e50392f8fa9e2074475e467aba7f80a26",
+        "kind": "current read display projection and one in-turn repair call; audit retained"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "bytes": 50098,
+        "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "after_sha256": "0876afa308228ee28bae71517e9101fc46d6b8c6230b1059a95d411db9eaf2e5",
+        "kind": "retained context plus peer companion read scope"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "bytes": 3414,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "bytes": 3414,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "bytes": 3414,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "614cf5878fd00f01386babbda88d5634012e589a99a703b7279147ae5119e5bc",
+        "kind": "two existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "bytes": 16513,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "c9ecbff741021aaf9c71720b19459768ac1703be4f2327945644f141642dd49d",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "bytes": 16513,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "c9ecbff741021aaf9c71720b19459768ac1703be4f2327945644f141642dd49d",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "bytes": 16513,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "c9ecbff741021aaf9c71720b19459768ac1703be4f2327945644f141642dd49d",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+        "bytes": 79535,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "kind": "common current-block read intent; no new endpoint or permission"
+      },
+      "/opt/capstone-ollama-trial/read_contract.py": {
+        "bytes": 79535,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "kind": "common current-block read intent; no new endpoint or permission"
+      },
+      "/opt/capstone-management/read_contract.py": {
+        "bytes": 79535,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "10ff4d79f2dc72d022adefc32d8587549673b36bbc20d2a43a56774078c7eee7",
+        "kind": "common current-block read intent; no new endpoint or permission"
+      }
+    }
+  },
+  "tests": {
+    "actual_installation_mac": {
+      "native": 169,
+      "sdk": 118,
+      "skipped": 0,
+      "passed": true
+    },
+    "actual_installation_linux": {
+      "native": 169,
+      "sdk": 118,
+      "harness2": 38,
+      "installer": 37,
+      "skipped": 0,
+      "passed": true
+    },
+    "canonical_native": {
+      "tests": 430,
+      "passed": true
+    },
+    "canonical_sdk": {
+      "tests": 422,
+      "existing_failure_entries": 8,
+      "existing_error_entries": 1,
+      "new_failed_methods": 0,
+      "passed": false
+    },
+    "canonical_service_contract": {
+      "full_local_tests": 147,
+      "missing_openai_error_entries": 13,
+      "companion_block_tests_passed": 7,
+      "package_installations": 0
+    }
+  },
+  "harness2": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_files": 140,
+    "observed_operating_sources": 50,
+    "always_on_character_delta": 0,
+    "new_mcp_tools": 0,
+    "structural_pass_is_quality_pass": false
+  },
+  "model_experiments": [
+    {
+      "basis": "fresh live registered MCP in isolated SDK, not Mattermost transport",
+      "plan_sha256": "1ff104f25f459f5c55a34222b22fe1f190a6158aa993fcfa02070e4166905ea4",
+      "question": "지난 24시간 WAF와 IDS 경보에서 같은 출발지가 있는지 조사해줘. 현재 차단된 IP도 대조하고, 요청 차단과 IP 차단은 구분해줘.",
+      "at_kst": "2026-11-18T00:44:12.340225+09:00",
+      "status": "partial",
+      "manual_verdict": "rejected_unread_block_list",
+      "seconds": 95.355181,
+      "model_calls": 4,
+      "incident_judgment_audit_present": true,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "unobserved_block_list_claim"
+      ],
+      "stop_reason": null,
+      "reads": [
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "8f38128347e2821507b1fe25be7280a5234bd60c6c9c673b74174b6db29983fe",
+          "returned_count": 10,
+          "limit": 10
+        },
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "bbb99215b9834ddde1aa8a893e3d81d753df235d82153a9ad50fed333fdc0378",
+          "returned_count": 10,
+          "limit": 10
+        }
+      ],
+      "final_response_sha256": "8931aa8dbd017056a6131f2e60a199088b1e98100c19db8b98270d5ab4ad439b"
+    },
+    {
+      "basis": "fresh live registered MCP in isolated SDK, not Mattermost transport",
+      "plan_sha256": "f83b15904df048905469c9d53cb76a23ef3edfdaa510d058c17debf992405d51",
+      "question": "지난 24시간 WAF와 IDS 경보에서 같은 출발지가 있는지 조사해줘. 현재 차단된 IP도 대조하고, 요청 차단과 IP 차단은 구분해줘.",
+      "at_kst": "2026-11-18T00:49:11.160421+09:00",
+      "status": "partial",
+      "manual_verdict": "rejected_http_status_causality",
+      "seconds": 101.094891,
+      "model_calls": 3,
+      "incident_judgment_audit_present": true,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "http_status_used_as_security_outcome"
+      ],
+      "stop_reason": "repeated_unchanged_judgment",
+      "reads": [
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "5df67bf4620a66b3f7c6afb602d1e9e53e6ae5a3c042a08c91d92cea944c9c94",
+          "returned_count": 10,
+          "limit": 10
+        },
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "d631043415e2c44035d9819c0b889578b03b77ad9c8e5df662d8fe4b7b6e9456",
+          "returned_count": 10,
+          "limit": 10
+        },
+        {
+          "tool": "mcp__resp__list_blocks",
+          "arguments": {},
+          "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "returned_count": null,
+          "limit": null
+        }
+      ],
+      "final_response_sha256": "d04f166ed10cab0255b62ee240fc4595ad24673fc71634352673dac4dcca764d"
+    },
+    {
+      "basis": "fresh live registered MCP in isolated SDK, not Mattermost transport",
+      "plan_sha256": "e86b704b84f6dd6ec8f301bb3308ed4f9cb5007d026b988c6bd87a099757d6de",
+      "question": "최근 24시간 ModSecurity와 Suricata 경보의 공통 출발지를 비교해줘. 현재 IP 차단 상태도 확인하고, 웹 요청 차단을 입증할 근거가 있는지 구분해줘.",
+      "at_kst": "2026-11-18T00:54:27.942481+09:00",
+      "status": "completed",
+      "manual_verdict": "rejected_automatic_completed_by_manual_source_audit",
+      "seconds": 77.577667,
+      "model_calls": 2,
+      "incident_judgment_audit_present": false,
+      "protected_calls": 0,
+      "remaining_issues": [],
+      "stop_reason": null,
+      "reads": [
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "limit": 50
+          },
+          "result_sha256": "91c8361169103a15a795d07c7ec163ea0e00a125f95e1b393f769c3ff3d3bd97",
+          "returned_count": 19,
+          "limit": 50
+        },
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "limit": 50
+          },
+          "result_sha256": "a3f6bdfedcfa41a8b340f735b12a505597f14a67dc41fffc65e0c54c038583ac",
+          "returned_count": 48,
+          "limit": 50
+        },
+        {
+          "tool": "mcp__resp__list_blocks",
+          "arguments": {},
+          "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "returned_count": null,
+          "limit": null
+        }
+      ],
+      "final_response_sha256": "46aa26038dd73fbb4f46a98b587172b07b17628dc12982ea5753411d8e355e7b"
+    },
+    {
+      "basis": "fresh live registered MCP in isolated SDK, not Mattermost transport",
+      "plan_sha256": "ebcb448bb09d9dc4c9c11acd76168ce34abe2578f53789b32dfc55f8bc5b51af",
+      "question": "최근 24시간 WAF·IDS 경보를 조사해서 출발지를 장비별로 비교해줘. 현재 IP 차단 상태와 웹 요청 차단 근거도 따로 확인해줘.",
+      "at_kst": "2026-11-18T01:05:48.011206+09:00",
+      "status": "partial",
+      "manual_verdict": "guard_incomplete_repeated_causality",
+      "seconds": 147.321878,
+      "model_calls": 4,
+      "incident_judgment_audit_present": true,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "http_status_used_as_security_outcome"
+      ],
+      "stop_reason": "repeated_unchanged_judgment",
+      "reads": [
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "17189e4fa62de07746e01ec9dc9f3402e1482317279dd7c37023b2dc12c41452",
+          "returned_count": 10,
+          "limit": 10
+        },
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440
+          },
+          "result_sha256": "c949f8d09b6df2a608d31e84fdf20d688b035e53e84deed094f89bd02d201544",
+          "returned_count": 10,
+          "limit": 10
+        },
+        {
+          "tool": "mcp__resp__list_blocks",
+          "arguments": {},
+          "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "returned_count": null,
+          "limit": null
+        }
+      ],
+      "final_response_sha256": "99ba44d85f4d8c06b448bf1b4758214e635e29c3c9f1c6fde995222f66805c14"
+    }
+  ],
+  "failed_completed_response_recheck": {
+    "wire_receipts_unchanged": true,
+    "original_status": "completed",
+    "original_remaining_issues": [],
+    "incident_judgment_audit_present": false,
+    "after_guard_issues": [
+      "http_status_used_as_security_outcome",
+      "source_address_attributed_to_wrong_sensor"
+    ],
+    "manual_quality_passed": false,
+    "reason": [
+      "HTTP403-only WAF block attribution",
+      "WAF source includes an address observed only by the peer sensor"
+    ],
+    "comparison_classified_as_incident": false
+  },
+  "interpretation": [
+    "Three actual reads fix the companion omission in the observed investigative request, not all natural language requests.",
+    "A completed runtime status is not a quality verdict.",
+    "The comparison question skipped incident judgment audit; field checks now run for actual event reads regardless of intent classification.",
+    "All model cases differ in wording and sample limit; no speedup ratio, average, p95 or Mattermost SLA established."
+  ],
+  "remaining": [
+    "Evidence-bound concise judgment and effective correction instead of repeated invalid drafts.",
+    "Read coverage and workflow choice for compound factual comparisons.",
+    "Native and SDK fresh real chat after quality acceptance; exact admin-route deployment remains undone.",
+    "Boot/power interruption and new OS installation are separate unperformed checks."
+  ],
+  "cleanup": {
+    "state": "verified_complete",
+    "owned_server_roots_removed": 8,
+    "files_removed": 2492,
+    "bytes_removed": 96832528,
+    "sha_verified_exported_artifacts": 44,
+    "remaining_roots": 0,
+    "mac_package_installations": 0,
+    "preserved": [
+      "operating sources",
+      "rollback backups",
+      "official Harness2",
+      "models",
+      "local source and evidence"
+    ]
+  },
+  "git": {
+    "state": "publication_pending",
+    "base_head": "9a2d154c8756bc82e7a3dc86f2f5a2b84bb47d93"
+  },
+  "operating_recheck": {
+    "sources": 59,
+    "unchanged": true,
+    "at_kst": "2026-11-18T01:10:15.330811+09:00",
+    "harness2_status": "passed",
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108"
+  }
+}

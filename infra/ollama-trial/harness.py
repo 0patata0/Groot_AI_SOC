@@ -1355,9 +1355,11 @@ def violations(question, answer, calls, reference=None, service_plan=None, *, at
                     or any(not observed.get(t) for t in subject['requested'])):
                 issues.append('unverified_service_state_claim')
     issues.extend(action_claim_violations(question, answer, calls))
+    # Actual event-field claims need the same check in listings/comparisons;
+    # their truth does not depend on classifying the question as an incident.
+    issues.extend(incident_field_violations(answer, calls))
     if EVIDENCE.incident_investigation_request(normalized(question)):
         issues.extend(incident_context_violations(answer))
-        issues.extend(incident_field_violations(answer, calls))
         if (re.search(r'^MANAGEMENT_STATUS:', answer, re.M)
                 and EVIDENCE.management_status_problem(answer)):
             issues.append('invalid_management_status_format')
@@ -1387,12 +1389,24 @@ def incident_field_violations(answer, calls):
     """
     calls=evidence_reads(calls)
     rows = []
+    sensor_sources = {}
     for call in calls:
         if (call.get('server') == 'security-events'
                 and call.get('name') in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts')):
             data = payload(call)
-            if data and isinstance(data.get('alerts'), list):
+            for _ in range(3):
+                if not isinstance(data,dict) or not set(data) <= {'result','isError','is_error'}:break
+                if data.get('isError') or data.get('is_error') or not isinstance(data.get('result'),str):
+                    data=None;break
+                try:data=json.loads(data['result'])
+                except (ValueError,TypeError):data=None;break
+            if isinstance(data,dict) and isinstance(data.get('alerts'), list):
                 rows.extend(r for r in data['alerts'][:50] if isinstance(r, dict))
+                family=call['name'].removeprefix('search_').removesuffix('_alerts')
+                if data.get('source')==family:
+                    sensor_sources.setdefault(family,set()).update(
+                        r['source_ip'] for r in data['alerts'][:50]
+                        if isinstance(r,dict) and isinstance(r.get('source_ip'),str))
     if not rows:
         return []
     issues = set()
@@ -1419,12 +1433,29 @@ def incident_field_violations(answer, calls):
                               r'(?:이므로|입니다|이다|라서|로\s*(?:동작|운영|설정))', line, re.I)
                 and not uncertain and not re.search(r'경보|기록|당시|가정|만약', line)):
             issues.add('event_mode_presented_as_current_configuration')
-        if (re.search(r'(?:HTTP\s*|응답\s*(?:코드\s*)?|상태\s*(?:코드\s*)?)[2345]\d{2}(?!\d)', line, re.I)
-                and re.search(r'이므로|으므로|때문|뜻|의미|시사|보여|나타|따라서|보아|통해', line)
+        http_status=re.search(r'(?:HTTP(?:[_\s-]*status)?|응답\s*(?:코드\s*)?|상태\s*(?:코드\s*)?)(?:는|은|이|가)?\s*[:=]?\s*[2345]\d{2}(?!\d)',line,re.I)
+        causal=(re.search(r'이므로|으므로|때문|뜻|의미|시사|보여|나타|따라서|보아|통해',line)
                 and re.search(r'(?:WAF|ModSecurity).{0,35}(?:차단|거부|리다이렉트)|'
-                              r'(?:침해|명령\s*실행|공격).{0,15}(?:성공|실패)', line, re.I)
-                and not uncertain):
+                              r'(?:침해|명령\s*실행|공격).{0,15}(?:성공|실패)',line,re.I))
+        block_assertion=(re.search(r'WAF|ModSecurity',line,re.I)
+                and re.search(r'차단(?:이|을|은|는)?\s*(?:입증|확인|성공|됨|됐|되었|되었습니다|했다|했습니다|중)|'
+                              r'(?:요청|트래픽|접근|공격).{0,25}차단(?:되|된|됐|하|했)',line)
+                and not re.search(r'차단.{0,8}(?:않|못)|확인해야|확인할\s*필요',line))
+        if http_status and (causal or block_assertion) and not uncertain:
             issues.add('http_status_used_as_security_outcome')
+        # Bind source claims to their own sensor, not the union of both sensors.
+        # Other cells' sample/count caveats cannot qualify a positive address cell.
+        cells=[s.strip() for s in line.split('|') if s.strip()] if line.lstrip().startswith('|') else []
+        claim=' '.join(cells[:2]) if cells else line
+        families={tool.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
+                  for pattern,tool in INVESTIGATION_ALERT_TOOLS if re.search(pattern,claim,re.I)}
+        if (len(families)==1 and re.search(r'출발지|발신|\bsource\b',line,re.I)
+                and not re.search(r'목적지|도착지|\bdest(?:ination)?\b|→|->',line,re.I)
+                and not re.search(r'미확인|불명|알\s*수\s*없|아님|아니|아닌|가정|제외',claim)):
+            family=next(iter(families))
+            addresses=set(re.findall(r'(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])',claim))
+            if family in sensor_sources and addresses-sensor_sources[family]:
+                issues.add('source_address_attributed_to_wrong_sensor')
         for row in rows:
             digest = row.get('transaction_id_sha256')
             if (isinstance(digest, str) and re.fullmatch(r'[a-f0-9]{64}', digest)
@@ -1498,6 +1529,34 @@ def service_report_receipts(calls):
     return CONTRACT.bind_service_read_attempts(ledger,outputs,{r['tool'] for r in ledger})
 
 
+def incident_required_read_gaps(question, calls):
+    """Missing named sensor/current-list reads, not an incident conclusion."""
+    calls = evidence_reads(calls)
+    required = set(investigation_first_scope(question) or ())
+    latest = {}
+    for call in calls:
+        if not isinstance(call.get('server'), str) or not isinstance(call.get('name'), str):continue
+        name = 'mcp__' + call['server'].replace('-', '_') + '__' + call['name']
+        if name in required:latest[name] = call
+    for name, call in latest.items():
+        if call.get('is_write'):continue
+        data = payload(call)
+        for _ in range(3):
+            if not isinstance(data, dict) or not set(data) <= {'result', 'isError', 'is_error'}:break
+            if data.get('isError') or data.get('is_error'):
+                data = None;break
+            if not isinstance(data.get('result'), str):break
+            try:data = json.loads(data['result'])
+            except (ValueError, TypeError):data = None;break
+        source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
+        if (isinstance(data, dict) and not any(data.get(k) for k in ('error','isError','is_error'))
+                and data.get('source') == source and isinstance(data.get('alerts'), list)):
+            required.discard(name)
+    if READ.companion_block_request(normalized(question)) and READ.block_list_state(calls) is None:
+        required.add('mcp__resp__list_blocks')
+    return required
+
+
 def incident_evidence_gap(question, calls, reference=None, service_plan=None):
     """A read-only incident judgment needs an actual event read, not an inventory.
 
@@ -1512,8 +1571,9 @@ def incident_evidence_gap(question, calls, reference=None, service_plan=None):
             and not CONTRACT.service_history_state(service_plan,service_history_receipts(calls))['incomplete']):return False
     if any(not EVIDENCE.allowed('mcp__' + c.get('server', '').replace('-', '_') + '__' + c.get('name', ''), 'verify') for c in calls):
         return False
-    if reference:return bool(card_evidence_gaps(reference,calls))
-    return not any(c.get('name') in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts',
+    pending = incident_required_read_gaps(question, calls)
+    if reference:return bool(card_evidence_gaps(reference,calls) or pending)
+    return bool(pending) or not any(c.get('name') in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts',
                                      'get_wazuh_alert_summary') and payload(c) for c in calls)
 
 
@@ -1539,7 +1599,8 @@ def incident_evidence_instruction(question, calls=()):
                     '같은 실패 인자를 그대로 재호출하지 마세요.\n<untrusted_failed_reads>\n' +
                     json.dumps({'calls': failed[-6:], 'earlier_failures_omitted': len(failed) > 6},
                                ensure_ascii=False).replace('<', '\\u003c') + '\n</untrusted_failed_reads>')
-    return ('현재 사건 조사 요청: ' + question + '\n이번 요청에서 실제 성공한 경보 조회가 없습니다. '
+    return ('현재 사건 조사 요청: ' + question + '\n요청한 읽기 근거가 아직 모두 확인되지 않았습니다. '
+            + untrusted_observation_json({'pending_read_tools': sorted(incident_required_read_gaps(question,calls))}) + '\n' +
             '앞선 보고는 조회 근거로 사용하지 마세요. 제공된 읽기 도구와 인자를 직접 선택해 사건 근거를 확보하고 '
             '위험·대응 필요성과 미확인을 판단하세요. 규칙 파일 목록이나 정책 설명만으로 사건 조사를 완료하지 마세요. '
             'security-events는 정확한 양끝 시각에 since_kst와 until_kst(초와 +09:00 포함)를 사용합니다. lookback_minutes와 혼용하지 마세요. 종료와 폭만 있으면 기존 until_kst와 lookback_minutes를 사용합니다. '
@@ -1684,18 +1745,19 @@ def repeated_judgment(audits):
 def incident_selection_scope(question, calls, reference=None, service_plan=None):
     if not incident_evidence_gap(question, calls, reference, service_plan):
         return None
-    if reference:return {EVIDENCE.BUNDLE_TOOL}|{'mcp__security_events__search_'+kind+'_alerts' for kind in card_evidence_gaps(reference,calls)}
-    if not calls:
-        first = investigation_first_scope(question)
-        if first:
-            return set(first)
+    pending = incident_required_read_gaps(question, calls)
+    if reference:
+        gaps = card_evidence_gaps(reference,calls)
+        return pending | ({EVIDENCE.BUNDLE_TOOL}|{'mcp__security_events__search_'+kind+'_alerts' for kind in gaps} if gaps else set())
+    first = investigation_first_scope(question)
+    if first and pending:return pending
     scope = {EVIDENCE.BUNDLE_TOOL, 'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_modsecurity_alerts',
              'mcp__security_events__search_suricata_alerts'}
     # Navigation is evidence, not an event or a guessed agent assignment.
     scope.update(('mcp__wazuh_ro__get_wazuh_agents', 'mcp__security_events__get_web_service_target'))
     if not historical_incident_request(question):
         scope.add('mcp__wazuh_ro__get_wazuh_alert_summary')
-    return scope
+    return scope | pending
 
 
 def historical_incident_request(question):
@@ -2871,15 +2933,18 @@ INVESTIGATION_OTHER_SUBJECTS = (
 def investigation_first_scope(question):
     """First read of an alert investigation that names its sensors.
 
-    Only the first selection is bound; later evidence-driven reads keep the
-    full catalog. Any other named subject keeps the broader investigation
+    Requested sensor reads remain pending until each has a valid receipt;
+    later evidence-driven reads keep the full catalog. Other named subjects
+    keep the broader investigation, except an explicit current-list companion
     (2026-11-13 22:47: an unasked cluster-node read with an invalid value
     failed the whole answer, and the peer read agents instead of alerts).
     """
     text = normalized(question)
+    companion = READ.companion_block_request(text)
+    other = [m[0] for m in re.finditer(INVESTIGATION_OTHER_SUBJECTS,text,re.I)]
     if (not EVIDENCE.incident_investigation_request(text) or READ.wants_write(text)
             or not re.search(r'경보|로그|이벤트|alerts?', text, re.I)
-            or re.search(INVESTIGATION_OTHER_SUBJECTS, text, re.I)):
+            or any(not(companion and re.fullmatch(r'차단\s*목록',name)) for name in other)):
         return None
     scope = frozenset(tool for pattern, tool in INVESTIGATION_ALERT_TOOLS if re.search(pattern, text, re.I))
     return scope or None
@@ -2962,7 +3027,7 @@ def missing_reads(question, calls, diagnostic_targets=(), reference=None, servic
     missing=(CONTRACT.service_history_state(service_plan,service_history_receipts(evidence_reads(calls)))['incomplete']
         if service_plan and service_plan.get('only_service') and not reference
         else _missing_reads(question,calls,diagnostic_targets))
-    if READ.companion_block_request(normalized(question)) and READ.block_list_state(evidence_reads(calls)) is None:
+    if 'mcp__resp__list_blocks' in incident_required_read_gaps(question,calls):
         missing=list(dict.fromkeys(missing+['list_blocks: 현재 동적 차단 목록 미확인']))
     return missing
 
@@ -3500,6 +3565,13 @@ def validated_selection(value, schema):
         from jsonschema import ValidationError
         raise ValidationError('firewall_pages_require_sequential_observations')
     Draft202012Validator(schema).validate(result)
+    if schema.get('title') == 'RequiredReadToolSelection':
+        required = {v['properties']['tool']['const'] for v in schema['properties']['calls']['items']['anyOf']}
+        if {item['tool'] for item in calls} != required:
+            from jsonschema import ValidationError
+            error = ValidationError('required_read_tool_coverage')
+            error.validator = 'required_read_tool_coverage'
+            raise error
     return result, removed
 
 
@@ -3522,6 +3594,13 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
                   for family in reference['families'] if 'mcp__security_events__search_'+family+'_alerts' in schemas)
         if count:limit=min(limit,count)
     minimum = 1
+    title = 'ReadToolSelection'
+    first = investigation_first_scope(question)
+    required = set(first or ())
+    if READ.companion_block_request(normalized(question)):required.add('mcp__resp__list_blocks')
+    if not reference and first and set(schemas) <= required and len(schemas) <= limit:
+        minimum = limit = len(schemas)
+        title = 'RequiredReadToolSelection'
     if soc_overview_request(question):
         minimum=len(schemas)
         if not 1 <= minimum <= limit:raise ValueError('soc_overview_selection_budget')
@@ -3530,7 +3609,7 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
         minimum = len(schemas[HOST_INVENTORY_TOOL].get('properties', {}).get('view', {}).get('enum', []))
         if not 1 <= minimum <= limit: raise ValueError('host_inventory_selection_budget')
         limit = minimum
-    return {'title': 'ReadToolSelection', 'type': 'object', 'additionalProperties': False,
+    return {'title': title, 'type': 'object', 'additionalProperties': False,
         'properties': {'calls': {'type': 'array', 'minItems': minimum, 'maxItems': limit, 'uniqueItems': True, 'items': {'anyOf': [
             {'type': 'object', 'additionalProperties': False, 'required': ['tool', 'arguments'],
              'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': EVIDENCE.chat_read_schema(name,schema)}}
@@ -3540,12 +3619,17 @@ def selection_schema(schemas, limit, reference=None, *, question=''):
 def selection_error_feedback(error, plan, schema):
     """Bounded validation facts; never echo argument values or raw model prose."""
     calls = plan.get('calls') if isinstance(plan, dict) else None
-    return {'error': 'read_selection_schema_validation_failed',
+    result = {'error': 'read_selection_schema_validation_failed',
             'validator': str(getattr(error, 'validator', '') or 'selection_constraint')[:80],
             'path': [x if isinstance(x, int) else str(x)[:80] for x in list(getattr(error, 'absolute_path', ()))[:8]],
             'selected_calls': len(calls) if isinstance(calls, list) else None,
             'maximum_calls': schema['properties']['calls']['maxItems'],
             'missing_arguments_at': [i for i, c in enumerate(calls or []) if isinstance(c, dict) and 'arguments' not in c][:40]}
+    if schema.get('title') == 'RequiredReadToolSelection':
+        required = {v['properties']['tool']['const'] for v in schema['properties']['calls']['items']['anyOf']}
+        selected = {c.get('tool') for c in calls or [] if isinstance(c,dict) and isinstance(c.get('tool'),str)}
+        result['missing_tools'] = sorted(required-selected)
+    return result
 
 
 def payload(call):

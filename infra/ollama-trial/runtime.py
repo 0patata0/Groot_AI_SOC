@@ -76,7 +76,8 @@ def question_scope_tools(request, current):
     Hermes' first selection); None keeps the existing catalog."""
     if not request.get('question_scope_reads'):
         return None
-    scope = harness.investigation_first_scope(current)
+    scope = (harness.incident_required_read_gaps(current, [])
+             if harness.investigation_first_scope(current) else None)
     return sorted(scope) if scope else None
 
 

@@ -112,3 +112,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 11/17 근거를 반영한20쪽 최종발표 초안·편집 표/차트·PDF·발표자 메모의 현행화는 유형별 `presentation-refresh-20261117` 이력을 참조한다. 실제 리허설과 최종 발표는 별도다.
+
+
+최근 [동반 조회·주장 검증](../infra/validation/management-latency/companion.validation.json)의 실제 2/3/3읽기와 자동 완료 오답, 공통 필드 검사 보완·13파일 후보 미적용을 유형별 원장에 남겼다. 구조/회귀 통과와 실제 판단 품질을 구분한다.

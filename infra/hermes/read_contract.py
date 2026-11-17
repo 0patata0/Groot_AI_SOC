@@ -514,7 +514,8 @@ def block_list_plan(text):
               r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？]\s*)*')
     reverse = (r'(?:어느|어떤)\s*' + address + r'\s*(?:이|가|은|는)?\s*'
                r'(?:차단\s*됐|막혔)(?:어|니|나(?:요)?)')
-    if not re.fullmatch(r'\s*' + prefix + '(?:' + subject + '|' + reverse + r')\s*' + suffix + r'\s*', text, re.I):
+    state = address + r'\s*(?:차단|막힘)\s*(?:상태|현황|여부)'
+    if not re.fullmatch(r'\s*' + prefix + '(?:' + subject + '|' + reverse + '|' + state + r')\s*' + suffix + r'\s*', text, re.I):
         return None
     page = re.search(r'([1-9][0-9]{0,3})\s*페이지', text)
     return {'kind': 'block_list', 'question': text, 'page': int(page[1]) if page else 1}
@@ -524,12 +525,34 @@ def companion_block_request(question):
     """Recognize an independent current-list clause without narrowing its peers."""
     if not isinstance(question,str) or len(question)>6000:return False
     if re.search(r'예시|가정|번역|라는\s*문장|도구\s*없이|조회\s*(?:하지|말)',question):return False
-    text=re.sub(r'```[\s\S]*?```|`[^`]*`|"[^"\n]*"|\'[^\'\n]*\'', '', question)
-    if re.search(r'차단\s*(?:목록|리스트)[^.!?\n;]{0,40}(?:제외|빼|말아|말고|하지\s*마)',text):return False
+    text=re.sub(r'```[\s\S]*?```|`[^`]*`|"[^"\n]*"|\'[^\'\n]*\'|“[^”\n]*”|‘[^’\n]*’', '', question)
+    if re.search(r'(?:차단\s*(?:목록|리스트|IP|아이피)|IP\s*차단(?:\s*상태)?)[^.!?\n;]{0,40}'
+                 r'(?:제외|빼|말아|말고|하지\s*마)',text,re.I):return False
     text=without_prohibitions(text)
     if wants_write(text):return False
-    clauses=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',text)
-    return any(block_list_plan(part.strip()) is not None for part in clauses if part.strip())
+    clauses=re.split(r'(?<=[.!?。])\s+|[;,\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',text)
+    current=r'(?:현재|지금|현\s*시점)(?:의|은|는)?\s*'
+    address=r'(?:IPv[46]|IP|아이피|주소)(?:\s*주소)?'
+    excluded=r'\s*(?:(?:이|가|은|는|의|에\s*대한)\s*)?(?:정책|규칙|룰|설정|예외|기준|방법|필요|승인|요청|이력|내역|기록|예정|설명|의미|뜻|정의|원리|이란|라는|란)'
+    noun=(r'(?:'+current+r'(?:임시\s*)?'+address+r'\s*차단(?!'+excluded+r')'
+          r'|(?:'+current+r')?(?:임시\s*)?(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)\s*'+address+r'(?:\s*(?:목록|리스트))?'
+          r'|(?:'+current+r')?(?:임시\s*)?차단\s*(?:목록|리스트)'
+          r'|\bcurrent\s+(?:blocked\s+IPs?|IP\s+block\s+(?:list|status))\b)')
+    for part in clauses:
+        part=part.strip()
+        if not part or re.search(r'이면|라면|경우(?:에만)?|아닌\s*과거',part):continue
+        if block_list_plan(part) is not None:return True
+        for match in re.finditer(noun,part,re.I):
+            before,after=part[max(0,match.start()-20):match.start()],part[match.end():match.end()+40]
+            if (not re.match(current,match[0]) and re.search(
+                    r'(?<![A-Za-z])(?:WAF|IDS|IPS|ModSecurity|Suricata|Wazuh)(?![A-Za-z])|와주',
+                    part[:match.start()],re.I)):
+                continue  # A named sensor's blocked requests are not the FW's current list.
+            if re.search(r'(?:\d{1,3}\.){3}\d{1,3}|과거|어제|지난|이력|내역',before):
+                if not re.match(current,match[0]) or re.search(r'(?:\d{1,3}\.){3}\d{1,3}',before):continue
+            if re.match(excluded,after) or re.search(r'말고|제외|빼고|아닌|하지\s*마|미래|예정|과거|어제|지난',after):continue
+            if re.search(r'조회|확인|보여|알려|비교|대조|구분|조사|분석|상태|있나|있어|\b(?:show|check|compare|investigate)\b',part,re.I):return True
+    return False
 
 
 def block_addresses(data):

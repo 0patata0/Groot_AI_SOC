@@ -4,7 +4,7 @@ Native가 실제 정규화에 읽는 `soc_policy.md`를 고정 감사 목록에 
 
 <!-- chat-alignment:current -->
 
-[복합 조사 검증](../management-latency/README.md). 새 실제 채팅은 Hermes 149.666초·SDK 116.849초로 두 경로 모두 판단 검증 미완료다. MCP45·모델·권한을 유지하는 10파일 후보의 설치본 Mac/Linux 검사(Native150·SDK60), Harness²38·설치37은 통과했으나 실제 MCP 격리 시험에서도 가짜 차단 조회 주장이 남아 운영에는 적용하지 않았다. 직전 단순 조회 13파일·새 8채팅 11.397~21.943초의 운영 확정과 구분한다.
+[복합 조사 검증](../management-latency/README.md). MCP 도구 45개·학습 모델·승인 경계를 유지하면서 복합 요청의 동반 읽기를 보완했다. 격리 SDK에서 WAF·IDS·현재 IP 차단 목록 3건을 실제 조회했지만 잘못된 차단·출발지 주장이 남았다. 자동 완료 응답도 원문 대조에서 오류를 찾아 새 공통 검증기로 거절했다. 최종 13파일 후보는 Mac/Linux Native 169·SDK 118·Harness² 38·설치 37을 통과했다. 운영은 직전 22:27 KST 확정 상태이며 새 후보는 미적용이다. 복합 30~60초·실제 양봇 채팅 검증은 미완료이고 공격·새 학습 중단을 유지한다.
 
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.

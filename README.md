@@ -5,6 +5,9 @@
 관리정책의 고정 조회·파일 후보를 A/B/C 실제8설정에서 확인했다. 같은 소스 Mac87·Linux87/생략0과 A의 nft/Bash/nginx 구문 검사는 개발 근거다. 실제 엔진 로드·신뢰된 출처/경로·14면 전체 연결·전역 MCP/정확 카드/독립 원복·초기 설치·두 봇 검증은 남았다.
 <!-- current-work-summary:end -->
 
+논문·판넬용 기술 로고와 그림은 로컬 전용 `logo/`에 보관한다. 판넬 자료는 `_pan` 접미사로 구분하며 `logos_pan.png`는 로고 미리보기, `method_pan.png`와 `method_pan.svg`는 논리 흐름도다. 출처·SHA는 같은 폴더의 원장에 남기고 폴더 전체를 Git에서 제외한다. 실제 구현·성능 검증의 완료 범위는 [현재 상태](STATUS.md)를 따른다.
+
+
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.
 
 [현재 모델의 개발16사례 진단](finetuning/WORKFLOW_DEVELOPMENT.md)을 마쳤습니다. 조회 없이 FW·DNS·서비스 상태를 조회했다고 쓴3답변을 확인했고 설치된 기존 Ollama 근거 검사가 모두 검출했습니다. 대상 없는 룰 질문도 실제 runtime이 먼저 확인합니다. 최종 보정·채팅까지의 성공을 입증한 시험은 아니며 다른 읽기7개는 미채점입니다. 최신45도구 스키마와 평가기 journal 호환을 맞췄고 로컬49검사를 통과했습니다. 운영/권한 변경·새 학습0, 정확19파일 후보는 계속 승인 대기입니다.

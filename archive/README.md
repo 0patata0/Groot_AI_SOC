@@ -97,3 +97,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 논문 전체 소스의 오프라인 복원 보강은 유형별 이력의 `thesis-reproduction-kit-20261117` 항목을 참조한다. 설치·운영 변경은 없어 새 배포 이력은 추가하지 않았다.
+
+
+논문 로그 정제 구현의 보완은 유형별 `thesis-log-pipeline-20261117` 이력을 참조한다. 설치·운영 설정 변경은 없어 새 배포 이력은 추가하지 않았다.

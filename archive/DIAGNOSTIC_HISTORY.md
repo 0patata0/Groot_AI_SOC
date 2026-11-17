@@ -541,3 +541,9 @@ R1Mac1409/기존6생략·새39. timerMainPID/고정DockerCLI경로가정점검�
 ## 논문 전체 소스의 오프라인 복원 — 2026-11-17T20:19:07.665442+09:00
 
 원래 공개 파일2,365개를 Git tree와 byte 단위로 대조했고 새 폴더의 복원본을 독립 Git blob 계산·실행 권한으로 다시 확인했다. 압축 변조·잘림, 누락·중복·추가·권한·경로·링크·manifest 반례를 포함한19검사 통과는 복원 도구의 범위다. 모델 정확도·새 서버 전체 설치·실제 공격/승인 E2E를 검증한 것은 아니다.
+
+
+<a id="thesis-log-pipeline-20261117"></a>
+## 논문 로그 정제 구현 보강 — 2026-11-17T20:41:14.830347+09:00
+
+고정 commit의TOML·VRL·기존 검사 정의를 전체 소스 원장 및 Git blob/SHA에 대조했다. WAF join key에 deployment binding이 직접 포함되지 않는 점, 시각 경계의 포함/초과, WAF의 evidence 제외와 normalized action=observed를 명시했다. 문서의 정적 근거이며 Vector 실행·새 공격·모델 호출·서버 변경은0이다.

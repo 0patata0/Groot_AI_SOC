@@ -493,5 +493,25 @@
     "gate_exit_code": 0,
     "public_docs": 15,
     "sections": 25
+  },
+  "publication": {
+    "content_commit": "d381a93c11e7de2007ee9d44c0e4175ed0c8faae",
+    "remote_main_content_verified_at_kst": "2026-11-17T22:41:27.857454+09:00",
+    "public_files": 23,
+    "tracked_paths": 2373,
+    "unsafe_paths": 0,
+    "known_secret_scan_findings": 10,
+    "new_secret_scan_findings": 0,
+    "staged_bytes_sha_verified": true,
+    "new_missing_links": 0,
+    "receipt_commit": "subsequent commit, final identity retained in local work record",
+    "receipt_prose_review": {
+      "run_id": "2026-11-17-006-0f2f",
+      "route": "light",
+      "change_rate": 0.0,
+      "grade": "B",
+      "self_check": "6/6",
+      "gate_exit_code": 0
+    }
   }
 }

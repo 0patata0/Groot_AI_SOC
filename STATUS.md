@@ -41,7 +41,7 @@ Malvex의 단계별 근거 보존을 참고해 자동 관리를 보완했다. �
 
 ## Git 반영 상태
 
-이번 학습 모델·호스트 범위 보완은22:27:24 KST 운영 확정했다. [검증 원장](infra/validation/management-latency/read-scope.validation.json)의 공개 소스·영향 문서 게시와 원격 일치 확인은 진행 중이다. 아래35aa25f는 직전 호명·기간 단위의 게시 영수증이다.
+이번 학습 모델·호스트 범위 보완은22:27:24 KST 운영 확정했다. 공개23파일의 내용 커밋은 `d381a93c11e7de2007ee9d44c0e4175ed0c8faae`이며 원격 main 일치는 `2026-11-17T22:41:27.857454+09:00`에 확인했다. 추적2,373경로·위험0·기존 탐지10/신규0·stage23파일 SHA·새 링크 누락0을 확인했다. 문서 윤문005는 light·변경률0.17%·B/6항·게이트0이다. [검증 원장](infra/validation/management-latency/read-scope.validation.json). 이 영수증의 후속 게시와 아래 직전35aa25f를 구분한다.
 
 이번 호명·기간·감사 보완의 운영 확정과 공개 소스 게시를 확인했다. 공개23파일의 내용 커밋은 `35aa25fdad1c1b92c6969c8f21b4d5d00e74e6c8`이며 원격 main 일치는 `2026-11-17T21:32:35.142830+09:00`에 확인했다. 이 영수증의 후속 커밋·푸시와 구분한다. [검증 원장](infra/validation/management-latency/event-window.validation.json).
 

@@ -1595,6 +1595,70 @@ def evidence_report_context(question, calls, requested_at_kst, available_reads=(
     return body if len(untrusted_observation_json(body).encode())<=131072 else None
 
 
+def evidence_source_comparison(context):
+    """Literal per-query sample membership; no flow, actor or incident verdict."""
+    text=normalized(context['question'])
+    if not (re.search(r'출발지|발신|\bsource\b',text,re.I)
+            and re.search(r'비교|대조|차이|공통|일치|겹',text)):
+        return ''
+    rows=context['derived_sample_source_sets']
+    if len({r['source'] for r in rows})<2:return ''
+    ips=sorted({ip for r in rows for ip in r['returned_sample_source_ips']})
+    if len(rows)>8 or len(ips)>128:
+        return '**출발지 표본 비교**\n표시 한도(조회 8개·IP 128개)를 넘어 비교 표는 미완료입니다. 아래 원문 표와 조회 범위를 확인하세요.'
+    names={'modsecurity':'WAF','suricata':'IDS','wazuh':'Wazuh'};used={};labels=[]
+    for r in rows:
+        source=r['source'];used[source]=used.get(source,0)+1
+        labels.append(names[source]+' 표본'+(' '+str(used[source]) if sum(x['source']==source for x in rows)>1 else ''))
+    table='\n'.join(READ.table(['출발지 IP',*labels],[[ip,*[
+        '관측됨' if ip in r['returned_sample_source_ips'] else '이 반환 표본에서 확인 안 됨' for r in rows]] for ip in ips]))
+    def clock(value):
+        stamp=EVIDENCE.parse_instant(value)
+        return stamp.astimezone(timezone(timedelta(hours=9))).isoformat() if stamp else '조회 시각 미확인'
+    scope='\n'.join(READ.table(['조회 표본','시작(KST)','종료(KST)','반환 표본의 출발지 IP 수'],[
+        [label,clock(r['requested_since_kst']),clock(r['requested_until_kst']),len(r['returned_sample_source_ips'])]
+        for label,r in zip(labels,rows)]))
+    return ('**출발지 표본 비교**\n'+(table if ips else '조회에서 반환된 유효 출발지 IP는 0개입니다.')+
+            '\n\n'+scope+'\n반환 표본끼리의 비교입니다. 표본에 없는 IP의 전체 부재·같은 흐름/사건·실제 호스트 신원은 증명하지 않습니다.')
+
+
+def evidence_report_text(review, calls, context):
+    """Keep the existing raw fact tables and model decision, add requested comparison."""
+    rendered=EVIDENCE.render_model_review(review,facts_for(calls))
+    return add_evidence_source_comparison(context,rendered)
+
+
+def add_evidence_source_comparison(context, text):
+    """A model failure cannot erase already verified sample comparisons."""
+    comparison=evidence_source_comparison(context)
+    return comparison+'\n\n'+text if comparison and not text.startswith(comparison) else text
+
+
+def initial_event_day_schemas(question, schemas, calls, requested_at_kst):
+    """Bind one unqualified KST calendar day in first event reads, not follow-ups."""
+    text=READ.without_prohibitions(normalized(question));at=EVIDENCE.parse_instant(requested_at_kst)
+    days=re.findall(r'오늘|금일|어제',text)
+    if (len(days)!=1 or not at or at.utcoffset()!=timedelta(hours=9)
+            or re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|쯤|대략|말고|제외|아닌|'
+                         r'\d\s*(?:시|분|시간|초)|\d:\d|\d{4}-\d{2}-\d{2}|'
+                         r'UTC|GMT|[+-]\d{2}:?\d{2}|(?:Asia|America|Europe)/|\b(?:PST|PDT|EST|EDT|JST)\b',text,re.I)):
+        return schemas
+    start=at.replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=days[0]=='어제')
+    end=start+timedelta(days=1) if days[0]=='어제' else at
+    if not start<end:return schemas
+    observed={r['tool'] for r in incident_read_references(calls)};result=copy.deepcopy(schemas)
+    for name,schema in result.items():
+        if (name not in {t for _p,t in INVESTIGATION_ALERT_TOOLS} or name in observed
+                or not {'since_kst','until_kst','lookback_minutes'}<=set(schema.get('properties',{}))
+                or {'since_kst','until_kst','lookback_minutes'} & set(schema.get('required',[]))):continue
+        if any('const' in schema['properties'][k] or 'enum' in schema['properties'][k] for k in ('since_kst','until_kst')):continue
+        for key,value in (('since_kst',start.isoformat()),('until_kst',end.isoformat())):
+            schema['properties'][key]={**schema['properties'][key],'const':value}
+        schema['properties'].pop('lookback_minutes')
+        schema['required']=list(dict.fromkeys(schema.get('required',[])+['since_kst','until_kst']))
+    return result
+
+
 def incident_required_read_gaps(question, calls):
     """Missing named sensor/current-list reads, not an incident conclusion."""
     calls = evidence_reads(calls)

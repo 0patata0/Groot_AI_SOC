@@ -118,3 +118,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [구조화 판단 검증](../infra/validation/management-latency/evidence-judgment.validation.json)의 실제 3읽기와 47.493/67.984/46.940초의 소요 시간, 오답 거절과 미완료 조사를 유형별 원장에 남겼다. 16사본 후보는 기본값 꺼짐·운영 미적용이다.
+
+
+[후속 조회 검증](../infra/validation/management-latency/evidence-followup.validation.json)에 5실제 시험의 추가 조회·비교표·KST 범위와 실패를 기록했다. 마지막 48.320초도 미확인 표현 오류가 남아 품질 미통과이며 16사본 후보는 운영 미적용이다.

@@ -114,5 +114,7 @@ class EvidenceReportSchema(unittest.TestCase):
             h.CONTRACT.validated_service_report({'more_evidence':False,'report':report},self.schema())
         report['status']='needs_review'
         self.assertEqual(h.CONTRACT.validated_service_report({'more_evidence':False,'report':report},self.schema())[0]['report']['status'],'needs_review')
+        report['status']='awaiting_approval'
+        with self.assertRaises(ValidationError):h.CONTRACT.validated_service_report({'more_evidence':False,'report':report},self.schema())
 
 if __name__=='__main__':unittest.main()

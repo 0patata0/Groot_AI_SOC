@@ -170,7 +170,7 @@ def process_search(text):
 
 
 def without_prohibitions(text):
-    action = r'(?:(?:추가|새로|다시)\s*조회|조회|(?:(?:변경안|원복안|제안)\s*)?(?:변경|수정|추가|삭제|차단|재시작|재적재|리로드|reload|원복|복구|작성|준비|제출|적용|배포|설치))'
+    action = r'(?:(?:추가|새로|다시)\s*조회|조회|비교|대조|(?:(?:변경안|원복안|제안)\s*)?(?:변경|수정|추가|삭제|차단|재시작|재적재|리로드|reload|원복|복구|작성|준비|제출|적용|배포|설치))'
     join = r'\s*(?:[·,/]|및|또는|이나|와|과)\s*'
     end = r'(?:은|는|을|를|도)?\s*(?:하지\s*(?:말고|마세요|말아(?:줘|주세요)?|마|않고|않는)|없이|금지)'
     text = re.sub(action + '(?:' + join + action + ')*' + end, '', text)
@@ -490,6 +490,12 @@ def requested_limit(question):
     return min(100, max(1, int(next(x for x in found.groups() if x)))) if found else 5
 
 
+def block_state_terms(text):
+    """Normalize temporary-IP-block word order for classification only."""
+    return re.sub(r'(?<![A-Za-z0-9_])(IPv[46]|IP|아이피)(?:\s*주소)?\s*임시\s*차단',
+                  r'임시 차단 \1',text,flags=re.I)
+
+
 def block_list_plan(text):
     """Only an explicit current dynamic-block inventory, not rules or decisions.
 
@@ -497,6 +503,7 @@ def block_list_plan(text):
     history, a write, or an explanation. Unrecognized requests stay with the
     ordinary agent; this function never dispatches an MCP call.
     """
+    text = block_state_terms(text)
     text = re.sub(r'(?:(?:설정|룰|규칙|정책)(?:은|는|을|를)?\s*)?바꾸지\s*'
                   r'(?:마세요|말아(?:줘|주세요)?|마)(?=$|[\s.!?,;])', '', text)
     # A conditional presentation request does not supply the observed count.
@@ -528,7 +535,7 @@ def companion_block_request(question):
     text=re.sub(r'```[\s\S]*?```|`[^`]*`|"[^"\n]*"|\'[^\'\n]*\'|“[^”\n]*”|‘[^’\n]*’', '', question)
     if re.search(r'(?:차단\s*(?:목록|리스트|IP|아이피)|IP\s*차단(?:\s*상태)?)[^.!?\n;]{0,40}'
                  r'(?:제외|빼|말아|말고|하지\s*마)',text,re.I):return False
-    text=without_prohibitions(text)
+    text=block_state_terms(without_prohibitions(text))
     if wants_write(text):return False
     clauses=re.split(r'(?<=[.!?。])\s+|[;,\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',text)
     current=r'(?:현재|지금|현\s*시점)(?:의|은|는)?\s*'
@@ -551,6 +558,7 @@ def companion_block_request(question):
             if re.search(r'(?:\d{1,3}\.){3}\d{1,3}|과거|어제|지난|이력|내역',before):
                 if not re.match(current,match[0]) or re.search(r'(?:\d{1,3}\.){3}\d{1,3}',before):continue
             if re.match(excluded,after) or re.search(r'말고|제외|빼고|아닌|하지\s*마|미래|예정|과거|어제|지난',after):continue
+            if re.fullmatch(r'\s*(?:은|는|이|가|도)?\s*[?？]\s*',after):return True
             if re.search(r'조회|확인|보여|알려|비교|대조|구분|조사|분석|상태|있나|있어|\b(?:show|check|compare|investigate)\b',part,re.I):return True
     return False
 

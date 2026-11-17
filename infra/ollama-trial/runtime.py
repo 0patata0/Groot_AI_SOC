@@ -246,7 +246,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                 attempt_sequence += 1
                                 sequence = attempt_sequence
                                 try:
-                                    Draft202012Validator(input_schema).validate(arguments)
+                                    effective_schema=harness.initial_event_day_schemas(current,
+                                        {alias(backend,bare_name):input_schema},report['calls'],report['at_kst'])[alias(backend,bare_name)]
+                                    Draft202012Validator(effective_schema).validate(arguments)
                                 except ValidationError as exc:
                                     # This is before any MCP call or protected-start
                                     # callback. Let the model correct schema input;
@@ -254,7 +256,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                     rejection = {'server': backend, 'name': bare_name,
                                         'error': 'tool_input_schema_validation_failed',
                                         'validator': str(exc.validator), 'executed': False}
-                                    rejected_output = canonical({**rejection, 'expected_schema': input_schema})
+                                    rejected_output = canonical({**rejection, 'expected_schema': effective_schema})
                                     report.setdefault('input_rejections', []).append({**rejection, 'arguments':dict(arguments),
                                         'attempt_output':rejected_output, 'attempt_output_sha256':hashlib.sha256(rejected_output.encode()).hexdigest(), 'attempt_sequence':sequence})
                                     return rejected_output
@@ -558,6 +560,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     nonce=os.urandom(16).hex()
                     schema=harness.CONTRACT.evidence_report_schema(citations,list(schemas),
                         read_schemas=schemas,direct_reads=remaining,allow_more=more_allowed,nonce=nonce)
+                    context['inquiry_budget']={'additional_rounds_remaining':max(0,harness.CONTRACT.SERVICE_INQUIRY_ROUNDS-report.get('evidence_inquiry_count',0)),
+                        'additional_tool_calls_available':remaining,'pending_read_proposals_only_after_inquiry_budget':True}
                     messages=harness.CONTRACT.evidence_report_messages(context,agent_role='ollama',feedback=feedback)
                     envelope=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema',include_raw=True).ainvoke(messages),90)
                     require(isinstance(envelope,dict) and {'raw','parsed','parsing_error'}<=set(envelope),'evidence_report_envelope_invalid')
@@ -571,8 +575,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         'parsing_error_type':type(envelope['parsing_error']).__name__ if envelope['parsing_error'] else None}
                     report.setdefault('evidence_report_audit',[]).append(audit)
                     report['evidence_report_audit']=report['evidence_report_audit'][-12:]
-                    report['evidence_report_prompt_sha256']=harness.CONTRACT.fingerprint(
-                        read_only=True,agent_role='ollama',phase='evidence-judgment')
+                    report['evidence_report_prompt_sha256']=hashlib.sha256(messages[0]['content'].encode()).hexdigest()
                     try:value,removed=harness.CONTRACT.validated_service_report(value,schema)
                     except ValidationError:
                         count=report.get('evidence_schema_repairs',0)
@@ -588,7 +591,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
                         review['evidence_tools']=[citations[i] for i in indexes]
                         report['last_evidence_review']=copy.deepcopy(review)
-                        return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
+                        return harness.evidence_report_text(review,report['calls'],context)
                     plan={'calls':value['calls']}
                     plan,_=harness.validated_selection(plan,harness.selection_schema(schemas,budget.limit-budget.used))
                     rejection=harness.CONTRACT.service_inquiry_rejection(plan['calls'],context['untrusted_completed_reads'],
@@ -675,6 +678,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         # protected tools, inferred approvals or incident decisions.
                         selected_tools = {t.name: t for t in agent.adapter.tools if t.name in read_scope}
                         schemas = {name: json.loads(json.dumps(tool.args_schema)) for name, tool in selected_tools.items()}
+                        schemas = harness.initial_event_day_schemas(current, schemas, report['calls'],report['at_kst'])
                         schemas = harness.refine_read_schemas(current, schemas, report['calls'], report.get('diagnostic_targets', ()),harness.card_reference(question,current))
                         if not schemas:
                             break  # Report a verified terminal failure; no blind repeat.
@@ -804,6 +808,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
         finally:
             await client.close_all_sessions()
         report['total_seconds'] = time.perf_counter() - started
+    if os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1' and report['calls'] and not report['protected_calls']:
+        try:
+            context=harness.evidence_report_context(current,report['calls'],report['at_kst'])
+            if context:report['final_response']=harness.add_evidence_source_comparison(context,report['final_response'])
+        except Exception as exc:
+            report['comparison_render_error']=type(exc).__name__;report['status']='partial'
+    report['total_seconds']=time.perf_counter()-started
     return report
 
 

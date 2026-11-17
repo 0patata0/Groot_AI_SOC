@@ -436,12 +436,12 @@ def normalized_schema(name, schema):
     """Advertise the actual host target enum without inventing new capabilities."""
     result = copy.deepcopy(schema)
     # Rust MCP no-argument tools legitimately omit properties. Ollama's typed
-    # parameter transport can turn that omission into null, which the GGUF
-    # runner rejects before inference. Keep the JSON Schema's open-object
-    # semantics explicit instead of inventing arguments or dropping a tool.
-    if result.get('type') == 'object' and 'properties' not in result:
+    # parameter transport can turn that omission into null. Advertise {} and
+    # reject undeclared arguments in this client; explicit maps stay explicit.
+    if (result.get('type') == 'object' and 'properties' not in result
+            and not any(k in result for k in ('patternProperties','$ref','allOf','anyOf','oneOf','if'))):
         result['properties'] = {}
-        result.setdefault('additionalProperties', True)
+        result.setdefault('additionalProperties', False)
     target = result.get('properties', {}).get('target')
     if isinstance(target, dict) and isinstance(target.get('enum'), list):
         host = ('a:' if name.startswith(('mcp__rule_a__', 'mcp__rule_write_a__')) else
@@ -1493,15 +1493,24 @@ def evidence_report_schema(citations, available_reads=(), *, allow_more=True, re
     for branch in schema.get('anyOf',[]):
         fields=branch.get('properties',{}).get('report',{}).get('properties')
         if not fields:continue
+        fields['status']['enum']=['resolved','monitor','needs_review']
+        fields['status']['description']='등록 읽기만 수행하는 현재 조사 보고의 상태. 이 단계는 승인 요청을 제출하지 않습니다.'
         fields['basis']['maxLength']=320
         fields['basis']['description']='실제 근거와 한계에 결속한 한국어 판단 1~2문장. 값·시각·주소·ID는 근거 표가 표시한다.'
         for key in ('limitations','next_steps'):
             fields[key]['maxItems']=2
             if fields[key]['items'].get('type')=='string':fields[key]['items']['maxLength']=200
+        # Available reads belong to the executable inquiry branch. After its
+        # budget is exhausted, a final pending proposal can still be honest.
+        if allow_more and type(direct_reads) is int and direct_reads>0:
+            choices=fields['next_steps']['items'].get('anyOf',[])
+            if choices:
+                fields['next_steps']['items']['anyOf']=[p for p in choices
+                    if p.get('properties',{}).get('kind',{}).get('const')!='read_proposal']
         report=branch['properties']['report']
         open_report=copy.deepcopy(report);closed_report=copy.deepcopy(report)
         open_report['properties']['assessment']={'const':'unresolved'}
-        open_report['properties']['status']['enum']=['monitor','needs_review','awaiting_approval']
+        open_report['properties']['status']['enum']=['monitor','needs_review']
         closed_report['properties']['assessment']['enum']=['benign','remediated']
         branch['properties']['report']={'anyOf':[open_report,closed_report]}
     return schema

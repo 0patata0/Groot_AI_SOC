@@ -109,7 +109,11 @@ class NoArgumentSchema(unittest.TestCase):
             raw = {'type': 'object', 'title': 'NoParams'}
             normalized = harness.CONTRACT.normalized_schema('mcp__wazuh_ro__'+name, raw)
             self.assertEqual(normalized['properties'], {})
-            self.assertIs(normalized['additionalProperties'], True)
+            self.assertIs(normalized['additionalProperties'], False)
+            from jsonschema import Draft202012Validator, ValidationError
+            Draft202012Validator(normalized).validate({})
+            with self.assertRaises(ValidationError):
+                Draft202012Validator(normalized).validate({'lookback_minutes':1440})
             self.assertEqual(raw, {'type': 'object', 'title': 'NoParams'})
 
     def test_existing_properties_required_and_constraints_remain_unchanged(self):
@@ -127,6 +131,13 @@ class NoArgumentSchema(unittest.TestCase):
         normalized = harness.CONTRACT.normalize_openai(request)
         self.assertEqual(normalized['tools'][0]['function']['parameters']['properties'], {})
         self.assertEqual(request, original)
+
+    def test_explicit_maps_patterns_and_composition_are_not_closed(self):
+        for extra in ({'additionalProperties':True},{'patternProperties':{'^tag':{'type':'string'}}},
+                      {'anyOf':[{'properties':{'value':{'type':'integer'}}}]},{'$ref':'#/$defs/item'}):
+            raw={'type':'object',**extra};actual=harness.CONTRACT.normalized_schema('fixture',raw)
+            for key,value in extra.items():self.assertEqual(actual[key],value)
+            if 'additionalProperties' not in extra:self.assertNotIn('additionalProperties',actual)
 
 
 if __name__ == '__main__': unittest.main()

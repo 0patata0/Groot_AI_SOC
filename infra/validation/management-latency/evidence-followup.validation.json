@@ -1,0 +1,342 @@
+{
+  "schema": 1,
+  "topic": "Existing-MCP evidence inquiry, short calendar query and literal source comparison",
+  "observed_at_kst": "2026-11-18T03:44:29.506907+09:00",
+  "candidate": {
+    "installed_copy_files": 16,
+    "plan_sha256": "1442242ac3dafd872b3630f868d1bb82cbe63d409e5be8100ebbf4700a8b321a",
+    "canonical_sources": {
+      "infra/hermes/chat_contract.py": "27414e8c2000300906ce0c04a91a65ac69bed475c96e9182e1e4ba41b0d119b0",
+      "infra/hermes/read_contract.py": "16a9e711a057f811c9949ad850de575e4987ac26dfcb8ad8eb094a92c8459620",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "01b808432fcdefd8c10bf2c6d8d7978c198d54086210fb08361223d8cf621745",
+      "infra/ollama-trial/harness.py": "740149068d2ad4222f581e1a85ec0459218fe3018c7499879ffff088dd3ae234",
+      "infra/ollama-trial/runtime.py": "0ffa038092d3f956eacd2f9aca4556dcaddb77dc939388bad17933694cceff15",
+      "infra/ollama-trial/test_companion_reads.py": "e2fd2e423607be02a70d9d123d889735387320800a163ddbb9ed0a094d847c94",
+      "infra/ollama-trial/test_diagnostic_grounding.py": "0b79705b7c7e49db3b4bf22c54cb1645bb8d370e1a2189b6a7b047b255153df3",
+      "infra/ollama-trial/test_evidence_report.py": "db0cf5f87aa5c2fe42b7b27683fa6885427248ce665425c35ae28d1c1763eafd",
+      "infra/ollama-trial/test_evidence_runtime.py": "d5661c10e7b0a05854fafbf5c51f59a498c07ae950b8a5a0126df6c787f91104",
+      "infra/ollama-trial/test_evidence_comparison.py": "b6b2581ef888d2acfd62c7438d9df68481022088a76f91ed7e1c692c4a1a4286",
+      "infra/ollama-trial/test_initial_event_day.py": "14b1ae7e88255ea412d5588372daf285c58d9505965f14e2198f22715af2e06d"
+    },
+    "evidence_phase_default": 0,
+    "flag": "CAPSTONE_EVIDENCE_REPORT_COMPACT",
+    "flag_scope": "Only the new structured evidence-report/inquiry phase; input/schema/intent fixes are separate candidate code.",
+    "operating_applied": false,
+    "native_execution_connected": false,
+    "common_native_contract_tests_only": true,
+    "initial_installer": "Existing deploy.sh source-copy paths preserved; no new server/tool architecture or automatic production activation."
+  },
+  "operating": {
+    "source_count": 59,
+    "source_hashes_unchanged": true,
+    "source_observed_at_kst": "2026-11-18T03:41:59.268162+09:00",
+    "harness2_observed_at_kst": "2026-11-18T03:42:18.056181+09:00",
+    "harness2_status": "passed",
+    "harness2_sources": 50,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "mcp_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "prior_13_file_operating_fix_preserved": true,
+    "services_restarted": 0,
+    "model_or_permissions_or_approval_or_protected_ips_or_ttl_changed": false
+  },
+  "checks": {
+    "actual_installed_copy_mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 201,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 161,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "actual_installed_copy_linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 201,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 161,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.399s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.545s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "official_framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "official_framework_files": 140,
+    "actual_tool_schema_hashes_verified": true,
+    "always_on_char_delta": {
+      "native": 0,
+      "sdk": 0,
+      "management": 0
+    },
+    "canonical": {
+      "at_kst": "2026-11-18T03:40:07.966975+09:00",
+      "results": {
+        "native": {
+          "rc": 0,
+          "summary": {
+            "run": 430,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "sdk": {
+          "rc": 1,
+          "summary": {
+            "run": 462,
+            "failures": [
+              "test_service_history.ServiceRuntime.test_compound_service_and_blocks_are_selected_read_and_passed_to_model",
+              "test_service_history.ServiceRuntime.test_direct_plan_rejects_protected_tools_without_dispatch",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='unresolved', status='resolved')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='needs_review')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='monitor')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='awaiting_approval')",
+              "test_service_history.ServiceRuntime.test_observation_success_does_not_resolve_open_incident (assessment='benign', status='resolved')",
+              "test_systemd_comparison.SystemdComparison.test_actual_narrowed_diagnostic_schema_has_no_impossible_empty_enum"
+            ],
+            "errors": [
+              "test_service_history.ServiceRuntime.test_explicit_journal_reaches_model_and_table_without_losing_other_reads"
+            ],
+            "skipped": 0
+          }
+        }
+      },
+      "same_preexisting_sdk_findings": true
+    },
+    "local_direct_defect_review": {
+      "code_review_delegated": false,
+      "fixed_calendar_order_defect": true,
+      "remaining_new_code_findings": 0,
+      "model_quality_failed": true
+    }
+  },
+  "actual_isolated_sdk": [
+    {
+      "round": 1,
+      "candidate_plan_sha256": "fc56c512c449b5835e13d2864831f4ca2e16f12132b80feeeb725d6b7d771276",
+      "question": "최근 24시간 WAF·IDS 경보를 조사해서 출발지를 장비별로 비교해줘. 현재 IP 차단 상태와 웹 요청 차단 근거도 따로 확인해줘.",
+      "seconds": 87.14455876400461,
+      "reads": 6,
+      "model_calls": 4,
+      "additional_inquiry_rounds": 2,
+      "runtime_status": "partial",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "remaining_issues": [],
+      "stop_reason": null,
+      "notes": [
+        "Long request",
+        "Actual extra reads in two inquiry rounds; premature awaiting_approval and request-block evidence gaps remain."
+      ],
+      "result_sha256": "f235ff6656b7d95e70a8511ae28b6f9dfd0911d8c517d1d909cf72484334b4b3",
+      "is_mattermost_roundtrip": false,
+      "quality_passed": false
+    },
+    {
+      "round": 2,
+      "candidate_plan_sha256": "ec158aa97a66dc6b754d5271940a2d0b590aee79fc05f0ca6bb19a5a8b85016b",
+      "question": "최근 24시간 WAF·IDS 경보를 조사해서 출발지를 장비별로 비교해줘. 현재 IP 차단 상태와 웹 요청 차단 근거도 따로 확인해줘.",
+      "seconds": 47.84338753600605,
+      "reads": 3,
+      "model_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "runtime_status": "partial",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "remaining_issues": [],
+      "stop_reason": "repeated_evidence_inquiry_rejection",
+      "notes": [
+        "Same long request; focused guidance rejected",
+        "Repeated successful reads rejected before dispatch; focused guidance reverted to full original."
+      ],
+      "result_sha256": "9ac8656cca46236057d82cc7f4e2aa352ba19f0dc318d8cd9d068df2a3358555",
+      "is_mattermost_roundtrip": false,
+      "quality_passed": false
+    },
+    {
+      "round": 3,
+      "candidate_plan_sha256": "30c827adc145bedccc8020a4df9c1728403960402cff92fcff143cd6cb6b80ea",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 121.84070917801,
+      "reads": 4,
+      "model_calls": 5,
+      "additional_inquiry_rounds": 1,
+      "runtime_status": "partial",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "remaining_issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "stop_reason": null,
+      "notes": [
+        "Short holdout",
+        "Yesterday read as rolling 24h; no-argument cluster call carried invented time args; sample-zero absence claim rejected."
+      ],
+      "result_sha256": "a989707db1b4c41658b8c2ccdfd193631ae021c20faf9ed8b3c96c6eb858cbb8",
+      "is_mattermost_roundtrip": false,
+      "quality_passed": false
+    },
+    {
+      "round": 4,
+      "candidate_plan_sha256": "7f650ae646d70ddcd67c7424c8e0d91fd1bfd5867c3ebeffcbde0ac6df85084e",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 33.26407857297454,
+      "reads": 1,
+      "model_calls": 3,
+      "additional_inquiry_rounds": 0,
+      "runtime_status": "partial",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "remaining_issues": [
+        "incident_disposition_missing",
+        "incident_evidence_missing",
+        "empty_model_answer",
+        "requested_read_scope_incomplete"
+      ],
+      "stop_reason": null,
+      "notes": [
+        "Same short holdout",
+        "Calendar/historical refinement conflict; only current blocks read; not a latency success."
+      ],
+      "result_sha256": "e39e9630a63784b6f105c34ae63736df58e848387e0fcad65c03313ef97ad79b",
+      "is_mattermost_roundtrip": false,
+      "quality_passed": false
+    },
+    {
+      "round": 5,
+      "candidate_plan_sha256": "1442242ac3dafd872b3630f868d1bb82cbe63d409e5be8100ebbf4700a8b321a",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?",
+      "seconds": 48.32002673303941,
+      "reads": 3,
+      "model_calls": 2,
+      "additional_inquiry_rounds": 0,
+      "runtime_status": "partial",
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "remaining_issues": [],
+      "stop_reason": null,
+      "notes": [
+        "Same short holdout",
+        "Correct KST calendar window and literal source matrix; empty list miscalled inactive and available web-access evidence mislabeled capability gap. Manual quality failed."
+      ],
+      "result_sha256": "9736aed72408e42eb75d19303f2b26ae2ca1014130c804c617aad5445850af9f",
+      "is_mattermost_roundtrip": false,
+      "quality_passed": false
+    }
+  ],
+  "final_timing": {
+    "total_seconds": 48.32002673303941,
+    "model_seconds_sum": 40.39735590299824,
+    "mcp_seconds_sum": 0.20872256706934422,
+    "initialization_seconds": 7.345450512017123
+  },
+  "verified_scope": {
+    "yesterday_kst": [
+      "2026-11-17T00:00:00+09:00",
+      "2026-11-18T00:00:00+09:00"
+    ],
+    "first_sensor_reads": [
+      "search_modsecurity_alerts",
+      "search_suricata_alerts"
+    ],
+    "current_ip_list": "list_blocks({})",
+    "sample_comparison": "One literal IP per row; per-query scopes remain separate; sample membership is not host, flow, incident, absence or success attribution.",
+    "model_failure_comparison": "SDK-boundary-substituted integration regression only; last live trial used valid structured report.",
+    "no_argument_input": "Client closes simple object roots with no declared fields; explicit maps, patterns and composition preserved. Native OpenAI projection tested; Native execution boundary not proved."
+  },
+  "comparison_limits": [
+    "Five trials are distinct candidate versions and query times; not controlled latency improvement or average/p95.",
+    "R1/R2 use a long request; R3/R4/R5 share a separate short holdout.",
+    "33.264s and 48.320s are not completed incident-investigation SLAs or chat roundtrip measurements.",
+    "No semantic deduplication of different windows: identical returned rows do not prove queries equivalent before execution."
+  ],
+  "remaining": [
+    "Empty current block list miscalled inactive in free-form limitation.",
+    "Available web-access evidence is left as capability gap rather than actual needed read.",
+    "Native evidence report/inquiry execution, protected candidate application and fresh two-bot chats unverified.",
+    "Canonical SDK 8 preexisting failure entries and 1 error remain."
+  ],
+  "not_performed": [
+    "Operating candidate installation",
+    "New Mattermost posts",
+    "Attack tests",
+    "New training or DGX training-status polling",
+    "New OS full deployment",
+    "Physical power-loss recovery"
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-18T03:41:37.317490+09:00",
+    "roots_removed": 10,
+    "files_removed": 3192,
+    "bytes_removed": 122430661,
+    "remaining_owned_roots": 0,
+    "operating_or_model_paths_touched": false,
+    "exported_artifacts": 55,
+    "all_owned_worker_units_terminal_before_removal": true,
+    "full_inventory_sha256": "bdce68f96667015a188cbb5cd91d1a9fa95de0a737853ff7f20157eb88eaddaa",
+    "mac_packages_installed": 0,
+    "mac_package_downloads": 0,
+    "official_harness_and_skill_preserved": true
+  },
+  "source_reference": {
+    "malvex": "https://github.com/JoasASantos/Malvex/tree/75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "method": "Stage receipts and hypothesis/evidence/judgment separation only; no Malvex installation or upstream automatic confirmation semantics.",
+    "prior_evidence": "evidence-judgment.validation.json"
+  },
+  "publication": {
+    "state": "not_yet_committed",
+    "credential_source": "project-local file, process-scoped token; no credential helper or HTTP trace",
+    "foreign_paths_preserved": 23
+  },
+  "documentation": {
+    "affected_public_documents": 15,
+    "humanize_run": "_workspace/2026-11-18-004-6163",
+    "humanize_route": "light",
+    "state": "humanized_verified_pending_publication",
+    "gate_exit": 0,
+    "change_rate": 0.0007,
+    "grade": "B",
+    "self_check": "6/6"
+  }
+}

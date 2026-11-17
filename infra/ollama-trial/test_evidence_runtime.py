@@ -21,7 +21,7 @@ def inquiry(tool=EXTRA,args=None):
 class EvidenceRuntime(unittest.TestCase):
     def execute(self,plans,**kwargs):
         fixture=test_runtime.PreparationLoop()
-        result,prompts,calls=fixture.execute(question=Q,read_incident=True,compact_plans=plans,**kwargs)
+        result,prompts,calls=fixture.execute(question=kwargs.pop('question',Q),read_incident=True,compact_plans=plans,**kwargs)
         self.fixture=fixture
         return result,prompts,calls
 
@@ -84,11 +84,20 @@ class EvidenceRuntime(unittest.TestCase):
         self.assertTrue(feedback['issues']);self.assertEqual(feedback['untrusted_rejected_report']['basis'],bad['report']['basis'])
         self.assertNotIn(bad['report']['basis'],result['final_response'])
 
-    def test_final_follow_up_proposal_is_not_silently_executed(self):
+    def test_pending_read_is_not_accepted_or_silently_executed_before_model_inquiry(self):
         value=report();value['report']['next_steps']=[{'kind':'read_proposal','tool':EXTRA,'arguments':{'target':'fixture'}}]
-        result,_,calls=self.execute([value])
-        self.assertEqual(calls,['search_modsecurity_alerts']);self.assertIn('미실행·미예약',result['final_response'])
-        self.assertEqual(result['status'],'partial');self.assertFalse(result.get('evidence_inquiry_count'))
+        result,_,calls=self.execute([value,inquiry(),report((0,1))])
+        self.assertEqual(calls,['search_modsecurity_alerts','search_wazuh_alerts'])
+        self.assertEqual(result['evidence_schema_repairs'],1);self.assertEqual(result['evidence_inquiry_count'],1)
+        self.assertTrue(result['evidence_report_audit'][0]['rejected_before_dispatch'])
+        self.assertFalse(result.get('remaining_issues'));self.assertEqual(result['protected_calls'],0)
+
+    def test_exhausted_inquiry_can_keep_a_pending_proposal_without_executing_it(self):
+        value=report((0,1));value['report']['next_steps']=[{'kind':'read_proposal','tool':EXTRA,'arguments':{'target':'later'}}]
+        result,_,calls=self.execute([inquiry(args={'target':'one'}),inquiry(args={'target':'two'}),value])
+        self.assertEqual(calls,['search_modsecurity_alerts','search_wazuh_alerts','search_wazuh_alerts'])
+        self.assertEqual(result['evidence_inquiry_count'],2);self.assertEqual(result['status'],'partial')
+        self.assertIn('미실행·미예약',result['final_response']);self.assertEqual(result['protected_calls'],0)
 
     def test_parse_failure_keeps_raw_output_and_repairs_without_another_read(self):
         result,_,calls=self.execute([report()],compact_parse_error=True)
@@ -98,5 +107,15 @@ class EvidenceRuntime(unittest.TestCase):
         self.assertEqual(first['parsing_error_type'],'ValueError')
         self.assertEqual(first['raw_response_sha256'],hashlib.sha256(first['raw_response'].encode()).hexdigest())
         self.assertTrue(first['rejected_before_dispatch']);self.assertFalse(result.get('remaining_issues'))
+
+    def test_rejected_model_report_keeps_real_two_sensor_sample_comparison(self):
+        result,_,calls=self.execute([inquiry(MOD,{'target':'fixture'})],
+            question='WAF·Wazuh 경보 조사해줘. 출발지 겹쳤어?',
+            selector_plans=[{'calls':[{'tool':t,'arguments':{'target':'fixture'}} for t in (MOD,EXTRA)]}])
+        self.assertEqual(calls,['search_modsecurity_alerts','search_wazuh_alerts'])
+        self.assertEqual(result['status'],'partial');self.assertEqual(result['protected_calls'],0)
+        self.assertEqual(result['stop_reason'],'repeated_evidence_inquiry_rejection')
+        self.assertIn('**출발지 표본 비교**',result['final_response'])
+        self.assertIn('유효 출발지 IP는 0개',result['final_response'])
 
 if __name__=='__main__':unittest.main()

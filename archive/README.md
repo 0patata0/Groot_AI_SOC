@@ -106,3 +106,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 논문 구조 재현 명령의 Git/Framework 입력과 실제 실행은 유형별 `thesis-harness-reproduction-20261117` 이력을 참조한다. 운영 배포는 없었다.
+
+
+논문 후속6대화의 측정 정의·원문 대조·결과와 한계는 유형별 `thesis-live-results-20261117` 이력을 참조한다. 기존 발표 초안의 현행화 미완료도 구분했다.

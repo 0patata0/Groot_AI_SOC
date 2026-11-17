@@ -1975,3 +1975,8 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 | 운영 적용 | 미적용 |
 | Native 실행 연결 | 미연결·결속 함수 준비 |
 | 실험 기본값 | `CAPSTONE_EVIDENCE_REPORT_COMPACT=0` |
+
+
+## 2026-11-18 Native 공통 조사 보고 연결 후보
+
+[23사본·내장 게이트 결속과 운영 미적용·격리 파일 정리](STATUS_HISTORY.md#2026-11-18-native-공통-조사-보고-연결-후보).

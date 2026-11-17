@@ -4079,8 +4079,128 @@ def compact_controller_context():
     except (ValueError,TypeError):return None
 
 
+def native_incident_report_request(request, agent, snapshot):
+    """Lease the existing Native transport a current-receipt report, never writes."""
+    if os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')!='1':return request
+    chat=chat_read_context()
+    turn=getattr(agent,'_current_turn_id',None)
+    if (not chat or not isinstance(turn,str) or not turn or not isinstance(snapshot,dict)
+            or snapshot.get('turn')!=turn or snapshot.get('service_context')
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
+            or getattr(agent,'provider',None)!='custom'
+            or getattr(agent,'api_mode','chat_completions')!='chat_completions'
+            or str(getattr(agent,'base_url','')).rstrip('/')!='http://10.200.10.10:11435/v1'
+            or not verified_runtime_model(agent,request.get('model'))
+            or getattr(agent,'_interrupt_requested',False)
+            or request.get('tool_choice') not in (None,'auto')
+            or not isinstance(request.get('messages'),list)):
+        return request
+    tools=request.get('tools')
+    if not isinstance(tools,list) or not 1<=len(tools)<=64:return request
+    catalog={}
+    for tool in tools:
+        f=tool.get('function',{}) if isinstance(tool,dict) else {}
+        name=f.get('name');schema=f.get('parameters')
+        if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
+                or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
+            raise RuntimeError('management_incident_catalog_invalid')
+        catalog[name]=copy.deepcopy(schema)
+    harness=chat_lookup_harness()
+    bound=native_incident_report_context(chat,snapshot.get('read_ledger'),snapshot.get('receipts'),catalog,harness)
+    if bound is None:
+        prior=getattr(agent,'_capstone_incident_phase',None)
+        if isinstance(prior,dict) and prior.get('turn')==turn and prior.get('requests',0):
+            raise RuntimeError('management_incident_receipts_unavailable')
+        return request
+    context,calls=bound
+    state=getattr(agent,'_capstone_incident_phase',None)
+    if not isinstance(state,dict) or state.get('turn')!=turn:
+        state={'turn':turn,'requests':0,'inquiries':0}
+        agent._capstone_incident_phase=state
+    # This phase stays within the Native runner's own iteration/time budgets.
+    if state['requests']>=6:raise RuntimeError('management_incident_report_budget_exhausted')
+    remaining=min(4,max(0,8-len(calls))) if state['inquiries']<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS else 0
+    schemas=harness.refine_read_schemas(chat['request'],catalog,calls)
+    nonce=uuid.uuid4().hex
+    schema=harness.CONTRACT.evidence_report_schema(list(context['evidence_tools'].values()),list(schemas),
+        read_schemas=schemas,direct_reads=remaining,allow_more=remaining>0,nonce=nonce,
+        inventory_observed=context.get('current_ip_inventory',{}).get('requested') is True
+            and context['current_ip_inventory']['read_state']=='observed')
+    context['inquiry_budget']={'additional_rounds_remaining':max(0,harness.CONTRACT.SERVICE_INQUIRY_ROUNDS-state['inquiries']),
+        'additional_tool_calls_available':remaining,'pending_read_proposals_only_after_inquiry_budget':True}
+    from jsonschema import Draft202012Validator
+    Draft202012Validator.check_schema(schema)
+    result=copy.deepcopy(request)
+    result.pop('tools',None);result.pop('tool_choice',None)
+    extra=result.get('extra_body')
+    if isinstance(extra,dict):
+        if set(extra)&{'messages','model'}:raise RuntimeError('management_incident_body_override')
+        for key in ('tools','tool_choice','response_format'):extra.pop(key,None)
+    result['messages']=harness.CONTRACT.evidence_report_messages(context,agent_role='hermes')
+    result['response_format']={'type':'json_schema','json_schema':{'name':'soc_incident_report','strict':True,'schema':schema}}
+    result['max_tokens']=1024;result.pop('max_completion_tokens',None)
+    agent._capstone_management_selection={'turn':turn,'nonce':nonce,'schema':copy.deepcopy(schema),
+        'catalog':catalog,'incident_report':True,'report_context':context,'report_calls':calls,
+        'remaining_read_calls':remaining}
+    state['requests']+=1
+    return result
+
+
+def native_incident_report_response(response, selection, agent, value):
+    """Validate the current lease; Native still dispatches selected read calls."""
+    harness=chat_lookup_harness()
+    state=getattr(agent,'_capstone_incident_phase',None)
+    snapshot=getattr(agent,'_capstone_management_report',None)
+    if (not isinstance(state,dict) or state.get('turn')!=selection['turn']
+            or not isinstance(snapshot,dict) or snapshot.get('turn')!=selection['turn']):
+        raise ValueError('management_incident_turn_changed')
+    bound=native_incident_report_context(chat_read_context(),snapshot.get('read_ledger'),
+        snapshot.get('receipts'),selection['catalog'],harness)
+    if bound is None or bound[1]!=selection['report_calls']:
+        raise ValueError('management_incident_receipts_changed')
+    # The current root request/clock and observations must still be the leased ones.
+    context=copy.deepcopy(selection['report_context']);context.pop('inquiry_budget',None)
+    if bound[0]!=context:raise ValueError('management_incident_context_changed')
+    value,_=harness.CONTRACT.validated_service_report(value,selection['schema'])
+    result=copy.deepcopy(response)
+    if not value['more_evidence']:
+        review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
+        citations=list(context['evidence_tools'].values())
+        review['evidence_tools']=[citations[i] for i in indexes]
+        if any(n not in getattr(agent,'valid_tool_names',()) or not allowed(n,'verify')
+               for n in review['evidence_tools']):raise ValueError('management_incident_citation_invalid')
+        rendered=harness.evidence_report_text(review,selection['report_calls'],context)
+        issues=(harness.violations(context['question'],rendered,selection['report_calls'])+
+            harness.evidence_capability_gap_violations(review,context)+
+            harness.evidence_report_scope_violations(review,context))
+        if issues:raise ValueError('management_incident_report_claim_invalid')
+        result.choices[0].message.content=rendered
+        return result,0
+    if (state['inquiries']>=harness.CONTRACT.SERVICE_INQUIRY_ROUNDS
+            or not 1<=len(value['calls'])<=selection['remaining_read_calls']):
+        raise ValueError('management_incident_inquiry_budget_exhausted')
+    rejection=harness.CONTRACT.service_inquiry_rejection(value['calls'],
+        context['untrusted_completed_reads'],selection['catalog'])
+    if rejection:raise ValueError('management_incident_inquiry_rejected')
+    for item in value['calls']:
+        name=item['tool']
+        if (name not in getattr(agent,'valid_tool_names',()) or not allowed(name,'verify')
+                or tool_input_rejection(name,item['arguments'],selection['catalog'][name])):
+            raise ValueError('management_incident_read_not_authorized')
+    from openai.types.chat import ChatCompletionMessageToolCall
+    result.choices[0].message.content=None
+    result.choices[0].message.tool_calls=[ChatCompletionMessageToolCall(
+        id='call_soc_read_'+uuid.uuid4().hex,type='function',function={
+            'name':item['tool'],'arguments':json.dumps(item['arguments'],ensure_ascii=False)}) for item in value['calls']]
+    result.choices[0].finish_reason='tool_calls'
+    state['inquiries']+=1
+    return result,len(value['calls'])
+
+
 def management_report_request(request, agent, snapshot):
     'Bind current-run reads and reports; allow new evidence.'
+    incident=native_incident_report_request(request,agent,snapshot)
+    if incident is not request:return incident
     inquiry=(isinstance(snapshot,dict) and isinstance(snapshot.get('turn'),str) and bool(snapshot['turn'])
         and getattr(agent,'_capstone_full_review_turn',None)==snapshot['turn'])
     service_chat=bool(os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and isinstance(snapshot,dict)
@@ -4352,6 +4472,8 @@ def management_selection_response(response, selection, agent):
         return obj
     value=json.loads(raw,object_pairs_hook=unique,
         parse_constant=lambda _value:(_ for _ in ()).throw(ValueError('nonfinite_json')))
+    if selection.get('incident_report'):
+        return native_incident_report_response(response,selection,agent,value)
     if selection.get('current_diagnostic'):
         value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
     elif selection.get('service_report'):
@@ -4465,6 +4587,8 @@ def management_selection_call_wrapper(original):
             and not request.get('tools') and not getattr(agent,'_interrupt_requested',False))
         if isinstance(selection,dict) and not active:
             agent._capstone_management_selection=None
+            if selection.get('incident_report'):
+                raise RuntimeError('management_incident_lease_invalid')
         started=time.monotonic()
         verdict=original(agent,**kw)  # Native transport, accounting and retries stay native.
         if not active:return verdict
@@ -4472,7 +4596,22 @@ def management_selection_call_wrapper(original):
         if (getattr(verdict,'action',None)!='fallthrough'
                 or kw.get('turn_id')!=getattr(agent,'_current_turn_id',None)
                 or getattr(agent,'_interrupt_requested',False)):
+            if selection.get('incident_report') and getattr(verdict,'action',None)=='fallthrough':
+                raise RuntimeError('management_incident_turn_changed')
             return verdict
+        if selection.get('incident_report'):
+            choices=getattr(verdict.response,'choices',[])
+            raw=getattr(getattr(choices[0],'message',None),'content',None) if len(choices)==1 else None
+            encoded=raw.encode() if isinstance(raw,str) else None
+            # The controller stores stderr privately; it is never trusted telemetry
+            # or channel content. Retain model report content, never reasoning.
+            sys.stderr.write('management_incident_report_audit '+json.dumps({
+                'turn':selection['turn'],'request_nonce':selection['nonce'],
+                'read_result_sha256':[c['result_sha256'] for c in selection['report_calls']],
+                'untrusted_raw_response':raw if encoded is not None and len(encoded)<=65536 else None,
+                'raw_response_bytes':len(encoded) if encoded is not None else None,
+                'raw_response_sha256':hashlib.sha256(encoded).hexdigest() if encoded is not None else None,
+                'raw_response_retained':encoded is not None and len(encoded)<=65536},ensure_ascii=False)+'\n')
         try:
             response,count=management_selection_response(verdict.response,selection,agent)
         except Exception as exc:
@@ -4484,6 +4623,16 @@ def management_selection_call_wrapper(original):
                 'literal_report_repair':bool(selection.get('literal_report_repair')),
                 'reasoning_effort':request.get('reasoning_effort'),
                 'actual_mcp_calls_by_adapter':0})+'\n')
+            if selection.get('incident_report'):
+                harness=chat_lookup_harness();snapshot=getattr(agent,'_capstone_management_report',{})
+                bound=native_incident_report_context(chat_read_context(),snapshot.get('read_ledger'),
+                    snapshot.get('receipts'),selection['catalog'],harness)
+                response=copy.deepcopy(verdict.response)
+                if len(getattr(response,'choices',[]))!=1:raise RuntimeError('management_incident_response_unavailable') from exc
+                response.choices[0].message.content=factual_review_report(harness.facts_for(bound[1]) if bound else [])
+                response.choices[0].message.tool_calls=None
+                response.choices[0].finish_reason='stop'
+                return replace(verdict,response=response)
             return verdict
         sys.stderr.write('management_read_selection '+json.dumps({'accepted':True,'selected_reads':count,
             'provider_seconds':round(time.monotonic()-started,6),'native_dispatch':count>0,
@@ -4733,7 +4882,9 @@ def main():
         service=(diagnostic_contract().service_report_context({'tools':scope_catalog},chat['request'],chat['requested_at_kst'],
             service_receipts,background=chat['background'],allowed_reads=service_reads)
             if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and chat and service_receipts is not None else None)
-        if result is not cited or service or (getattr(self,'_current_turn_id',None) and
+        incident=bool(os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1' and chat
+            and chat_lookup_harness().EVIDENCE.incident_investigation_request(chat_lookup_harness().normalized(chat['request'])))
+        if result is not cited or service or incident or (getattr(self,'_current_turn_id',None) and
                 getattr(self,'_capstone_full_review_turn',None)==self._current_turn_id):
             self._capstone_management_report={'turn':getattr(self,'_current_turn_id',None),
                 'reads':sorted(n for n in successful_read_names if allowed(n,'verify')),'facts':copy.deepcopy(read_facts),

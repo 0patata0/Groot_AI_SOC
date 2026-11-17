@@ -1,0 +1,245 @@
+{
+  "format": "native_incident_report_connection_v1",
+  "at_kst": "2026-11-18T07:01:37.753272+09:00",
+  "scope": {
+    "operating_applied": false,
+    "flag": "CAPSTONE_EVIDENCE_REPORT_COMPACT",
+    "default": "0",
+    "mcp_tools": 45,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "permission_approval_ttl_changes": false,
+    "attack_training_or_dgx_polling": false
+  },
+  "candidate": {
+    "files": 23,
+    "plan_sha256": "d1b9f203703255109b5f306f03b6ceb3d9fb39685362e510a82531121681ac7f",
+    "canonical_sources": {
+      "infra/hermes/soc_management_run.py": "8bd03403ab971597f59f2aefd39ae7fea180c71136719adb4f3f0e79ef0daba6",
+      "infra/hermes/query-completion/__init__.py": "9bd8a2c6528b10b9a3922316489ff659cc38cabc81269d08fd6f96edafa62cce",
+      "infra/hermes/test_native_incident_phase.py": "e5a188c6e72ea6e3414c7fa7a8e865d10535dc60a2ee69384452d8054f814212"
+    },
+    "installed_grounding_sha256": "ac1b38282ea43f59949d59dd66de64425c2ce8ac1e9c01634b30a7eb13668b3f",
+    "same_grounding_copies": 4,
+    "query_grounding_pin_copies": 2,
+    "embedded_controller_gate_matches_root_reference": true,
+    "preserved_installed_service_report_branches": true,
+    "source_installer_paths_unchanged": true,
+    "flagged_request_and_selection_hooks_connected": true,
+    "operating_copies_connected": false
+  },
+  "contract": {
+    "input": "current root chat request/clock, current Native read ledger and original MCP wrapper bytes",
+    "report": "shared schema, model-owned assessment/scope, literal evidence tables and common claim validation",
+    "authority": "verify-only registered catalog; native wire/dispatch and permission gates remain authoritative",
+    "binding": "turn, exact response schema, nonce, runtime model and original receipt bytes; changed lease fails closed",
+    "invalid_report": "private raw-content audit plus current verified facts/needs_review; never publish rejected raw JSON as a conclusion",
+    "audit": "Native controller private stderr trace; bounded content field/SHA/receipt references; reasoning_content is not collected",
+    "budgets": {
+      "prepared_report_requests": 6,
+      "inquiry_rounds": 2,
+      "additional_calls_per_batch": "min(4,max(0,8-current_receipt_count))",
+      "native_global_iteration_time_retry_controls_unchanged": true,
+      "earlier_native_reads_not_retroactively_capped": true
+    }
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_files": 140,
+    "before_status": "passed",
+    "after_status": "passed",
+    "before_at_kst": "2026-11-18T06:49:00.332508+09:00",
+    "after_at_kst": "2026-11-18T06:59:03.736857+09:00",
+    "diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/alignment.py",
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/harness.py",
+          "scripts/query_grounding.py",
+          "scripts/read_contract.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/harness.py",
+          "scripts/query_grounding.py",
+          "scripts/read_contract.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/read_contract.py",
+          "scripts/soc_management_controller.py",
+          "scripts/soc_management_run.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    }
+  },
+  "tests": {
+    "mac_installed_candidate": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 238,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 204,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 14,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_installed_candidate": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 238,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 204,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 14,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.310s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.560s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "base_current_installation_failure_counts": {
+      "base/native": {
+        "rc": 1,
+        "run": 238,
+        "failure_ids": 23,
+        "error_ids": 62,
+        "skipped": 0
+      },
+      "base/sdk": {
+        "rc": 1,
+        "run": 204,
+        "failure_ids": 42,
+        "error_ids": 75,
+        "skipped": 0
+      }
+    },
+    "all_canonical_tests_rerun": false,
+    "prior_canonical_failures_not_claimed_resolved": true,
+    "native_provider_class_substituted_in_boundary_tests": true,
+    "actual_native_model_calls": 0,
+    "mattermost_posts": 0
+  },
+  "after_verification": {
+    "at_kst": "2026-11-18T06:58:45.061990+09:00",
+    "unchanged_operating_sources": 59,
+    "same_model_catalog": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T06:59:37.194521+09:00",
+    "root_removed": "/var/lib/capstone-evidence-validation/native-9ff7311fc2",
+    "files_removed": 634,
+    "bytes_removed": 23794135,
+    "remaining_owned_roots": [],
+    "operating_or_backups_touched": false,
+    "verified_exported_artifacts": 8,
+    "model_workers_started": 0,
+    "mac_packages_installed": 0,
+    "framework_and_skill_preserved": true
+  },
+  "remaining": [
+    "Source inspection found Native initial-event today/recent handling separate from SDK shared yesterday-calendar binding; verify parity before promoting a past-day result.",
+    "Run this exact frozen candidate in the actual Native executor, not only helper/installed-copy tests.",
+    "Verify actual Native report audit, additional reads, outcome and latency through the existing B-to-Thor path.",
+    "Exact approved operating application and new actual chats for both bots are not done.",
+    "Prior expanded SDK72.166s exceeds60s; two web path mappings/intervention/impact remain unconfirmed.",
+    "Known canonical SDK failures and environment-dependent exploratory tests are not resolved by these selected tests."
+  ],
+  "publication": {
+    "state": "pending_commit_and_push",
+    "private_logs_credentials_weights_excluded": true
+  },
+  "initial_selection_source_probe": {
+    "basis": "pure request-builder and actual registered schema comparison; no model or MCP execution",
+    "requested_at_kst": "2026-11-18T07:00:00+09:00",
+    "native_initial_offered_reads": [
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__security_events__search_suricata_alerts"
+    ],
+    "native_two_sensor_rolling30min_batch_accepted": true,
+    "sdk_sensor_rolling30min_arguments_accepted": {
+      "mcp__security_events__search_modsecurity_alerts": false,
+      "mcp__security_events__search_suricata_alerts": false
+    },
+    "companion_current_list_offered_in_first_batch": false,
+    "actual_runtime_wrong_answer_reproduced": false,
+    "remaining": "Unify Native initial calendar/companion selection and require current-list evidence before compact reporting; verify actual Native execution."
+  }
+}

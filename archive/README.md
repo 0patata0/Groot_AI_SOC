@@ -130,3 +130,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [관측 목록과 미확인 범위](../infra/validation/management-latency/report-scope.validation.json)에 실제5시험·보관 원문3건 재표시·Native 결속 준비를 구분했다. Native 실행 연결·정확 운영 적용·새 채팅은 미완료다.
+
+
+[Native 공통 보고 연결 후보](../infra/validation/management-latency/native-compact-execution.validation.json)는 소스 연결·설치 사본14경계 검증과 실제 Native/채팅·운영의 미검증 상태를 구분한다.

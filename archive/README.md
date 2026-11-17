@@ -133,3 +133,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 
 
 [Native 공통 보고 연결 후보](../infra/validation/management-latency/native-compact-execution.validation.json)는 소스 연결·설치 사본14경계 검증과 실제 Native/채팅·운영의 미검증 상태를 구분한다.
+
+
+FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·입력형 검증 공백은 유형별 `thesis-mcp-contract-20261117` 이력을 참조한다. 운영 수정과 새 독립 재구현은 별도다.

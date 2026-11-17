@@ -56,3 +56,13 @@ MCP `tools/call` 예:
 11/5 NAT/IPv4 적용 후 실제 Hermes→resp-a는4테이블·17체인·102규칙·9집합을 complete=true로 읽었다. capstone_fw는 유지하며 IPv6 전용 테이블은0이다. 위11/3의99규칙/미적용은 당시 기록이다. [현재 구조·검증·복구](fw-consolidation.md).
 
 기본 FW 질문도 IP 임시차단·남은시간·거부조건·예외 의미를 같은 완전 스냅샷에서 표시한다. xt 미해석·앞선 허용/체인·예외와실제패킷판정을구분한다. [반영·실측·한계](containment-display.md).
+
+
+<a id="thesis-mcp-contract-20261117"></a>
+## 2026-11-17 고정 소스의 로컬 stdio 입력형 관측
+
+기준은 고정 커밋 `4fcbbf4bf2ca89f8bea0b1bd69b67545e2b6f9c3`의 `response-mcp.py`이며 작업본 바이트도 같았다. 기존 서버5·공통 하네스9검사는 실패/생략0이고 별도 fixture stdio에서17요청/알림1개를 대조했다.
+
+기존 함수 단위 입력 검사와 실제 JSON-RPC 래퍼의 기본값 처리 사이에서 공백을 확인했다.5종의 비객체 falsey 입력은 handle에서 {}가 되어 새 fixture 조회로 이어졌다. 실제 nft·원격 연결·승인/차단은0이다. 재현기는 종료1과 공백 원장을 남기며 종료2의 소스 불일치/미완료와 구분한다. 이 결과를 운영 취약성이나 승인 우회의 입증으로 사용하지 않는다.
+
+[고정 서버 구현](https://github.com/0patata0/Groot_AI_SOC/blob/4fcbbf4bf2ca89f8bea0b1bd69b67545e2b6f9c3/infra/mcp/response-mcp.py) · [기존 서버 검사](test_firewall_read.py) · [기존 공통 하네스 검사](../ollama-trial/test_firewall_harness.py). nft 바이트·캐시 위치·파일 UID를 시험용으로 대체했으므로 실제 커널·root 소유권·운영 서버 동작은 확인하지 않았다.

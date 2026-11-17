@@ -1,5 +1,9 @@
 # 진단 탐색 이력
 
+## 학습 모델 우회 재현·8조회·helper 오류 복구 (2026-11-17)
+
+실제 Native는 base guard로 학습 모델을 제외했다. 설치 파서는 B를 누락·다른 호스트/컨테이너로 확대했다. Mac/Linux각145·정본Native429·H2각38·설치각37 통과. 초기 helper 검증 인자 오류, 자동 조사 중 resume 거절, 결과 확인 전 검증/읽기 실행, 갱신 전 health 실패를 보존했다. 승격 전 IDS52.926초/2읽기는 후보8건에서 제외한다. 자체 stage444파일17,342,926B·로그5개 SHA 보존 후 제거·B failed0. [검증·범위](../infra/validation/management-latency/README.md).
+
 ## 호명 분류 재현·새6채팅 잔여 오류 (2026-11-17)
 
 설치본 기준31검사에서 기존50하위 실패/오류1→후보0이며 Mac/Linux각31·H2각37·설치각37통과였다. Linux 최초 H2 오류2는 안전 경로 검사이며 같은SHA를 신뢰 경로에 옮겨 통과했다. 새6채팅 실제10도구 시도에는 Native 잘못된 시각2거절·지표 이름/표 문제와 SDK 범위 확대가 남았다.2stage424파일24,080,323B 제거·B failed0을 확인했다. [검증·범위](../infra/validation/management-latency/README.md).

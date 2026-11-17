@@ -70,6 +70,8 @@ class AuditTests(unittest.TestCase):
             relative = key.split("/", 1)[1]
             if relative == "systemprompt.md":
                 raw = ("Load " + " ".join(audit.SKILLS) + " when appropriate.\n").encode()
+            elif relative == "runtime_policy.md":
+                raw = b"Observed native normalization policy; no fixture routing claims.\n"
             elif relative.startswith("scripts/"):
                 # ast.parse + official compile must NEVER execute this body.
                 raw = b"raise RuntimeError('source code must never run')\n"
@@ -139,6 +141,16 @@ class AuditTests(unittest.TestCase):
             self.assertEqual(report["review_drafts"], [])
             path.write_bytes(original)
 
+    def test_native_loaded_policy_copy_is_an_observed_source(self):
+        key = "native/runtime_policy.md"
+        self.assertEqual(self.originals[key],
+                         "/opt/hermes-data/plugins/groot-query-completion/soc_policy.md")
+        Path(self.paths[key]).unlink()
+        report = self.run_audit()["report"]
+        self.assertEqual(report["sources"][key]["error_code"], "missing_file")
+        self.assertEqual(report["status"], "incomplete")
+        self.assertEqual(report["review_drafts"], [])
+
     def test_actual_full_official_core_and_source_immutability(self):
         before = {path: (Path(path).read_bytes(), Path(path).stat().st_mtime_ns) for path in self.paths.values()}
         fake = types.ModuleType("harness2.core.tree")
@@ -150,7 +162,7 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["scope"], "structural checks")
         self.assertEqual(report["framework"]["files"], self.lock["files"])
         self.assertEqual(report["framework"]["status"], "verified")
-        self.assertEqual(len(report["sources"]), 49)
+        self.assertEqual(len(report["sources"]), 50)
         self.assertEqual(len(report["framework_diffs"]), 3)
         self.assertTrue(all(s["census"]["skills"] == 5 for s in report["surfaces"].values()))
         self.assertEqual(report["source_snapshot"]["status"], "verified")

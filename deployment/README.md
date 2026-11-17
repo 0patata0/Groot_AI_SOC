@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[양봇 공통 보강 이관](../infra/validation/management-latency/README.md)의 후속 호명·기간·시간 열 보완을21:18 KST 운영 확정했다. 새6채팅은11.263~29.165초였으며 Native 계산/지표 이름/표와 SDK 명시 호스트 범위 오류는 남았다. Mac/Linux각31·H2각37·설치각37과 운영49소스 passed는 별도 근거다. 모델·MCP·승인 경계는 유지하고 새 OS 전체 설치·실제 브라우저 검수는 미수행이다.
+[양봇 공통 조회 보완](../infra/validation/management-latency/README.md). 학습 모델의 Native 공통 처리 우회와 명시 호스트 선택을 보완해22:27 KST 운영 확정했다. 새8채팅11.397~21.943초·8읽기/거절0, Mac/Linux각145·H2각38·설치각37·정본Native429를 확인했다. 운영 Harness²는 기존 Native 정책 사본을 감사하여50소스 passed다. 모델·MCP·승인 경계는 유지하며 복합 조사·새 OS 전체 설치·브라우저 검수는 미완료다.
 
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 

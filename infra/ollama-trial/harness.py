@@ -227,11 +227,11 @@ def rule_scope_request(question):
 def container_target_required(question):
     """Only an unqualified Docker log/detail request requires an object name."""
     if host_read_prohibited(question):return None
-    text=normalized(question)
+    text=READ.scope_text(normalized(question))
     if READ.wants_write(text):return None
-    hosts=re.findall(r'(?<![a-z0-9])([abc])\s*서버',text,re.I)
+    hosts=[host for _,_,host in READ.host_mentions(text)]
     if len(set(h.lower() for h in hosts))>1:return None
-    rest=re.sub(r'(?<![a-z0-9])[abc]\s*서버','',text,flags=re.I)
+    rest=READ.without_hosts(text)
     rest=re.sub(r'보여(?:주세요|줄래요|줄래|줘)?|알려(?:주세요|줄래|줘)?|조회(?:해줘|해주세요)?|확인(?:해줘|해주세요)?|지금|현재|좀','',rest)
     m=re.fullmatch(r'\s*(?:(?:도커|Docker|컨테이너|containers?)\s*)+(로그|상세|자세히|헬스|health)\s*[?.!]*',rest,re.I)
     return dict(host=hosts[0].lower() if hosts else 'all',kind='로그' if m[1]=='로그' else '상세') if m else None
@@ -679,7 +679,7 @@ def read_plan(question):
     # it does not turn that object's status into Wazuh agent identity.
     if (plan and plan.get('kind') == 'agent_identity'
             and (re.search(r'\.service\b|\bsystemd\b|컨테이너|\bcontainer\b', text, re.I)
-                 or not re.search(r'에이전트|\bagent\b|식별|(?<![A-Za-z])ID(?![A-Za-z])', text, re.I)
+                 or not re.search(r'에이전트|\bagent\b|식별|연결|접속|등록|(?<![A-Za-z])ID(?![A-Za-z])', text, re.I)
                  and any(re.search(pattern, text, re.I) for pattern, _, _ in DIAGNOSTIC_SERVICE_ALIASES))):
         return None
     return plan

@@ -1,0 +1,497 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-17T22:32:41.087583+09:00",
+  "unit": "trained-native-and-explicit-host-read-scope",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_tools": 45,
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "mcp_structure_changed": false,
+  "new_mcp_tools": 0,
+  "protected_permissions_changed": false,
+  "attack_requests": 0,
+  "training_runs": 0,
+  "root_causes": [
+    "Native alignment accepted only base model while root exact guard already accepted the deployed learned model",
+    "Installed host parsers expanded bare B and explicit b:systemd or treated B as a Docker object",
+    "Installed Native runtime policy copy was not part of fixed Harness2 source audit"
+  ],
+  "regression": {
+    "actual_copy_mac": 145,
+    "actual_copy_linux": 145,
+    "base_failed_methods": 6,
+    "base_errors": 4,
+    "candidate_failures": 0,
+    "candidate_errors": 0,
+    "canonical_native": 429,
+    "harness2_mac_linux_each": 38,
+    "installer_mac_linux_each": 37,
+    "skipped": 0,
+    "actual_schema_semantic_validations": 5
+  },
+  "framework": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_files": 140,
+    "operating_status": "passed",
+    "operating_sources": 50,
+    "surfaces": {
+      "management": {
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 14,
+          "scripts": 7,
+          "skills": 5,
+          "sub_agents": 0
+        },
+        "routing_projection": {
+          "skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ],
+          "source": "scripts/workflow_contract.py"
+        },
+        "status": "passed",
+        "unreadable_components": []
+      },
+      "native": {
+        "census": {
+          "always_on_chars": 33505,
+          "n_files": 19,
+          "scripts": 11,
+          "skills": 5,
+          "sub_agents": 0
+        },
+        "routing_projection": {
+          "skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ],
+          "source": "scripts/workflow_contract.py"
+        },
+        "status": "passed",
+        "unreadable_components": []
+      },
+      "sdk": {
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 20,
+          "scripts": 13,
+          "skills": 5,
+          "sub_agents": 0
+        },
+        "routing_projection": {
+          "skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ],
+          "source": "scripts/workflow_contract.py"
+        },
+        "status": "passed",
+        "unreadable_components": []
+      }
+    },
+    "native_policy_observation_note": "Audit now observes existing root SOUL and actual normalization policy separately. The policy bytes were unchanged; audit census growth is not a new runtime prompt injection."
+  },
+  "deployment": {
+    "route": "Mac-admin231-A-B",
+    "applied_at_kst": "2026-11-17T22:24:27.380578+09:00",
+    "confirmed_at_kst": "2026-11-17T22:27:24.123718+09:00",
+    "candidate_files": 13,
+    "protected_file_hashes": 16,
+    "sdk_receipt_sources": 20,
+    "review_receipt_sources": 5,
+    "same_hermes_container_and_image": true,
+    "planned_native_restarts": 1,
+    "database_same_while_stopped": true,
+    "rollback_timer": "inactive",
+    "rollback_confirmed_noop": true,
+    "backup_root": "/var/lib/capstone-read-scope/20261117-02dc0ff943",
+    "files": {
+      "/etc/capstone-harness2/audit.json": {
+        "after": "38d09dbc9f3b953bb837342a17f43f405c5df5d9529b36c131910b7f18528c53",
+        "before": "3c51240cf7854df4ecc2a04496e642b7155b34ba393dc02864f80852508188e8",
+        "gid": 0,
+        "mode": 384,
+        "slot": "10",
+        "uid": 0
+      },
+      "/etc/capstone-harness2/installation.json": {
+        "after": "2208ae2ef20feabd21a2cbeb65c686908a929dcd09e0d5b5badb5fb5f328cbaa",
+        "before": "872b8c05121bd37b0830101dca2a17a40a987d1036b03c0e01dcc07c34a5b73f",
+        "gid": 0,
+        "mode": 384,
+        "slot": "11",
+        "uid": 0
+      },
+      "/etc/capstone-ollama-trial/receipt.json": {
+        "after": "91f9b8e5c766bcd7443c40fb8cf3d22bc6d7dbaf4a93d807322901e833bcb26c",
+        "before": "89e45be4a498a93ac1fa771fc8970fd86b5923fb2c550d11e460a79cca9c203b",
+        "gid": 0,
+        "mode": 384,
+        "slot": "12",
+        "uid": 0
+      },
+      "/opt/capstone-harness2/server_audit.py": {
+        "after": "6f5dd4ab3f39341dec37ef3dbe500ba148e2d0fafeb70629391df27fd9c15882",
+        "before": "997404d4bd3da576ac8c4d4effa175409f6b67c98e37cf089361b80fdfecc00b",
+        "gid": 0,
+        "mode": 420,
+        "slot": "9",
+        "uid": 0
+      },
+      "/opt/capstone-management/read_contract.py": {
+        "after": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "before": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+        "gid": 0,
+        "mode": 420,
+        "slot": "5",
+        "uid": 0
+      },
+      "/opt/capstone-management/skill-soc-query.md": {
+        "after": "bfa8667b320846596bf88bc8c9dd37b3fcb1171c8475755566f0848c6bd8751c",
+        "before": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+        "gid": 0,
+        "mode": 420,
+        "slot": "6",
+        "uid": 0
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "after": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "before": "ea4de422d3bb7aa9c539dd60dd1c9f4ff270e300ac79088ce210cfea4e9256d9",
+        "gid": 981,
+        "mode": 416,
+        "slot": "7",
+        "uid": 0
+      },
+      "/opt/capstone-ollama-trial/read_contract.py": {
+        "after": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "before": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+        "gid": 981,
+        "mode": 416,
+        "slot": "3",
+        "uid": 0
+      },
+      "/opt/capstone-ollama-trial/skill-soc-query.md": {
+        "after": "bfa8667b320846596bf88bc8c9dd37b3fcb1171c8475755566f0848c6bd8751c",
+        "before": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+        "gid": 981,
+        "mode": 416,
+        "slot": "4",
+        "uid": 0
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "after": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "before": "535ea93bac58fb94988bc87f71b1edc43fef3a36d96be234316562a82a8f85a9",
+        "gid": 986,
+        "mode": 384,
+        "slot": "0",
+        "uid": 995
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "after": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "before": "ea4de422d3bb7aa9c539dd60dd1c9f4ff270e300ac79088ce210cfea4e9256d9",
+        "gid": 986,
+        "mode": 384,
+        "slot": "8",
+        "uid": 995
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+        "after": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "before": "9f8e119715572623c4a5d34a9efa974e2a19609ddeafc2bb2e4c2e053bbf7fce",
+        "gid": 986,
+        "mode": 384,
+        "slot": "1",
+        "uid": 995
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": {
+        "after": "bfa8667b320846596bf88bc8c9dd37b3fcb1171c8475755566f0848c6bd8751c",
+        "before": "45bc00d8fd5a6b0fbca5ca1c2eb0a812b3989f8d343252dd241bd359983cccec",
+        "gid": 986,
+        "mode": 384,
+        "slot": "2",
+        "uid": 995
+      }
+    }
+  },
+  "actual_chats": [
+    {
+      "engine": "hermes",
+      "case": "ids30-r2",
+      "question": "최근 30분 IDS 경보 2건만 보여줘",
+      "source_id": "oydoc5gh63dadcz64ye47rx4re",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/oydoc5gh63dadcz64ye47rx4re",
+      "source_created_at_kst": "2026-11-17T22:24:43.703000+09:00",
+      "reply_id": "jsiqwicnpjg8zf6fe9hfd9gnio",
+      "reply_created_at_kst": "2026-11-17T22:25:05.646000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:25:05.646000+09:00",
+      "source_to_final_seconds": 21.943,
+      "answer_sha256": "769769b6dc75849fbdeb98891d13d0836f5932b262cbc8cf9f5e173c9148166f",
+      "calls": [
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 30
+          },
+          "raw_result_sha256": "c68d22b82a6366a102900d7085712c9cd55a7e398e1742cce54d9b122220625a",
+          "observed_status": null,
+          "returned_count": 0
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "hermes",
+      "case": "systemd",
+      "question": "B systemd 상태 보여줘",
+      "source_id": "5rkqbsfgmjyb3k1fzsqbuwwopw",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/5rkqbsfgmjyb3k1fzsqbuwwopw",
+      "source_created_at_kst": "2026-11-17T22:25:27.790000+09:00",
+      "reply_id": "fegfmj81q3g15yjujfgyuf566w",
+      "reply_created_at_kst": "2026-11-17T22:25:44.522000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:25:44.522000+09:00",
+      "source_to_final_seconds": 16.732,
+      "answer_sha256": "c88ab666f7aae31d760e2cecd7cf753819172855cd84d40879829af6371077bb",
+      "calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          },
+          "raw_result_sha256": "bfd5b1a1d240218e5ac2985e39d43f302285511fb9547cc9474e57a4ae9ceda2",
+          "observed_status": "ok",
+          "returned_count": null
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "ollama",
+      "case": "systemd",
+      "question": "B systemd 상태 보여줘",
+      "source_id": "1gskgdd4ypdx8ge7hxwg9qujah",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/1gskgdd4ypdx8ge7hxwg9qujah",
+      "source_created_at_kst": "2026-11-17T22:26:13.166000+09:00",
+      "reply_id": "8kufpj4af38a3kkacmbnxn599o",
+      "reply_created_at_kst": "2026-11-17T22:26:13.203000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:26:30.084000+09:00",
+      "source_to_final_seconds": 16.918,
+      "answer_sha256": "2850ed55f7ad1f13f28f7f5a7e6431cc3d0936202934247ecea684dca9d9013d",
+      "calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:systemd"
+          },
+          "raw_result_sha256": "b676224867c2e7d9f642da860c8bdd2bd16119f69b81f45ab6d69d22cfcb5209",
+          "mcp_seconds": 0.12288332899333909
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "hermes",
+      "case": "waf",
+      "question": "최근 WAF 차단 경보 2건만 보여줘",
+      "source_id": "xpkpmze3ijgz9nzewibn66pkwr",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/xpkpmze3ijgz9nzewibn66pkwr",
+      "source_created_at_kst": "2026-11-17T22:26:45.198000+09:00",
+      "reply_id": "simiutrnxjrobrrc5kbuj7k7uh",
+      "reply_created_at_kst": "2026-11-17T22:26:59.842000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:26:59.842000+09:00",
+      "source_to_final_seconds": 14.644,
+      "answer_sha256": "84d7422a0cd682d1263fee26a6da2e31a5649d593ffb60d7249f720d3d66e124",
+      "calls": [
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 60
+          },
+          "raw_result_sha256": "531d6ab31e441ec68faa6aee8fc88cf6a4b24552f295683e4b877f87c7fccea0",
+          "observed_status": null,
+          "returned_count": 0
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "ollama",
+      "case": "ids30",
+      "question": "최근 30분 IDS 경보 2건만 보여줘",
+      "source_id": "3zdhm7qe5t8c8bsig1pjumci9h",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/3zdhm7qe5t8c8bsig1pjumci9h",
+      "source_created_at_kst": "2026-11-17T22:27:53.283000+09:00",
+      "reply_id": "fz6bxkiwwjn3xgfso66atkks9o",
+      "reply_created_at_kst": "2026-11-17T22:27:53.312000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:28:05.389000+09:00",
+      "source_to_final_seconds": 12.106,
+      "answer_sha256": "de162a49f87e5c1952c9dd4e442f904744530b2dea8aaf1cf2c69e5090e29018",
+      "calls": [
+        {
+          "tool": "mcp__security_events__search_suricata_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 30
+          },
+          "raw_result_sha256": "0e2d2023fbf0f4069a625b0e58efcd2bb43f3e02d4b7ec4d7e2317d3290479ba",
+          "mcp_seconds": 0.034540850028861314
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "ollama",
+      "case": "waf",
+      "question": "최근 WAF 차단 경보 2건만 보여줘",
+      "source_id": "9r6dzrhpmjrhzdgdegnsi669gr",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/9r6dzrhpmjrhzdgdegnsi669gr",
+      "source_created_at_kst": "2026-11-17T22:28:24.151000+09:00",
+      "reply_id": "efwyesujiib3xjr4gtgirfjnie",
+      "reply_created_at_kst": "2026-11-17T22:28:24.182000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:28:35.548000+09:00",
+      "source_to_final_seconds": 11.397,
+      "answer_sha256": "9176e89bcd1b38821b0236df447b005066c081357df1c737223980bfcc200e47",
+      "calls": [
+        {
+          "tool": "mcp__security_events__search_modsecurity_alerts",
+          "arguments": {
+            "limit": 2,
+            "lookback_minutes": 60
+          },
+          "raw_result_sha256": "eb377fe7a4b669cdabbef7896da8da290b823e7fb55a24e3b7314d92f1983014",
+          "mcp_seconds": 0.03408179199323058
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "hermes",
+      "case": "docker-resources",
+      "question": "B 도커 컨테이너 자원 보여줘",
+      "source_id": "gb4kdig9s3gbpbxtqdxoq9q91r",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/gb4kdig9s3gbpbxtqdxoq9q91r",
+      "source_created_at_kst": "2026-11-17T22:29:27.657000+09:00",
+      "reply_id": "zmo16hg6kf853mt8941wtd8tbe",
+      "reply_created_at_kst": "2026-11-17T22:29:42.755000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:29:42.755000+09:00",
+      "source_to_final_seconds": 15.098,
+      "answer_sha256": "a5f28f4f33b369e3afa6aff420a99d1a890e5274229d419ca18992b36d710504",
+      "calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_host_inventory",
+          "arguments": {
+            "host": "b",
+            "limit": 100,
+            "offset": 0,
+            "state": "all",
+            "view": "container_stats"
+          },
+          "raw_result_sha256": "d49db2729547e2175116c264cca5042f7a5c5ce4c9eb6766497a25cce4cef852",
+          "observed_status": null,
+          "returned_count": null
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    },
+    {
+      "engine": "ollama",
+      "case": "vector",
+      "question": "B Vector 상태 알려줘",
+      "source_id": "sndb8773gjyajxsgmdgnu4eiaw",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/sndb8773gjyajxsgmdgnu4eiaw",
+      "source_created_at_kst": "2026-11-17T22:30:06.055000+09:00",
+      "reply_id": "fmizf9g5yjr4fy19jdmc1icwnh",
+      "reply_created_at_kst": "2026-11-17T22:30:06.096000+09:00",
+      "reply_final_updated_at_kst": "2026-11-17T22:30:20.207000+09:00",
+      "source_to_final_seconds": 14.152,
+      "answer_sha256": "2df86522ae43721e0408dbfceb3db916f75c728780544354b3fa694c4f2e4a5f",
+      "calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:vector"
+          },
+          "raw_result_sha256": "3132af7b2bfee42aac2eb5dd644eaa27f796e93b6db94560f432be524ac35685",
+          "mcp_seconds": 0.005109491990879178
+        }
+      ],
+      "markdown_table_present": true,
+      "browser_visual_check": false
+    }
+  ],
+  "chat_count": 8,
+  "successful_read_calls": 8,
+  "rejected_tool_attempts": 0,
+  "seconds_range": [
+    11.397,
+    21.943
+  ],
+  "operator_failures": [
+    {
+      "stage": "initial apply",
+      "reason": "Operator helper verify_receipts read arity error after 13 files written; before Native restart/APPLIED. Original 15-minute timer and backups remained active. Corrected only helper function; candidates unchanged."
+    },
+    {
+      "stage": "first resume",
+      "reason": "Idle guard refused active automatic investigation; no restart. A premature live check and read-only pre-promotion IDS chat were mistakenly launched afterward and excluded from candidate evidence."
+    },
+    {
+      "stage": "first post-restart health",
+      "reason": "Health not yet refreshed; next fresh sample passed."
+    }
+  ],
+  "excluded_pre_promotion_probe": {
+    "source_id": "8mioaqf6k3yhbm5imq1guxs57r",
+    "source_to_final_seconds": 52.926,
+    "read_calls": 2,
+    "not_candidate_evidence": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-17T22:28:53.820896+09:00",
+    "removed": {
+      "/var/lib/capstone-read-scope-validation/20261117-02dc0ff943": {
+        "files": 444,
+        "bytes": 17342926
+      }
+    },
+    "logs_exported_and_sha_verified_before_deletion": true,
+    "empty_created_parent_removed": true,
+    "rollback_confirmed_noop": true,
+    "rollback_timer": "inactive",
+    "b_failed_units": 0,
+    "operating_sources_and_recovery_backups_preserved": true,
+    "mac_package_installations": 0
+  },
+  "limitations": [
+    "Eight sequential fresh read-only chats, not independent incident accuracy or controlled speedup/average/p95/SLA",
+    "No browser rendering verification; API Markdown only",
+    "B Vector returned not-found/inactive snapshot. It is not an all-Vector healthy/failed verdict; no fallback to A was used",
+    "Complex incidents, repeated reads, long conclusions, approval writes, attacks, reboot/power/manual full restore and new-OS installation not tested",
+    "Canonical current sources contain other unpromoted development changes; only declared observed-copy deltas were promoted. Installed query/common version labels stay1.19.137/1.5.84, bounded by file SHA",
+    "Thesis content/output not changed by this unit"
+  ],
+  "document_review": {
+    "skill": "humanize-korean v2.3-codex",
+    "run_id": "2026-11-17-005-c22c",
+    "route": "light",
+    "change_rate": 0.0017,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit_code": 0,
+    "public_docs": 15,
+    "sections": 25
+  }
+}

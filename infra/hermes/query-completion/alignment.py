@@ -30,10 +30,12 @@ def load_harness():
     return module
 
 
-def enabled(agent):
+def enabled(agent, evidence):
+    """Use the shared exact operator-model guard, including the deployed model."""
     platform = getattr(agent, "platform", "")
     return (str(getattr(platform, "value", platform)).lower() == "mattermost"
-            and getattr(agent, "model", None) == "qwen3.6:35b"
+            and callable(getattr(evidence, "verified_runtime_model", None))
+            and evidence.verified_runtime_model(agent, getattr(agent, "model", None))
             and getattr(agent, "provider", None) == "custom"
             and getattr(agent, "api_mode", "chat_completions") == "chat_completions")
 
@@ -296,7 +298,7 @@ def recover_summary_request(request, rows, idx, query, harness):
 def request_wrapper(original, query, harness):
     @functools.wraps(original)
     def wrapped(agent, **kw):
-        if not enabled(agent):
+        if not enabled(agent, harness.EVIDENCE):
             return original(agent, **kw)
         request = query.current_request_text(kw.get("original_user_message"))
         request = harness.resolve_short_read(request, harness.native_scope_history(kw.get('original_user_message')))
@@ -488,13 +490,13 @@ def proposal_input_wrapper(original, harness, version):
     @functools.wraps(original)
     def wrapped(agent, ref):
         block, arguments = original(agent, ref)
-        if block is None and enabled(agent) and harness.EVIDENCE.allowed(ref.name,'verify'):
+        if block is None and enabled(agent, harness.EVIDENCE) and harness.EVIDENCE.allowed(ref.name,'verify'):
             schema=next((t['function'].get('parameters') for t in getattr(agent,'tools',[])
                          if isinstance(t,dict) and t.get('function',{}).get('name')==ref.name),None)
             rejection=harness.EVIDENCE.tool_input_rejection(ref.name,arguments,schema)
             if rejection:return json.dumps(rejection,ensure_ascii=False),arguments
         match = re.fullmatch(r'mcp__(rule_write_[ab])__(propose_rule_edit|propose_rule_change)', ref.name)
-        if block is not None or not enabled(agent) or not match:
+        if block is not None or not enabled(agent, harness.EVIDENCE) or not match:
             return block, arguments
         context = getattr(agent, '_capstone_proposal_context', None)
         if not context or context[0] != getattr(agent, '_current_turn_id', None):
@@ -531,7 +533,7 @@ def budget_fallback_wrapper(original, query, harness, reanchor):
         remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
         exhausted = (type(count) is int and type(maximum) is int and count >= maximum
                      or type(remaining) is int and remaining <= 0)
-        if (enabled(agent) and exhausted and not kw.get('interrupted') and not kw.get('failed')
+        if (enabled(agent, harness.EVIDENCE) and exhausted and not kw.get('interrupted') and not kw.get('failed')
                 and not getattr(agent, '_interrupt_requested', False)
                 and kw.get('final_response') is None and kw.get('_pending_verification_response') is None
                 and str(kw.get('_turn_exit_reason')) in ('unknown','budget_exhausted')
@@ -579,11 +581,12 @@ def selection_response(response, schema, harness=None):
 
 
 def selection_call_wrapper(original, query, harness=None):
+    harness = harness if harness is not None else load_harness()
     @functools.wraps(original)
     def wrapped(agent, **kw):
         selection = getattr(agent, '_capstone_read_selection', None)
         verdict = original(agent, **kw)
-        if (not enabled(agent) or not selection or selection[0] != kw.get('turn_id')
+        if (not enabled(agent, harness.EVIDENCE) or not selection or selection[0] != kw.get('turn_id')
                 or selection[0] != getattr(agent, '_current_turn_id', None)
                 or getattr(verdict, 'action', None) != 'fallthrough'
                 or getattr(agent, '_interrupt_requested', False)):
@@ -605,7 +608,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
     @functools.wraps(legacy)
     def wrapped(agent, **kw):
         message, rows, user = kw.get("assistant_message"), kw.get("messages"), kw.get("user_message")
-        if (not enabled(agent) or kw.get("finish_reason") != "stop"
+        if (not enabled(agent, harness.EVIDENCE) or kw.get("finish_reason") != "stop"
                 or getattr(message, "tool_calls", None) or not isinstance(rows, list)
                 or getattr(agent, "_interrupt_requested", False)):
             return legacy(agent, **kw)

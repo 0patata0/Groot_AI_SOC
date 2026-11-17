@@ -47,6 +47,10 @@ def host_mentions(text):
     found = [(m.start(), m.end(), names[name])
              for pattern, name in ASSET_PATTERNS if name in names
              for m in re.finditer(r'(?<![A-Za-z0-9_.:/@-])(?:' + pattern + r')(?![A-Za-z0-9_.:/@-])', text, re.I)]
+    # A complete logical target also carries an explicit host. Do not read the
+    # same letter in a URL, path, unit name or ordinary lowercase prose as one.
+    found.extend((m.start(), m.end(), m[1]) for m in re.finditer(
+        r'(?<![A-Za-z0-9_.:/@-])([abc]):[a-z][a-z0-9-]*(?![A-Za-z0-9_.:/@-])', text))
     for match in re.finditer(r'(?<![A-Za-z0-9_.:/@-])([ABC])(?=$|[\s,;/·]|(?:의|은|는|도|만)(?![A-Za-z]))', text):
         if not any(a <= match.start() and match.end() <= b for a, b, _ in found):
             found.append((match.start(), match.end(), match[1].lower()))
@@ -55,6 +59,8 @@ def host_mentions(text):
 
 def without_hosts(text):
     for start, end, _ in reversed(host_mentions(text)):
+        if re.fullmatch(r'[abc]:[a-z][a-z0-9-]*', text[start:end]):
+            end = start + 2  # Keep the object name after its explicit host.
         text = text[:start] + ' ' * (end - start) + text[end:]
     return text
 
@@ -109,7 +115,8 @@ def supplied_kst_display(text, aware_time):
 
 def asset_mentions(text):
     names = {'a': 'groot-sec', 'b': 'groot-siem-host', 'c': 'groot-web'}
-    mentions = [(start, end, names[host], None) for start, end, host in host_mentions(text)]
+    mentions = [(start, end, names[host], None) for start, end, host in host_mentions(text)
+                if not re.fullmatch(r'[abc]:[a-z][a-z0-9-]*', text[start:end])]
     mentions += [(m.start(), m.end(), name, None)
                  for pattern, name in ASSET_PATTERNS if name == 'wazuh.manager'
                  for m in re.finditer(pattern, text, re.I)]

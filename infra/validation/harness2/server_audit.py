@@ -117,6 +117,9 @@ def default_component_paths() -> dict[str, str]:
             paths[f"{surface}/skills/{skill}/SKILL.md"] = roots[surface] + "/" + filename
         for name, filename in scripts[surface].items():
             paths[f"{surface}/scripts/{name}.py"] = roots[surface] + "/" + filename
+    # Native normalization reads this policy copy, while Hermes also retains
+    # its root SOUL. Observe both; byte identity is not assumed.
+    paths["native/runtime_policy.md"] = roots["native"] + "/soc_policy.md"
     return paths
 
 
@@ -442,8 +445,9 @@ def _finding_kinds(message):
 
 
 def _surface(tree, name, routed=False):
+    prompts = ("systemprompt.md", "runtime_policy.md") if name == "native" else ("systemprompt.md",)
     return tree.SurfaceSpec(
-        name="soc-" + name, always_on=("systemprompt.md", ROUTING_INDEX) if routed else ("systemprompt.md",),
+        name="soc-" + name, always_on=prompts + ((ROUTING_INDEX,) if routed else ()),
         always_on_max=65536,
         always_on_cap_reason="fixed audit structural cap; not a model context estimate",
         skill_dir="skills", skill_name_rule="must_match", trigger_hint="Review actual runtime skill routing.",

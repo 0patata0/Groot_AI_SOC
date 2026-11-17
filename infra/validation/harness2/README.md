@@ -1,10 +1,10 @@
 # Harness² 보완 점검
 
-관리 호스트의 기존 `chat_contract.py`·`read_contract.py`를 고정 감사 목록에도 포함했다. 초기 설치는 같은 목록 생성기를 사용하고 기존 B의 audit.json·installation.json은 실제 SHA와 맞췄다.47→49는 새 도구 수가 아니라 관측 소스 수다. 두 파일 중 하나가 없는 반례도 검사했다. 이때 incomplete로 남기고 개선안 승격을 막는지 확인했다. [운영·검사 원장](../management-latency/event-window.validation.json).
+Native가 실제 정규화에 읽는 `soc_policy.md`를 고정 감사 목록에 추가했다. root SOUL과 별개 경로로 관측하고 누락 시 incomplete·승격 보류를 검사한다. 초기 설치 목록과 B의 audit/installation 영수증을 함께 맞춰49→50소스로 늘렸다. 운영 Native census의33,505자는 기존 동일 정책2사본을 이제 각각 센 수치이며 새 prompt 주입량이 아니다. [운영·검사 원장](../management-latency/read-scope.validation.json).
 
 <!-- chat-alignment:current -->
 
-[양봇 공통 보강 이관](../management-latency/README.md)의 후속 호명·기간·시간 열 보완을21:18 KST 운영 확정했다. 새6채팅은11.263~29.165초였으며 Native 계산/지표 이름/표와 SDK 명시 호스트 범위 오류는 남았다. Mac/Linux각31·H2각37·설치각37과 운영49소스 passed는 별도 근거다. 모델·MCP·승인 경계는 유지하고 새 OS 전체 설치·실제 브라우저 검수는 미수행이다.
+[양봇 공통 조회 보완](../management-latency/README.md). 학습 모델의 Native 공통 처리 우회와 명시 호스트 선택을 보완해22:27 KST 운영 확정했다. 새8채팅11.397~21.943초·8읽기/거절0, Mac/Linux각145·H2각38·설치각37·정본Native429를 확인했다. 운영 Harness²는 기존 Native 정책 사본을 감사하여50소스 passed다. 모델·MCP·승인 경계는 유지하며 복합 조사·새 OS 전체 설치·브라우저 검수는 미완료다.
 
 <!-- diagnostic-read-boundaries:start -->
 진단 경계 후속은 [검증 원장](../diagnostic-read-boundaries/README.md)에 정리했다. 내부µs·등록 대상 확인·명확한 상대 기간과 원인 괄호 반례를 보완했고 실제SDK3요청/4읽기·모델완료6·wire2성공/3거절을 확인했다. not-found/default Result의 미검출 해석 오류가 남아 미승격이며 현재 정본·초기 설치·운영/권한/모델은 바꾸지 않았다. 구조/회귀·실제 의미·새 채팅을 구분한다.

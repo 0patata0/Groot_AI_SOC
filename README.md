@@ -3,14 +3,14 @@
 <!-- current-work-summary:start -->
 자동 관리의 입력 중복·보고 표·중단 복구를 운영 B에 반영했다. 성공한 읽기의 실행/사건 결속을 보존하고 프로세스 중단 뒤 모델 호출 없이 미완료 보고를 복원한다. Mac209·설치47·Linux20와 실제9읽기 기록의 재처리·격리SIGKILL 복구를 확인했다. **응답30~60초와 양봇 실제 채팅은 아직 미완료다.** [이번 적용·한계](infra/validation/management-latency/README.md) · [현재 상태](STATUS.md).
 
-Malvex는 고정 소스를 참고했으며 설치하거나 MCP를 추가하지 않았다. 기존 공통 조사 스킬을 보완했고 도구·승인 권한은 유지한다. Native/SDK의 gate·출력/조사 스킬·핀·영수증 이관과 반복 조회/긴 판단 출력 개선이 다음 순서다. 공격 송신과 새 학습은 중단한다. 논문에는 이후 실제 사용 코드와 수동/스크립트 설치 절차를 보완한다.
+Malvex는 고정 소스를 참고했으며 설치하거나 MCP를 추가하지 않았다. 기존 공통 조사 스킬을 보완했고 도구·승인 권한은 유지한다. Native/SDK의 gate·출력/조사 스킬·핀·영수증 이관과 반복 조회/긴 판단 출력 개선이 다음 순서다. 공격 송신과 새 학습은 중단한다. 논문 구조 재편과 재현용 코드·설정·절차 보강은 이번 작업에서 수행했으며 기존 병목과 두 봇의 새 실제 채팅 검증은 계속 남아 있다.
 <!-- current-work-summary:end -->
 
 논문·판넬용 기술 로고와 그림은 로컬 전용 `logo/`에 보관한다. 판넬 자료는 `_pan` 접미사로 구분하며 `logos_pan.png`는 로고 미리보기, `method_pan.png`와 `method_pan.svg`는 논리 흐름도다. 출처·SHA는 같은 폴더의 원장에 남기고 폴더 전체를 Git에서 제외한다. 실제 구현·성능 검증의 완료 범위는 [현재 상태](STATUS.md)를 따른다.
 
 공격 시험은 현재 중단 상태다. 이전 실행과 별도 정적 분석의 결과는 검증 기록으로 구분하고, A/B/C 관리는231 경유·233 자료 보관·학습 미편입 원칙을 유지한다.
 
-논문은 문어체와 확정 서식·기술 로고를 반영한73쪽 MD/PDF/DOCX로 맞추고 전 페이지를 검수했다. TLS 반복 경고는 서비스 IP 제한에서 재현했으며 고정 프록시 후보의 native26검사·실제 TLS helper 검증을 통과했다. 운영 적용·독립 원복·설치 연결은 아직이다. 조회된 systemd5건은 과거 시험 유닛이며 B 현재 failed0을 확인했다. 전역 WAF 파일과 후속 실제 거래의 Enabled·403은 관측 범위가 다르므로 구분한다. [인증서 후보·한계](infra/groot-a/certificate-monitor/README.md) · [현재 상태](STATUS.md).
+논문은 2025년 첫 보안관제 논문의6장 구조로 재편했다. 관련 연구와 설계 근거, 실제 코드·설정·입출력·검증을 본문에 연결하고 사용자 점검 절차는 부록에 두었다. 고정 커밋의 핵심 소스40개·발췌 함수3개·재현 원장을 보존하고 MD/DOCX/PDF를 함께 검수했다. 새 OS 전체 설치와 후임자 독립 재구현은 미수행이다. TLS 반복 경고는 서비스 IP 제한에서 재현했으며 고정 프록시 후보의 native26검사·실제 TLS helper 검증을 통과했다. 운영 적용·독립 원복·설치 연결은 아직이다. 조회된 systemd5건은 과거 시험 유닛이며 B 현재 failed0을 확인했다. 전역 WAF 파일과 후속 실제 거래의 Enabled·403은 관측 범위가 다르므로 구분한다. [인증서 후보·한계](infra/groot-a/certificate-monitor/README.md) · [현재 상태](STATUS.md).
 
 
 현재 읽기 경로의 [실제 MCP6요청](infra/validation/live-reads/README.md)은 FW15.003초·B범위/DNS판단/시각 계산/journal실패를 확인했다. 후속 [native journal 어댑터](infra/validation/journal-adapter/README.md)의166검사·실제격리8건과 별도 [정확9코드 적용안](infra/validation/journal-adapter/application/README.md)의33회귀·9복제적용/9원복·18중간cold load를 마쳤다. A/B/C 최종후보·원본6개는 PREPARED이며 운영 apply/원복 timer·실제MCP/양봇 새채팅은 아직 미수행이다. 두 봇의 모델·권한과 기존19파일 승인은 이 후보에 포함하지 않는다. 새 학습·공격·운영 변경도 없다.

@@ -87,3 +87,6 @@ shasum -a 256 /private/tmp/groot-old-status.md
 수집 오버레이의 실제 A/B 잘림 보완·과거4ID/격리 캐시 인수·초기 실패/최종 회귀·미배포 범위는 유형별5이력과 [수집 원장](../infra/validation/journal-composition/collection-validation.json)을 따릅니다. 이전 캐시 준비와 기본 통합 기록은 당시 사실로 보존합니다.
 
 자동 관리의 입력 중복·보고 의존성 누락·중단 복구와 Malvex 선택적 참고는 [현황 이력](STATUS_HISTORY.md)·[진단 이력](DIAGNOSTIC_HISTORY.md)·[설계 대안](DESIGN_ALTERNATIVES.md)에 기록했다. 현재 적용 범위와 미완료는 [검증 문서](../infra/validation/management-latency/README.md)를 따른다.
+
+
+논문 구조 재편의 결과·계획·설계·검증은 STATUS_HISTORY·PLAN_HISTORY·DESIGN_ALTERNATIVES·DIAGNOSTIC_HISTORY의 `thesis-structure-20261117` 항목에 기록했다. 실제 배포 변경은 없어 DEPLOYMENT_HISTORY의 새 적용 이력은 추가하지 않았다.

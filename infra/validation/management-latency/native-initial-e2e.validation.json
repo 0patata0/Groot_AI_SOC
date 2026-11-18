@@ -1,0 +1,757 @@
+{
+  "format": "native_initial_live_read_report_v1",
+  "at_kst": "2026-11-18T08:54:58.414500+09:00",
+  "scope": {
+    "operating_applied": false,
+    "flag": "CAPSTONE_EVIDENCE_REPORT_COMPACT",
+    "default": "0",
+    "mcp_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "new_mcp_servers_tools_ports_packages": 0,
+    "permission_approval_or_ttl_changes": false,
+    "attack_training_and_dgx_polling": false,
+    "explicit_mattermost_posts": 0
+  },
+  "candidate": {
+    "files": 23,
+    "plan_sha256": "1ed94127a8e17db204d3c4b7973820efb48bed81247cae53807feb803dbcd5a2",
+    "canonical_sources": {
+      "infra/hermes/soc_management_run.py": "758ec79eaa5f248a244f0aee96e860eb8ab2ddb7ef07311dbd113d64abd25c02",
+      "infra/hermes/query-completion/__init__.py": "45f157ccd6789dff789996c31d60b293042494a366946d9ae1cdfde6570d729f",
+      "infra/hermes/test_native_incident_phase.py": "7a9d4f8ba092499d4e797c748d4d2a9df31c59cc4f9ddf93c08bcaec9901f1e9",
+      "infra/hermes/read_contract.py": "ee443b6d8a136c32dba6035560b86fc45042f036ba58f6e14641e33eda27384c",
+      "infra/ollama-trial/test_companion_reads.py": "20fefb5551bbf11c9a2dc0bf7e284c50f18ba57996e2116d2b3a1ba7a508b0b2",
+      "infra/hermes/chat_contract.py": "2ac34fc2575ec48c8d0782d848417dc32cb5fe6a53ca40e7ef8f01d7833ade86",
+      "infra/ollama-trial/test_capability_grounding.py": "43381deeaafbd05af959ad7919ad015e3ea2eb0774d14f2d732b18a162e7328e"
+    },
+    "installed_grounding_sha256": "48cb127a15e158a52fbaf68c26052bb808c5559fdb7ed2b0e9ab3259f545c6d2",
+    "embedded_gate_bytes": 75442,
+    "installed_branches_preserved": true,
+    "operating_flag_activation_connected": false
+  },
+  "behavior": {
+    "first_reads": "Shared complete named-sensor/current-list batch and explicit KST calendar day; missing tool fails closed.",
+    "current_list_intent": "A leading current-time phrase can qualify an independent coordinated inventory request, preserving sensor/history/prohibition/write exclusions.",
+    "report_profile": {
+      "reasoning_effort": "none",
+      "max_tokens": 2048,
+      "temperature": 0,
+      "top_p": 0.95
+    },
+    "repair": "Rejected claim or inquiry feedback stays bound to current request/clock/receipt bytes; at most2 combined repairs, repeated identical rejected inquiry stops.",
+    "budgets": "Prepared reports6, inquiry rounds2, existing Native global12 iterations/time controls retained; no repeated read dispatch to buy retries.",
+    "audit": "Original content only, private raw/SHA; no reasoning_content collection or publication of rejected JSON."
+  },
+  "harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_files": 140,
+    "census": {
+      "native/base": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "native/candidate": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "sdk/base": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "sdk/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "management/base": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      },
+      "management/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/alignment.py",
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/harness.py",
+          "scripts/query_grounding.py",
+          "scripts/read_contract.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/harness.py",
+          "scripts/query_grounding.py",
+          "scripts/read_contract.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/read_contract.py",
+          "scripts/soc_management_controller.py",
+          "scripts/soc_management_run.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "before_at_kst": "2026-11-18T08:39:30.377407+09:00",
+    "after_at_kst": "2026-11-18T08:53:23.322956+09:00",
+    "after_status": "passed"
+  },
+  "tests": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 240,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 240,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.375s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.546s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "all_canonical_tests_rerun": false,
+    "prior_canonical_sdk_failures_not_claimed_fixed": true,
+    "actual_native_trials": [
+      {
+        "runtime": 7,
+        "plan_sha256": "0b0b443232882cf35feeabdacbb24c5f47910760ac42df1be3af17e78dfdd656",
+        "elapsed_seconds": 62.58340975799365,
+        "cli_duration_ms": 52310,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks"
+        ],
+        "read_arguments": [
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00",
+            "limit": 25
+          },
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00",
+            "limit": 25
+          },
+          {}
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": false,
+        "render_matches": false,
+        "request_nonce_match": false,
+        "model_assessment": null,
+        "model_status": null,
+        "claim_issues": null,
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 7.077764,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": false,
+            "seconds": 42.31976,
+            "selected_reads": null,
+            "error_code": "management_selection_response_shape",
+            "issues": [],
+            "profile": null
+          }
+        ]
+      },
+      {
+        "runtime": 8,
+        "plan_sha256": "df3618466b3988fdc3968004cb785fc9304f11040b401da17e10d0314576aec1",
+        "elapsed_seconds": 39.7817845629761,
+        "cli_duration_ms": 28679,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks"
+        ],
+        "read_arguments": [
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00",
+            "limit": 10
+          },
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00",
+            "limit": 10
+          },
+          {}
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": false,
+        "render_matches": false,
+        "request_nonce_match": true,
+        "model_assessment": "unresolved",
+        "model_status": "needs_review",
+        "claim_issues": [
+          "incident_disposition_missing"
+        ],
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 6.820394,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": false,
+            "seconds": 18.874864,
+            "selected_reads": null,
+            "error_code": "management_incident_report_claim_invalid",
+            "issues": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      },
+      {
+        "runtime": 9,
+        "plan_sha256": "871a87286f178ce30157b0129bbbe02071139564ef8080ddd068b0a45add5304",
+        "elapsed_seconds": 67.09431634098291,
+        "cli_duration_ms": 57035,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks",
+          "mcp__security_events__search_wazuh_alerts"
+        ],
+        "read_arguments": [
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00"
+          },
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00"
+          },
+          {},
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00"
+          }
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": true,
+        "render_matches": true,
+        "request_nonce_match": true,
+        "model_assessment": "unresolved",
+        "model_status": "needs_review",
+        "claim_issues": [],
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 6.670826,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": false,
+            "seconds": 19.02228,
+            "selected_reads": null,
+            "error_code": "management_incident_report_claim_invalid",
+            "issues": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          },
+          {
+            "accepted": true,
+            "seconds": 8.417353,
+            "selected_reads": 1,
+            "error_code": null,
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          },
+          {
+            "accepted": true,
+            "seconds": 19.831154,
+            "selected_reads": 0,
+            "error_code": null,
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      },
+      {
+        "runtime": 10,
+        "plan_sha256": "871a87286f178ce30157b0129bbbe02071139564ef8080ddd068b0a45add5304",
+        "elapsed_seconds": 37.88042877800763,
+        "cli_duration_ms": 27191,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts"
+        ],
+        "read_arguments": [
+          {
+            "limit": 10,
+            "lookback_minutes": 60,
+            "until_kst": "2026-11-18T08:34:56.370764+09:00"
+          },
+          {
+            "limit": 10,
+            "lookback_minutes": 60,
+            "until_kst": "2026-11-18T08:34:56.370764+09:00"
+          }
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": false,
+        "render_matches": false,
+        "request_nonce_match": true,
+        "model_assessment": null,
+        "model_status": null,
+        "claim_issues": null,
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 6.279829,
+            "selected_reads": 2,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": false,
+            "seconds": 9.313835,
+            "selected_reads": null,
+            "error_code": "management_incident_report_claim_invalid",
+            "issues": [
+              "sample_zero_presented_as_absence",
+              "unobserved_block_list_claim"
+            ],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          },
+          {
+            "accepted": false,
+            "seconds": 8.43071,
+            "selected_reads": null,
+            "error_code": "management_incident_inquiry_rejected",
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      },
+      {
+        "runtime": 11,
+        "plan_sha256": "6a952b1f28342dbff18369a5a0f76dcf23400c8a77559d6fc74f7526dde0341e",
+        "elapsed_seconds": 37.52168792596785,
+        "cli_duration_ms": 27266,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks"
+        ],
+        "read_arguments": [
+          {
+            "limit": 10,
+            "lookback_minutes": 60
+          },
+          {
+            "limit": 10,
+            "lookback_minutes": 60
+          },
+          {}
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": false,
+        "render_matches": false,
+        "request_nonce_match": true,
+        "model_assessment": null,
+        "model_status": null,
+        "claim_issues": null,
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 5.325748,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": false,
+            "seconds": 11.78894,
+            "selected_reads": null,
+            "error_code": "management_incident_report_claim_invalid",
+            "issues": [
+              "block_inventory_does_not_verify_activation",
+              "sample_zero_presented_as_absence"
+            ],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          },
+          {
+            "accepted": false,
+            "seconds": 7.529526,
+            "selected_reads": null,
+            "error_code": "management_incident_inquiry_rejected",
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      },
+      {
+        "runtime": 12,
+        "plan_sha256": "1ed94127a8e17db204d3c4b7973820efb48bed81247cae53807feb803dbcd5a2",
+        "elapsed_seconds": 28.745246423990466,
+        "cli_duration_ms": 18426,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks"
+        ],
+        "read_arguments": [
+          {
+            "lookback_minutes": 60
+          },
+          {
+            "lookback_minutes": 60
+          },
+          {}
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": true,
+        "render_matches": true,
+        "request_nonce_match": true,
+        "model_assessment": "unresolved",
+        "model_status": "monitor",
+        "claim_issues": [],
+        "model_phases": [
+          {
+            "accepted": true,
+            "seconds": 4.258425,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": true,
+            "seconds": 11.77293,
+            "selected_reads": 0,
+            "error_code": null,
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      },
+      {
+        "runtime": 13,
+        "plan_sha256": "1ed94127a8e17db204d3c4b7973820efb48bed81247cae53807feb803dbcd5a2",
+        "elapsed_seconds": 64.76403383800061,
+        "cli_duration_ms": 54120,
+        "actual_read_tools": [
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__resp__list_blocks"
+        ],
+        "read_arguments": [
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00"
+          },
+          {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-18T00:00:00+09:00"
+          },
+          {}
+        ],
+        "all_audit_receipt_prefixes_match": true,
+        "report_admitted": true,
+        "render_matches": true,
+        "request_nonce_match": true,
+        "model_assessment": "unresolved",
+        "model_status": "needs_review",
+        "claim_issues": [],
+        "model_phases": [
+          {
+            "accepted": false,
+            "seconds": 7.520405,
+            "selected_reads": null,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": true,
+            "seconds": 24.685788,
+            "selected_reads": 3,
+            "error_code": null,
+            "issues": [],
+            "profile": null
+          },
+          {
+            "accepted": true,
+            "seconds": 19.218307,
+            "selected_reads": 0,
+            "error_code": null,
+            "issues": [],
+            "profile": {
+              "reasoning_effort": "none",
+              "max_tokens": 2048,
+              "temperature": 0,
+              "top_p": 0.95
+            }
+          }
+        ]
+      }
+    ],
+    "final_candidate_reports_admitted": 2,
+    "final_candidate_cases": 2,
+    "independent_expert_accuracy_or_statistical_latency_claim": false,
+    "manual_semantic_limitations": [
+      "Final2reports passed current mechanical guards. In runtime12 the broad current-state wording relies on the explicit feature-scope banner and observed current-inventory table; this is not an unrestricted independent semantic accuracy result.",
+      "Runtime13 used a rejected initial selection and large-context fallback. Inquiry-rejection feedback was covered by boundary tests but did not fire in the final2actual trials."
+    ],
+    "initial_selection_replay": {
+      "candidate_plan_sha256": "1ed94127a8e17db204d3c4b7973820efb48bed81247cae53807feb803dbcd5a2",
+      "scope": "Exact captured selections with shared named-batch validator; original native nonce identity not replayed. No model/MCP calls.",
+      "results": [
+        {
+          "accepted": false,
+          "error_class": "ValidationError",
+          "feedback": {
+            "error": "read_selection_schema_validation_failed",
+            "validator": "minItems",
+            "path": [
+              "calls"
+            ],
+            "selected_calls": 3,
+            "maximum_calls": 3,
+            "missing_arguments_at": [],
+            "missing_tools": [
+              "mcp__resp__list_blocks"
+            ]
+          }
+        },
+        {
+          "accepted": true,
+          "reads": 3,
+          "removed_duplicates": 0
+        }
+      ]
+    }
+  },
+  "runtime_setup": {
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "fresh_writable_state": true,
+    "original_config_soul_skills_auth_read_only": true,
+    "credential_copies": 0,
+    "verified_operating_python_overlays": 3,
+    "guard_runtime_package": "regex2026.9.29;8required server-only temporary files",
+    "identity": "UID995/GID986; actual HOME/passwd/group semantics retained; no shadow or password hashes copied",
+    "pre_model_preparation_failures": [
+      "1 missing operating guard module",
+      "2 rejected proc-directory bind",
+      "3 missing isolated guard engine",
+      "4 temporary guard parent permissions",
+      "5 base-image UID995 absent; initial MCP connections closed before message",
+      "6 generated worker SyntaxError; journal retained, no result artifact; collected unit default exit0 is not success"
+    ],
+    "static_preparation_failures": [
+      "Canonical test pin was not updated before first26-test attempt.",
+      "Whole canonical wrapper was incompatible with installed helper API;2static errors fixed by transplanting only this unit delta."
+    ],
+    "originals_not_modified": true
+  },
+  "operating_after": {
+    "at_kst": "2026-11-18T08:53:04.062108+09:00",
+    "unchanged_sources": 59,
+    "same_model_catalog": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T08:54:28.642585+09:00",
+    "roots_removed": 18,
+    "files_removed": 3865,
+    "bytes_removed": 206867038,
+    "exported_artifacts_sha_verified": 89,
+    "operating_or_backups_touched": false,
+    "original_framework_guard_runtime_skills_credentials_preserved": true,
+    "mac_packages_installed": 0,
+    "mac_package_downloads": 0,
+    "owned_containers_running_after": 0,
+    "declared_native_cases_checked_terminal": 13,
+    "declared_validation_containers_absent_after": 13
+  },
+  "remaining": [
+    "Initial Native selection schema failure still falls back to a large conversation; runtime13 first failure7.520s, second selection91876message-bytes/24.686s. Compact bounded initial-selection feedback remains to be connected.",
+    "Connect trusted operating activation for Native/SDK read-only paths, freeze/review exact deployment and obtain required approval.",
+    "New actual Mattermost requests and rendered tables; current trials exclude its transport/queue/browser.",
+    "30/60second end-to-end target, report quality across new cases and extended web evidence gaps remain unproven.",
+    "Known SDK full-suite failures, web path/intervention/impact gaps and other existing SOC tasks remain."
+  ],
+  "publication": {
+    "state": "pending_commit_and_push",
+    "private_traces_credentials_weights_excluded": true
+  }
+}

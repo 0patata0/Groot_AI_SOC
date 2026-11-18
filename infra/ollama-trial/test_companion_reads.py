@@ -30,6 +30,21 @@ def schemas(names=(MOD, SUR, BLOCK)):
 
 
 class CompoundReadIntent(unittest.TestCase):
+    def test_leading_current_time_covers_a_separate_coordinated_inventory_request(self):
+        for q in ('지금 WAF·IDS 경보 조사하고 임시 차단 IP도 보여줘.',
+                  '현재 IDS 로그 확인하고 막힌 아이피 보여줘',
+                  '현 시점의 Wazuh 경보 분석한 뒤 차단 IP 알려줘',
+                  '지금 WAF 경보 비교하고 임시 차단 주소도 대조해줘'):
+            self.assertTrue(h.READ.companion_block_request(q),q)
+            self.assertIn(BLOCK,h.incident_required_read_gaps(q,[]),q)
+        for q in ('지금 WAF의 차단 IP도 보여줘', '현재 IDS 차단 주소 알려줘',
+                  '현재 WAF 경보 조사하고 IDS 차단 IP 알려줘',
+                  '현재 WAF 경보 조사하고 어제 차단 IP 보여줘',
+                  '지금 WAF 경보 조사하고 임시 차단 IP는 제외해줘',
+                  '지금 WAF 경보 조사하고 IP 차단해줘',
+                  '"지금 WAF 경보 조사하고 차단 IP 보여줘"라는 문장 설명해줘'):
+            self.assertFalse(h.READ.companion_block_request(q),q)
+
     def test_short_temporary_block_state_question_keeps_the_event_peers(self):
         for q in ('어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 IP 임시차단은?',
                   'WAF·IDS 경보 조사하고 지금 아이피 임시 차단은?',

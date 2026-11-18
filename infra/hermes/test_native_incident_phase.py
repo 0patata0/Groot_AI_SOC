@@ -111,6 +111,7 @@ class NativePhase(unittest.TestCase):
         line=next(v for v in logs.splitlines() if v.startswith('management_incident_report_audit '))
         audit=json.loads(line.split(' ',1)[1]);self.assertEqual(audit['untrusted_raw_response'],raw)
         self.assertEqual(audit['raw_response_sha256'],hashlib.sha256(raw.encode()).hexdigest())
+        self.assertEqual(audit['inference_profile'],selection['incident_inference_profile'])
         self.assertNotEqual(result.response.choices[0].message.content,raw)
 
     def test_invalid_json_nonce_or_claim_is_not_returned_as_a_report(self):
@@ -127,6 +128,7 @@ class NativePhase(unittest.TestCase):
             self.assertIn('MANAGEMENT_STATUS: needs_review',text,kind)
             self.assertIsNone(result.response.choices[0].message.tool_calls)
             self.assertIn('"accepted": false',logs)
+            if kind=='current_unknown':self.assertIn('current_block_inventory_unknown_scope',logs)
 
     def test_current_receipts_or_root_context_cannot_change_after_the_lease(self):
         for kind in ('receipt','clock','question'):
@@ -174,5 +176,196 @@ class NativePhase(unittest.TestCase):
     def test_lost_evidence_after_phase_start_cannot_fall_back_to_unbound_prompt(self):
         self.lease();self.snapshot['receipts']=[]
         with self.assertRaisesRegex(RuntimeError,'receipts_unavailable'):self.lease()
+
+    def initial(self,question=None,missing=()):
+        question=question or self.chat['request']
+        catalog=copy.deepcopy(self.catalog)
+        for name in (MOD,SUR):
+            catalog[name]['properties'].update(since_kst={'type':'string'},until_kst={'type':'string'},
+                limit={'type':'integer','minimum':1,'maximum':50})
+        for name in missing:catalog.pop(name)
+        request={**self.request,'tool_choice':'required','tools':[
+            {'type':'function','function':{'name':n,'parameters':s}} for n,s in catalog.items()]}
+        self.agent.valid_tool_names=set(catalog)
+        with patch.dict(os.environ,{'CAPSTONE_CHAT_READ_JSON':json.dumps({**self.chat,'request':question})}):
+            result=w.management_read_request(request,self.agent,pending=True)
+        return result,self.agent._capstone_management_selection,catalog
+
+    def test_initial_named_sensors_and_current_list_form_one_complete_read_batch(self):
+        from jsonschema import ValidationError
+        request,selection,_=self.initial()
+        self.assertTrue(selection['shared_incident_initial'])
+        self.assertEqual(set(selection['catalog']),{MOD,SUR,BLOCK})
+        self.assertEqual(selection['schema']['title'],'RequiredReadToolSelection')
+        self.assertEqual(selection['schema']['properties']['calls']['minItems'],3)
+        calls=[{'tool':n,'arguments':{} if n==BLOCK else {
+            'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-18T00:00:00+09:00'}} for n in (MOD,SUR,BLOCK)]
+        value={'request_nonce':selection['nonce'],'calls':calls}
+        result,count=w.management_selection_response(self.response(value),selection,self.agent)
+        self.assertEqual(count,3);self.assertEqual(result.choices[0].finish_reason,'tool_calls')
+        with self.assertRaises(ValidationError):
+            w.management_selection_response(self.response({**value,'calls':calls[:2]}),selection,self.agent)
+        repeated=[calls[0],{**calls[0],'arguments':{**calls[0]['arguments'],'limit':5}},calls[1]]
+        with self.assertRaises(ValidationError):
+            w.management_selection_response(self.response({**value,'calls':repeated}),selection,self.agent)
+
+    def test_initial_calendar_binding_matches_shared_today_and_yesterday_rules(self):
+        from jsonschema import Draft202012Validator
+        for word,start,end in (('어제','2026-11-17T00:00:00+09:00','2026-11-18T00:00:00+09:00'),
+                               ('오늘','2026-11-18T00:00:00+09:00',AT)):
+            question=f'{word} WAF·IDS 경보 조사해줘. 현재 임시 IP 차단도 확인해줘.'
+            if hasattr(self.agent,'_capstone_chat_selection_turn'):del self.agent._capstone_chat_selection_turn
+            _,selection,_=self.initial(question)
+            schema=selection['schema'];nonce=selection['nonce']
+            calls=[{'tool':n,'arguments':{} if n==BLOCK else {'since_kst':start,'until_kst':end}} for n in (MOD,SUR,BLOCK)]
+            self.assertTrue(Draft202012Validator(schema).is_valid({'request_nonce':nonce,'calls':calls}))
+            for bad in ({'lookback_minutes':30},{'since_kst':'2026-11-18T04:30:00+09:00','until_kst':AT}):
+                changed=copy.deepcopy(calls);changed[0]['arguments']=bad
+                self.assertFalse(Draft202012Validator(schema).is_valid({'request_nonce':nonce,'calls':changed}))
+
+    def test_initial_missing_registered_companion_never_silently_narrows_scope(self):
+        for name in (MOD,SUR,BLOCK):
+            if hasattr(self.agent,'_capstone_chat_selection_turn'):del self.agent._capstone_chat_selection_turn
+            with self.assertRaisesRegex(RuntimeError,'initial_read_scope_missing'):self.initial(missing=(name,))
+
+    def test_initial_explicit_period_and_controller_bound_dates_are_preserved(self):
+        from jsonschema import Draft202012Validator
+        _,selection,_=self.initial('어제 11시부터 12시까지 WAF·IDS 경보 조사해줘.')
+        self.assertEqual(set(selection['catalog']),{MOD,SUR})
+        self.assertNotIn(BLOCK,selection['catalog'])
+        value={'request_nonce':selection['nonce'],'calls':[{'tool':n,'arguments':{
+            'since_kst':'2026-11-17T11:00:00+09:00','until_kst':'2026-11-17T12:00:00+09:00'}} for n in (MOD,SUR)]}
+        self.assertTrue(Draft202012Validator(selection['schema']).is_valid(value))
+        schema={'type':'object','additionalProperties':False,'properties':{
+            'since_kst':{'const':'2026-11-16T00:00:00+09:00'},'until_kst':{'const':'2026-11-17T00:00:00+09:00'},
+            'lookback_minutes':{'type':'integer'}},'required':['since_kst','until_kst']}
+        self.assertEqual(self.h.initial_event_day_schemas('어제 WAF 조사해줘.',{MOD:schema},[],AT),{MOD:schema})
+
+    def test_initial_default_off_and_follow_up_do_not_rebind_prior_selection(self):
+        with patch.dict(os.environ,{'CAPSTONE_EVIDENCE_REPORT_COMPACT':'0'}):
+            _,selection,_=self.initial()
+        self.assertNotIn('shared_incident_initial',selection)
+        self.assertNotIn(BLOCK,selection['catalog'])
+        self.agent._capstone_chat_selection_turn=self.agent._current_turn_id
+        _,selection,_=self.initial()
+        self.assertNotIn('shared_incident_initial',selection)
+        self.assertIn(BLOCK,selection['catalog'])
+
+    def test_report_uses_the_shared_inference_profile_instead_of_inherited_thinking(self):
+        self.request.update(reasoning_effort='medium',think=True,max_tokens=1024,max_completion_tokens=1024,
+            temperature=1,top_p=1,extra_body={'think':True,'reasoning':'enabled','reasoning_effort':'medium',
+                'max_tokens':1,'max_completion_tokens':1,'temperature':1,'top_p':1})
+        before=copy.deepcopy(self.request);request,selection=self.lease()
+        expected={'reasoning_effort':'none','max_tokens':self.h.CONTRACT.OUTPUT_TOKENS,
+            'temperature':self.h.CONTRACT.TEMPERATURE,'top_p':self.h.CONTRACT.TOP_P}
+        self.assertEqual(selection['incident_inference_profile'],expected)
+        self.assertEqual({k:request[k] for k in expected},expected)
+        self.assertNotIn('think',request);self.assertNotIn('max_completion_tokens',request)
+        self.assertEqual(request['extra_body'],{});self.assertEqual(before,self.request)
+        with patch.object(self.h.CONTRACT,'REASONING',True):
+            request,selection=self.lease();self.assertEqual(request['reasoning_effort'],'medium')
+
+    def test_changed_inference_profile_is_rejected_before_native_transport(self):
+        for change in ({'reasoning_effort':'medium'},{'max_tokens':1},{'temperature':1},{'top_p':1},
+                       {'extra_body':{'think':True}}):
+            request,selection=self.lease();request=copy.deepcopy(request);request.update(change);calls=[]
+            def transport(agent,**kw):calls.append(kw);return Verdict('fallthrough',self.response(self.value(selection)))
+            wrapped=w.management_selection_call_wrapper(transport)
+            with self.assertRaisesRegex(RuntimeError,'lease_invalid'):
+                wrapped(self.agent,api_kwargs=request,turn_id=self.agent._current_turn_id)
+            self.assertEqual(calls,[])
+
+    def test_invalid_shared_profile_never_reaches_the_provider(self):
+        for name,value in (('REASONING','none'),('OUTPUT_TOKENS',0),('TEMPERATURE',float('nan')),('TOP_P',2)):
+            with patch.object(self.h.CONTRACT,name,value):
+                with self.assertRaisesRegex(RuntimeError,'inference_profile_invalid'):self.lease()
+
+    def reject_claim(self):
+        request,selection=self.lease();value=self.value(selection)
+        value['report']['basis']='현재 IP 차단 목록은 미확인입니다. 추가 조회가 필요합니다.'
+        result,calls,logs=self.invoke(request,self.response(value))
+        return result,selection,value
+
+    def continue_repair(self,text,counter=0,remaining=8):
+        agent=self.agent;agent.max_iterations=12;agent.iteration_budget=types.SimpleNamespace(remaining=remaining)
+        agent._emit_pending_fallback_notice=agent._clear_status_buffer=lambda:None
+        agent._build_assistant_message=lambda message,kind:{'role':'assistant','content':message.content}
+        original_calls=[]
+        native=types.SimpleNamespace(FinalResponseVerdict=lambda **kw:types.SimpleNamespace(**kw))
+        wrapped=w.grounding_wrapper(lambda agent,**kw:original_calls.append(kw) or 'original',native,
+            lambda messages,message:messages.append(message),lambda messages,user:0,['completed'],
+            facts=[],successful_reads=set(self.catalog))
+        user=self.chat['request'];messages=[{'role':'user','content':user}]
+        kw={'assistant_message':types.SimpleNamespace(content=text,tool_calls=None),'messages':messages,
+            'user_message':user,'api_call_count':3,'codex_ack_continuations':counter,'finish_reason':'stop',
+            '_pending_verification_response':None}
+        for key in ('active_system_prompt','_turn_exit_reason','_preflight_compression_blocked',
+                    'truncated_response_parts','length_continue_retries','_pending_verification_response_previewed'):
+            kw[key]=None
+        return wrapped(agent,**kw),messages,original_calls
+
+    def test_rejected_claim_continues_native_iteration_with_same_evidence_and_feedback(self):
+        result,selection,value=self.reject_claim();state=self.agent._capstone_incident_phase
+        self.assertTrue(state['repair_pending']);self.assertEqual(state['claim_repairs'],1)
+        continued,messages,original=self.continue_repair(result.response.choices[0].message.content)
+        self.assertEqual(continued.action,'continue');self.assertEqual(continued.codex_ack_continuations,1)
+        self.assertEqual(original,[]);self.assertFalse(state['repair_pending'])
+        request,next_selection=self.lease();body=json.loads(request['messages'][1]['content'])
+        self.assertEqual(body['untrusted_report_feedback']['issues'],['current_block_inventory_unknown_scope'])
+        self.assertEqual(body['untrusted_report_feedback']['untrusted_rejected_report']['basis'],value['report']['basis'])
+        self.assertEqual(next_selection['report_calls'],selection['report_calls'])
+        self.assertEqual(len(messages),3)
+        good=self.value(next_selection);accepted,_,_=self.invoke(request,self.response(good))
+        self.assertIn('INCIDENT_DISPOSITION:',accepted.response.choices[0].message.content)
+        self.assertNotIn('feedback',state);self.assertNotIn('repair_pending',state)
+
+    def test_claim_repairs_stop_at_shared_limit_and_native_iteration_budget(self):
+        for counter in range(self.h.CONTRACT.REPAIR_PASSES):
+            result,_,_=self.reject_claim()
+            continued,_,_=self.continue_repair(result.response.choices[0].message.content,counter=counter)
+            self.assertEqual(continued.action,'continue')
+        result,_,_=self.reject_claim()
+        self.assertFalse(self.agent._capstone_incident_phase['repair_pending'])
+        self.assertEqual(self.agent._capstone_incident_phase['claim_repairs'],self.h.CONTRACT.REPAIR_PASSES)
+        self.assertIn('MANAGEMENT_STATUS: needs_review',result.response.choices[0].message.content)
+        # A pending repair cannot bypass the runner's own remaining budget.
+        self.agent._capstone_incident_phase['repair_pending']=True
+        stopped,_,original=self.continue_repair(result.response.choices[0].message.content,counter=2,remaining=1)
+        self.assertEqual(stopped,'original');self.assertEqual(len(original),1)
+
+    def test_repair_feedback_is_not_reused_for_changed_receipts_or_root_question(self):
+        _,selection,_=self.reject_claim()
+        for kind in ('receipt','question'):
+            with contextlib.ExitStack() as stack:
+                if kind=='receipt':
+                    snapshot=copy.deepcopy(self.snapshot);raw=json.dumps({'result':json.dumps({'blocks':['192.0.2.10']})})
+                    snapshot['receipts'][-1]['output']=raw
+                    snapshot['read_ledger'][-1]['result_sha256']=hashlib.sha256(raw.encode()).hexdigest()
+                    stack.enter_context(patch.dict(self.snapshot,snapshot))
+                else:
+                    stack.enter_context(patch.dict(os.environ,{'CAPSTONE_CHAT_READ_JSON':json.dumps({**self.chat,'request':Q+' 출발지 비교도 해줘.'})}))
+                request,_=self.lease()
+                self.assertNotIn('untrusted_report_feedback',json.loads(request['messages'][1]['content']))
+
+    def test_nonce_failure_does_not_create_a_claim_repair(self):
+        request,selection=self.lease();value=self.value(selection);value['request_nonce']='wrong'
+        result,_,_=self.invoke(request,self.response(value))
+        self.assertFalse(self.agent._capstone_incident_phase.get('repair_pending',False))
+        self.assertNotIn('feedback',self.agent._capstone_incident_phase)
+
+    def test_repeated_inquiry_gets_feedback_once_without_reexecuting_reads(self):
+        request,selection=self.lease()
+        value={'request_nonce':selection['nonce'],'more_evidence':True,'report':None,
+            'calls':[{'tool':MOD,'arguments':{}}]}
+        result,_,_=self.invoke(request,self.response(value));state=self.agent._capstone_incident_phase
+        self.assertTrue(state['repair_pending']);self.assertEqual(state['feedback']['issues'],['already_completed_read'])
+        self.assertIsNone(result.response.choices[0].message.tool_calls)
+        continued,_,_=self.continue_repair(result.response.choices[0].message.content)
+        self.assertEqual(continued.action,'continue')
+        request,selection=self.lease();body=json.loads(request['messages'][1]['content'])
+        self.assertIn('untrusted_rejected_reads',body['untrusted_report_feedback'])
+        value['request_nonce']=selection['nonce'];result,_,_=self.invoke(request,self.response(value))
+        self.assertFalse(state['repair_pending']);self.assertEqual(len(state['rejected_reads']),1)
+        self.assertIsNone(result.response.choices[0].message.tool_calls)
 
 if __name__=='__main__':unittest.main()

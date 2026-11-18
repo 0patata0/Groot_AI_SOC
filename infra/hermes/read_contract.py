@@ -551,9 +551,12 @@ def companion_block_request(question):
         if block_list_plan(part) is not None:return True
         for match in re.finditer(noun,part,re.I):
             before,after=part[max(0,match.start()-20):match.start()],part[match.end():match.end()+40]
-            if (not re.match(current,match[0]) and re.search(
+            prefix=part[:match.start()]
+            independent_current=bool(re.search(current,prefix) and re.search(
+                r'(?:조사|분석|조회|확인|비교|대조)(?:하고|해주고|한\s*뒤)\s*$',prefix))
+            if (not re.match(current,match[0]) and not independent_current and re.search(
                     r'(?<![A-Za-z])(?:WAF|IDS|IPS|ModSecurity|Suricata|Wazuh)(?![A-Za-z])|와주',
-                    part[:match.start()],re.I)):
+                    prefix,re.I)):
                 continue  # A named sensor's blocked requests are not the FW's current list.
             if re.search(r'(?:\d{1,3}\.){3}\d{1,3}|과거|어제|지난|이력|내역',before):
                 if not re.match(current,match[0]) or re.search(r'(?:\d{1,3}\.){3}\d{1,3}',before):continue

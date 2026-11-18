@@ -106,4 +106,14 @@ class ReportValidation(unittest.TestCase):
                      'HTTP 403은 WAF 차단 성공의 증거가 아닌 것은 아닙니다.'):
             self.assertIn('http_status_used_as_security_outcome',h.incident_field_violations(line,calls),line)
 
+    def test_activation_feedback_binds_the_observed_inventory_without_new_feature_evidence(self):
+        body=context();before=copy.deepcopy(body)
+        import json
+        value=json.loads(h.CONTRACT.evidence_report_messages(body,agent_role='hermes',feedback={
+            'issues':['block_inventory_does_not_verify_activation']})[1]['content'])
+        check=value['report_validation']['current_inventory_scope_check']
+        self.assertEqual(check['observed_current_inventory'],body['current_ip_inventory'])
+        self.assertIn('차단 기능의 활성 설정',check['not_proven_by_current_inventory_ko'])
+        self.assertEqual(body,before)
+
 if __name__=='__main__':unittest.main()

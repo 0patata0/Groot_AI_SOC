@@ -139,3 +139,6 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 <a id="thesis-outline-correction-20261118"></a>
 논문 목차 재수정의 결과·완료 범위·구조 선택·출력 검수는 [상태 이력](STATUS_HISTORY.md#thesis-outline-correction-20261118)·[계획 이력](PLAN_HISTORY.md#thesis-outline-correction-20261118)·[설계 이력](DESIGN_ALTERNATIVES.md#thesis-outline-correction-20261118)·[검증 이력](DIAGNOSTIC_HISTORY.md#thesis-outline-correction-20261118)에 보존했다. 운영 배포 변경은 없어 새 배포 이력을 추가하지 않았다.
+
+
+[Native 첫 조회·실제 실행 보완](../infra/validation/management-latency/native-initial-e2e.validation.json)은 격리 모델/MCP 실행과 운영 미적용·실제 채팅 미검증, 중간 실패를 구분한다.

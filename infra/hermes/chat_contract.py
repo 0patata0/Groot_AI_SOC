@@ -1562,12 +1562,14 @@ def evidence_report_messages(context, *, agent_role, feedback=None):
                         'is_error':row['is_error'],'returned_list_sizes':dict(list(sizes.items())[:8])})
             checks.append({'tool':name,'registered':True,'current_attempts':attempts[-4:]})
         body['report_validation']={'issues':codes,'registered_read_checks':checks[:4]}
-        if 'current_block_inventory_unknown_scope' in codes:
+        if {'current_block_inventory_unknown_scope','block_inventory_does_not_verify_activation'} & set(codes):
             inventory=context.get('current_ip_inventory',{})
             if inventory.get('requested') is True and inventory.get('read_state')=='observed':
                 body['report_validation']['current_inventory_scope_check']={
                     'observed_current_inventory':copy.deepcopy(inventory),
-                    'rejection_reason_ko':'차단 상태 미확인의 대상이 관측한 현재 IP 목록과 구분되지 않음',
+                    'rejection_reason_ko':('목록 구성원 조회는 차단 기능의 활성 설정에 대한 관측이 아님'
+                        if 'block_inventory_does_not_verify_activation' in codes else
+                        '차단 상태 미확인의 대상이 관측한 현재 IP 목록과 구분되지 않음'),
                     'not_proven_by_current_inventory_ko':['과거 개별 웹 요청의 차단·거부','차단 기능의 활성 설정'],
                     'related_model_fields':['basis','limitations']}
     raw=json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c')

@@ -3260,8 +3260,14 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         count, maximum, counter = kw.get('api_call_count'), getattr(agent, 'max_iterations', None), kw.get('codex_ack_continuations')
         remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
         content = getattr(message, 'content', None)
+        incident_state=getattr(agent,'_capstone_incident_phase',None)
+        incident_retry=bool(os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1'
+            and os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
+            and isinstance(incident_state,dict) and incident_state.get('turn')==turn
+            and incident_state.get('repair_pending') is True)
         attempt_view = read_attempts() if callable(read_attempts) else read_attempts
         issues = evidence_claim_violations(content, facts or [], successful_reads, read_attempts=attempt_view)
+        if incident_retry:issues.append('native_incident_report_rejected')
         inquiry=getattr(agent,'_capstone_more_evidence_turn',None)==turn and isinstance(turn,str)
         if inquiry:
             agent._capstone_more_evidence_turn=None
@@ -3317,11 +3323,14 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status'))
                 for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors or pending_web})
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
+        if incident_retry:
+            marker=('_capstone_incident_repair_turn2' if
+                getattr(agent,'_capstone_incident_repair_turn',None)==turn else '_capstone_incident_repair_turn')
         # 2026-11-10: a compound Hermes report fell back after its single factual
         # rewrite still carried one phrasing issue. Allow exactly one more rewrite
         # when every remaining issue is a literal phrasing repair (no new reads,
         # no new claims); the continuation counter cap below still applies.
-        if (factual and not inquiry and getattr(agent, '_capstone_factual_turn', None) == turn
+        if (factual and not inquiry and not incident_retry and getattr(agent, '_capstone_factual_turn', None) == turn
                 and issues and set(issues) <= LITERAL_REPAIR_ISSUES):
             marker = '_capstone_factual_turn2'
         prior_inquiries=getattr(agent,'_capstone_inquiry_retries',None)
@@ -3330,7 +3339,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         inquiry_key=getattr(agent,'_capstone_inquiry_receipts',None)
         known_retries = sum(getattr(agent, name, None) == turn for name in
                             ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn',
-                             '_capstone_factual_turn2'))+len(read_retries)+len(inquiry_retries)
+                             '_capstone_factual_turn2','_capstone_incident_repair_turn',
+                             '_capstone_incident_repair_turn2'))+len(read_retries)+len(inquiry_retries)
         if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
@@ -3368,12 +3378,13 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         elif factual:
             if inquiry:agent._capstone_inquiry_retries=(turn,(*inquiry_retries,inquiry_key))
             else:setattr(agent, marker, turn)
-            if not missing_evidence:
+            if incident_retry:incident_state['repair_pending']=False
+            if not missing_evidence and not incident_retry:
                 arm_literal_repair(agent, turn, ['invalid_disposition_tool_names' if
                     citation_only and x == 'unobserved_disposition_tools' else x for x in issues],
                     report=content, successful_reads=successful_reads,
                     question=current_management_request(user))
-            if not inquiry and isinstance(content,str):
+            if not inquiry and not incident_retry and isinstance(content,str):
                 # Preserve actual guard feedback out of band: compact request
                 # construction replaces user history with the root context.
                 agent._capstone_review_feedback={'turn':turn,'issues':sorted(set(issues)),
@@ -3841,11 +3852,16 @@ def management_read_request(request, agent, *, pending=False):
     # alert reads; later evidence-driven reads keep the full catalog (shared
     # rule with the SDK peer; 11-13 22:47 an unasked cluster-node read with an
     # invalid value failed the whole answer).
-    first_scope=None
+    first_scope=None;shared_initial=False
     if chat and shared_scope is None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
-        first_scope=getattr(chat_lookup_harness(),'investigation_first_scope',lambda _:None)(chat['request'])
+        harness=chat_lookup_harness()
+        first_scope=harness.investigation_first_scope(chat['request'])
+        shared_initial=bool(first_scope and os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1')
+        if shared_initial:first_scope=harness.incident_selection_scope(chat['request'],[])
         offered={(t.get('function') or {}).get('name') for t in tools if isinstance(t,dict)}
-        if first_scope is not None and not set(first_scope)<=offered:first_scope=None
+        if first_scope is not None and not set(first_scope)<=offered:
+            if shared_initial:raise RuntimeError('management_initial_read_scope_missing')
+            first_scope=None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -3859,6 +3875,9 @@ def management_read_request(request, agent, *, pending=False):
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
             selected=initial_event_filter_schema(name,selected,chat['request'],chat['requested_at_kst'])
+            if os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1':
+                selected=chat_lookup_harness().initial_event_day_schemas(chat['request'],{name:selected},[],
+                    chat['requested_at_kst'])[name]
         if pipeline and selected is not None:
             target='b:management-pipeline'
             if target not in selected.get('properties',{}).get('target',{}).get('enum',[]):
@@ -3890,6 +3909,9 @@ def management_read_request(request, agent, *, pending=False):
     if overview:
         shared=chat_lookup_harness().selection_schema(catalog,4,question=chat['request'])
         schema['properties']['calls']=shared['properties']['calls']
+    if shared_initial:
+        shared=chat_lookup_harness().selection_schema(catalog,4,question=chat['request'])
+        schema['title']=shared['title'];schema['properties']['calls']=shared['properties']['calls']
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)
@@ -3928,6 +3950,7 @@ def management_read_request(request, agent, *, pending=False):
         'schema':copy.deepcopy(schema),'catalog':catalog}
     if chat:agent._capstone_management_selection['chat_read']=True
     if current:agent._capstone_management_selection['current_diagnostic']=True
+    if shared_initial:agent._capstone_management_selection['shared_incident_initial']=True
     return result
 
 
@@ -4112,7 +4135,7 @@ def native_incident_report_request(request, agent, snapshot):
         if isinstance(prior,dict) and prior.get('turn')==turn and prior.get('requests',0):
             raise RuntimeError('management_incident_receipts_unavailable')
         return request
-    context,calls=bound
+    context,calls=copy.deepcopy(bound)
     state=getattr(agent,'_capstone_incident_phase',None)
     if not isinstance(state,dict) or state.get('turn')!=turn:
         state={'turn':turn,'requests':0,'inquiries':0}
@@ -4135,13 +4158,25 @@ def native_incident_report_request(request, agent, snapshot):
     extra=result.get('extra_body')
     if isinstance(extra,dict):
         if set(extra)&{'messages','model'}:raise RuntimeError('management_incident_body_override')
-        for key in ('tools','tool_choice','response_format'):extra.pop(key,None)
-    result['messages']=harness.CONTRACT.evidence_report_messages(context,agent_role='hermes')
+        for key in ('tools','tool_choice','response_format','think','reasoning','reasoning_effort',
+                    'max_tokens','max_completion_tokens','temperature','top_p'):extra.pop(key,None)
+    contract=harness.CONTRACT
+    if (type(contract.REASONING) is not bool or type(contract.OUTPUT_TOKENS) is not int
+            or not 1<=contract.OUTPUT_TOKENS<=8192
+            or type(contract.TEMPERATURE) not in (int,float) or not 0<=contract.TEMPERATURE<=2
+            or type(contract.TOP_P) not in (int,float) or not 0<contract.TOP_P<=1):
+        raise RuntimeError('management_incident_inference_profile_invalid')
+    profile={'reasoning_effort':'medium' if contract.REASONING else 'none',
+        'max_tokens':contract.OUTPUT_TOKENS,'temperature':contract.TEMPERATURE,'top_p':contract.TOP_P}
+    for key in ('think','reasoning','max_completion_tokens'):result.pop(key,None)
+    result.update(profile)
+    feedback=(state.get('feedback') if state.get('feedback_context')==bound[0]
+        and state.get('feedback_calls')==calls else None)
+    result['messages']=harness.CONTRACT.evidence_report_messages(context,agent_role='hermes',feedback=feedback)
     result['response_format']={'type':'json_schema','json_schema':{'name':'soc_incident_report','strict':True,'schema':schema}}
-    result['max_tokens']=1024;result.pop('max_completion_tokens',None)
     agent._capstone_management_selection={'turn':turn,'nonce':nonce,'schema':copy.deepcopy(schema),
         'catalog':catalog,'incident_report':True,'report_context':context,'report_calls':calls,
-        'remaining_read_calls':remaining}
+        'remaining_read_calls':remaining,'incident_inference_profile':copy.deepcopy(profile)}
     state['requests']+=1
     return result
 
@@ -4173,7 +4208,11 @@ def native_incident_report_response(response, selection, agent, value):
         issues=(harness.violations(context['question'],rendered,selection['report_calls'])+
             harness.evidence_capability_gap_violations(review,context)+
             harness.evidence_report_scope_violations(review,context))
-        if issues:raise ValueError('management_incident_report_claim_invalid')
+        if issues:
+            selection['incident_validation_issues']=sorted(set(issues))
+            selection['incident_rejected_report']=copy.deepcopy(review)
+            raise ValueError('management_incident_report_claim_invalid')
+        for key in ('feedback','feedback_context','feedback_calls','repair_pending'):state.pop(key,None)
         result.choices[0].message.content=rendered
         return result,0
     if (state['inquiries']>=harness.CONTRACT.SERVICE_INQUIRY_ROUNDS
@@ -4181,7 +4220,10 @@ def native_incident_report_response(response, selection, agent, value):
         raise ValueError('management_incident_inquiry_budget_exhausted')
     rejection=harness.CONTRACT.service_inquiry_rejection(value['calls'],
         context['untrusted_completed_reads'],selection['catalog'])
-    if rejection:raise ValueError('management_incident_inquiry_rejected')
+    if rejection:
+        selection['incident_validation_issues']=[rejection['code']]
+        selection['incident_rejected_reads']=copy.deepcopy(rejection)
+        raise ValueError('management_incident_inquiry_rejected')
     for item in value['calls']:
         name=item['tool']
         if (name not in getattr(agent,'valid_tool_names',()) or not allowed(name,'verify')
@@ -4193,6 +4235,7 @@ def native_incident_report_response(response, selection, agent, value):
         id='call_soc_read_'+uuid.uuid4().hex,type='function',function={
             'name':item['tool'],'arguments':json.dumps(item['arguments'],ensure_ascii=False)}) for item in value['calls']]
     result.choices[0].finish_reason='tool_calls'
+    for key in ('feedback','feedback_context','feedback_calls','repair_pending'):state.pop(key,None)
     state['inquiries']+=1
     return result,len(value['calls'])
 
@@ -4474,7 +4517,7 @@ def management_selection_response(response, selection, agent):
         parse_constant=lambda _value:(_ for _ in ()).throw(ValueError('nonfinite_json')))
     if selection.get('incident_report'):
         return native_incident_report_response(response,selection,agent,value)
-    if selection.get('current_diagnostic'):
+    if selection.get('current_diagnostic') or selection.get('shared_incident_initial'):
         value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
     elif selection.get('service_report'):
         value,removed=diagnostic_contract().validated_service_report(value,selection['schema'])
@@ -4584,6 +4627,11 @@ def management_selection_call_wrapper(original):
             and isinstance(request,dict) and verified_runtime_model(agent, request.get('model'))
             and request.get('response_format',{}).get('json_schema',{}).get('schema')==selection['schema']
             and not set(request.get('extra_body') or {}).intersection({'tools','tool_choice','response_format','model','messages'})
+            and (not selection.get('incident_report') or
+                isinstance(selection.get('incident_inference_profile'),dict)
+                and all(request.get(k)==v for k,v in selection['incident_inference_profile'].items())
+                and not set(request.get('extra_body') or {}).intersection(
+                    set(selection['incident_inference_profile'])|{'think','reasoning','max_completion_tokens'}))
             and not request.get('tools') and not getattr(agent,'_interrupt_requested',False))
         if isinstance(selection,dict) and not active:
             agent._capstone_management_selection=None
@@ -4607,6 +4655,7 @@ def management_selection_call_wrapper(original):
             # or channel content. Retain model report content, never reasoning.
             sys.stderr.write('management_incident_report_audit '+json.dumps({
                 'turn':selection['turn'],'request_nonce':selection['nonce'],
+                'inference_profile':selection['incident_inference_profile'],
                 'read_result_sha256':[c['result_sha256'] for c in selection['report_calls']],
                 'untrusted_raw_response':raw if encoded is not None and len(encoded)<=65536 else None,
                 'raw_response_bytes':len(encoded) if encoded is not None else None,
@@ -4618,6 +4667,8 @@ def management_selection_call_wrapper(original):
             sys.stderr.write('management_read_selection '+json.dumps({'accepted':False,
                 'error_class':type(exc).__name__,'provider_seconds':round(time.monotonic()-started,6),
                 'error_code':str(exc) if re.fullmatch(r'management_[a-z_]+',str(exc)) else None,
+                'incident_validation_issues':selection.get('incident_validation_issues',[]),
+                'inference_profile':selection.get('incident_inference_profile'),
                 'response_finish':getattr(next(iter(getattr(verdict.response,'choices',[])),None),'finish_reason',None),
                 'additional_inquiry':bool(selection.get('additional_inquiry')),
                 'literal_report_repair':bool(selection.get('literal_report_repair')),
@@ -4627,6 +4678,24 @@ def management_selection_call_wrapper(original):
                 harness=chat_lookup_harness();snapshot=getattr(agent,'_capstone_management_report',{})
                 bound=native_incident_report_context(chat_read_context(),snapshot.get('read_ledger'),
                     snapshot.get('receipts'),selection['catalog'],harness)
+                state=getattr(agent,'_capstone_incident_phase',None)
+                if (bound and isinstance(state,dict) and state.get('turn')==selection['turn']
+                        and str(exc) in ('management_incident_report_claim_invalid','management_incident_inquiry_rejected')
+                        and selection.get('incident_validation_issues')
+                        and state.get('claim_repairs',0)<harness.CONTRACT.REPAIR_PASSES
+                        and state.get('requests',6)<6
+                        and (not selection.get('incident_rejected_reads') or
+                            selection['incident_rejected_reads'] not in state.get('rejected_reads',[]))):
+                    feedback={'issues':selection['incident_validation_issues']}
+                    if 'incident_rejected_reads' in selection:
+                        rejection=selection['incident_rejected_reads']
+                        state.setdefault('rejected_reads',[]).append(copy.deepcopy(rejection))
+                        feedback['untrusted_rejected_reads']=rejection
+                    else:feedback['untrusted_rejected_report']=selection['incident_rejected_report']
+                    state.update(claim_repairs=state.get('claim_repairs',0)+1,repair_pending=True,
+                        feedback=feedback,
+                        feedback_context=copy.deepcopy(bound[0]),feedback_calls=copy.deepcopy(bound[1]))
+                elif isinstance(state,dict):state['repair_pending']=False
                 response=copy.deepcopy(verdict.response)
                 if len(getattr(response,'choices',[]))!=1:raise RuntimeError('management_incident_response_unavailable') from exc
                 response.choices[0].message.content=factual_review_report(harness.facts_for(bound[1]) if bound else [])
@@ -4636,9 +4705,10 @@ def management_selection_call_wrapper(original):
             return verdict
         sys.stderr.write('management_read_selection '+json.dumps({'accepted':True,'selected_reads':count,
             'provider_seconds':round(time.monotonic()-started,6),'native_dispatch':count>0,
-            'report_projection':count==0 and 'report_facts' in selection and not selection.get('repeated_read_rejected') and getattr(agent,'_capstone_more_evidence_turn',None)!=selection['turn'],
+            'report_projection':count==0 and ('report_facts' in selection or selection.get('incident_report')) and not selection.get('repeated_read_rejected') and getattr(agent,'_capstone_more_evidence_turn',None)!=selection['turn'],
             'repeated_read_rejected':bool(selection.get('repeated_read_rejected')),
-            'indexed_reads':'indexed_options' in selection,'compact_report':'compact_citations' in selection,
+            'indexed_reads':'indexed_options' in selection,'compact_report':'compact_citations' in selection or bool(selection.get('incident_report')),
+            'inference_profile':selection.get('incident_inference_profile'),
             'additional_inquiry':bool(selection.get('additional_inquiry')),
             'literal_report_repair':bool(selection.get('literal_report_repair')),
                 'reasoning_effort':request.get('reasoning_effort'),

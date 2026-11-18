@@ -1,5 +1,17 @@
 # 초기 설치·통합 패키지 준비 상태
 
+<!-- chat-access-readiness-20261118 -->
+<a id="chat-access-readiness-20261118"></a>
+
+기존 운영 감시기 두 파일의17:13 확정과 신규 설치기의 소스 연결·격리 Wazuh112검증은 완료한 범위다. 관리자 LAN의443·HTTP 확인을 추가했으며 외부 인터넷 경로와 다음09:00 실제 예약 실행은 아직이다. 신규3호스트 전체 OS 설치와 독립 재구현도 미수행이다.
+
+관리자 호스트는 NTP=yes·NTPSynchronized=no였고 조회 컴퓨터보다46.486~47.051초 늦었다. 같은 방식으로 읽은 A의 상대 차이는-0.033~0.864초 범위였으며 NTP 동기화 상태는yes였다. 이 범위는 각 SSH 조회의 왕복 시간을 포함한 관측 한계다. 원래 원격 시각과 조회 컴퓨터의 수신 시각을 함께 보존하며 과거 원문 시각을 고쳐 쓰지 않는다.
+
+정확 변경안390a0f43은 관리자231의 /etc/systemd/timesyncd.conf.d/90-capstone-campus.conf 파일1개와 기존 timesyncd의1회 재시작만 포함한다. 학내131을 지정하고5분 내 확인하지 못하면 추가한 설정만 원복한다. NTP 보정으로 시계가 약47초 앞으로 이동할 수 있으며 원복 시 시계를 강제로 과거로 돌리지 않는다. 관리자에게 정확 승인을 요청했으며 실제 설정·시각 변경과 운영 NTP 서비스 재시작은 아직 수행하지 않았다.
+
+[관리자 경로·시각·정확 변경안 원장](../infra/groot-a/certificate-monitor/access-readiness-20261118.json)
+<!-- /chat-access-readiness-20261118 -->
+
 <!-- certificate-bootstrap-20261118 -->
 <a id="certificate-bootstrap-20261118"></a>
 
@@ -79,4 +91,4 @@ root생성 요청별 내부 CAPSTONE_REVIEW_CONTEXT_JSON은 canonical controller
 
 ## 인증서 감시기의 설치 이식 공백
 
-기존 A용 TLS 감시기 후보는 전체 check 격리 비교·native26·원복14·독립 타이머의 격리 파일2개 복구까지 확인했다. 수동 변경 제어기는 기존 두 파일의 정확 복구용이며 초기 설치기의 추가 진입점이 아니다. 운영 두 파일은 정확 승인 후17:13:01 KST에 확정했고 실제 exit0/verified·MCP/journal을 확인했다. 새 채팅의 최종 대상 오류는 별도다. deploy.sh의 lab TLS와 채팅 TLS는 도메인·포트·파일 경로/모드가 다르므로 고정 machine-id·경로·B 규칙을 명시적으로 이식해야 한다. 단일deploy.sh 연결·새 OS 전체 설치는 미완료이며 기존 서비스·패키지·모델·MCP를 바꾸지 않았다. [검증과 수동 복구](../infra/groot-a/certificate-monitor/README.md).
+기존 A용 TLS 감시기 후보는 전체 check 격리 비교·native26·원복14·독립 타이머의 격리 파일2개 복구까지 확인했다. 수동 변경 제어기는 기존 두 파일의 정확 복구용이며 초기 설치기의 추가 진입점이 아니다. 운영 두 파일은 정확 승인 후17:13:01 KST에 확정했고 실제 exit0/verified·MCP/journal을 확인했다. 새 채팅의 최종 대상 오류는 별도다. deploy.sh의 lab TLS와 채팅 TLS는 도메인·포트·파일 경로/모드가 다르므로 고정 machine-id·경로·B 규칙을 명시적으로 이식해야 한다. 기존 운영 감시기 두 파일의17:13 확정과 신규 설치기의 소스 연결·격리 Wazuh112검증은 완료한 범위다. 관리자 LAN의443·HTTP 확인을 추가했으며 외부 인터넷 경로와 다음09:00 실제 예약 실행은 아직이다. 신규3호스트 전체 OS 설치와 독립 재구현도 미수행이다. [검증과 수동 복구](../infra/groot-a/certificate-monitor/README.md).

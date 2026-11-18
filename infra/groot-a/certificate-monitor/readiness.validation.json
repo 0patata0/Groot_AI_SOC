@@ -661,5 +661,15 @@
       "new_operating_installation": false,
       "fresh_OS_installation": false
     }
+  },
+  "live_access_followup": {
+    "source": "access-readiness-20261118.json",
+    "administrator_LAN_HTTP_status": 200,
+    "administrator_LAN_ping_status": "OK",
+    "certificate_fingerprints_match": true,
+    "external_Internet_path_verified": false,
+    "admin_clock_unsynchronized": true,
+    "exact_NTP_proposal": "390a0f4347cab13efe584982657f51642ee38068bbdc7fe053c9806fa11268d7",
+    "NTP_applied": false
   }
 }

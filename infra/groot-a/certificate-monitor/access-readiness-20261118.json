@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T19:41:30.764141+09:00",
+  "state": "administrator_LAN_chat_health_passed_admin_clock_unsynchronized_exact_change_pending",
+  "HTTP": {
+    "target": "chat.grootlab.duckdns.org",
+    "port": 443,
+    "path": "/api/v4/system/ping",
+    "vantage": "administrator231",
+    "request_method": "GET",
+    "credentials_sent": false,
+    "settings_changed": false,
+    "dns_ipv4": [
+      "192.168.16.230"
+    ],
+    "check_hostname": true,
+    "verify_mode": "2",
+    "peer": "192.168.16.230",
+    "source": "192.168.16.231",
+    "TLS_version": "TLSv1.3",
+    "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+    "not_before_utc": "Oct 15 04:25:13 2026 GMT",
+    "not_after_utc": "Jan 13 04:25:12 2027 GMT",
+    "not_after_epoch": 1799814312,
+    "TLS_CA_and_hostname_verified": true,
+    "http_status": 200,
+    "body_sha256": "98b5aafedadf2b3b3f3b59ba5ee57365f45d4930ea7567f1189b8ec3b1cc21e2",
+    "response_bytes": 138,
+    "ping_status": "OK",
+    "status": "passed",
+    "observed_at_utc": "2026-11-18T10:21:32.221151+00:00",
+    "seconds": 7.212
+  },
+  "controller_received_at_kst": "2026-11-18T19:22:19.267473+09:00",
+  "HTTP_remote_original_clock_skewed": true,
+  "vantage_scope": "administrator231 -> private resolved192.168.16.230:443; not external Internet path",
+  "stored_monitor_observation_at_kst": "2026-11-18T17:09:18+09:00",
+  "stored_monitor_not_rerun": true,
+  "certificate_fingerprints_match": true,
+  "A_observed_at_utc": "2026-11-18T10:22:12.156215+00:00",
+  "A_operating_public_file_hashes": {
+    "/usr/local/sbin/capstone-cert-monitor": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8",
+    "/etc/systemd/system/capstone-cert-monitor.service": "9c9f50343d7671890e8218352fa69922144d9c34fd50f67d1348a2caa314e97c",
+    "/etc/systemd/system/capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+    "/home/groot_a/capstone/chatproxy/tls/chatduck.crt": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794"
+  },
+  "A_timer": "NextElapseUSecRealtime=Thu 2026-11-19 09:00:00 KST\nLastTriggerUSec=Wed 2026-11-18 09:00:00 KST\nActiveState=active\nSubState=waiting\n",
+  "clock_observations": {
+    "admin-clock-corrected.result.json": {
+      "observed_at_utc": "2026-11-18T10:23:43.329127+00:00",
+      "epoch": 1794997423.329141,
+      "timedatectl_rc": 0,
+      "timedatectl": {
+        "Timezone": "Asia/Seoul",
+        "NTP": "yes",
+        "NTPSynchronized": "no",
+        "TimeUSec": "Wed 2026-11-18 19:23:43 KST",
+        "RTCTimeUSec": "Wed 2026-11-18 19:24:30 KST"
+      },
+      "explicit_hosts_mapping": [],
+      "elapsed_seconds": 0.061839509988203645,
+      "settings_changed": false,
+      "remote_minus_controller_seconds_interval": [
+        -47.051,
+        -46.486
+      ]
+    },
+    "a-clock-corrected.result.json": {
+      "observed_at_utc": "2026-11-18T10:24:30.669084+00:00",
+      "epoch": 1794997470.6690977,
+      "timedatectl_rc": 0,
+      "timedatectl": {
+        "Timezone": "Asia/Seoul",
+        "NTP": "yes",
+        "NTPSynchronized": "yes",
+        "TimeUSec": "Wed 2026-11-18 19:24:30 KST",
+        "RTCTimeUSec": "Wed 2026-11-18 19:24:30 KST"
+      },
+      "explicit_hosts_mapping": [],
+      "elapsed_seconds": 0.07294986094348133,
+      "settings_changed": false,
+      "remote_minus_controller_seconds_interval": [
+        -0.033,
+        0.864
+      ]
+    }
+  },
+  "campus_NTP_one_request": {
+    "server": "192.168.16.131",
+    "port": 123,
+    "requests": 1,
+    "clock_set": false,
+    "settings_changed": false,
+    "status": "reply_validated",
+    "stratum": 3,
+    "version": 4,
+    "server_minus_client_seconds": 47.051976,
+    "roundtrip_seconds": 0.001173,
+    "server_transmit_epoch": 1794997663.2778234
+  },
+  "A_selected_NTP_source": "192.168.16.131",
+  "A_chrony_tracking": "Reference ID    : C0A81083 (192.168.16.131)\nStratum         : 4\nRef time (UTC)  : Wed Nov 18 10:25:47 2026\nSystem time     : 0.000003253 seconds slow of NTP time\nLast offset     : -0.000003908 seconds\nRMS offset      : 0.000592602 seconds\nFrequency       : 89.661 ppm slow\nResidual freq   : -0.000 ppm\nSkew            : 0.043 ppm\nRoot delay      : 0.006950628 seconds\nRoot dispersion : 0.019793857 seconds\nUpdate interval : 129.4 seconds\nLeap status     : Normal\n",
+  "admin_NTP": {
+    "enabled": true,
+    "synchronized": false,
+    "configured_fallback": "ntp.ubuntu.com",
+    "recent_timeout_journal_samples": 12,
+    "firewall_block_root_cause_proven": false
+  },
+  "exact_proposal": {
+    "plan_id": "390a0f4347cab13efe584982657f51642ee38068bbdc7fe053c9806fa11268d7",
+    "state": "prepared_not_approved_not_applied",
+    "target_host": "192.168.16.231",
+    "target_file": "/etc/systemd/timesyncd.conf.d/90-capstone-campus.conf",
+    "target_file_sha256": "9aced43555c9bbe83b1cbc23fa573ce1b768ead91b38386dbaf829722c53ac8b",
+    "controller_sha256": "84f4b0b3b4f8ed6a9322fc6a63b39952166218b83a87644b87bb6e06ef119ba4",
+    "controller_bytes": 8035,
+    "upstream": "192.168.16.131",
+    "NTP_service_restarts_authorized_yet": false,
+    "independent_restore_seconds": 300,
+    "clock_forced_backward_on_restore": false,
+    "exact_approval_requested": true,
+    "exact_approval_received": false,
+    "private_proof": {
+      "atomic_new_file": true,
+      "existing_target_rejected_unchanged": true,
+      "actual_independent_timer_and_sandbox_callback": true,
+      "fixture_only_RemainAfterExit_for_inspection": true,
+      "callback_read_systemd_success": true,
+      "unit_properties": "Result=success\nExecMainStatus=0\nTransient=yes\n",
+      "actual_NTP_setting_change": false,
+      "actual_NTP_service_restart": false,
+      "cleanup_files": 3,
+      "cleanup_bytes": 439,
+      "owned_directory_absent": true
+    },
+    "actual_NTP_apply_or_restore": false,
+    "SSH_disconnect_or_reboot_test": false,
+    "operator_review_artifacts": "project-local ignored evidence; frozen proposal/controller/diff preserved"
+  },
+  "normal_HTTP_requests": 1,
+  "normal_NTP_requests": 1,
+  "malicious_traffic": 0,
+  "new_model_calls": 0,
+  "new_chat_messages": 0,
+  "operating_settings_changed": false,
+  "private_key_reads": 0,
+  "observer_sources": {
+    "admin-read.py": {
+      "bytes": 1973,
+      "sha256": "29810de0d60088942eb7c3eddf0581063c83138a56ad722ddadf00962e9714c0",
+      "location": "local ignored evidence"
+    },
+    "a-read.py": {
+      "bytes": 1497,
+      "sha256": "f268398831efc13c8d03ef189b994c8481bba89a7af68058639b324f8233c806",
+      "location": "local ignored evidence"
+    },
+    "clock-read-corrected.py": {
+      "bytes": 1026,
+      "sha256": "3321bda99a624f980d43009424e588d1652ffffe778ff36ee1999d33dc82e68e",
+      "location": "local ignored evidence"
+    },
+    "campus-ntp-query.py": {
+      "bytes": 1224,
+      "sha256": "945fd8af5a664bf1287c9f204abdbea78bcfc0219eef46ef0b3ee42bcdd422e7",
+      "location": "local ignored evidence"
+    },
+    "a-chrony-read.py": {
+      "bytes": 780,
+      "sha256": "61b4b6e6f3988e8fa40f7c22c0ae61b020ff2a1c8933f3303d0f2de92e748858",
+      "location": "local ignored evidence"
+    }
+  },
+  "humanize": {
+    "run": "2026-11-18-033-7e3e",
+    "route": "light",
+    "version": "v2.3-codex",
+    "change_rate_percent": 0.0,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0,
+    "residual_warnings": 0,
+    "scope": "seven new service-readiness/clock/proposal paragraphs"
+  },
+  "limitations": [
+    "external Internet/other VPN path",
+    "authentication/bot/incident closure and general accuracy/SLO",
+    "next09:00 actual timer execution",
+    "fresh3host OS installation and independent reproduction",
+    "exact administrator clock proposal approval, application and verification"
+  ],
+  "primary_references": [
+    "https://www.freedesktop.org/software/systemd/man/255/timesyncd.conf.html",
+    "https://www.rfc-editor.org/info/rfc5905/"
+  ],
+  "publication": {
+    "state": "prepared_not_published",
+    "operating_deployment": false
+  }
+}

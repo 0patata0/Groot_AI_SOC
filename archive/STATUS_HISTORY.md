@@ -1,5 +1,17 @@
 # 현황 이력
 
+<!-- chat-access-readiness-20261118 -->
+<a id="chat-access-readiness-20261118"></a>
+
+관리자231에서 채팅의 공개 이름으로443/TLS1.3 연결과 /api/v4/system/ping의200·OK를 확인했다. CA·호스트명 검증을 통과했고 제공 인증서 지문은 A의 저장 관측과 같았다. 다만 이름이192.168.16.230으로 해석됐으므로 관리자 LAN 경로의 결과다. 외부 인터넷·다른 VPN 경로·로그인·봇 대화의 성공으로 확대하지 않는다. 실제 정상 HTTP 요청은1개이며 자격 증명을 보내지 않았다.
+
+관리자 호스트는 NTP=yes·NTPSynchronized=no였고 조회 컴퓨터보다46.486~47.051초 늦었다. 같은 방식으로 읽은 A의 상대 차이는-0.033~0.864초 범위였으며 NTP 동기화 상태는yes였다. 이 범위는 각 SSH 조회의 왕복 시간을 포함한 관측 한계다. 원래 원격 시각과 조회 컴퓨터의 수신 시각을 함께 보존하며 과거 원문 시각을 고쳐 쓰지 않는다.
+
+정확 변경안390a0f43은 관리자231의 /etc/systemd/timesyncd.conf.d/90-capstone-campus.conf 파일1개와 기존 timesyncd의1회 재시작만 포함한다. 학내131을 지정하고5분 내 확인하지 못하면 추가한 설정만 원복한다. NTP 보정으로 시계가 약47초 앞으로 이동할 수 있으며 원복 시 시계를 강제로 과거로 돌리지 않는다. 관리자에게 정확 승인을 요청했으며 실제 설정·시각 변경과 운영 NTP 서비스 재시작은 아직 수행하지 않았다.
+
+[관리자 경로·시각·정확 변경안 원장](../infra/groot-a/certificate-monitor/access-readiness-20261118.json)
+<!-- /chat-access-readiness-20261118 -->
+
 <!-- certificate-rules-native-20261118 -->
 <a id="certificate-rules-native-20261118"></a>
 

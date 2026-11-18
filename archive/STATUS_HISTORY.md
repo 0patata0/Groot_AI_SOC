@@ -13653,3 +13653,7 @@ Native 첫 도구 선택 오류의 재시도를 작은 요청에 연결했다. �
 | 게시 전 검사 | 추적2433·위험경로0·기존 합성/코드10·신규0 |
 | 문서 윤문 | light·0.04%·B·6/6·gate0·경고0 |
 <!-- /service-cause-publication-20261119 -->
+
+<!-- coordinator-native-systemd-20261119 -->
+11/19 07:33~07:50 KST에 실제 고정27유닛의 운영 모드 읽기와 별도 systemd 합성6조건을 확인했다. 후보40소스·별도 캐시 의존2개의 지문과 기존 공식 Harness² HEAD를 대조했으며 새 구조 검사나 런타임 변경은 없었다. 중단된 합성 파일2개는 다른 PID의 타이머가 약9.42초 뒤 복구했고 reader 차단을 보존했다. 운영 root 진입점·전체 Lifecycle·실제 재부팅·B Docker/SSH·캐시/전역 복구는 미완료다. 두 초기 실패와 읽기 검사 가정 오류를 보존하고 자체 유닛·파일·링크·폴더 부재를 별도로 확인했다. 공개 게시 결과는 현재 STATUS와 검증 원장의 publication을 따른다. [근거](../infra/validation/journal-composition/native-systemd.validation.json).
+<!-- /coordinator-native-systemd-20261119 -->

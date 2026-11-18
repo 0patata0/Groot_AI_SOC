@@ -6968,3 +6968,7 @@ MCP 기본 소스와 실제 core/journal2차이를 확인해 직접 배포하지
 | 게시 전 검사 | 추적2433·위험경로0·기존 합성/코드10·신규0 |
 | 문서 윤문 | light·0.04%·B·6/6·gate0·경고0 |
 <!-- /service-cause-publication-20261119 -->
+
+<!-- coordinator-native-systemd-20261119 -->
+A/B/C27유닛 읽기와 별도 systemd 합성6조건을 확인해 모의 backend만 있던 검증 근거를 보강했다. 이 결과로 운영 root 진입점·Lifecycle.recover·실제 재부팅/SSH 단절·B Docker·전체 캐시/전역 복구를 완료 처리하지 않는다. 해당 연결을 검증하고 새 라이브 소스/스키마/모델/권한 대조와 전체 payload 동결·공식 Harness²/회귀·정확 승인·관리자 경유 적용·새 MCP/두 봇 채팅으로 이어간다. 공격·학습 중단과 발표자료 추가 생성·수정 중단은 유지한다. [검증 범위](../infra/validation/journal-composition/native-systemd.validation.json).
+<!-- /coordinator-native-systemd-20261119 -->

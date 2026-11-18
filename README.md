@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+<!-- coordinator-native-systemd-20261119 -->
+조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).
+<!-- /coordinator-native-systemd-20261119 -->
+
 <!-- panel-content-20261119 -->
 사용자 요청에 따라 판넬 자료를 ABSTRACT·METHOD·CONCLUSION의 세 항목으로 구성했다. 요약에는 구현 이유·대상·방법·결론을 담고 Method와 Conclusion에서 구현 과정과 실제 결과를 설명한다. IP·포트 등 세부 값은 본문에 나열하지 않고 그림에서 확인하도록 했다.
 

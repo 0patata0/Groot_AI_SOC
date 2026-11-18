@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "status": "native_read_only_and_owned_systemd_fixture_passed_not_operating_deployment",
+  "observed_at_kst": "2026-11-19T07:49:00.187430+09:00",
+  "validator": "validate_owned_systemd.py",
+  "validator_sha256": "e26c605c42e54297892d54e80cb29cc08235a305f9007d38beda598e062b28cc",
+  "coordinator_manifest_sha256": "a7868339b5b0880f50df42e8538b0d462527b740db08a0db6626f9b287cb2fc6",
+  "witness_manifest_sha256": "e42296de7b89989b6b5379d8c1cf3cb916bd7c7bc44c25ecf1b09d4b9f3e755b",
+  "candidate_sources_verified": 40,
+  "additional_cache_dependencies_verified": 2,
+  "total_pins_verified": 42,
+  "official_harness2": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "head_and_frozen_sources_verified_this_unit": true,
+    "new_structure_run_this_unit": false,
+    "runtime_candidate_changes": 0
+  },
+  "operating_read_only": {
+    "hosts": {
+      "a": {
+        "observed_at_kst": "2026-11-19T07:33:58.315388+09:00",
+        "route": "Mac-admin-A",
+        "unit_count": 6,
+        "constructor_and_parser_valid": true,
+        "fixture_mode": false,
+        "operating_changes": 0,
+        "temporary_source_files_removed": true,
+        "source_sha256": {
+          "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+          "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57"
+        },
+        "result_sha256": "658541375ac067947af5dfbe01f16d9c24e0250823e2a16d9739c83ad096990b"
+      },
+      "b": {
+        "observed_at_kst": "2026-11-19T07:33:58.749455+09:00",
+        "route": "Mac-admin-A-B",
+        "unit_count": 17,
+        "constructor_and_parser_valid": true,
+        "fixture_mode": false,
+        "operating_changes": 0,
+        "temporary_source_files_removed": true,
+        "source_sha256": {
+          "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+          "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57"
+        },
+        "result_sha256": "dd17f74056a881db52c95b36394cb772594429b0c8bf94900472a5f5bd32a89a"
+      },
+      "c": {
+        "observed_at_kst": "2026-11-19T07:33:58.647324+09:00",
+        "route": "Mac-admin-A-C",
+        "unit_count": 4,
+        "constructor_and_parser_valid": true,
+        "fixture_mode": false,
+        "operating_changes": 0,
+        "temporary_source_files_removed": true,
+        "source_sha256": {
+          "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+          "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57"
+        },
+        "result_sha256": "c3a87c9ac84375ae0b06291d3f288c16482fc53ebca73549da390fcc89744574"
+      }
+    },
+    "total_units": 27,
+    "scope": "production Native constructor, fixed catalog, systemctl show parser; B selected container inspect only",
+    "lifecycle_mutations": 0
+  },
+  "owned_native_fixture": {
+    "host_role": "administrator231",
+    "systemd": "255.4-1ubuntu8.5",
+    "fixture_host_role": "c",
+    "conditions_passed": [
+      "native_collection_resource_contract",
+      "native_helper_load_and_arm",
+      "actual_loaded_resource_drift_refused",
+      "actual_condition_fence_blocks_start",
+      "separate_native_timer_restores_interrupted_fixture_core",
+      "native_resume_only_original_active_units"
+    ],
+    "condition_count": 6,
+    "translations": [
+      "owned unit names",
+      "fixture file paths",
+      "Group=root",
+      "synthetic ExecStart",
+      "enable/disable --runtime",
+      "fixture root as additional ReadWritePaths for synthetic receipts",
+      "show identity/path and enabled-runtime normalization"
+    ],
+    "actual_controller_process_exit": 23,
+    "distinct_recovery_process": true,
+    "interrupted_source_files": 2,
+    "restored_source_files": 2,
+    "recovery_delay_monotonic_seconds": 9.421034097,
+    "reader_barrier_preserved": true,
+    "only_original_active_units_resumed": true,
+    "result_sha256": "3cfd8b2a23552fc3fecc1ac55105b2d3e5a709a99a6c5c3215728c7d937455f1"
+  },
+  "cleanup": {
+    "validator": {
+      "errors": [],
+      "remaining_running_units": [],
+      "unit_files_absent": true,
+      "workspace_absent": true
+    },
+    "bundle_removed": true,
+    "fresh_read_only_confirmed_at_kst": "2026-11-19T07:50:51.661156+09:00",
+    "owned_unit_list_empty": true,
+    "owned_unit_file_list_empty": true,
+    "owned_run_paths_remaining": 0,
+    "owned_unit_paths_remaining": 0,
+    "owned_enable_links_remaining": 0,
+    "existing_manager_state": "degraded before and after; unrelated failures not reset"
+  },
+  "preserved_failures": [
+    {
+      "attempt": 1,
+      "failure": "fixture omitted required baseline netlink drop-in and normalized only first DropInPaths path",
+      "operating_runtime_changed": false,
+      "owned_cleanup_passed": true
+    },
+    {
+      "attempt": 2,
+      "failure": "validator removed multi-file drop-in directory too early; final report interrupted",
+      "owned_units_already_stopped": true,
+      "remaining_own_files_inventoried_and_removed": 39,
+      "cleanup_independently_confirmed": true
+    },
+    {
+      "stage": "post-cleanup observer",
+      "failure": "initial observer assumed list-unit-files returns zero for empty match; actual empty result rc1",
+      "remaining_files_or_units": 0,
+      "read_only_observer_corrected": true
+    }
+  ],
+  "not_verified": [
+    "production root entry point",
+    "Lifecycle.recover under actual system manager",
+    "full source/cache/cohort lifecycle with native backends",
+    "actual reboot fence and SSH loss",
+    "B Docker stop/restart and reader child drain",
+    "exact full payload approval and operating deployment",
+    "new real MCP and both bot chats",
+    "fresh OS installation and independent reconstruction",
+    "model accuracy or SLO"
+  ],
+  "operating_source_cache_unit_changes": 0,
+  "packages_installed": 0,
+  "attacks": 0,
+  "model_calls": 0,
+  "bot_posts": 0,
+  "presentation_generation_or_editing": 0,
+  "publication": {
+    "status": "prepared_not_yet_committed_or_pushed"
+  },
+  "humanize": {
+    "version": "2.3-codex",
+    "run": "2026-11-19-006-5121",
+    "route": "light",
+    "change_rate": 0.0001,
+    "change_rate_percent": 0.01,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit_code": 0,
+    "warnings": 0,
+    "edit": "one C-11 comma removal; observed official gate output retained in tool transcript"
+  },
+  "code_review": {
+    "source_sha256": "e26c605c42e54297892d54e80cb29cc08235a305f9007d38beda598e062b28cc",
+    "ast": "pass",
+    "foreign_command_refusals": 6,
+    "native_subprocess_calls_during_guard_checks": 0,
+    "explicit_opt_in_required": true,
+    "review": "main agent defect-first review; review-agent skill absent",
+    "unresolved_new_findings": 0,
+    "runtime_sources_changed": false,
+    "meaningful_checks": "owned-unit target/program/verb boundaries and real native six-condition fixture; no full repeated 252 regression because frozen runtime bytes unchanged"
+  }
+}

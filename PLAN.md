@@ -1,5 +1,11 @@
 # Agentic SOC 실행 계획
 
+<!-- coordinator-native-systemd-20261119 -->
+A/B/C27유닛의 운영 모드 읽기와 별도 systemd 합성6조건을 확인했다. 다음에는 운영 root 진입점과 Lifecycle.recover, 캐시·전역 정지·SSH 자식·B Docker를 연결한 전체 복구 및 실제 재부팅 조건을 검증한다. 시험용 변환을 운영 검증으로 승계하지 않는다. 현재 소스·모델·MCP 스키마·권한을 다시 대조하고 전체 payload 동결→공식 Harness²/회귀→정확 승인→관리자 경유 적용→새 실제 MCP·두 봇 채팅을 따른다. 기존 관리19/journal9 승인과 NTP390a 승인 대기는 그대로 유지한다.
+
+[확인한 범위와 미검증 항목](infra/validation/journal-composition/native-systemd.validation.json)
+<!-- /coordinator-native-systemd-20261119 -->
+
 <!-- presentation-preserve-user-20261119 -->
 기존 발표자료를 유지하고 추가 생성·수정은 사용자 명시 요청 전까지 진행하지 않는다. 판넬 문구와 배치용 자료는 보존한다. 전체 실전 운용·논문·최종 발표 목표는 활성 상태이며 이 지시를 목표 전체의 일시정지나 운영 후보 승인으로 확대하지 않는다.
 <!-- /presentation-preserve-user-20261119 -->

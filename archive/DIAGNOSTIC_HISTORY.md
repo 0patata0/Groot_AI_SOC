@@ -824,3 +824,11 @@ MD·DOCX·PDF96쪽·본문/표/코드1,902구간 누락0·82제목/62캡션의14
 
 현재 상태 단독 조회의 확정 결과와 복합 원인 질문의 실패를 분리했다. 실제 두 새 채팅과 격리 후보에서 추가 읽기 누락·보고 검증 거절을 확인하고, 단일 SDK 실행기 연결 후보와3반례를 만들었다. 회귀833·Linux 공식38/설치37은 통과했지만 실제 격리 최종 보고는 수용되지 않아 운영 적용을 보류했다. 원본·후보·현재 소스/스키마·실제 호출·실패·미수행 근거를 보존한다. [원인·수행·미완료](../infra/hermes/service-query-contract.md) · [실제 실패·후보 검증](../infra/validation/service-query/cause-completion.validation.json).
 <!-- /service-cause-candidate-20261119 -->
+
+<!-- coordinator-native-systemd-20261119 -->
+운영 Native의 실제27유닛 읽기는 모두 해석됐다. 이 결과는 운영 자원 제한이나 정지·재개를 시험한 증거가 아니다. 관리자231의 system manager는 시험 전후 모두 기존 degraded였고 다른 실패 유닛을 reset하지 않았다.
+
+첫 격리 시험은 고정 netlink drop-in을 합성 기반 설정에서 빠뜨렸고 DropInPaths의 첫 경로만 변환해 collection_loaded_source_mismatch로 거절됐다. 시험 설정과 조회 변환만 보완했다. 두 번째에는 여러 파일이 있는 drop-in 디렉터리의 정리 순서가 잘못돼 전체 보고 출력 전에 실패했다. 이미 중단된 자체 유닛을 다시 확인하고 남은39파일의 크기·SHA를 보존한 뒤 제거했다. 정리 오류도 결과로 남기도록 checkpoint와 종료 처리를 보완했다.
+
+최종 시험은6조건과 자체 정리를 통과했다. 별도 읽기 검사는 빈 list-unit-files의 종료1을 오류로 가정해 처음 거절됐으나 실제 유닛·파일·링크·작업 폴더는 없었다. 빈 출력과 stderr 부재를 함께 확인하도록 고쳐07:50:51 KST에 부재를 재확인했다. 기존 운영 코드 결함이나 운영 복구 성공으로 바꾸어 기록하지 않는다. [원장과 한계](../infra/validation/journal-composition/native-systemd.validation.json).
+<!-- /coordinator-native-systemd-20261119 -->

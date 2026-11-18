@@ -142,3 +142,6 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 
 [Native 첫 조회·실제 실행 보완](../infra/validation/management-latency/native-initial-e2e.validation.json)은 격리 모델/MCP 실행과 운영 미적용·실제 채팅 미검증, 중간 실패를 구분한다.
+
+
+[Native 첫 선택 작은 정정](../infra/validation/management-latency/native-selection-repair.validation.json)은 자연2질문·선택 오류의 제어된 재현·운영 미적용과 실제 채팅 미검증을 구분한다.

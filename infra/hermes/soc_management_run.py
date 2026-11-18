@@ -3255,6 +3255,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         restore = getattr(agent, '_capstone_grounding_restore', None)
         if callable(restore):
             restore()
+        initial=native_initial_selection_continuation(agent,original,native,append_message,reanchor,
+            completed_calls,kw)
+        if initial is not None:return initial
         turn = getattr(agent, '_current_turn_id', None)
         message, messages, user = kw.get('assistant_message'), kw.get('messages'), kw.get('user_message')
         count, maximum, counter = kw.get('api_call_count'), getattr(agent, 'max_iterations', None), kw.get('codex_ack_continuations')
@@ -3341,6 +3344,11 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                             ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn',
                              '_capstone_factual_turn2','_capstone_incident_repair_turn',
                              '_capstone_incident_repair_turn2'))+len(read_retries)+len(inquiry_retries)
+        initial_state=getattr(agent,'_capstone_initial_selection',None)
+        if (isinstance(initial_state,dict) and initial_state.get('turn')==turn
+                and type(initial_state.get('continuations')) is int
+                and 0<=initial_state['continuations']<=2):
+            known_retries+=initial_state['continuations']
         if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
@@ -3815,9 +3823,97 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
     return result
 
 
+def native_initial_selection_retry(request, agent, state, *, pending):
+    """Restore only the current compact read lease, never conversation history."""
+    chat=chat_read_context();catalog={}
+    tools=request.get('tools')
+    if not isinstance(tools,list) or not 1<=len(tools)<=64:
+        raise RuntimeError('management_initial_selection_catalog_changed')
+    for tool in tools:
+        f=tool.get('function',{}) if isinstance(tool,dict) else {}
+        name=f.get('name');schema=f.get('parameters')
+        if (not isinstance(tool,dict) or tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
+                or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
+            raise RuntimeError('management_initial_selection_catalog_changed')
+        catalog[name]=schema
+    if (pending is not True or os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')!='1'
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
+            or state.get('turn')!=getattr(agent,'_current_turn_id',None)
+            or state.get('chat')!=chat or catalog!=state.get('source_catalog')
+            or getattr(agent,'provider',None)!='custom'
+            or getattr(agent,'api_mode','chat_completions')!='chat_completions'
+            or str(getattr(agent,'base_url','')).rstrip('/')!='http://10.200.10.10:11435/v1'
+            or not verified_runtime_model(agent,request.get('model'))
+            or request.get('tool_choice')!='required' or getattr(agent,'_interrupt_requested',False)
+            or type(state.get('repairs')) is not int
+            or not 1<=state['repairs']<=chat_lookup_harness().CONTRACT.REPAIR_PASSES):
+        raise RuntimeError('management_initial_selection_lease_changed')
+    result=copy.deepcopy(state['original_request']);selection=copy.deepcopy(state['original_selection'])
+    old=json.dumps(selection['schema'],ensure_ascii=False,separators=(',',':'))
+    selection['nonce']=uuid.uuid4().hex
+    selection['schema']['properties']['request_nonce']['const']=selection['nonce']
+    last=result['messages'][-1]
+    if last.get('role')!='user' or not isinstance(last.get('content'),str) or last['content'].count(old)!=1:
+        raise RuntimeError('management_initial_selection_prompt_changed')
+    last['content']=last['content'].replace(old,json.dumps(selection['schema'],ensure_ascii=False,separators=(',',':')),1)
+    result['messages'].append({'role':'user','content':json.dumps(
+        {'selection_validation':state['feedback']},ensure_ascii=False,separators=(',',':'))})
+    result['response_format']['json_schema']['schema']=copy.deepcopy(selection['schema'])
+    selection['initial_selection_retry']=True
+    selection['initial_selection_messages']=copy.deepcopy(result['messages'])
+    agent._capstone_management_selection=selection
+    state.update(request_pending=False,last_rejected=False)
+    return result
+
+
+def native_initial_selection_continuation(agent, original, native, append_message, reanchor, completed, kw):
+    """One bounded Native continuation; no provider or MCP calls here."""
+    state=getattr(agent,'_capstone_initial_selection',None)
+    if not isinstance(state,dict) or not state.get('last_rejected'):return None
+    turn=getattr(agent,'_current_turn_id',None)
+    if state.get('turn')!=turn:return None
+    message=kw.get('assistant_message');messages=kw.get('messages');user=kw.get('user_message')
+    counter=kw.get('codex_ack_continuations');count=kw.get('api_call_count')
+    maximum=getattr(agent,'max_iterations',None)
+    remaining=getattr(getattr(agent,'iteration_budget',None),'remaining',None)
+    if (os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')!='1'
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
+            or state.get('turn')!=turn or state.get('chat')!=chat_read_context()
+            or not state.get('repair_pending') or completed or getattr(agent,'_interrupt_requested',False)
+            or kw.get('finish_reason')!='stop' or getattr(message,'tool_calls',None)
+            or kw.get('_pending_verification_response') is not None
+            or not isinstance(turn,str) or not turn or not isinstance(user,str) or not isinstance(messages,list)
+            or type(counter) is not int or not 0<=counter<3 or counter!=state.get('continuations')
+            or type(count) is not int or type(maximum) is not int or not 0<=count<maximum-1
+            or remaining is not None and (type(remaining) not in (int,float) or not remaining>=2)):
+        return original(agent,**kw)
+    idx=reanchor(messages,user)
+    if (type(idx) is not int or not 0<=idx<len(messages) or not isinstance(messages[idx],dict)
+            or messages[idx].get('role')!='user' or messages[idx].get('content')!=user):
+        return original(agent,**kw)
+    state.update(repair_pending=False,request_pending=True,continuations=counter+1)
+    agent._mute_post_response=False
+    agent._empty_content_retries=agent._thinking_prefill_retries=0
+    agent._emit_pending_fallback_notice();agent._clear_status_buffer()
+    append_message(messages,agent._build_assistant_message(message,'incomplete'))
+    append_message(messages,{'role':'user','content':json.dumps(
+        {'selection_validation':state['feedback']},ensure_ascii=False,separators=(',',':'))})
+    agent._session_messages=messages
+    fields=('active_system_prompt','_turn_exit_reason','_preflight_compression_blocked',
+        'truncated_response_parts','length_continue_retries','_pending_verification_response',
+        '_pending_verification_response_previewed')
+    return native.FinalResponseVerdict(action='continue',final_response=None,
+        codex_ack_continuations=counter+1,**{name:kw[name] for name in fields})
+
+
 def management_read_request(request, agent, *, pending=False):
     'Encode a pending, catalog-bound read choice; native still dispatches it.'
     agent._capstone_management_selection = None
+    retry=getattr(agent,'_capstone_initial_selection',None)
+    if isinstance(retry,dict) and retry.get('turn')!=getattr(agent,'_current_turn_id',None):
+        agent._capstone_initial_selection=None;retry=None
+    if isinstance(retry,dict) and retry.get('request_pending'):
+        return native_initial_selection_retry(request,agent,retry,pending=pending)
     if (pending is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
             or getattr(agent, 'provider', None) != 'custom'
             or getattr(agent, 'api_mode', 'chat_completions') != 'chat_completions'
@@ -3950,7 +4046,15 @@ def management_read_request(request, agent, *, pending=False):
         'schema':copy.deepcopy(schema),'catalog':catalog}
     if chat:agent._capstone_management_selection['chat_read']=True
     if current:agent._capstone_management_selection['current_diagnostic']=True
-    if shared_initial:agent._capstone_management_selection['shared_incident_initial']=True
+    if shared_initial:
+        agent._capstone_management_selection['shared_incident_initial']=True
+        agent._capstone_management_selection['initial_selection_messages']=copy.deepcopy(result['messages'])
+    if shared_initial:
+        source_catalog={t['function']['name']:copy.deepcopy(t['function']['parameters']) for t in tools}
+        agent._capstone_initial_selection={'turn':agent._current_turn_id,'chat':copy.deepcopy(chat),
+            'source_catalog':source_catalog,'original_request':copy.deepcopy(result),
+            'original_selection':copy.deepcopy(agent._capstone_management_selection),
+            'repairs':0,'continuations':0,'rejections':[],'last_rejected':False}
     return result
 
 
@@ -4518,7 +4622,20 @@ def management_selection_response(response, selection, agent):
     if selection.get('incident_report'):
         return native_incident_report_response(response,selection,agent,value)
     if selection.get('current_diagnostic') or selection.get('shared_incident_initial'):
-        value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
+        try:value,_=chat_lookup_harness().validated_selection(value,selection['schema'])
+        except Exception as exc:
+            if (selection.get('shared_incident_initial') and type(exc).__module__.startswith('jsonschema')
+                    and isinstance(value,dict) and value.get('request_nonce')==selection['nonce']
+                    and isinstance(value.get('calls'),list)):
+                selection['initial_selection_feedback']=chat_lookup_harness().selection_error_feedback(exc,value,selection['schema'])
+                selection['initial_selection_rejection_key']=hashlib.sha256(json.dumps(
+                    {'calls':value['calls'],'feedback':selection['initial_selection_feedback']},
+                    ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+            raise
+        if selection.get('shared_incident_initial'):
+            state=getattr(agent,'_capstone_initial_selection',None)
+            if isinstance(state,dict) and state.get('turn')==selection['turn']:
+                state.update(last_rejected=False,repair_pending=False,request_pending=False)
     elif selection.get('service_report'):
         value,removed=diagnostic_contract().validated_service_report(value,selection['schema'])
         if removed:
@@ -4621,12 +4738,18 @@ def management_selection_call_wrapper(original):
     @functools.wraps(original)
     def wrapped(agent,**kw):
         selection=getattr(agent,'_capstone_management_selection',None)
+        initial_state=getattr(agent,'_capstone_initial_selection',None)
         request=kw.get('api_kwargs')
         active=(os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify' and isinstance(selection,dict)
             and selection.get('turn')==kw.get('turn_id')==getattr(agent,'_current_turn_id',None)
             and isinstance(request,dict) and verified_runtime_model(agent, request.get('model'))
             and request.get('response_format',{}).get('json_schema',{}).get('schema')==selection['schema']
             and not set(request.get('extra_body') or {}).intersection({'tools','tool_choice','response_format','model','messages'})
+            and (not selection.get('shared_incident_initial') or
+                os.environ.get('CAPSTONE_EVIDENCE_REPORT_COMPACT','0')=='1'
+                and isinstance(initial_state,dict) and initial_state.get('turn')==selection['turn']
+                and initial_state.get('chat')==chat_read_context()
+                and request.get('messages')==selection.get('initial_selection_messages'))
             and (not selection.get('incident_report') or
                 isinstance(selection.get('incident_inference_profile'),dict)
                 and all(request.get(k)==v for k,v in selection['incident_inference_profile'].items())
@@ -4637,6 +4760,8 @@ def management_selection_call_wrapper(original):
             agent._capstone_management_selection=None
             if selection.get('incident_report'):
                 raise RuntimeError('management_incident_lease_invalid')
+            if selection.get('shared_incident_initial'):
+                raise RuntimeError('management_initial_selection_lease_changed')
         started=time.monotonic()
         verdict=original(agent,**kw)  # Native transport, accounting and retries stay native.
         if not active:return verdict
@@ -4644,7 +4769,7 @@ def management_selection_call_wrapper(original):
         if (getattr(verdict,'action',None)!='fallthrough'
                 or kw.get('turn_id')!=getattr(agent,'_current_turn_id',None)
                 or getattr(agent,'_interrupt_requested',False)):
-            if selection.get('incident_report') and getattr(verdict,'action',None)=='fallthrough':
+            if (selection.get('incident_report') or selection.get('shared_incident_initial')) and getattr(verdict,'action',None)=='fallthrough':
                 raise RuntimeError('management_incident_turn_changed')
             return verdict
         if selection.get('incident_report'):
@@ -4672,6 +4797,8 @@ def management_selection_call_wrapper(original):
                 'response_finish':getattr(next(iter(getattr(verdict.response,'choices',[])),None),'finish_reason',None),
                 'additional_inquiry':bool(selection.get('additional_inquiry')),
                 'literal_report_repair':bool(selection.get('literal_report_repair')),
+                'initial_selection_retry':bool(selection.get('initial_selection_retry')),
+                'initial_selection_feedback':selection.get('initial_selection_feedback'),
                 'reasoning_effort':request.get('reasoning_effort'),
                 'actual_mcp_calls_by_adapter':0})+'\n')
             if selection.get('incident_report'):
@@ -4702,6 +4829,22 @@ def management_selection_call_wrapper(original):
                 response.choices[0].message.tool_calls=None
                 response.choices[0].finish_reason='stop'
                 return replace(verdict,response=response)
+            if selection.get('shared_incident_initial'):
+                state=getattr(agent,'_capstone_initial_selection',None)
+                if not isinstance(state,dict) or state.get('turn')!=selection['turn']:
+                    raise RuntimeError('management_initial_selection_state_changed') from exc
+                feedback=selection.get('initial_selection_feedback');key=selection.get('initial_selection_rejection_key')
+                eligible=bool(feedback and key not in state['rejections']
+                    and state['repairs']<chat_lookup_harness().CONTRACT.REPAIR_PASSES)
+                state.update(last_rejected=True,repair_pending=eligible,request_pending=False)
+                if eligible:
+                    state['rejections'].append(key);state['repairs']+=1;state['feedback']=copy.deepcopy(feedback)
+                response=copy.deepcopy(verdict.response)
+                if len(getattr(response,'choices',[]))!=1:
+                    raise RuntimeError('management_initial_selection_response_unavailable') from exc
+                response.choices[0].message.content='읽기 도구 선택이 검증을 통과하지 못했습니다. 실제 조회는 수행하지 않았습니다.\nMANAGEMENT_STATUS: needs_review'
+                response.choices[0].message.tool_calls=None;response.choices[0].finish_reason='stop'
+                return replace(verdict,response=response)
             return verdict
         sys.stderr.write('management_read_selection '+json.dumps({'accepted':True,'selected_reads':count,
             'provider_seconds':round(time.monotonic()-started,6),'native_dispatch':count>0,
@@ -4711,6 +4854,7 @@ def management_selection_call_wrapper(original):
             'inference_profile':selection.get('incident_inference_profile'),
             'additional_inquiry':bool(selection.get('additional_inquiry')),
             'literal_report_repair':bool(selection.get('literal_report_repair')),
+            'initial_selection_retry':bool(selection.get('initial_selection_retry')),
                 'reasoning_effort':request.get('reasoning_effort'),
             'input_message_bytes':len(json.dumps(request.get('messages',[]),ensure_ascii=False).encode()),
             'usage':(verdict.response.usage.model_dump() if getattr(verdict.response,'usage',None) is not None else None),

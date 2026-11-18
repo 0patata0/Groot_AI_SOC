@@ -6,6 +6,7 @@ others. Package archives must already have vendor signature/provenance review.
 The manifest is an administrator trust boundary, not a vendor signature.
 """
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -50,6 +51,31 @@ def run(args, *, check=True, timeout=120, input=None):
     result = subprocess.run(args, input=input, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=timeout)
     need(not check or result.returncode == 0, 'offline command failed: ' + Path(args[0]).name)
     return result
+
+def host_clock():
+    """Read the OS clock precondition; never set time, NTP or time zone.
+
+    This is an OS-reported readiness gate, not a measurement of source trust,
+    absolute UTC accuracy, inter-host offset or future synchronization.
+    """
+    result = run(['timedatectl', 'show', '--all', '--no-pager'], check=False, timeout=10)
+    need(result.returncode == 0, 'host clock state unavailable; prepare approved time synchronization')
+    names = {'Timezone', 'NTP', 'NTPSynchronized'}
+    observed = {}
+    for line in result.stdout.decode('utf-8').splitlines():
+        key, separator, value = line.partition('=')
+        if separator and key in names:
+            need(key not in observed, 'duplicate host clock property')
+            observed[key] = value
+    need(set(observed) == names, 'host clock properties missing; cannot establish readiness')
+    need(observed['Timezone'] == 'Asia/Seoul', 'host time zone must be Asia/Seoul')
+    need(observed['NTP'] == 'yes', 'host NTP must be enabled by the operator')
+    need(observed['NTPSynchronized'] == 'yes', 'host clock not synchronized; prepare an approved reachable NTP source')
+    return {'status': 'OS_clock_precondition_passed', 'timezone': observed['Timezone'],
+            'NTP': observed['NTP'], 'NTPSynchronized': observed['NTPSynchronized'],
+            'observed_at_utc': datetime.now(timezone.utc).isoformat(),
+            'scope': 'OS-reported state only; source trust/UTC accuracy/inter-host offset not measured',
+            'settings_changed': False}
 
 def sha(path):
     h = hashlib.sha256()
@@ -205,11 +231,15 @@ def verify_existing(doc):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('check', 'apply'))
+    parser.add_argument('action', choices=('check', 'apply', 'clock'))
     parser.add_argument('role', choices=('security', 'siem', 'service'))
     parser.add_argument('--manifest', type=Path, default=Path('/opt/capstone-prereqs/artifacts.json'))
     args = parser.parse_args()
     need(os.geteuid() == 0, 'root required')
+    clock = host_clock()
+    if args.action == 'clock':
+        print(json.dumps({'role': args.role, 'action': 'clock', 'clock': clock}))
+        return
     managed = fresh_host_guard(args.role)
     doc = read_manifest(args.manifest, args.role)
     security_baseline(doc)
@@ -240,7 +270,7 @@ def main():
                 fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
                 with os.fdopen(fd, 'w') as f: f.write('vm.max_map_count=262144\n'); f.flush(); os.fsync(f.fileno())
                 run(['sysctl', '-p', str(target)])
-    print(json.dumps({'role': args.role, 'action': args.action, 'packages': len(doc['packages']), 'images': len(doc['images']), 'network_downloads': 0}))
+    print(json.dumps({'role': args.role, 'action': args.action, 'packages': len(doc['packages']), 'images': len(doc['images']), 'network_downloads': 0, 'clock': clock}))
 
 if __name__ == '__main__':
     try: main()

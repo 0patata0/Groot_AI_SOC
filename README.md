@@ -1,5 +1,13 @@
 # Groot_AI_SOC
 
+<!-- bootstrap-clock-gate-20261118 -->
+<a id="bootstrap-clock-gate-20261118"></a>
+
+단일deploy.sh의 사전검사에서 호스트 시간대가Asia/Seoul이고 NTP=yes·NTPSynchronized=yes인지 확인한다. 세 호스트의 준비 검사와 각 호스트의 패키지 적용 단계에서 같은 조건을 읽으며 역할별 실행·검증·내보내기 전에도 다시 확인한다. 누락·중복·다른 시간대·NTP 비활성·미동기·조회 실패는 준비 완료로 통과시키지 않는다. 시간·시간대·NTP 설정을 바꾸거나 서비스를 재시작하지 않는다.
+
+[시각 사전조건·검증 범위](deployment/clock-readiness.validation.json)
+<!-- /bootstrap-clock-gate-20261118 -->
+
 <!-- chat-access-readiness-20261118 -->
 <a id="chat-access-readiness-20261118"></a>
 

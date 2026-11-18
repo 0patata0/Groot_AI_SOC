@@ -1,5 +1,13 @@
 # 과거 기록과 복원 안내
 
+<!-- bootstrap-clock-gate-20261118 -->
+<a id="bootstrap-clock-gate-20261118"></a>
+
+로컬 prerequisites25·remote5·기존 controller48의78검사를 통과했다. 기존 설치 순서를 바꾸지 않았고 가짜 SSH의 순서 검증은 실제 서버 설치 증거로 쓰지 않는다. 실제 읽기에서는 같은 검사 소스를 메모리에서 실행했다. A/B/C가 통과하고 관리자231이 미동기로 거절됐다. 기존 운영 설치기를 실행하거나 운영 소스를 교체하지 않았으며 패키지 설치·서비스 재시작·새 네트워크 요청·모델 호출·채팅·공격·학습은0이다.
+
+[시각 사전조건·검증 범위](../deployment/clock-readiness.validation.json)
+<!-- /bootstrap-clock-gate-20261118 -->
+
 <!-- chat-access-readiness-20261118 -->
 <a id="chat-access-readiness-20261118"></a>
 

@@ -690,7 +690,21 @@
     "No real outage, attack, retraining, public443 probe, next09:00 run or fresh full OS reconstruction performed"
   ],
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_pushed_and_remote_verified",
+    "content_commit": "8ec59467961a70b91559b7decd3cb9f4abff6ca7",
+    "remote_main_at_content_verification": "8ec59467961a70b91559b7decd3cb9f4abff6ca7",
+    "verified_at_kst": "2026-11-18T20:01:41.658570+09:00",
+    "public_files": 35,
+    "exact_curated_index_sha256_verified": true,
+    "unrelated_work_preserved": true,
+    "secret_scan": {
+      "tracked_working_tree": 2429,
+      "unsafe_paths": 0,
+      "known_synthetic_findings": 10,
+      "new_findings": 0,
+      "staged_or_history_coverage_claimed": false
+    },
+    "receipt_commit_recorded_separately_in_private_session": true
   },
   "documentation": {
     "public_documents": 23,

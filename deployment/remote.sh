@@ -26,6 +26,9 @@ for tool in bash python3 docker systemctl flock curl openssl jq tar sha256sum; d
   command -v "$tool" >/dev/null || { printf 'missing package command: %s (README)\n' "$tool" >&2; exit 69; }
 done
 systemctl is-system-running >/dev/null 2>&1 || [[ $(systemctl is-system-running) == degraded ]] || { echo 'running systemd required' >&2; exit 69; }
+# Preserve binary/secret export streams: the read-only clock gate's JSON must
+# never be written into enrollment, CA, key or other piped role payloads.
+python3 -B "$stage/source/deployment/prerequisites.py" clock "$role" >/dev/null
 docker info >/dev/null 2>&1 || { echo 'Docker daemon unavailable' >&2; exit 69; }
 docker compose version >/dev/null || exit 69
 export CAPSTONE_SOURCE=$stage/source

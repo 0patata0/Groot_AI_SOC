@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T20:01:56.369297+09:00",
+  "state": "source_integrated_local78_and_live_readonly4_checked_not_new_OS_installation",
+  "entrypoint": "deploy.sh",
+  "internal_helper": "deployment/prerequisites.py clock ROLE",
+  "required_properties": {
+    "Timezone": "Asia/Seoul",
+    "NTP": "yes",
+    "NTPSynchronized": "yes"
+  },
+  "OS_read_command": [
+    "timedatectl",
+    "show",
+    "--all",
+    "--no-pager"
+  ],
+  "read_timeout_seconds": 10,
+  "scope": "OS-reported readiness only; NTP source trust, absolute UTC accuracy, inter-host offset and long-term health not measured",
+  "call_sites": {
+    "prerequisites": "check/apply before host/bundle/package work; clock action reads only",
+    "remote_dispatcher": "after OS/systemd checks, before Docker/action dispatch/locks; stdout suppressed for export streams"
+  },
+  "new_config_keys": 0,
+  "new_packages": 0,
+  "new_ports": 0,
+  "new_MCP_tools": 0,
+  "sources": {
+    "deployment/prerequisites.py": {
+      "bytes": 16499,
+      "sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5"
+    },
+    "deployment/remote.sh": {
+      "bytes": 7916,
+      "sha256": "e084f94369626ea54e147678bc28a3693718ec205078ee17fd93b05e682dee1d"
+    },
+    "deployment/tests/test_prerequisites.py": {
+      "bytes": 12369,
+      "sha256": "ed59790d9618a7594d5658ee36f2b41bc04888802c8565be826c1dff57138f43"
+    },
+    "deployment/tests/test_remote_actions.py": {
+      "bytes": 3972,
+      "sha256": "90fe8b1a32626b535f793844e0f52e224267efcc968c2ff2231f99d0a2d57696"
+    }
+  },
+  "local_suites": {
+    "prerequisites": 25,
+    "remote_actions": 5,
+    "controller": 48
+  },
+  "local_total": 78,
+  "new_test_methods": 9,
+  "controller_scope": "actual deploy.sh against fake SSH; same role order, not a real installation",
+  "export_fixture": "actual Bash: opaque NUL-containing bytes preserved on success; empty stdout and no following command on failure",
+  "live_readonly": {
+    "admin": {
+      "route": "Mac-admin",
+      "at_kst": "2026-11-18T19:52:56.554364+09:00",
+      "clock_status": "refused",
+      "reason": "host clock not synchronized; prepare an approved reachable NTP source",
+      "source_sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5",
+      "settings_changed": false,
+      "packages_installed": 0,
+      "services_restarted": 0,
+      "new_network_requests": 0,
+      "full_installer_invoked": false
+    },
+    "A": {
+      "route": "Mac-admin-A",
+      "at_kst": "2026-11-18T19:52:58.320364+09:00",
+      "clock_status": "passed",
+      "clock": {
+        "status": "OS_clock_precondition_passed",
+        "timezone": "Asia/Seoul",
+        "NTP": "yes",
+        "NTPSynchronized": "yes",
+        "observed_at_utc": "2026-11-18T10:52:58.248164+00:00",
+        "scope": "OS-reported state only; source trust/UTC accuracy/inter-host offset not measured",
+        "settings_changed": false
+      },
+      "source_sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5",
+      "settings_changed": false,
+      "packages_installed": 0,
+      "services_restarted": 0,
+      "new_network_requests": 0,
+      "full_installer_invoked": false
+    },
+    "B": {
+      "route": "Mac-admin-A-B",
+      "at_kst": "2026-11-18T19:52:58.493404+09:00",
+      "clock_status": "passed",
+      "clock": {
+        "status": "OS_clock_precondition_passed",
+        "timezone": "Asia/Seoul",
+        "NTP": "yes",
+        "NTPSynchronized": "yes",
+        "observed_at_utc": "2026-11-18T10:52:58.463064+00:00",
+        "scope": "OS-reported state only; source trust/UTC accuracy/inter-host offset not measured",
+        "settings_changed": false
+      },
+      "source_sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5",
+      "settings_changed": false,
+      "packages_installed": 0,
+      "services_restarted": 0,
+      "new_network_requests": 0,
+      "full_installer_invoked": false
+    },
+    "C": {
+      "route": "Mac-admin-A-C",
+      "at_kst": "2026-11-18T19:52:58.818253+09:00",
+      "clock_status": "passed",
+      "clock": {
+        "status": "OS_clock_precondition_passed",
+        "timezone": "Asia/Seoul",
+        "NTP": "yes",
+        "NTPSynchronized": "yes",
+        "observed_at_utc": "2026-11-18T10:52:58.787417+00:00",
+        "scope": "OS-reported state only; source trust/UTC accuracy/inter-host offset not measured",
+        "settings_changed": false
+      },
+      "source_sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5",
+      "settings_changed": false,
+      "packages_installed": 0,
+      "services_restarted": 0,
+      "new_network_requests": 0,
+      "full_installer_invoked": false
+    }
+  },
+  "live_clock_passes": 3,
+  "live_clock_rejections": 1,
+  "live_execution_scope": "same source compiled in memory; host_clock only, no install/check/apply of existing hosts",
+  "actual_new_OS_installation": false,
+  "existing_operating_sources_replaced": false,
+  "settings_changed": false,
+  "services_restarted": 0,
+  "packages_installed": 0,
+  "new_network_requests": 0,
+  "new_model_or_chat_calls": 0,
+  "NTP_plan390a0f43": {
+    "state": "pending exact approval; not applied",
+    "source": "../infra/groot-a/certificate-monitor/access-readiness-20261118.json"
+  },
+  "review": "manual defect-first; review-agent skill unavailable as checked earlier",
+  "humanize": {
+    "run": "2026-11-18-035-bc2d",
+    "route": "light",
+    "version": "v2.3-codex",
+    "change_rate_percent": 0.8,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0,
+    "residual_warnings": 0,
+    "edit": "split one long modifier into two connected sentences; facts and limits preserved"
+  },
+  "remaining": [
+    "actual fresh3host OS installation",
+    "site-approved time-source trust and absolute/inter-host accuracy verification",
+    "administrator clock exact approval/application/verification",
+    "independent reproduction/evaluation and real presentation"
+  ],
+  "publication": {
+    "state": "prepared_not_published",
+    "operating_deployment": false
+  }
+}

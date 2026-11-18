@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "at_kst": "2026-11-18T19:13:44.431404+09:00",
+  "at_kst": "2026-11-18T20:01:56.369297+09:00",
   "state": "source_integrated_private_native112_passed_new_OS_not_tested",
   "entrypoint": "deploy.sh",
   "scope": "fresh Ubuntu24.04 A lab-edge and B internal chat TLS observers; no existing-host adoption",
@@ -14,8 +14,8 @@
       "sha256": "3b0ad2d286a2cfa1dd0b7369a4b74addbc92ae58b466262aba3da1c8679f5bdb"
     },
     "deployment/remote.sh": {
-      "bytes": 7684,
-      "sha256": "d0d210c49fb524ac09e0e82c653714a139770ae5823f60c44fe9d2ee31ce4dfb"
+      "bytes": 7916,
+      "sha256": "e084f94369626ea54e147678bc28a3693718ec205078ee17fd93b05e682dee1d"
     },
     "deployment/log_pipeline.py": {
       "bytes": 65469,
@@ -30,8 +30,8 @@
       "sha256": "27b14c3662e6fcc6bf98e0e694d6327ece77d925c714c357849debbd1b97e1b4"
     },
     "deployment/tests/test_remote_actions.py": {
-      "bytes": 2199,
-      "sha256": "6ba04bd5c6616dba760dcdfcf07c0205c251a40795ca41f86c13c9d3ac2743f9"
+      "bytes": 3972,
+      "sha256": "90fe8b1a32626b535f793844e0f52e224267efcc968c2ff2231f99d0a2d57696"
     },
     "deployment/tests/test_certificate_monitor.py": {
       "bytes": 9172,
@@ -56,6 +56,14 @@
     "deployment/tests/test_certificate_rules_native.py": {
       "bytes": 3838,
       "sha256": "5f5f520e080f4beee466442ed650ed20a20e9659b75a6269e22e8c8d38fbfb06"
+    },
+    "deployment/prerequisites.py": {
+      "bytes": 16499,
+      "sha256": "21d658eb318003d3d46d8648809e0a290e02d4e65126bf0cc71df59b5155ffe5"
+    },
+    "deployment/tests/test_prerequisites.py": {
+      "bytes": 12369,
+      "sha256": "ed59790d9618a7594d5658ee36f2b41bc04888802c8565be826c1dff57138f43"
     }
   },
   "probe_templates": {
@@ -1844,5 +1852,74 @@
       "receipt_committed_separately": true,
       "operating_deployment": false
     }
+  },
+  "source_snapshot_history": [
+    {
+      "at_kst": "2026-11-18T19:13:44.431404+09:00",
+      "scope": "source pins before clock precondition; original190/52/native112 evidence kept at its original scope",
+      "sources": {
+        "deploy.sh": {
+          "bytes": 27273,
+          "sha256": "45b8280a973758ce336a8ae3fed1f51d7e91cc58da2dea0ef283ff1d66f264df"
+        },
+        "deployment/certificate_monitor.py": {
+          "bytes": 13571,
+          "sha256": "3b0ad2d286a2cfa1dd0b7369a4b74addbc92ae58b466262aba3da1c8679f5bdb"
+        },
+        "deployment/remote.sh": {
+          "bytes": 7684,
+          "sha256": "d0d210c49fb524ac09e0e82c653714a139770ae5823f60c44fe9d2ee31ce4dfb"
+        },
+        "deployment/log_pipeline.py": {
+          "bytes": 65469,
+          "sha256": "d5e52763a5a7735bf515349e136ad743080b68d3b77896d20531b34a5e151c4f"
+        },
+        "deployment/test_log_pipeline.py": {
+          "bytes": 18494,
+          "sha256": "f6d85cbfac35250bb3a910b38313dc61842932e7a5c8a1167f29dd36784f67f5"
+        },
+        "deployment/tests/test_controller.py": {
+          "bytes": 32718,
+          "sha256": "27b14c3662e6fcc6bf98e0e694d6327ece77d925c714c357849debbd1b97e1b4"
+        },
+        "deployment/tests/test_remote_actions.py": {
+          "bytes": 2199,
+          "sha256": "6ba04bd5c6616dba760dcdfcf07c0205c251a40795ca41f86c13c9d3ac2743f9"
+        },
+        "deployment/tests/test_certificate_monitor.py": {
+          "bytes": 9172,
+          "sha256": "152241995753460db014800f02ea714c9d230a3584836d65822bbf07bdbb964e"
+        },
+        "deployment/tests/run_certificate_native.py": {
+          "bytes": 4320,
+          "sha256": "2a3668ec855385f7d8795e2ced254dfb81fd61026691daf67eaf47b64c928b9d"
+        },
+        "infra/mcp/system_diagnostics.py": {
+          "bytes": 36744,
+          "sha256": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c"
+        },
+        "infra/mcp/test_system_diagnostics.py": {
+          "bytes": 36587,
+          "sha256": "ccf28b4de9afa0a5e6d74a5a2df9c87e4e84c4e5ebbb2e545c39f15be3e02ee8"
+        },
+        "deployment/tests/run_certificate_rules_native.py": {
+          "bytes": 16518,
+          "sha256": "ee07f566b89b2e4b4cc7678e17b15117d016fb2e1388901aaa92dd8400e3faab"
+        },
+        "deployment/tests/test_certificate_rules_native.py": {
+          "bytes": 3838,
+          "sha256": "5f5f520e080f4beee466442ed650ed20a20e9659b75a6269e22e8c8d38fbfb06"
+        }
+      }
+    }
+  ],
+  "clock_precondition_followup": {
+    "source": "deployment/clock-readiness.validation.json",
+    "local_tests": 78,
+    "live_OS_readonly_passes": 3,
+    "live_OS_readonly_rejections": 1,
+    "existing_operating_deployment": false,
+    "original_native112_inputs_unchanged": true,
+    "original190_not_rerun_as_a_whole": true
   }
 }

@@ -1,4 +1,6 @@
 import importlib.util
+import contextlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -135,5 +137,53 @@ class HostSecurityBaseline(unittest.TestCase):
     def test_post_install_checks_actual_host_not_only_manifest(self):
         with patch.object(m, 'run', side_effect=self.result), self.assertRaises(m.Refused):
             m.security_baseline({'packages': [{'package': 'sudo', 'version': '1.9.15p5-3ubuntu5.24.04.4'}]}, installed=True)
+
+class HostClock(unittest.TestCase):
+    VALID = b'Timezone=Asia/Seoul\nNTP=yes\nNTPSynchronized=yes\nTimeUSec=observed-only\n'
+
+    def test_OS_state_pass_is_explicitly_limited_and_read_only(self):
+        with patch.object(m, 'run', return_value=subprocess.CompletedProcess([],0,self.VALID)) as runner:
+            result=m.host_clock()
+        self.assertEqual(result['status'],'OS_clock_precondition_passed')
+        self.assertFalse(result['settings_changed'])
+        self.assertIn('not measured',result['scope'])
+        self.assertTrue(result['observed_at_utc'].endswith('+00:00'))
+        runner.assert_called_once_with(['timedatectl','show','--all','--no-pager'],check=False,timeout=10)
+
+    def test_missing_duplicate_and_noncanonical_properties_refuse(self):
+        for raw in (b'',b'Timezone=Asia/Seoul\nNTP=yes\n',
+                    self.VALID+b'NTP=yes\n',self.VALID.replace(b'NTP=yes',b'NTP=true'),
+                    self.VALID.replace(b'NTPSynchronized=yes',b'NTPSynchronized=Yes')):
+            with self.subTest(raw=raw),patch.object(m,'run',return_value=subprocess.CompletedProcess([],0,raw)),self.assertRaises(m.Refused):
+                m.host_clock()
+
+    def test_client_environment_timezone_cannot_mask_host_timezone(self):
+        with patch.dict(m.os.environ,{'TZ':'Asia/Seoul'}),patch.object(m,'run',return_value=subprocess.CompletedProcess([],0,self.VALID.replace(b'Asia/Seoul',b'UTC'))),self.assertRaises(m.Refused):
+            m.host_clock()
+
+    def test_ntp_disabled_or_enabled_but_unsynchronized_refuses(self):
+        for raw in (self.VALID.replace(b'NTP=yes',b'NTP=no'),
+                    self.VALID.replace(b'NTPSynchronized=yes',b'NTPSynchronized=no')):
+            with self.subTest(raw=raw),patch.object(m,'run',return_value=subprocess.CompletedProcess([],0,raw)),self.assertRaises(m.Refused):
+                m.host_clock()
+
+    def test_command_failure_cannot_pass_with_cached_healthy_output(self):
+        with patch.object(m,'run',return_value=subprocess.CompletedProcess([],1,self.VALID)),self.assertRaises(m.Refused):
+            m.host_clock()
+
+    def test_bad_clock_stops_before_manifest_package_or_host_mutation(self):
+        for action in ('check','apply'):
+            for role in ('security','siem','service'):
+                raw=self.VALID.replace(b'NTPSynchronized=yes',b'NTPSynchronized=no')
+                with self.subTest(action=action,role=role),patch.object(m.sys,'argv',['prerequisites.py',action,role]),patch.object(m.os,'geteuid',return_value=0),patch.object(m,'run',return_value=subprocess.CompletedProcess([],0,raw)),patch.object(m,'fresh_host_guard') as guard,patch.object(m,'read_manifest') as manifest,patch.object(m,'security_baseline') as security,patch.object(m,'install') as install,self.assertRaises(m.Refused):
+                    m.main()
+                guard.assert_not_called();manifest.assert_not_called();security.assert_not_called();install.assert_not_called()
+
+    def test_clock_only_does_not_adopt_or_install_existing_host(self):
+        with patch.object(m.sys,'argv',['prerequisites.py','clock','siem']),patch.object(m.os,'geteuid',return_value=0),patch.object(m,'run',return_value=subprocess.CompletedProcess([],0,self.VALID)),patch.object(m,'fresh_host_guard') as guard,patch.object(m,'read_manifest') as manifest,contextlib.redirect_stdout(io.StringIO()) as output:
+            m.main()
+        result=json.loads(output.getvalue())
+        self.assertEqual(result['action'],'clock');self.assertEqual(result['role'],'siem')
+        guard.assert_not_called();manifest.assert_not_called()
 
 if __name__=='__main__':unittest.main()

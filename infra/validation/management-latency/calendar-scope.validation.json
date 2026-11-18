@@ -553,6 +553,12 @@
         "tail": "·백엔드 미도달·공격 실패의 증거가 아닙니다.",
         "current_modality": "asserted_or_unspecified",
         "scope": "Offline shared modality probe; no model/MCP calls. The same simple final evidence negation is recognized, but a three-item coordinated outcome is not."
+      },
+      "exploratory_prototype_rejected": {
+        "scope": "In-memory only; no canonical or operating source changes; model/MCP0",
+        "mutation": "Extend coordination from one additional noun group to at most4",
+        "failed_control": "Three coordinated outcomes followed by evidence double negation incorrectly classified not_asserted",
+        "decision": "Reject; preserve finite-predicate and double-negation boundaries before freezing a future candidate"
       }
     },
     "implicit_event_request": {
@@ -580,10 +586,25 @@
     "source_records_and_original_framework_and_operating_backups_retained": true
   },
   "publication": {
-    "status": "pending",
-    "expected_public_files": 18,
-    "source_test_files": 2,
-    "documentation_files": 15,
-    "validation_files": 1
+    "state": "content_published",
+    "content_commit": "d013ffaf7756f3ec8acbfc59cd07aa4bce2a3841",
+    "remote_main_at_content_publication": "d013ffaf7756f3ec8acbfc59cd07aa4bce2a3841",
+    "remote_match_at_kst": "2026-11-18T13:50:23.471620+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 18,
+    "secret_scan_tracked_files": 2406,
+    "new_secret_findings": 0
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-019-349c",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0006,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "diagnostician_and_finalizer": "not required by light successful gate",
+    "receipt_update": "structured publication metadata with existing reviewed wording retained"
   }
 }

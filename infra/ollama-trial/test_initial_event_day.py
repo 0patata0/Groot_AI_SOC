@@ -12,6 +12,41 @@ def schema():
         'lookback_minutes':{'type':'integer'},'source_ip':{'type':'string'}},'additionalProperties':False}
 
 class InitialEventDay(unittest.TestCase):
+    def test_non_temporal_particles_and_repeated_day_mentions_keep_the_calendar_day(self):
+        # The first full sentence failed on both actual bots; keep it verbatim.
+        questions=(
+            '어제 WAF·IDS 경보를 개별 내역까지 상세 표로 조사해줘. 출발지를 비교하고 지금 임시 IP 차단 목록도 보여줘',
+            '어제 WAF와 IDS 사이의 출발지를 비교해줘',
+            '어제 IDS 경보 5건까지만 보여줘',
+            '어제 IDS 경보를 첫 행부터 보여줘',
+            '어제 IDS와 어제 WAF 경보 조사해줘',
+            '어제 경보는 원문 말고 요약으로 보여줘',
+            '어제 경보를 JSON 제외하고 표로 보여줘',
+            '어제 IDS 12시그니처 경보와 5분류 결과를 조사해줘')
+        for question in questions:
+            with self.subTest(question=question):
+                raw={name:schema() for name in (f.MOD,f.SUR,'mcp__security_events__search_wazuh_alerts')}
+                result=h.initial_event_day_schemas(question,raw,[],AT)
+                for name in raw:
+                    self.assertEqual(result[name]['properties']['since_kst']['const'],'2026-11-17T00:00:00+09:00')
+                    self.assertEqual(result[name]['properties']['until_kst']['const'],'2026-11-17T23:59:59.999999+09:00')
+                    self.assertNotIn('lookback_minutes',result[name]['properties'])
+
+    def test_equivalent_today_aliases_are_one_day_but_mixed_days_stay_unbound(self):
+        raw={f.MOD:schema()}
+        bound=h.initial_event_day_schemas('오늘 WAF와 금일 IDS 경보를 조사해줘',raw,[],AT)
+        self.assertEqual(bound[f.MOD]['properties']['until_kst']['const'],AT)
+        for q in ('오늘 IDS와 어제 WAF 경보 조사해줘','어제 이후 WAF 경보 조사해줘','어제까지 IDS 경보 보여줘',
+                  '어제는 제외하고 IDS 경보 보여줘','어제와 11월 16일 WAF 경보 조사해줘'):
+            self.assertEqual(h.initial_event_day_schemas(q,raw,[],AT),raw,q)
+
+    def test_actual_time_qualifiers_are_not_replaced_with_a_whole_day(self):
+        raw={f.MOD:schema()}
+        for qualifier in ('09시부터 10시까지','9시 이후','09:00~10:00','오전','오후','새벽','밤',
+                          '30분간','1시간 전','같은 시각','탐지 시점부터','종료 시간까지'):
+            q='어제 '+qualifier+' WAF 경보 조사해줘'
+            self.assertEqual(h.initial_event_day_schemas(q,raw,[],AT),raw,q)
+
     def test_yesterday_binds_closed_calendar_day_and_rejects_rolling_24_hours(self):
         raw={f.MOD:schema(),f.SUR:schema(),f.BLOCK:{'type':'object','properties':{}}};before=copy.deepcopy(raw)
         actual=h.initial_event_day_schemas('어제 WAF·IDS 경보 조사해줘',raw,[],AT)
@@ -58,5 +93,17 @@ class InitialEventDay(unittest.TestCase):
         for item in selected.values():
             self.assertNotIn('lookback_minutes',item['properties'])
             self.assertNotIn('lookback_minutes',item['required'])
+
+    def test_failed_detail_wording_and_cross_device_comparison_keep_exact_window_after_refinement(self):
+        for q in ('어제 WAF·IDS 경보를 개별 내역까지 상세 표로 조사해줘. 출발지를 비교하고 지금 임시 IP 차단 목록도 보여줘',
+                  '어제 WAF와 IDS 사이의 출발지를 비교해줘'):
+            raw={name:schema() for name in (f.MOD,f.SUR)}
+            selected=h.refine_read_schemas(q,h.initial_event_day_schemas(q,raw,[],AT),[],())
+            wire=h.selection_schema(selected,8,question=q)
+            args={'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-17T23:59:59.999999+09:00'}
+            h.validated_selection({'calls':[{'tool':name,'arguments':args} for name in (f.MOD,f.SUR)]},wire)
+            for name in (f.MOD,f.SUR):
+                with self.assertRaises(ValidationError):
+                    h.validated_selection({'calls':[{'tool':name,'arguments':{'lookback_minutes':1440,'until_kst':AT}}]},wire)
 
 if __name__=='__main__':unittest.main()

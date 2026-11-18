@@ -1,0 +1,589 @@
+{
+  "status": "calendar_fix_confirmed_with_additional_failures_preserved",
+  "scope": "Common unqualified KST calendar-day interpretation only; no MCP structure change",
+  "reference": {
+    "repository": "https://github.com/JoasASantos/Malvex",
+    "inspected_commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "adoption": "Existing evidence/report reuse and hypothesis-versus-observation separation; this follow-up fixes a project-specific query-period defect, not upstream Malvex code"
+  },
+  "candidate": {
+    "plan_sha256": "6f5bb592f4ad365a90157fdd92ec1b17147dc9af74f5371783f3767294540489",
+    "installed_sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "before_sha256": "59d0302717a250cf04c71b6fd1a0a5f1d875ec9d50f43b12db918b0ae48686d1",
+        "after_sha256": "a629f2df46464392b178b40b51217bd9bcbd0469a06698aff12a8d441560be10",
+        "bytes": 336210
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "before_sha256": "59d0302717a250cf04c71b6fd1a0a5f1d875ec9d50f43b12db918b0ae48686d1",
+        "after_sha256": "a629f2df46464392b178b40b51217bd9bcbd0469a06698aff12a8d441560be10",
+        "bytes": 336210
+      }
+    },
+    "public_source_sha256": {
+      "infra/ollama-trial/harness.py": "762f86589e360e6d1461ef5faf6e99a3693169119706e2b4d38b454fe7750571",
+      "infra/ollama-trial/test_initial_event_day.py": "57ce799ec4e919c26bf33719f8fb923d179863733126c903427d6be8f3b529b9"
+    }
+  },
+  "tests": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 315,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 219,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 315,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 219,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.376s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.568s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "base_counterexample": {
+      "tests": 9,
+      "failures": 1,
+      "errors": 10,
+      "interpretation": "10 subtest/method errors due to absent expected calendar const, plus1 temporal-qualifier failure; not11 independent incidents"
+    },
+    "framework": {
+      "pin": "6868817518876de8fd170c6a8354daca273b6191",
+      "files": 140,
+      "operating_sources": 50,
+      "status": "passed",
+      "always_on_char_delta": 0
+    }
+  },
+  "invariants": {
+    "tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "management_gate_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+    "management_gate_argument_bytes": 77456,
+    "management_gate_conditions": 7,
+    "MCP_server_or_schema_changes": 0,
+    "permission_or_approval_changes": 0,
+    "model_changes": 0,
+    "new_packages": 0,
+    "attacks": 0,
+    "training": 0,
+    "training_monitoring": 0
+  },
+  "limits": [
+    "Selected suites overlap and are not model accuracy scores",
+    "Explicit/ambiguous period interpretation remains the existing model path; this helper binds one unqualified today/yesterday only",
+    "No new OS installation, attack E2E, general response SLO or broad expert accuracy evaluation in this unit"
+  ],
+  "at_kst": "2026-11-18T13:42:13.983922+09:00",
+  "rollout": {
+    "applied_at_kst": "2026-11-18T13:23:49.573934+09:00",
+    "status": "confirmed",
+    "at_kst": "2026-11-18T13:29:47.735495+09:00",
+    "files": 3,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "protected": 68,
+    "rollback_timer": "inactive",
+    "source_files": 2,
+    "receipt_files": 1,
+    "same_container_and_image": true,
+    "planned_native_restarts": 1,
+    "SDK_and_review_workers_refreshed": true,
+    "database_bytes_equal_while_workers_stopped": true,
+    "final_source_health_at_kst": "2026-11-18T13:39:13.833756+09:00",
+    "initial_readiness_observation_failed_then_same_processes_passed": true,
+    "management_grounding_pin_and_embedded_gate_unchanged": true
+  },
+  "actual_chats": {
+    "fresh_roots": 6,
+    "distinct_wordings": 3,
+    "previously_failing_wording_reused": 1,
+    "requested_period_verified": 4,
+    "requested_sensor_period_not_queried": 2,
+    "read_executions": 17,
+    "protected_calls": 0,
+    "accepted_structured_model_reports": 3,
+    "public_projection_matches_private_final": 6,
+    "cases": {
+      "hermes-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 49.126,
+        "public_chars": 8966,
+        "post_count": 3,
+        "post_ids": [
+          "jmq8kzg9dbrqfecxwha9bw6ckr",
+          "mm37n4q73bbetrn768bsawbm5c",
+          "k7s6c5ocobbcpkgausx7rbeciw"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "hermes-between": {
+        "requested_period_correct": false,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 0,
+        "read_sha256": [],
+        "read_arguments": [],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [],
+        "status": "no_structured_report",
+        "assessment": "no_accepted_model_judgment",
+        "native_api_stages": 1,
+        "seconds": 42.514,
+        "public_chars": 329,
+        "post_count": 1,
+        "post_ids": [
+          "3hu15ztw1j87xp5fcg6hgequ3a"
+        ],
+        "returned_counts": {}
+      },
+      "hermes-range": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T09:00:00+09:00",
+          "until_kst": "2026-11-17T10:00:00+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "859048a5848422bf092040b24473d851ad7a3ac7a56f2a5761b4734c41231b1b",
+          "13ff1fdfe2eb7f22c24aff06b7d6397b6d0224ffbdec12a46638ae165c7852d4",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T09:00:00+09:00",
+              "until_kst": "2026-11-17T10:00:00+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T09:00:00+09:00",
+              "until_kst": "2026-11-17T10:00:00+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 27.888,
+        "public_chars": 1484,
+        "post_count": 1,
+        "post_ids": [
+          "w6eyazih578qjrdwoof99aykjr"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 0,
+          "search_modsecurity_alerts": 0
+        }
+      },
+      "ollama-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          [
+            "http_status_used_as_security_outcome"
+          ],
+          [
+            "http_status_used_as_security_outcome"
+          ],
+          [
+            "http_status_used_as_security_outcome"
+          ]
+        ],
+        "status": "partial",
+        "assessment": "no_accepted_model_judgment",
+        "sdk_actual_model_calls": 4,
+        "seconds": 69.574,
+        "public_chars": 3842,
+        "post_count": 1,
+        "post_ids": [
+          "mhxjg3kcu3buikjj4amispaaka"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      },
+      "ollama-between": {
+        "requested_period_correct": false,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 5,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "1287b48632957d3a4fe8e0c10ee925f00dc251eb60395994f3e9799e14edface",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bc84541f2807ff4c106439c34aeb158a808ba3b74746e7f11f63b64adaea7fcc",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "wazuh-ro",
+            "name": "get_wazuh_alert_summary",
+            "arguments": {
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "wazuh-ro",
+            "name": "get_wazuh_alert_summary",
+            "arguments": {
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [],
+        "status": "partial",
+        "assessment": "no_accepted_model_judgment",
+        "sdk_actual_model_calls": 12,
+        "seconds": 157.426,
+        "public_chars": 1163,
+        "post_count": 1,
+        "post_ids": [
+          "bq57rsmiiigwjm19h61cbpof9c"
+        ],
+        "returned_counts": {}
+      },
+      "ollama-range": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T09:00:00+09:00",
+          "until_kst": "2026-11-17T10:00:00+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "46e682fb9f20f17a8eccc12e17d3346faf5241f9711501598b3724d81a7047d9",
+          "6c5a45a13fc81b94957ed178bdb46180a3e938a6d04b42747aa234175f33926b",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T09:00:00+09:00",
+              "until_kst": "2026-11-17T10:00:00+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T09:00:00+09:00",
+              "until_kst": "2026-11-17T10:00:00+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 35.429,
+        "public_chars": 1568,
+        "post_count": 1,
+        "post_ids": [
+          "5xeoxi16zjyztbmax5cd51r3yw"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 0,
+          "search_suricata_alerts": 0
+        }
+      }
+    },
+    "interpretation": "Period correctness, report acceptance, conservative fallback and expert task accuracy are separate. Two implicit event requests failed; do not report6/6 success."
+  },
+  "remaining_gaps": {
+    "scope": "Offline pure helper checks against actual archived receipts; model/MCP0",
+    "http_evidence_negation": {
+      "actual_sentence": "HTTP 403는 응답 코드일 뿐 WAF 차단 성공·백엔드 미도달·공격 실패의 증거가 아닙니다. 실제 백엔드 영향은 `search_web_access`로 확인해야 합니다.",
+      "current_issues": [
+        "http_status_used_as_security_outcome"
+      ],
+      "helper_unchanged_before_after": true,
+      "shared_modality_on_negated_evidence": "not_asserted",
+      "coordinated_tail_probe": {
+        "tail": "·백엔드 미도달·공격 실패의 증거가 아닙니다.",
+        "current_modality": "asserted_or_unspecified",
+        "scope": "Offline shared modality probe; no model/MCP calls. The same simple final evidence negation is recognized, but a three-item coordinated outcome is not."
+      }
+    },
+    "implicit_event_request": {
+      "question": "어제 WAF와 IDS 사이에 출발지가 겹쳤는지 조사해줘. 지금 임시 IP 차단도 알려줘",
+      "incident_intent_recognized": false,
+      "event_listing_recognized": false,
+      "write_intent": false
+    },
+    "next_work": "Preserve both failing natural-language cases; fix scoped evidence negation and implied event-query intent through the same Harness²/regression/rollout/chat process; no MCP server change"
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T13:38:50.849750+09:00",
+    "roots": [
+      "/var/lib/capstone-evidence-validation/gateway-f6a76d8e19",
+      "/var/lib/capstone-evidence-validation/calendar-prepare-9093198501"
+    ],
+    "files": 656,
+    "bytes": 25416222,
+    "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-calendar-9093198501",
+    "operating_changes": 0,
+    "exported_results": 7,
+    "exported_bytes": 120702,
+    "all_exports_and_whole_member_manifests_SHA256_verified": true,
+    "Mac_package_install_or_download": 0,
+    "source_records_and_original_framework_and_operating_backups_retained": true
+  },
+  "publication": {
+    "status": "pending",
+    "expected_public_files": 18,
+    "source_test_files": 2,
+    "documentation_files": 15,
+    "validation_files": 1
+  }
+}

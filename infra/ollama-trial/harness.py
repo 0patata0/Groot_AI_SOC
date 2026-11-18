@@ -1759,15 +1759,22 @@ def add_evidence_source_comparison(context, text):
 def initial_event_day_schemas(question, schemas, calls, requested_at_kst):
     """Bind one unqualified KST calendar day in first event reads, not follow-ups."""
     text=READ.without_prohibitions(normalized(question));at=EVIDENCE.parse_instant(requested_at_kst)
-    days=re.findall(r'오늘|금일|어제',text)
+    days={1 if word=='어제' else 0 for word in re.findall(r'오늘|금일|어제',text)}
+    # Range/exclusion particles also modify rows, devices and display choices.
+    # Only temporal operands qualify a day; "개별 내역까지" is not an end time.
+    day_qualified=re.search(r'(?:오늘|금일|어제)(?:는|은)?\s*(?:부터|까지|이후|이전|사이|말고|제외|아닌)',text)
+    clock_qualified=re.search(r'\d\s*(?:시간|시|분|초)(?=$|[^가-힣]|부터|까지|이후|이전|전|후|동안|간|쯤|경|에)',text)
     if (len(days)!=1 or not at or at.utcoffset()!=timedelta(hours=9)
-            or re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|쯤|대략|말고|제외|아닌|'
-                         r'\d\s*(?:시|분|시간|초)|\d:\d|\d{4}-\d{2}-\d{2}|'
+            or day_qualified or clock_qualified
+            or re.search(r'최근|지난|그제|그저께|내일|모레|쯤|대략|오전|오후|새벽|아침|저녁|정오|자정|밤|'
+                         r'같은\s*(?:시간|시각)|(?:발생|탐지|시작|종료)\s*(?:시점|시각|시간)\s*(?:부터|까지|이후|이전)|'
+                         r'\d:\d|\d{4}-\d{2}-\d{2}|\d{1,2}\s*월\s*\d{1,2}\s*일|'
                          r'UTC|GMT|[+-]\d{2}:?\d{2}|(?:Asia|America|Europe)/|\b(?:PST|PDT|EST|EDT|JST)\b',text,re.I)):
         return schemas
-    start=at.replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=days[0]=='어제')
+    day=next(iter(days))
+    start=at.replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=day)
     # The existing security-events query uses gte/lte, both inclusive.
-    end=start+timedelta(days=1,microseconds=-1) if days[0]=='어제' else at
+    end=start+timedelta(days=1,microseconds=-1) if day else at
     if not start<end:return schemas
     observed={r['tool'] for r in incident_read_references(calls)};result=copy.deepcopy(schemas)
     for name,schema in result.items():

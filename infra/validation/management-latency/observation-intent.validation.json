@@ -792,10 +792,25 @@
     "source_records_and_original_framework_and_operating_backups_retained": true
   },
   "publication": {
-    "status": "pending",
-    "expected_public_files": 22,
-    "source_test_files": 6,
-    "documentation_files": 15,
-    "validation_files": 1
+    "state": "content_published",
+    "content_commit": "986df29bdd16cc90673c97ef10f34e43f28c5a96",
+    "remote_main_at_content_publication": "986df29bdd16cc90673c97ef10f34e43f28c5a96",
+    "remote_match_at_kst": "2026-11-18T15:25:35.722985+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 22,
+    "secret_scan_tracked_files": 2408,
+    "new_secret_findings": 0
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-020-c98b",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0005,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "diagnostician_and_finalizer": "not required by light successful gate",
+    "receipt_update": "structured publication metadata with existing reviewed wording retained"
   }
 }

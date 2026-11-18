@@ -922,14 +922,29 @@ def event_window_violations(text, facts):
     return []
 
 
+def sensor_observation_request(text):
+    """One shared inferred event intent for selectors and both runtime gates."""
+    if not isinstance(text,str):return False
+    # Time, sensor and observed field must accompany investigation/comparison.
+    # Bare address listings and configuration/concept requests stay separate.
+    return bool(re.search(r'(?<![A-Za-z0-9_])(?:WAF|IDS|IPS|Suricata|ModSecurity|Wazuh)(?![A-Za-z0-9_])|'
+                        r'웹\s*방화벽|수리카타|와주',text,re.I)
+              and re.search(r'출발지|목적지|\b(?:source|destination)\s*(?:IP|address)',text,re.I)
+              and re.search(r'오늘|금일|어제|그제|그저께|최근|지난|현재|지금|\d{4}-\d{2}-\d{2}|\d{1,2}\s*월\s*\d{1,2}\s*일',text)
+              and re.search(r'조사|분석|비교|대조|겹|같(?:았|은|나)|동일|일치',text)
+              and not re.search(r'룰|규칙|설정|원리|사용법|설치|버전|아키텍처|구조',text))
+
+
 def incident_investigation_request(text):
     """Preserve investigation intent; naming rules does not request an inventory."""
-    return isinstance(text, str) and bool(
+    if not isinstance(text,str):return False
+    explicit=bool(
         re.search(r'사건|경보|로그|공격|침해|오탐|탐지|DVWA|Log4Shell', text, re.I)
         and re.search(r'조사|판단|분석|위험|대응\s*필요|(?:공격|오탐).{0,5}(?:이었|였|인가|인지)|'
                       r'무슨\s*(?:로그|경보|의미)|뭐가\s*문제|뭐\s*때문|'
                       r'(?:로그|경보|탐지된\s*(?:거|것)).{0,35}(?:왜|원인|의미|설명|알고\s*싶)|'
                       r'(?:왜|원인).{0,35}(?:로그|경보)', text))
+    return explicit or sensor_observation_request(text)
 
 
 def argument_refusal(name, result):

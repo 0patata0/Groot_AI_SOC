@@ -3355,7 +3355,8 @@ def investigation_first_scope(question):
     companion = READ.companion_block_request(text)
     other = [m[0] for m in re.finditer(INVESTIGATION_OTHER_SUBJECTS,text,re.I)]
     if (not EVIDENCE.incident_investigation_request(text) or READ.wants_write(text)
-            or not re.search(r'경보|로그|이벤트|alerts?', text, re.I)
+            or not (re.search(r'경보|로그|이벤트|alerts?', text, re.I)
+                    or EVIDENCE.sensor_observation_request(text))
             or any(not(companion and re.fullmatch(r'차단\s*목록',name)) for name in other)):
         return None
     scope = frozenset(tool for pattern, tool in INVESTIGATION_ALERT_TOOLS if re.search(pattern, text, re.I))

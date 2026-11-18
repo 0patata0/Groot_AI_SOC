@@ -2607,19 +2607,27 @@ def claim_modality(after):
     after = after[:240]
     # A shared predicate may negate coordinated noun phrases. Do not scan
     # through punctuation or a finite/connective predicate into another claim.
-    noun=(r'(?![A-Za-z가-힣0-9_-]*(?:지만|는데|으며|[하했되됐있없이였었않](?:고|며)|니다)(?:\s|$))'
+    # Negation predicates cannot be consumed as list nouns; otherwise a
+    # coordinated double negative could look like a simple final negation.
+    noun=(r'(?![A-Za-z가-힣0-9_-]*(?:지만|는데|으며|[하했되됐있없이였었않](?:고|며)|니다|'
+          r'(?:아니|아닌|아닙|않|못)[가-힣]*|[했됐있없이였었았한된는온간본준난낸]다(?:고|며|지만|는데|면서|므로|라서)?|'
+          r'[하해되돼](?:서|여))(?:\s|$))'
           r'[A-Za-z가-힣_][A-Za-z가-힣0-9_-]*')
-    coordinated=r'(?:\s*(?:또는|혹은|및|이나|나|와|과|[·/])\s*'+noun+r'(?:\s+'+noun+r'){0,3})?'
+    # Attached Korean joins can begin the suffix, but subsequent groups need
+    # punctuation or a spaced join. Never partition a dense word repeatedly.
+    coordinated=(r'(?:\s*(?:또는|혹은|및|이나|나|와|과|[·/])\s*'+noun+r'(?:\s+'+noun+r'){0,3}'
+                 r'(?:(?:\s*[·/]\s*|\s+(?:또는|혹은|및|이나|나|와|과)\s+)'+noun+
+                 r'(?:\s+'+noun+r'){0,3}){0,3})?')
     prefix=(r'\s*(?:(?:상태|현상|상황|문제)\s*)?'
             r'(?:(?:이라는|이라고|이란|다는|다고|라고|라는|으로|를|을|이|가|은|는|고)\s*)?'
             r'(?:(?:한|된)\s*)?'
             r'(?:(?:것|음|사실|주장|판정|결론)(?:을|은|는|이|임을)?\s*)?'
             r'(?:(?:의\s*)?(?:증거|근거)(?:가|이|은|는)?\s*)?')
-    if re.match(prefix+r'(?:한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
+    if re.match(coordinated+prefix+r'(?:아니라면|아니면|아니었다면|아니었으면|한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
         return 'conditional_or_unverified'
-    if re.match(prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):
+    if re.match(coordinated+prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):
         return 'conditional_or_unverified'
-    if re.match(prefix+r'(?:(?:추가|직접|다시|상세히)\s*)?(?:조회|조사|확인|검토|대조|분석)'
+    if re.match(coordinated+prefix+r'(?:(?:추가|직접|다시|상세히)\s*)?(?:조회|조사|확인|검토|대조|분석)'
             r'(?:할\s*(?:예정|계획)|(?:이|가)?\s*필요|해야|하겠)', after):
         return 'planned_check'
     adverbs=r'(?:(?:직접|곧바로|반드시|전혀|아직|[가-힣]+히|[가-힣]+적으로)\s+)*'

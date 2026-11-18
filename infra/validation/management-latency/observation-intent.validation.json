@@ -1,0 +1,801 @@
+{
+  "status": "observation_intent_confirmed_membership_adjective_guard_false_positive_preserved",
+  "scope": "Existing MCP structure, two shared semantic primitives: implied observation intent and bounded coordinated modality",
+  "candidate": {
+    "plan_sha256": "ed829b18cf2b841b58aa521d6fcfb109da47a03bfb812bba5870f9a6e1e6ca67",
+    "installed_sources": {
+      "/opt/capstone-management/soc_management_run.py": {
+        "before_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+        "after_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "bytes": 304879
+      },
+      "/opt/hermes-data/management-code/run.py": {
+        "before_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+        "after_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "bytes": 304879
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+        "before_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+        "after_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "bytes": 304879
+      },
+      "/opt/capstone-ollama-trial/grounding.py": {
+        "before_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+        "after_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "bytes": 304879
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "before_sha256": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+        "after_sha256": "2c5ff3b5ddf4882670cd27f538ecf6f72f613dca1210cca7a8e4bce57b388f56",
+        "bytes": 201359
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "before_sha256": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+        "after_sha256": "2c5ff3b5ddf4882670cd27f538ecf6f72f613dca1210cca7a8e4bce57b388f56",
+        "bytes": 201359
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "before_sha256": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+        "after_sha256": "2c5ff3b5ddf4882670cd27f538ecf6f72f613dca1210cca7a8e4bce57b388f56",
+        "bytes": 201359
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+        "before_sha256": "11360c64e300b09f8038f0d1d3a694300d7c08c10cd6fa53d6e3fff08487ad43",
+        "after_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "bytes": 73909
+      },
+      "/opt/capstone-ollama-trial/query_grounding.py": {
+        "before_sha256": "11360c64e300b09f8038f0d1d3a694300d7c08c10cd6fa53d6e3fff08487ad43",
+        "after_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "bytes": 73909
+      },
+      "/opt/capstone-management/soc_management_controller.py": {
+        "before_sha256": "f86cc16e13e4fd31d380d3627fe6f5d3600379c970dc83c87fabf3a3cd626409",
+        "after_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "bytes": 537458
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "before_sha256": "a629f2df46464392b178b40b51217bd9bcbd0469a06698aff12a8d441560be10",
+        "after_sha256": "b5df50c9896115839563c2d187b12031ac03e2a1c34b317ef0c115d14f0eec47",
+        "bytes": 336277
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "before_sha256": "a629f2df46464392b178b40b51217bd9bcbd0469a06698aff12a8d441560be10",
+        "after_sha256": "b5df50c9896115839563c2d187b12031ac03e2a1c34b317ef0c115d14f0eec47",
+        "bytes": 336277
+      }
+    },
+    "public_source_sha256": {
+      "infra/hermes/chat_contract.py": "bb6e5d2046e3d05f9340e6fe564e381d0d79403ed6652e96922b7daf6281eca5",
+      "infra/hermes/soc_management_run.py": "a4295a13d229e8c5d0f1236df2bf19bd29dacb966fb84d994128b0bc5c4589db",
+      "infra/hermes/query-completion/__init__.py": "e877a7eab2c3adf1b308427229b3673babf8e7a38c49417b841ac6da90f05a44",
+      "infra/ollama-trial/harness.py": "d382ae3ed7b70a55da50eb713b4f9c0f05ca0d054cac1f167b1bc40cdc894724",
+      "infra/ollama-trial/test_observation_intent.py": "96cfd4c0eda92586911f702acac0869924dae2c6cd01829160332eda72f3e8b3",
+      "infra/hermes/query-completion/test_gateway_evidence.py": "42cdfe14262214d857b85fa5aa025eb144dda86f15d401e1f136679734470143"
+    }
+  },
+  "tests": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 325,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 228,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 325,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 228,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.293s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.555s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "canonical_installer_gate": {
+      "tests": 5,
+      "rc": 0,
+      "scope": "canonical current root/helper/gate/workflow source, no remote or new OS install",
+      "methods": [
+        "test_workflow_bundle_keeps_four_distinct_skills_and_common_output",
+        "test_rendered_inline_gate_matches_the_root_reference_and_rejects_stale_source",
+        "test_rendered_controller_keeps_exact_read_scope_and_embedded_gate",
+        "test_management_gate_excludes_general_powers_and_verify_writes",
+        "test_installer_management_prompt_matches_private_source_and_tool_gate"
+      ]
+    },
+    "baseline_new_cases": {
+      "tests": 8,
+      "failures": 4,
+      "scope": "before new performance case, original baseline helper"
+    },
+    "prototype_semantics": 19,
+    "prototype5_parser_seconds": [
+      0.01957045798189938,
+      0.019532208039890975,
+      0.019313583034090698,
+      0.01962708297651261
+    ],
+    "actual_schema_native_admission": {
+      "scope": "actual45 schema metadata plus actual candidate Native request/selection code, mocked API transport only; model/MCP0; not live bot acceptance",
+      "results": [
+        {
+          "question": "어제 WAF와 IDS 사이에 출발지가 겹쳤는지 조사해줘. 지금 임시 IP 차단도 알려줘",
+          "phase": "initial",
+          "tools": [
+            "mcp__resp__list_blocks",
+            "mcp__security_events__search_modsecurity_alerts",
+            "mcp__security_events__search_suricata_alerts"
+          ],
+          "observed_schema_catalog": 45
+        },
+        {
+          "question": "어제 WAF와 IDS의 출발지를 비교해줘. 403이면 모두 차단 성공으로 봐도 되는지 판단해줘. 지금 임시 IP 차단도 알려줘.",
+          "phase": "initial",
+          "tools": [
+            "mcp__resp__list_blocks",
+            "mcp__security_events__search_modsecurity_alerts",
+            "mcp__security_events__search_suricata_alerts"
+          ],
+          "observed_schema_catalog": 45
+        }
+      ]
+    }
+  },
+  "review": {
+    "main_direct": true,
+    "delegated_code_review": false,
+    "resolved_findings": [
+      "Ambiguous address listing no longer forced into events",
+      "Double-negation and finite-predicate swallowing controlled",
+      "Dense-word regex splitting removed, bounded subprocess regression",
+      "Actual Native admission duplicate alert-noun gate now reuses one shared observation predicate"
+    ],
+    "earlier_prototypes_and_frozen_rounds_retained": true,
+    "round2_semantic_suites_passed_but_dense_input_exceeded2s": true,
+    "round2_operating_deployment": 0
+  },
+  "framework": {
+    "pin": "6868817518876de8fd170c6a8354daca273b6191",
+    "files": 140,
+    "operating_sources": 50,
+    "status": "passed",
+    "always_on_char_delta": 0
+  },
+  "invariants": {
+    "catalog_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "MCP_server_or_schema_changes": 0,
+    "model_or_permission_changes": 0,
+    "roles_or_approval_or_TTL_changes": 0,
+    "new_skills": 0,
+    "Mac_package_install_or_download": 0,
+    "attacks": 0,
+    "training": 0,
+    "training_monitoring": 0
+  },
+  "operating": {
+    "round": "round4",
+    "applied": {
+      "status": "applied",
+      "at_kst": "2026-11-18T14:56:00.496479+09:00",
+      "epoch": 1794981360.4965014,
+      "files": 13,
+      "same_container": true,
+      "planned_hermes_restarts": 1,
+      "database_same_while_stopped": true,
+      "protected": 58
+    },
+    "protected": 58,
+    "independent_rollback_minutes": 15,
+    "confirmed": false,
+    "source_sha_and_readiness_at_kst": "2026-11-18T14:57:12.369439+09:00",
+    "management_gate_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+    "management_gate_argument_bytes": 77782,
+    "management_gate_conditions": 7,
+    "unit_planned_native_restart_events_so_far": 3,
+    "events": "round3 apply, manual rollback, round4 apply"
+  },
+  "limits": [
+    "Actual45 schema/request/selection integration mocks transport; no expert accuracy or general SLO proof",
+    "Previous failed live167.38s and its8reads/9APIstages remain historical, not a pass",
+    "Round4 actual6 retests/confirmation/cleanup/documentation/publication pending"
+  ],
+  "actual_failed_round3": {
+    "engine": "hermes",
+    "case": "implicit",
+    "seconds": 167.38,
+    "tool_executions": 8,
+    "native_api_stages": 9,
+    "structured_report_phase_entered": false,
+    "result": "conservative partial report",
+    "root_cause": "investigation_first_scope retained duplicate explicit alert/log noun requirement; shared predicate unit tests did not exercise Native gateway admission",
+    "protected_calls": 0,
+    "decision": "do not confirm; original11files restored, independent timer inactive; extend actual Native entry-point tests and reuse one shared observation predicate"
+  },
+  "at_kst": "2026-11-18T15:19:45.876044+09:00",
+  "upstream_reference": {
+    "repository": "https://github.com/JoasASantos/Malvex",
+    "commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "use": "Evidence and judgment separation, exact receipts and recovery principles; project-specific follow-up only; no framework installation or MCP restructuring"
+  },
+  "rollout": {
+    "applied_at_kst": "2026-11-18T14:56:00.496479+09:00",
+    "status": "confirmed",
+    "at_kst": "2026-11-18T15:06:17.070745+09:00",
+    "files": 13,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "protected": 58,
+    "rollback_timer": "inactive",
+    "source_files": 12,
+    "receipt_files": 1,
+    "same_container_and_image": true,
+    "planned_native_restarts_latest_rollout": 1,
+    "planned_native_restarts_whole_unit": 3,
+    "SDK_and_review_workers_refreshed": true,
+    "SDK_review_database_bytes_equal_while_workers_stopped": true,
+    "Native_database_immutable_not_claimed": true,
+    "final_source_health_at_kst": "2026-11-18T15:19:35.930010+09:00",
+    "embedded_gate_bytes": 77782,
+    "embedded_gate_conditions": 7,
+    "gate_source_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7"
+  },
+  "actual_chats": {
+    "fresh_roots": 6,
+    "distinct_wordings": 3,
+    "previously_failing_wordings_reused": 2,
+    "requested_period_verified": 6,
+    "requested_sensor_period_not_queried": 0,
+    "read_executions": 18,
+    "protected_calls": 0,
+    "accepted_structured_model_reports": 3,
+    "public_projection_matches_private_final": 6,
+    "cases": {
+      "hermes-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          }
+        ],
+        "status": "no_accepted_structured_report",
+        "assessment": "no_accepted_model_judgment",
+        "native_api_stages": 4,
+        "seconds": 68.475,
+        "public_chars": 1179,
+        "post_count": 1,
+        "post_ids": [
+          "8gwmw6t4p78kjjnt9jjtd4pktr"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "hermes-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "block_inventory_does_not_verify_activation"
+            ],
+            "scope": [],
+            "capability": []
+          }
+        ],
+        "status": "no_accepted_structured_report",
+        "assessment": "no_accepted_model_judgment",
+        "native_api_stages": 4,
+        "seconds": 66.737,
+        "public_chars": 8107,
+        "post_count": 3,
+        "post_ids": [
+          "gchf71cif7dgmyz5dkga59xd9r",
+          "bn1feiexnjr43ba6ihad3rktfa",
+          "975bpjqqgfrk8q4r75zdh1iatc"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "hermes-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 31.566,
+        "public_chars": 1858,
+        "post_count": 1,
+        "post_ids": [
+          "4878px1cofrf7cqbjjdscfxf9a"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      },
+      "ollama-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 42.846,
+        "public_chars": 1917,
+        "post_count": 1,
+        "post_ids": [
+          "zpf5nb5d9tr88ni39hfwafndgh"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      },
+      "ollama-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 46.03,
+        "public_chars": 4117,
+        "post_count": 1,
+        "post_ids": [
+          "abytezp963gu7xe88yrgde4xbo"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      },
+      "ollama-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          [
+            "block_inventory_does_not_verify_activation"
+          ],
+          [
+            "block_inventory_does_not_verify_activation"
+          ],
+          [
+            "block_inventory_does_not_verify_activation"
+          ]
+        ],
+        "status": "partial",
+        "assessment": "no_accepted_model_judgment",
+        "sdk_actual_model_calls": 4,
+        "seconds": 63.074,
+        "public_chars": 1666,
+        "post_count": 1,
+        "post_ids": [
+          "fnsa59f7sjd48chyjcsc7tjc8y"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      }
+    },
+    "interpretation": "Six actual sensor periods verified does not mean6 complete reports. Native implicit/detail drafts remain rejected by an unchanged membership/activation guard. Single paired latency observations are not a general SLO or expert accuracy score."
+  },
+  "remaining_gaps": {
+    "scope": "follow-up design only; no canonical or operating edits in this note",
+    "guard_function": "infra/ollama-trial/harness.py:action_claim_violations",
+    "actual_false_positive": "임시 차단 목록 조회 결과 빈 배열은 현재 활성화된 주소가 없음을 뜻합니다.",
+    "evidence": "native-implicit-draft-check.json: same legitimate membership statement rejected3times only by block_inventory_does_not_verify_activation; actual list_blocks returned[]",
+    "requirements": [
+      "Distinguish an activation predicate about a feature from an adjective modifying addresses in an explicitly observed current list",
+      "Do not exempt a separate feature-on/off claim just because another clause mentions list membership",
+      "Wrong absence/count statements must remain rejected against actual nonempty membership",
+      "Failed/unread/partial/malformed list cannot verify membership",
+      "Direct feature-state negation without runtime proof is still an unsupported state claim; negated evidence/uncertainty/conditions remain distinct",
+      "Use shared read-contract membership extraction; retain actual report/nonce/read receipts and approval gates"
+    ],
+    "verification": "replay exact3archived drafts; zero/nonzero/error/wrong-count/independent-feature counterexamples; Harness² freeze/regression/admin rollout/new actual chats",
+    "state": "not implemented; current13files are confirmed15:06:17, no rollback timer active"
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T15:18:09.310270+09:00",
+    "roots": [
+      "/var/lib/capstone-evidence-validation/gateway-15d49754ff",
+      "/var/lib/capstone-evidence-validation/gateway-1c6e069653",
+      "/var/lib/capstone-evidence-validation/gateway-92c8f78c15",
+      "/var/lib/capstone-evidence-validation/gateway-18b43a1c7e",
+      "/var/lib/capstone-evidence-validation/observation-prepare-6443ea843b",
+      "/var/lib/capstone-evidence-validation/observation-prepare-5e1cf31c6f"
+    ],
+    "files": 2638,
+    "bytes": 105772029,
+    "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-observation-5e1cf31c6f",
+    "operating_changes": 0,
+    "exported_results": 28,
+    "exported_bytes": 495903,
+    "all_exports_and_whole_member_manifests_SHA256_verified": true,
+    "Mac_package_install_or_download": 0,
+    "source_records_and_original_framework_and_operating_backups_retained": true
+  },
+  "publication": {
+    "status": "pending",
+    "expected_public_files": 22,
+    "source_test_files": 6,
+    "documentation_files": 15,
+    "validation_files": 1
+  }
+}

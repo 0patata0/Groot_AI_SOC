@@ -48,6 +48,24 @@ def catalog():
 
 
 class GatewayEvidence(unittest.TestCase):
+    def test_implicit_observation_intent_enters_actual_native_initial_phase(self):
+        for question in (
+                '어제 WAF와 IDS 사이에 출발지가 겹쳤는지 조사해줘. 지금 임시 IP 차단도 알려줘',
+                '어제 WAF와 IDS의 출발지를 비교해줘. 403이면 모두 차단 성공으로 봐도 되는지 판단해줘. 지금 임시 IP 차단도 알려줘.'):
+            with self.subTest(question=question):
+                request=self.prepare(question=question)
+                self.assertIn('response_format',request)
+                self.assertEqual(self.h.agent._capstone_gateway_phase['kind'],'initial')
+                self.assertEqual(request['response_format']['json_schema']['name'],'soc_gateway_initial')
+                result=self.respond(self.initial())
+                calls=result.response.choices[0].message.tool_calls
+                self.assertEqual({c.function.name for c in calls},{MOD,SUR,BLOCK})
+                for c in calls:
+                    arguments=json.loads(c.function.arguments)
+                    if c.function.name!=BLOCK:
+                        self.assertEqual(arguments['since_kst'],'2026-11-17T00:00:00+09:00')
+                        self.assertEqual(arguments['until_kst'],'2026-11-17T23:59:59.999999+09:00')
+
     def setUp(self):
         if importlib.util.find_spec('openai') is None:
             # Mac has no server package installation. Linux runs use the real SDK.

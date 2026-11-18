@@ -22,7 +22,7 @@ from types import ModuleType, SimpleNamespace
 VERSION = "groot-query-completion:1.19.152"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = '9097d93c2898c80dbce7d16475945c1a995ad6df530c86497b9308a404e63cdd'
+EVIDENCE_SOURCE_SHA256 = 'a4295a13d229e8c5d0f1236df2bf19bd29dacb966fb84d994128b0bc5c4589db'
 
 
 def publish_load_receipt(installed):

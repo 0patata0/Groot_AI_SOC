@@ -209,5 +209,14 @@
     "tracked_paths_at_scan": 2420,
     "new_secret_findings": 0,
     "operating_deployment": false
+  },
+  "verifier_isolation_publication": {
+    "state": "content_published",
+    "content_commit": "607430d70d184292c3263bb84479b4da2082f8f4",
+    "remote_main_at_publication": "607430d70d184292c3263bb84479b4da2082f8f4",
+    "verified_at_kst": "2026-11-18T18:28:37.918273+09:00",
+    "receipt_committed_separately": true,
+    "same52_conditions_retested": true,
+    "operating_changes": 0
   }
 }

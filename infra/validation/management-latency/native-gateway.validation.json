@@ -393,9 +393,24 @@
     "new MCP installation"
   ],
   "documentation": {
-    "state": "draft_pending_humanize"
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-014-b015",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "new_prose_changed": false,
+    "receipt_update": "verified structured publication metadata; existing reviewed wording retained"
   },
   "publication": {
-    "state": "pending"
+    "state": "content_published",
+    "content_commit": "9fd5c434c172b6db6aedf4a84b2c9770eee53648",
+    "remote_main_at_content_publication": "9fd5c434c172b6db6aedf4a84b2c9770eee53648",
+    "remote_match_at_kst": "2026-11-18T11:50:05.188178+09:00",
+    "receipt_committed_separately": true,
+    "secret_scan_tracked_files": 2401,
+    "new_secret_findings": 0
   }
 }

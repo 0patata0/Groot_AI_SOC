@@ -8,6 +8,13 @@
 A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:8443을 사용한다. B는 /etc/capstone-internal-tls/server.crt와 SIEM_HOST:8444를 사용한다. 공개 인증서 파일은 root:root/0444이며 개인키는 감시 서비스에서 접근할 수 없다. CA 신뢰·SAN과 hostname·실제 제공 인증서 지문을 대조한다. 자동 갱신이나 공개 DNS·외부443·HTTP·LLM 가용성까지 확인하는 기능은 아니다.
 <!-- /certificate-bootstrap-20261118 -->
 
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+시험은 기존 Linux amd64 이미지의 analysisd와 wazuh-db를 별도 컨테이너에서 실행했다. 이미지 다운로드 없이 network none·권한 제한·읽기 전용 입력5개·자원 제한을 사용했다. 기본 internal_options와 CDB6목록은 이미지 안의 공개 기본 파일에서 복원하고 시험 내부에서만 쓰기 권한을 부여했다. 운영 설정·데이터·키·소켓은 시험 컨테이너에 연결하지 않았다. 개인키 읽기·운영 재시작·새 공격·학습·모델 호출·채팅은0이다.
+<!-- /certificate-rules-native-20261118 -->
+
+
 [수집기 한도 후보](../infra/validation/journal-composition/LIMITS.md)의 반입 소스는 deployment/soc_diagnostics.py와 infra/mcp/system_diagnostics.py이며 기존 source_bundle을 사용한다. 추가 deb/wheel/image·공개 포트·키·설정 입력은0이다. 기존 systemd255/binding235의 SYSTEM_ONLY와 Reader files API를 검사하고 수집·초기 이력·타이머·reader의4개 unit을 생성한다. [정확한 생성 내용·SHA](../infra/validation/journal-composition/limits-units.json)를 확인한다. 새 OS 전체 설치는 미검증이다.
 
 [정확 journal9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 기존 Python/systemd·이미 설치된 native binding을 사용해 추가 deb/wheel/image/포트/키0이다. operator-only 파일 트랜잭션/실행기는 root 전용 준비 폴더에 보관하며 MCP·초기 설치기의 새 진입점으로 등록하지 않는다. 초기설치의6개 local source/helper·의존 검사와 별도로 기존운영의 정확 승인·백업·독립 원복·실MCP/새채팅·확정을 수행한다. 현재는 준비/복제검사까지만 완료했다.

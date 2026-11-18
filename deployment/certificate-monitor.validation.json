@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "at_kst": "2026-11-18T18:15:47.665724+09:00",
-  "state": "source_integrated_isolated_checks_passed_new_OS_not_tested",
+  "at_kst": "2026-11-18T19:13:44.431404+09:00",
+  "state": "source_integrated_private_native112_passed_new_OS_not_tested",
   "entrypoint": "deploy.sh",
   "scope": "fresh Ubuntu24.04 A lab-edge and B internal chat TLS observers; no existing-host adoption",
   "sources": {
@@ -48,6 +48,14 @@
     "infra/mcp/test_system_diagnostics.py": {
       "bytes": 36587,
       "sha256": "ccf28b4de9afa0a5e6d74a5a2df9c87e4e84c4e5ebbb2e545c39f15be3e02ee8"
+    },
+    "deployment/tests/run_certificate_rules_native.py": {
+      "bytes": 16518,
+      "sha256": "ee07f566b89b2e4b4cc7678e17b15117d016fb2e1388901aaa92dd8400e3faab"
+    },
+    "deployment/tests/test_certificate_rules_native.py": {
+      "bytes": 3838,
+      "sha256": "5f5f520e080f4beee466442ed650ed20a20e9659b75a6269e22e8c8d38fbfb06"
     }
   },
   "probe_templates": {
@@ -66,6 +74,10 @@
     "capstone_certificate_decoders.xml": {
       "bytes": 363,
       "sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c"
+    },
+    "test-certificate-rules.py": {
+      "bytes": 10145,
+      "sha256": "6444e7946b671528ff7d7e263ff5d576e984f4fb082c4207066e9af1da1906f2"
     }
   },
   "tests": {
@@ -114,7 +126,7 @@
     "native_tls_transport": "simulated, zero network connections",
     "new_operating_files_modified": 0,
     "operating_A_hashes_unchanged": true,
-    "native_Wazuh_rules": "not executed; new-initial rules require fresh installed-manager evaluation",
+    "native_Wazuh_rules": "passed112 in private pinned4.14.8 engine; operating install/alert delivery still not tested",
     "new_OS_installation": "not performed",
     "synthetic_remote_cleanup": {
       "path": "/var/tmp/capstone-cert-bootstrap-4b1155964f9ca79b661a976f",
@@ -166,7 +178,8 @@
         "bytes": 43358,
         "absence_verified": true
       }
-    }
+    },
+    "native_Wazuh_rules_at_bootstrap_checkpoint": "not executed; new-initial rules require fresh installed-manager evaluation"
   },
   "humanize": {
     "run": "2026-11-18-031-25d6",
@@ -193,7 +206,7 @@
     "private_key_reads": 0
   },
   "remaining": [
-    "native installed-manager evaluation of12 portable rules",
+    "actual fresh-installed manager load and portable alert delivery; private native112 verified separately",
     "actual fresh3host OS installation",
     "independent successor reproduction",
     "current unrelated bot output scope repair",
@@ -218,5 +231,1611 @@
     "receipt_committed_separately": true,
     "same52_conditions_retested": true,
     "operating_changes": 0
+  },
+  "native_rules_followup": {
+    "at_kst": "2026-11-18T19:13:44.431404+09:00",
+    "status": "passed",
+    "scope": "private Wazuh engine with vendor rules and generated12 portable rules; not operating rule install/alert delivery or fresh OS",
+    "runner": "deployment/tests/run_certificate_rules_native.py",
+    "boundary_tests": "deployment/tests/test_certificate_rules_native.py",
+    "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30",
+    "image_digest": [
+      "wazuh/wazuh-manager@sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30"
+    ],
+    "architecture": "amd64",
+    "version": "Wazuh v4.14.8",
+    "binaries_sha256": [
+      "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019  /var/ossec/bin/wazuh-analysisd",
+      "c1503cec37487b41ac50eea0e674f18d603280941de43d7cb4aaaf362b707490  /var/ossec/bin/wazuh-logtest"
+    ],
+    "case_inputs_sha256": "e4f950ec9e4eb460c715c301553b81ead959f1d3bbfb453ce54484ea1afe219c",
+    "fixture_files": {
+      "decoder.xml": {
+        "bytes": 363,
+        "sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c"
+      },
+      "local_internal_options.conf": {
+        "bytes": 94,
+        "sha256": "2ca83e1ac1b67b76ef1aee454adfff4b87a120e53635becac6157a9793c4565e"
+      },
+      "ossec.conf": {
+        "bytes": 903,
+        "sha256": "dcd90ad9a24505f7a9ecced1baa823ec82ff897d13e7a3248b234480f8798295"
+      },
+      "rules.xml": {
+        "bytes": 7118,
+        "sha256": "0793bbb1cbc98fce1f9b4f9f7f0b87624c6a93ae5fe4fccbc311559684e0a5c3"
+      },
+      "start.sh": {
+        "bytes": 519,
+        "sha256": "754b4412896a27fcb839e6b88f6ce47ac726fa36775bc455ac3e13d2200ed8f2"
+      }
+    },
+    "case_source": "infra/groot-a/certificate-monitor/test-certificate-rules.py",
+    "cases_planned": 112,
+    "cases_passed": 112,
+    "expected_rule_cases": 54,
+    "rejection_cases": 58,
+    "case_extension": "51 original per role plus5 domain/sensor/program/location/message-hostname cases per role",
+    "actual_12_rule_ids_observed": [
+      "100300",
+      "100301",
+      "100302",
+      "100303",
+      "100304",
+      "100305",
+      "100306",
+      "100307",
+      "100308",
+      "100309",
+      "100310",
+      "100311"
+    ],
+    "seconds": 213.596,
+    "private_engine_enabled_rules": 8462,
+    "startup_errors_or_warnings": 0,
+    "network": "none",
+    "bind_inputs": "5 read-only source fixtures; no operating data/key/socket mounts",
+    "root_filesystem": "private writable container layer; not claimed read-only",
+    "operating_manager_identity_and_start_unchanged": true,
+    "operating_configuration_files": 8,
+    "operating_configuration_sha256_before": "b208babc968ac43e8284ad522ca06f80723f356a60ea0c294eb07a0efb85a341",
+    "operating_configuration_sha256_after": "b208babc968ac43e8284ad522ca06f80723f356a60ea0c294eb07a0efb85a341",
+    "container_removed": true,
+    "daemon_listing_success_and_CID_absence_rechecked": true,
+    "host_cleanup": {
+      "files": 129,
+      "bytes": 251412,
+      "absence_verified": true
+    },
+    "local_boundary_tests": 4,
+    "existing_certificate_tests_retested": 15,
+    "fresh_OS_installation": false,
+    "operating_portable_rule_installation": false,
+    "actual_expired_event_delivery": false,
+    "private_key_reads": 0,
+    "new_attacks": 0,
+    "new_model_calls": 0,
+    "failure_history": [
+      "private-image default file/group/list setup failures retained in local evidence",
+      "first full run44passed then85s suite deadline; stopped and cleaned; not counted156 unique",
+      "deadline360s; same job PID/start ticks/boot ID and private CID polled; final112passed"
+    ],
+    "case_results": [
+      {
+        "diagnostic_sha256": "443369bd6fa3317a13ee726c1c24c8f2ccb661f4bdc088ceb5df6b1c60b8ef6f",
+        "exit_code": 0,
+        "expected": [
+          "100300",
+          0
+        ],
+        "ids": [
+          "100300"
+        ],
+        "levels": [
+          "0"
+        ],
+        "name": "ok_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "2f7c1853f3808091e8c1323181e101f468bb8ee329acc8e3e26228c77601a2f8",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "ok_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "38463c661b3d6140663e16e915ed5c4397e97aefc0f656dc3ad670b33558694d",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "ok_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "06d51117a7435ebac4af33bae00244d2d4409c5710f17b534e3f7545ff7a8512",
+        "exit_code": 0,
+        "expected": [
+          "100301",
+          3
+        ],
+        "ids": [
+          "100301"
+        ],
+        "levels": [
+          "3"
+        ],
+        "name": "within_30_days_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "2eb408b59ecf43d4a3a52426290ac0aac012a4f8178a7d97dd041fc018b823c0",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_30_days_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "7684977c7bfce47e2618edbda03434db73c9af1209412a6eb54d9b373641cc0f",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_30_days_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "c12296c204d9f2a75615e20ac9255e6c6e8d04b830f9fd9d40c749876c3d4e3c",
+        "exit_code": 0,
+        "expected": [
+          "100302",
+          5
+        ],
+        "ids": [
+          "100302"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "3387554271acd3e6610d811d0d2e8b4a57b8b3ea978200f21acb3a99183cc01f",
+        "exit_code": 0,
+        "expected": [
+          "100302",
+          5
+        ],
+        "ids": [
+          "100302"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "a1a2b891b793b3b2b10e0809eae891805106eb290059e93bb27dcd29c9d12121",
+        "exit_code": 0,
+        "expected": [
+          "100302",
+          5
+        ],
+        "ids": [
+          "100302"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "7b4f2776e9cd2c246857072c300b925e929d8abe02cb6bb02480f6b875804653",
+        "exit_code": 0,
+        "expected": [
+          "100303",
+          7
+        ],
+        "ids": [
+          "100303"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1f841c5e6e895412f610de53272bb7c3bd808b30c422d8dc65e9ae657c4d8b24",
+        "exit_code": 0,
+        "expected": [
+          "100303",
+          7
+        ],
+        "ids": [
+          "100303"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "783e9be83f50a40498f98647d7e22af47721e215b40fb11bf2bff3f6715b17cb",
+        "exit_code": 0,
+        "expected": [
+          "100303",
+          7
+        ],
+        "ids": [
+          "100303"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "24dd244bb5e586ed483ec2e25852b00f1d7251406dfd97bbc90b3b0511e55471",
+        "exit_code": 0,
+        "expected": [
+          "100304",
+          10
+        ],
+        "ids": [
+          "100304"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "298ff89964acac9d465d37888c8cbb2db517c0e6758e70f9de526abb0f570adb",
+        "exit_code": 0,
+        "expected": [
+          "100304",
+          10
+        ],
+        "ids": [
+          "100304"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "60750a8346824fa0640399979ec7f698282b31a53be3fc6016155991f4def25b",
+        "exit_code": 0,
+        "expected": [
+          "100304",
+          10
+        ],
+        "ids": [
+          "100304"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "02bdaa6a88be2363e99599f01ed16caf2d9d60b7edd5b476c667cd982b9ac9bd",
+        "exit_code": 0,
+        "expected": [
+          "100300",
+          0
+        ],
+        "ids": [
+          "100300"
+        ],
+        "levels": [
+          "0"
+        ],
+        "name": "unknown_verified",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "af01a9e0de76bc8842c336bfd8cb5a4fe4c00c7543ce9c9abb14a709086d7051",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "unknown_mismatch",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "474989568560d901eafd6d029d497ca23ac10576bff182329b9ae654e0298b22",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "unknown_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "120aab892a497f7a1acad7a2f8bea55519067326d7edb84b60e7d050d13119b5",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_unavailable",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "f29820f51978823d5a17f23c572a6b9cb64458b6902c4eee4e3bf42a66bccaf1",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_changed",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "902da1770b3cdb5504bc56f4204ad0d3520294b40557d9701ab5d89feb9015ab",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_invalid",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "e5d62d0aa3b100632fc5acc1e920c74e775437614155fdda71515bd04bf3c6c5",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_hostname_invalid",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "4df816ee1add93534b4eb6c4ea599500e4e9cbbbc8d57b503de69a6cc1c82464",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_not_yet_valid",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "e2f3f4590b55b90019a7ec2242665167dd7651dd9c84eff5e0a158e223485bda",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_checkend_failed",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "de5202c4e8578bbbe4463e50b0b0042e28548b1875a0caaf04ec29e3dac37416",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_tls_verification_failed",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "c2da28218d7b3e4e16c4bfb56703c62f0f8d48b1d070202c113345ce8aae66b9",
+        "exit_code": 0,
+        "expected": [
+          "100305",
+          5
+        ],
+        "ids": [
+          "100305"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_served_certificate_invalid",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "7d16990d5914c9daef32009931925bf7ec75768ef767e4398a501f73456c3923",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_program",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "f7d2cda23d9a80cf8658c8e0df0c884e7a7d020b9fcf367d9854173b48f664a2",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "program_suffix",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1d26192185ef3a33a095a9156f1f4df145925858842ebc3c4c636b1dcfa9c03b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_agent",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1d26192185ef3a33a095a9156f1f4df145925858842ebc3c4c636b1dcfa9c03b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "bare_location",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1d26192185ef3a33a095a9156f1f4df145925858842ebc3c4c636b1dcfa9c03b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_location",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "e1dec051a1f942b28e962e71242325c1255e81df30ac64ca97c5009fb8f80a8f",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_domain_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "da489c10a4b1d3552cf116e246a230974331703711360af769974ac02e2528d1",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_schema_version_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "723a004bf55e8d65ff8c6f96f9b470f3f7ea2752fc58055bca212b1c155c770f",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_schema_version_bool",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "3a26c47f78e69ae14f03925fba6edb1a23f3f2a0a5981796e7eb0ccf8cab6bd7",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_automatic_renewal_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "f17dcab77d3b3207bc94b2e685e21b868343b53e6a8e45dc44edb5afbda12de6",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_automatic_renewal_bool",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "50d2de1f81a4306612b1a8b290b672c495b49e7d557c02fc8917c087716f1f48",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_expiry_status_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "0b19f2816225e6b9740bad62ed85be12affa4e7e62bdc7ba9ce717374e64c4be",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_probe_status_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "8e6f1610471941d4cf269a4f23493c3c09b7196f1b571c9d393c8646cafce27b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_reason_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "7fe6378b7fad95cd067ab846ec8354e464c197adb655b25e668d4568ddf97e6e",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_certificate_sha256_list",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "7565bfedac56461ab6191d1360c05a8e5e8f2997cd2c74d0a2effdf1384337fc",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_seconds_remaining_str",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "f866a6c32856a372fa02c781f018bf0256020665b1c42bff7b2e4bb45bd6ddb4",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_domain",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "5571af5f57a1a2c581ba197f2f5d7e7ea8897600efc73c559019d8d6e5bf17b9",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_expiry_status",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "a08c2b7fb1803db7187c8b61683bc52ac0cc3c8eca86b65e20e4de181eda8ca4",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_probe_status",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "0dea304da7f56bd90683d8779ac4aba04a3346a25ab81780513b8a5afa69bd20",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_reason",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "f87fe68dbafaa441a1cfb71715d2ffb52d9b5a9726993525ca42ca119505b82b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_automatic_renewal",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "82670a43a7c96d61efc03a6022c4d9e0be142ee42a0718c1b470bd2c9b7cdfcd",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "extra_key",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "8d9aa10d842924b7f17ba8d364388c7da7f98faea78381c253b02b5c4ce13ce7",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "trailing_payload",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "5cc7c48c6a823a5e0ede02fda007101865eefae9800e17b74c08b111a90179e3",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "json_concatenation",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "522856cfa5e7a57b8414a55eeac96d4ffd3816b285a39f6352ced7a3a099ca89",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "duplicate_key",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "2e3fa457cb76b83bfd03cd7875d369880c7b30b08180bb0c12ddb9c69985afe4",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "noncanonical_spacing",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1d26192185ef3a33a095a9156f1f4df145925858842ebc3c4c636b1dcfa9c03b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "known_other_sensor",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "ebe1aba1a76a4901801e0fee0378508d925279c4e2821158b99ddbf227d1e768",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "known_other_domain",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "1d26192185ef3a33a095a9156f1f4df145925858842ebc3c4c636b1dcfa9c03b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "location_suffix",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "453502faa6da86488745454d0066443afb23e94400cda5a190c5d93786933177",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "program_prefix",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "c1dcb82e8c5e6a4b852ad6380c4abc471a42806b207ae6d0755f61c444745245",
+        "exit_code": 0,
+        "expected": [
+          "100304",
+          10
+        ],
+        "ids": [
+          "100304"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "message_hostname_differs",
+        "passed": true,
+        "role": "security"
+      },
+      {
+        "diagnostic_sha256": "2923a4647fa202b2a85fa22ee306f30f944d1824f6c4027c3d0bccd7a678ffbe",
+        "exit_code": 0,
+        "expected": [
+          "100306",
+          0
+        ],
+        "ids": [
+          "100306"
+        ],
+        "levels": [
+          "0"
+        ],
+        "name": "ok_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "0a978351e131d9d0e64d0424f872c8b03df0e7aad8f9cd38b789d4f06c663f4c",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "ok_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "0939c940f98b6cedd148e2ee20229025a06991ff4534dc2fa8e2a9062d49138b",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "ok_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "33f292fa44dfa1f60167a6bfbc813d69ad44eceee516852c243267a80aeb4c57",
+        "exit_code": 0,
+        "expected": [
+          "100307",
+          3
+        ],
+        "ids": [
+          "100307"
+        ],
+        "levels": [
+          "3"
+        ],
+        "name": "within_30_days_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "d02e5ab6a915f6d3e151e654194fb6cbdececc319026d9bf45ef49f4e9c00c48",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_30_days_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "a1df212b7871dcc218cbb5a2da7060223f74e7add89f0242fb7b944184d45157",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_30_days_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "0bb6765f921e04091eec03b3e611b526828580725fabf6779f486d9f6cbb86c7",
+        "exit_code": 0,
+        "expected": [
+          "100308",
+          5
+        ],
+        "ids": [
+          "100308"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "e2b22da5bedea2d029094a4774cd88c36f7d4b95e4b5bc3f67ab6516b20a39ad",
+        "exit_code": 0,
+        "expected": [
+          "100308",
+          5
+        ],
+        "ids": [
+          "100308"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "ff24b9700117bb53efe7e6d2f18365942f2dfffa5a487cbae365a80319913e77",
+        "exit_code": 0,
+        "expected": [
+          "100308",
+          5
+        ],
+        "ids": [
+          "100308"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "within_14_days_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "50e45b98fab9b00f1bb568a8c10226cc7004766f7a2c10149e88c57243c48839",
+        "exit_code": 0,
+        "expected": [
+          "100309",
+          7
+        ],
+        "ids": [
+          "100309"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "4d581fff7641a530909d2c3802149eeaca579e26062ffa6273814bb5ac65d416",
+        "exit_code": 0,
+        "expected": [
+          "100309",
+          7
+        ],
+        "ids": [
+          "100309"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "edadabb0cdffe162a1ef704b9287443b73e6ee845f66c7d40a842de9dfafc608",
+        "exit_code": 0,
+        "expected": [
+          "100309",
+          7
+        ],
+        "ids": [
+          "100309"
+        ],
+        "levels": [
+          "7"
+        ],
+        "name": "within_7_days_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "998d39e7ad8cc627bf6c4a95440ec3fdf6cfe50f8d44772a6d392881c6ac205b",
+        "exit_code": 0,
+        "expected": [
+          "100310",
+          10
+        ],
+        "ids": [
+          "100310"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "f50a4083b6ac71d126cbddedb94f9757090fa382317853127d071af337d01d07",
+        "exit_code": 0,
+        "expected": [
+          "100310",
+          10
+        ],
+        "ids": [
+          "100310"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "9db01a5f83ff83e4461e8191d0fd7d6bbfa5194f6cf71d1a0b32630c08cd14c1",
+        "exit_code": 0,
+        "expected": [
+          "100310",
+          10
+        ],
+        "ids": [
+          "100310"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "expired_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "249c17264a3949ce69b2b204fdd2470b7b2b964d103552960538f8f26e7a3725",
+        "exit_code": 0,
+        "expected": [
+          "100306",
+          0
+        ],
+        "ids": [
+          "100306"
+        ],
+        "levels": [
+          "0"
+        ],
+        "name": "unknown_verified",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "e0296a00594b7cc70330c2de9a79ca149e028edf6039cc4353faea31e74c0969",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "unknown_mismatch",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "240985b05313bdd6fba42ffa9c4c4a6bc6698c9612971736f7d7638e720ae77e",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "unknown_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "6413640a13bc45159810e5b77c6ba7dd86592704a02b3edd31bee047299205bb",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_unavailable",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "5ca41f00fc6960f49b54a5974fcefc43336df6b68f50309467348c1643526315",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_changed",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "c6851a140bbf093ef920edef51d2929f9ee791f90473c225874084515e1e9a47",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_certificate_invalid",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "642e6f21f88e7fe239faff687cb75d494b3081b786739d80866e42269c8187ab",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_hostname_invalid",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "3c347f87ce0eb598798c04813a963dd34455cc85331b8e1a004bf84bc677667d",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_not_yet_valid",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "c54a80766963beee60c21049ca6c14e83ac8c29f6af12bd28a038a3d3549005c",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_checkend_failed",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "affd3e774b917255050bc327ec413333e51ff8874ec92a5796958ee048c30f85",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_tls_verification_failed",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "181e7be9a63945f76b2d7d55d65108add3b34a123fb43ed02b80846b24f53355",
+        "exit_code": 0,
+        "expected": [
+          "100311",
+          5
+        ],
+        "ids": [
+          "100311"
+        ],
+        "levels": [
+          "5"
+        ],
+        "name": "reason_served_certificate_invalid",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "b45ad8a8ad049a8a8596fe43ea33e1b9be190a04de809f7e4aa2a37161964a5a",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_program",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "7455c39c42f337b9b8caf8429fc278ce8cc90ff5bc206a8e1a2a4295259b0f68",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "program_suffix",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "34028a658d6bb76ae7a1c546088f8dfcaf4336b283d2836c48c3597ab956ba69",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_agent",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "34028a658d6bb76ae7a1c546088f8dfcaf4336b283d2836c48c3597ab956ba69",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "bare_location",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "34028a658d6bb76ae7a1c546088f8dfcaf4336b283d2836c48c3597ab956ba69",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "wrong_location",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "f4e5432012aa364a03948bb62a3bbe432029eda6fc86cc7efa4b2bcedc21c3f6",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_domain_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "3425035a2dad4d3c1d5a1b878c980645d4e1b9318803420c9150fd4a6c451aba",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_schema_version_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "6d13829ea621388a6a76c016811f94e14ebd206057233f06c0732267454cc1f5",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_schema_version_bool",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "ebd2a2cd3b61516b250d78718931f8e054b4594e6a212a0acf46c90597263057",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_automatic_renewal_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "b08e4821530607876fc3485ef7467147ea347da5e895f4183334310094802dba",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_automatic_renewal_bool",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "8eac8a780045c871f5a5c977ba05901c18cc542c418cee38982513bcaa22b541",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_expiry_status_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "ffb34b89e6484abf3f3c625682b3339b6ee80e1cca1f545d7d1458ad19199d8a",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_probe_status_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "4d3c5bd1140a9d4efff1ae6d5f8a476d4e1265ded0d013849e89a3c4c606f132",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_reason_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "ff7e080f47b480d0fdbbbadf958d9c9bb4b379d710628b1beba697af4d437e15",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_certificate_sha256_list",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "f36d16509f605c7c3a4f3ea728996bd76991339da8bfa1a1f7f3b2cf8daadafa",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "invalid_seconds_remaining_str",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "d8f530219238790a6ea73fca8f47655adf07aa0b5c9e5fd136bbbaf4ed1a825c",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_domain",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "9205e395d50b4401360d8a9a07ff75a436406f4df5e10b418391a564dde208de",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_expiry_status",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "186df084ed89a40e108f57ba81ce0b91054a42155bcb509c22d400679dc5108c",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_probe_status",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "977db18ff7b8e76ecc16e9a2c3810ebebf5d8cdbf9be996f9494a0b109c18d88",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_reason",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "877d63fe39bf7ab02ea944115a740d317d89be070ed345b1e1070d62cc72e943",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "missing_automatic_renewal",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "889990f54ef20821253c972dfb211cec9b7323a0bcf7d3df2ae45a84ec70d3e0",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "extra_key",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "e1f0c8af8d9ba46c914d1751fb19324c99d40d9d083387eb0a35ff7c90367cd1",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "trailing_payload",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "eb735a996a44d28623fa4592c1b5971070fc96ec53af2b942d2c5317179e610b",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "json_concatenation",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "b6d382426778ea7cf6eb7df57d3416a3d3cba1492e07ca1bce226da1ff5cc9a1",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "duplicate_key",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "f125500f008300ab66cba2a7c2733da1a2caf0c8adfc77d7c0394dd1bcddb8ff",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "noncanonical_spacing",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "34028a658d6bb76ae7a1c546088f8dfcaf4336b283d2836c48c3597ab956ba69",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "known_other_sensor",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "c65e4862b0f920307a7aea12158cb133c374815812914a5431c931000f10bf19",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "known_other_domain",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "34028a658d6bb76ae7a1c546088f8dfcaf4336b283d2836c48c3597ab956ba69",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "location_suffix",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "f4e8af904fab7223ea3f614cd22e4e33663fdfb102a071b62ea4f4d8f6fbebbf",
+        "exit_code": 0,
+        "expected": null,
+        "ids": [],
+        "levels": [],
+        "name": "program_prefix",
+        "passed": true,
+        "role": "siem"
+      },
+      {
+        "diagnostic_sha256": "8496c6aaebe143322bf3668176d86f8f6f092fa2c94eb41aebcacc15e84e8f6e",
+        "exit_code": 0,
+        "expected": [
+          "100310",
+          10
+        ],
+        "ids": [
+          "100310"
+        ],
+        "levels": [
+          "10"
+        ],
+        "name": "message_hostname_differs",
+        "passed": true,
+        "role": "siem"
+      }
+    ],
+    "humanize": {
+      "run": "2026-11-18-032-0652",
+      "version": "v2.3-codex",
+      "route": "light",
+      "gate_exit": 0,
+      "change_rate_percent": 0.0,
+      "grade": "B",
+      "self_check": "6/6",
+      "summary_count": 1,
+      "residual_warnings": 0,
+      "scope": "seven new native-engine/reproduction explanations"
+    },
+    "publication": {
+      "state": "prepared_not_published",
+      "operating_deployment": false
+    }
   }
 }

@@ -1,5 +1,15 @@
 # 설치·웹 정책 이력
 
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+시험은 기존 Linux amd64 이미지의 analysisd와 wazuh-db를 별도 컨테이너에서 실행했다. 이미지 다운로드 없이 network none·권한 제한·읽기 전용 입력5개·자원 제한을 사용했다. 기본 internal_options와 CDB6목록은 이미지 안의 공개 기본 파일에서 복원하고 시험 내부에서만 쓰기 권한을 부여했다. 운영 설정·데이터·키·소켓은 시험 컨테이너에 연결하지 않았다. 개인키 읽기·운영 재시작·새 공격·학습·모델 호출·채팅은0이다.
+
+초기 설치기 연결의 로컬190검사와 Linux 합성52조건·두 역할의 유닛 구문 검사는 기존 근거로 보존한다. 후속으로 B의 기존 Wazuh4.14.8 이미지에서12규칙을 격리 적재하고112사례를 모두 통과했다. 새 검증기의 로컬 경계 검사4개와 기존 인증서 검사15개도 통과했다. 운영 매니저의 컨테이너·시작 시각·설정8파일 지문은 전후 같았다. 새 Ubuntu 전체 설치·운영 룰 적용·실제 경보 전달·독립 재구현은 미수행이다.
+
+[검증 원장](../deployment/certificate-monitor.validation.json)
+<!-- /certificate-rules-native-20261118 -->
+
 <!-- certificate-bootstrap-20261118 -->
 <a id="certificate-bootstrap-20261118"></a>
 

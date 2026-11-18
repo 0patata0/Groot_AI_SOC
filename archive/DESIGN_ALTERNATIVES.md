@@ -1,5 +1,15 @@
 # 설계 대안 이력
 
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+시험은 기존 Linux amd64 이미지의 analysisd와 wazuh-db를 별도 컨테이너에서 실행했다. 이미지 다운로드 없이 network none·권한 제한·읽기 전용 입력5개·자원 제한을 사용했다. 기본 internal_options와 CDB6목록은 이미지 안의 공개 기본 파일에서 복원하고 시험 내부에서만 쓰기 권한을 부여했다. 운영 설정·데이터·키·소켓은 시험 컨테이너에 연결하지 않았다. 개인키 읽기·운영 재시작·새 공격·학습·모델 호출·채팅은0이다.
+
+재검증에는 기존 고정 이미지와 Linux root의 빈0700 작업 경로, 운영 매니저의 전체 컨테이너 ID가 필요하다. 실행기는 생성한12규칙과 원본 decoder를 읽기 전용으로 연결하고 매 사례마다 새 logtest 세션을 사용한다. 실제 엔진의 규칙 ID·위험도·decoder와 잘못된 입력의 거절을 확인한다. 종료 시 전체 CID·이미지·작업 표식·입력 경로를 대조한 뒤 자기 컨테이너만 제거한다. Docker 목록 조회 성공과 CID 부재를 함께 확인하고 운영 지문도 다시 읽는다.
+
+[검증 원장](../deployment/certificate-monitor.validation.json)
+<!-- /certificate-rules-native-20261118 -->
+
 <!-- certificate-bootstrap-20261118 -->
 <a id="certificate-bootstrap-20261118"></a>
 

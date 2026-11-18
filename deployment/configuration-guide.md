@@ -10,6 +10,13 @@ A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:
 Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.internal을 한 쌍씩 검사한다. 100300~100311의12규칙을 기존 초기 규칙과 함께 구성하고 중복 ID를 거절한다. 기존 진단 도구에는 b:certificate-monitor 고정 읽기 대상을 추가했다. 도구 수·일반 명령 권한을 늘리지 않으며 새 대상의 운영 설치는 이번 작업에서 수행하지 않았다.
 <!-- /certificate-bootstrap-20261118 -->
 
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+재검증에는 기존 고정 이미지와 Linux root의 빈0700 작업 경로, 운영 매니저의 전체 컨테이너 ID가 필요하다. 실행기는 생성한12규칙과 원본 decoder를 읽기 전용으로 연결하고 매 사례마다 새 logtest 세션을 사용한다. 실제 엔진의 규칙 ID·위험도·decoder와 잘못된 입력의 거절을 확인한다. 종료 시 전체 CID·이미지·작업 표식·입력 경로를 대조한 뒤 자기 컨테이너만 제거한다. Docker 목록 조회 성공과 CID 부재를 함께 확인하고 운영 지문도 다시 읽는다.
+<!-- /certificate-rules-native-20261118 -->
+
+
 > **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-5f5f782f6b670953).
 
 새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 취급하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**

@@ -651,6 +651,15 @@
     "linux_synthetic_conditions": 52,
     "existing_operating_files_changed": 0,
     "new_read_target_source_only": "b:certificate-monitor",
-    "machine_and_certificate_inputs": "new A lab-edge and B internal chat; legacy fixed A observer retained"
+    "machine_and_certificate_inputs": "new A lab-edge and B internal chat; legacy fixed A observer retained",
+    "native_rules_followup": {
+      "at_kst": "2026-11-18T19:13:44.431404+09:00",
+      "source": "deployment/certificate-monitor.validation.json#native_rules_followup",
+      "private_native_cases": 112,
+      "local_boundary_tests": 4,
+      "operating8_hashes_unchanged": true,
+      "new_operating_installation": false,
+      "fresh_OS_installation": false
+    }
   }
 }

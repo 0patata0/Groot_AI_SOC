@@ -1,5 +1,13 @@
 # 과거 기록과 복원 안내
 
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+초기 설치기 연결의 로컬190검사와 Linux 합성52조건·두 역할의 유닛 구문 검사는 기존 근거로 보존한다. 후속으로 B의 기존 Wazuh4.14.8 이미지에서12규칙을 격리 적재하고112사례를 모두 통과했다. 새 검증기의 로컬 경계 검사4개와 기존 인증서 검사15개도 통과했다. 운영 매니저의 컨테이너·시작 시각·설정8파일 지문은 전후 같았다. 새 Ubuntu 전체 설치·운영 룰 적용·실제 경보 전달·독립 재구현은 미수행이다.
+
+[검증 원장](../deployment/certificate-monitor.validation.json)
+<!-- /certificate-rules-native-20261118 -->
+
 <!-- certificate-bootstrap-20261118 -->
 단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
 <!-- /certificate-bootstrap-20261118 -->

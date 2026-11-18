@@ -5,8 +5,23 @@
 
 단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
 
-로컬190검사와 Linux 격리 감시52조건, 두 역할의 systemd 유닛 구문을 통과했다. Linux는 A에서 두 역할의 합성 인증서와 모의 TLS 전송으로 검사했으며 운영5파일의 SHA를 전후 대조했다. 실제 TLS 연결·운영 유닛 시작·운영 설정 변경은0이다. 새 B 규칙의 실제 엔진 판정과 새 Ubuntu 전체 설치·독립 재구현은 미수행이다.
+초기 설치기 연결의 로컬190검사와 Linux 합성52조건·두 역할의 유닛 구문 검사는 기존 근거로 보존한다. 후속으로 B의 기존 Wazuh4.14.8 이미지에서12규칙을 격리 적재하고112사례를 모두 통과했다. 새 검증기의 로컬 경계 검사4개와 기존 인증서 검사15개도 통과했다. 운영 매니저의 컨테이너·시작 시각·설정8파일 지문은 전후 같았다. 새 Ubuntu 전체 설치·운영 룰 적용·실제 경보 전달·독립 재구현은 미수행이다.
 <!-- /certificate-bootstrap-20261118 -->
+
+<!-- certificate-rules-native-20261118 -->
+<a id="certificate-rules-native-20261118"></a>
+
+기존51사례를 각 역할에 적용하고 센서·도메인 교차, 프로그램명·수집 위치 접미 조건, 메시지 hostname 차이를 추가해112사례를 구성했다. 기대 규칙이 있는54사례는 실제 규칙 ID와 위험도를 대조했고 나머지58사례는12규칙에 매칭되지 않음을 확인했다. 정상·30/14/7일·만료와 TLS 실패를 조합했으며 만료는 A100304/B100310·위험도10을 유지한다. unknown+verified는 원본의 상태 형식 대조이며 실제 정상 관측으로 집계하지 않는다.
+
+재검증에는 기존 고정 이미지와 Linux root의 빈0700 작업 경로, 운영 매니저의 전체 컨테이너 ID가 필요하다. 실행기는 생성한12규칙과 원본 decoder를 읽기 전용으로 연결하고 매 사례마다 새 logtest 세션을 사용한다. 실제 엔진의 규칙 ID·위험도·decoder와 잘못된 입력의 거절을 확인한다. 종료 시 전체 CID·이미지·작업 표식·입력 경로를 대조한 뒤 자기 컨테이너만 제거한다. Docker 목록 조회 성공과 CID 부재를 함께 확인하고 운영 지문도 다시 읽는다.
+<!-- /certificate-rules-native-20261118 -->
+
+```bash
+# Linux B, root; replace FULL_MANAGER_CID with the exact existing manager ID.
+install -d -m 0700 /var/tmp/capstone-cert-rules-check
+python3 -B deployment/tests/run_certificate_rules_native.py --workdir /var/tmp/capstone-cert-rules-check --manager FULL_MANAGER_CID
+```
+
 
 [복합 조사 검증](../infra/validation/management-latency/README.md). 공통 어법/HTTP 인과 검사는 증거가 아니다·차단했는지·의미하는지는 추가 검증 필요라는 올바른 한계를 거절했다. 이를 보완했다. 계약3사본·하네스2사본·SDK영수증1을 운영6파일로 확정하고 보호66파일을 대조했다. 새3채팅/9읽기의 대상·기간이 일치했고 모델 보고는3건 수용됐다. 실제거절3초안 재생과 Mac/Linux336·298·39·27, Linux공식38·설치37을 통과했다. MCP45도구·모델·권한·승인·TTL·스킬·상시 지시량은 유지한다. 제한된 검증이며 일반 정확도/SLO는 별도다. [HTTP 어법·새 채팅 검증](../infra/validation/management-latency/http-modality.validation.json).
 

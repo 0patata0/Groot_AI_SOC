@@ -1834,7 +1834,14 @@
       "scope": "seven new native-engine/reproduction explanations"
     },
     "publication": {
-      "state": "prepared_not_published",
+      "state": "content_published",
+      "content_commit": "3a59c06a055ae1149bc2c9754712f76d388414e8",
+      "remote_main_at_publication": "3a59c06a055ae1149bc2c9754712f76d388414e8",
+      "verified_at_kst": "2026-11-18T19:17:05.872778+09:00",
+      "public_files": 20,
+      "tracked_paths_at_scan": 2422,
+      "new_secret_findings": 0,
+      "receipt_committed_separately": true,
       "operating_deployment": false
     }
   }

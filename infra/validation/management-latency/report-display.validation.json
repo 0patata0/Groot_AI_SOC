@@ -428,7 +428,9 @@
     "requested_calendar_day_correct": 2,
     "total_cases": 4,
     "overall_task_accuracy_claimed": false,
-    "new_semantic_tests": 2
+    "distinct_question_wordings": 2,
+    "reused_control_wordings": 1,
+    "new_question_wordings": 1
   },
   "calendar_gap": {
     "state": "verified_existing_shared_gap",
@@ -439,7 +441,15 @@
     "summary_period_correct": true,
     "detail_period_correct": false,
     "operating_display_kept_confirmed": true,
-    "next": "qualify temporal operators by time operands; rerun identical failing questions"
+    "next": "qualify temporal operators by time operands; rerun identical failing questions",
+    "pure_helper_reproduction": {
+      "cases": 8,
+      "unqualified_day_cases": 6,
+      "correctly_bound_before": 1,
+      "explicit_time_range_cases_preserved": 2,
+      "new_model_or_mcp_calls": 0,
+      "scope": "fixed clock and simplified schema; not extra live cases"
+    }
   },
   "visual_qa": {
     "surface": "Mattermost Desktop Electron, existing authenticated session",
@@ -486,9 +496,24 @@
     "mac_task_package_downloads_or_installs": 0
   },
   "documentation": {
-    "state": "draft_pending_humanize"
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-018-a1ce",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0008,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "draft_correction": "monolith draft warning corrected, original/modal/numeric values preserved; final gate0",
+    "receipt_update": "verified structured publication metadata; existing reviewed wording retained"
   },
   "publication": {
-    "state": "pending"
+    "state": "content_published",
+    "content_commit": "607eb63482a99abce9000c387418bb199a868908",
+    "remote_main_at_content_publication": "607eb63482a99abce9000c387418bb199a868908",
+    "remote_match_at_kst": "2026-11-18T13:06:03.441795+09:00",
+    "receipt_committed_separately": true,
+    "secret_scan_tracked_files": 2405,
+    "new_secret_findings": 0
   }
 }

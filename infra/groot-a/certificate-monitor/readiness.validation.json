@@ -680,5 +680,16 @@
     "original_failed_chat_preserved": true,
     "unrelated_agent_repair_replaced": true,
     "general_accuracy_slo_verified": false
+  },
+  "current_lookup_followup": {
+    "state": "operating_confirmed_limited_current_and_followup_validation",
+    "plan_sha256": "3a8ad92000b245bd255965e21fad5fae99f13104038035510dada177995799f8",
+    "validation": "../../hermes/query-completion/service-catalog.validation.json",
+    "confirmed_at_kst": "2026-11-18T20:55:49.109316+09:00",
+    "requests": 8,
+    "actual_reads": 6,
+    "previous_six_chat_result_retained_as_previous_observation": true,
+    "tls_observer_not_rerun_in_this_followup": true,
+    "general_accuracy_slo_verified": false
   }
 }

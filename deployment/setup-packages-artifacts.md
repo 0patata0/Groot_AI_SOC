@@ -775,5 +775,5 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 
 <!-- service-query-20261118 -->
 
-서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../infra/hermes/query-completion/service-catalog.validation.json).
+현재 상태만 묻는 짧은 요청과 호스트만 답하는 후속 요청을 같은 공통 계약으로 처리한다. 현재 조회에는 필요한 실제 읽기만 사용하고 요청하지 않은 journal을 추가하지 않는다. 모호한 대상은 확인하며 과거 수치·판단·승인을 새 근거로 이어받지 않는다. 운영10소스·영수증1개와 새8요청/6읽기를 확인했다. 기존 단일 deploy.sh의 복사·영수증 경로를 유지하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [실제 검증](../infra/hermes/query-completion/service-catalog.validation.json).
 <!-- /service-query-20261118 -->

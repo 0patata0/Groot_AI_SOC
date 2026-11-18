@@ -204,6 +204,74 @@ class ServiceCatalogPhase(unittest.TestCase):
                 final=self.h.call(assistant_message=result.response.choices[0].message)
                 self.assertEqual(final.action,'break')
 
+    def test_current_only_service_keeps_one_actual_read_through_native_final(self):
+        for question,target in (
+                ('[operator.42] A 서버 저장소 감시 상태 보여줘','a:storage-monitor'),
+                ('B 서버 도커 현재 상태 보여줘','b:docker'),
+                ('C 서버 apache2.service 상태 확인해줘','c:apache')):
+            with self.subTest(question=question):
+                self.prepare(question)
+                phase=self.h.agent._capstone_gateway_phase
+                self.assertTrue(phase['service_plan']['current_only'])
+                self.assertEqual(self.options(),[{'tool':NAME,'arguments':{'target':target}}])
+                self.respond(self.initial());calls=self.observations();self.build()
+                self.assertEqual(len(calls),1)
+                phase=self.h.agent._capstone_gateway_phase
+                self.assertTrue(phase['context']['lookup_only'])
+                self.assertEqual(phase['context']['requested_service_scope']['history_windows'],[])
+                result=self.respond(self.report());text=result.response.choices[0].message.content
+                self.assertIn(target,text)
+                self.assertNotIn('15분 표본',text)
+                self.assertNotIn('journal 원문',text)
+                final=self.h.call(assistant_message=result.response.choices[0].message)
+                self.assertEqual(final.action,'break')
+                self.assertIn(target,final.final_response)
+
+    def test_current_only_index_does_not_offer_unrequested_history(self):
+        self.prepare('A 서버 인증서 감시 상태 보여줘')
+        phase=self.h.agent._capstone_gateway_phase
+        self.assertTrue(phase['service_plan']['current_only'])
+        self.assertEqual(len(self.options()),1)
+        value={'request_nonce':self.initial()['request_nonce'],'indexes':[1]}
+        self.assertFalse(Draft202012Validator(phase['schema']).is_valid(value))
+        result=self.respond(value)
+        self.assertFalse(result.response.choices[0].message.tool_calls)
+
+    def test_current_only_failed_snapshot_is_not_a_completed_lookup(self):
+        self.prepare('A 서버 저장소 감시 상태 보여줘');self.respond(self.initial());calls=self.observations()
+        calls[0]['result']='{"error":"fixture_unavailable"}'
+        calls[0]['result_sha256']=hashlib.sha256(calls[0]['result'].encode()).hexdigest()
+        calls[0]['is_error']=True
+        self.h.kw['messages']=self.h.kw['messages'][:2]+base.H.linked_rows(calls)
+        self.build()
+        phase=self.h.agent._capstone_gateway_phase
+        self.assertFalse(phase and phase.get('context',{}).get('lookup_only'))
+
+    def test_current_service_ambiguity_asks_once_before_native_model_or_read(self):
+        self.prepare('[operator.42] Docker 상태 보여줘')
+        self.assertIsNone(self.h.agent._capstone_gateway_phase)
+        turn,request,notice=self.h.agent._capstone_scope_clarification
+        self.assertEqual(turn,self.h.agent._current_turn_id)
+        self.assertIn('어느 대상의 상태',notice)
+        self.assertIn('아직 조회하지 않았습니다',notice)
+        result=self.h.call()
+        self.assertEqual(result.action,'break')
+        self.assertEqual(result.final_response,notice)
+
+    def test_current_ambiguity_uses_exact_registry_when_native_strips_conditions(self):
+        raw=catalog();wire=copy.deepcopy(raw['tools'])
+        for tool in wire:
+            tool['type']='function'
+            for key in ('allOf','anyOf','oneOf','enum','not'):
+                tool['function']['parameters'].pop(key,None)
+        entry={'name':NAME,'parameters':raw['tools'][0]['function']['parameters']}
+        fake=SimpleNamespace(registry=SimpleNamespace(get_schema=lambda name:copy.deepcopy(entry)))
+        with patch.dict(sys.modules,{'tools.registry':fake}),patch.object(base,'catalog',return_value=wire):
+            base.GatewayEvidence.prepare(self,question='Docker 상태 보여줘',
+                at=datetime.now(base.H.EVIDENCE.KST).isoformat())
+        self.assertIsNone(self.h.agent._capstone_gateway_phase)
+        self.assertIn('어느 대상의 상태',self.h.agent._capstone_scope_clarification[2])
+
     def test_catalog_bound_service_receipts_precede_legacy_aliases_only_when_complete(self):
         question='[socadmin] A 서버 저장소 감시 서비스의 현재 상태와 마지막 실행 결과를 표로 알려줘.'
         self.prepare(question);plan=self.h.agent._capstone_gateway_phase['service_plan']

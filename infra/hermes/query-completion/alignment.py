@@ -582,7 +582,7 @@ def request_wrapper(original, query, harness):
             return result
         plan = harness.read_plan(request)
         reference=harness.card_reference(kw.get('original_user_message',''),request)
-        notice=(harness.CONTRACT.service_scope_notice(result.api_kwargs,request)
+        notice=(harness.CONTRACT.service_scope_notice(registered_service_catalog(agent,result.api_kwargs,harness),request)
                 if not calls and not reference and not harness.READ.wants_write(harness.normalized(request)) else None)
         agent._capstone_scope_clarification=(turn,request,notice)
         if notice:

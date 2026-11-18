@@ -1,1951 +1,533 @@
---- a/opt/hermes-data/plugins/groot-query-completion/read_contract.py
-+++ b/opt/hermes-data/plugins/groot-query-completion/read_contract.py
-@@ -237,6 +237,8 @@
-     if states and re.search(r'과거|어제|지난|최근|당시|이력|끊겼던|원인|분석|침해|위험|왜', text):
-         return None
-     if not features:
-+        if operational_object_request(text):
-+            return None
-         identity = identity_plan(text, states)
-         if identity:
-             return identity
-@@ -260,8 +262,27 @@
-             'needs_agent': dependent, 'limit': requested_limit(text), 'search': search, 'question': text}
- 
- 
-+def operational_object_request(text):
-+    """An explicit OS/container object is not a Wazuh agent identity.
-+
-+    Strip host qualifiers first: the host alias '서비스 서버' is a location,
-+    whereas '서버의 서비스' names an operational object. No live identity,
-+    registered target, service state or successful observation is inferred.
-+    """
-+    if re.search(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_.:-])',text):
-+        return True
-+    residual = without_hosts(text)
-+    return bool(re.search(
-+        r'(?<![A-Za-z0-9_.:-])[A-Za-z0-9@_.-]+\.(?:service|timer|socket|target)\b|'
-+        r'\b(?:systemd|docker|containers?|daemons?|services?|OS)\b|'
-+        r'서비스|시스템|운영\s*체제|도커|컨테이너|데몬|타이머|감시기',
-+        residual, re.I))
-+
-+
- def identity_plan(text, states):
-     """Current identity/state only; never reinterpret a diagnosis or a change."""
-+    if operational_object_request(text):
-+        return None
-     if re.search(r'과거|어제|지난|당시|이력|끊겼던', text):
-         return None
-     if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):
---- a/opt/capstone-ollama-trial/read_contract.py
-+++ b/opt/capstone-ollama-trial/read_contract.py
-@@ -237,6 +237,8 @@
-     if states and re.search(r'과거|어제|지난|최근|당시|이력|끊겼던|원인|분석|침해|위험|왜', text):
-         return None
-     if not features:
-+        if operational_object_request(text):
-+            return None
-         identity = identity_plan(text, states)
-         if identity:
-             return identity
-@@ -260,8 +262,27 @@
-             'needs_agent': dependent, 'limit': requested_limit(text), 'search': search, 'question': text}
- 
- 
-+def operational_object_request(text):
-+    """An explicit OS/container object is not a Wazuh agent identity.
-+
-+    Strip host qualifiers first: the host alias '서비스 서버' is a location,
-+    whereas '서버의 서비스' names an operational object. No live identity,
-+    registered target, service state or successful observation is inferred.
-+    """
-+    if re.search(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_.:-])',text):
-+        return True
-+    residual = without_hosts(text)
-+    return bool(re.search(
-+        r'(?<![A-Za-z0-9_.:-])[A-Za-z0-9@_.-]+\.(?:service|timer|socket|target)\b|'
-+        r'\b(?:systemd|docker|containers?|daemons?|services?|OS)\b|'
-+        r'서비스|시스템|운영\s*체제|도커|컨테이너|데몬|타이머|감시기',
-+        residual, re.I))
-+
-+
- def identity_plan(text, states):
-     """Current identity/state only; never reinterpret a diagnosis or a change."""
-+    if operational_object_request(text):
-+        return None
-     if re.search(r'과거|어제|지난|당시|이력|끊겼던', text):
-         return None
-     if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):
---- a/opt/capstone-management/read_contract.py
-+++ b/opt/capstone-management/read_contract.py
-@@ -237,6 +237,8 @@
-     if states and re.search(r'과거|어제|지난|최근|당시|이력|끊겼던|원인|분석|침해|위험|왜', text):
-         return None
-     if not features:
-+        if operational_object_request(text):
-+            return None
-         identity = identity_plan(text, states)
-         if identity:
-             return identity
-@@ -260,8 +262,27 @@
-             'needs_agent': dependent, 'limit': requested_limit(text), 'search': search, 'question': text}
- 
- 
-+def operational_object_request(text):
-+    """An explicit OS/container object is not a Wazuh agent identity.
-+
-+    Strip host qualifiers first: the host alias '서비스 서버' is a location,
-+    whereas '서버의 서비스' names an operational object. No live identity,
-+    registered target, service state or successful observation is inferred.
-+    """
-+    if re.search(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_.:-])',text):
-+        return True
-+    residual = without_hosts(text)
-+    return bool(re.search(
-+        r'(?<![A-Za-z0-9_.:-])[A-Za-z0-9@_.-]+\.(?:service|timer|socket|target)\b|'
-+        r'\b(?:systemd|docker|containers?|daemons?|services?|OS)\b|'
-+        r'서비스|시스템|운영\s*체제|도커|컨테이너|데몬|타이머|감시기',
-+        residual, re.I))
-+
-+
- def identity_plan(text, states):
-     """Current identity/state only; never reinterpret a diagnosis or a change."""
-+    if operational_object_request(text):
-+        return None
-     if re.search(r'과거|어제|지난|당시|이력|끊겼던', text):
-         return None
-     if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):
 --- a/opt/hermes-data/plugins/groot-query-completion/chat_contract.py
 +++ b/opt/hermes-data/plugins/groot-query-completion/chat_contract.py
-@@ -149,16 +149,7 @@
-     Original user text is always retained by adapters. Device token boundaries
-     keep FW distinct from WAF, and aliases do not manufacture an inline IPS.
-     """
--    # Native Mattermost messages carry a leading [username] display label.
--    # Ignore it for classification only, keeping literal device labels intact.
--    text = re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
--                  r'[A-Za-z0-9_.-]{1,64}\]\s+', '', text, count=1, flags=re.I)
--    # A single leading bot address is transport syntax, not a device/filter.
--    # Keep multiple addresses, quoted mentions and the original request intact;
--    # channel routing and protected actions still inspect the original text.
--    address = re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)', text, re.I)
--    if address and not text[address.end():].startswith('@'):
--        text = text[address.end():]
-+    text=query_body(text)
-     aliases = ((r'웹\s*방화벽|와프|모드시큐리티', 'WAF'),
-                (r'(?<![A-Za-z])(?:F/W|firewall|nftables|iptables)(?![A-Za-z])|방화벽', 'FW'),
-                (r'(?<![A-Za-z])IPS(?![A-Za-z])|수리카타', 'Suricata'),
-@@ -491,6 +482,29 @@
+@@ -636,7 +636,7 @@
  
  
- def _service_natural_period(question, at):
-+    window=_service_natural_window(question,at)
-+    return window['bounds'] if window is not None else None
-+
-+
-+def service_log_request(question):
-+    """Message-log intent, excluding words embedded in target/unit names."""
-+    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
-+                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
-+    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
-+                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
-+
-+
-+def query_body(text):
-+    """Remove inspected transport labels, preserving registered object names."""
-+    if not isinstance(text,str):return text
-+    text=re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
-+        r'[A-Za-z0-9_.-]{1,64}\]\s+','',text,count=1,flags=re.I)
-+    address=re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)',text,re.I)
-+    if address and not text[address.end():].startswith('@'):text=text[address.end():]
-+    return text
-+
-+
-+def _service_natural_window(question, at):
-     """One explicit local clock interval; never infer a missing date or rollover.
- 
-     The project clock is KST. Other zones, approximate/multiple windows and
-@@ -498,6 +512,17 @@
-     time arguments only, never service identity, dispatch or incident judgment.
-     """
-     if re.search(r'UTC|GMT|[+-]\d{2}:?\d{2}|(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|(?:Asia|America|Europe|Africa|Australia)/|쯤|대략',question,re.I):return None
-+    # An explicit bounded lookback is relative to this turn's precise KST
-+    # capture. Unknown, compound or qualified periods never get a default.
-+    lookbacks=list(re.finditer(r'(?:최근|지난)\s*(?P<count>[0-9]{1,5})\s*(?P<unit>시간|초|분|일)(?![A-Za-z0-9])',question))
-+    if lookbacks:
-+        if len(lookbacks)!=1:return None
-+        found=lookbacks[0];rest=question[:found.start()]+question[found.end():]
-+        if (re.search(r'오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|[0-9]\s*(?:시|분|초|시간|일)|[0-9]:[0-9]|[0-9]{4}-[0-9]{2}-[0-9]{2}',rest)
-+                or re.match(r'\s*(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|제외|인지|일까|일지|또는|혹은|이나)',question[found.end():])):return None
-+        seconds=int(found['count'])*{'초':1,'분':60,'시간':3600,'일':86400}[found['unit']]
-+        if not 1<=seconds<=86400:return None
-+        return {'bounds':(at-timedelta(seconds=seconds),at),'phrase':found[0]}
-     date=r'(?:\d{4}-\d{2}-\d{2}|\d{4}년\s*\d{1,2}월\s*\d{1,2}일|오늘|금일|어제)'
-     clock=r'(?:(?:오전|오후)\s*)?(?:\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?(?:\s*\d{1,2}초)?)'
-     pattern=(r'(?<![\dA-Za-z])(?P<date>'+date+r')\s*(?P<start>'+clock+r')\s*'
-@@ -535,59 +560,122 @@
-         start=instant(match['start'],match['date'])
-         meridiem=re.match(r'(오전|오후)',match['start'])
-         end=instant(match['end'],match['end_date'] or match['date'],meridiem[1] if meridiem and not match['end_date'] else '')
--        return (start,end)
-+        return {'bounds':(start,end),'phrase':match[0]}
-     except ValueError:return None
- 
- 
--def service_log_request(question):
--    """Message-log intent, excluding words embedded in target/unit names."""
--    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
--                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
--    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
--                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
--
--
--def service_history_plan(request, question, requested_at):
--    """Required reads for explicitly named units and unambiguous past periods.
--
--    Only registered metadata resolves units. No hardcoded aliases, prior assistant text,
--    inferred host IPs, dispatch, completion or incident decision is supplied.
--    Unknown/negative time expressions retain the ordinary investigation.
--    Explicit today/yesterday comparisons keep separate KST calendar windows.
--    """
--    name='mcp__system_diagnostics__get_system_diagnostics'
--    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-+def _service_name_remainder(text, names):
-+    """Remove only catalog-resolved names, preserving unknown request clauses."""
-+    for name in sorted(set(names),key=len,reverse=True):
-+        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+r'\s+'.join(map(re.escape,name.split()))+
-+            r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
-+    return text
-+
-+
-+def read_action_remainder(text):
-+    """Remove affirmative lookup verbs only; never erase objects or negation.
-+
-+    Callers retain their own closed object/condition grammar. This recognizes
-+    conversational spelling, not a decision, permission or request execution.
-+    """
-+    if not isinstance(text,str):return text
-+    return re.sub(r'(?<![A-Za-z0-9_])(?:'
-+        r'보여\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'알려\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'(?:조회|확인|정리)\s*(?:해\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)|부탁(?:해요|해|드려요|드립니다)?)|'
-+        r'봐\s*(?:주세요|줄래요|줄래|줘)|볼\s*(?:수\s*있을까|수\s*있나요|수\s*있니|래요|래)|'
-+        r'(?:조회|확인|정리)해줄\s*수\s*있(?:을까|나요|니)'
-+        r')(?![A-Za-z0-9_])',' ',text)
-+
-+
-+def _service_log_noun_pattern():
-+    """A log noun and its bounded case ending, not a temporal endpoint."""
-+    particle=(r'(?:(?:에서|에게서|으로|에|로)(?:부터|까지)?(?:는|은|도|만)?|'
-+              r'(?:는|은|도|만|을|를|이|가|의|와|과|랑|이랑|하고|까지|부터)(?:도|만)?)')
-+    return r'로그(?:들)?(?:'+particle+r')?(?=$|[\s,.!?？])'
-+
-+
-+def diagnostic_journal_catalog(schema):
-+    """Validate advertised unit history and fixed-host journal capabilities.
-+
-+    Host aggregates are live journal reads only, never an archived unit index.
-+    An absent extension preserves older unit-only catalogs unchanged.
-+    """
-+    if not isinstance(schema,dict):return None
-+    prop=schema.get('properties',{}).get('target',{})
-+    if not isinstance(prop,dict) or not isinstance(prop.get('enum'),list):return None
-+    enums=prop['enum']
-+    if any(not isinstance(x,str) for x in enums) or len(set(enums))!=len(enums):return None
-+    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
-+               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
-+    if (len(histories)!=1 or not isinstance(histories[0],list)
-+            or any(not isinstance(x,str) for x in histories[0])
-+            or len(set(histories[0]))!=len(histories[0])):return None
-+    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
-+    units=dict(pairs)
-+    aggregates=prop.get('x-capstone-host-journal-targets',{})
-+    if not isinstance(aggregates,dict):return None
-+    for target,item in aggregates.items():
-+        if (target not in {'a:systemd','b:systemd','c:systemd'} or not isinstance(item,dict)
-+                or set(item)!={'host','scope','labels'} or item['host']!=target[0]
-+                or item['scope']!='host_system' or not isinstance(item['labels'],list)
-+                or not 1<=len(item['labels'])<=8 or any(not isinstance(label,str)
-+                    or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]{0,79}',label)
-+                    for label in item['labels'])):return None
-+    if (not units or len(units)!=len(pairs) or set(units)&set(aggregates)
-+            or set(units)|set(aggregates)!=set(histories[0])
-+            or not (set(units)|set(aggregates))<=set(enums)):return None
-+    if aggregates:
-+        indexes=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum')
-+            for x in schema.get('allOf',[]) if isinstance(x,dict) and x.get('if')=={
-+                'allOf':[{'required':['since_kst']},{'not':{'required':['view']}}]}]
-+        if (len(indexes)!=1 or not isinstance(indexes[0],list)
-+                or any(not isinstance(x,str) for x in indexes[0])
-+                or len(set(indexes[0]))!=len(indexes[0]) or set(indexes[0])!=set(units)):return None
-+    return units,aggregates
-+
-+
-+def _service_lookup_intent(question):
-+    """Recognize an actual log/history lookup; never a quoted/negative task."""
-+    if not isinstance(question,str) or len(question)>6000:return None
+ def _service_lookup_intent(question):
+-    """Recognize an actual log/history lookup; never a quoted/negative task."""
++    """Recognize current state or history; never a quoted/negative task."""
+     if not isinstance(question,str) or len(question)>6000:return None
      if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
      if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
-     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
--    wants_journal=service_log_request(question)
--    wants_history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
--    cause_inquiry=bool(wants_history and re.search(r'원인|왜|영향|조사',question))
--    if not wants_history and not wants_journal:return None
--    at=_diagnostic_instant(requested_at)
--    if at is None:return None
-+    execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
-+    journal=service_log_request(question) or execution
-+    history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
-+    if not history and not journal:return None
-+    return {'journal':journal,'history':history,'execution':execution,
-+        'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
-+
-+
-+def service_target_selection(request, question):
-+    """Resolve only advertised diagnostic names; preserve actual ambiguity."""
-+    name='mcp__system_diagnostics__get_system_diagnostics'
-+    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-     tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
-     if len(tools)!=1:return None
-     schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
--    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
--               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
--    if len(histories)!=1 or not isinstance(histories[0],list) or not isinstance(prop.get('enum'),list):return None
--    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
--    mapping=dict(pairs)
--    if not mapping or len(mapping)!=len(pairs) or set(mapping)!=set(histories[0]):return None
--    mapping={k:v for k,v in mapping.items() if k in prop['enum']}
-+    catalog=diagnostic_journal_catalog(schema)
-+    if catalog is None:return None
-+    unit_mapping,aggregates=catalog
-+    mapping=unit_mapping|{t:None for t in aggregates}
-     explicit=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])',question))
-     units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
-+    explicit_hosts=re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([A-Z])\s*(?:서버|호스트|server\b|host\b)',question,re.I)
-+    explicit_hosts+=re.findall(r'^\s*([A-Z])\s+(?=\S)',question)
-+    if any(host.lower() not in 'abc' for host in explicit_hosts):return None
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z])([ABC])\s*(?:서버|호스트|server\b|host\b)',question,re.I)}
-     # A bare uppercase host label is explicit too ("B 관리 서비스"). Do not
-     # infer it from IPs, embedded names, a lowercase English article or replies.
-     hosts.update(re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([ABC])(?=\s)',question))
-     hosts={h.lower() for h in hosts}
-     if len(hosts)>1 or explicit-set(mapping):return None
--    targets=set(explicit)
-+    targets=set(explicit);ambiguous=set()
-     for unit in units:
-         matches=[k for k,v in mapping.items() if v==unit and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0])
-     # Short service labels are names from the actual catalog, not a default
-     # host or a remembered answer. A shared label (Vector, Docker, etc.) needs
-@@ -596,13 +684,15 @@
-     for label in {k.split(':',1)[1] for k in mapping}:
-         if not re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',question,re.I):continue
-         matches=[k for k in mapping if k.split(':',1)[1]==label and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
-     labels=prop.get('x-capstone-service-labels',{})
-     if (not isinstance(labels,dict) or any(k not in prop['enum'] or not isinstance(v,list)
-             or not 1<=len(v)<=8 or any(not isinstance(label,str) or not 1<=len(label)<=80
-                 or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]*',label)
-                 for label in v) for k,v in labels.items())):return None
-+    labels=labels|{t:item['labels'] for t,item in aggregates.items()}
-     # Only registered labels resolve a service. Prefer the longer overlapping
-     # name; a genuine shared name still requires an explicit unambiguous host.
-     hits=[]
-@@ -613,22 +703,114 @@
-     for start,end,label in hits:
-         if any(a<=start and end<=b and b-a>end-start for a,b,_ in hits):continue
-         matches=[k for k,v in labels.items() if k in mapping and label in v and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
--    if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    if not (targets or ambiguous) or len(targets)>4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    return {'name':name,'schema':schema,'property':prop,'unit_mapping':unit_mapping,'aggregates':aggregates,
-+        'mapping':mapping,'targets':targets,'aliases':aliases,'ambiguous':ambiguous}
-+
-+
-+def service_requested_journal_scope(question, explicit_journal):
-+    """Keep an explicit message request distinct from a filtered error index.
-+
-+    A request for error logs is still filtered. Error/cause words elsewhere
-+    in a raw-log request do not silently narrow the source to candidates.
-+    """
-+    mixed=re.search(r'(?:전체|모든|정상)\s*로그|\ball\s+(?:logs?|journal)\b|필터\s*없이',question,re.I)
-+    filtered=re.search(r'(?:오류|에러|실패)\s*(?:후보\s*)?로그|'
-+        r'(?<![A-Za-z0-9_.:-])(?:errors?|failure)\s+(?:logs?|journal)\b',question,re.I)
-+    return 'all' if explicit_journal and (mixed or not filtered) else 'errors'
-+
-+
-+def service_required_read_selection(options, schemas):
-+    """Select indexes of exact catalog-valid reads, without generating inputs.
-+
-+    The caller supplies the current read-only catalog and unmet requirements.
-+    This returns schemas only; it never dispatches or repairs an argument.
-+    """
-+    from jsonschema import Draft202012Validator
-+    if not isinstance(options,list) or not 1<=len(options)<=4 or not isinstance(schemas,dict):
-+        raise ValueError('service_required_read_scope')
-+    seen=set()
-+    for option in options:
-+        if (not isinstance(option,dict) or set(option)!={'tool','arguments'}
-+                or not isinstance(option['arguments'],dict) or option['tool'] not in schemas
-+                or not Draft202012Validator(schemas[option['tool']]).is_valid(option['arguments'])):
-+            raise ValueError('service_required_read_catalog_mismatch')
-+        identity=json.dumps(option,sort_keys=True,ensure_ascii=False,allow_nan=False)
-+        if identity in seen:raise ValueError('service_required_read_duplicate')
-+        seen.add(identity)
-+    return {'type':'object','additionalProperties':False,'required':['indexes'],
-+        'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
-+            'uniqueItems':True,'items':{'type':'integer','enum':list(range(len(options)))}}}}
-+
-+
-+def service_lookup_note(context):
-+    """Explain a registered initial sample without inventing execution times."""
-+    minutes=context.get('initial_history_window_minutes')
-+    if (context.get('lookup_only') is not True
-+            or context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
-+            or type(minutes) is not int or not 1<=minutes<=1440):return ''
-+    return ('\n\n기간을 지정하지 않아 도구에 등록된 최근 '+str(minutes)+'분 표본을 먼저 조회했습니다. '
-+            '수집 관측 시각은 실제 실행 시각과 다릅니다. 이 구간 밖의 과거 실행·실패는 미확인입니다.')
-+
-+
-+def service_lookup_text(text, context):
-+    """Keep the existing terminal control record terminal for public filtering."""
-+    note=service_lookup_note(context)
-+    return note.strip()+'\n\n'+text if note else text
-+
-+
-+def service_history_plan(request, question, requested_at):
-+    """Build required reads from the same catalog-bound target resolution."""
-+    question=query_body(question)
-+    intent=_service_lookup_intent(question)
-+    if intent is None:return None
-+    selected=service_target_selection(request,question)
-+    if not selected or selected['ambiguous']:return None
-+    at=_diagnostic_instant(requested_at)
-+    if at is None:return None
-+    name=selected['name'];schema=selected['schema'];prop=selected['property']
-+    unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
-+    mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
-+    wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
-+    journal_scope=service_requested_journal_scope(question,intent['journal'])
-+    # The host target has no archived unit index. Its real bounded system
-+    # journal supplies historical log evidence instead of a current snapshot.
-+    if targets & set(aggregates):wants_journal=True
+@@ -644,7 +644,9 @@
+     execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
+     journal=service_log_request(question) or execution
+     history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+-    if not history and not journal:return None
++    if not history and not journal:
++        if not re.search(r'현재|지금|상태|\b(?:current|now|state|status)\b',question,re.I):return None
++        return {'journal':False,'history':False,'execution':False,'cause':False,'current_only':True}
+     return {'journal':journal,'history':history,'execution':execution,
+         'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
+ 
+@@ -763,7 +765,7 @@
+ 
+ 
+ def service_history_plan(request, question, requested_at):
+-    """Build required reads from the same catalog-bound target resolution."""
++    """Build current/history reads from the same catalog-bound resolution."""
+     question=query_body(question)
+     intent=_service_lookup_intent(question)
+     if intent is None:return None
+@@ -775,15 +777,22 @@
+     unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
+     mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
+     wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
++    current_only=bool(intent.get('current_only'))
+     journal_scope=service_requested_journal_scope(question,intent['journal'])
+     # The host target has no archived unit index. Its real bounded system
+     # journal supplies historical log evidence instead of a current snapshot.
+-    if targets & set(aggregates):wants_journal=True
++    if targets & set(aggregates) and not current_only:wants_journal=True
      def without_targets(text):
--        for label in sorted(set(targets)|{mapping[t] for t in targets}|aliases,key=len,reverse=True):
--            text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
--        return text
-+        return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
+         return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
      # Resolve names before interpreting temporal words: e.g. 에이전트
      # contains 이전, which is not a request for an earlier time window.
--    period_question=without_targets(question)
-+    period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
+     period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
++    # A current-only read has no historical window. Do not discard temporal,
++    # comparison or resampling qualifiers just because "state" also appears.
++    if current_only and re.search(r'오늘|금일|최근|지난|어제|그제|내일|아까|이전|과거|당시|'
++            r'부터|까지|이후|사이|비교|대조|반복|연속|재조회|다시|'
++            r'두\s*번|세\s*번|여러\s*번|\d+\s*(?:초|분|시간|일|번|회)|'
++            r'\d{1,2}:\d{2}|\d{4}[-/.]\d',period_question):return None
      bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',period_question)
-+    natural=_service_natural_window(period_question,at) if not bounds else None
+     natural=_service_natural_window(period_question,at) if not bounds else None
      periods=[];days=set();initial_window=False
-+    # Bare "recent" and the last execution result request a bounded sample,
-+    # not a guessed incident date. Use only the actual catalog's valid default;
-+    # explicit/compound/unsupported periods never fall back to that sample.
-+    if not bounds and natural is None and (intent['execution'] or re.search(r'최근',period_question)):
-+        remaining=re.sub(r'최근','',period_question,count=1)
-+        default=schema.get('properties',{}).get('lookback_minutes',{})
-+        minutes=default.get('default')
-+        bare=not re.search(r'최근|지난|오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|'
-+                r'\d|쯤|대략|또는|혹은|UTC|GMT|[+-]\d{2}:?\d{2}|'
-+                r'(?:한|두|세|네|다섯|여섯|몇|여러|반)\s*(?:초|분|시간|일|주|달|개월|년)|'
-+                r'하루|이틀|사흘|나흘|일주일|한달|'
-+                r'(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|'
-+                r'(?:Asia|America|Europe|Africa|Australia)/',remaining,re.I)
-+        if bare:
-+            if not (default.get('type')=='integer' and type(minutes) is int
-+                and type(default.get('minimum',1)) is int and type(default.get('maximum',1440)) is int
-+                and max(1,default.get('minimum',1))<=minutes<=min(1440,default.get('maximum',1440))):return None
-+            natural={'bounds':(at-timedelta(minutes=minutes),at),
-+                'phrase':'등록된 기본 '+str(minutes)+'분의 최근 표본'}
-+            initial_window=True
-     if len(bounds)==2:
-         periods=[tuple(map(_diagnostic_instant,bounds))]
--    elif not bounds and (period:=_service_natural_period(period_question,at)) is not None:
--        periods=[period]
-+    elif not bounds and natural is not None:
-+        periods=[natural['bounds']]
-     elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',period_question):
-         days=set(re.findall(r'오늘|금일|어제',period_question))
-         midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)
-@@ -655,26 +837,27 @@
+@@ -829,9 +838,9 @@
+             initial_window=True
+             periods.append((at-(timedelta(hours=24) if cause_inquiry else timedelta(minutes=15)),at))
+     else:return None
+-    if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
++    if (not current_only and not periods) or any(not start or not end or not 0<(end-start).total_seconds()<=86400
+             or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
+-    current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
++    current=current_only or bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+     if wants_journal and not wants_history and not re.search(r'상태|state|status',question,re.I):current=False
+     # A named today's operating state also asks for a current observation;
      # the separate today's history is still required, never replaced by it.
-     current=current or bool(re.search(r'(?:오늘|금일)(?:은|의)?\s*(?:(?:관제|처리|서비스|운영)\s*)?상태',question))
-     companions=prop.get('x-capstone-current-companions',{})
--    if (not isinstance(companions,dict) or any(k not in mapping or not isinstance(v,list)
-+    if (not isinstance(companions,dict) or any(k not in unit_mapping or not isinstance(v,list)
-             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
-                 or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
-     options=[]
--    journal_supported='journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+    journal_supported=('journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+        and (journal_scope=='errors' or 'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[])))
-     # A cause inquiry already requesting the live journal does not also need
-     # the cached index of those same error candidates as a mandatory read.
-     # Keep explicit index/metadata requests and metadata-only lookups intact;
-     # the model may still request the index later if it adds needed evidence.
--    live_cause_history=(cause_inquiry and wants_journal and journal_supported
-+    live_cause_history=((cause_inquiry or intent['execution']) and wants_journal and journal_supported
-         and not re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I))
-     for target in sorted(targets):
-         if current:options.append({'tool':name,'arguments':{'target':target}})
--        if wants_history and not live_cause_history:
-+        if wants_history and not live_cause_history and target not in aggregates:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
-                            for start,end in periods)
-         if wants_journal and journal_supported:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),
-                 'until_kst':end.isoformat(),'view':'journal','limit':50,
--                **({} if wants_history else {'journal_scope':'all'})}} for start,end in periods)
-+                **({} if journal_scope=='errors' else {'journal_scope':'all'})}} for start,end in periods)
-         elif wants_journal and not wants_history and not current:
-             # Old catalogs can still report the available target, but the
-             # unavailable journal capability below always vetoes completion.
-@@ -682,6 +865,8 @@
-     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
-     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
-     unavailable=['journal_excerpt'] if wants_journal and not journal_supported else []
-+    if targets & set(aggregates) and re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I):
-+        unavailable.append('host_system_archived_metadata')
-     if read_contract().companion_block_request(question):
-         block_name='mcp__resp__list_blocks'
-         registered=[t.get('function',{}).get('parameters',{}) for t in request['tools']
-@@ -690,7 +875,7 @@
-                 and registered[0].get('properties')=={} and not registered[0].get('required')):
-             options.append({'tool':block_name,'arguments':{}})
-         else:unavailable.append('current_block_list')
--    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-+    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행(?!\s*(?:결과|기록|상태|이력|시각|시간|중|여부))|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-     only_service=not re.search(outside,without_targets(read_contract().without_prohibitions(question)),re.I)
-     # Preserve the full question and every receipt. Only a separately matched
-     # inventory clause is removed for scope classification, never for inquiry.
-@@ -700,14 +885,20 @@
+@@ -884,11 +893,11 @@
+         residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
                            if read_contract().block_list_plan(part.strip()) is None)
      compact_scope=not re.search(outside,without_targets(read_contract().without_prohibitions(residual)),re.I)
-     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
-+            'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
-+            'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
+-    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
++    value={'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+             'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
+             'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
              'requested_at_kst':requested_at,
-             'compact_scope':compact_scope,'initial_window':initial_window,
+-            'compact_scope':compact_scope,'initial_window':initial_window,
++            'compact_scope':compact_scope,'initial_window':initial_window,'current_only':current_only,
              'initial_history_window_minutes':int((periods[0][1]-periods[0][0]).total_seconds()/60) if initial_window else None,
              'current_companions':related,
-+            'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
-+                r'(?:오류|에러|실패)\s*(?:후보\s*)?(?:로그|표본)(?:들)?만|\bonly\s+(?:error|failure)\s+logs?\b|\b(?:error|failure)\s+logs?\s+only\b',question,re.I)),
-+                'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
-+                'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
+             'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
+@@ -896,6 +905,9 @@
+                 'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
+                 'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
              'unavailable_capabilities':unavailable}
++    # A factual current lookup cannot substitute for unknown clauses such as
++    # cause, impact, effective rules, health judgment or a protected change.
++    return value if not current_only or service_lookup_scope(value,question) else None
  
  
--def service_history_state(plan, receipts, now=None):
-+def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
-     """Distinguish pending attempts, failed/malformed reads and actual coverage.
- 
-     Receipts come from authenticated in-process MCP calls, not chat text. A
-@@ -726,7 +917,8 @@
-                 state['incomplete'].append('current_block_list:unavailable')
-             continue
-         args=required['arguments'];target=args['target'];past='since_kst' in args
--        runtime=target in plan.get('current_companions',[])
-+        runtime=(target in plan.get('current_companions',[])
-+                 or not past and target in plan.get('aggregate_targets',{}))
-         journal=args.get('view')=='journal'
-         matches=[]
-         for row in receipts:
-@@ -779,6 +971,27 @@
-             and data.get('lookback_scope')=='latest_snapshot_only_not_requested_history')
-         else:valid=data.get('kind')!='journal_history' and data.get('status')=='observed' and isinstance(data.get('properties'),dict)
-         if not valid:state['incomplete'].append(label+':scope_mismatch')
-+    coverage=plan.get('cause_source_coverage',{})
-+    if include_empty_source and not state['incomplete'] and coverage.get('required') is True:
-+        expanded=[]
-+        for required in plan['requirements']:
-+            args=required.get('arguments',{})
-+            if required.get('tool')!='mcp__system_diagnostics__get_system_diagnostics' or args.get('view')!='journal' or args.get('journal_scope','errors')!='errors':continue
-+            matching=[r for r in receipts if r.get('tool')==required['tool']
-+                and r.get('arguments',{}).get('target')==args['target'] and r.get('arguments',{}).get('view')=='journal'
-+                and r.get('arguments',{}).get('journal_scope','errors')=='errors'
-+                and all(_diagnostic_instant(r.get('arguments',{}).get(k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))]
-+            # All base reads above have already passed freshness/scope checks.
-+            if not matching or matching[-1]['data'].get('returned_entries')!=0:continue
-+            limit=coverage.get('limit')
-+            if coverage.get('all_supported') is not True or type(limit) is not int or not 1<=limit<=50:
-+                state['incomplete'].append(args['target']+':unfiltered_journal:tool_capability_unavailable');continue
-+            choice={'tool':required['tool'],'arguments':{**args,'journal_scope':'all','limit':limit}}
-+            if choice not in expanded:expanded.append(choice)
-+        if expanded:
-+            followup=service_history_state({**plan,'requirements':expanded},receipts,now,include_empty_source=False)
-+            state['pending']+=followup['pending']
-+            state['incomplete']+=['unfiltered_source:'+x for x in followup['incomplete']]
-     return state
- 
- 
-@@ -841,6 +1054,7 @@
-     Registration, periods and successful fresh receipts are checked separately.
-     """
-     if not plan or not plan.get('compact_scope') or plan.get('unavailable_capabilities'):return False
-+    question=query_body(question)
-     parts=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
-     kept=[]
-     for part in parts:
-@@ -849,19 +1063,22 @@
-         if re.fullmatch(r'(?:설정\s*)?(?:변경|수정|재시작|재가동|실행)(?:은|는|을|를)?\s*(?:하지\s*마(?:세요)?|금지)[.!?。]*',part):continue
-         kept.append(part)
-     text=' '.join(kept)
--    if not re.search(r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)',text):return False
-+    if read_action_remainder(text)==text:return False
-     # Bare A/B/C beside an exact unit must agree with the registered host too.
-+    text=read_action_remainder(text)
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z0-9_:])([ABC])(?:\s*(?:서버|호스트))?(?=\s|의|$)',text,re.I)}
-     if hosts and (len(hosts)!=1 or any(t[0] not in hosts for t in plan['units'])):return False
-     if re.search(r'관제|처리|대기',text) and 'b:management-pipeline' not in plan.get('current_companions',[]):return False
--    for name in sorted(set(plan['units'])|set(plan['units'].values()),key=len,reverse=True):
--        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(name)+r'(?![A-Za-z0-9_.:-])',' ',text)
-+    text=_service_name_remainder(text,set(plan['units'])|{x for x in plan['units'].values() if x is not None}
-+        |set(plan.get('scope_labels',[])))
-+    if phrase:=plan.get('scope_period_phrase'):text=text.replace(phrase,' ',1)
-     text=re.sub(r'(?<![A-Za-z0-9_:])[ABC](?:\s*(?:서버|호스트))?(?=\s|의|$)',' ',text,flags=re.I)
-     text=re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?',' ',text)
--    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|'
-+    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|예전|'
-+           r'최근|마지막|직전|실행|기동|종료|결과|구분\s*해\s*(?:줘|주세요)|알려\s*(?:줘|주세요)|'
-            r'원문|로그|logs?|journal(?:ctl)?|raw|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
-            r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
--           r'부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|도|만|에|[\s,.!?。~–—-]')
-+           r'간단히|간단하게|짧게|부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|이랑|랑|하고|도|만|에|[\s,.!?。~–—-]')
-     return re.fullmatch(r'(?:'+token+r')+',text) is not None
- 
- 
-@@ -954,6 +1171,7 @@
+ def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
+@@ -1167,7 +1179,8 @@
+     failed=[r for r in receipts if r.get('is_error') is True]
+     receipts=[r for r in receipts if r.get('is_error') is False]
+     value={'question':question,'requested_at_kst':requested_at,'background':background,
+-           'history_window_origin':'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period',
++           'history_window_origin':('current_observation_only' if plan.get('current_only') else
++               'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period'),
             'initial_history_window_minutes':plan['initial_history_window_minutes'],
             'requested_service_scope':{
                 'units':copy.deepcopy(plan['units']),
-+               'aggregate_targets':copy.deepcopy(plan.get('aggregate_targets',{})),
-                'history_windows':[{'target':r['arguments']['target'],
-                    'since_kst':r['arguments']['since_kst'],'until_kst':r['arguments']['until_kst']}
-                    for r in plan['requirements'] if 'since_kst' in r['arguments']],
+@@ -2971,3 +2984,20 @@
+             if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
+             issues.add('diagnostic_snapshot_is_not_functional_health')
+     return sorted(issues)
++
++
++def service_scope_notice(request, question):
++    """Ask once for an ambiguous registered target before any inference/read."""
++    question=query_body(question)
++    intent=_service_lookup_intent(question)
++    if intent is None:return None
++    if read_contract().wants_write(question):return None
++    # An explicit all-host request is not a missing-host question. Do not
++    # confuse all logs for one service with all hosts.
++    if re.search(r'(?:모든|전체|각)\s*(?:호스트|서버)|\ball\s+(?:hosts?|servers?)\b',question,re.I):return None
++    selected=service_target_selection(request,question)
++    if not selected or not selected['ambiguous']:return None
++    choices=' · '.join('`'+target+'`' for target in sorted(selected['ambiguous']))
++    subject='상태' if intent.get('current_only') else '로그·이력'
++    return '어느 대상의 '+subject+'를 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
++
 --- a/opt/capstone-ollama-trial/chat_contract.py
 +++ b/opt/capstone-ollama-trial/chat_contract.py
-@@ -149,16 +149,7 @@
-     Original user text is always retained by adapters. Device token boundaries
-     keep FW distinct from WAF, and aliases do not manufacture an inline IPS.
-     """
--    # Native Mattermost messages carry a leading [username] display label.
--    # Ignore it for classification only, keeping literal device labels intact.
--    text = re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
--                  r'[A-Za-z0-9_.-]{1,64}\]\s+', '', text, count=1, flags=re.I)
--    # A single leading bot address is transport syntax, not a device/filter.
--    # Keep multiple addresses, quoted mentions and the original request intact;
--    # channel routing and protected actions still inspect the original text.
--    address = re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)', text, re.I)
--    if address and not text[address.end():].startswith('@'):
--        text = text[address.end():]
-+    text=query_body(text)
-     aliases = ((r'웹\s*방화벽|와프|모드시큐리티', 'WAF'),
-                (r'(?<![A-Za-z])(?:F/W|firewall|nftables|iptables)(?![A-Za-z])|방화벽', 'FW'),
-                (r'(?<![A-Za-z])IPS(?![A-Za-z])|수리카타', 'Suricata'),
-@@ -491,6 +482,29 @@
+@@ -636,7 +636,7 @@
  
  
- def _service_natural_period(question, at):
-+    window=_service_natural_window(question,at)
-+    return window['bounds'] if window is not None else None
-+
-+
-+def service_log_request(question):
-+    """Message-log intent, excluding words embedded in target/unit names."""
-+    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
-+                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
-+    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
-+                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
-+
-+
-+def query_body(text):
-+    """Remove inspected transport labels, preserving registered object names."""
-+    if not isinstance(text,str):return text
-+    text=re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
-+        r'[A-Za-z0-9_.-]{1,64}\]\s+','',text,count=1,flags=re.I)
-+    address=re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)',text,re.I)
-+    if address and not text[address.end():].startswith('@'):text=text[address.end():]
-+    return text
-+
-+
-+def _service_natural_window(question, at):
-     """One explicit local clock interval; never infer a missing date or rollover.
- 
-     The project clock is KST. Other zones, approximate/multiple windows and
-@@ -498,6 +512,17 @@
-     time arguments only, never service identity, dispatch or incident judgment.
-     """
-     if re.search(r'UTC|GMT|[+-]\d{2}:?\d{2}|(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|(?:Asia|America|Europe|Africa|Australia)/|쯤|대략',question,re.I):return None
-+    # An explicit bounded lookback is relative to this turn's precise KST
-+    # capture. Unknown, compound or qualified periods never get a default.
-+    lookbacks=list(re.finditer(r'(?:최근|지난)\s*(?P<count>[0-9]{1,5})\s*(?P<unit>시간|초|분|일)(?![A-Za-z0-9])',question))
-+    if lookbacks:
-+        if len(lookbacks)!=1:return None
-+        found=lookbacks[0];rest=question[:found.start()]+question[found.end():]
-+        if (re.search(r'오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|[0-9]\s*(?:시|분|초|시간|일)|[0-9]:[0-9]|[0-9]{4}-[0-9]{2}-[0-9]{2}',rest)
-+                or re.match(r'\s*(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|제외|인지|일까|일지|또는|혹은|이나)',question[found.end():])):return None
-+        seconds=int(found['count'])*{'초':1,'분':60,'시간':3600,'일':86400}[found['unit']]
-+        if not 1<=seconds<=86400:return None
-+        return {'bounds':(at-timedelta(seconds=seconds),at),'phrase':found[0]}
-     date=r'(?:\d{4}-\d{2}-\d{2}|\d{4}년\s*\d{1,2}월\s*\d{1,2}일|오늘|금일|어제)'
-     clock=r'(?:(?:오전|오후)\s*)?(?:\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?(?:\s*\d{1,2}초)?)'
-     pattern=(r'(?<![\dA-Za-z])(?P<date>'+date+r')\s*(?P<start>'+clock+r')\s*'
-@@ -535,59 +560,122 @@
-         start=instant(match['start'],match['date'])
-         meridiem=re.match(r'(오전|오후)',match['start'])
-         end=instant(match['end'],match['end_date'] or match['date'],meridiem[1] if meridiem and not match['end_date'] else '')
--        return (start,end)
-+        return {'bounds':(start,end),'phrase':match[0]}
-     except ValueError:return None
- 
- 
--def service_log_request(question):
--    """Message-log intent, excluding words embedded in target/unit names."""
--    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
--                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
--    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
--                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
--
--
--def service_history_plan(request, question, requested_at):
--    """Required reads for explicitly named units and unambiguous past periods.
--
--    Only registered metadata resolves units. No hardcoded aliases, prior assistant text,
--    inferred host IPs, dispatch, completion or incident decision is supplied.
--    Unknown/negative time expressions retain the ordinary investigation.
--    Explicit today/yesterday comparisons keep separate KST calendar windows.
--    """
--    name='mcp__system_diagnostics__get_system_diagnostics'
--    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-+def _service_name_remainder(text, names):
-+    """Remove only catalog-resolved names, preserving unknown request clauses."""
-+    for name in sorted(set(names),key=len,reverse=True):
-+        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+r'\s+'.join(map(re.escape,name.split()))+
-+            r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
-+    return text
-+
-+
-+def read_action_remainder(text):
-+    """Remove affirmative lookup verbs only; never erase objects or negation.
-+
-+    Callers retain their own closed object/condition grammar. This recognizes
-+    conversational spelling, not a decision, permission or request execution.
-+    """
-+    if not isinstance(text,str):return text
-+    return re.sub(r'(?<![A-Za-z0-9_])(?:'
-+        r'보여\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'알려\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'(?:조회|확인|정리)\s*(?:해\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)|부탁(?:해요|해|드려요|드립니다)?)|'
-+        r'봐\s*(?:주세요|줄래요|줄래|줘)|볼\s*(?:수\s*있을까|수\s*있나요|수\s*있니|래요|래)|'
-+        r'(?:조회|확인|정리)해줄\s*수\s*있(?:을까|나요|니)'
-+        r')(?![A-Za-z0-9_])',' ',text)
-+
-+
-+def _service_log_noun_pattern():
-+    """A log noun and its bounded case ending, not a temporal endpoint."""
-+    particle=(r'(?:(?:에서|에게서|으로|에|로)(?:부터|까지)?(?:는|은|도|만)?|'
-+              r'(?:는|은|도|만|을|를|이|가|의|와|과|랑|이랑|하고|까지|부터)(?:도|만)?)')
-+    return r'로그(?:들)?(?:'+particle+r')?(?=$|[\s,.!?？])'
-+
-+
-+def diagnostic_journal_catalog(schema):
-+    """Validate advertised unit history and fixed-host journal capabilities.
-+
-+    Host aggregates are live journal reads only, never an archived unit index.
-+    An absent extension preserves older unit-only catalogs unchanged.
-+    """
-+    if not isinstance(schema,dict):return None
-+    prop=schema.get('properties',{}).get('target',{})
-+    if not isinstance(prop,dict) or not isinstance(prop.get('enum'),list):return None
-+    enums=prop['enum']
-+    if any(not isinstance(x,str) for x in enums) or len(set(enums))!=len(enums):return None
-+    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
-+               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
-+    if (len(histories)!=1 or not isinstance(histories[0],list)
-+            or any(not isinstance(x,str) for x in histories[0])
-+            or len(set(histories[0]))!=len(histories[0])):return None
-+    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
-+    units=dict(pairs)
-+    aggregates=prop.get('x-capstone-host-journal-targets',{})
-+    if not isinstance(aggregates,dict):return None
-+    for target,item in aggregates.items():
-+        if (target not in {'a:systemd','b:systemd','c:systemd'} or not isinstance(item,dict)
-+                or set(item)!={'host','scope','labels'} or item['host']!=target[0]
-+                or item['scope']!='host_system' or not isinstance(item['labels'],list)
-+                or not 1<=len(item['labels'])<=8 or any(not isinstance(label,str)
-+                    or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]{0,79}',label)
-+                    for label in item['labels'])):return None
-+    if (not units or len(units)!=len(pairs) or set(units)&set(aggregates)
-+            or set(units)|set(aggregates)!=set(histories[0])
-+            or not (set(units)|set(aggregates))<=set(enums)):return None
-+    if aggregates:
-+        indexes=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum')
-+            for x in schema.get('allOf',[]) if isinstance(x,dict) and x.get('if')=={
-+                'allOf':[{'required':['since_kst']},{'not':{'required':['view']}}]}]
-+        if (len(indexes)!=1 or not isinstance(indexes[0],list)
-+                or any(not isinstance(x,str) for x in indexes[0])
-+                or len(set(indexes[0]))!=len(indexes[0]) or set(indexes[0])!=set(units)):return None
-+    return units,aggregates
-+
-+
-+def _service_lookup_intent(question):
-+    """Recognize an actual log/history lookup; never a quoted/negative task."""
-+    if not isinstance(question,str) or len(question)>6000:return None
+ def _service_lookup_intent(question):
+-    """Recognize an actual log/history lookup; never a quoted/negative task."""
++    """Recognize current state or history; never a quoted/negative task."""
+     if not isinstance(question,str) or len(question)>6000:return None
      if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
      if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
-     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
--    wants_journal=service_log_request(question)
--    wants_history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
--    cause_inquiry=bool(wants_history and re.search(r'원인|왜|영향|조사',question))
--    if not wants_history and not wants_journal:return None
--    at=_diagnostic_instant(requested_at)
--    if at is None:return None
-+    execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
-+    journal=service_log_request(question) or execution
-+    history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
-+    if not history and not journal:return None
-+    return {'journal':journal,'history':history,'execution':execution,
-+        'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
-+
-+
-+def service_target_selection(request, question):
-+    """Resolve only advertised diagnostic names; preserve actual ambiguity."""
-+    name='mcp__system_diagnostics__get_system_diagnostics'
-+    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-     tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
-     if len(tools)!=1:return None
-     schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
--    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
--               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
--    if len(histories)!=1 or not isinstance(histories[0],list) or not isinstance(prop.get('enum'),list):return None
--    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
--    mapping=dict(pairs)
--    if not mapping or len(mapping)!=len(pairs) or set(mapping)!=set(histories[0]):return None
--    mapping={k:v for k,v in mapping.items() if k in prop['enum']}
-+    catalog=diagnostic_journal_catalog(schema)
-+    if catalog is None:return None
-+    unit_mapping,aggregates=catalog
-+    mapping=unit_mapping|{t:None for t in aggregates}
-     explicit=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])',question))
-     units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
-+    explicit_hosts=re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([A-Z])\s*(?:서버|호스트|server\b|host\b)',question,re.I)
-+    explicit_hosts+=re.findall(r'^\s*([A-Z])\s+(?=\S)',question)
-+    if any(host.lower() not in 'abc' for host in explicit_hosts):return None
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z])([ABC])\s*(?:서버|호스트|server\b|host\b)',question,re.I)}
-     # A bare uppercase host label is explicit too ("B 관리 서비스"). Do not
-     # infer it from IPs, embedded names, a lowercase English article or replies.
-     hosts.update(re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([ABC])(?=\s)',question))
-     hosts={h.lower() for h in hosts}
-     if len(hosts)>1 or explicit-set(mapping):return None
--    targets=set(explicit)
-+    targets=set(explicit);ambiguous=set()
-     for unit in units:
-         matches=[k for k,v in mapping.items() if v==unit and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0])
-     # Short service labels are names from the actual catalog, not a default
-     # host or a remembered answer. A shared label (Vector, Docker, etc.) needs
-@@ -596,13 +684,15 @@
-     for label in {k.split(':',1)[1] for k in mapping}:
-         if not re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',question,re.I):continue
-         matches=[k for k in mapping if k.split(':',1)[1]==label and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
-     labels=prop.get('x-capstone-service-labels',{})
-     if (not isinstance(labels,dict) or any(k not in prop['enum'] or not isinstance(v,list)
-             or not 1<=len(v)<=8 or any(not isinstance(label,str) or not 1<=len(label)<=80
-                 or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]*',label)
-                 for label in v) for k,v in labels.items())):return None
-+    labels=labels|{t:item['labels'] for t,item in aggregates.items()}
-     # Only registered labels resolve a service. Prefer the longer overlapping
-     # name; a genuine shared name still requires an explicit unambiguous host.
-     hits=[]
-@@ -613,22 +703,114 @@
-     for start,end,label in hits:
-         if any(a<=start and end<=b and b-a>end-start for a,b,_ in hits):continue
-         matches=[k for k,v in labels.items() if k in mapping and label in v and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
--    if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    if not (targets or ambiguous) or len(targets)>4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    return {'name':name,'schema':schema,'property':prop,'unit_mapping':unit_mapping,'aggregates':aggregates,
-+        'mapping':mapping,'targets':targets,'aliases':aliases,'ambiguous':ambiguous}
-+
-+
-+def service_requested_journal_scope(question, explicit_journal):
-+    """Keep an explicit message request distinct from a filtered error index.
-+
-+    A request for error logs is still filtered. Error/cause words elsewhere
-+    in a raw-log request do not silently narrow the source to candidates.
-+    """
-+    mixed=re.search(r'(?:전체|모든|정상)\s*로그|\ball\s+(?:logs?|journal)\b|필터\s*없이',question,re.I)
-+    filtered=re.search(r'(?:오류|에러|실패)\s*(?:후보\s*)?로그|'
-+        r'(?<![A-Za-z0-9_.:-])(?:errors?|failure)\s+(?:logs?|journal)\b',question,re.I)
-+    return 'all' if explicit_journal and (mixed or not filtered) else 'errors'
-+
-+
-+def service_required_read_selection(options, schemas):
-+    """Select indexes of exact catalog-valid reads, without generating inputs.
-+
-+    The caller supplies the current read-only catalog and unmet requirements.
-+    This returns schemas only; it never dispatches or repairs an argument.
-+    """
-+    from jsonschema import Draft202012Validator
-+    if not isinstance(options,list) or not 1<=len(options)<=4 or not isinstance(schemas,dict):
-+        raise ValueError('service_required_read_scope')
-+    seen=set()
-+    for option in options:
-+        if (not isinstance(option,dict) or set(option)!={'tool','arguments'}
-+                or not isinstance(option['arguments'],dict) or option['tool'] not in schemas
-+                or not Draft202012Validator(schemas[option['tool']]).is_valid(option['arguments'])):
-+            raise ValueError('service_required_read_catalog_mismatch')
-+        identity=json.dumps(option,sort_keys=True,ensure_ascii=False,allow_nan=False)
-+        if identity in seen:raise ValueError('service_required_read_duplicate')
-+        seen.add(identity)
-+    return {'type':'object','additionalProperties':False,'required':['indexes'],
-+        'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
-+            'uniqueItems':True,'items':{'type':'integer','enum':list(range(len(options)))}}}}
-+
-+
-+def service_lookup_note(context):
-+    """Explain a registered initial sample without inventing execution times."""
-+    minutes=context.get('initial_history_window_minutes')
-+    if (context.get('lookup_only') is not True
-+            or context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
-+            or type(minutes) is not int or not 1<=minutes<=1440):return ''
-+    return ('\n\n기간을 지정하지 않아 도구에 등록된 최근 '+str(minutes)+'분 표본을 먼저 조회했습니다. '
-+            '수집 관측 시각은 실제 실행 시각과 다릅니다. 이 구간 밖의 과거 실행·실패는 미확인입니다.')
-+
-+
-+def service_lookup_text(text, context):
-+    """Keep the existing terminal control record terminal for public filtering."""
-+    note=service_lookup_note(context)
-+    return note.strip()+'\n\n'+text if note else text
-+
-+
-+def service_history_plan(request, question, requested_at):
-+    """Build required reads from the same catalog-bound target resolution."""
-+    question=query_body(question)
-+    intent=_service_lookup_intent(question)
-+    if intent is None:return None
-+    selected=service_target_selection(request,question)
-+    if not selected or selected['ambiguous']:return None
-+    at=_diagnostic_instant(requested_at)
-+    if at is None:return None
-+    name=selected['name'];schema=selected['schema'];prop=selected['property']
-+    unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
-+    mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
-+    wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
-+    journal_scope=service_requested_journal_scope(question,intent['journal'])
-+    # The host target has no archived unit index. Its real bounded system
-+    # journal supplies historical log evidence instead of a current snapshot.
-+    if targets & set(aggregates):wants_journal=True
+@@ -644,7 +644,9 @@
+     execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
+     journal=service_log_request(question) or execution
+     history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+-    if not history and not journal:return None
++    if not history and not journal:
++        if not re.search(r'현재|지금|상태|\b(?:current|now|state|status)\b',question,re.I):return None
++        return {'journal':False,'history':False,'execution':False,'cause':False,'current_only':True}
+     return {'journal':journal,'history':history,'execution':execution,
+         'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
+ 
+@@ -763,7 +765,7 @@
+ 
+ 
+ def service_history_plan(request, question, requested_at):
+-    """Build required reads from the same catalog-bound target resolution."""
++    """Build current/history reads from the same catalog-bound resolution."""
+     question=query_body(question)
+     intent=_service_lookup_intent(question)
+     if intent is None:return None
+@@ -775,15 +777,22 @@
+     unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
+     mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
+     wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
++    current_only=bool(intent.get('current_only'))
+     journal_scope=service_requested_journal_scope(question,intent['journal'])
+     # The host target has no archived unit index. Its real bounded system
+     # journal supplies historical log evidence instead of a current snapshot.
+-    if targets & set(aggregates):wants_journal=True
++    if targets & set(aggregates) and not current_only:wants_journal=True
      def without_targets(text):
--        for label in sorted(set(targets)|{mapping[t] for t in targets}|aliases,key=len,reverse=True):
--            text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
--        return text
-+        return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
+         return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
      # Resolve names before interpreting temporal words: e.g. 에이전트
      # contains 이전, which is not a request for an earlier time window.
--    period_question=without_targets(question)
-+    period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
+     period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
++    # A current-only read has no historical window. Do not discard temporal,
++    # comparison or resampling qualifiers just because "state" also appears.
++    if current_only and re.search(r'오늘|금일|최근|지난|어제|그제|내일|아까|이전|과거|당시|'
++            r'부터|까지|이후|사이|비교|대조|반복|연속|재조회|다시|'
++            r'두\s*번|세\s*번|여러\s*번|\d+\s*(?:초|분|시간|일|번|회)|'
++            r'\d{1,2}:\d{2}|\d{4}[-/.]\d',period_question):return None
      bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',period_question)
-+    natural=_service_natural_window(period_question,at) if not bounds else None
+     natural=_service_natural_window(period_question,at) if not bounds else None
      periods=[];days=set();initial_window=False
-+    # Bare "recent" and the last execution result request a bounded sample,
-+    # not a guessed incident date. Use only the actual catalog's valid default;
-+    # explicit/compound/unsupported periods never fall back to that sample.
-+    if not bounds and natural is None and (intent['execution'] or re.search(r'최근',period_question)):
-+        remaining=re.sub(r'최근','',period_question,count=1)
-+        default=schema.get('properties',{}).get('lookback_minutes',{})
-+        minutes=default.get('default')
-+        bare=not re.search(r'최근|지난|오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|'
-+                r'\d|쯤|대략|또는|혹은|UTC|GMT|[+-]\d{2}:?\d{2}|'
-+                r'(?:한|두|세|네|다섯|여섯|몇|여러|반)\s*(?:초|분|시간|일|주|달|개월|년)|'
-+                r'하루|이틀|사흘|나흘|일주일|한달|'
-+                r'(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|'
-+                r'(?:Asia|America|Europe|Africa|Australia)/',remaining,re.I)
-+        if bare:
-+            if not (default.get('type')=='integer' and type(minutes) is int
-+                and type(default.get('minimum',1)) is int and type(default.get('maximum',1440)) is int
-+                and max(1,default.get('minimum',1))<=minutes<=min(1440,default.get('maximum',1440))):return None
-+            natural={'bounds':(at-timedelta(minutes=minutes),at),
-+                'phrase':'등록된 기본 '+str(minutes)+'분의 최근 표본'}
-+            initial_window=True
-     if len(bounds)==2:
-         periods=[tuple(map(_diagnostic_instant,bounds))]
--    elif not bounds and (period:=_service_natural_period(period_question,at)) is not None:
--        periods=[period]
-+    elif not bounds and natural is not None:
-+        periods=[natural['bounds']]
-     elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',period_question):
-         days=set(re.findall(r'오늘|금일|어제',period_question))
-         midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)
-@@ -655,26 +837,27 @@
+@@ -829,9 +838,9 @@
+             initial_window=True
+             periods.append((at-(timedelta(hours=24) if cause_inquiry else timedelta(minutes=15)),at))
+     else:return None
+-    if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
++    if (not current_only and not periods) or any(not start or not end or not 0<(end-start).total_seconds()<=86400
+             or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
+-    current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
++    current=current_only or bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+     if wants_journal and not wants_history and not re.search(r'상태|state|status',question,re.I):current=False
+     # A named today's operating state also asks for a current observation;
      # the separate today's history is still required, never replaced by it.
-     current=current or bool(re.search(r'(?:오늘|금일)(?:은|의)?\s*(?:(?:관제|처리|서비스|운영)\s*)?상태',question))
-     companions=prop.get('x-capstone-current-companions',{})
--    if (not isinstance(companions,dict) or any(k not in mapping or not isinstance(v,list)
-+    if (not isinstance(companions,dict) or any(k not in unit_mapping or not isinstance(v,list)
-             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
-                 or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
-     options=[]
--    journal_supported='journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+    journal_supported=('journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+        and (journal_scope=='errors' or 'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[])))
-     # A cause inquiry already requesting the live journal does not also need
-     # the cached index of those same error candidates as a mandatory read.
-     # Keep explicit index/metadata requests and metadata-only lookups intact;
-     # the model may still request the index later if it adds needed evidence.
--    live_cause_history=(cause_inquiry and wants_journal and journal_supported
-+    live_cause_history=((cause_inquiry or intent['execution']) and wants_journal and journal_supported
-         and not re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I))
-     for target in sorted(targets):
-         if current:options.append({'tool':name,'arguments':{'target':target}})
--        if wants_history and not live_cause_history:
-+        if wants_history and not live_cause_history and target not in aggregates:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
-                            for start,end in periods)
-         if wants_journal and journal_supported:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),
-                 'until_kst':end.isoformat(),'view':'journal','limit':50,
--                **({} if wants_history else {'journal_scope':'all'})}} for start,end in periods)
-+                **({} if journal_scope=='errors' else {'journal_scope':'all'})}} for start,end in periods)
-         elif wants_journal and not wants_history and not current:
-             # Old catalogs can still report the available target, but the
-             # unavailable journal capability below always vetoes completion.
-@@ -682,6 +865,8 @@
-     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
-     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
-     unavailable=['journal_excerpt'] if wants_journal and not journal_supported else []
-+    if targets & set(aggregates) and re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I):
-+        unavailable.append('host_system_archived_metadata')
-     if read_contract().companion_block_request(question):
-         block_name='mcp__resp__list_blocks'
-         registered=[t.get('function',{}).get('parameters',{}) for t in request['tools']
-@@ -690,7 +875,7 @@
-                 and registered[0].get('properties')=={} and not registered[0].get('required')):
-             options.append({'tool':block_name,'arguments':{}})
-         else:unavailable.append('current_block_list')
--    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-+    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행(?!\s*(?:결과|기록|상태|이력|시각|시간|중|여부))|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-     only_service=not re.search(outside,without_targets(read_contract().without_prohibitions(question)),re.I)
-     # Preserve the full question and every receipt. Only a separately matched
-     # inventory clause is removed for scope classification, never for inquiry.
-@@ -700,14 +885,20 @@
+@@ -884,11 +893,11 @@
+         residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
                            if read_contract().block_list_plan(part.strip()) is None)
      compact_scope=not re.search(outside,without_targets(read_contract().without_prohibitions(residual)),re.I)
-     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
-+            'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
-+            'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
+-    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
++    value={'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+             'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
+             'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
              'requested_at_kst':requested_at,
-             'compact_scope':compact_scope,'initial_window':initial_window,
+-            'compact_scope':compact_scope,'initial_window':initial_window,
++            'compact_scope':compact_scope,'initial_window':initial_window,'current_only':current_only,
              'initial_history_window_minutes':int((periods[0][1]-periods[0][0]).total_seconds()/60) if initial_window else None,
              'current_companions':related,
-+            'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
-+                r'(?:오류|에러|실패)\s*(?:후보\s*)?(?:로그|표본)(?:들)?만|\bonly\s+(?:error|failure)\s+logs?\b|\b(?:error|failure)\s+logs?\s+only\b',question,re.I)),
-+                'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
-+                'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
+             'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
+@@ -896,6 +905,9 @@
+                 'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
+                 'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
              'unavailable_capabilities':unavailable}
++    # A factual current lookup cannot substitute for unknown clauses such as
++    # cause, impact, effective rules, health judgment or a protected change.
++    return value if not current_only or service_lookup_scope(value,question) else None
  
  
--def service_history_state(plan, receipts, now=None):
-+def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
-     """Distinguish pending attempts, failed/malformed reads and actual coverage.
- 
-     Receipts come from authenticated in-process MCP calls, not chat text. A
-@@ -726,7 +917,8 @@
-                 state['incomplete'].append('current_block_list:unavailable')
-             continue
-         args=required['arguments'];target=args['target'];past='since_kst' in args
--        runtime=target in plan.get('current_companions',[])
-+        runtime=(target in plan.get('current_companions',[])
-+                 or not past and target in plan.get('aggregate_targets',{}))
-         journal=args.get('view')=='journal'
-         matches=[]
-         for row in receipts:
-@@ -779,6 +971,27 @@
-             and data.get('lookback_scope')=='latest_snapshot_only_not_requested_history')
-         else:valid=data.get('kind')!='journal_history' and data.get('status')=='observed' and isinstance(data.get('properties'),dict)
-         if not valid:state['incomplete'].append(label+':scope_mismatch')
-+    coverage=plan.get('cause_source_coverage',{})
-+    if include_empty_source and not state['incomplete'] and coverage.get('required') is True:
-+        expanded=[]
-+        for required in plan['requirements']:
-+            args=required.get('arguments',{})
-+            if required.get('tool')!='mcp__system_diagnostics__get_system_diagnostics' or args.get('view')!='journal' or args.get('journal_scope','errors')!='errors':continue
-+            matching=[r for r in receipts if r.get('tool')==required['tool']
-+                and r.get('arguments',{}).get('target')==args['target'] and r.get('arguments',{}).get('view')=='journal'
-+                and r.get('arguments',{}).get('journal_scope','errors')=='errors'
-+                and all(_diagnostic_instant(r.get('arguments',{}).get(k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))]
-+            # All base reads above have already passed freshness/scope checks.
-+            if not matching or matching[-1]['data'].get('returned_entries')!=0:continue
-+            limit=coverage.get('limit')
-+            if coverage.get('all_supported') is not True or type(limit) is not int or not 1<=limit<=50:
-+                state['incomplete'].append(args['target']+':unfiltered_journal:tool_capability_unavailable');continue
-+            choice={'tool':required['tool'],'arguments':{**args,'journal_scope':'all','limit':limit}}
-+            if choice not in expanded:expanded.append(choice)
-+        if expanded:
-+            followup=service_history_state({**plan,'requirements':expanded},receipts,now,include_empty_source=False)
-+            state['pending']+=followup['pending']
-+            state['incomplete']+=['unfiltered_source:'+x for x in followup['incomplete']]
-     return state
- 
- 
-@@ -841,6 +1054,7 @@
-     Registration, periods and successful fresh receipts are checked separately.
-     """
-     if not plan or not plan.get('compact_scope') or plan.get('unavailable_capabilities'):return False
-+    question=query_body(question)
-     parts=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
-     kept=[]
-     for part in parts:
-@@ -849,19 +1063,22 @@
-         if re.fullmatch(r'(?:설정\s*)?(?:변경|수정|재시작|재가동|실행)(?:은|는|을|를)?\s*(?:하지\s*마(?:세요)?|금지)[.!?。]*',part):continue
-         kept.append(part)
-     text=' '.join(kept)
--    if not re.search(r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)',text):return False
-+    if read_action_remainder(text)==text:return False
-     # Bare A/B/C beside an exact unit must agree with the registered host too.
-+    text=read_action_remainder(text)
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z0-9_:])([ABC])(?:\s*(?:서버|호스트))?(?=\s|의|$)',text,re.I)}
-     if hosts and (len(hosts)!=1 or any(t[0] not in hosts for t in plan['units'])):return False
-     if re.search(r'관제|처리|대기',text) and 'b:management-pipeline' not in plan.get('current_companions',[]):return False
--    for name in sorted(set(plan['units'])|set(plan['units'].values()),key=len,reverse=True):
--        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(name)+r'(?![A-Za-z0-9_.:-])',' ',text)
-+    text=_service_name_remainder(text,set(plan['units'])|{x for x in plan['units'].values() if x is not None}
-+        |set(plan.get('scope_labels',[])))
-+    if phrase:=plan.get('scope_period_phrase'):text=text.replace(phrase,' ',1)
-     text=re.sub(r'(?<![A-Za-z0-9_:])[ABC](?:\s*(?:서버|호스트))?(?=\s|의|$)',' ',text,flags=re.I)
-     text=re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?',' ',text)
--    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|'
-+    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|예전|'
-+           r'최근|마지막|직전|실행|기동|종료|결과|구분\s*해\s*(?:줘|주세요)|알려\s*(?:줘|주세요)|'
-            r'원문|로그|logs?|journal(?:ctl)?|raw|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
-            r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
--           r'부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|도|만|에|[\s,.!?。~–—-]')
-+           r'간단히|간단하게|짧게|부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|이랑|랑|하고|도|만|에|[\s,.!?。~–—-]')
-     return re.fullmatch(r'(?:'+token+r')+',text) is not None
- 
- 
-@@ -954,6 +1171,7 @@
+ def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
+@@ -1167,7 +1179,8 @@
+     failed=[r for r in receipts if r.get('is_error') is True]
+     receipts=[r for r in receipts if r.get('is_error') is False]
+     value={'question':question,'requested_at_kst':requested_at,'background':background,
+-           'history_window_origin':'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period',
++           'history_window_origin':('current_observation_only' if plan.get('current_only') else
++               'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period'),
             'initial_history_window_minutes':plan['initial_history_window_minutes'],
             'requested_service_scope':{
                 'units':copy.deepcopy(plan['units']),
-+               'aggregate_targets':copy.deepcopy(plan.get('aggregate_targets',{})),
-                'history_windows':[{'target':r['arguments']['target'],
-                    'since_kst':r['arguments']['since_kst'],'until_kst':r['arguments']['until_kst']}
-                    for r in plan['requirements'] if 'since_kst' in r['arguments']],
+@@ -2971,3 +2984,20 @@
+             if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
+             issues.add('diagnostic_snapshot_is_not_functional_health')
+     return sorted(issues)
++
++
++def service_scope_notice(request, question):
++    """Ask once for an ambiguous registered target before any inference/read."""
++    question=query_body(question)
++    intent=_service_lookup_intent(question)
++    if intent is None:return None
++    if read_contract().wants_write(question):return None
++    # An explicit all-host request is not a missing-host question. Do not
++    # confuse all logs for one service with all hosts.
++    if re.search(r'(?:모든|전체|각)\s*(?:호스트|서버)|\ball\s+(?:hosts?|servers?)\b',question,re.I):return None
++    selected=service_target_selection(request,question)
++    if not selected or not selected['ambiguous']:return None
++    choices=' · '.join('`'+target+'`' for target in sorted(selected['ambiguous']))
++    subject='상태' if intent.get('current_only') else '로그·이력'
++    return '어느 대상의 '+subject+'를 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
++
 --- a/opt/capstone-management/chat_contract.py
 +++ b/opt/capstone-management/chat_contract.py
-@@ -149,16 +149,7 @@
-     Original user text is always retained by adapters. Device token boundaries
-     keep FW distinct from WAF, and aliases do not manufacture an inline IPS.
-     """
--    # Native Mattermost messages carry a leading [username] display label.
--    # Ignore it for classification only, keeping literal device labels intact.
--    text = re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
--                  r'[A-Za-z0-9_.-]{1,64}\]\s+', '', text, count=1, flags=re.I)
--    # A single leading bot address is transport syntax, not a device/filter.
--    # Keep multiple addresses, quoted mentions and the original request intact;
--    # channel routing and protected actions still inspect the original text.
--    address = re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)', text, re.I)
--    if address and not text[address.end():].startswith('@'):
--        text = text[address.end():]
-+    text=query_body(text)
-     aliases = ((r'웹\s*방화벽|와프|모드시큐리티', 'WAF'),
-                (r'(?<![A-Za-z])(?:F/W|firewall|nftables|iptables)(?![A-Za-z])|방화벽', 'FW'),
-                (r'(?<![A-Za-z])IPS(?![A-Za-z])|수리카타', 'Suricata'),
-@@ -491,6 +482,29 @@
+@@ -636,7 +636,7 @@
  
  
- def _service_natural_period(question, at):
-+    window=_service_natural_window(question,at)
-+    return window['bounds'] if window is not None else None
-+
-+
-+def service_log_request(question):
-+    """Message-log intent, excluding words embedded in target/unit names."""
-+    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
-+                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
-+    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
-+                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
-+
-+
-+def query_body(text):
-+    """Remove inspected transport labels, preserving registered object names."""
-+    if not isinstance(text,str):return text
-+    text=re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
-+        r'[A-Za-z0-9_.-]{1,64}\]\s+','',text,count=1,flags=re.I)
-+    address=re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)',text,re.I)
-+    if address and not text[address.end():].startswith('@'):text=text[address.end():]
-+    return text
-+
-+
-+def _service_natural_window(question, at):
-     """One explicit local clock interval; never infer a missing date or rollover.
- 
-     The project clock is KST. Other zones, approximate/multiple windows and
-@@ -498,6 +512,17 @@
-     time arguments only, never service identity, dispatch or incident judgment.
-     """
-     if re.search(r'UTC|GMT|[+-]\d{2}:?\d{2}|(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|(?:Asia|America|Europe|Africa|Australia)/|쯤|대략',question,re.I):return None
-+    # An explicit bounded lookback is relative to this turn's precise KST
-+    # capture. Unknown, compound or qualified periods never get a default.
-+    lookbacks=list(re.finditer(r'(?:최근|지난)\s*(?P<count>[0-9]{1,5})\s*(?P<unit>시간|초|분|일)(?![A-Za-z0-9])',question))
-+    if lookbacks:
-+        if len(lookbacks)!=1:return None
-+        found=lookbacks[0];rest=question[:found.start()]+question[found.end():]
-+        if (re.search(r'오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|[0-9]\s*(?:시|분|초|시간|일)|[0-9]:[0-9]|[0-9]{4}-[0-9]{2}-[0-9]{2}',rest)
-+                or re.match(r'\s*(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|제외|인지|일까|일지|또는|혹은|이나)',question[found.end():])):return None
-+        seconds=int(found['count'])*{'초':1,'분':60,'시간':3600,'일':86400}[found['unit']]
-+        if not 1<=seconds<=86400:return None
-+        return {'bounds':(at-timedelta(seconds=seconds),at),'phrase':found[0]}
-     date=r'(?:\d{4}-\d{2}-\d{2}|\d{4}년\s*\d{1,2}월\s*\d{1,2}일|오늘|금일|어제)'
-     clock=r'(?:(?:오전|오후)\s*)?(?:\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?(?:\s*\d{1,2}초)?)'
-     pattern=(r'(?<![\dA-Za-z])(?P<date>'+date+r')\s*(?P<start>'+clock+r')\s*'
-@@ -535,59 +560,122 @@
-         start=instant(match['start'],match['date'])
-         meridiem=re.match(r'(오전|오후)',match['start'])
-         end=instant(match['end'],match['end_date'] or match['date'],meridiem[1] if meridiem and not match['end_date'] else '')
--        return (start,end)
-+        return {'bounds':(start,end),'phrase':match[0]}
-     except ValueError:return None
- 
- 
--def service_log_request(question):
--    """Message-log intent, excluding words embedded in target/unit names."""
--    if re.search(r'로그(?:들)?(?=$|[\s,.!?？]|(?:는|은|도|만|을|를|가|의|에|로|와|과|랑|이랑|하고|까지|부터)(?=$|[\s,.!?？]))|'
--                 r'(?<![A-Za-z0-9_.:-])(?:logs?|journal(?:ctl)?)(?![A-Za-z0-9_.:-])',question,re.I):return True
--    return bool(re.search(r'원문|(?<![A-Za-z0-9_.:-])raw(?![A-Za-z0-9_.:-])',question,re.I)
--                and re.search(r'오류|실패|장애|이력|failure|failed|error|history',question,re.I))
--
--
--def service_history_plan(request, question, requested_at):
--    """Required reads for explicitly named units and unambiguous past periods.
--
--    Only registered metadata resolves units. No hardcoded aliases, prior assistant text,
--    inferred host IPs, dispatch, completion or incident decision is supplied.
--    Unknown/negative time expressions retain the ordinary investigation.
--    Explicit today/yesterday comparisons keep separate KST calendar windows.
--    """
--    name='mcp__system_diagnostics__get_system_diagnostics'
--    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-+def _service_name_remainder(text, names):
-+    """Remove only catalog-resolved names, preserving unknown request clauses."""
-+    for name in sorted(set(names),key=len,reverse=True):
-+        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+r'\s+'.join(map(re.escape,name.split()))+
-+            r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
-+    return text
-+
-+
-+def read_action_remainder(text):
-+    """Remove affirmative lookup verbs only; never erase objects or negation.
-+
-+    Callers retain their own closed object/condition grammar. This recognizes
-+    conversational spelling, not a decision, permission or request execution.
-+    """
-+    if not isinstance(text,str):return text
-+    return re.sub(r'(?<![A-Za-z0-9_])(?:'
-+        r'보여\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'알려\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)?|'
-+        r'(?:조회|확인|정리)\s*(?:해\s*(?:주세요|줄래요|줄래|줘|주실래요|주실래)|부탁(?:해요|해|드려요|드립니다)?)|'
-+        r'봐\s*(?:주세요|줄래요|줄래|줘)|볼\s*(?:수\s*있을까|수\s*있나요|수\s*있니|래요|래)|'
-+        r'(?:조회|확인|정리)해줄\s*수\s*있(?:을까|나요|니)'
-+        r')(?![A-Za-z0-9_])',' ',text)
-+
-+
-+def _service_log_noun_pattern():
-+    """A log noun and its bounded case ending, not a temporal endpoint."""
-+    particle=(r'(?:(?:에서|에게서|으로|에|로)(?:부터|까지)?(?:는|은|도|만)?|'
-+              r'(?:는|은|도|만|을|를|이|가|의|와|과|랑|이랑|하고|까지|부터)(?:도|만)?)')
-+    return r'로그(?:들)?(?:'+particle+r')?(?=$|[\s,.!?？])'
-+
-+
-+def diagnostic_journal_catalog(schema):
-+    """Validate advertised unit history and fixed-host journal capabilities.
-+
-+    Host aggregates are live journal reads only, never an archived unit index.
-+    An absent extension preserves older unit-only catalogs unchanged.
-+    """
-+    if not isinstance(schema,dict):return None
-+    prop=schema.get('properties',{}).get('target',{})
-+    if not isinstance(prop,dict) or not isinstance(prop.get('enum'),list):return None
-+    enums=prop['enum']
-+    if any(not isinstance(x,str) for x in enums) or len(set(enums))!=len(enums):return None
-+    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
-+               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
-+    if (len(histories)!=1 or not isinstance(histories[0],list)
-+            or any(not isinstance(x,str) for x in histories[0])
-+            or len(set(histories[0]))!=len(histories[0])):return None
-+    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
-+    units=dict(pairs)
-+    aggregates=prop.get('x-capstone-host-journal-targets',{})
-+    if not isinstance(aggregates,dict):return None
-+    for target,item in aggregates.items():
-+        if (target not in {'a:systemd','b:systemd','c:systemd'} or not isinstance(item,dict)
-+                or set(item)!={'host','scope','labels'} or item['host']!=target[0]
-+                or item['scope']!='host_system' or not isinstance(item['labels'],list)
-+                or not 1<=len(item['labels'])<=8 or any(not isinstance(label,str)
-+                    or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]{0,79}',label)
-+                    for label in item['labels'])):return None
-+    if (not units or len(units)!=len(pairs) or set(units)&set(aggregates)
-+            or set(units)|set(aggregates)!=set(histories[0])
-+            or not (set(units)|set(aggregates))<=set(enums)):return None
-+    if aggregates:
-+        indexes=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum')
-+            for x in schema.get('allOf',[]) if isinstance(x,dict) and x.get('if')=={
-+                'allOf':[{'required':['since_kst']},{'not':{'required':['view']}}]}]
-+        if (len(indexes)!=1 or not isinstance(indexes[0],list)
-+                or any(not isinstance(x,str) for x in indexes[0])
-+                or len(set(indexes[0]))!=len(indexes[0]) or set(indexes[0])!=set(units)):return None
-+    return units,aggregates
-+
-+
-+def _service_lookup_intent(question):
-+    """Recognize an actual log/history lookup; never a quoted/negative task."""
-+    if not isinstance(question,str) or len(question)>6000:return None
+ def _service_lookup_intent(question):
+-    """Recognize an actual log/history lookup; never a quoted/negative task."""
++    """Recognize current state or history; never a quoted/negative task."""
+     if not isinstance(question,str) or len(question)>6000:return None
      if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
      if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
-     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
--    wants_journal=service_log_request(question)
--    wants_history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
--    cause_inquiry=bool(wants_history and re.search(r'원인|왜|영향|조사',question))
--    if not wants_history and not wants_journal:return None
--    at=_diagnostic_instant(requested_at)
--    if at is None:return None
-+    execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
-+    journal=service_log_request(question) or execution
-+    history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
-+    if not history and not journal:return None
-+    return {'journal':journal,'history':history,'execution':execution,
-+        'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
-+
-+
-+def service_target_selection(request, question):
-+    """Resolve only advertised diagnostic names; preserve actual ambiguity."""
-+    name='mcp__system_diagnostics__get_system_diagnostics'
-+    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
-     tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
-     if len(tools)!=1:return None
-     schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
--    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
--               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
--    if len(histories)!=1 or not isinstance(histories[0],list) or not isinstance(prop.get('enum'),list):return None
--    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
--    mapping=dict(pairs)
--    if not mapping or len(mapping)!=len(pairs) or set(mapping)!=set(histories[0]):return None
--    mapping={k:v for k,v in mapping.items() if k in prop['enum']}
-+    catalog=diagnostic_journal_catalog(schema)
-+    if catalog is None:return None
-+    unit_mapping,aggregates=catalog
-+    mapping=unit_mapping|{t:None for t in aggregates}
-     explicit=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])',question))
-     units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
-+    explicit_hosts=re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([A-Z])\s*(?:서버|호스트|server\b|host\b)',question,re.I)
-+    explicit_hosts+=re.findall(r'^\s*([A-Z])\s+(?=\S)',question)
-+    if any(host.lower() not in 'abc' for host in explicit_hosts):return None
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z])([ABC])\s*(?:서버|호스트|server\b|host\b)',question,re.I)}
-     # A bare uppercase host label is explicit too ("B 관리 서비스"). Do not
-     # infer it from IPs, embedded names, a lowercase English article or replies.
-     hosts.update(re.findall(r'(?<![A-Za-z0-9가-힣_.:-])([ABC])(?=\s)',question))
-     hosts={h.lower() for h in hosts}
-     if len(hosts)>1 or explicit-set(mapping):return None
--    targets=set(explicit)
-+    targets=set(explicit);ambiguous=set()
-     for unit in units:
-         matches=[k for k,v in mapping.items() if v==unit and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0])
-     # Short service labels are names from the actual catalog, not a default
-     # host or a remembered answer. A shared label (Vector, Docker, etc.) needs
-@@ -596,13 +684,15 @@
-     for label in {k.split(':',1)[1] for k in mapping}:
-         if not re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',question,re.I):continue
-         matches=[k for k in mapping if k.split(':',1)[1]==label and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
-     labels=prop.get('x-capstone-service-labels',{})
-     if (not isinstance(labels,dict) or any(k not in prop['enum'] or not isinstance(v,list)
-             or not 1<=len(v)<=8 or any(not isinstance(label,str) or not 1<=len(label)<=80
-                 or not re.fullmatch(r'[A-Za-z0-9가-힣][A-Za-z0-9가-힣 _.-]*',label)
-                 for label in v) for k,v in labels.items())):return None
-+    labels=labels|{t:item['labels'] for t,item in aggregates.items()}
-     # Only registered labels resolve a service. Prefer the longer overlapping
-     # name; a genuine shared name still requires an explicit unambiguous host.
-     hits=[]
-@@ -613,22 +703,114 @@
-     for start,end,label in hits:
-         if any(a<=start and end<=b and b-a>end-start for a,b,_ in hits):continue
-         matches=[k for k,v in labels.items() if k in mapping and label in v and (not hosts or k[0] in hosts)]
--        if len(matches)!=1:return None
-+        if not matches:return None
-+        if len(matches)>1:ambiguous.update(matches);continue
-         targets.add(matches[0]);aliases.add(label)
--    if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    if not (targets or ambiguous) or len(targets)>4 or hosts and any(t[0] not in hosts for t in targets):return None
-+    return {'name':name,'schema':schema,'property':prop,'unit_mapping':unit_mapping,'aggregates':aggregates,
-+        'mapping':mapping,'targets':targets,'aliases':aliases,'ambiguous':ambiguous}
-+
-+
-+def service_requested_journal_scope(question, explicit_journal):
-+    """Keep an explicit message request distinct from a filtered error index.
-+
-+    A request for error logs is still filtered. Error/cause words elsewhere
-+    in a raw-log request do not silently narrow the source to candidates.
-+    """
-+    mixed=re.search(r'(?:전체|모든|정상)\s*로그|\ball\s+(?:logs?|journal)\b|필터\s*없이',question,re.I)
-+    filtered=re.search(r'(?:오류|에러|실패)\s*(?:후보\s*)?로그|'
-+        r'(?<![A-Za-z0-9_.:-])(?:errors?|failure)\s+(?:logs?|journal)\b',question,re.I)
-+    return 'all' if explicit_journal and (mixed or not filtered) else 'errors'
-+
-+
-+def service_required_read_selection(options, schemas):
-+    """Select indexes of exact catalog-valid reads, without generating inputs.
-+
-+    The caller supplies the current read-only catalog and unmet requirements.
-+    This returns schemas only; it never dispatches or repairs an argument.
-+    """
-+    from jsonschema import Draft202012Validator
-+    if not isinstance(options,list) or not 1<=len(options)<=4 or not isinstance(schemas,dict):
-+        raise ValueError('service_required_read_scope')
-+    seen=set()
-+    for option in options:
-+        if (not isinstance(option,dict) or set(option)!={'tool','arguments'}
-+                or not isinstance(option['arguments'],dict) or option['tool'] not in schemas
-+                or not Draft202012Validator(schemas[option['tool']]).is_valid(option['arguments'])):
-+            raise ValueError('service_required_read_catalog_mismatch')
-+        identity=json.dumps(option,sort_keys=True,ensure_ascii=False,allow_nan=False)
-+        if identity in seen:raise ValueError('service_required_read_duplicate')
-+        seen.add(identity)
-+    return {'type':'object','additionalProperties':False,'required':['indexes'],
-+        'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
-+            'uniqueItems':True,'items':{'type':'integer','enum':list(range(len(options)))}}}}
-+
-+
-+def service_lookup_note(context):
-+    """Explain a registered initial sample without inventing execution times."""
-+    minutes=context.get('initial_history_window_minutes')
-+    if (context.get('lookup_only') is not True
-+            or context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
-+            or type(minutes) is not int or not 1<=minutes<=1440):return ''
-+    return ('\n\n기간을 지정하지 않아 도구에 등록된 최근 '+str(minutes)+'분 표본을 먼저 조회했습니다. '
-+            '수집 관측 시각은 실제 실행 시각과 다릅니다. 이 구간 밖의 과거 실행·실패는 미확인입니다.')
-+
-+
-+def service_lookup_text(text, context):
-+    """Keep the existing terminal control record terminal for public filtering."""
-+    note=service_lookup_note(context)
-+    return note.strip()+'\n\n'+text if note else text
-+
-+
-+def service_history_plan(request, question, requested_at):
-+    """Build required reads from the same catalog-bound target resolution."""
-+    question=query_body(question)
-+    intent=_service_lookup_intent(question)
-+    if intent is None:return None
-+    selected=service_target_selection(request,question)
-+    if not selected or selected['ambiguous']:return None
-+    at=_diagnostic_instant(requested_at)
-+    if at is None:return None
-+    name=selected['name'];schema=selected['schema'];prop=selected['property']
-+    unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
-+    mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
-+    wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
-+    journal_scope=service_requested_journal_scope(question,intent['journal'])
-+    # The host target has no archived unit index. Its real bounded system
-+    # journal supplies historical log evidence instead of a current snapshot.
-+    if targets & set(aggregates):wants_journal=True
+@@ -644,7 +644,9 @@
+     execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
+     journal=service_log_request(question) or execution
+     history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+-    if not history and not journal:return None
++    if not history and not journal:
++        if not re.search(r'현재|지금|상태|\b(?:current|now|state|status)\b',question,re.I):return None
++        return {'journal':False,'history':False,'execution':False,'cause':False,'current_only':True}
+     return {'journal':journal,'history':history,'execution':execution,
+         'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
+ 
+@@ -763,7 +765,7 @@
+ 
+ 
+ def service_history_plan(request, question, requested_at):
+-    """Build required reads from the same catalog-bound target resolution."""
++    """Build current/history reads from the same catalog-bound resolution."""
+     question=query_body(question)
+     intent=_service_lookup_intent(question)
+     if intent is None:return None
+@@ -775,15 +777,22 @@
+     unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
+     mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
+     wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
++    current_only=bool(intent.get('current_only'))
+     journal_scope=service_requested_journal_scope(question,intent['journal'])
+     # The host target has no archived unit index. Its real bounded system
+     # journal supplies historical log evidence instead of a current snapshot.
+-    if targets & set(aggregates):wants_journal=True
++    if targets & set(aggregates) and not current_only:wants_journal=True
      def without_targets(text):
--        for label in sorted(set(targets)|{mapping[t] for t in targets}|aliases,key=len,reverse=True):
--            text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(label)+r'(?![A-Za-z0-9_.:-])',' ',text,flags=re.I)
--        return text
-+        return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
+         return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
      # Resolve names before interpreting temporal words: e.g. 에이전트
      # contains 이전, which is not a request for an earlier time window.
--    period_question=without_targets(question)
-+    period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
+     period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
++    # A current-only read has no historical window. Do not discard temporal,
++    # comparison or resampling qualifiers just because "state" also appears.
++    if current_only and re.search(r'오늘|금일|최근|지난|어제|그제|내일|아까|이전|과거|당시|'
++            r'부터|까지|이후|사이|비교|대조|반복|연속|재조회|다시|'
++            r'두\s*번|세\s*번|여러\s*번|\d+\s*(?:초|분|시간|일|번|회)|'
++            r'\d{1,2}:\d{2}|\d{4}[-/.]\d',period_question):return None
      bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',period_question)
-+    natural=_service_natural_window(period_question,at) if not bounds else None
+     natural=_service_natural_window(period_question,at) if not bounds else None
      periods=[];days=set();initial_window=False
-+    # Bare "recent" and the last execution result request a bounded sample,
-+    # not a guessed incident date. Use only the actual catalog's valid default;
-+    # explicit/compound/unsupported periods never fall back to that sample.
-+    if not bounds and natural is None and (intent['execution'] or re.search(r'최근',period_question)):
-+        remaining=re.sub(r'최근','',period_question,count=1)
-+        default=schema.get('properties',{}).get('lookback_minutes',{})
-+        minutes=default.get('default')
-+        bare=not re.search(r'최근|지난|오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|'
-+                r'\d|쯤|대략|또는|혹은|UTC|GMT|[+-]\d{2}:?\d{2}|'
-+                r'(?:한|두|세|네|다섯|여섯|몇|여러|반)\s*(?:초|분|시간|일|주|달|개월|년)|'
-+                r'하루|이틀|사흘|나흘|일주일|한달|'
-+                r'(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|'
-+                r'(?:Asia|America|Europe|Africa|Australia)/',remaining,re.I)
-+        if bare:
-+            if not (default.get('type')=='integer' and type(minutes) is int
-+                and type(default.get('minimum',1)) is int and type(default.get('maximum',1440)) is int
-+                and max(1,default.get('minimum',1))<=minutes<=min(1440,default.get('maximum',1440))):return None
-+            natural={'bounds':(at-timedelta(minutes=minutes),at),
-+                'phrase':'등록된 기본 '+str(minutes)+'분의 최근 표본'}
-+            initial_window=True
-     if len(bounds)==2:
-         periods=[tuple(map(_diagnostic_instant,bounds))]
--    elif not bounds and (period:=_service_natural_period(period_question,at)) is not None:
--        periods=[period]
-+    elif not bounds and natural is not None:
-+        periods=[natural['bounds']]
-     elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',period_question):
-         days=set(re.findall(r'오늘|금일|어제',period_question))
-         midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)
-@@ -655,26 +837,27 @@
+@@ -829,9 +838,9 @@
+             initial_window=True
+             periods.append((at-(timedelta(hours=24) if cause_inquiry else timedelta(minutes=15)),at))
+     else:return None
+-    if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
++    if (not current_only and not periods) or any(not start or not end or not 0<(end-start).total_seconds()<=86400
+             or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
+-    current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
++    current=current_only or bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+     if wants_journal and not wants_history and not re.search(r'상태|state|status',question,re.I):current=False
+     # A named today's operating state also asks for a current observation;
      # the separate today's history is still required, never replaced by it.
-     current=current or bool(re.search(r'(?:오늘|금일)(?:은|의)?\s*(?:(?:관제|처리|서비스|운영)\s*)?상태',question))
-     companions=prop.get('x-capstone-current-companions',{})
--    if (not isinstance(companions,dict) or any(k not in mapping or not isinstance(v,list)
-+    if (not isinstance(companions,dict) or any(k not in unit_mapping or not isinstance(v,list)
-             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
-                 or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
-     options=[]
--    journal_supported='journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+    journal_supported=('journal' in schema.get('properties',{}).get('view',{}).get('enum',[])
-+        and (journal_scope=='errors' or 'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[])))
-     # A cause inquiry already requesting the live journal does not also need
-     # the cached index of those same error candidates as a mandatory read.
-     # Keep explicit index/metadata requests and metadata-only lookups intact;
-     # the model may still request the index later if it adds needed evidence.
--    live_cause_history=(cause_inquiry and wants_journal and journal_supported
-+    live_cause_history=((cause_inquiry or intent['execution']) and wants_journal and journal_supported
-         and not re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I))
-     for target in sorted(targets):
-         if current:options.append({'tool':name,'arguments':{'target':target}})
--        if wants_history and not live_cause_history:
-+        if wants_history and not live_cause_history and target not in aggregates:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
-                            for start,end in periods)
-         if wants_journal and journal_supported:
-             options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),
-                 'until_kst':end.isoformat(),'view':'journal','limit':50,
--                **({} if wants_history else {'journal_scope':'all'})}} for start,end in periods)
-+                **({} if journal_scope=='errors' else {'journal_scope':'all'})}} for start,end in periods)
-         elif wants_journal and not wants_history and not current:
-             # Old catalogs can still report the available target, but the
-             # unavailable journal capability below always vetoes completion.
-@@ -682,6 +865,8 @@
-     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
-     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
-     unavailable=['journal_excerpt'] if wants_journal and not journal_supported else []
-+    if targets & set(aggregates) and re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I):
-+        unavailable.append('host_system_archived_metadata')
-     if read_contract().companion_block_request(question):
-         block_name='mcp__resp__list_blocks'
-         registered=[t.get('function',{}).get('parameters',{}) for t in request['tools']
-@@ -690,7 +875,7 @@
-                 and registered[0].get('properties')=={} and not registered[0].get('required')):
-             options.append({'tool':block_name,'arguments':{}})
-         else:unavailable.append('current_block_list')
--    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-+    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행(?!\s*(?:결과|기록|상태|이력|시각|시간|중|여부))|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
-     only_service=not re.search(outside,without_targets(read_contract().without_prohibitions(question)),re.I)
-     # Preserve the full question and every receipt. Only a separately matched
-     # inventory clause is removed for scope classification, never for inquiry.
-@@ -700,14 +885,20 @@
+@@ -884,11 +893,11 @@
+         residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
                            if read_contract().block_list_plan(part.strip()) is None)
      compact_scope=not re.search(outside,without_targets(read_contract().without_prohibitions(residual)),re.I)
-     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
-+            'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
-+            'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
+-    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
++    value={'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+             'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
+             'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
              'requested_at_kst':requested_at,
-             'compact_scope':compact_scope,'initial_window':initial_window,
+-            'compact_scope':compact_scope,'initial_window':initial_window,
++            'compact_scope':compact_scope,'initial_window':initial_window,'current_only':current_only,
              'initial_history_window_minutes':int((periods[0][1]-periods[0][0]).total_seconds()/60) if initial_window else None,
              'current_companions':related,
-+            'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
-+                r'(?:오류|에러|실패)\s*(?:후보\s*)?(?:로그|표본)(?:들)?만|\bonly\s+(?:error|failure)\s+logs?\b|\b(?:error|failure)\s+logs?\s+only\b',question,re.I)),
-+                'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
-+                'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
+             'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
+@@ -896,6 +905,9 @@
+                 'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
+                 'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
              'unavailable_capabilities':unavailable}
++    # A factual current lookup cannot substitute for unknown clauses such as
++    # cause, impact, effective rules, health judgment or a protected change.
++    return value if not current_only or service_lookup_scope(value,question) else None
  
  
--def service_history_state(plan, receipts, now=None):
-+def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
-     """Distinguish pending attempts, failed/malformed reads and actual coverage.
- 
-     Receipts come from authenticated in-process MCP calls, not chat text. A
-@@ -726,7 +917,8 @@
-                 state['incomplete'].append('current_block_list:unavailable')
-             continue
-         args=required['arguments'];target=args['target'];past='since_kst' in args
--        runtime=target in plan.get('current_companions',[])
-+        runtime=(target in plan.get('current_companions',[])
-+                 or not past and target in plan.get('aggregate_targets',{}))
-         journal=args.get('view')=='journal'
-         matches=[]
-         for row in receipts:
-@@ -779,6 +971,27 @@
-             and data.get('lookback_scope')=='latest_snapshot_only_not_requested_history')
-         else:valid=data.get('kind')!='journal_history' and data.get('status')=='observed' and isinstance(data.get('properties'),dict)
-         if not valid:state['incomplete'].append(label+':scope_mismatch')
-+    coverage=plan.get('cause_source_coverage',{})
-+    if include_empty_source and not state['incomplete'] and coverage.get('required') is True:
-+        expanded=[]
-+        for required in plan['requirements']:
-+            args=required.get('arguments',{})
-+            if required.get('tool')!='mcp__system_diagnostics__get_system_diagnostics' or args.get('view')!='journal' or args.get('journal_scope','errors')!='errors':continue
-+            matching=[r for r in receipts if r.get('tool')==required['tool']
-+                and r.get('arguments',{}).get('target')==args['target'] and r.get('arguments',{}).get('view')=='journal'
-+                and r.get('arguments',{}).get('journal_scope','errors')=='errors'
-+                and all(_diagnostic_instant(r.get('arguments',{}).get(k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))]
-+            # All base reads above have already passed freshness/scope checks.
-+            if not matching or matching[-1]['data'].get('returned_entries')!=0:continue
-+            limit=coverage.get('limit')
-+            if coverage.get('all_supported') is not True or type(limit) is not int or not 1<=limit<=50:
-+                state['incomplete'].append(args['target']+':unfiltered_journal:tool_capability_unavailable');continue
-+            choice={'tool':required['tool'],'arguments':{**args,'journal_scope':'all','limit':limit}}
-+            if choice not in expanded:expanded.append(choice)
-+        if expanded:
-+            followup=service_history_state({**plan,'requirements':expanded},receipts,now,include_empty_source=False)
-+            state['pending']+=followup['pending']
-+            state['incomplete']+=['unfiltered_source:'+x for x in followup['incomplete']]
-     return state
- 
- 
-@@ -841,6 +1054,7 @@
-     Registration, periods and successful fresh receipts are checked separately.
-     """
-     if not plan or not plan.get('compact_scope') or plan.get('unavailable_capabilities'):return False
-+    question=query_body(question)
-     parts=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
-     kept=[]
-     for part in parts:
-@@ -849,19 +1063,22 @@
-         if re.fullmatch(r'(?:설정\s*)?(?:변경|수정|재시작|재가동|실행)(?:은|는|을|를)?\s*(?:하지\s*마(?:세요)?|금지)[.!?。]*',part):continue
-         kept.append(part)
-     text=' '.join(kept)
--    if not re.search(r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)',text):return False
-+    if read_action_remainder(text)==text:return False
-     # Bare A/B/C beside an exact unit must agree with the registered host too.
-+    text=read_action_remainder(text)
-     hosts={h.lower() for h in re.findall(r'(?<![A-Za-z0-9_:])([ABC])(?:\s*(?:서버|호스트))?(?=\s|의|$)',text,re.I)}
-     if hosts and (len(hosts)!=1 or any(t[0] not in hosts for t in plan['units'])):return False
-     if re.search(r'관제|처리|대기',text) and 'b:management-pipeline' not in plan.get('current_companions',[]):return False
--    for name in sorted(set(plan['units'])|set(plan['units'].values()),key=len,reverse=True):
--        text=re.sub(r'(?<![A-Za-z0-9_.:-])'+re.escape(name)+r'(?![A-Za-z0-9_.:-])',' ',text)
-+    text=_service_name_remainder(text,set(plan['units'])|{x for x in plan['units'].values() if x is not None}
-+        |set(plan.get('scope_labels',[])))
-+    if phrase:=plan.get('scope_period_phrase'):text=text.replace(phrase,' ',1)
-     text=re.sub(r'(?<![A-Za-z0-9_:])[ABC](?:\s*(?:서버|호스트))?(?=\s|의|$)',' ',text,flags=re.I)
-     text=re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?',' ',text)
--    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|'
-+    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|예전|'
-+           r'최근|마지막|직전|실행|기동|종료|결과|구분\s*해\s*(?:줘|주세요)|알려\s*(?:줘|주세요)|'
-            r'원문|로그|logs?|journal(?:ctl)?|raw|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
-            r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
--           r'부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|도|만|에|[\s,.!?。~–—-]')
-+           r'간단히|간단하게|짧게|부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|이랑|랑|하고|도|만|에|[\s,.!?。~–—-]')
-     return re.fullmatch(r'(?:'+token+r')+',text) is not None
- 
- 
-@@ -954,6 +1171,7 @@
+ def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
+@@ -1167,7 +1179,8 @@
+     failed=[r for r in receipts if r.get('is_error') is True]
+     receipts=[r for r in receipts if r.get('is_error') is False]
+     value={'question':question,'requested_at_kst':requested_at,'background':background,
+-           'history_window_origin':'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period',
++           'history_window_origin':('current_observation_only' if plan.get('current_only') else
++               'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period'),
             'initial_history_window_minutes':plan['initial_history_window_minutes'],
             'requested_service_scope':{
                 'units':copy.deepcopy(plan['units']),
-+               'aggregate_targets':copy.deepcopy(plan.get('aggregate_targets',{})),
-                'history_windows':[{'target':r['arguments']['target'],
-                    'since_kst':r['arguments']['since_kst'],'until_kst':r['arguments']['until_kst']}
-                    for r in plan['requirements'] if 'since_kst' in r['arguments']],
+@@ -2971,3 +2984,20 @@
+             if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
+             issues.add('diagnostic_snapshot_is_not_functional_health')
+     return sorted(issues)
++
++
++def service_scope_notice(request, question):
++    """Ask once for an ambiguous registered target before any inference/read."""
++    question=query_body(question)
++    intent=_service_lookup_intent(question)
++    if intent is None:return None
++    if read_contract().wants_write(question):return None
++    # An explicit all-host request is not a missing-host question. Do not
++    # confuse all logs for one service with all hosts.
++    if re.search(r'(?:모든|전체|각)\s*(?:호스트|서버)|\ball\s+(?:hosts?|servers?)\b',question,re.I):return None
++    selected=service_target_selection(request,question)
++    if not selected or not selected['ambiguous']:return None
++    choices=' · '.join('`'+target+'`' for target in sorted(selected['ambiguous']))
++    subject='상태' if intent.get('current_only') else '로그·이력'
++    return '어느 대상의 '+subject+'를 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
++
 --- a/opt/hermes-data/plugins/groot-query-completion/alignment.py
 +++ b/opt/hermes-data/plugins/groot-query-completion/alignment.py
-@@ -40,12 +40,40 @@
-             and getattr(agent, "api_mode", "chat_completions") == "chat_completions")
- 
- 
-+def registered_service_catalog(agent, request, harness):
-+    """Recover registry conditions removed only by Native's wire projection.
-+
-+    Never add an omitted tool or replace a changed/narrowed wire definition.
-+    The registry and the currently offered schema must otherwise agree exactly.
-+    """
-+    name='mcp__system_diagnostics__get_system_diagnostics'
-+    if name not in getattr(agent,'valid_tool_names',()) or not harness.EVIDENCE.allowed(name,'verify'):
-+        return request
-+    selected=[t for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
-+    if len(selected)!=1:return request
-+    wire=selected[0]['function'].get('parameters')
-+    if not isinstance(wire,dict) or harness.CONTRACT.diagnostic_journal_catalog(wire) is not None:return request
-+    try:from tools.registry import registry
-+    except ImportError:return request
-+    registered=registry.get_schema(name)
-+    if not isinstance(registered,dict) or registered.get('name')!=name:return request
-+    raw=registered.get('parameters')
-+    if not isinstance(raw,dict) or harness.CONTRACT.diagnostic_journal_catalog(raw) is None:return request
-+    projected=copy.deepcopy(raw)
-+    for key in ('allOf','anyOf','oneOf','enum','not'):projected.pop(key,None)
-+    if projected!=wire:return request
-+    result=copy.deepcopy(request)
-+    next(t for t in result['tools'] if t.get('function',{}).get('name')==name)['function']['parameters']=copy.deepcopy(raw)
-+    logging.getLogger('capstone.query_completion').info('event=service_registry_conditions restored=true tool=%s registry_sha256=%s',
-+        name,hashlib.sha256(json.dumps(raw,sort_keys=True,ensure_ascii=False).encode()).hexdigest())
-+    return result
-+
-+
- def gateway_evidence_request(agent, data, catalog_request, question, calls, harness, clock, reference):
-     """Lease the existing Native API a bounded, current-turn read/report phase."""
-     if (os.environ.get('CAPSTONE_GATEWAY_EVIDENCE_COMPACT','1')!='1'
-             or not enabled(agent,harness.EVIDENCE) or reference
-             or harness.READ.wants_write(harness.normalized(question))
--            or not harness.investigation_first_scope(question)
-             or not isinstance(getattr(agent,'base_url',None),str)
-             or not harness.EVIDENCE.verified_runtime_model(agent,data.get('model'))
-             or getattr(agent,'_interrupt_requested',False)):
-@@ -58,6 +86,12 @@
-     at=match[1]
-     if not at.endswith('+09:00') or not harness.EVIDENCE.parse_instant(at):
-         raise ValueError('gateway_evidence_clock_invalid')
-+    catalog_request=registered_service_catalog(agent,catalog_request,harness)
-+    service_plan=harness.CONTRACT.service_history_plan(catalog_request,question,at)
-+    service_plan=service_plan if service_plan and service_plan.get('compact_scope') else None
-+    if not service_plan and not harness.investigation_first_scope(question):
-+        agent._capstone_gateway_phase=None
-+        return None
-     catalog={}
-     for tool in catalog_request.get('tools',[]):
-         f=tool.get('function',{}) if isinstance(tool,dict) else {}
-@@ -81,11 +115,42 @@
-     used=getattr(agent,'_capstone_read_selection_count',(None,0))
-     used=used[1] if used[0]==turn else 0
-     remaining=min(4,max(0,harness.CONTRACT.TOOL_CALLS-used))
--    schemas=harness.refine_read_schemas(question,catalog,calls)
--    context=harness.evidence_report_context(question,calls,at,catalog)
-+    schemas=harness.refine_read_schemas(question,catalog,calls) if not service_plan else catalog
-+    context=harness.evidence_report_context(question,calls,at,catalog) if not service_plan else None
-     nonce=uuid.uuid4().hex
-     feedback=state.get('feedback') if state.get('feedback_calls')==calls else None
--    if not calls:
-+    if service_plan:
-+        receipts=harness.service_report_receipts(calls) if calls else []
-+        if receipts is None:raise ValueError('gateway_service_receipts_invalid')
-+        service_state=harness.CONTRACT.service_history_state(service_plan,receipts)
-+        pending=service_state['pending']+harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
-+        if pending:
-+            if remaining<1:raise ValueError('gateway_service_read_budget_exhausted')
-+            options=pending[:remaining]
-+            schema=harness.CONTRACT.service_required_read_selection(options,catalog)
-+            schema['properties']['request_nonce']={'const':nonce};schema['required'].append('request_nonce')
-+            context={'request':question,'requested_at_kst':at,'required_reads':options,
-+                     'initial_history_window_minutes':service_plan.get('initial_history_window_minutes')}
-+            selection_context={**context,'required_reads':[{'index':i,**option} for i,option in enumerate(options)]}
-+            messages=harness.CONTRACT.incident_selection_messages(selection_context,schema,agent_role='hermes',feedback=feedback)
-+            kind='initial'
-+        else:
-+            context=harness.CONTRACT.service_report_context(catalog_request,question,at,receipts,allowed_reads=set(catalog))
-+            if context is None:
-+                agent._capstone_gateway_phase=None
-+                return None
-+            remaining=remaining if state['inquiries']<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS else 0
-+            citations=sorted({r['tool'] for r in context['untrusted_completed_reads']})
-+            schema=harness.CONTRACT.service_report_schema(citations,nonce=nonce,available_reads=list(catalog),
-+                facts=harness.facts_for(calls),read_schemas=catalog,direct_reads=remaining,
-+                allow_more=remaining>0,lookup_only=context.get('lookup_only') is True)
-+            descriptions={t['function']['name']:harness.CONTRACT.service_tool_description(
-+                t['function'].get('description',''),t['function']['parameters'])
-+                for t in catalog_request.get('tools',[]) if t.get('function',{}).get('name') in catalog}
-+            messages=harness.CONTRACT.service_report_messages(context,descriptions,citations,feedback,
-+                structured_followups=True,direct_reads=True)
-+            kind='service'
-+    elif not calls:
-         scope=harness.incident_selection_scope(question,[])
-         if not scope or not set(scope)<=set(schemas):
-             raise ValueError('gateway_evidence_initial_scope_missing')
-@@ -126,6 +191,7 @@
-     phase={'binding':copy.deepcopy(binding),'kind':kind,'nonce':nonce,'context':copy.deepcopy(context),
-         'calls':copy.deepcopy(calls),'schema':copy.deepcopy(schema),'remaining':remaining,'used':used,
-         'messages':copy.deepcopy(messages),'profile':profile,'rejected':False}
-+    if service_plan:phase['service_plan']=copy.deepcopy(service_plan)
-     agent._capstone_gateway_phase=phase;agent._capstone_read_selection=None
-     state['requests']+=1
-     return result
-@@ -160,6 +226,11 @@
-     value=json.loads(response.choices[0].message.content)
-     phase['raw_response']=response.choices[0].message.content
-     if phase['kind']=='initial':
-+        if phase.get('service_plan'):
-+            from jsonschema import Draft202012Validator
-+            Draft202012Validator(phase['schema']).validate(value)
-+            choices=[phase['context']['required_reads'][i] for i in value['indexes']]
-+            return read_calls_response(response,choices),len(choices)
-         return selection_response(response,phase['schema'],harness)
-     value,_=harness.CONTRACT.validated_service_report(value,phase['schema'])
-     if value['more_evidence']:
-@@ -173,12 +244,15 @@
-         agent._capstone_gateway_evidence['inquiries']+=1
-         return read_calls_response(response,value['calls']),len(value['calls'])
-     review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
--    citations=list(phase['context']['evidence_tools'].values())
-+    citations=(sorted({r['tool'] for r in phase['context']['untrusted_completed_reads']})
-+        if phase['kind']=='service' else list(phase['context']['evidence_tools'].values()))
-     review['evidence_tools']=[citations[i] for i in indexes]
--    text=harness.evidence_report_text(review,phase['calls'],phase['context'])
--    issues=(harness.violations(phase['binding']['question'],text,phase['calls'])+
--        harness.evidence_capability_gap_violations(review,phase['context'])+
--        harness.evidence_report_scope_violations(review,phase['context']))
-+    text=(harness.EVIDENCE.render_model_review(review,harness.facts_for(phase['calls'])) if phase['kind']=='service'
-+        else harness.evidence_report_text(review,phase['calls'],phase['context']))
-+    if phase['kind']=='service':text=harness.CONTRACT.service_lookup_text(text,phase['context'])
-+    issues=(harness.violations(phase['binding']['question'],text,phase['calls'],service_plan=phase.get('service_plan'))+
-+        ([] if phase['kind']=='service' else harness.evidence_capability_gap_violations(review,phase['context'])+
-+        harness.evidence_report_scope_violations(review,phase['context'])))
-     if issues:
-         phase['feedback']={'issues':sorted(set(issues)),'untrusted_rejected_report':review}
-         raise ValueError('gateway_evidence_claim_invalid')
-@@ -745,7 +819,8 @@
-                 if not phase.get('feedback'):
-                     if getattr(exc,'validator',None) and isinstance(value,dict):
-                         phase['feedback']=(harness.selection_error_feedback(exc,value,phase['schema'])
--                            if phase['kind']=='initial' else harness.CONTRACT.service_schema_repair_feedback(value,phase['schema']))
-+                            if phase['kind']=='initial' and not phase.get('service_plan')
-+                            else harness.CONTRACT.service_schema_repair_feedback(value,phase['schema']))
-                     else:phase['feedback']={'issues':['gateway_'+type(exc).__name__]}
-                 state=agent._capstone_gateway_evidence
-                 state['feedback']=copy.deepcopy(phase['feedback']);state['feedback_calls']=copy.deepcopy(phase['calls'])
-@@ -824,7 +899,7 @@
-                     codex_ack_continuations=counter+1,**{name:kw[name] for name in names})
-             agent._capstone_alignment_partial=True
-             return original(agent,**query._with_final_text(kw,harness.fallback(request,calls)))
--        if (isinstance(phase,dict) and phase.get('kind')=='report' and isinstance(phase.get('admitted_text'),str)
-+        if (isinstance(phase,dict) and phase.get('kind') in ('report','service') and isinstance(phase.get('admitted_text'),str)
-                 and phase['admitted_text']==getattr(message,'content',None)
-                 and not phase.get('raw_audited')):
-             if (phase['binding']['turn']!=getattr(agent,'_current_turn_id',None)
-@@ -847,8 +922,10 @@
-         counter = kw.get('codex_ack_continuations')
-         repairs = getattr(agent, '_capstone_incident_repairs', (None, 0))
-         used = repairs[1] if repairs[0] == turn else 0
--        audit = harness.incident_judgment_check(request, text, calls,harness.card_reference(user,request))
--        incident_gap = harness.incident_evidence_gap(request, calls,harness.card_reference(user,request))
-+        service_plan=(phase.get('service_plan') if isinstance(phase,dict)
-+            and phase['binding']['turn']==turn and phase['binding']['question']==request else None)
-+        audit = harness.incident_judgment_check(request, text, calls,harness.card_reference(user,request),service_plan)
-+        incident_gap = harness.incident_evidence_gap(request, calls,harness.card_reference(user,request),service_plan)
-         incident_issues = audit['issues'] if audit else []
-         repeated = False
-         if audit:
-@@ -892,6 +969,9 @@
-         if action_issues:
-             text = harness.action_fallback(request, calls)
+@@ -582,6 +582,14 @@
+             return result
+         plan = harness.read_plan(request)
+         reference=harness.card_reference(kw.get('original_user_message',''),request)
++        notice=(harness.CONTRACT.service_scope_notice(registered_service_catalog(agent,result.api_kwargs,harness),request)
++                if not calls and not reference and not harness.READ.wants_write(harness.normalized(request)) else None)
++        agent._capstone_scope_clarification=(turn,request,notice)
++        if notice:
++            agent._capstone_read_selection=None
++            agent._capstone_query_completion_local_format=(turn,notice)
++            agent._capstone_alignment_partial=True
++            return result
+         incident_scope = harness.incident_selection_scope(request, calls,reference)
+         scope = incident_scope or harness.tool_scope(request, calls)
+         agent._capstone_read_selection = None
+@@ -909,6 +917,9 @@
+             append_message(rows,agent._build_assistant_message(raw_message,'incomplete'))
+             agent._session_messages=rows;phase['raw_audited']=True
+         notice = harness.scope_notice(request)
++        clarification=getattr(agent,'_capstone_scope_clarification',None)
++        if (not notice and clarification and clarification[:2]==(getattr(agent,'_current_turn_id',None),request)):
++            notice=clarification[2]
+         if notice and not calls:
              agent._capstone_alignment_partial = True
-+        if (service_plan and isinstance(phase,dict) and phase.get('kind')=='service'
-+                and phase.get('admitted_text')==getattr(message,'content',None)):
-+            return original(agent,**query._with_final_text(kw,harness.EVIDENCE.kst_display(text)))
-         prior = prior_read_report(request, rows, idx, query, harness) or harness.SHARED.render_prior_inventory(request, rows, idx)
-         if not calls and (prior or harness.reuse_only(request)):
-             agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))
---- a/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md
-+++ b/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md
-@@ -60,7 +60,7 @@
- 
- ## 사건 읽기 선택
- 
--- 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 JSON Schema의 `calls`에 선택한다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 Native 실행기가 담당한다.
-+- JSON Schema가 `calls`를 요구하면 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 선택한다. `indexes`를 요구하면 제공된 필수 읽기 목록에서 0부터 시작하는 index를 빠짐·중복 없이 선택하며 도구 이름·인자를 다시 만들지 않는다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 실행기가 담당한다.
- - 함께 요청한 장비와 현재 목록을 빠뜨리지 않고 독립된 읽기는 스키마 한도 안에서 함께 선택한다. 요청하지 않은 IP·룰·프로그램·장비 필터는 추가하지 않는다.
- - 날짜는 `requested_at_kst`와 사용자가 지정한 구간에 결속한다. ‘어제’는 KST의 전날 달력일이며 지난24시간으로 바꾸지 않는다. 과거 대화의 수치·판단은 현재 근거가 아니다.
- - 검증 피드백은 거절된 선택을 고치는 데만 사용한다. 범위·필수 읽기·인자·실행 한도를 줄여 검사를 피하지 않는다. 이 선택 단계는 쓰기 권한이나 승인으로 이어지지 않는다.
---- a/opt/capstone-ollama-trial/skill-soc-query.md
-+++ b/opt/capstone-ollama-trial/skill-soc-query.md
-@@ -60,7 +60,7 @@
- 
- ## 사건 읽기 선택
- 
--- 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 JSON Schema의 `calls`에 선택한다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 Native 실행기가 담당한다.
-+- JSON Schema가 `calls`를 요구하면 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 선택한다. `indexes`를 요구하면 제공된 필수 읽기 목록에서 0부터 시작하는 index를 빠짐·중복 없이 선택하며 도구 이름·인자를 다시 만들지 않는다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 실행기가 담당한다.
- - 함께 요청한 장비와 현재 목록을 빠뜨리지 않고 독립된 읽기는 스키마 한도 안에서 함께 선택한다. 요청하지 않은 IP·룰·프로그램·장비 필터는 추가하지 않는다.
- - 날짜는 `requested_at_kst`와 사용자가 지정한 구간에 결속한다. ‘어제’는 KST의 전날 달력일이며 지난24시간으로 바꾸지 않는다. 과거 대화의 수치·판단은 현재 근거가 아니다.
- - 검증 피드백은 거절된 선택을 고치는 데만 사용한다. 범위·필수 읽기·인자·실행 한도를 줄여 검사를 피하지 않는다. 이 선택 단계는 쓰기 권한이나 승인으로 이어지지 않는다.
---- a/opt/capstone-management/skill-soc-query.md
-+++ b/opt/capstone-management/skill-soc-query.md
-@@ -60,7 +60,7 @@
- 
- ## 사건 읽기 선택
- 
--- 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 JSON Schema의 `calls`에 선택한다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 Native 실행기가 담당한다.
-+- JSON Schema가 `calls`를 요구하면 현재 요청에 필요한 등록 읽기 도구와 정확한 인자를 선택한다. `indexes`를 요구하면 제공된 필수 읽기 목록에서 0부터 시작하는 index를 빠짐·중복 없이 선택하며 도구 이름·인자를 다시 만들지 않는다. 이 단계에서는 답변·위험 판단·도구 결과·승인을 작성하지 않는다. 도구 실행과 결과 확인은 실행기가 담당한다.
- - 함께 요청한 장비와 현재 목록을 빠뜨리지 않고 독립된 읽기는 스키마 한도 안에서 함께 선택한다. 요청하지 않은 IP·룰·프로그램·장비 필터는 추가하지 않는다.
- - 날짜는 `requested_at_kst`와 사용자가 지정한 구간에 결속한다. ‘어제’는 KST의 전날 달력일이며 지난24시간으로 바꾸지 않는다. 과거 대화의 수치·판단은 현재 근거가 아니다.
- - 검증 피드백은 거절된 선택을 고치는 데만 사용한다. 범위·필수 읽기·인자·실행 한도를 줄여 검사를 피하지 않는다. 이 선택 단계는 쓰기 권한이나 승인으로 이어지지 않는다.
+             return original(agent, **query._with_final_text(kw, notice))
 --- a/opt/capstone-ollama-trial/runtime.py
 +++ b/opt/capstone-ollama-trial/runtime.py
-@@ -434,7 +434,7 @@
-                         report['service_lookup_complete']=review.get('scope')=='verified_service_lookup'
-                         report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
-                         report['last_service_review']=copy.deepcopy(review)  # for bounded sentence pruning
--                        return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
-+                        return harness.CONTRACT.service_lookup_text(harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls'])),service_context)
-                     if direct:
-                         selected={row['tool']:readable[row['tool']] for row in value['calls']}
-                         plan={'calls':value['calls']}
+@@ -324,6 +324,12 @@
+             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
+             report['workflow_skills']=list(harness.workflow_names(current))
+             tick = time.perf_counter()
++            notice=(harness.CONTRACT.service_scope_notice(report.get('_service_catalog',{}),current)
++                    if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
++            if notice:
++                report.update(status='partial',final_response=notice,
++                    scope_resolution='clarification_required',conversation_seconds=time.perf_counter()-tick)
++                return report
+             service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
+                           if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
+             service_background=question if service_plan and question!=current else ''
 --- a/opt/hermes-data/plugins/groot-query-completion/chat_harness.py
 +++ b/opt/hermes-data/plugins/groot-query-completion/chat_harness.py
-@@ -1269,7 +1269,9 @@
-     if (not calls and not READ.wants_write(text)
-             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
-         issues.append('current_state_requires_actual_read')
--    diagnostic = diagnostic_request(question)
-+    bound_service=bool(service_plan and not reference and CONTRACT.service_lookup_scope(service_plan,question)
-+        and not CONTRACT.service_history_state(service_plan,service_history_receipts(calls))['incomplete'])
-+    diagnostic = None if bound_service else diagnostic_request(question)
-     observed = None
-     if diagnostic:
-         observed = diagnostic_observations(calls)
-@@ -1279,7 +1281,7 @@
-     # A second boundary checks an observed-state assertion even when an
-     # unfamiliar short question was not routed as a diagnostic. Appending a
-     # scope word here only interprets the subject; it never dispatches a tool.
--    if service_state_asserted(answer):
-+    if not bound_service and service_state_asserted(answer):
-         subject = diagnostic or diagnostic_request(question + ' 상태')
-         if subject:
-             if observed is None: observed = diagnostic_observations(calls)
+@@ -75,6 +75,22 @@
+     # Resolve consecutive same-subject ellipses without skipping a topic turn.
+     if len(prior_questions)>1:
+         previous=resolve_short_read(previous,prior_questions[-12:-1])
++    # A human may answer the service-host clarification with just "C 서버".
++    # Carry the request subject/conditions, never an observation or approval;
++    # the actual catalog and fresh reads still decide what can be executed.
++    supplied=normalized(question).strip(' \t\n?？.!')
++    supplied_hosts=READ.host_mentions(READ.scope_text(supplied))
++    prior_text=normalized(previous)
++    prior_hosts=READ.host_mentions(READ.scope_text(prior_text))
++    if (len(supplied_hosts)==1 and len({host for _,_,host in prior_hosts})<=1
++            and not READ.without_hosts(supplied).strip(' \t\n?？.!')
++            and CONTRACT._service_lookup_intent(prior_text)
++            and CONTRACT.read_action_remainder(prior_text)!=prior_text):
++        diagnostic=diagnostic_request(previous)
++        if (READ.operational_object_request(prior_text)
++                or diagnostic and not diagnostic.get('all') and diagnostic.get('requested')):
++            resolved=supplied_hosts[0][2].upper()+' 서버 '+READ.without_hosts(prior_text).strip()
++            if len(resolved)<=1800:return resolved
+     follow=re.fullmatch(r'\s*(?:그(?:거|것|중)|해당\s*(?:서비스|컨테이너))?\s*'
+         r'(메모리|CPU|자원|리소스|사용량|로그|journal|상태|상세히|자세히|상세)'
+         r'(?:는|은|도)?\s*(?:보여줘|보여줄래|알려줘|조회해줘)?[?？.! ]*',normalized(question),re.I)
 --- a/opt/capstone-ollama-trial/harness.py
 +++ b/opt/capstone-ollama-trial/harness.py
-@@ -1269,7 +1269,9 @@
-     if (not calls and not READ.wants_write(text)
-             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
-         issues.append('current_state_requires_actual_read')
--    diagnostic = diagnostic_request(question)
-+    bound_service=bool(service_plan and not reference and CONTRACT.service_lookup_scope(service_plan,question)
-+        and not CONTRACT.service_history_state(service_plan,service_history_receipts(calls))['incomplete'])
-+    diagnostic = None if bound_service else diagnostic_request(question)
-     observed = None
-     if diagnostic:
-         observed = diagnostic_observations(calls)
-@@ -1279,7 +1281,7 @@
-     # A second boundary checks an observed-state assertion even when an
-     # unfamiliar short question was not routed as a diagnostic. Appending a
-     # scope word here only interprets the subject; it never dispatches a tool.
--    if service_state_asserted(answer):
-+    if not bound_service and service_state_asserted(answer):
-         subject = diagnostic or diagnostic_request(question + ' 상태')
-         if subject:
-             if observed is None: observed = diagnostic_observations(calls)
+@@ -75,6 +75,22 @@
+     # Resolve consecutive same-subject ellipses without skipping a topic turn.
+     if len(prior_questions)>1:
+         previous=resolve_short_read(previous,prior_questions[-12:-1])
++    # A human may answer the service-host clarification with just "C 서버".
++    # Carry the request subject/conditions, never an observation or approval;
++    # the actual catalog and fresh reads still decide what can be executed.
++    supplied=normalized(question).strip(' \t\n?？.!')
++    supplied_hosts=READ.host_mentions(READ.scope_text(supplied))
++    prior_text=normalized(previous)
++    prior_hosts=READ.host_mentions(READ.scope_text(prior_text))
++    if (len(supplied_hosts)==1 and len({host for _,_,host in prior_hosts})<=1
++            and not READ.without_hosts(supplied).strip(' \t\n?？.!')
++            and CONTRACT._service_lookup_intent(prior_text)
++            and CONTRACT.read_action_remainder(prior_text)!=prior_text):
++        diagnostic=diagnostic_request(previous)
++        if (READ.operational_object_request(prior_text)
++                or diagnostic and not diagnostic.get('all') and diagnostic.get('requested')):
++            resolved=supplied_hosts[0][2].upper()+' 서버 '+READ.without_hosts(prior_text).strip()
++            if len(resolved)<=1800:return resolved
+     follow=re.fullmatch(r'\s*(?:그(?:거|것|중)|해당\s*(?:서비스|컨테이너))?\s*'
+         r'(메모리|CPU|자원|리소스|사용량|로그|journal|상태|상세히|자세히|상세)'
+         r'(?:는|은|도)?\s*(?:보여줘|보여줄래|알려줘|조회해줘)?[?？.! ]*',normalized(question),re.I)
+--- a/opt/hermes-data/plugins/groot-query-completion/read_contract.py
++++ b/opt/hermes-data/plugins/groot-query-completion/read_contract.py
+@@ -301,6 +301,22 @@
+         mentions.append((literal.start(), literal.end(), literal[1], None))
+     if not mentions and not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I):
+         return None
++    if not re.search(r'Wazuh|와주|에이전트|\bagents?\b',text,re.I):
++        # A host plus an unrecognized object is not an implicit Wazuh agent.
++        # Keep plain identity/status wording, but leave other nouns for the
++        # actual service/OS catalog instead of narrowing its exposed tools.
++        residual=text
++        for start,end,_,_ in sorted(mentions,reverse=True):
++            residual=residual[:start]+' '*(end-start)+residual[end:]
++        token=(r'현재|지금|최신|식별자?|연결|접속|등록|상태|이름|주소|목록|리스트|'
++               r'전체|모든|전부|요약|표로|표|활성화?|비활성|끊긴|끊어진|대기|'
++               r'보여\s*(?:줘|주세요|줄래)|알려\s*(?:줘|주세요)|'
++               r'(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
++               r'조회|확인|정리|몇\s*개|개수|통계|'
++               r'(?<![A-Za-z])(?:ID|IP|identity|status|active|disconnected|pending|never_connected)(?![A-Za-z])|'
++               r'의|을|를|은|는|이랑|이|가|과|와|랑|하고|도|만|로|에|'
++               r'[\s,.!?？:;`\'"()\[\]/-]')
++        if re.fullmatch(r'(?:'+token+r')*',residual,re.I) is None:return None
+     if not (re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I)
+             or states and re.search(r'보여|조회|확인|몇\s*개|개수', text)):
+         return None
+--- a/opt/capstone-ollama-trial/read_contract.py
++++ b/opt/capstone-ollama-trial/read_contract.py
+@@ -301,6 +301,22 @@
+         mentions.append((literal.start(), literal.end(), literal[1], None))
+     if not mentions and not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I):
+         return None
++    if not re.search(r'Wazuh|와주|에이전트|\bagents?\b',text,re.I):
++        # A host plus an unrecognized object is not an implicit Wazuh agent.
++        # Keep plain identity/status wording, but leave other nouns for the
++        # actual service/OS catalog instead of narrowing its exposed tools.
++        residual=text
++        for start,end,_,_ in sorted(mentions,reverse=True):
++            residual=residual[:start]+' '*(end-start)+residual[end:]
++        token=(r'현재|지금|최신|식별자?|연결|접속|등록|상태|이름|주소|목록|리스트|'
++               r'전체|모든|전부|요약|표로|표|활성화?|비활성|끊긴|끊어진|대기|'
++               r'보여\s*(?:줘|주세요|줄래)|알려\s*(?:줘|주세요)|'
++               r'(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
++               r'조회|확인|정리|몇\s*개|개수|통계|'
++               r'(?<![A-Za-z])(?:ID|IP|identity|status|active|disconnected|pending|never_connected)(?![A-Za-z])|'
++               r'의|을|를|은|는|이랑|이|가|과|와|랑|하고|도|만|로|에|'
++               r'[\s,.!?？:;`\'"()\[\]/-]')
++        if re.fullmatch(r'(?:'+token+r')*',residual,re.I) is None:return None
+     if not (re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I)
+             or states and re.search(r'보여|조회|확인|몇\s*개|개수', text)):
+         return None
+--- a/opt/capstone-management/read_contract.py
++++ b/opt/capstone-management/read_contract.py
+@@ -301,6 +301,22 @@
+         mentions.append((literal.start(), literal.end(), literal[1], None))
+     if not mentions and not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I):
+         return None
++    if not re.search(r'Wazuh|와주|에이전트|\bagents?\b',text,re.I):
++        # A host plus an unrecognized object is not an implicit Wazuh agent.
++        # Keep plain identity/status wording, but leave other nouns for the
++        # actual service/OS catalog instead of narrowing its exposed tools.
++        residual=text
++        for start,end,_,_ in sorted(mentions,reverse=True):
++            residual=residual[:start]+' '*(end-start)+residual[end:]
++        token=(r'현재|지금|최신|식별자?|연결|접속|등록|상태|이름|주소|목록|리스트|'
++               r'전체|모든|전부|요약|표로|표|활성화?|비활성|끊긴|끊어진|대기|'
++               r'보여\s*(?:줘|주세요|줄래)|알려\s*(?:줘|주세요)|'
++               r'(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
++               r'조회|확인|정리|몇\s*개|개수|통계|'
++               r'(?<![A-Za-z])(?:ID|IP|identity|status|active|disconnected|pending|never_connected)(?![A-Za-z])|'
++               r'의|을|를|은|는|이랑|이|가|과|와|랑|하고|도|만|로|에|'
++               r'[\s,.!?？:;`\'"()\[\]/-]')
++        if re.fullmatch(r'(?:'+token+r')*',residual,re.I) is None:return None
+     if not (re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I)
+             or states and re.search(r'보여|조회|확인|몇\s*개|개수', text)):
+         return None

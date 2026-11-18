@@ -636,7 +636,7 @@ def diagnostic_journal_catalog(schema):
 
 
 def _service_lookup_intent(question):
-    """Recognize an actual log/history lookup; never a quoted/negative task."""
+    """Recognize current state or history; never a quoted/negative task."""
     if not isinstance(question,str) or len(question)>6000:return None
     if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
     if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
@@ -644,7 +644,9 @@ def _service_lookup_intent(question):
     execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
     journal=service_log_request(question) or execution
     history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
-    if not history and not journal:return None
+    if not history and not journal:
+        if not re.search(r'현재|지금|상태|\b(?:current|now|state|status)\b',question,re.I):return None
+        return {'journal':False,'history':False,'execution':False,'cause':False,'current_only':True}
     return {'journal':journal,'history':history,'execution':execution,
         'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
 
@@ -713,7 +715,9 @@ def service_target_selection(request, question):
 
 def service_scope_notice(request, question):
     """Ask once for an ambiguous registered target before any inference/read."""
-    if _service_lookup_intent(question) is None:return None
+    question=query_body(question)
+    intent=_service_lookup_intent(question)
+    if intent is None:return None
     if read_contract().wants_write(question):return None
     # An explicit all-host request is not a missing-host question. Do not
     # confuse all logs for one service with all hosts.
@@ -721,7 +725,8 @@ def service_scope_notice(request, question):
     selected=service_target_selection(request,question)
     if not selected or not selected['ambiguous']:return None
     choices=' · '.join('`'+target+'`' for target in sorted(selected['ambiguous']))
-    return '어느 대상의 로그·이력을 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
+    subject='상태' if intent.get('current_only') else '로그·이력'
+    return '어느 대상의 '+subject+'를 확인할까요? 등록된 후보는 '+choices+'입니다. 호스트와 서비스 대상을 알려주세요. 아직 조회하지 않았습니다.'
 
 
 def service_requested_journal_scope(question, explicit_journal):
@@ -737,7 +742,7 @@ def service_requested_journal_scope(question, explicit_journal):
 
 
 def service_history_plan(request, question, requested_at):
-    """Build required reads from the same catalog-bound target resolution."""
+    """Build current/history reads from the same catalog-bound resolution."""
     question=query_body(question)
     intent=_service_lookup_intent(question)
     if intent is None:return None
@@ -749,15 +754,22 @@ def service_history_plan(request, question, requested_at):
     unit_mapping=selected['unit_mapping'];aggregates=selected['aggregates']
     mapping=selected['mapping'];targets=selected['targets'];aliases=selected['aliases']
     wants_journal=intent['journal'];wants_history=intent['history'];cause_inquiry=intent['cause']
+    current_only=bool(intent.get('current_only'))
     journal_scope=service_requested_journal_scope(question,intent['journal'])
     # The host target has no archived unit index. Its real bounded system
     # journal supplies historical log evidence instead of a current snapshot.
-    if targets & set(aggregates):wants_journal=True
+    if targets & set(aggregates) and not current_only:wants_journal=True
     def without_targets(text):
         return _service_name_remainder(text,set(targets)|{mapping[t] for t in targets if mapping[t] is not None}|aliases)
     # Resolve names before interpreting temporal words: e.g. 에이전트
     # contains 이전, which is not a request for an earlier time window.
     period_question=re.sub(_service_log_noun_pattern(),'로그',without_targets(question))
+    # A current-only read has no historical window. Do not discard temporal,
+    # comparison or resampling qualifiers just because "state" also appears.
+    if current_only and re.search(r'오늘|금일|최근|지난|어제|그제|내일|아까|이전|과거|당시|'
+            r'부터|까지|이후|사이|비교|대조|반복|연속|재조회|다시|'
+            r'두\s*번|세\s*번|여러\s*번|\d+\s*(?:초|분|시간|일|번|회)|'
+            r'\d{1,2}:\d{2}|\d{4}[-/.]\d',period_question):return None
     bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',period_question)
     natural=_service_natural_window(period_question,at) if not bounds else None
     periods=[];days=set();initial_window=False
@@ -803,9 +815,9 @@ def service_history_plan(request, question, requested_at):
             initial_window=True
             periods.append((at-(timedelta(hours=24) if cause_inquiry else timedelta(minutes=15)),at))
     else:return None
-    if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
+    if (not current_only and not periods) or any(not start or not end or not 0<(end-start).total_seconds()<=86400
             or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
-    current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+    current=current_only or bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
     if wants_journal and not wants_history and not re.search(r'상태|state|status',question,re.I):current=False
     # A named today's operating state also asks for a current observation;
     # the separate today's history is still required, never replaced by it.
@@ -858,11 +870,11 @@ def service_history_plan(request, question, requested_at):
         residual=' '.join(part for part in re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
                           if read_contract().block_list_plan(part.strip()) is None)
     compact_scope=not re.search(outside,without_targets(read_contract().without_prohibitions(residual)),re.I)
-    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+    value={'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
             'aggregate_targets':{t:aggregates[t]['scope'] for t in sorted(targets & set(aggregates))},
             'scope_labels':sorted(aliases),'scope_period_phrase':natural['phrase'] if natural is not None else None,
             'requested_at_kst':requested_at,
-            'compact_scope':compact_scope,'initial_window':initial_window,
+            'compact_scope':compact_scope,'initial_window':initial_window,'current_only':current_only,
             'initial_history_window_minutes':int((periods[0][1]-periods[0][0]).total_seconds()/60) if initial_window else None,
             'current_companions':related,
             'cause_source_coverage':{'required':cause_inquiry and not bool(re.search(
@@ -870,6 +882,9 @@ def service_history_plan(request, question, requested_at):
                 'all_supported':'all' in schema.get('properties',{}).get('journal_scope',{}).get('enum',[]),
                 'limit':schema.get('properties',{}).get('limit',{}).get('maximum')},
             'unavailable_capabilities':unavailable}
+    # A factual current lookup cannot substitute for unknown clauses such as
+    # cause, impact, effective rules, health judgment or a protected change.
+    return value if not current_only or service_lookup_scope(value,question) else None
 
 
 def service_history_state(plan, receipts, now=None, *, include_empty_source=True):
@@ -1308,7 +1323,8 @@ def service_report_context(request, question, requested_at, receipts, *, now=Non
     failed=[r for r in receipts if r.get('is_error') is True]
     receipts=[r for r in receipts if r.get('is_error') is False]
     value={'question':question,'requested_at_kst':requested_at,'background':background,
-           'history_window_origin':'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period',
+           'history_window_origin':('current_observation_only' if plan.get('current_only') else
+               'initial_recent_sample_not_incident_time' if plan['initial_window'] else 'user_specified_period'),
            'initial_history_window_minutes':plan['initial_history_window_minutes'],
            'requested_service_scope':{
                'units':copy.deepcopy(plan['units']),

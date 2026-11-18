@@ -79,6 +79,22 @@ def resolve_short_read(question, prior_questions=()):
     # Resolve consecutive same-subject ellipses without skipping a topic turn.
     if len(prior_questions)>1:
         previous=resolve_short_read(previous,prior_questions[-12:-1])
+    # A human may answer the service-host clarification with just "C 서버".
+    # Carry the request subject/conditions, never an observation or approval;
+    # the actual catalog and fresh reads still decide what can be executed.
+    supplied=normalized(question).strip(' \t\n?？.!')
+    supplied_hosts=READ.host_mentions(READ.scope_text(supplied))
+    prior_text=normalized(previous)
+    prior_hosts=READ.host_mentions(READ.scope_text(prior_text))
+    if (len(supplied_hosts)==1 and len({host for _,_,host in prior_hosts})<=1
+            and not READ.without_hosts(supplied).strip(' \t\n?？.!')
+            and CONTRACT._service_lookup_intent(prior_text)
+            and CONTRACT.read_action_remainder(prior_text)!=prior_text):
+        diagnostic=diagnostic_request(previous)
+        if (READ.operational_object_request(prior_text)
+                or diagnostic and not diagnostic.get('all') and diagnostic.get('requested')):
+            resolved=supplied_hosts[0][2].upper()+' 서버 '+READ.without_hosts(prior_text).strip()
+            if len(resolved)<=1800:return resolved
     follow=re.fullmatch(r'\s*(?:그(?:거|것|중)|해당\s*(?:서비스|컨테이너))?\s*'
         r'(메모리|CPU|자원|리소스|사용량|로그|journal|상태|상세히|자세히|상세)'
         r'(?:는|은|도)?\s*(?:보여줘|보여줄래|알려줘|조회해줘)?[?？.! ]*',normalized(question),re.I)

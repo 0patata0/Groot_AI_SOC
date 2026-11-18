@@ -347,6 +347,22 @@ def identity_plan(text, states):
         mentions.append((literal.start(), literal.end(), literal[1], None))
     if not mentions and not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I):
         return None
+    if not re.search(r'Wazuh|와주|에이전트|\bagents?\b',text,re.I):
+        # A host plus an unrecognized object is not an implicit Wazuh agent.
+        # Keep plain identity/status wording, but leave other nouns for the
+        # actual service/OS catalog instead of narrowing its exposed tools.
+        residual=text
+        for start,end,_,_ in sorted(mentions,reverse=True):
+            residual=residual[:start]+' '*(end-start)+residual[end:]
+        token=(r'현재|지금|최신|식별자?|연결|접속|등록|상태|이름|주소|목록|리스트|'
+               r'전체|모든|전부|요약|표로|표|활성화?|비활성|끊긴|끊어진|대기|'
+               r'보여\s*(?:줘|주세요|줄래)|알려\s*(?:줘|주세요)|'
+               r'(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
+               r'조회|확인|정리|몇\s*개|개수|통계|'
+               r'(?<![A-Za-z])(?:ID|IP|identity|status|active|disconnected|pending|never_connected)(?![A-Za-z])|'
+               r'의|을|를|은|는|이랑|이|가|과|와|랑|하고|도|만|로|에|'
+               r'[\s,.!?？:;`\'"()\[\]/-]')
+        if re.fullmatch(r'(?:'+token+r')*',residual,re.I) is None:return None
     if not (re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I)
             or states and re.search(r'보여|조회|확인|몇\s*개|개수', text)):
         return None

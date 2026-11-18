@@ -1,0 +1,1179 @@
+{
+  "at_kst": "2026-11-18T16:10:16.854270+09:00",
+  "status": "membership_grounding_confirmed_http_modality_gap_preserved",
+  "scope": "Current observed inventory membership and quantity are not feature activation; preserve MCP structure and approval boundaries",
+  "candidate": {
+    "plan_sha256": "769987b0eca665059ed20c80d1fae05396add5bf0547d6bb0b9e17f8fae0e00a",
+    "installed_sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "before_sha256": "a101dbe5bf4ff567151c810da758bd849916be8eaa38ec693549134f8ed5cb33",
+        "after_sha256": "0b54dc27e1c62730e9c8e0e098646a9e167f703b478ad01539030ecfdb546003",
+        "bytes": 339485
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "before_sha256": "a101dbe5bf4ff567151c810da758bd849916be8eaa38ec693549134f8ed5cb33",
+        "after_sha256": "0b54dc27e1c62730e9c8e0e098646a9e167f703b478ad01539030ecfdb546003",
+        "bytes": 339485
+      }
+    },
+    "public_source_sha256": {
+      "infra/ollama-trial/harness.py": "9ff041a4c995252252e2b91615cf7d3dae56449f458d20a2ce90e148c4673446",
+      "infra/ollama-trial/test_block_inventory_claims.py": "d970c4fe7c92b882733c2edcc4dbd74d17511b9e39acef920101b52e1a6246ba"
+    }
+  },
+  "tests": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 333,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 295,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 333,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 295,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.406s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.609s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "previous_guard_counterexample": {
+      "rc": 1,
+      "summary": {
+        "run": 7,
+        "failures": [
+          "test_block_inventory_claims.BlockInventoryClaims.test_actual_hermes_and_sdk_adjectives_describe_observed_addresses",
+          "test_block_inventory_claims.BlockInventoryClaims.test_direct_negative_feature_state_still_needs_configuration_proof",
+          "test_block_inventory_claims.BlockInventoryClaims.test_empty_and_nonempty_list_cannot_support_a_wrong_total_or_absence"
+        ],
+        "errors": []
+      }
+    },
+    "actual_archived_rejected_drafts": 12,
+    "archived_replay_model_MCP_chat_calls": 0,
+    "previous_confirmed_round_counterexample": {
+      "rc": 1,
+      "summary": {
+        "run": 8,
+        "failures": [
+          "test_block_inventory_claims.BlockInventoryClaims.test_current_list_members_generalize_without_becoming_service_state"
+        ],
+        "errors": []
+      }
+    }
+  },
+  "harness2": {
+    "at_kst": "2026-11-18T15:54:35.189591+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "pinned_framework_files": 140,
+    "catalog_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "census": {
+      "native/base": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "native/candidate": {
+        "always_on_chars": 33499,
+        "n_files": 19,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 11,
+        "plugins": 0
+      },
+      "sdk/base": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "sdk/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 20,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 13,
+        "plugins": 0
+      },
+      "management/base": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      },
+      "management/candidate": {
+        "always_on_chars": 16829,
+        "n_files": 14,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 7,
+        "plugins": 0
+      }
+    },
+    "diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/harness.py"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/harness.py"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [],
+        "always_on_char_delta": 0
+      }
+    },
+    "candidate_files": 2,
+    "plan_sha256": "769987b0eca665059ed20c80d1fae05396add5bf0547d6bb0b9e17f8fae0e00a",
+    "actual_mcp_schema_hashes_verified": true,
+    "operating_changes": 0,
+    "mcp_calls": 0,
+    "model_calls": 0,
+    "skill_copy_byte_deltas": {},
+    "observation": "Current membership and feature-state guards differ across2 installed harness copies. Workflow skills, always-on prompt content, MCP45, model and authority/approval remain unchanged."
+  },
+  "direct_review": {
+    "mode": "main direct defect-first review; review-agent unavailable",
+    "installed_current_round_changed_functions": [
+      "action_claim_violations"
+    ],
+    "initial_round_changed_functions": [
+      "action_claim_violations",
+      "block_inventory_assertion_violations"
+    ],
+    "other_AST_unchanged": true,
+    "public_source_sha256": {
+      "infra/ollama-trial/harness.py": "9ff041a4c995252252e2b91615cf7d3dae56449f458d20a2ce90e148c4673446",
+      "infra/ollama-trial/test_block_inventory_claims.py": "d970c4fe7c92b882733c2edcc4dbd74d17511b9e39acef920101b52e1a6246ba"
+    },
+    "controls": "Typed list member nouns do not attest service/host/config mode; actual counts and latest read validity retained",
+    "scope_limits": [
+      "A bounded factual guard is not full semantic verification",
+      "Round1 six actual5/6, round2 six actual5/6; changed membership guard fixed, separate HTTP negation/embedded-question guard failure remains"
+    ]
+  },
+  "isolation_failures": {
+    "missing_dependency": "Actual channel_sync.py absent from bounded test fixture; no operating dependency failure",
+    "failed_test_stages": 2,
+    "preparation_error": "First support merge incorrectly assumed chat_policy.py was absent too; it was already present with the same SHA. No source candidate changed.",
+    "recovery": "Preserved two failed fixture runs; fetched actual channel_sync.py and verified same chat_policy.py, rebuilt exact fixtures259files/arm; all same frozen source regressions then passed."
+  },
+  "unchanged": {
+    "MCP_tools": 45,
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "schema_permissions_roles_approval_TTL_ports_images": true,
+    "always_on_prompt_char_delta": 0,
+    "grounding4_pins2_embedded_management_gate": true
+  },
+  "publication": {
+    "status": "pending",
+    "expected_public_files": 18,
+    "source_test_files": 2,
+    "documentation_files": 15,
+    "validation_files": 1
+  },
+  "operating": {
+    "applied_at_kst": "2026-11-18T15:56:57.224247+09:00",
+    "files": 3,
+    "source_files": 2,
+    "receipt_files": 1,
+    "protected": 69,
+    "framework_operating_sources": 50,
+    "same_container_image": true,
+    "planned_native_restarts": 1,
+    "embedded_gate_bytes": 77782,
+    "embedded_gate_conditions": 7,
+    "gate_source_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+    "confirmation": {
+      "status": "confirmed",
+      "at_kst": "2026-11-18T16:05:08.042564+09:00",
+      "files": 3,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "protected": 69,
+      "rollback_timer": "inactive"
+    },
+    "final_source_health_at_kst": "2026-11-18T16:06:33.093325+09:00",
+    "planned_native_restarts_latest_rollout": 1,
+    "planned_native_restarts_whole_unit": 2,
+    "SDK_and_review_workers_refreshed": true,
+    "SDK_review_database_bytes_equal_while_workers_stopped": true,
+    "Native_whole_database_immutable_not_claimed": true
+  },
+  "round1": {
+    "applied_at_kst": "2026-11-18T15:38:18.276047+09:00",
+    "confirmed": {
+      "status": "confirmed",
+      "at_kst": "2026-11-18T15:46:01.840848+09:00",
+      "files": 3,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "protected": 69,
+      "rollback_timer": "inactive"
+    },
+    "fresh_chats": 6,
+    "accepted": 5,
+    "failed": 1,
+    "cases": {
+      "hermes-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 35.847,
+        "public_chars": 1873,
+        "post_count": 1,
+        "post_ids": [
+          "ac3u4a4sipbm7ja8g6odpz6dae"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      },
+      "hermes-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413",
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 45.966,
+        "public_chars": 8845,
+        "post_count": 3,
+        "post_ids": [
+          "cx5r8y49zpg8teaysdsgnz1izh",
+          "1h95yt3tfbbcfmmekos496o6xe",
+          "7kohhxf6ip88jqpww8raiedz9w"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 19,
+          "search_suricata_alerts": 48
+        }
+      },
+      "hermes-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "monitor",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 30.159,
+        "public_chars": 1790,
+        "post_count": 1,
+        "post_ids": [
+          "yddiyfprbbr8xx19ss69ggyafh"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      },
+      "ollama-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 40.341,
+        "public_chars": 1724,
+        "post_count": 1,
+        "post_ids": [
+          "jp5dih6k9jgrtjeygfh9fimrkr"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      },
+      "ollama-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          [
+            "block_inventory_does_not_verify_activation"
+          ],
+          [
+            "block_inventory_does_not_verify_activation"
+          ],
+          [
+            "block_inventory_does_not_verify_activation"
+          ]
+        ],
+        "status": "partial",
+        "assessment": "no_accepted_model_judgment",
+        "sdk_actual_model_calls": 4,
+        "seconds": 60.777,
+        "public_chars": 3842,
+        "post_count": 1,
+        "post_ids": [
+          "qffgd4z1ufb9x8kx3abywhm7ba"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      },
+      "ollama-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 44.141,
+        "public_chars": 1827,
+        "post_count": 1,
+        "post_ids": [
+          "h938isosx7ybibe3in746gr6fo"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      }
+    },
+    "new_false_positive": "Current active list targets were not recognized as typed members",
+    "original_cleanup": {
+      "at_kst": "2026-11-18T15:48:05.278154+09:00",
+      "roots": [
+        "/var/lib/capstone-evidence-validation/gateway-093b96a9a1",
+        "/var/lib/capstone-evidence-validation/gateway-ef058c212e",
+        "/var/lib/capstone-evidence-validation/gateway-72ac45dcac",
+        "/var/lib/capstone-evidence-validation/membership-prepare-9f994cb0e9"
+      ],
+      "files": 1982,
+      "bytes": 74563798,
+      "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-membership-9f994cb0e9",
+      "operating_changes": 0
+    },
+    "preserved_evidence": "First-round6 roots,5 accepted/1 failed and two failed isolated fixture stages retained locally; first-round operating backup retained"
+  },
+  "upstream_reference": {
+    "repository": "https://github.com/JoasASantos/Malvex",
+    "commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "adoption": "Evidence/judgment separation and exact receipt/recovery principles; project-specific guard repair, no upstream framework installation or MCP restructuring"
+  },
+  "actual_chats": {
+    "fresh_roots": 6,
+    "previous_round_roots": 6,
+    "distinct_wordings": 3,
+    "previous_unit_same_wordings_reused": 3,
+    "previously_failed_roots_reused_as_new_roots": 3,
+    "requested_period_verified": 6,
+    "read_executions": 18,
+    "protected_calls": 0,
+    "accepted_structured_model_reports": 5,
+    "public_projection_matches_private_final": 6,
+    "cases": {
+      "hermes-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 46.565,
+        "public_chars": 1769,
+        "post_count": 1,
+        "post_ids": [
+          "rarynitqg3d5jpasp5gbop6pgy"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "hermes-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": true,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "native_api_stages": 2,
+        "seconds": 43.657,
+        "public_chars": 8779,
+        "post_count": 3,
+        "post_ids": [
+          "f9wqg9b6opnpjmdk1d4zg3r7dc",
+          "fwtcu7tbj3fob8pkkk7ftd4kpo",
+          "3jaj3r5phfdn9xedat5fyao9th"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "hermes-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00",
+              "limit": 50
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [
+            "incident_disposition_missing"
+          ],
+          "scope": null,
+          "capability": null
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": false,
+        "rejected_draft_issues": [
+          {
+            "facts": [
+              "http_status_used_as_security_outcome"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "http_status_used_as_security_outcome"
+            ],
+            "scope": [],
+            "capability": []
+          },
+          {
+            "facts": [
+              "http_status_used_as_security_outcome"
+            ],
+            "scope": [],
+            "capability": []
+          }
+        ],
+        "status": "no_accepted_structured_report",
+        "assessment": "no_accepted_model_judgment",
+        "native_api_stages": 4,
+        "seconds": 68.769,
+        "public_chars": 1179,
+        "post_count": 1,
+        "post_ids": [
+          "jcpoqdtbnjgd38e9b6obuowwxh"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 48,
+          "search_modsecurity_alerts": 19
+        }
+      },
+      "ollama-implicit": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d"
+        ],
+        "read_arguments": [
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 40.989,
+        "public_chars": 1766,
+        "post_count": 1,
+        "post_ids": [
+          "416mtb9gipbs9g1cud9x8nz6zo"
+        ],
+        "returned_counts": {
+          "search_modsecurity_alerts": 10,
+          "search_suricata_alerts": 10
+        }
+      },
+      "ollama-detail": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 45.808,
+        "public_chars": 4096,
+        "post_count": 1,
+        "post_ids": [
+          "twc6zrpfqpbt8p9saym1gmnd1e"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      },
+      "ollama-causality": {
+        "requested_period_correct": true,
+        "requested_bounds": {
+          "since_kst": "2026-11-17T00:00:00+09:00",
+          "until_kst": "2026-11-17T23:59:59.999999+09:00"
+        },
+        "read_count": 3,
+        "read_sha256": [
+          "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+          "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+          "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+        ],
+        "read_arguments": [
+          {
+            "server": "security-events",
+            "name": "search_suricata_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "security-events",
+            "name": "search_modsecurity_alerts",
+            "arguments": {
+              "since_kst": "2026-11-17T00:00:00+09:00",
+              "until_kst": "2026-11-17T23:59:59.999999+09:00"
+            }
+          },
+          {
+            "server": "resp",
+            "name": "list_blocks",
+            "arguments": {}
+          }
+        ],
+        "report_guard_issues": {
+          "facts": [],
+          "scope": [],
+          "capability": []
+        },
+        "private_controls_preserved": false,
+        "public_controls_absent": true,
+        "public_projection_matches_private_final": true,
+        "accepted_model_report": true,
+        "rejected_draft_issues": [],
+        "status": "needs_review",
+        "assessment": "unresolved",
+        "sdk_actual_model_calls": 2,
+        "seconds": 42.081,
+        "public_chars": 1851,
+        "post_count": 1,
+        "post_ids": [
+          "idabbp7z4pfsb8cby1q6ab8foc"
+        ],
+        "returned_counts": {
+          "search_suricata_alerts": 10,
+          "search_modsecurity_alerts": 10
+        }
+      }
+    },
+    "interpretation": "Report acceptance and requested period correctness are bounded checks, not expert incident accuracy. Same-wording paired timings are single observations; Native implicit sample sizes differ48/19 versus10/10, while Native detail48/19 and SDK causality10/10 match. No general30/60sec SLO claim."
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T16:05:36.346797+09:00",
+    "roots": [
+      "/var/lib/capstone-evidence-validation/gateway-ad86ff0d56",
+      "/var/lib/capstone-evidence-validation/membership-prepare-5414e5078e"
+    ],
+    "files": 666,
+    "bytes": 25552756,
+    "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-membership-5414e5078e",
+    "operating_changes": 0,
+    "exported_results": 7,
+    "exported_bytes": 136932,
+    "all_exports_and_whole_member_manifests_SHA256_verified": true,
+    "first_export_precondition_deferred_until_APPLIED_readonly_export": true,
+    "deletion_only_after_CONFIRMED": true,
+    "Mac_package_download_install": 0,
+    "operating_backups_framework_skills_weights_local_evidence_retained": true,
+    "first_round_already_cleaned": {
+      "at_kst": "2026-11-18T15:48:05.278154+09:00",
+      "roots": [
+        "/var/lib/capstone-evidence-validation/gateway-093b96a9a1",
+        "/var/lib/capstone-evidence-validation/gateway-ef058c212e",
+        "/var/lib/capstone-evidence-validation/gateway-72ac45dcac",
+        "/var/lib/capstone-evidence-validation/membership-prepare-9f994cb0e9"
+      ],
+      "files": 1982,
+      "bytes": 74563798,
+      "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-membership-9f994cb0e9",
+      "operating_changes": 0
+    }
+  },
+  "remaining_limits": [
+    "A bounded factual guard is not a complete natural-language semantic verifier",
+    "Final6 actual conversations plus first-round6 with5 accepted/1 failed,12 archived draft replays and selected regressions; general task accuracy and load SLO unverified",
+    "No new attacks/training/GUI visual QA/new OS installation/thesis body export"
+  ],
+  "remaining_http_gap": {
+    "source": "round2 Hermes causality three actual drafts",
+    "current_list_guard_issues": 0,
+    "guard_issue": "http_status_used_as_security_outcome",
+    "forms": [
+      "증거가 아니다",
+      "차단했는지 확인할 수 없다",
+      "의미하는지는 추가 검증이 필요하다"
+    ],
+    "classification": "Correct evidence negation/embedded question rejected by unchanged HTTP/modality checks; not a proved block outcome",
+    "scope": "Current source repair pending, preserve actual failure68.769sec/4stages/3reads; no unsupported success declared"
+  },
+  "observation_transport": {
+    "at_kst": "2026-11-18T16:03:53.559394+09:00",
+    "scope": "Mac-admin-A-B observation transport only",
+    "operation": "hermes-detail first poll after verified successful post",
+    "rc": 255,
+    "error_kind": "timeout",
+    "seconds": 19.89941395900678,
+    "question_reposted": false,
+    "recovery": "Same post read succeeded16:03:00KST; no configuration/VPN change performed",
+    "local_network": "scutil lists en0; existing route to231 remains utun8; no route mutation",
+    "chat_timing": "Mattermost source create_at to actual bot update_at, not observer poll elapsed time",
+    "second_failure": {
+      "rc": 0,
+      "seconds": 1.230062499991618,
+      "route": "Mac-admin-A-B",
+      "at_kst": "2026-11-18T16:04:43.537595+09:00"
+    },
+    "second_question_reposted": false
+  }
+}

@@ -2311,6 +2311,31 @@ def incident_observation_prompt(question, calls, *, attempts=None):
                     'earlier_attempts_omitted': len(attempts.get('rows',[])) > 32}}) + '\n</untrusted_tool_observations>')
 
 
+def block_inventory_assertion_violations(answer, addresses):
+    """Bind explicit current-list totals to a validated membership receipt.
+
+    This does not establish feature state or decide an incident. Historical,
+    per-address, limit and other-subject quantities are separate claims.
+    """
+    if addresses is None or not isinstance(answer,str):return []
+    for clause in re.split(r'\n|;|(?<=[.!?])\s+|하지만|그러나',re.sub(r'[*`]', '', answer)):
+        subject=re.search(r'차단\s*(?:목록|리스트)|\blist_blocks\b',clause,re.I)
+        if not subject:continue
+        prefix=clause[:subject.start()]
+        if re.search(r'과거|어제|당시|이력',prefix) and not re.search(r'현재|지금',prefix):continue
+        tail=clause[subject.end():subject.end()+160]
+        for claim in re.finditer(r'빈\s*(?:배열|목록|리스트)|비어\s*있(?:습니다|음|다)|없(?:습니다|음|다)|'
+                r'(?<![\d.,])([0-9][0-9,]{0,11})\s*(?:개|건)(?=$|[^가-힣]|입니다|이었|였|이며|이고|로|으로|만|뿐|임|인|은|는|이|가|라면|이면)',tail):
+            before=tail[:claim.start()];after=tail[claim.end():]
+            if (re.search(r'경보|로그|규칙|룰|기능|설정|과거|어제|당시|이력|한도|최대|상한|예시|가정|만약|미확인|확인\s*불가|\b(?:limit|WAF|IDS|HTTP)\b',before,re.I)
+                    or re.search(r'(?<![\d.])(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?![\d.])',before)
+                    or CONTRACT.claim_modality(after) in ('not_asserted','conditional_or_unverified','planned_check')):
+                continue
+            count=int(claim[1].replace(',','')) if claim[1] else 0
+            if count!=len(addresses):return ['block_inventory_membership_count_mismatch']
+    return []
+
+
 def action_claim_violations(question, answer, calls):
     """Check claimed observations/execution, including on the write path.
 
@@ -2325,7 +2350,8 @@ def action_claim_violations(question, answer, calls):
         raw = call.get('result')
         if isinstance(raw, str) and hashlib.sha256(raw.encode()).hexdigest() == call.get('result_sha256'):
             verified.append(call)
-    block_reads = READ.block_list_state(calls) is not None
+    current_blocks = READ.block_list_state(calls)
+    block_reads = current_blocks is not None
     fw = firewall_state(calls)
     # A complete FW receipt contains the same live agent_block set. It is valid
     # evidence for the FW renderer without an additional list_blocks request.
@@ -2338,7 +2364,7 @@ def action_claim_violations(question, answer, calls):
     actual_actions = [c for c in verified if (c.get('server'), c.get('name')) in (
         ('resp', 'block_ip'), ('resp', 'unblock_ip'),
         ('rule-write-a', 'temporarily_contain_ip'))]
-    issues = set()
+    issues = set(block_inventory_assertion_violations(answer,current_blocks))
     rule_observation = (request_kind(question) == 'other'
         and (CONTRACT.bare_firewall_view(normalized(question)) or
              re.search(r'룰|규칙|\brules?\b', normalized(question), re.I)
@@ -2362,7 +2388,21 @@ def action_claim_violations(question, answer, calls):
                 if not subject:continue
                 for state in re.finditer(r'비활성(?:화)?|활성화|중지|중단|꺼져|켜져|\b(?:disabled|enabled|inactive|active|off|on)\b',clause[subject.end():],re.I):
                     after=clause[subject.end()+state.end():]
-                    if (CONTRACT.claim_modality(after) in ('not_asserted','conditional_or_unverified','planned_check')
+                    membership=(current_blocks is not None and state[0].lower() in ('활성화','active')
+                        and re.search(r'차단\s*(?:목록|리스트)|\blist_blocks\b',clause,re.I)
+                        and (re.match(r'\s*(?:된|되어\s*있는|중인)\s*(?:(?:임시|동적)\s*)?'
+                                      r'(?:(?:IP|아이피)\s*차단\s*|차단\s*)?'
+                                      r'(?:주소|(?:대상|항목|구성원|원소|엔트리|IP|아이피)'
+                                      r'(?!\s*(?:차단\s*)?(?:서버|서비스|시스템|기능|설정|모드)))(?:들)?(?:[은는이가을를]|\s|$)',after,re.I)
+                             or state[0].lower()=='active' and re.match(r'\s+(?:IP\s+addresses|addresses|IPs|entries|members|elements)\b',after,re.I)))
+                    if membership:continue
+                    # A direct negated mode is still an unsupported mode claim.
+                    # Negated evidence, uncertainty and conditions remain valid.
+                    direct_negation=re.match(r'\s*(?:상태\s*)?(?:은|는|이|가)?\s*'
+                        r'(?:아니|아님|아닙|되지\s*않|되어\s*있지\s*않|하지\s*않|안\s*(?:되|돼))',after)
+                    modality=CONTRACT.claim_modality(after)
+                    if (modality in ('conditional_or_unverified','planned_check')
+                            or not direct_negation and modality=='not_asserted'
                             or re.match(r'\s*(?:인지|여부|인가|일지)',after)):
                         continue
                     issues.add('block_inventory_does_not_verify_activation')

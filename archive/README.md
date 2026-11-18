@@ -1,5 +1,9 @@
 # 과거 기록과 복원 안내
 
+<!-- presentation-and-plain-toc-20261118 -->
+[표 없는 목차·발표 동기화](DESIGN_ALTERNATIVES.md#presentation-and-plain-toc-20261118)와 [출력 검수](DIAGNOSTIC_HISTORY.md#presentation-and-plain-toc-20261118)를 기록했다. 11월18일 후속 결과와5장 논문 좌표를 연결한20쪽 발표·편집 표/차트·메모의 갱신은 유형별 presentation-and-plain-toc-20261118 이력을 참조한다. 실제 리허설과 발표는 별도다.
+<!-- /presentation-and-plain-toc-20261118 -->
+
 사용자 지정 [다섯 장 목차](DESIGN_ALTERNATIVES.md#thesis-five-chapter-20261118)와 [내용·출력 검증](DIAGNOSTIC_HISTORY.md#thesis-five-chapter-20261118)을 유형별 이력에 연결했다. 기존6장 조건은 후속 지시로 대체됐으며 전체98쪽/본문1~92쪽·151색인과 고정 결과 원장의 범위를 구분한다.
 
 <!-- chat-alignment:history -->

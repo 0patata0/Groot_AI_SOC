@@ -1,0 +1,626 @@
+{
+  "schema_version": 1,
+  "state": "operating_confirmed_chat_output_subject_error_open",
+  "scope": "Fixed A certificate observer; existing MCP/tool/server/model layout unchanged",
+  "observed_at_kst": "2026-11-18T16:51:11.677381+09:00",
+  "route": "Mac-admin231-A/B",
+  "indexed_warning_sample": {
+    "observed_at_kst": "2026-11-18T16:54:43.237961+09:00",
+    "applied_filters": {
+      "wazuh_rule_id": "100305",
+      "agent_id": "001"
+    },
+    "window_start_kst": "2026-11-17T16:54:43.205050+09:00",
+    "window_end_kst": "2026-11-18T16:54:43.205050+09:00",
+    "returned_count": 1,
+    "full_window_total_known": false,
+    "alerts": [
+      {
+        "timestamp": "2026-11-18T09:00:12.292000+09:00",
+        "agent": "groot-sec",
+        "agent_id": "001",
+        "wazuh_rule_id": "100305",
+        "wazuh_rule_description": "chat.grootlab.duckdns.org certificate observation failed; probe=unavailable; reason=tls_timeout",
+        "wazuh_level": "5",
+        "decoder": "capstone_certificate_json",
+        "program_name": "capstone-cert-monitor",
+        "source_ip": "",
+        "destination_ip": "",
+        "service_units": [],
+        "exit_status": null,
+        "raw_log_returned": false
+      }
+    ]
+  },
+  "candidate": {
+    "sha256": {
+      "monitor.sh": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8",
+      "capstone-cert-monitor.service": "9c9f50343d7671890e8218352fa69922144d9c34fd50f67d1348a2caa314e97c",
+      "test-monitor.sh": "c742e7a5aa8174b84487e23a8a8d538801171682275f6db7a36be20d73ee270a"
+    },
+    "public_validation_code_sha256": {
+      "infra/groot-a/certificate-monitor/check-native.py": "cd8337d8851c8c7d0bebdd332aa697d697109ac585f06e39eab030a5d7b4e882",
+      "infra/groot-a/certificate-monitor/rollout.py": "aea8c13157aecdc2e2472e5fe96e01e6318444fc727424fcca541c51cf371821",
+      "infra/groot-a/certificate-monitor/test-rollout.py": "eb57baeb279aaf40d845e1c0c609b9eb7c114704b92c60c599016307f8867447"
+    },
+    "exact_plan_sha256": "10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7",
+    "prepared_stage": "/var/lib/capstone-cert-rollout/change-rifziyda",
+    "controller_sha256": "aea8c13157aecdc2e2472e5fe96e01e6318444fc727424fcca541c51cf371821",
+    "operating_target_count": 2,
+    "timer_changed": false,
+    "certificate_changed": false,
+    "private_key_read": false,
+    "packages_installed": 0,
+    "MCP_changes": 0,
+    "network_policy_change_requires_exact_approval": false,
+    "exact_approval_received": true
+  },
+  "validation": {
+    "native_regression": {
+      "suite": "certificate_monitor_private",
+      "passed": 26,
+      "network_connections": 0,
+      "operating_access": false,
+      "tls_transport_simulated": true
+    },
+    "full_cm_main_check_cases": [
+      {
+        "case": "installed_baseline",
+        "unit": "capstone-cert-check-944b6704e212.service",
+        "exit": 0,
+        "seconds": 10.3972,
+        "event": {
+          "automatic_renewal": false,
+          "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+          "domain": "chat.grootlab.duckdns.org",
+          "expiry_status": "ok",
+          "not_after_epoch": 1799814312,
+          "not_after_kst": "2027-01-13T13:25:12+09:00",
+          "observed_at_kst": "2026-11-18T16:54:22+09:00",
+          "observed_at_utc": "2026-11-18T07:54:22Z",
+          "probe_status": "unavailable",
+          "reason": "tls_timeout",
+          "schema_version": 1,
+          "seconds_remaining": 4825860,
+          "served_certificate_sha256": null
+        },
+        "collected": true,
+        "private_status_unchanged": true,
+        "full_cm_main_check": true
+      },
+      {
+        "case": "candidate",
+        "unit": "capstone-cert-check-db4b5abff696.service",
+        "exit": 0,
+        "seconds": 0.472,
+        "event": {
+          "automatic_renewal": false,
+          "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+          "domain": "chat.grootlab.duckdns.org",
+          "expiry_status": "ok",
+          "not_after_epoch": 1799814312,
+          "not_after_kst": "2027-01-13T13:25:12+09:00",
+          "observed_at_kst": "2026-11-18T16:54:22+09:00",
+          "observed_at_utc": "2026-11-18T07:54:22Z",
+          "probe_status": "verified",
+          "reason": "verified",
+          "schema_version": 1,
+          "seconds_remaining": 4825850,
+          "served_certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427"
+        },
+        "collected": true,
+        "private_status_unchanged": true,
+        "full_cm_main_check": true
+      }
+    ],
+    "candidate_unit_syntax": true,
+    "operating_sources_unchanged": true,
+    "transaction_filesystem_tests": {
+      "tests": 14,
+      "passed": 14,
+      "skipped": 0,
+      "service_control_simulated": true,
+      "controller_sha256": "aea8c13157aecdc2e2472e5fe96e01e6318444fc727424fcca541c51cf371821"
+    },
+    "detached_rollback": {
+      "at_kst": "2026-11-18T17:02:10.009850+09:00",
+      "timer_unit": "capstone-cert-detached-ad1ed9f74a1b.timer",
+      "issuer_process_exited_before_rollback": true,
+      "seconds_after_issuer_exit": 2.226,
+      "private_targets_restored": 2,
+      "service_control_in_coordinator_simulated": true,
+      "actual_independent_timer_and_child_process": true,
+      "operating_sources_unchanged": true,
+      "failed_units_unchanged": true,
+      "operating_changes": 0,
+      "real_SSH_disconnect_not_performed": true,
+      "controller_sha256": "aea8c13157aecdc2e2472e5fe96e01e6318444fc727424fcca541c51cf371821",
+      "owned_root_removed": true
+    },
+    "temporary_sources_removed": true,
+    "actual_operating_change": true,
+    "actual_operating_run": true,
+    "actual_SSH_disconnect_test": false,
+    "new_actual_chat": true,
+    "fresh_OS_install": false,
+    "public_DNS_443_HTTP_availability_proven": false,
+    "cleanup_chat": {
+      "root": "/var/lib/capstone-evidence-validation/certificate-10a9be42f4bb",
+      "exported_files": 2,
+      "bytes": 1130,
+      "cleanup_verified": true,
+      "receipt": {
+        "removed": "/var/lib/capstone-evidence-validation/certificate-10a9be42f4bb",
+        "files": 2,
+        "export_sha_verified": true,
+        "operating_or_backup_files_removed": 0
+      }
+    }
+  },
+  "pending": [
+    "Repair common follow-up/repair/output scope: actual certificate query was replaced by Wazuh-agent inventory; Harness² and new chat tests required",
+    "Portable single deploy.sh integration: distinct lab-edge/chat certificate inputs, fixed endpoint, safe public-cert paths, host identity and domain-bound Wazuh rules",
+    "Next scheduled 09:00 KST observation; public DNS/443/HTTP availability and fresh OS install are separate"
+  ],
+  "review": {
+    "approach": "Primary agent defect-first review; review-agent unavailable",
+    "fixed_during_review": [
+      "Rollback waits for concurrent confirmation lock",
+      "Confirmation cannot commit after five-minute deadline",
+      "Controller SHA binds both staged and running source",
+      "All target conflicts checked before restoring any file"
+    ],
+    "not_performed": [
+      "Semgrep",
+      "Real public ingress availability",
+      "New operating run or model/chat call"
+    ]
+  },
+  "publication": {
+    "state": "pending_commit_and_push"
+  },
+  "supplementary_read_only_systemd": {
+    "failed-b": {
+      "schema": 1,
+      "host": "b",
+      "observed_at_kst": "2026-11-18T17:07:32.004891+09:00",
+      "failed_service_count": 0,
+      "failed_services": [],
+      "failed_list_truncated": false,
+      "recent_manager_events": [],
+      "journal_scope": "last four hours, last300 PID1 records; no complete-history or application-cause claim",
+      "operating_changes": 0
+    },
+    "failed-c": {
+      "schema": 1,
+      "host": "c",
+      "observed_at_kst": "2026-11-18T17:07:31.980981+09:00",
+      "failed_service_count": 0,
+      "failed_services": [],
+      "failed_list_truncated": false,
+      "recent_manager_events": [],
+      "journal_scope": "last four hours, last300 PID1 records; no complete-history or application-cause claim",
+      "operating_changes": 0
+    },
+    "systemd-index-b": {
+      "at_kst": "2026-11-18T17:07:31.949151+09:00",
+      "query": {
+        "source": "wazuh",
+        "lookback_minutes": 1440,
+        "applied_filters": {
+          "program_name": "systemd"
+        },
+        "window_mode": "lookback",
+        "requested_since_kst": "2026-11-17T17:07:31.918648+09:00",
+        "requested_until_kst": "2026-11-18T17:07:31.918648+09:00",
+        "returned_count": 1,
+        "indexed_window_total_count": null,
+        "source_scope": "wazuh_indexed_alerts",
+        "untrusted_evidence": true,
+        "field_semantics": {
+          "agent": "collecting_wazuh_agent_name_not_source_host_or_destination_attestation",
+          "source_ip": "recorded_source_address_not_verified_host_name_or_authorization",
+          "wazuh_rule_id": "correlation_rule_id_not_sensor_rule_id",
+          "wazuh_rule_description": "bounded_untrusted_rule_label"
+        },
+        "evidence_scope_ko": "색인된 경보의 제한된 반환 표본입니다. 원시 센서 로그 직접 조회가 아니며 수집·색인 지연/누락이 가능합니다. 반환0건은 이 검색 표본0건을 뜻하고 전체 공격/경보 부재나 정상 판정을 입증하지 않습니다. 요청 구간 전체 건수는 미확인입니다.",
+        "limit": 50,
+        "scanned": 1,
+        "scan_capped": false,
+        "alerts": [
+          {
+            "timestamp": "2026-11-18T07:54:59.187000+09:00",
+            "agent": "groot-siem-host",
+            "agent_id": "003",
+            "wazuh_rule_id": "40704",
+            "wazuh_rule_description": "Systemd: Service exited due to a failure.",
+            "wazuh_level": "5",
+            "decoder": "systemd",
+            "program_name": "systemd",
+            "source_ip": "",
+            "destination_ip": "",
+            "service_units": [
+              "capstone-native-read-e6f35c48c0.service"
+            ],
+            "exit_status": {
+              "code": "exited",
+              "status": "1",
+              "label": "FAILURE"
+            },
+            "raw_log_returned": false
+          }
+        ]
+      }
+    },
+    "historical_sample_ownership": {
+      "unit": "capstone-native-read-e6f35c48c0.service",
+      "recorded_case_plan_sha256": "0b0b443232882cf35feeabdacbb24c5f47910760ac42df1be3af17e78dfdd656",
+      "recorded_case_sha256": "aa6315d1509225934e65a7dbdaf637493b7c99c4265dc0b342d58c772af45248",
+      "recorded_terminal_sha256": "e62542c263526d2f97e5717989dcb0391bd1dc5b0b47da6ac15c74a19db123f1",
+      "recorded_exit": 1,
+      "recorded_error": "SyntaxError: unterminated string literal in isolated validation worker",
+      "recorded_terminal_load_state": "not-found",
+      "basis": "Prior exact plan, unit, worker terminal and cleanup records; not inferred from unit name alone",
+      "current_B_failed_services": 0,
+      "current_C_failed_services": 0,
+      "all_history_or_current_application_health_claim": false
+    }
+  },
+  "operating_before": {
+    "source_sha256": {
+      "/usr/local/sbin/capstone-cert-monitor": "91c0ed1025beb3f7bbc59ec38b58c705add1637c8e5c69216eb489d62e65a540",
+      "/etc/systemd/system/capstone-cert-monitor.service": "d8357b4979398ae4bc2e1f699c1513b5509c447ae0ebd563acf76a2a609e8f64",
+      "/etc/systemd/system/capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+      "/home/groot_a/capstone/chatproxy/tls/chatduck.crt": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794",
+      "/var/lib/capstone-cert-monitor/status.json": "0e33f257a9b43fa849b9a312ec6c49e5b69713e1202fb0131a98daae8f22b0f2"
+    },
+    "current_A_failed_units": [],
+    "latest_status": {
+      "automatic_renewal": false,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "domain": "chat.grootlab.duckdns.org",
+      "expiry_status": "ok",
+      "not_after_epoch": 1799814312,
+      "not_after_kst": "2027-01-13T13:25:12+09:00",
+      "observed_at_kst": "2026-11-18T09:00:10+09:00",
+      "observed_at_utc": "2026-11-18T00:00:10Z",
+      "probe_status": "unavailable",
+      "reason": "tls_timeout",
+      "schema_version": 1,
+      "seconds_remaining": 4854312,
+      "served_certificate_sha256": null
+    },
+    "observer_unit": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Wed 2026-11-18 09:00:00 KST",
+      "ExecMainExitTimestamp": "Wed 2026-11-18 09:00:10 KST",
+      "ExecMainStatus": "2",
+      "IPAddressAllow": "127.0.0.1/32",
+      "IPAddressDeny": "0.0.0.0/0 ::/0",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.service",
+      "UnitFileState": "static"
+    },
+    "timer": {
+      "NextElapseUSecRealtime": "Thu 2026-11-19 09:00:00 KST",
+      "LastTriggerUSec": "Wed 2026-11-18 09:00:00 KST",
+      "Result": "success",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.timer",
+      "UnitFileState": "enabled"
+    },
+    "container": {
+      "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+      "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+      "running": true,
+      "started_at": "2026-11-12T07:58:30.958074106Z",
+      "networks": {
+        "chatproxy_chat-net": {
+          "address": "172.19.0.2",
+          "gateway": "172.19.0.1",
+          "ipam": null
+        },
+        "secstack_waf-net": {
+          "address": "172.18.0.3",
+          "gateway": "172.18.0.1",
+          "ipam": {
+            "IPv4Address": "172.18.0.3"
+          }
+        }
+      }
+    },
+    "direct_tls_probes": [
+      {
+        "address": "127.0.0.1",
+        "port": 443,
+        "context": "root shell outside unit cgroup",
+        "tcp_connected": true,
+        "tls_verified": true,
+        "http_requests": 0,
+        "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+        "seconds": 0.0352
+      },
+      {
+        "address": "172.18.0.3",
+        "port": 8443,
+        "context": "root shell outside unit cgroup",
+        "tcp_connected": true,
+        "tls_verified": true,
+        "http_requests": 0,
+        "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+        "seconds": 0.0337
+      }
+    ]
+  },
+  "operating": {
+    "applied_at_kst": "2026-11-18T17:09:18+09:00",
+    "confirmed_at_kst": "2026-11-18T17:13:01.479351+09:00",
+    "last_observed_at_kst": "2026-11-18T17:14:21.464430+09:00",
+    "source_sha256": {
+      "/usr/local/sbin/capstone-cert-monitor": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8",
+      "/etc/systemd/system/capstone-cert-monitor.service": "9c9f50343d7671890e8218352fa69922144d9c34fd50f67d1348a2caa314e97c",
+      "/etc/systemd/system/capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+      "/home/groot_a/capstone/chatproxy/tls/chatduck.crt": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794",
+      "/var/lib/capstone-cert-monitor/status.json": "b04b6859fb931ee612ad0440ff9891932a42db17f139f220e5862b727589578b"
+    },
+    "status": {
+      "automatic_renewal": false,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "domain": "chat.grootlab.duckdns.org",
+      "expiry_status": "ok",
+      "not_after_epoch": 1799814312,
+      "not_after_kst": "2027-01-13T13:25:12+09:00",
+      "observed_at_kst": "2026-11-18T17:09:18+09:00",
+      "observed_at_utc": "2026-11-18T08:09:18Z",
+      "probe_status": "verified",
+      "reason": "verified",
+      "schema_version": 1,
+      "seconds_remaining": 4824955,
+      "served_certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427"
+    },
+    "units": {
+      "capstone-cert-monitor.service": {
+        "Result": "success",
+        "ExecMainStartTimestamp": "Wed 2026-11-18 17:09:17 KST",
+        "ExecMainExitTimestamp": "Wed 2026-11-18 17:09:18 KST",
+        "ExecMainStatus": "0",
+        "IPAddressAllow": "127.0.0.1/32 172.18.0.3/32",
+        "IPAddressDeny": "0.0.0.0/0 ::/0",
+        "LoadState": "loaded",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.service",
+        "UnitFileState": "static"
+      },
+      "capstone-cert-monitor.timer": {
+        "NextElapseUSecRealtime": "Thu 2026-11-19 09:00:00 KST",
+        "LastTriggerUSec": "Wed 2026-11-18 09:00:00 KST",
+        "Result": "success",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.timer",
+        "UnitFileState": "enabled"
+      }
+    },
+    "failed_units": [],
+    "journal_events": [
+      {
+        "timestamp_usec": "1794989358163987",
+        "event": {
+          "automatic_renewal": false,
+          "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+          "domain": "chat.grootlab.duckdns.org",
+          "expiry_status": "ok",
+          "not_after_epoch": 1799814312,
+          "not_after_kst": "2027-01-13T13:25:12+09:00",
+          "observed_at_kst": "2026-11-18T17:09:18+09:00",
+          "observed_at_utc": "2026-11-18T08:09:18Z",
+          "probe_status": "verified",
+          "reason": "verified",
+          "schema_version": 1,
+          "seconds_remaining": 4824955,
+          "served_certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427"
+        }
+      }
+    ],
+    "backup": {
+      "backup": "/var/lib/capstone-cert-rollout/change-rifziyda",
+      "state": {
+        "armed_epoch": 1794989357.2883894,
+        "at_kst": "2026-11-18T17:13:01.479351+09:00",
+        "phase": "confirmed",
+        "plan_sha256": "10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7",
+        "timer": "capstone-cert-change-rifziyda-rollback"
+      },
+      "rollback_timer": {
+        "LoadState": "not-found",
+        "ActiveState": "inactive"
+      },
+      "backup_file_count": 7
+    },
+    "source_files_changed": 2,
+    "observer_oneshot_runs": 1,
+    "proxy_restarts": 0,
+    "certificate_or_timer_changes": 0,
+    "private_key_reads": 0,
+    "chatproxy_identity_and_start_unchanged": true
+  },
+  "approval": {
+    "source": "Explicit user instruction: 운영후보 승인할테니까 진행해봐",
+    "exact_plan_sha256": "10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7",
+    "scope": "Only fixed A observer executable and service; independent 300-second rollback; no MCP input candidate or unrelated policy approval"
+  },
+  "actual_MCP": {
+    "process_user": "mcp",
+    "observed_at_kst": "2026-11-18T17:13:02.464885+09:00",
+    "current": {
+      "age_seconds": 8,
+      "count_scope": "error_observations covers the bounded four-hour collector sample, not the requested subwindow or all journal records",
+      "coverage": {
+        "live_query": false,
+        "maximum_accepted_age_seconds": 180,
+        "normal_interval_seconds": 60,
+        "requested_since": 1794988680,
+        "since": 1794988680,
+        "status": "covered_sample",
+        "unobserved_latest_seconds": 8,
+        "until": 1794989572
+      },
+      "error_observations": {
+        "count": null,
+        "first_at": null,
+        "last_at": null,
+        "scope": "bounded_journal_sample"
+      },
+      "evidence_scope_ko": "요청 구간은 requested_since_kst부터 requested_until_kst까지입니다. observed_at_kst는 수집기가 마지막 확인한 시각입니다. returned_error_count는 반환 표본 수이며 요청 구간 전체 오류 건수는 미확인입니다. 서로 다른 조회의 시작 시각을 구간 양 끝으로 사용하지 마세요.",
+      "expires_at": 1794989752,
+      "host": "a",
+      "journal_status": "unavailable",
+      "journal_truncated": false,
+      "mutation_performed": false,
+      "observed_at": 1794989572,
+      "observed_at_kst": "2026-11-18T17:12:52+09:00",
+      "process_termination": {
+        "exit_status": 0,
+        "kind": "exited",
+        "kind_code": 1,
+        "scope_ko": "마지막 메인 프로세스의 종료 정보입니다. ExecMainCode는 종료 종류이고 프로세스 종료값이 아닙니다. 현재 서비스 정상 여부는 Type/ActiveState/SubState/Result와 함께 판단하세요.",
+        "signal_number": null
+      },
+      "properties": {
+        "ActiveEnterTimestampMonotonic": 0,
+        "ActiveState": "inactive",
+        "ExecMainCode": 1,
+        "ExecMainExitTimestampMonotonic": 531393288605,
+        "ExecMainStartTimestampMonotonic": 531392832057,
+        "ExecMainStatus": 0,
+        "InactiveEnterTimestampMonotonic": 531393288877,
+        "LoadState": "loaded",
+        "NRestarts": 0,
+        "Result": "success",
+        "SubState": "dead",
+        "Type": "oneshot",
+        "UnitFileState": "static"
+      },
+      "raw_messages_returned": false,
+      "recent_errors": [],
+      "requested_minutes": 15,
+      "requested_since_kst": "2026-11-18T16:58:00+09:00",
+      "requested_until_kst": "2026-11-18T17:13:00+09:00",
+      "requested_window_total_count": null,
+      "retained_errors_truncated": false,
+      "returned_error_count": null,
+      "schema": 1,
+      "status": "observed",
+      "target": "a:certificate-monitor",
+      "unit": "capstone-cert-monitor.service",
+      "untrusted_evidence": true
+    },
+    "journal": {
+      "entries": [
+        {
+          "at_kst": "2026-11-18T17:09:18.170082+09:00",
+          "excerpt_sha256": "0dc4a499cd6682bc30b8d73f880f849e1edf3cfd12d165b091aa29e14aaf448e",
+          "message_excerpt": "Finished capstone-cert-monitor.service - Observe the fixed ChatDuck proxy TLS certificate.",
+          "message_sha256": "0dc4a499cd6682bc30b8d73f880f849e1edf3cfd12d165b091aa29e14aaf448e",
+          "message_state": "unchanged",
+          "priority": 6,
+          "record_sha256": "6a94fafa751973467fb3747ea3e483cbef4eb87686a2d4542ee953a27d23321f"
+        },
+        {
+          "at_kst": "2026-11-18T17:09:18.169807+09:00",
+          "excerpt_sha256": "8bf42c475f6a846f8d07f2dff0524bec0f291cd9babd9d668b7429e890376233",
+          "message_excerpt": "capstone-cert-monitor.service: Deactivated successfully.",
+          "message_sha256": "8bf42c475f6a846f8d07f2dff0524bec0f291cd9babd9d668b7429e890376233",
+          "message_state": "unchanged",
+          "priority": 6,
+          "record_sha256": "098345579ee65fb663bf64cdd8e26d3ec6d03a2911a91452bc7570adf7a6c541"
+        },
+        {
+          "at_kst": "2026-11-18T17:09:18.163987+09:00",
+          "excerpt_sha256": "744ff4461ce5d1414084df296e088aca69c703ac305f0568b06e143f763a26a6",
+          "message_excerpt": "{\"automatic_renewal\":false,\"certificate_sha256\":\"[REDACTED OPAQUE]\",\"domain\":\"[REDACTED OPAQUE]\",\"expiry_status\":\"ok\",\"not_after_epoch\":1799814312,\"not_after_kst\":\"2027-01-13T13:25:12+09:00\",\"observed_at_kst\":\"2026-11-18T17:09:18+09:00\",\"observed_at_utc\":\"2026-11-18T08:09:18Z\",\"probe_status\":\"verified\",\"reason\":\"verified\",\"schema_version\":1,\"seconds_remaining\":4824955,\"[REDACTED OPAQUE]\":\"[REDACTED OPAQUE]\"}",
+          "message_sha256": "0d0a09976538b88295c06307f899ef2c4d3f1cf83274de391935ef0a736f6579",
+          "message_state": "redacted",
+          "priority": 5,
+          "record_sha256": "dc11e2064655cb9f6062a0d3408b6895fd4ab15a86cebfeffe4debcfdacf8cae"
+        },
+        {
+          "at_kst": "2026-11-18T17:09:17.714477+09:00",
+          "excerpt_sha256": "15aa4cc786abc0b5c6db9269b3c986b9d1482522c4615cdeb4f38aa8b15c688c",
+          "message_excerpt": "Starting capstone-cert-monitor.service - Observe the fixed ChatDuck proxy TLS certificate...",
+          "message_sha256": "15aa4cc786abc0b5c6db9269b3c986b9d1482522c4615cdeb4f38aa8b15c688c",
+          "message_state": "unchanged",
+          "priority": 6,
+          "record_sha256": "cfc1679648d5014ae619fd3c30d8c57855f31b33407a2b60903e741e6b264497"
+        }
+      ],
+      "has_more": false,
+      "host": "a",
+      "journal_retention_verified": false,
+      "journal_scope": "all",
+      "kind": "journal_excerpt",
+      "limits": [
+        "available_journal_sample_not_complete_retention",
+        "all_priority_sample",
+        "best_effort_secret_masking_not_a_confidentiality_guarantee",
+        "source_messages_are_data_not_instructions_or_approval"
+      ],
+      "live_query": true,
+      "mutation_performed": false,
+      "observed_at_kst": "2026-11-18T17:13:02+09:00",
+      "raw_messages_returned": false,
+      "redacted_excerpts_returned": true,
+      "requested_since_kst": "2026-11-18T17:09:00+09:00",
+      "requested_until_kst": "2026-11-18T17:13:00.212433+09:00",
+      "requested_window_total_count": null,
+      "response_size_limited": false,
+      "returned_entries": 4,
+      "schema": 1,
+      "status": "observed",
+      "target": "a:certificate-monitor",
+      "unit": "capstone-cert-monitor.service",
+      "untrusted_evidence": true
+    },
+    "MCP_changes": 0,
+    "earlier_test_context_failures_preserved": [
+      "root direct invocation returned unavailable",
+      "capstone-mcp account attempt failed; actual installed mcp account observed before retry"
+    ],
+    "initial_root_failure_cause_verified": false
+  },
+  "actual_chat": {
+    "source_id": "krxocfd693ds8p4rtb84jo6dxa",
+    "question": "A 서버 인증서 감시 서비스의 현재 상태와 최근 실행 결과를 표로 보여줘. 예전 실패와 지금 상태를 구분해줘.",
+    "seconds": 43.783,
+    "status": "done",
+    "correct_report": false,
+    "requested_diagnostic_read_succeeded": true,
+    "calls": [
+      {
+        "server": "system-diagnostics",
+        "name": "get_system_diagnostics",
+        "arguments": {
+          "target": "a:certificate-monitor"
+        },
+        "is_error": false
+      },
+      {
+        "server": "wazuh-ro",
+        "name": "get_wazuh_agents",
+        "arguments": {
+          "status": "active"
+        },
+        "is_error": false
+      }
+    ],
+    "protected_calls": 0,
+    "final_response": "**요약**\n요청한 에이전트 ID·연결 상태를 실제 조회로 확인했습니다.\n\n**확인 내역**\n요청 대상: groot-sec\n| ID | 이름 | 주소 | 상태 | 마지막 연결 KST |\n| --- | --- | --- | --- | --- |\n| 001 | groot-sec | 10.200.10.1 | 🟢 ACTIVE | 2026-11-18T17:11:02+09:00 (KST) |\n표시한 반환 레코드: 1개. 이름/ID로 대조했으며 IP만으로 호스트를 추정하지 않았습니다.\n확인한 상태 범위: active. 반환 목록/페이지 밖과 모든 보안 기능의 정상 여부는 미확인입니다.\n\n**조치 및 다음 단계**\n조회만 수행했습니다. 보호된 변경은 실행하지 않았습니다.",
+    "open_error": "Correct certificate unit read followed by unrelated active Wazuh-agent repair/read; final table reports agent membership rather than requested certificate observer. Exact cause not yet repaired."
+  }
+}

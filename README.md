@@ -789,3 +789,11 @@ Suricata는 기본 수동 탐지 모드이며 nft 대응은 LLM 조사·판단�
 
 
 [짧은 조회3소스 후속](infra/validation/read-intent-scope/README.md)은 공통 표현·DNS 주제 표본을 격리 보완했다. 로컬801집계795pass/6의존성skip·기존Hermes801/skip0,실제후보3요청/MCP3·모델3/12~16초·표 반환을 확인했다. 모두 빈 표본·Native 실대화/채팅 미수행·통제 전후 비교 아님이다. OS 대상명 허위 실패/current 대체·조사0건/SID 활성 오류는 남았으며 정본·초기설치/운영/권한/예산과 기존 두 정확 승인 계획은 불변이다.
+
+
+<!-- certificate-readiness:20261118 -->
+
+## 인증서 관측 실패 수정과 남은 출력 오류
+
+관리자231 경유로 승인된 감시 실행파일·service2개를 적용하고17:13:01 KST에 확정했다. 실제 oneshot은exit0/verified이며 인증서 지문이 일치한다. 기존 MCP의 현재 상태와 실제 journal4표본에서도 확인했다. 5분 독립 원복은 해제하고 원본·정확 후보·제어기는 보존했다. 프록시·인증서·개인키·매일09:00 타이머·MCP/모델은 유지한다. 새 채팅1건은 올바른 인증서 조회 뒤 불필요한 Wazuh 에이전트 조회가 추가되고 최종 표의 대상이 바뀌어 실패로 기록했다. 초기 설치 이식·공개443·내일 예약 실행은 별도 미완료다. [검증·미완료 범위](infra/groot-a/certificate-monitor/readiness.validation.json).
+<!-- /certificate-readiness:20261118 -->

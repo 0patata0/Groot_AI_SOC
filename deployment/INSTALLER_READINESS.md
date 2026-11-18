@@ -56,3 +56,8 @@ root생성 요청별 내부 CAPSTONE_REVIEW_CONTEXT_JSON은 canonical controller
 정정 피드백/종결 검사는 기존 source 복사·controller 설치 렌더에 포함된다. 실제 영향 미확인+resolved 거절을 Native/host에서 검사하며 새 패키지·설정·오프라인 반입 항목은 없다.
 
 11/6 [예약 조사 잠금 충돌](../infra/hermes/controller-contention.md)은 기존 canonical controller/source_bundle와 immutable gate 렌더 경로에 반영된다. 실제 Busy만 --once deferred/exit0, 명시적 재조사와 일반 오류는 실패 유지. 설치 렌더42PASS·B controller1파일 증분 확인이며 새 설정/키/포트/오프라인 반입 항목0. 새 OS 전체 설치는 미실행이다.
+
+
+## 인증서 감시기의 설치 이식 공백
+
+기존 A용 TLS 감시기 후보는 전체 check 격리 비교·native26·원복14·독립 타이머의 격리 파일2개 복구까지 확인했다. 수동 변경 제어기는 기존 두 파일의 정확 복구용이며 초기 설치기의 추가 진입점이 아니다. 운영 두 파일은 정확 승인 후17:13:01 KST에 확정했고 실제 exit0/verified·MCP/journal을 확인했다. 새 채팅의 최종 대상 오류는 별도다. deploy.sh의 lab TLS와 채팅 TLS는 도메인·포트·파일 경로/모드가 다르므로 고정 machine-id·경로·B 규칙을 명시적으로 이식해야 한다. 단일deploy.sh 연결·새 OS 전체 설치는 미완료이며 기존 서비스·패키지·모델·MCP를 바꾸지 않았다. [검증과 수동 복구](../infra/groot-a/certificate-monitor/README.md).

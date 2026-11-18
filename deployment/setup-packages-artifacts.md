@@ -739,3 +739,8 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 
 [응답 MCP 검증 원장](../infra/mcp/response-rpc.validation.json)
 <!-- /response-rpc-input-20261118 -->
+
+
+## 인증서 감시기 복구 후보의 반입 범위
+
+기존 Linux의 Python 표준 라이브러리·Bash·OpenSSL·GNU coreutils·jq·flock·logger·systemd를 사용한다. 새로운 deb·wheel·이미지·Mac 도구 설치는0이다. 이번 고정 A용 후보2파일과 검증/수동 원복 코드만 root 전용 위치에 반입하며 개인키는 읽거나 복사하지 않는다. 후보 원본·준비한 복구본을 보존하고 이번 임시 전송·검사 경로는 제거했다. 초기 설치기의 전체 오프라인 묶음과 이식은 별도 미완료다. [검증 원장](../infra/groot-a/certificate-monitor/readiness.validation.json).

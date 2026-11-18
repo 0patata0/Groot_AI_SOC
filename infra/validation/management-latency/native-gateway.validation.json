@@ -1,0 +1,401 @@
+{
+  "schema_version": 1,
+  "recorded_at_kst": "2026-11-18T11:45:22.647773+09:00",
+  "state": "operating_confirmed_display_followup_pending",
+  "reference": {
+    "url": "https://github.com/JoasASantos/Malvex",
+    "commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "adopted": [
+      "read capability preflight",
+      "current evidence and limitations",
+      "separate selection/report validation"
+    ],
+    "not_installed": true,
+    "mcp_structure_changed": false
+  },
+  "candidate": {
+    "plan_sha256": "2b4f6a8349ea2300d9f32dac780067baec7c23bfa420e72811333aaff1223403",
+    "operating_sources": 28,
+    "generated_receipts": 3,
+    "public_source_sha256": {
+      "infra/hermes/query-completion/alignment.py": "5b862e368dd115ab7e2e700ba098392016df79524ae7b56fc3e25e91a6e364e7",
+      "infra/hermes/chat_contract.py": "9a3c9603cdd8ed9ed261b82fbe319d9320759e2379fdd61e577668f5209ef665",
+      "infra/hermes/workflow_contract.py": "d28a9b641453d2994d6b04f1c8736752d70f971ed62bf1b88df661455dc459c4",
+      "infra/hermes/skills/soc-query/SKILL.md": "e4f3e6e2461739bc1f69289cdc21080f016ebe57c0b7149830bb754a7f68a07a",
+      "infra/hermes/query-completion/test_gateway_evidence.py": "12ad090b46094a9b6ddd22a6f8c5c2bd8dffd09c4bf279e329ed100a08358085",
+      "infra/ollama-trial/harness.py": "1c3a2bbd9269511da9768d49d7e2cbf8b033eb173d7e96911ed069b003b09dfb",
+      "infra/ollama-trial/test_initial_event_day.py": "ba0ec23dcc4eaa0adf7efcf0351605efe9d97231a09921ede8c1564260b9a5d0",
+      "infra/hermes/test_native_incident_phase.py": "e3eb273bac1ba62db1350141c62737b363da8c18a7c3b9848d84c3d996a5900b",
+      "infra/hermes/test_native_selection_repair.py": "1f0cf5dbe4f10e5d4ca5de6f3d9d61f38d477677983828c7c9ea367bc9d805db"
+    },
+    "operating_after_sha256": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "f42e92fd978a8ea8863b5a4102d5ca2f001d97dc6bef5e39432df21b801086c0",
+      "/opt/capstone-ollama-trial/harness.py": "f42e92fd978a8ea8863b5a4102d5ca2f001d97dc6bef5e39432df21b801086c0",
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": "05b666112cc97093cd662b3000fee272c00e86fe863fb19b4c22d5f8880e5329",
+      "/opt/capstone-ollama-trial/runtime.py": "ab6b6c5f042118f9f5a2f64790071113bbe57a5a0435e69fa93acb2c86031612",
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "/opt/capstone-ollama-trial/workflow_contract.py": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "/opt/capstone-management/workflow_contract.py": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "/opt/capstone-management/skill-soc-investigate.md": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "/opt/capstone-ollama-trial/read_contract.py": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "/opt/capstone-management/read_contract.py": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+      "/opt/capstone-ollama-trial/chat_contract.py": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+      "/opt/capstone-management/chat_contract.py": "cbaebefc80f24a69ae9577dd28c1c0e3b0af3b40ecef084cc8470adba9c17409",
+      "/opt/capstone-management/soc_management_run.py": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+      "/opt/capstone-ollama-trial/grounding.py": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+      "/opt/hermes-data/management-code/run.py": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "a42b728d8c6e946443370defdc3007af81618d9258087ab828758adb1e829a24",
+      "/opt/capstone-ollama-trial/query_grounding.py": "a42b728d8c6e946443370defdc3007af81618d9258087ab828758adb1e829a24",
+      "/opt/capstone-management/soc_management_controller.py": "eb2db199172acaea0193846b7ca354b7baa34c14365898c5c49cfb8d9a81e28a",
+      "/opt/capstone-review-chat/review_channel.py": "779cd996aa63cdc5eeea8f57b875af04571cd9da9e61edc644fefd46a08a8456",
+      "/etc/systemd/system/capstone-ollama-chat.service": "aafc419bc4f2ec5625915e4a6937b312025681b558744fd2033d5373fe64b482",
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126",
+      "/opt/capstone-ollama-trial/skill-soc-query.md": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126",
+      "/opt/capstone-management/skill-soc-query.md": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126"
+    }
+  },
+  "boundaries": {
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "management_route": "Mac-admin231-A-B",
+    "role_or_approval_or_ttl_changes": false,
+    "protected_files": 38,
+    "original_native_transport_dispatch_cancellation_retained": true,
+    "shared_two_repairs": true,
+    "new_mcp_tools": 0,
+    "new_packages": 0,
+    "thor_inference_interrupted": false,
+    "source_receipt_question_clock_catalog_transport_lease": "validated before and after original Native transport",
+    "gateway_compact_flag": "CAPSTONE_GATEWAY_EVIDENCE_COMPACT; default enabled; 0 disables"
+  },
+  "calendar_day": {
+    "backend_source": "/opt/mcp/security-events-mcp.py",
+    "backend_sha256": "ca374b65d6f7e531c74baf5df216cb3681aba52a3fa8aa2a94b5c71e417e05f3",
+    "actual_query_bounds": "gte/lte; inclusive; backend unchanged",
+    "yesterday_since_kst": "2026-11-17T00:00:00+09:00",
+    "yesterday_until_kst": "2026-11-17T23:59:59.999999+09:00",
+    "scope": "common Native gateway/SDK/root helper; previous next-midnight inclusive boundary corrected"
+  },
+  "verification": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 302,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_candidate": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 302,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_harness2": {
+      "rc": 0,
+      "summary": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 38 tests in 3.342s",
+        "",
+        "OK"
+      ]
+    },
+    "linux_installer": {
+      "rc": 0,
+      "summary": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 37 tests in 0.563s",
+        "",
+        "OK"
+      ]
+    },
+    "canonical_installer_gate_checks": 4,
+    "new_gateway_boundary_tests": 18,
+    "mac_gateway_wire_types": "stub; no Mac dependency installation",
+    "linux_gateway_wire_types": "actual installed SDK",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_files": 140,
+    "actual_mcp_schema_hashes_verified": true,
+    "operating_harness2_sources": 50,
+    "operating_harness2_passed": true,
+    "always_on_census_char_delta": 0,
+    "always_on_census_limit": "does not attest unchanged phase prompt size",
+    "source_gate_argument_bytes": 77008,
+    "source_gate_conditions": 7,
+    "whole_canonical_suite_repeated": false,
+    "prior_unrelated_canonical_sdk_failures_resolved": false,
+    "observed_report_semantic_recheck": {
+      "at_kst": "2026-11-18T11:42:48.376491+09:00",
+      "cases": {
+        "hermes-compound": {
+          "read_count": 3,
+          "errors": {
+            "facts": [],
+            "capability": [],
+            "scope": []
+          },
+          "read_sha256": [
+            "bd8faeeda2e0de88559ab494e23a8c16444ff32bb91f311eabec14371e810413",
+            "35dd659bbf6dc735cc42b2a1e119b3feab8505d44a391eba33acf7fafe9574fb",
+            "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+          ],
+          "report_sha256": "31af8ea2b4a20f8e7f33372be43e57c6b832708f192b38c92de0f6a534033d24",
+          "rendered_chars": 8921,
+          "status": "needs_review",
+          "assessment": "unresolved",
+          "clock_source": "reconstructed from source-post time; exact wire clock not exported",
+          "current_ip_inventory": {
+            "requested": true,
+            "read_state": "observed",
+            "returned_ip_count": 0,
+            "tool": "mcp__resp__list_blocks",
+            "receipt_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+            "scope": "current_dynamic_ip_set_membership_not_historical_request_intervention_or_feature_activation"
+          }
+        },
+        "ollama-compound": {
+          "read_count": 3,
+          "errors": {
+            "facts": [],
+            "capability": [],
+            "scope": []
+          },
+          "read_sha256": [
+            "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+            "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+            "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+          ],
+          "report_sha256": "fede18202296b6eb24933d7c92a133ed6ba598734407e1445b145b0047eb6b50",
+          "rendered_chars": 4376,
+          "status": "needs_review",
+          "assessment": "unresolved",
+          "clock_source": "actual SDK turn_clock",
+          "current_ip_inventory": {
+            "requested": true,
+            "read_state": "observed",
+            "returned_ip_count": 0,
+            "tool": "mcp__resp__list_blocks",
+            "receipt_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+            "scope": "current_dynamic_ip_set_membership_not_historical_request_intervention_or_feature_activation"
+          }
+        }
+      },
+      "scope": "Offline semantic recheck of actual receipts, not a second live observation or independent wire-lease attestation"
+    }
+  },
+  "deployment": {
+    "applied_at_kst": "2026-11-18T11:13:58.332403+09:00",
+    "confirmation": {
+      "status": "confirmed",
+      "at_kst": "2026-11-18T11:27:12.724928+09:00",
+      "files": 31,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "protected": 38,
+      "rollback_timer": "inactive"
+    },
+    "last_live_check_at_kst": "2026-11-18T11:41:40.320468+09:00",
+    "same_native_container_and_image": true,
+    "planned_native_restarts": 1,
+    "sdk_review_queue_bytes_same_while_stopped": true,
+    "full_native_db_unchanged_claimed": false,
+    "prepare_final_diagnostic_rc": 1,
+    "prepare_result": "PREPARED and all backups/candidates already persisted; timer oneshot observation race",
+    "independent_prepared_verification": "all31 original/candidate/current before SHA, protected38, 7 real gate conditions",
+    "apply_race_handling": "briefly stop existing management/audit timers, wait inactive, retain strict transaction checks, restore timers",
+    "rollback_timer_after_confirmation": "inactive",
+    "retained_backup": "/var/lib/capstone-evidence-rollout/20261118-969aba4256"
+  },
+  "actual_chats": [
+    {
+      "case": "hermes-compound",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 임시 IP 차단은?",
+      "fresh_root": true,
+      "source_id": "dzurp4cysbrhpgnro16moufa5o",
+      "post_ids": [
+        "z4do71564jrx3czjyxdnix3rmh",
+        "i87zkw76mt8ymesqs87r338whr",
+        "f4wxjza9jidfzjy6ho677mcq3a"
+      ],
+      "seconds_to_complete_final": 47.132,
+      "final_posts": 3,
+      "final_chars": 9053,
+      "read_calls": 3,
+      "protected_calls": 0,
+      "native_api_stages": 2,
+      "native_model": "soc-qwen36:35b-balanced-q4km-20261108"
+    },
+    {
+      "case": "ollama-compound",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 임시 IP 차단은?",
+      "fresh_root": true,
+      "source_id": "ypewcp44zjn6fde84ukmwh5ime",
+      "post_ids": [
+        "41tarnzqx3y7u8k7if435z9whe"
+      ],
+      "seconds_to_complete_final": 46.925,
+      "final_posts": 1,
+      "final_chars": 4094,
+      "read_calls": 3,
+      "protected_calls": 0,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "model_calls": 2,
+      "status": "partial"
+    },
+    {
+      "case": "hermes-short",
+      "question": "지금 IDS 경보 2건만 표로 보여줘",
+      "fresh_root": true,
+      "source_id": "48crrhw197n3bn59d6rcoyxd3e",
+      "post_ids": [
+        "6y6xwtgzdjy8x8odpxj1xpiqiy"
+      ],
+      "seconds_to_complete_final": 14.873,
+      "final_posts": 1,
+      "final_chars": 329,
+      "read_calls": 1,
+      "protected_calls": 0,
+      "native_api_stages": 2,
+      "native_model": "soc-qwen36:35b-balanced-q4km-20261108"
+    },
+    {
+      "case": "ollama-systemd",
+      "question": "B systemd 실패 유닛만 보여줘",
+      "fresh_root": true,
+      "source_id": "i3rwf7cmrj8hbxxfnbp8ngf9rr",
+      "post_ids": [
+        "k41yfshf8jbt38ptyhg5cpejee"
+      ],
+      "seconds_to_complete_final": 12.19,
+      "final_posts": 1,
+      "final_chars": 455,
+      "read_calls": 1,
+      "protected_calls": 0,
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "model_calls": 1,
+      "status": "completed"
+    }
+  ],
+  "actual_data_reads": 8,
+  "protected_calls": 0,
+  "actual_content": {
+    "native_compound": {
+      "waf_sample": 19,
+      "ids_sample": 48,
+      "requested_limit": 50,
+      "current_ip_blocks": 0,
+      "api_stages": 2,
+      "report_schema_admitted": true,
+      "status": "needs_review",
+      "assessment": "unresolved"
+    },
+    "sdk_compound": {
+      "waf_sample": 10,
+      "ids_sample": 10,
+      "default_limit": 10,
+      "current_ip_blocks": 0,
+      "model_calls": 2,
+      "status": "partial",
+      "assessment": "unresolved"
+    },
+    "source_comparison": "literal returned samples: .232 shared; .230 IDS sample only; no flow/host/total absence claim",
+    "short_ids": "actual one-hour query returned 0; not all-alert absence",
+    "systemd": "b:systemd snapshot at 11:21:45 KST has failed_loaded_count0; no past recovery or all-host health claim"
+  },
+  "comparison_limits": {
+    "before_native_seconds": 147.415,
+    "after_native_seconds": 47.132,
+    "controlled_causal_comparison": false,
+    "reason": "n1 each; query period, limits, returned payload and inference load differ",
+    "general_30_or_60_second_slo_proven": false,
+    "independent_expert_accuracy_score_proven": false,
+    "native_api_stage_count_is_not_always_remote_model_calls": true
+  },
+  "open_findings": [
+    "Native public final exposes INCIDENT_DISPOSITION/MANAGEMENT_STATUS footer",
+    "default compound report is too long: Native3 posts, SDK4094 chars",
+    "browser table render not visually verified",
+    "general semantic accuracy and extended-query latency remain unproven"
+  ],
+  "cleanup": {
+    "roots": [
+      "/var/lib/capstone-evidence-validation/gateway-d659299da5",
+      "/var/lib/capstone-evidence-validation/gateway-197cff305c",
+      "/var/lib/capstone-evidence-validation/gateway-prepare-dd216aacc1",
+      "/var/lib/capstone-evidence-validation/gateway-prepare-969aba4256",
+      "/var/lib/capstone-evidence-rollout/20261118-dd216aacc1"
+    ],
+    "files": 1367,
+    "bytes": 71021931,
+    "exported_results": 24,
+    "exported_result_bytes": 6208418,
+    "unused_originals_duplicated_in_retained_backup": 31,
+    "mac_package_downloads_or_installs": 0,
+    "operating_backups_framework_and_skills_preserved": true
+  },
+  "not_performed": [
+    "attacks",
+    "new training",
+    "training monitoring",
+    "new OS full installation",
+    "new MCP installation"
+  ],
+  "documentation": {
+    "state": "draft_pending_humanize"
+  },
+  "publication": {
+    "state": "pending"
+  }
+}

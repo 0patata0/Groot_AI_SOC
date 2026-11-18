@@ -1753,7 +1753,8 @@ def initial_event_day_schemas(question, schemas, calls, requested_at_kst):
                          r'UTC|GMT|[+-]\d{2}:?\d{2}|(?:Asia|America|Europe)/|\b(?:PST|PDT|EST|EDT|JST)\b',text,re.I)):
         return schemas
     start=at.replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=days[0]=='어제')
-    end=start+timedelta(days=1) if days[0]=='어제' else at
+    # The existing security-events query uses gte/lte, both inclusive.
+    end=start+timedelta(days=1,microseconds=-1) if days[0]=='어제' else at
     if not start<end:return schemas
     observed={r['tool'] for r in incident_read_references(calls)};result=copy.deepcopy(schemas)
     for name,schema in result.items():

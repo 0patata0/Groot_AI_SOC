@@ -199,7 +199,7 @@ class NativePhase(unittest.TestCase):
         self.assertEqual(selection['schema']['title'],'RequiredReadToolSelection')
         self.assertEqual(selection['schema']['properties']['calls']['minItems'],3)
         calls=[{'tool':n,'arguments':{} if n==BLOCK else {
-            'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-18T00:00:00+09:00'}} for n in (MOD,SUR,BLOCK)]
+            'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-17T23:59:59.999999+09:00'}} for n in (MOD,SUR,BLOCK)]
         value={'request_nonce':selection['nonce'],'calls':calls}
         result,count=w.management_selection_response(self.response(value),selection,self.agent)
         self.assertEqual(count,3);self.assertEqual(result.choices[0].finish_reason,'tool_calls')
@@ -211,7 +211,7 @@ class NativePhase(unittest.TestCase):
 
     def test_initial_calendar_binding_matches_shared_today_and_yesterday_rules(self):
         from jsonschema import Draft202012Validator
-        for word,start,end in (('어제','2026-11-17T00:00:00+09:00','2026-11-18T00:00:00+09:00'),
+        for word,start,end in (('어제','2026-11-17T00:00:00+09:00','2026-11-17T23:59:59.999999+09:00'),
                                ('오늘','2026-11-18T00:00:00+09:00',AT)):
             question=f'{word} WAF·IDS 경보 조사해줘. 현재 임시 IP 차단도 확인해줘.'
             if hasattr(self.agent,'_capstone_chat_selection_turn'):del self.agent._capstone_chat_selection_turn

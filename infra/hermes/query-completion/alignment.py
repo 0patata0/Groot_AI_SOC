@@ -40,6 +40,156 @@ def enabled(agent, evidence):
             and getattr(agent, "api_mode", "chat_completions") == "chat_completions")
 
 
+def gateway_evidence_request(agent, data, catalog_request, question, calls, harness, clock, reference):
+    """Lease the existing Native API a bounded, current-turn read/report phase."""
+    if (os.environ.get('CAPSTONE_GATEWAY_EVIDENCE_COMPACT','1')!='1'
+            or not enabled(agent,harness.EVIDENCE) or reference
+            or harness.READ.wants_write(harness.normalized(question))
+            or not harness.investigation_first_scope(question)
+            or not isinstance(getattr(agent,'base_url',None),str)
+            or not harness.EVIDENCE.verified_runtime_model(agent,data.get('model'))
+            or getattr(agent,'_interrupt_requested',False)):
+        agent._capstone_gateway_phase=None
+        return None
+    turn=getattr(agent,'_current_turn_id',None)
+    match=re.fullmatch(r'\[SOC_RUNTIME_CLOCK\]\n현재 요청 시작 시각\(KST\): ([^\n]+)\n.*',clock[1],re.S)
+    if not isinstance(turn,str) or not turn or clock[0]!=turn or not match:
+        raise ValueError('gateway_evidence_clock_invalid')
+    at=match[1]
+    if not at.endswith('+09:00') or not harness.EVIDENCE.parse_instant(at):
+        raise ValueError('gateway_evidence_clock_invalid')
+    catalog={}
+    for tool in catalog_request.get('tools',[]):
+        f=tool.get('function',{}) if isinstance(tool,dict) else {}
+        name=f.get('name')
+        if not harness.EVIDENCE.allowed(name,'verify'):continue
+        if (tool.get('type')!='function' or name in catalog
+                or name not in getattr(agent,'valid_tool_names',()) or not isinstance(f.get('parameters'),dict)):
+            raise ValueError('gateway_evidence_catalog_invalid')
+        catalog[name]=harness.EVIDENCE.tool_input_schema(name,f['parameters'])
+    if not catalog:return None
+    identity=(agent.provider,getattr(agent,'api_mode','chat_completions'),agent.base_url,agent.model)
+    binding={'turn':turn,'question':question,'at_kst':at,'clock':clock[1],'identity':identity,'catalog':catalog}
+    state=getattr(agent,'_capstone_gateway_evidence',None)
+    if not isinstance(state,dict) or state.get('binding',{}).get('turn')!=turn:
+        state={'binding':copy.deepcopy(binding),'requests':0,'inquiries':0,'rejections':[]}
+        agent._capstone_gateway_evidence=state
+    elif state['binding']!=binding:
+        raise ValueError('gateway_evidence_binding_changed')
+    if state['requests']>=harness.CONTRACT.MODEL_STEPS:
+        raise ValueError('gateway_evidence_request_budget_exhausted')
+    used=getattr(agent,'_capstone_read_selection_count',(None,0))
+    used=used[1] if used[0]==turn else 0
+    remaining=min(4,max(0,harness.CONTRACT.TOOL_CALLS-used))
+    schemas=harness.refine_read_schemas(question,catalog,calls)
+    context=harness.evidence_report_context(question,calls,at,catalog)
+    nonce=uuid.uuid4().hex
+    feedback=state.get('feedback') if state.get('feedback_calls')==calls else None
+    if not calls:
+        scope=harness.incident_selection_scope(question,[])
+        if not scope or not set(scope)<=set(schemas):
+            raise ValueError('gateway_evidence_initial_scope_missing')
+        schemas=harness.refine_read_schemas(question,
+            harness.initial_event_day_schemas(question,{n:catalog[n] for n in scope},[],at),[])
+        schema=harness.selection_schema(schemas,remaining,question=question)
+        schema['properties']['request_nonce']={'const':nonce};schema['required'].append('request_nonce')
+        context={'request':question,'requested_at_kst':at}
+        messages=harness.CONTRACT.incident_selection_messages(context,schema,agent_role='hermes',feedback=feedback)
+        kind='initial'
+    elif context is not None:
+        remaining=remaining if state['inquiries']<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS else 0
+        schema=harness.CONTRACT.evidence_report_schema(list(context['evidence_tools'].values()),list(schemas),
+            read_schemas=schemas,direct_reads=remaining,allow_more=remaining>0,nonce=nonce,
+            inventory_observed=context.get('current_ip_inventory',{}).get('requested') is True
+                and context['current_ip_inventory']['read_state']=='observed')
+        context['inquiry_budget']={'additional_rounds_remaining':max(0,harness.CONTRACT.SERVICE_INQUIRY_ROUNDS-state['inquiries']),
+            'additional_tool_calls_available':remaining,'pending_read_proposals_only_after_inquiry_budget':True}
+        messages=harness.CONTRACT.evidence_report_messages(context,agent_role='hermes',feedback=feedback)
+        kind='report'
+    else:
+        agent._capstone_gateway_phase=None
+        return None
+    from jsonschema import Draft202012Validator
+    Draft202012Validator.check_schema(schema)
+    result=copy.deepcopy(data)
+    for key in ('tools','tool_choice','think','reasoning','max_completion_tokens'):result.pop(key,None)
+    extra=result.get('extra_body')
+    if isinstance(extra,dict):
+        if {'model','messages'}&set(extra):raise ValueError('gateway_evidence_body_override')
+        for key in ('tools','tool_choice','response_format','reasoning_effort','think','reasoning',
+                    'max_tokens','max_completion_tokens','temperature','top_p'):extra.pop(key,None)
+    profile={'reasoning_effort':'medium' if harness.CONTRACT.REASONING else 'none',
+             'max_tokens':harness.CONTRACT.OUTPUT_TOKENS,'temperature':harness.CONTRACT.TEMPERATURE,
+             'top_p':harness.CONTRACT.TOP_P}
+    result.update(profile,messages=messages,response_format={'type':'json_schema','json_schema':{
+        'name':'soc_gateway_'+kind,'strict':True,'schema':schema}})
+    phase={'binding':copy.deepcopy(binding),'kind':kind,'nonce':nonce,'context':copy.deepcopy(context),
+        'calls':copy.deepcopy(calls),'schema':copy.deepcopy(schema),'remaining':remaining,'used':used,
+        'messages':copy.deepcopy(messages),'profile':profile,'rejected':False}
+    agent._capstone_gateway_phase=phase;agent._capstone_read_selection=None
+    state['requests']+=1
+    return result
+
+
+def gateway_evidence_lease(agent, request, turn, harness):
+    phase=getattr(agent,'_capstone_gateway_phase',None)
+    state=getattr(agent,'_capstone_gateway_evidence',None)
+    if not isinstance(phase,dict):return None
+    binding=phase['binding'];context=getattr(agent,'_capstone_proposal_context',None)
+    if (not isinstance(state,dict) or state.get('binding')!=binding
+            or not enabled(agent,harness.EVIDENCE) or os.environ.get('CAPSTONE_GATEWAY_EVIDENCE_COMPACT','1')!='1'
+            or binding['turn']!=turn or turn!=getattr(agent,'_current_turn_id',None)
+            or (agent.provider,getattr(agent,'api_mode','chat_completions'),agent.base_url,agent.model)!=binding['identity']
+            or not isinstance(context,tuple) or context[:2]!=(turn,binding['question']) or context[2]!=phase['calls']
+            or getattr(agent,'_capstone_turn_clock',None)!=(turn,binding['clock'])
+            or not isinstance(request,dict) or request.get('model')!=agent.model
+            or request.get('messages')!=phase['messages'] or request.get('tools') or request.get('tool_choice')
+            or request.get('response_format',{}).get('json_schema',{}).get('schema')!=phase['schema']
+            or any(request.get(k)!=v for k,v in phase['profile'].items())
+            or set(request.get('extra_body') or {})&({'tools','tool_choice','response_format','model','messages',
+                'think','reasoning','max_completion_tokens'}|set(phase['profile']))
+            or not set(binding['catalog'])<=set(getattr(agent,'valid_tool_names',()))
+            or getattr(agent,'_interrupt_requested',False)):
+        raise ValueError('gateway_evidence_lease_changed')
+    return phase
+
+
+def gateway_evidence_response(response, phase, agent, harness):
+    if (len(response.choices)!=1 or response.choices[0].message.tool_calls
+            or not isinstance(response.choices[0].message.content,str)
+            or len(response.choices[0].message.content.encode())>65536):
+        raise ValueError('gateway_evidence_response_shape')
+    value=json.loads(response.choices[0].message.content)
+    phase['raw_response']=response.choices[0].message.content
+    if phase['kind']=='initial':
+        return selection_response(response,phase['schema'],harness)
+    value,_=harness.CONTRACT.validated_service_report(value,phase['schema'])
+    if value['more_evidence']:
+        rejection=harness.CONTRACT.service_inquiry_rejection(value['calls'],
+            phase['context']['untrusted_completed_reads'],phase['binding']['catalog'])
+        if rejection:
+            phase['feedback']={'issues':[rejection['code']],'rejected_reads':rejection}
+            raise ValueError('gateway_evidence_inquiry_rejected')
+        if not 1<=len(value['calls'])<=phase['remaining']:
+            raise ValueError('gateway_evidence_inquiry_budget')
+        agent._capstone_gateway_evidence['inquiries']+=1
+        return read_calls_response(response,value['calls']),len(value['calls'])
+    review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
+    citations=list(phase['context']['evidence_tools'].values())
+    review['evidence_tools']=[citations[i] for i in indexes]
+    text=harness.evidence_report_text(review,phase['calls'],phase['context'])
+    issues=(harness.violations(phase['binding']['question'],text,phase['calls'])+
+        harness.evidence_capability_gap_violations(review,phase['context'])+
+        harness.evidence_report_scope_violations(review,phase['context']))
+    if issues:
+        phase['feedback']={'issues':sorted(set(issues)),'untrusted_rejected_report':review}
+        raise ValueError('gateway_evidence_claim_invalid')
+    result=copy.deepcopy(response);result.choices[0].message.content=text
+    agent._capstone_alignment_partial=review['assessment']=='unresolved' or review['status'] in ('needs_review','monitor')
+    phase['admitted_text']=text;phase['review']=copy.deepcopy(review)
+    return result,0
+
+
 def project_new_thread(messages, original, current, prefix):
     """Like the other gateway, a new root does not inherit other channel roots.
 
@@ -298,6 +448,7 @@ def recover_summary_request(request, rows, idx, query, harness):
 def request_wrapper(original, query, harness):
     @functools.wraps(original)
     def wrapped(agent, **kw):
+        agent._capstone_gateway_phase=None
         if not enabled(agent, harness.EVIDENCE):
             return original(agent, **kw)
         request = query.current_request_text(kw.get("original_user_message"))
@@ -395,6 +546,11 @@ def request_wrapper(original, query, harness):
         if not clock or clock[0] != turn:
             clock = (turn, harness.CONTRACT.turn_clock())
             agent._capstone_turn_clock = clock
+        if idx>=0:
+            compact=gateway_evidence_request(agent,data,result.api_kwargs,request,calls,harness,clock,reference)
+            if compact is not None:
+                return replace(result,api_kwargs=compact,api_messages=compact['messages'],
+                               _original_api_kwargs=copy.deepcopy(compact))
         for row in data.get('messages', []):
             if row.get('role') == 'system' and isinstance(row.get('content'), str):
                 row['content'] += '\n' + clock[1]
@@ -557,6 +713,16 @@ def budget_fallback_wrapper(original, query, harness, reanchor):
     return wrapped
 
 
+def read_calls_response(response, calls):
+    from openai.types.chat import ChatCompletionMessageToolCall
+    result=copy.deepcopy(response)
+    result.choices[0].message.tool_calls=[ChatCompletionMessageToolCall(
+        id='call_soc_'+uuid.uuid4().hex,type='function',function={
+            'name':item['tool'],'arguments':json.dumps(item['arguments'],ensure_ascii=False)}) for item in calls]
+    result.choices[0].finish_reason='tool_calls'
+    return result
+
+
 def selection_response(response, schema, harness=None):
     """Translate the model's validated selection, retaining its content/usage.
 
@@ -564,7 +730,6 @@ def selection_response(response, schema, harness=None):
     Any malformed, unknown or protected choice fails before native execution.
     """
     from jsonschema import Draft202012Validator
-    from openai.types.chat import ChatCompletionMessageToolCall
     if len(response.choices) != 1 or response.choices[0].message.tool_calls:
         raise ValueError('read_selection_response_shape')
     raw = response.choices[0].message.content
@@ -574,20 +739,59 @@ def selection_response(response, schema, harness=None):
     harness = harness if harness is not None else load_harness()
     value, removed = harness.validated_selection(value, schema)
     if removed: logging.getLogger('capstone.query_completion').info('event=deduplicated_read_selection removed=%d', removed)
-    result = copy.deepcopy(response)
-    result.choices[0].message.tool_calls = [ChatCompletionMessageToolCall(
-        id='call_soc_' + uuid.uuid4().hex, type='function',
-        function={'name': item['tool'], 'arguments': json.dumps(item['arguments'], ensure_ascii=False)}) for item in value['calls']]
-    result.choices[0].finish_reason = 'tool_calls'
-    return result, len(value['calls'])
+    return read_calls_response(response,value['calls']), len(value['calls'])
 
 
 def selection_call_wrapper(original, query, harness=None):
     harness = harness if harness is not None else load_harness()
     @functools.wraps(original)
     def wrapped(agent, **kw):
+        phase=gateway_evidence_lease(agent,kw.get('api_kwargs'),kw.get('turn_id'),harness)
         selection = getattr(agent, '_capstone_read_selection', None)
         verdict = original(agent, **kw)
+        if phase is not None:
+            if (getattr(verdict,'action',None)!='fallthrough' or getattr(verdict,'response',None) is None
+                    or getattr(verdict,'interrupted',False) or getattr(agent,'_interrupt_requested',False)):
+                agent._capstone_gateway_phase=None
+                return verdict
+            gateway_evidence_lease(agent,kw.get('api_kwargs'),kw.get('turn_id'),harness)
+            from jsonschema.exceptions import ValidationError
+            try:
+                response,count=gateway_evidence_response(verdict.response,phase,agent,harness)
+            except (ValueError,TypeError,KeyError,IndexError,ValidationError) as exc:
+                if len(verdict.response.choices)!=1:raise ValueError('gateway_evidence_unusable_response') from exc
+                phase['rejected']=True
+                raw=getattr(verdict.response.choices[0].message,'content',None)
+                if not isinstance(raw,str) or len(raw.encode())>65536:
+                    raise ValueError('gateway_evidence_unusable_response') from exc
+                try:value=json.loads(raw) if isinstance(raw,str) else None
+                except ValueError:value=None
+                if not phase.get('feedback'):
+                    if getattr(exc,'validator',None) and isinstance(value,dict):
+                        phase['feedback']=(harness.selection_error_feedback(exc,value,phase['schema'])
+                            if phase['kind']=='initial' else harness.CONTRACT.service_schema_repair_feedback(value,phase['schema']))
+                    else:phase['feedback']={'issues':['gateway_'+type(exc).__name__]}
+                state=agent._capstone_gateway_evidence
+                state['feedback']=copy.deepcopy(phase['feedback']);state['feedback_calls']=copy.deepcopy(phase['calls'])
+                semantic=copy.deepcopy(value)
+                if isinstance(semantic,dict):semantic.pop('request_nonce',None)
+                key=hashlib.sha256(json.dumps({'phase':phase['kind'],'value':semantic if value is not None else raw,
+                    'issues':phase['feedback'].get('issues',[]),'error_type':type(exc).__name__},
+                    ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+                phase['repeat']=key in state['rejections'];state['rejections']=(state['rejections']+[key])[-3:]
+                response=copy.deepcopy(verdict.response)
+                response.choices[0].message.tool_calls=None;response.choices[0].finish_reason='stop'
+                logging.getLogger('capstone.query_completion').warning(
+                    'event=gateway_evidence_rejected phase=%s error_type=%s repeated=%s',
+                    phase['kind'],type(exc).__name__,phase['repeat'])
+                return replace(verdict,response=response)
+            agent._capstone_read_selection_count=(phase['binding']['turn'],phase['used']+count)
+            state=agent._capstone_gateway_evidence
+            state.pop('feedback',None);state.pop('feedback_calls',None)
+            logging.getLogger('capstone.query_completion').info(
+                'event=gateway_evidence_admitted phase=%s calls=%d message_bytes=%d',
+                phase['kind'],count,len(json.dumps(phase['messages'],ensure_ascii=False).encode()))
+            return replace(verdict,response=response)
         if (not enabled(agent, harness.EVIDENCE) or not selection or selection[0] != kw.get('turn_id')
                 or selection[0] != getattr(agent, '_current_turn_id', None)
                 or getattr(verdict, 'action', None) != 'fallthrough'
@@ -623,6 +827,36 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         request=resolve_rule_history(request,rows,idx,query,harness)
         request=harness.resolve_card_request(user,request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
+        phase=getattr(agent,'_capstone_gateway_phase',None)
+        if isinstance(phase,dict) and phase['binding']['turn']==getattr(agent,'_current_turn_id',None) and phase.get('rejected'):
+            if phase['binding']['question']!=request or phase['calls']!=calls:
+                raise ValueError('gateway_evidence_final_binding_changed')
+            counter=kw.get('codex_ack_continuations');turn=agent._current_turn_id
+            prior=getattr(agent,'_capstone_incident_repairs',(None,0));used=prior[1] if prior[0]==turn else 0
+            append_message(rows,agent._build_assistant_message(message,'incomplete'))
+            agent._session_messages=rows
+            if (not phase.get('repeat') and type(counter) is int and used<harness.CONTRACT.REPAIR_PASSES
+                    and query._remaining(kw,agent)):
+                agent._capstone_incident_repairs=(turn,used+1)
+                agent._mute_post_response=False;agent._clear_status_buffer()
+                append_message(rows,{'role':'user','content':json.dumps({'gateway_read_phase_rejected':phase['kind'],
+                    'validation_feedback':phase['feedback']},ensure_ascii=False)})
+                names=('active_system_prompt','_turn_exit_reason','_preflight_compression_blocked',
+                    'truncated_response_parts','length_continue_retries','_pending_verification_response',
+                    '_pending_verification_response_previewed')
+                return native.FinalResponseVerdict(action='continue',final_response=None,
+                    codex_ack_continuations=counter+1,**{name:kw[name] for name in names})
+            agent._capstone_alignment_partial=True
+            return original(agent,**query._with_final_text(kw,harness.fallback(request,calls)))
+        if (isinstance(phase,dict) and phase.get('kind')=='report' and isinstance(phase.get('admitted_text'),str)
+                and phase['admitted_text']==getattr(message,'content',None)
+                and not phase.get('raw_audited')):
+            if (phase['binding']['turn']!=getattr(agent,'_current_turn_id',None)
+                    or phase['binding']['question']!=request or phase['calls']!=calls):
+                raise ValueError('gateway_evidence_final_binding_changed')
+            raw_message=copy.deepcopy(message);raw_message.content=phase['raw_response'];raw_message.tool_calls=None
+            append_message(rows,agent._build_assistant_message(raw_message,'incomplete'))
+            agent._session_messages=rows;phase['raw_audited']=True
         notice = harness.scope_notice(request)
         clarification=getattr(agent,'_capstone_scope_clarification',None)
         if (not notice and clarification and clarification[:2]==(getattr(agent,'_current_turn_id',None),request)):
@@ -652,6 +886,11 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
             logging.getLogger('capstone.query_completion').info(
                 'event=incident_judgment_check draft_sha256=%s issues=%s',
                 audit['draft_sha256'], ','.join(incident_issues))
+        if incident_issues and isinstance(phase,dict) and phase.get('admitted_text')==text:
+            state=getattr(agent,'_capstone_gateway_evidence',None)
+            if isinstance(state,dict) and state.get('binding')==phase['binding']:
+                state['feedback']={'issues':incident_issues,'untrusted_rejected_report':phase.get('review')}
+                state['feedback_calls']=copy.deepcopy(calls)
         if ((incident_gap or incident_issues) and not repeated and type(counter) is int
                 and used < harness.CONTRACT.REPAIR_PASSES and query._remaining(kw, agent)):
             agent._capstone_incident_repairs = (turn, used + 1)

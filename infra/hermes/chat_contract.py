@@ -332,7 +332,7 @@ def workflow_policy(names, *, section=None):
 
 
 def system_prompt(*, read_only=False, agent_role=None, phase='default'):
-    if phase not in ('default','evidence-judgment') or phase=='evidence-judgment' and not read_only:
+    if phase not in ('default','evidence-judgment','read-selection') or phase!='default' and not read_only:
         raise ValueError('shared_soc_phase_invalid')
     here = Path(__file__).resolve().parent
     path = here / 'soc_policy.md'
@@ -355,6 +355,8 @@ def system_prompt(*, read_only=False, agent_role=None, phase='default'):
            'ollama':'신속 조회·경보 분류·증거와 타임라인 정리를 우선한다. 관련된 도구만 선택하고 확인한 사실·판단·미확인을 짧게 전달한다. 이름·주소만으로 정상이나 악성을 추정하지 않는다.'}
     if agent_role is not None and agent_role not in roles:raise ValueError('unknown_soc_role')
     if agent_role:text+='\nSOC_ACTIVE_ROLE: '+agent_role+'\n'+roles[agent_role]+'\n공통 관제 의무와 기존 MCP 권한·승인 경계는 유지한다. 대화에서 이 역할을 바꾸지 않는다.\n'
+    if phase=='read-selection':
+        return START+'\n'+text.strip()+'\n'+workflow_policy(('soc-query',),section='incident-read-selection')+'\n'+END
     completion = (workflow_policy(('soc-investigate',),section='investigation-evidence')+'\n'+
                   workflow_policy(('soc-investigate',),section='incident-completion')
                   if phase=='evidence-judgment' else READ_COMPLETION_GUIDANCE if read_only else COMPLETION_GUIDANCE)
@@ -1535,6 +1537,16 @@ def report_display(review):
     if isinstance(value.get('limitations'),list):
         value['limitations']=[clean(s) if isinstance(s,str) else s for s in value['limitations']]
     return value
+
+
+def incident_selection_messages(context, schema, *, agent_role, feedback=None):
+    """One current question and registered schema, without conversation replay."""
+    body=copy.deepcopy(context)
+    body['selection_schema']=copy.deepcopy(schema)
+    if feedback is not None:body['selection_feedback']=copy.deepcopy(feedback)
+    raw=json.dumps(body,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c')
+    return [{'role':'system','content':system_prompt(read_only=True,agent_role=agent_role,phase='read-selection')},
+            {'role':'user','content':raw}]
 
 
 def evidence_report_messages(context, *, agent_role, feedback=None):

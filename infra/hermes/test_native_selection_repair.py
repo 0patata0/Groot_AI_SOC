@@ -28,7 +28,7 @@ class NativeSelectionRepair(unittest.TestCase):
     def plan(self,selection,duplicate=False):
         names=(f.MOD,f.SUR,f.SUR if duplicate else f.BLOCK)
         return {'request_nonce':selection['nonce'],'calls':[{'tool':n,'arguments':{} if n==f.BLOCK else {
-            'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-18T00:00:00+09:00'}} for n in names]}
+            'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-17T23:59:59.999999+09:00'}} for n in names]}
 
     def continuation(self,text,counter=0,remaining=8):
         agent=self.agent;agent.max_iterations=12;agent.iteration_budget=types.SimpleNamespace(remaining=remaining)

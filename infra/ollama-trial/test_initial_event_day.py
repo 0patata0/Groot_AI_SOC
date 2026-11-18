@@ -1,5 +1,6 @@
 """Calendar days constrain first event reads without changing follow-up scopes."""
 import copy
+from datetime import datetime
 import unittest
 from jsonschema import Draft202012Validator, ValidationError
 import harness as h
@@ -11,13 +12,18 @@ def schema():
         'lookback_minutes':{'type':'integer'},'source_ip':{'type':'string'}},'additionalProperties':False}
 
 class InitialEventDay(unittest.TestCase):
-    def test_yesterday_binds_calendar_midnights_and_rejects_rolling_24_hours(self):
+    def test_yesterday_binds_closed_calendar_day_and_rejects_rolling_24_hours(self):
         raw={f.MOD:schema(),f.SUR:schema(),f.BLOCK:{'type':'object','properties':{}}};before=copy.deepcopy(raw)
         actual=h.initial_event_day_schemas('어제 WAF·IDS 경보 조사해줘',raw,[],AT)
         for name in (f.MOD,f.SUR):
             validator=Draft202012Validator(actual[name])
-            validator.validate({'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-18T00:00:00+09:00'})
+            validator.validate({'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-17T23:59:59.999999+09:00'})
             with self.assertRaises(ValidationError):validator.validate({'lookback_minutes':1440})
+            with self.assertRaises(ValidationError):validator.validate({
+                'since_kst':'2026-11-17T00:00:00+09:00','until_kst':'2026-11-18T00:00:00+09:00'})
+            upper=datetime.fromisoformat(actual[name]['properties']['until_kst']['const'])
+            self.assertLess(upper,datetime.fromisoformat('2026-11-18T00:00:00+09:00'))
+            self.assertGreaterEqual(upper,datetime.fromisoformat('2026-11-17T23:59:59.999000+09:00'))
         self.assertEqual(actual[f.BLOCK],raw[f.BLOCK]);self.assertEqual(raw,before)
 
     def test_today_ends_at_actual_turn_clock_without_removing_source_filter(self):
@@ -47,7 +53,7 @@ class InitialEventDay(unittest.TestCase):
         selected=h.refine_read_schemas(q,bound,[],())
         wire=h.selection_schema(selected,8,question=q)
         plan={'calls':[{'tool':name,'arguments':{'since_kst':'2026-11-17T00:00:00+09:00',
-            'until_kst':'2026-11-18T00:00:00+09:00'}} for name in (f.MOD,f.SUR)]}
+            'until_kst':'2026-11-17T23:59:59.999999+09:00'}} for name in (f.MOD,f.SUR)]}
         h.validated_selection(plan,wire)
         for item in selected.values():
             self.assertNotIn('lookback_minutes',item['properties'])

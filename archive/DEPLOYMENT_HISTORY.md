@@ -2031,3 +2031,15 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 ## 2026-11-18 읽기 연결 후보 실제 채팅 실패·원복
 
 [게이트 생성 정정·실제1채팅·28파일 원복·후속 연결 공백](../infra/validation/management-latency/read-activation.validation.json).
+
+
+<!-- read-activation:publication -->
+
+| 게시 항목 | 값 |
+| --- | --- |
+| 내용 커밋 | `5529232f72c866c6d53faea5dec4adee4e7e4619` |
+| 원격 main 일치 | `2026-11-18T10:21:29.767521+09:00` |
+| 공개 파일 | 21 |
+| 비밀정보 검사 | 추적2399·기존합성fixture10·신규0 |
+| 운영 적용 | 실제 시험 후28파일 원복·승격 보류 |
+| 실제 실행 | Hermes1채팅147.415초·판단 미완료/날짜 오류·원복 후Harness²50소스 일치 |

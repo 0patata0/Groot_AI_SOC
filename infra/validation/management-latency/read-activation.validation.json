@@ -353,7 +353,7 @@
     "Update thesis reproduction after operating result is confirmed"
   ],
   "documentation": {
-    "state": "humanized_verified",
+    "state": "humanized_verified_content_published",
     "run": "2026-11-18-012-27ce",
     "route": "light",
     "change_rate": 0.0007,
@@ -362,6 +362,10 @@
     "gate_exit": 0
   },
   "publication": {
-    "state": "pending"
+    "state": "content_published",
+    "content_commit": "5529232f72c866c6d53faea5dec4adee4e7e4619",
+    "remote_main_at_content_publication": "5529232f72c866c6d53faea5dec4adee4e7e4619",
+    "remote_match_at_kst": "2026-11-18T10:21:29.767521+09:00",
+    "receipt_committed_separately": true
   }
 }

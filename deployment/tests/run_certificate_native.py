@@ -41,6 +41,7 @@ def main():
         with tempfile.TemporaryDirectory(prefix=role+'-',dir=args.workdir) as directory:
             root=Path(directory)
             monitor=root/'monitor.sh';monitor.write_bytes(cm.monitor(template['monitor.sh'],spec,'b'*32))
+            monitor.chmod(0o500)
             test=root/'test-monitor.sh';test.write_text(fixture)
             process=subprocess.run(['/bin/bash',str(test),str(monitor),str(root)],capture_output=True,text=True,
                                    timeout=40,env=cm.ENV)
@@ -49,12 +50,17 @@ def main():
             lines=[line for line in process.stdout.splitlines() if line.startswith('{')]
             result=json.loads(lines[-1]);assert result['passed']==26 and result['network_connections']==0
             assert not result['operating_access'] and result['tls_transport_simulated']
-            unit=root/cm.UNIT.name;unit.write_bytes(cm.service(spec))
+            # verify also checks that ExecStart exists and is executable. Use
+            # the private rendered file so no installed operating monitor is
+            # required. Keep every sandbox/network/calendar option unchanged.
+            unit=root/cm.UNIT.name
+            unit.write_bytes(cm.service(spec).replace(str(cm.EXECUTABLE).encode(),str(monitor).encode()))
             timer=root/cm.TIMER.name;timer.write_bytes(cm.timer())
             syntax=subprocess.run(['/usr/bin/systemd-analyze','verify',str(unit),str(timer)],capture_output=True,text=True,timeout=15,env=cm.ENV)
             (args.workdir/(role+'-unit.log')).write_text(syntax.stdout+syntax.stderr)
             assert syntax.returncode==0,(role,'unit syntax')
             result['systemd_unit_syntax']='passed'
+            result['systemd_unit_syntax_adapter']='ExecStart path only -> private rendered monitor; no operating executable dependency'
             result['role']=role
             result['monitor_sha256']=cm.sha(monitor.read_bytes())
             result['fixture_source_sha256']=cm.sha(raw.encode())

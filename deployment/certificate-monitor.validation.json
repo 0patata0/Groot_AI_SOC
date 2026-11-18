@@ -38,8 +38,8 @@
       "sha256": "152241995753460db014800f02ea714c9d230a3584836d65822bbf07bdbb964e"
     },
     "deployment/tests/run_certificate_native.py": {
-      "bytes": 3847,
-      "sha256": "794732afaea7f6a49997e9fb299d04f545ce0132d6d2286c77add715e73f84b3"
+      "bytes": 4320,
+      "sha256": "2a3668ec855385f7d8795e2ced254dfb81fd61026691daf67eaf47b64c928b9d"
     },
     "infra/mcp/system_diagnostics.py": {
       "bytes": 36744,
@@ -151,7 +151,22 @@
       "systemd": "systemd 255 (255.4-1ubuntu8.18)",
       "writes": 0
     },
-    "registered_read_target_addition": "source-only b:certificate-monitor -> capstone-cert-monitor.service; operating catalogs unchanged"
+    "registered_read_target_addition": "source-only b:certificate-monitor -> capstone-cert-monitor.service; operating catalogs unchanged",
+    "postreview_verifier_isolation": {
+      "at_kst": "2026-11-18T18:27:23.503171+09:00",
+      "correction": "unit syntax test ExecStart now references private root0500 rendered monitor; no installed monitor dependency",
+      "same_52_conditions_retested": true,
+      "do_not_sum_as104_unique_conditions": true,
+      "systemd_unit_syntax": 2,
+      "actual_units_started": 0,
+      "operating5_hashes_unchanged": true,
+      "cleanup": {
+        "path": "/var/tmp/capstone-cert-bootstrap-3e9b81a2780cb331bab26eb2",
+        "files": 11,
+        "bytes": 43358,
+        "absence_verified": true
+      }
+    }
   },
   "humanize": {
     "run": "2026-11-18-031-25d6",

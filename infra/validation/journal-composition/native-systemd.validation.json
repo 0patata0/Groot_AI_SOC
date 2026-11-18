@@ -150,7 +150,25 @@
   "bot_posts": 0,
   "presentation_generation_or_editing": 0,
   "publication": {
-    "status": "prepared_not_yet_committed_or_pushed"
+    "status": "content_committed_pushed_and_remote_verified",
+    "content_commit": "b7e1b739a7e17aef5a05e7b4ff7a1607c15b28df",
+    "remote_main_at_content_verification": "b7e1b739a7e17aef5a05e7b4ff7a1607c15b28df",
+    "content_verified_at_kst": "2026-11-19T08:22:12.662160+09:00",
+    "exact_public_content_files": 10,
+    "tracked_paths_scanned": 2435,
+    "unsafe_paths": 0,
+    "known_synthetic_or_code_findings": 10,
+    "new_secret_findings": 0,
+    "credential_values_saved": false,
+    "reviewed_private_index": true,
+    "followup_receipt_scope": "documentation and current record only; operating candidate still not deployed",
+    "humanize_receipt": {
+      "run": "2026-11-19-007-6ca4",
+      "route": "light",
+      "change_rate_percent": 0.0,
+      "self_checks": "6/6",
+      "gate_exit_code": 0
+    }
   },
   "humanize": {
     "version": "2.3-codex",

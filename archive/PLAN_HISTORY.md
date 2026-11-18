@@ -6971,4 +6971,21 @@ MCP 기본 소스와 실제 core/journal2차이를 확인해 직접 배포하지
 
 <!-- coordinator-native-systemd-20261119 -->
 A/B/C27유닛 읽기와 별도 systemd 합성6조건을 확인해 모의 backend만 있던 검증 근거를 보강했다. 이 결과로 운영 root 진입점·Lifecycle.recover·실제 재부팅/SSH 단절·B Docker·전체 캐시/전역 복구를 완료 처리하지 않는다. 해당 연결을 검증하고 새 라이브 소스/스키마/모델/권한 대조와 전체 payload 동결·공식 Harness²/회귀·정확 승인·관리자 경유 적용·새 MCP/두 봇 채팅으로 이어간다. 공격·학습 중단과 발표자료 추가 생성·수정 중단은 유지한다. [검증 범위](../infra/validation/journal-composition/native-systemd.validation.json).
+<!-- coordinator-native-systemd-publication-20261119 -->
+| 조정 실행기 검증 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `b7e1b739a7e17aef5a05e7b4ff7a1607c15b28df` |
+| 실제 원격 main 일치 | `2026-11-19T08:22:12.662160+09:00` |
+| 공개 범위 | 새 검증기·원장·설명/현황10파일. 운영 runtime 소스 변경0 |
+| 실제 읽기 | A6/B17/C4의27유닛, 운영 모드 생성자·카탈로그·속성 해석 |
+| 별도 systemd | 합성6조건·다른 PID의 파일2개 복구9.421초·원래 활성 집합만 재개 |
+| 정리 | 자체 유닛·파일·링크·폴더 부재, 별도07:50:51 KST 읽기 확인 |
+| 게시 전 검사 | 추적2435·위험경로0·기존 합성/코드10·신규0·명령 범위 음성6 |
+| 문서/자료 | 윤문006-5121 light·0.01%·B·6/6·gate0. 기존 발표3SHA·판넬23SHA 보존 |
+| 미검증 | 운영 root/Lifecycle·실제 재부팅/SSH·B Docker·캐시/전역 복구·정확 승인·새 MCP/봇 |
+<!-- /coordinator-native-systemd-publication-20261119 -->
 <!-- /coordinator-native-systemd-20261119 -->
+
+<!-- panel-half-expansion-20261119 -->
+판넬 본문의50% 확장과 논문 표2개 재사용·Conclusion 실제 캡처 배치를 마쳤다. Method 본문은 구현 역할과 처리 흐름 중심으로 유지하고 세부 주소·설정값은 표·그림으로 전달한다. 실제 규격이 정해지면 캡처 글자가 읽히는 크기로 조판하고 인쇄 결과를 검수한다. 발표자료 추가 생성·수정과 공격·학습 중단은 유지한다.
+<!-- /panel-half-expansion-20261119 -->

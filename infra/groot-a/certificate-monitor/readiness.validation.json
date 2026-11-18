@@ -158,8 +158,7 @@
     }
   },
   "pending": [
-    "Repair common follow-up/repair/output scope: actual certificate query was replaced by Wazuh-agent inventory; Harness² and new chat tests required",
-    "Fresh single deploy.sh execution and native evaluation of the12 new-initial rules; source integration complete, operating legacy observer unchanged",
+    "Fresh single deploy.sh execution and operating12-rule/alert delivery; source integration and isolated native engine112 cases verified, operating legacy observer unchanged",
     "Next scheduled 09:00 KST observation; public DNS/443/HTTP availability and fresh OS install are separate"
   ],
   "review": {
@@ -671,5 +670,15 @@
     "admin_clock_unsynchronized": true,
     "exact_NTP_proposal": "390a0f4347cab13efe584982657f51642ee38068bbdc7fe053c9806fa11268d7",
     "NTP_applied": false
+  },
+  "service_query_followup": {
+    "state": "operating_confirmed_limited_chat_validation",
+    "validation": "../../hermes/query-completion/service-catalog.validation.json",
+    "confirmed_at_kst": "2026-11-18T19:46:17.410464+09:00",
+    "new_chats": 6,
+    "actual_reads": 10,
+    "original_failed_chat_preserved": true,
+    "unrelated_agent_repair_replaced": true,
+    "general_accuracy_slo_verified": false
   }
 }

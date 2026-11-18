@@ -40,12 +40,40 @@ def enabled(agent, evidence):
             and getattr(agent, "api_mode", "chat_completions") == "chat_completions")
 
 
+def registered_service_catalog(agent, request, harness):
+    """Recover registry conditions removed only by Native's wire projection.
+
+    Never add an omitted tool or replace a changed/narrowed wire definition.
+    The registry and the currently offered schema must otherwise agree exactly.
+    """
+    name='mcp__system_diagnostics__get_system_diagnostics'
+    if name not in getattr(agent,'valid_tool_names',()) or not harness.EVIDENCE.allowed(name,'verify'):
+        return request
+    selected=[t for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
+    if len(selected)!=1:return request
+    wire=selected[0]['function'].get('parameters')
+    if not isinstance(wire,dict) or harness.CONTRACT.diagnostic_journal_catalog(wire) is not None:return request
+    try:from tools.registry import registry
+    except ImportError:return request
+    registered=registry.get_schema(name)
+    if not isinstance(registered,dict) or registered.get('name')!=name:return request
+    raw=registered.get('parameters')
+    if not isinstance(raw,dict) or harness.CONTRACT.diagnostic_journal_catalog(raw) is None:return request
+    projected=copy.deepcopy(raw)
+    for key in ('allOf','anyOf','oneOf','enum','not'):projected.pop(key,None)
+    if projected!=wire:return request
+    result=copy.deepcopy(request)
+    next(t for t in result['tools'] if t.get('function',{}).get('name')==name)['function']['parameters']=copy.deepcopy(raw)
+    logging.getLogger('capstone.query_completion').info('event=service_registry_conditions restored=true tool=%s registry_sha256=%s',
+        name,hashlib.sha256(json.dumps(raw,sort_keys=True,ensure_ascii=False).encode()).hexdigest())
+    return result
+
+
 def gateway_evidence_request(agent, data, catalog_request, question, calls, harness, clock, reference):
     """Lease the existing Native API a bounded, current-turn read/report phase."""
     if (os.environ.get('CAPSTONE_GATEWAY_EVIDENCE_COMPACT','1')!='1'
             or not enabled(agent,harness.EVIDENCE) or reference
             or harness.READ.wants_write(harness.normalized(question))
-            or not harness.investigation_first_scope(question)
             or not isinstance(getattr(agent,'base_url',None),str)
             or not harness.EVIDENCE.verified_runtime_model(agent,data.get('model'))
             or getattr(agent,'_interrupt_requested',False)):
@@ -58,6 +86,12 @@ def gateway_evidence_request(agent, data, catalog_request, question, calls, harn
     at=match[1]
     if not at.endswith('+09:00') or not harness.EVIDENCE.parse_instant(at):
         raise ValueError('gateway_evidence_clock_invalid')
+    catalog_request=registered_service_catalog(agent,catalog_request,harness)
+    service_plan=harness.CONTRACT.service_history_plan(catalog_request,question,at)
+    service_plan=service_plan if service_plan and service_plan.get('compact_scope') else None
+    if not service_plan and not harness.investigation_first_scope(question):
+        agent._capstone_gateway_phase=None
+        return None
     catalog={}
     for tool in catalog_request.get('tools',[]):
         f=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -81,11 +115,42 @@ def gateway_evidence_request(agent, data, catalog_request, question, calls, harn
     used=getattr(agent,'_capstone_read_selection_count',(None,0))
     used=used[1] if used[0]==turn else 0
     remaining=min(4,max(0,harness.CONTRACT.TOOL_CALLS-used))
-    schemas=harness.refine_read_schemas(question,catalog,calls)
-    context=harness.evidence_report_context(question,calls,at,catalog)
+    schemas=harness.refine_read_schemas(question,catalog,calls) if not service_plan else catalog
+    context=harness.evidence_report_context(question,calls,at,catalog) if not service_plan else None
     nonce=uuid.uuid4().hex
     feedback=state.get('feedback') if state.get('feedback_calls')==calls else None
-    if not calls:
+    if service_plan:
+        receipts=harness.service_report_receipts(calls) if calls else []
+        if receipts is None:raise ValueError('gateway_service_receipts_invalid')
+        service_state=harness.CONTRACT.service_history_state(service_plan,receipts)
+        pending=service_state['pending']+harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+        if pending:
+            if remaining<1:raise ValueError('gateway_service_read_budget_exhausted')
+            options=pending[:remaining]
+            schema=harness.CONTRACT.service_required_read_selection(options,catalog)
+            schema['properties']['request_nonce']={'const':nonce};schema['required'].append('request_nonce')
+            context={'request':question,'requested_at_kst':at,'required_reads':options,
+                     'initial_history_window_minutes':service_plan.get('initial_history_window_minutes')}
+            selection_context={**context,'required_reads':[{'index':i,**option} for i,option in enumerate(options)]}
+            messages=harness.CONTRACT.incident_selection_messages(selection_context,schema,agent_role='hermes',feedback=feedback)
+            kind='initial'
+        else:
+            context=harness.CONTRACT.service_report_context(catalog_request,question,at,receipts,allowed_reads=set(catalog))
+            if context is None:
+                agent._capstone_gateway_phase=None
+                return None
+            remaining=remaining if state['inquiries']<harness.CONTRACT.SERVICE_INQUIRY_ROUNDS else 0
+            citations=sorted({r['tool'] for r in context['untrusted_completed_reads']})
+            schema=harness.CONTRACT.service_report_schema(citations,nonce=nonce,available_reads=list(catalog),
+                facts=harness.facts_for(calls),read_schemas=catalog,direct_reads=remaining,
+                allow_more=remaining>0,lookup_only=context.get('lookup_only') is True)
+            descriptions={t['function']['name']:harness.CONTRACT.service_tool_description(
+                t['function'].get('description',''),t['function']['parameters'])
+                for t in catalog_request.get('tools',[]) if t.get('function',{}).get('name') in catalog}
+            messages=harness.CONTRACT.service_report_messages(context,descriptions,citations,feedback,
+                structured_followups=True,direct_reads=True)
+            kind='service'
+    elif not calls:
         scope=harness.incident_selection_scope(question,[])
         if not scope or not set(scope)<=set(schemas):
             raise ValueError('gateway_evidence_initial_scope_missing')
@@ -126,6 +191,7 @@ def gateway_evidence_request(agent, data, catalog_request, question, calls, harn
     phase={'binding':copy.deepcopy(binding),'kind':kind,'nonce':nonce,'context':copy.deepcopy(context),
         'calls':copy.deepcopy(calls),'schema':copy.deepcopy(schema),'remaining':remaining,'used':used,
         'messages':copy.deepcopy(messages),'profile':profile,'rejected':False}
+    if service_plan:phase['service_plan']=copy.deepcopy(service_plan)
     agent._capstone_gateway_phase=phase;agent._capstone_read_selection=None
     state['requests']+=1
     return result
@@ -162,6 +228,11 @@ def gateway_evidence_response(response, phase, agent, harness):
     value=json.loads(response.choices[0].message.content)
     phase['raw_response']=response.choices[0].message.content
     if phase['kind']=='initial':
+        if phase.get('service_plan'):
+            from jsonschema import Draft202012Validator
+            Draft202012Validator(phase['schema']).validate(value)
+            choices=[phase['context']['required_reads'][i] for i in value['indexes']]
+            return read_calls_response(response,choices),len(choices)
         return selection_response(response,phase['schema'],harness)
     value,_=harness.CONTRACT.validated_service_report(value,phase['schema'])
     if value['more_evidence']:
@@ -175,12 +246,15 @@ def gateway_evidence_response(response, phase, agent, harness):
         agent._capstone_gateway_evidence['inquiries']+=1
         return read_calls_response(response,value['calls']),len(value['calls'])
     review=copy.deepcopy(value['report']);indexes=review.pop('evidence_indexes')
-    citations=list(phase['context']['evidence_tools'].values())
+    citations=(sorted({r['tool'] for r in phase['context']['untrusted_completed_reads']})
+        if phase['kind']=='service' else list(phase['context']['evidence_tools'].values()))
     review['evidence_tools']=[citations[i] for i in indexes]
-    text=harness.evidence_report_text(review,phase['calls'],phase['context'])
-    issues=(harness.violations(phase['binding']['question'],text,phase['calls'])+
-        harness.evidence_capability_gap_violations(review,phase['context'])+
-        harness.evidence_report_scope_violations(review,phase['context']))
+    text=(harness.EVIDENCE.render_model_review(review,harness.facts_for(phase['calls'])) if phase['kind']=='service'
+        else harness.evidence_report_text(review,phase['calls'],phase['context']))
+    if phase['kind']=='service':text=harness.CONTRACT.service_lookup_text(text,phase['context'])
+    issues=(harness.violations(phase['binding']['question'],text,phase['calls'],service_plan=phase.get('service_plan'))+
+        ([] if phase['kind']=='service' else harness.evidence_capability_gap_violations(review,phase['context'])+
+        harness.evidence_report_scope_violations(review,phase['context'])))
     if issues:
         phase['feedback']={'issues':sorted(set(issues)),'untrusted_rejected_report':review}
         raise ValueError('gateway_evidence_claim_invalid')
@@ -769,7 +843,8 @@ def selection_call_wrapper(original, query, harness=None):
                 if not phase.get('feedback'):
                     if getattr(exc,'validator',None) and isinstance(value,dict):
                         phase['feedback']=(harness.selection_error_feedback(exc,value,phase['schema'])
-                            if phase['kind']=='initial' else harness.CONTRACT.service_schema_repair_feedback(value,phase['schema']))
+                            if phase['kind']=='initial' and not phase.get('service_plan')
+                            else harness.CONTRACT.service_schema_repair_feedback(value,phase['schema']))
                     else:phase['feedback']={'issues':['gateway_'+type(exc).__name__]}
                 state=agent._capstone_gateway_evidence
                 state['feedback']=copy.deepcopy(phase['feedback']);state['feedback_calls']=copy.deepcopy(phase['calls'])
@@ -848,7 +923,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                     codex_ack_continuations=counter+1,**{name:kw[name] for name in names})
             agent._capstone_alignment_partial=True
             return original(agent,**query._with_final_text(kw,harness.fallback(request,calls)))
-        if (isinstance(phase,dict) and phase.get('kind')=='report' and isinstance(phase.get('admitted_text'),str)
+        if (isinstance(phase,dict) and phase.get('kind') in ('report','service') and isinstance(phase.get('admitted_text'),str)
                 and phase['admitted_text']==getattr(message,'content',None)
                 and not phase.get('raw_audited')):
             if (phase['binding']['turn']!=getattr(agent,'_current_turn_id',None)
@@ -874,8 +949,10 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         counter = kw.get('codex_ack_continuations')
         repairs = getattr(agent, '_capstone_incident_repairs', (None, 0))
         used = repairs[1] if repairs[0] == turn else 0
-        audit = harness.incident_judgment_check(request, text, calls,harness.card_reference(user,request))
-        incident_gap = harness.incident_evidence_gap(request, calls,harness.card_reference(user,request))
+        service_plan=(phase.get('service_plan') if isinstance(phase,dict)
+            and phase['binding']['turn']==turn and phase['binding']['question']==request else None)
+        audit = harness.incident_judgment_check(request, text, calls,harness.card_reference(user,request),service_plan)
+        incident_gap = harness.incident_evidence_gap(request, calls,harness.card_reference(user,request),service_plan)
         incident_issues = audit['issues'] if audit else []
         repeated = False
         if audit:
@@ -920,6 +997,9 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         if action_issues:
             text = harness.action_fallback(request, calls)
             agent._capstone_alignment_partial = True
+        if (service_plan and isinstance(phase,dict) and phase.get('kind')=='service'
+                and phase.get('admitted_text')==getattr(message,'content',None)):
+            return original(agent,**query._with_final_text(kw,harness.EVIDENCE.kst_display(text)))
         prior = prior_read_report(request, rows, idx, query, harness) or harness.SHARED.render_prior_inventory(request, rows, idx)
         if not calls and (prior or harness.reuse_only(request)):
             agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))

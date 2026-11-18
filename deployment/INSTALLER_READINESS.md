@@ -92,3 +92,9 @@ root생성 요청별 내부 CAPSTONE_REVIEW_CONTEXT_JSON은 canonical controller
 ## 인증서 감시기의 설치 이식 공백
 
 기존 A용 TLS 감시기 후보는 전체 check 격리 비교·native26·원복14·독립 타이머의 격리 파일2개 복구까지 확인했다. 수동 변경 제어기는 기존 두 파일의 정확 복구용이며 초기 설치기의 추가 진입점이 아니다. 운영 두 파일은 정확 승인 후17:13:01 KST에 확정했고 실제 exit0/verified·MCP/journal을 확인했다. 새 채팅의 최종 대상 오류는 별도다. deploy.sh의 lab TLS와 채팅 TLS는 도메인·포트·파일 경로/모드가 다르므로 고정 machine-id·경로·B 규칙을 명시적으로 이식해야 한다. 기존 운영 감시기 두 파일의17:13 확정과 신규 설치기의 소스 연결·격리 Wazuh112검증은 완료한 범위다. 관리자 LAN의443·HTTP 확인을 추가했으며 외부 인터넷 경로와 다음09:00 실제 예약 실행은 아직이다. 신규3호스트 전체 OS 설치와 독립 재구현도 미수행이다. [검증과 수동 복구](../infra/groot-a/certificate-monitor/README.md).
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../infra/hermes/query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

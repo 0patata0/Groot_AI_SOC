@@ -239,3 +239,9 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 관리자231 경유로 승인된 감시 실행파일·service2개를 적용하고17:13:01 KST에 확정했다. 실제 oneshot은exit0/verified이며 인증서 지문이 일치한다. 기존 MCP의 현재 상태와 실제 journal4표본에서도 확인했다. 5분 독립 원복은 해제하고 원본·정확 후보·제어기는 보존했다. 프록시·인증서·개인키·매일09:00 타이머·MCP/모델은 유지한다. 새 채팅1건은 올바른 인증서 조회 뒤 불필요한 Wazuh 에이전트 조회가 추가되고 최종 표의 대상이 바뀌어 실패로 기록했다. 초기 설치 이식·공개443·내일 예약 실행은 별도 미완료다.
 
 적용 전 전체 cm_main/check는 기존10.3972초/tls_timeout·후보0.472초/verified였다. Linux root26·적용/원복14검사와 실제 독립 타이머의 격리 파일2개 복구를 통과했다. 단일deploy.sh의 lab TLS와 채팅 TLS 이식은 미완료다. [검증·실패·복구](../infra/groot-a/certificate-monitor/readiness.validation.json).
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../infra/hermes/query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

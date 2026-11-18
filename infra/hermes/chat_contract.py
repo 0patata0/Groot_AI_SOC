@@ -143,22 +143,23 @@ READ_VIEW_ENDING = (
 )
 
 
+def query_body(text):
+    """Remove inspected transport labels, preserving registered object names."""
+    if not isinstance(text,str):return text
+    text=re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
+        r'[A-Za-z0-9_.-]{1,64}\]\s+','',text,count=1,flags=re.I)
+    address=re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)',text,re.I)
+    if address and not text[address.end():].startswith('@'):text=text[address.end():]
+    return text
+
+
 def normalize_query_text(text):
     """Conservative read vocabulary, not fuzzy action correction or dispatch.
 
     Original user text is always retained by adapters. Device token boundaries
     keep FW distinct from WAF, and aliases do not manufacture an inline IPS.
     """
-    # Native Mattermost messages carry a leading [username] display label.
-    # Ignore it for classification only, keeping literal device labels intact.
-    text = re.sub(r'^\[(?!(?:FW|WAF|IDS|IPS|Suricata|Wazuh|ModSecurity)\])'
-                  r'[A-Za-z0-9_.-]{1,64}\]\s+', '', text, count=1, flags=re.I)
-    # A single leading bot address is transport syntax, not a device/filter.
-    # Keep multiple addresses, quoted mentions and the original request intact;
-    # channel routing and protected actions still inspect the original text.
-    address = re.match(r'^\s*@(?:hermes|ollama)(?:[,:：])?(?:\s+|$)', text, re.I)
-    if address and not text[address.end():].startswith('@'):
-        text = text[address.end():]
+    text=query_body(text)
     aliases = ((r'웹\s*방화벽|와프|모드시큐리티', 'WAF'),
                (r'(?<![A-Za-z])(?:F/W|firewall|nftables|iptables)(?![A-Za-z])|방화벽', 'FW'),
                (r'(?<![A-Za-z])IPS(?![A-Za-z])|수리카타', 'Suricata'),
@@ -640,10 +641,11 @@ def _service_lookup_intent(question):
     if re.search(r'```|번역|예시|가정|정규식|사용법|개념|설명만|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
     if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
-    journal=service_log_request(question)
-    history=bool(re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
+    execution=bool(re.search(r'(?:최근|마지막|직전)\s*(?:실행|기동|종료)\s*(?:결과|기록|이력)',question))
+    journal=service_log_request(question) or execution
+    history=bool(execution or re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I))
     if not history and not journal:return None
-    return {'journal':journal,'history':history,
+    return {'journal':journal,'history':history,'execution':execution,
         'cause':bool(history and re.search(r'원인|왜|영향|조사',question))}
 
 
@@ -736,6 +738,7 @@ def service_requested_journal_scope(question, explicit_journal):
 
 def service_history_plan(request, question, requested_at):
     """Build required reads from the same catalog-bound target resolution."""
+    question=query_body(question)
     intent=_service_lookup_intent(question)
     if intent is None:return None
     selected=service_target_selection(request,question)
@@ -758,6 +761,26 @@ def service_history_plan(request, question, requested_at):
     bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',period_question)
     natural=_service_natural_window(period_question,at) if not bounds else None
     periods=[];days=set();initial_window=False
+    # Bare "recent" and the last execution result request a bounded sample,
+    # not a guessed incident date. Use only the actual catalog's valid default;
+    # explicit/compound/unsupported periods never fall back to that sample.
+    if not bounds and natural is None and (intent['execution'] or re.search(r'최근',period_question)):
+        remaining=re.sub(r'최근','',period_question,count=1)
+        default=schema.get('properties',{}).get('lookback_minutes',{})
+        minutes=default.get('default')
+        bare=not re.search(r'최근|지난|오늘|금일|어제|그제|내일|부터|까지|이후|이전|사이|'
+                r'\d|쯤|대략|또는|혹은|UTC|GMT|[+-]\d{2}:?\d{2}|'
+                r'(?:한|두|세|네|다섯|여섯|몇|여러|반)\s*(?:초|분|시간|일|주|달|개월|년)|'
+                r'하루|이틀|사흘|나흘|일주일|한달|'
+                r'(?<![A-Za-z])(?:Z|PST|PDT|EST|EDT|CST|CDT|MST|MDT|CET|CEST|JST|IST)(?![A-Za-z])|'
+                r'(?:Asia|America|Europe|Africa|Australia)/',remaining,re.I)
+        if bare:
+            if not (default.get('type')=='integer' and type(minutes) is int
+                and type(default.get('minimum',1)) is int and type(default.get('maximum',1440)) is int
+                and max(1,default.get('minimum',1))<=minutes<=min(1440,default.get('maximum',1440))):return None
+            natural={'bounds':(at-timedelta(minutes=minutes),at),
+                'phrase':'등록된 기본 '+str(minutes)+'분의 최근 표본'}
+            initial_window=True
     if len(bounds)==2:
         periods=[tuple(map(_diagnostic_instant,bounds))]
     elif not bounds and natural is not None:
@@ -798,7 +821,7 @@ def service_history_plan(request, question, requested_at):
     # the cached index of those same error candidates as a mandatory read.
     # Keep explicit index/metadata requests and metadata-only lookups intact;
     # the model may still request the index later if it adds needed evidence.
-    live_cause_history=(cause_inquiry and wants_journal and journal_supported
+    live_cause_history=((cause_inquiry or intent['execution']) and wants_journal and journal_supported
         and not re.search(r'색인|메타데이터|\b(?:index(?:ed)?|metadata)\b',question,re.I))
     for target in sorted(targets):
         if current:options.append({'tool':name,'arguments':{'target':target}})
@@ -826,7 +849,7 @@ def service_history_plan(request, question, requested_at):
                 and registered[0].get('properties')=={} and not registered[0].get('required')):
             options.append({'tool':block_name,'arguments':{}})
         else:unavailable.append('current_block_list')
-    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
+    outside=r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행(?!\s*(?:결과|기록|상태|이력|시각|시간|중|여부))|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b'
     only_service=not re.search(outside,without_targets(read_contract().without_prohibitions(question)),re.I)
     # Preserve the full question and every receipt. Only a separately matched
     # inventory clause is removed for scope classification, never for inquiry.
@@ -944,6 +967,29 @@ def service_history_state(plan, receipts, now=None, *, include_empty_source=True
             state['pending']+=followup['pending']
             state['incomplete']+=['unfiltered_source:'+x for x in followup['incomplete']]
     return state
+
+
+def service_required_read_selection(options, schemas):
+    """Select indexes of exact catalog-valid reads, without generating inputs.
+
+    The caller supplies the current read-only catalog and unmet requirements.
+    This returns schemas only; it never dispatches or repairs an argument.
+    """
+    from jsonschema import Draft202012Validator
+    if not isinstance(options,list) or not 1<=len(options)<=4 or not isinstance(schemas,dict):
+        raise ValueError('service_required_read_scope')
+    seen=set()
+    for option in options:
+        if (not isinstance(option,dict) or set(option)!={'tool','arguments'}
+                or not isinstance(option['arguments'],dict) or option['tool'] not in schemas
+                or not Draft202012Validator(schemas[option['tool']]).is_valid(option['arguments'])):
+            raise ValueError('service_required_read_catalog_mismatch')
+        identity=json.dumps(option,sort_keys=True,ensure_ascii=False,allow_nan=False)
+        if identity in seen:raise ValueError('service_required_read_duplicate')
+        seen.add(identity)
+    return {'type':'object','additionalProperties':False,'required':['indexes'],
+        'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
+            'uniqueItems':True,'items':{'type':'integer','enum':list(range(len(options)))}}}}
 
 
 def service_current_refresh_reads(plan, receipts, now=None):
@@ -1130,6 +1176,7 @@ def service_lookup_scope(plan, question):
     Registration, periods and successful fresh receipts are checked separately.
     """
     if not plan or not plan.get('compact_scope') or plan.get('unavailable_capabilities'):return False
+    question=query_body(question)
     parts=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',question)
     kept=[]
     for part in parts:
@@ -1149,11 +1196,28 @@ def service_lookup_scope(plan, question):
     if phrase:=plan.get('scope_period_phrase'):text=text.replace(phrase,' ',1)
     text=re.sub(r'(?<![A-Za-z0-9_:])[ABC](?:\s*(?:서버|호스트))?(?=\s|의|$)',' ',text,flags=re.I)
     text=re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00|\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}(?::\d{2})?|\d{1,2}시(?:\s*\d{1,2}분)?',' ',text)
-    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|'
+    token=(r'오늘|금일|어제|현재|지금|오전|오후|KST|한국시간|오류|실패|이력|과거|당시|예전|'
+           r'최근|마지막|직전|실행|기동|종료|결과|구분\s*해\s*(?:줘|주세요)|알려\s*(?:줘|주세요)|'
            r'원문|로그|logs?|journal(?:ctl)?|raw|발췌|상태|관제|처리|대기|서비스|표로|표|내역|기록|'
            r'보여\s*(?:줘|주세요)|(?:조회|확인|정리)\s*해\s*(?:줘|주세요)|'
            r'간단히|간단하게|짧게|부터|까지|사이|동안|그리고|의|을|를|은|는|과|와|이랑|랑|하고|도|만|에|[\s,.!?。~–—-]')
     return re.fullmatch(r'(?:'+token+r')+',text) is not None
+
+
+def service_lookup_note(context):
+    """Explain a registered initial sample without inventing execution times."""
+    minutes=context.get('initial_history_window_minutes')
+    if (context.get('lookup_only') is not True
+            or context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
+            or type(minutes) is not int or not 1<=minutes<=1440):return ''
+    return ('\n\n기간을 지정하지 않아 도구에 등록된 최근 '+str(minutes)+'분 표본을 먼저 조회했습니다. '
+            '수집 관측 시각은 실제 실행 시각과 다릅니다. 이 구간 밖의 과거 실행·실패는 미확인입니다.')
+
+
+def service_lookup_text(text, context):
+    """Keep the existing terminal control record terminal for public filtering."""
+    note=service_lookup_note(context)
+    return note.strip()+'\n\n'+text if note else text
 
 
 def bind_service_read_receipts(ledger, outputs, allowed_reads):

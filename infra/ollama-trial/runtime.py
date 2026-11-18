@@ -496,8 +496,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         report['service_lookup_complete']=review.get('scope')=='verified_service_lookup'
                         report['service_judgment']={'assessment':review['assessment'],'status':review['status']}
                         report['last_service_review']=copy.deepcopy(review)  # for bounded sentence pruning
-                        return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']),
-                            lookup_identity=service_context.get('service_identity_discovery') if service_context.get('lookup_incomplete') is True else None)
+                        return harness.CONTRACT.service_lookup_text(harness.EVIDENCE.render_model_review(
+                            review,harness.facts_for(report['calls']),
+                            lookup_identity=service_context.get('service_identity_discovery') if service_context.get('lookup_incomplete') is True else None),service_context)
                     if direct:
                         selected={row['tool']:readable[row['tool']] for row in value['calls']}
                         plan={'calls':value['calls']}

@@ -80,3 +80,9 @@ HTTP Wazuh는 같은 호스트의 HTTPS로 308을 반환하며 관리ACL은 유�
 ## 인증서 관측 실패와 서비스 실패의 구분
 
 capstone-cert-monitor의 Result=success/exit2와 probe_status=unavailable은 인증서 관측 실패다. systemd의 failed unit0을 인증서 정상 검증으로 해석하지 않는다. 현재100305 경보의 reason=tls_timeout은 감시 서비스의 loopback 제한에서 재현됐다. 고정 프록시172.18.0.3:8443·그/32 허용 두 파일을 승인 후17:13:01 KST에 확정하고 실제 exit0/verified·기존 MCP/journal4표본을 확인했다. 5분 독립 원복 제어기는 기존 두 파일만 복구하도록 준비했다. 프록시 재시작·인증서 교체·일반 root 권한 위임은 없다. 원복 타이머는 해제하고 복구본은 보존했다. 다음09:00 예약 실행은 별도 관찰한다. 새 채팅은 올바른 인증서 조회 뒤 최종 표를 에이전트 목록으로 바꿔 실패했다. 운영 서비스 검증과 대화 출력 정확도를 구분한다. [정확 범위·검증·복구](../infra/groot-a/certificate-monitor/README.md).
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../infra/hermes/query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

@@ -1,0 +1,708 @@
+{
+  "schema": 1,
+  "state": "operating_confirmed_limited_chat_validation",
+  "observed_at_kst": "2026-11-18T19:48:37.047263+09:00",
+  "scope": "catalog-bound service current state and execution-history factual lookup; Wazuh identity retained",
+  "plan_sha256": "ef00a8ad000cbccc6935091372489bd0850757334d4e8e2f0f17059bb877d268",
+  "route": "Mac-admin231-A-B",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "access_mode": "hermes-parity",
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "registered_tools": 45,
+  "diagnostic_targets": 42,
+  "public_source_sha256": {
+    "infra/hermes/read_contract.py": "765c36d42adc413a55f9cc24edf81929f38918d7f306f600db778ac3b6e0e725",
+    "infra/hermes/chat_contract.py": "c990c11a00fc3e2fc53097df1358bf9ff7299f9a3eec66e074f424403519dddf",
+    "infra/hermes/test_service_history_contract.py": "d79cf5ce1da74d99a6c41a44701e3014f017c24747bf17415d0f8196b7fa8a65",
+    "infra/ollama-trial/test_service_identity_scope.py": "c82266ed85ca6e7a9ae8ca921590d5cd0726ed1e5d784ac5f369dfd27fca1a21",
+    "infra/hermes/query-completion/alignment.py": "108c5e64b89be41bf4b0bad226e2495c96a81cb8ffbcd6dc07ed328a167acdaf",
+    "infra/hermes/query-completion/test_service_catalog_phase.py": "78b4968ff97042f3b4a8ac34c1e8bffe4731db6360815ae839f7446032ffadd3",
+    "infra/hermes/skills/soc-query/SKILL.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+    "infra/ollama-trial/runtime.py": "0c0898fd6ca75f00c0f9f0514bb5100e3e51cccf59e1350873e78dd69147abef",
+    "infra/ollama-trial/harness.py": "374ab648777b7340a7128efa4b419e2de4fb67c0f2a5033d71ab604fbf465316"
+  },
+  "installed_function_scope": {
+    "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+      "changed": [
+        "_single_plan",
+        "identity_plan"
+      ],
+      "added": [
+        "operational_object_request"
+      ],
+      "unchanged_functions": 57,
+      "before": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "after": "871500a961c90986218086559d6b7ae3b8fa050966ba65068160c6420ab2f78a"
+    },
+    "/opt/capstone-ollama-trial/read_contract.py": {
+      "changed": [
+        "_single_plan",
+        "identity_plan"
+      ],
+      "added": [
+        "operational_object_request"
+      ],
+      "unchanged_functions": 57,
+      "before": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "after": "871500a961c90986218086559d6b7ae3b8fa050966ba65068160c6420ab2f78a"
+    },
+    "/opt/capstone-management/read_contract.py": {
+      "changed": [
+        "_single_plan",
+        "identity_plan"
+      ],
+      "added": [
+        "operational_object_request"
+      ],
+      "unchanged_functions": 57,
+      "before": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+      "after": "871500a961c90986218086559d6b7ae3b8fa050966ba65068160c6420ab2f78a"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+      "changed": [
+        "_service_natural_period",
+        "normalize_query_text",
+        "service_history_plan",
+        "service_history_state",
+        "service_lookup_scope",
+        "service_report_context"
+      ],
+      "added": [
+        "_service_log_noun_pattern",
+        "_service_lookup_intent",
+        "_service_name_remainder",
+        "_service_natural_window",
+        "diagnostic_journal_catalog",
+        "query_body",
+        "read_action_remainder",
+        "service_lookup_note",
+        "service_lookup_text",
+        "service_requested_journal_scope",
+        "service_required_read_selection",
+        "service_target_selection"
+      ],
+      "unchanged_functions": 69,
+      "before": "ab6e2730ca4470e8446c527f52bec1673b9d9856d3ad90a9c256d1fef348d8b4",
+      "after": "0076b22ef39fb283dffc6163b8764fada51bd852cc3b4cf7bd5c1e167aafca30"
+    },
+    "/opt/capstone-ollama-trial/chat_contract.py": {
+      "changed": [
+        "_service_natural_period",
+        "normalize_query_text",
+        "service_history_plan",
+        "service_history_state",
+        "service_lookup_scope",
+        "service_report_context"
+      ],
+      "added": [
+        "_service_log_noun_pattern",
+        "_service_lookup_intent",
+        "_service_name_remainder",
+        "_service_natural_window",
+        "diagnostic_journal_catalog",
+        "query_body",
+        "read_action_remainder",
+        "service_lookup_note",
+        "service_lookup_text",
+        "service_requested_journal_scope",
+        "service_required_read_selection",
+        "service_target_selection"
+      ],
+      "unchanged_functions": 69,
+      "before": "ab6e2730ca4470e8446c527f52bec1673b9d9856d3ad90a9c256d1fef348d8b4",
+      "after": "0076b22ef39fb283dffc6163b8764fada51bd852cc3b4cf7bd5c1e167aafca30"
+    },
+    "/opt/capstone-management/chat_contract.py": {
+      "changed": [
+        "_service_natural_period",
+        "normalize_query_text",
+        "service_history_plan",
+        "service_history_state",
+        "service_lookup_scope",
+        "service_report_context"
+      ],
+      "added": [
+        "_service_log_noun_pattern",
+        "_service_lookup_intent",
+        "_service_name_remainder",
+        "_service_natural_window",
+        "diagnostic_journal_catalog",
+        "query_body",
+        "read_action_remainder",
+        "service_lookup_note",
+        "service_lookup_text",
+        "service_requested_journal_scope",
+        "service_required_read_selection",
+        "service_target_selection"
+      ],
+      "unchanged_functions": 69,
+      "before": "ab6e2730ca4470e8446c527f52bec1673b9d9856d3ad90a9c256d1fef348d8b4",
+      "after": "0076b22ef39fb283dffc6163b8764fada51bd852cc3b4cf7bd5c1e167aafca30"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+      "changed": [
+        "final_wrapper",
+        "gateway_evidence_request",
+        "gateway_evidence_response",
+        "selection_call_wrapper"
+      ],
+      "added": [
+        "registered_service_catalog"
+      ],
+      "unchanged_functions": 16,
+      "before": "05b666112cc97093cd662b3000fee272c00e86fe863fb19b4c22d5f8880e5329",
+      "after": "d0016e15054e6155041737048649c535a0cef3bcc54efbdfeebdbee182dc832a"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": {
+      "scope": "one existing read-selection instruction; calls or indexes per actual schema",
+      "before": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126",
+      "after": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7"
+    },
+    "/opt/capstone-ollama-trial/skill-soc-query.md": {
+      "scope": "one existing read-selection instruction; calls or indexes per actual schema",
+      "before": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126",
+      "after": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7"
+    },
+    "/opt/capstone-management/skill-soc-query.md": {
+      "scope": "one existing read-selection instruction; calls or indexes per actual schema",
+      "before": "3858c7e071973a8f652fbd576be3cbdf067d6bf94b57f21d84547981208bf126",
+      "after": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7"
+    },
+    "/opt/capstone-ollama-trial/runtime.py": {
+      "changed": [
+        "run"
+      ],
+      "added": [],
+      "unchanged_functions": 7,
+      "before": "ab6b6c5f042118f9f5a2f64790071113bbe57a5a0435e69fa93acb2c86031612",
+      "after": "4ece9ab3417f5e4a840bd2fd8905ae99b75452bd922f480fed66b7bbba9ca711"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+      "changed": [
+        "violations"
+      ],
+      "added": [],
+      "unchanged_functions": 152,
+      "before": "7756612c7ed2db0d62b2f933deb74ad6f1693af0352d21a4790eeab4c847c5a9",
+      "after": "1b7ea60b7f190a96fb8ba60ab459bac0a74ac613b6ebefe063609f542688c684"
+    },
+    "/opt/capstone-ollama-trial/harness.py": {
+      "changed": [
+        "violations"
+      ],
+      "added": [],
+      "unchanged_functions": 152,
+      "before": "7756612c7ed2db0d62b2f933deb74ad6f1693af0352d21a4790eeab4c847c5a9",
+      "after": "1b7ea60b7f190a96fb8ba60ab459bac0a74ac613b6ebefe063609f542688c684"
+    }
+  },
+  "actual_installed_baseline": "64 source/receipt observations; only specified functions and one shared read-selection skill line changed",
+  "operating": {
+    "root": "/var/lib/capstone-evidence-rollout/20261118-service-4d7c245672",
+    "confirmed_at_kst": "2026-11-18T19:46:17.410464+09:00",
+    "source_files": 13,
+    "receipt_updates": 1,
+    "protected_files": 58,
+    "sdk_receipt_sources": 20,
+    "review_receipt_sources": 5,
+    "rollback_timer": "inactive",
+    "original_and_exact_candidate_retained": true,
+    "same_native_container_and_image": true,
+    "planned_native_restarts_final_round": 1,
+    "databases_equal_while_workers_stopped": true,
+    "new_tools": 0,
+    "model_or_authority_changes": 0,
+    "new_dependencies_ports_keys": 0,
+    "last_read_only_check_at_kst": "2026-11-18T19:47:35.070759+09:00",
+    "confirmed_marker_reobserved": "2026-11-18T19:46:17.401183+09:00",
+    "after_original_rollback_deadline": {
+      "observed_at_kst": "2026-11-18T19:56:37.204520+09:00",
+      "files": 14,
+      "protected": 58,
+      "rollback_timer": "inactive",
+      "confirmed_marker": "2026-11-18T19:46:17.401183+09:00"
+    }
+  },
+  "regression": {
+    "mac": {
+      "at_kst": "2026-11-18T19:34:36.064340+09:00",
+      "plan_sha256": "ef00a8ad000cbccc6935091372489bd0850757334d4e8e2f0f17059bb877d268",
+      "results": {
+        "candidate/native": {
+          "rc": 0,
+          "summary": {
+            "run": 364,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/sdk": {
+          "rc": 0,
+          "summary": {
+            "run": 313,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/transport": {
+          "rc": 0,
+          "summary": {
+            "run": 27,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/native_phase": {
+          "rc": 0,
+          "summary": {
+            "run": 39,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/service_contract": {
+          "rc": 0,
+          "summary": {
+            "run": 52,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        }
+      },
+      "packages_installed": 0
+    },
+    "linux": {
+      "at_kst": "2026-11-18T19:39:27.842588+09:00",
+      "stage": "/var/lib/capstone-evidence-validation/gateway-a5966f7a61",
+      "results": {
+        "candidate/native": {
+          "rc": 0,
+          "summary": {
+            "run": 364,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/sdk": {
+          "rc": 0,
+          "summary": {
+            "run": 313,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/native_phase": {
+          "rc": 0,
+          "summary": {
+            "run": 39,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/transport": {
+          "rc": 0,
+          "summary": {
+            "run": 27,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "candidate/service_contract": {
+          "rc": 0,
+          "summary": {
+            "run": 52,
+            "failures": [],
+            "errors": [],
+            "skipped": 0
+          }
+        },
+        "harness2": {
+          "rc": 0,
+          "summary": [
+            "",
+            "----------------------------------------------------------------------",
+            "Ran 38 tests in 3.414s",
+            "",
+            "OK"
+          ]
+        },
+        "installer": {
+          "rc": 0,
+          "summary": [
+            "",
+            "----------------------------------------------------------------------",
+            "Ran 37 tests in 0.700s",
+            "",
+            "OK"
+          ]
+        }
+      },
+      "model_calls": 0,
+      "mcp_calls": 0,
+      "operating_source_changes": 0,
+      "installed_vendor_unchanged": true,
+      "created_stage_parent": false,
+      "plan_sha256": "ef00a8ad000cbccc6935091372489bd0850757334d4e8e2f0f17059bb877d268"
+    },
+    "unique_test_accuracy_inferred": false,
+    "baseline_new_tests_failed_as_expected": true,
+    "counts_note": "Mac 795 and Linux 795+38+37=870 executions; overlapping tests, not independent accuracy samples"
+  },
+  "official_harness2": {
+    "vendor_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before_at_kst": "2026-11-18T19:40:14.263639+09:00",
+    "after_at_kst": "2026-11-18T19:43:34.948685+09:00",
+    "before_status": "passed",
+    "after_status": "passed",
+    "before_census": {
+      "management": {
+        "always_on_chars": 16835,
+        "n_files": 14,
+        "scripts": 7,
+        "skills": 5,
+        "sub_agents": 0
+      },
+      "native": {
+        "always_on_chars": 33505,
+        "n_files": 19,
+        "scripts": 11,
+        "skills": 5,
+        "sub_agents": 0
+      },
+      "sdk": {
+        "always_on_chars": 16835,
+        "n_files": 20,
+        "scripts": 13,
+        "skills": 5,
+        "sub_agents": 0
+      }
+    },
+    "after_census": {
+      "management": {
+        "always_on_chars": 16835,
+        "n_files": 14,
+        "scripts": 7,
+        "skills": 5,
+        "sub_agents": 0
+      },
+      "native": {
+        "always_on_chars": 33505,
+        "n_files": 19,
+        "scripts": 11,
+        "skills": 5,
+        "sub_agents": 0
+      },
+      "sdk": {
+        "always_on_chars": 16835,
+        "n_files": 20,
+        "scripts": 13,
+        "skills": 5,
+        "sub_agents": 0
+      }
+    },
+    "automatic_adoption": false,
+    "framework_direct_model_calls": 0,
+    "framework_structure_is_not_quality": true
+  },
+  "actual_chat": {
+    "at_kst": "2026-11-18T19:46:07.656522+09:00",
+    "cases": [
+      {
+        "engine": "hermes",
+        "case": "certificate",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/5xmufauft7ghura5h46ozaoh3h",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/ob4gj63wzif5p8y4dzk6zba6go",
+        "seconds_to_chat_reply": 12.715,
+        "actual_reads": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:certificate-monitor"
+            },
+            "wire_result_sha256": "da618418fddd7f9bed108e631698e4a40677e1492dd83e88299159269ce7f2a2"
+          },
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:certificate-monitor",
+              "since_kst": "2026-11-18T19:26:36.096947+09:00",
+              "until_kst": "2026-11-18T19:41:36.096947+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "wire_result_sha256": "03ba692eca572b533bf4c6a831f3d03f437bb0d70cf27a3b328711d1a5a3509d"
+          }
+        ],
+        "model_calls": 2,
+        "message_sha256": "5e154ddd2b6574b51adfdaf9e2cd6f7656cab12d19ed7650e8dc2b246512a6f6",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      },
+      {
+        "engine": "hermes",
+        "case": "storage",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/sr1uqdfqxfym8n6xtws3sgq7oy",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/5q89wr5xaidf3ea7s6h8t51k4y",
+        "seconds_to_chat_reply": 12.511,
+        "actual_reads": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:storage-monitor"
+            },
+            "wire_result_sha256": "61f5fb8ed5815e019207e2755204a78f919f322198f3d41fd5669ee770cefc1e"
+          },
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:storage-monitor",
+              "since_kst": "2026-11-18T19:27:13.590766+09:00",
+              "until_kst": "2026-11-18T19:42:13.590766+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "wire_result_sha256": "3431403d4a17e66e9a8d8de264ee93d4acc315ec4d92d96d5e24056f38ee6533"
+          }
+        ],
+        "model_calls": 2,
+        "message_sha256": "75cb74da61a0c8e9d5332ddce0f1154c1714add64076b2717676b470207dc558",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      },
+      {
+        "engine": "hermes",
+        "case": "identity",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/urpm75fr1pfzuc6ocf1nx4o55y",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/6zu8smxh8pr1fqseo7nxpmy4wy",
+        "seconds_to_chat_reply": 15.059,
+        "actual_reads": [
+          {
+            "tool": "mcp__wazuh_ro__get_wazuh_agents",
+            "arguments": {
+              "status": "active"
+            },
+            "wire_result_sha256": "3dc98abbbca0f91164171b94140baec2e4d19ce013d9f854136d7efde501694c"
+          }
+        ],
+        "model_calls": 2,
+        "message_sha256": "7de26fd29eb1ab60d28b91507f19cc41fa11acb4623fe6f1afe8a2e1d986bc0a",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      },
+      {
+        "engine": "ollama",
+        "case": "certificate",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/wzay8uctxfyhpnfwuifiby8nge",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/3wbfjfio3tgq98tuz43ktxupbe",
+        "seconds_to_chat_reply": 16.194,
+        "actual_reads": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:certificate-monitor"
+            },
+            "result_sha256": "c0caa7e29db63500ca8bb7c1a5e26094510d00f9fb7d5b150dc7c12ea7524f64"
+          },
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:certificate-monitor",
+              "since_kst": "2026-11-18T19:26:51.157916+09:00",
+              "until_kst": "2026-11-18T19:41:51.157916+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "result_sha256": "e805ae1a075794fc896596ac67686becb10f4f6d1f28f2b2f419f006eb94e00b"
+          }
+        ],
+        "model_calls": 2,
+        "message_sha256": "2d57668533c508c66f2d31f964924d2c1587c03b49f259ace89a8fc3121bbaa6",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      },
+      {
+        "engine": "ollama",
+        "case": "storage",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/bazkbbt5jifotq6wfhydp35sqr",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/ohq9fm1ywjryibmxq4jj54ytye",
+        "seconds_to_chat_reply": 11.117,
+        "actual_reads": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:storage-monitor"
+            },
+            "result_sha256": "49fd2251fbd72a74ad1bf976c38b27c2f1de11588d4c65357908aac83f65f136"
+          },
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:storage-monitor",
+              "since_kst": "2026-11-18T19:27:29.133493+09:00",
+              "until_kst": "2026-11-18T19:42:29.133493+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            },
+            "result_sha256": "c0def8532ef99da64d531c8cac08d7911528c2d3f3fbc0b7908c55b33bc6eeb4"
+          }
+        ],
+        "model_calls": 2,
+        "message_sha256": "a65cec3db510aa092ed3022ae7bd4494dba60733789e54ee1e3cca5a692c3bde",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      },
+      {
+        "engine": "ollama",
+        "case": "identity",
+        "source_url": "https://chat.grootlab.duckdns.org/soc/pl/eei3fxi3ci8duy5qk8h9ttu3ha",
+        "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/6i5e5pe7cbrr3c4y7579rhfe8r",
+        "seconds_to_chat_reply": 10.977,
+        "actual_reads": [
+          {
+            "tool": "mcp__wazuh_ro__get_wazuh_agents",
+            "arguments": {
+              "status": "active"
+            },
+            "result_sha256": "1a512f4388e34ba9e04ba5dd7548062153588cbc97240009c60f6d5faad46b3a"
+          }
+        ],
+        "model_calls": 1,
+        "message_sha256": "db377b259a029cf1923a3f77cf82a2cf4f5552d9b096bfcb765524d1c7df0ef4",
+        "markdown_table": true,
+        "public_control_record_leaks": 0,
+        "subject_scope_checked": true,
+        "semantic_review": "primary agent compared actual calls, public answer, scope, count, timestamps and limits"
+      }
+    ],
+    "actual_reads": 10,
+    "protected_writes": 0,
+    "passed": 6,
+    "independent_accuracy_evaluation": false,
+    "browser_ui_all_clients_verified": false,
+    "general_latency_slo_verified": false,
+    "whole_day_history_cases": "deferred, not run"
+  },
+  "reproduction": {
+    "operating_patch": "../../validation/service-query/operating.patch",
+    "patch_sha256": "68f78113e39a7a281fbcba1af458696e91b309225ffe044f01aa15f217f35e54",
+    "patch_source_files": 13,
+    "exact_original_apply_and_reverse_sha_verified": true,
+    "patch_applied_to_operating_server": false,
+    "canonical_source_and_minimal_installed_patch_are_distinct": true,
+    "installer": "existing deploy.sh copies common files and creates source receipts; no new installation entrypoint",
+    "fresh_os_install": false,
+    "patch_format_check": {
+      "code_and_other_tracked_changes_rc": 0,
+      "excluded_artifact": "infra/validation/service-query/operating.patch",
+      "reason": "standard unified-diff blank context lines are a literal single space",
+      "context_blank_lines": 50,
+      "exact_apply_and_reverse_verified": true
+    }
+  },
+  "prior_failed_rounds": [
+    {
+      "round": "identity-scope",
+      "operating": "rolled_back",
+      "failure": "Native service plan was absent; SDK improved but Native identity repair remained"
+    },
+    {
+      "round": "native-catalog",
+      "operating": "rolled_back",
+      "failure": "Native wire projection removed top-level conditional schema"
+    },
+    {
+      "round": "registry-binding",
+      "operating": "rolled_back",
+      "failure": "argument grammar produced invalid conditional combinations; zero actual calls"
+    },
+    {
+      "round": "field-grammar",
+      "operating": "prepared_only_not_applied",
+      "failure": "pre-apply review found calls-only feedback incompatible with indexes"
+    },
+    {
+      "round": "index-selection",
+      "operating": "rolled_back",
+      "failure": "read succeeded but free reports overclaimed functional health and execution time"
+    },
+    {
+      "round": "factual-lookup",
+      "operating": "rolled_back",
+      "failure": "Native username envelope bypassed factual mode; SDK note broke terminal status filtering; legacy aliases rejected actual storage evidence"
+    },
+    {
+      "round": "chat-envelope-initial",
+      "operating": "prepared_only_not_applied",
+      "failure": "scope narrowed before apply; common query-body and factual-only evidence precedence refrozen"
+    }
+  ],
+  "transport_failures": {
+    "before_auth_banner_timeouts": 2,
+    "identity_posts_confirmed_absent_before_retry": true,
+    "duplicate_chat_posts": 0,
+    "evidence_private": true
+  },
+  "cleanup": {
+    "removed_paths": 25,
+    "files": 6288,
+    "bytes": 249679506,
+    "absence_verified": true,
+    "operating_backups_preserved": true,
+    "local_evidence_source_and_harness2_preserved": true,
+    "mac_packages_installed": 0
+  },
+  "tls_followup": {
+    "observed_at_kst": "2026-11-18T19:47:34.540111+09:00",
+    "approved_file_and_status_sha_unchanged": true,
+    "original_warning_repair": "../../groot-a/certificate-monitor/readiness.validation.json",
+    "new_tls_probe": false
+  },
+  "limitations": [
+    "Six fresh chats and ten actual reads are a bounded validation; no general accuracy or latency SLO claim",
+    "API Markdown tables verified; all browser/client UIs not checked",
+    "Bare recent/last execution lookup uses registered default 15-minute initial sample, not guaranteed last ever execution or whole-history absence",
+    "Pure current-only natural aliases without log/history intent retain legacy scope resolver",
+    "Ambiguous/unregistered services and general cause/impact/normality/recovery investigations are not certified by factual lookup",
+    "Two optional whole-day history chats deferred, not run",
+    "No real outage, attack, retraining, public443 probe, next09:00 run or fresh full OS reconstruction performed"
+  ],
+  "publication": {
+    "state": "pending_commit_and_push"
+  },
+  "documentation": {
+    "public_documents": 23,
+    "humanize_run": "2026-11-18-034-74f2",
+    "route": "heavy",
+    "gate_exit": 0,
+    "change_rate": 0.0269,
+    "grade": "B",
+    "self_check": "6/6",
+    "finalize": "accept",
+    "residual_findings": 0,
+    "extra_documents_reuse_verified_passages": 2,
+    "numeric_commands_paths_approval_preserved": true
+  }
+}

@@ -185,3 +185,9 @@ bash test-monitor.sh /ABS/certificate-monitor/monitor.sh /EXISTING/PRIVATE/TEMP
 **A native 보완과 최종 결과:** 첫 후보는 A OpenSSL3.0.13에서 8개 통과 뒤 `wrong_hostname` 시험이 실패해 설치 전에 중단됐다. 이 버전의 `x509 -checkhost`는 `does NOT match certificate`를 출력하면서 rc0을 반환했다. v2는 DNS SAN 존재·rc0·정확한 `Hostname chat.grootlab.duckdns.org does match certificate` 문구를 모두 요구한다. 실패 소스/로그는 보존했으며, v2의 기존 **26개 전체 PASS** 뒤 실제 TLS와 설치를 진행했다. 실제 TLS 성공은 모의 transport 시험과 별도로 확인한 결과다.
 
 옵션 근거: [OpenSSL3 s_client](https://docs.openssl.org/3.0/man1/openssl-s_client/)의 검증 오류 반환·hostname 검증, [OpenSSL3 x509](https://docs.openssl.org/3.0/man1/openssl-x509/)의 `-checkend`/fingerprint/SAN 출력.
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [초기 설치 이식·격리 규칙 검증](../../../deployment/certificate-monitor.validation.json)은 별도 후속 근거이며 새 OS 설치·운영 규칙 12개/경보 전달 완료를 뜻하지 않는다. [동작·재현·한계](../../hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../../hermes/query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

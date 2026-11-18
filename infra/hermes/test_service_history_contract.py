@@ -754,10 +754,18 @@ class ServiceHistory(unittest.TestCase):
         for q in ('오늘 vector.service 오류 확인','오늘 A 서버 capstone-management.service 실패와 현재 확인',
                   '오늘 b:management 오류 조회하지 마','오늘 b:management 오류 예시 설명',
                   '오늘 b:unknown 오류 확인','오늘 192.168.16.231 b:management 오류 확인',
-                  '오늘인지 어제인지 b:management 오류 확인','최근 b:management 오류 확인',
+                  '오늘인지 어제인지 b:management 오류 확인',
                   '오늘 3시부터 b:management 오류 확인','오늘 b:management 말고 c:apache 오류 확인',
                   '오늘 A 서버 B 서버 vector.service 실패 확인','오늘 soc:coverage 오류 확인'):
             with self.subTest(q=q):self.assertIsNone(c.service_history_plan(catalog(),q,self.at))
+
+    def test_unqualified_recent_uses_advertised_default_as_initial_sample(self):
+        plan=c.service_history_plan(catalog(),'최근 b:management 오류 확인',self.at)
+        minutes=catalog()['tools'][0]['function']['parameters']['properties']['lookback_minutes']['default']
+        args=plan['requirements'][0]['arguments']
+        self.assertEqual(datetime.fromisoformat(args['until_kst'])-datetime.fromisoformat(args['since_kst']),timedelta(minutes=minutes))
+        self.assertTrue(plan['initial_window'])
+        self.assertEqual(plan['initial_history_window_minutes'],minutes)
 
     def test_calendar_comparison_keeps_each_day_and_current_pipeline(self):
         question='어제 B 서버 capstone-management.service 실패 뒤 오늘 처리 상태가 어떤지 확인해줘. 설정은 바꾸지 마.'

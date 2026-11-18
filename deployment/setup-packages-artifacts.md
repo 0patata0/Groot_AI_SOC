@@ -759,3 +759,9 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 ## 인증서 감시기 복구 후보의 반입 범위
 
 기존 Linux의 Python 표준 라이브러리·Bash·OpenSSL·GNU coreutils·jq·flock·logger·systemd를 사용한다. 새로운 deb·wheel·이미지·Mac 도구 설치는0이다. 이번 고정 A용 후보2파일과 검증/수동 원복 코드만 root 전용 위치에 반입하며 개인키는 읽거나 복사하지 않는다. 후보 원본·준비한 복구본을 보존하고 이번 임시 전송·검사 경로는 제거했다. 초기 설치기의 전체 오프라인 묶음과 이식은 별도 미완료다. [검증 원장](../infra/groot-a/certificate-monitor/readiness.validation.json).
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [정확 SHA·실제 채팅](../infra/hermes/query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

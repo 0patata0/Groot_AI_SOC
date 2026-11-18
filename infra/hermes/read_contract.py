@@ -283,6 +283,8 @@ def _single_plan(question, aware_time):
     if states and re.search(r'과거|어제|지난|최근|당시|이력|끊겼던|원인|분석|침해|위험|왜', text):
         return None
     if not features:
+        if operational_object_request(text):
+            return None
         identity = identity_plan(text, states)
         if identity:
             return identity
@@ -306,8 +308,27 @@ def _single_plan(question, aware_time):
             'needs_agent': dependent, 'limit': requested_limit(text), 'search': search, 'question': text}
 
 
+def operational_object_request(text):
+    """An explicit OS/container object is not a Wazuh agent identity.
+
+    Strip host qualifiers first: the host alias '서비스 서버' is a location,
+    whereas '서버의 서비스' names an operational object. No live identity,
+    registered target, service state or successful observation is inferred.
+    """
+    if re.search(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_.:-])',text):
+        return True
+    residual = without_hosts(text)
+    return bool(re.search(
+        r'(?<![A-Za-z0-9_.:-])[A-Za-z0-9@_.-]+\.(?:service|timer|socket|target)\b|'
+        r'\b(?:systemd|docker|containers?|daemons?|services?|OS)\b|'
+        r'서비스|시스템|운영\s*체제|도커|컨테이너|데몬|타이머|감시기',
+        residual, re.I))
+
+
 def identity_plan(text, states):
     """Current identity/state only; never reinterpret a diagnosis or a change."""
+    if operational_object_request(text):
+        return None
     if re.search(r'과거|어제|지난|당시|이력|끊겼던', text):
         return None
     if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):

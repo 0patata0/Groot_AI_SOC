@@ -34,3 +34,9 @@ B18:44 최초13대상 적용 후 중간 후보를 검수하고19:09 SDK 실행�
 신규 설치는 기존 `deploy.sh`→SIEM plugin의 read_contract/chat_harness/grounding/query 복사와 SDK runtime/harness 복사를 사용한다. 추가 바이너리/설정 키가 없어 기존 소스 묶음과 오프라인 목록을 유지한다. 실제 신규 설치는 실행하지 않았다.
 
 한국어 상태 의미의 원출처: [Wazuh agent life cycle](https://documentation.wazuh.com/current/user-manual/agent/agent-enrollment/agent-life-cycle.html), [connection](https://documentation.wazuh.com/current/user-manual/agent/agent-management/agent-connection.html), [API use cases](https://documentation.wazuh.com/current/user-manual/api/use-cases.html).2026-11-04공식 문서 확인. 로컬 timeout 설정은 별도이며 문서 예시를 현재 설정으로 간주하지 않는다.
+
+
+<!-- service-query-20261118 -->
+
+서비스 조회의 대상·기간·사실 표를 공통 계약으로 보완했다. 등록 카탈로그와 실제 읽기를 사용하고 Wazuh 에이전트 조회와 구분한다. 운영 소스 13개·영수증 1개와 새 채팅 6개·실제 읽기 10회를 확인했다. 기존 단일 deploy.sh 복사 경로를 사용하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](service-query-contract.md) · [정확 SHA·실제 채팅](query-completion/service-catalog.validation.json).
+<!-- /service-query-20261118 -->

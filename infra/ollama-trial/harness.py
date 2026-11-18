@@ -1337,7 +1337,9 @@ def violations(question, answer, calls, reference=None, service_plan=None, *, at
     if (not calls and not READ.wants_write(text)
             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
         issues.append('current_state_requires_actual_read')
-    diagnostic = diagnostic_request(question)
+    bound_service=bool(service_plan and not reference and CONTRACT.service_lookup_scope(service_plan,question)
+        and not CONTRACT.service_history_state(service_plan,service_history_receipts(calls))['incomplete'])
+    diagnostic = None if bound_service else diagnostic_request(question)
     observed = None
     if diagnostic:
         observed = diagnostic_observations(calls)
@@ -1347,7 +1349,7 @@ def violations(question, answer, calls, reference=None, service_plan=None, *, at
     # A second boundary checks an observed-state assertion even when an
     # unfamiliar short question was not routed as a diagnostic. Appending a
     # scope word here only interprets the subject; it never dispatches a tool.
-    if service_state_asserted(answer):
+    if not bound_service and service_state_asserted(answer):
         subject = diagnostic or diagnostic_request(question + ' 상태')
         if subject:
             if observed is None: observed = diagnostic_observations(calls)

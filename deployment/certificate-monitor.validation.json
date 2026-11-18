@@ -185,7 +185,14 @@
     "public443/HTTP availability and next09:00 actual observation"
   ],
   "publication": {
-    "state": "pending",
-    "public_files": 30
+    "state": "content_published",
+    "content_commit": "2a4cad631d3ff833ecd67020deca0dfea36e3795",
+    "remote_main_at_content_publication": "2a4cad631d3ff833ecd67020deca0dfea36e3795",
+    "remote_match_at_kst": "2026-11-18T18:21:02.192555+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 30,
+    "tracked_paths_at_scan": 2420,
+    "new_secret_findings": 0,
+    "operating_deployment": false
   }
 }

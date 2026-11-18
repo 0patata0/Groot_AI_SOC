@@ -1,5 +1,13 @@
 # Groot_AI_SOC
 
+<!-- panel-content-20261119 -->
+사용자 요청에 따라 판넬 자료를 ABSTRACT·METHOD·CONCLUSION의 세 항목으로 구성했다. 요약에는 구현 이유·대상·방법·결론을 담고 Method와 Conclusion에서 구현 과정과 실제 결과를 설명한다. IP·포트 등 세부 값은 본문에 나열하지 않고 그림에서 확인하도록 했다.
+
+로컬 판넬 폴더에 본문 TXT·이미지/표 배치 안내 TXT, 기존 구성도3개와 실제 화면5개, 표2개의 PNG·SVG·CSV, 출처·SHA 원장을 모았다. .gitignore의 /판넬/ 규칙으로 모든 하위 자료를 제외한다. 논문·발표 원본과 기존 검증 수치는 보존했으며 새 운영 변경·채팅·공격·학습은 수행하지 않았다.
+
+상세한 현재 상태는 [STATUS](STATUS.md), 남은 작업은 [PLAN](PLAN.md)을 따른다.
+<!-- /panel-content-20261119 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

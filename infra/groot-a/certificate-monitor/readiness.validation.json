@@ -177,7 +177,14 @@
     ]
   },
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_published",
+    "content_commit": "3ae0ce376476ec2b794d10c64bbc27417eb0b2db",
+    "remote_main_at_content_publication": "3ae0ce376476ec2b794d10c64bbc27417eb0b2db",
+    "remote_match_at_kst": "2026-11-18T17:23:32.284302+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 20,
+    "secret_scan_tracked_files": 2416,
+    "new_secret_findings": 0
   },
   "supplementary_read_only_systemd": {
     "failed-b": {
@@ -622,5 +629,18 @@
     "protected_calls": 0,
     "final_response": "**요약**\n요청한 에이전트 ID·연결 상태를 실제 조회로 확인했습니다.\n\n**확인 내역**\n요청 대상: groot-sec\n| ID | 이름 | 주소 | 상태 | 마지막 연결 KST |\n| --- | --- | --- | --- | --- |\n| 001 | groot-sec | 10.200.10.1 | 🟢 ACTIVE | 2026-11-18T17:11:02+09:00 (KST) |\n표시한 반환 레코드: 1개. 이름/ID로 대조했으며 IP만으로 호스트를 추정하지 않았습니다.\n확인한 상태 범위: active. 반환 목록/페이지 밖과 모든 보안 기능의 정상 여부는 미확인입니다.\n\n**조치 및 다음 단계**\n조회만 수행했습니다. 보호된 변경은 실행하지 않았습니다.",
     "open_error": "Correct certificate unit read followed by unrelated active Wazuh-agent repair/read; final table reports agent membership rather than requested certificate observer. Exact cause not yet repaired."
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-029-092c",
+    "route": "light",
+    "route_source": "automatic",
+    "change_rate": 0.003,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "documents": 16,
+    "preapproval_run_retained": "2026-11-18-027-2c83",
+    "receipt_update": "Structured publication metadata and already-reviewed phrasing; prior input/intermediates/final preserved"
   }
 }

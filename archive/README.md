@@ -145,3 +145,6 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 
 [Native 첫 선택 작은 정정](../infra/validation/management-latency/native-selection-repair.validation.json)은 자연2질문·선택 오류의 제어된 재현·운영 미적용과 실제 채팅 미검증을 구분한다.
+
+
+[읽기 경로의 실제 승격 시험](../infra/validation/management-latency/read-activation.validation.json)은 설치 사본 회귀와 일반 Hermes 채팅 실패, 원복 후 검증을 구분한다.

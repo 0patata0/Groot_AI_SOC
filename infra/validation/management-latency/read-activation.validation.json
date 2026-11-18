@@ -1,0 +1,367 @@
+{
+  "format": "trusted_read_activation_trial_v1",
+  "at_kst": "2026-11-18T10:17:15.859695+09:00",
+  "state": "promotion_rejected_and_rolled_back",
+  "reference": {
+    "repository": "https://github.com/JoasASantos/Malvex",
+    "reviewed_commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "adopted_principles": [
+      "capability preflight",
+      "actual evidence and limitations",
+      "stage validation before promotion"
+    ],
+    "framework_installed": false
+  },
+  "boundaries": {
+    "mcp_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "tool_server_changes": 0,
+    "roles_or_authority_changes": 0,
+    "new_attacks": 0,
+    "new_training": 0,
+    "thor_service_stop": 0
+  },
+  "candidate": {
+    "plan_sha256": "cd7e69157fb0a970bfb3a958c773cdf0daa8d566b0f4af48d1fdb15ff21cd289",
+    "sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+        "bytes": 334534,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "bb3e8b772433a38055be506618c0427fb08cc919f16f89b43c937ce615026474",
+        "kind": "existing read report plus exact current inventory scope and model-only ambiguity check"
+      },
+      "/opt/capstone-ollama-trial/harness.py": {
+        "bytes": 334534,
+        "before_sha256": "63a38e6b06916a6e986fa0f66a2dc1c92cf44262cc33acf2d9e9a1463cc4150a",
+        "after_sha256": "bb3e8b772433a38055be506618c0427fb08cc919f16f89b43c937ce615026474",
+        "kind": "existing read report plus exact current inventory scope and model-only ambiguity check"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+        "bytes": 46191,
+        "before_sha256": "55c5bf790a0469fd20dd5a635f9eca74f08aceb84ce9eecffe8d72995d89056c",
+        "after_sha256": "0e1d40fd89823686963ff8eb7096031e50392f8fa9e2074475e467aba7f80a26",
+        "kind": "current read display projection and one in-turn repair call; audit retained"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "bytes": 59215,
+        "before_sha256": "75a8ffe15c36ebb6a83054c7534bcf60674e37a969c4df50a8dce99b6ded3540",
+        "after_sha256": "ab6b6c5f042118f9f5a2f64790071113bbe57a5a0435e69fa93acb2c86031612",
+        "kind": "existing total budgets; distinct successful read batches do not consume answer repair allowance"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "bytes": 3493,
+        "before_sha256": "de984acab1a6ad594b979ec9a6f9a24cf374288880af22039a2946e495207bfa",
+        "after_sha256": "deae89e49428da0a8d0f57b6375ead4db05dbafb81031307929922d0b9f9bcca",
+        "kind": "three existing canonical section mappings; other mappings unchanged"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "bytes": 17436,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "bytes": 17436,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "bytes": 17436,
+        "before_sha256": "a7fb2f89b9d7ea95401c6ee438764cbf33c8be74554af205d29166e65e865eb5",
+        "after_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "kind": "existing canonical metadata/evidence sections, no new skill/authority"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": {
+        "bytes": 80188,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+        "kind": "Shared current-list coordination grammar; sensor-specific, historical, negated and write requests preserved"
+      },
+      "/opt/capstone-ollama-trial/read_contract.py": {
+        "bytes": 80188,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+        "kind": "Shared current-list coordination grammar; sensor-specific, historical, negated and write requests preserved"
+      },
+      "/opt/capstone-management/read_contract.py": {
+        "bytes": 80188,
+        "before_sha256": "87a34578a31192ccba37f862652dff38027c023f20ddadc700a19f4a5137db25",
+        "after_sha256": "525e6aa601b37dd9fd04c08cf2a900755f9d12924dee49f88af8dfe695a408ea",
+        "kind": "Shared current-list coordination grammar; sensor-specific, historical, negated and write requests preserved"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "bytes": 199877,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "8c6b76e6ccff7eda2ddba4ee086643efeef50e8575e6a3343cc2f57c5dde181f",
+        "kind": "Shared actual-inventory feedback for rejected feature-activation claims; no feature proof invented"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "bytes": 199877,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "8c6b76e6ccff7eda2ddba4ee086643efeef50e8575e6a3343cc2f57c5dde181f",
+        "kind": "Shared actual-inventory feedback for rejected feature-activation claims; no feature proof invented"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "bytes": 199877,
+        "before_sha256": "7b519e894aa3a34bf2eebd8986aa742d7c3e224faf5edbf58224dbc2c785542d",
+        "after_sha256": "8c6b76e6ccff7eda2ddba4ee086643efeef50e8575e6a3343cc2f57c5dde181f",
+        "kind": "Shared actual-inventory feedback for rejected feature-activation claims; no feature proof invented"
+      },
+      "/opt/capstone-management/soc_management_run.py": {
+        "bytes": 301960,
+        "before_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac",
+        "after_sha256": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+        "kind": "Frozen previous report/selection candidate plus compact bounded Native initial-selection feedback; installed branches preserved"
+      },
+      "/opt/capstone-ollama-trial/grounding.py": {
+        "bytes": 301960,
+        "before_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac",
+        "after_sha256": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+        "kind": "Frozen previous report/selection candidate plus compact bounded Native initial-selection feedback; installed branches preserved"
+      },
+      "/opt/hermes-data/management-code/run.py": {
+        "bytes": 301960,
+        "before_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac",
+        "after_sha256": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+        "kind": "Frozen previous report/selection candidate plus compact bounded Native initial-selection feedback; installed branches preserved"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+        "bytes": 301960,
+        "before_sha256": "9c226ae007525a95a0e0dfdfac2cb4e5b658f76c776920e76d864b601bcf17ac",
+        "after_sha256": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+        "kind": "Frozen previous report/selection candidate plus compact bounded Native initial-selection feedback; installed branches preserved"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+        "bytes": 73909,
+        "before_sha256": "e7e16ec9c7e435db3ed268f93a973dfd51444f5464f0afc62648b2a596d1c3de",
+        "after_sha256": "a42b728d8c6e946443370defdc3007af81618d9258087ab828758adb1e829a24",
+        "kind": "Exact installed grounding pin"
+      },
+      "/opt/capstone-ollama-trial/query_grounding.py": {
+        "bytes": 73909,
+        "before_sha256": "e7e16ec9c7e435db3ed268f93a973dfd51444f5464f0afc62648b2a596d1c3de",
+        "after_sha256": "a42b728d8c6e946443370defdc3007af81618d9258087ab828758adb1e829a24",
+        "kind": "Exact installed grounding pin"
+      },
+      "/opt/capstone-management/soc_management_controller.py": {
+        "bytes": 532349,
+        "before_sha256": "91201647a1102f8c8132b038b2ee8e310032f920f0bd0e9c60420fea4f6326fa",
+        "after_sha256": "eb2db199172acaea0193846b7ca354b7baa34c14365898c5c49cfb8d9a81e28a",
+        "kind": "Trusted fresh read-lead activation; unchanged immutable gate"
+      },
+      "/opt/capstone-review-chat/review_channel.py": {
+        "bytes": 31299,
+        "before_sha256": "f52ec1a267da3b82139a500db890ea519c23d1928641d4c1aa4c214cc1706217",
+        "after_sha256": "779cd996aa63cdc5eeea8f57b875af04571cd9da9e61edc644fefd46a08a8456",
+        "kind": "Fixed metadata only for already-classified readonly SDK workers"
+      },
+      "/etc/systemd/system/capstone-ollama-chat.service": {
+        "bytes": 948,
+        "before_sha256": "68eb75f8e58b95fc35e4139683b902692fc97ffb65671a9845b1e717ba6aee55",
+        "after_sha256": "aafc419bc4f2ec5625915e4a6937b312025681b558744fd2033d5373fe64b482",
+        "kind": "Same SDK service text as initial installer; runtime excludes writes and protected calls"
+      }
+    },
+    "prepared_files": 28,
+    "receipts_updated": 3,
+    "public_source_sha256": {
+      "infra/hermes/soc_management_controller.py": "3ed03fb7717381e5a065fcc83dda836e766f77d103e012895d92e17541273089",
+      "infra/hermes/review_channel.py": "779cd996aa63cdc5eeea8f57b875af04571cd9da9e61edc644fefd46a08a8456",
+      "deployment/ollama_trial_chat.py": "86fdb95d0dae5a9ec2bcd18b1ff71bd5b27fe4ce26d31167802dc82e44e280a4",
+      "infra/hermes/test_soc_management_chat_read.py": "cfac759369d4452d6bfef8efe403ab2c568b4a9dde34569eb38266055005839f",
+      "infra/hermes/test_read_activation.py": "df91685d75ae7183f1f1170f90c2ae7e9d9cc811822e79afd68c1cfff5d25030"
+    },
+    "deployment_entry": "deploy.sh",
+    "offline_dependencies_changed": false,
+    "sdk_service_equals_initial_installer": true
+  },
+  "checks": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 240,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux_candidate": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 240,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 206,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.419s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.600s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "scope": "Selected regressions, not a full canonical test suite or operating quality score",
+    "actual_installed_command_validation": {
+      "argument_bytes": 77008,
+      "boundary_cases": 7,
+      "gate_sha256": "f8c5b977e1e2693e52fb8aad39bbbea25b70ab50fb516c066478227e69a1662f",
+      "mcp_calls": 0,
+      "model_calls": 0
+    },
+    "official_before": {
+      "status": "passed",
+      "sources": 50
+    },
+    "official_after_apply": {
+      "status": "passed",
+      "sources": 50
+    },
+    "official_after_rollback": {
+      "status": "passed",
+      "sources": 50,
+      "same_as_before": true,
+      "at_kst": "2026-11-18T10:14:43.938054+09:00"
+    }
+  },
+  "actual_chat": {
+    "requests_posted": 1,
+    "engine": "hermes",
+    "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 임시 IP 차단은?",
+    "source_id": "9puswzxkuiba7x8prkufq5pesa",
+    "final_post_id": "ankxzym11irj5jdx3yei7c38ky",
+    "final_message_sha256": "937ced09f2d8b3d4260923101c5bae23e6fbd9c737460e3cab7e89c502633bd1",
+    "final_seconds": 147.415,
+    "model_api_calls": 4,
+    "mcp_calls": 3,
+    "current_blocks_observed": 0,
+    "sensor_samples_returned": {
+      "WAF": 10,
+      "IDS": 10
+    },
+    "query_interval_issue": "Yesterday was selected as lookback1440 through current time instead of the previous KST calendar day",
+    "judgment": "validation incomplete fallback; no complete incident decision",
+    "other_three_prepared_chats_posted": false,
+    "rendering": "Markdown table syntax present; browser visual QA not performed"
+  },
+  "corrections": [
+    {
+      "issue": "Prior installed candidate changed a literal inside dynamic management_gate_argument, producing an oversized composed argument",
+      "found_before_operating_apply": true,
+      "resolution": "Restore original dynamic helper and replace embedded source bytes; run verified_management_command against root reference",
+      "round1_preserved": true
+    },
+    {
+      "issue": "CLI structured phase and ordinary Native gateway use different adapters",
+      "resolution": "Operating promotion rejected; ordinary gateway integration remains required"
+    }
+  ],
+  "rollout": {
+    "applied_at_kst": "2026-11-18T10:01:49.544127+09:00",
+    "rolled_back_at_kst": "2026-11-18T10:10:28.591659+09:00",
+    "files_restored": 28,
+    "protected_unchanged": 40,
+    "same_hermes_container": true,
+    "planned_restarts_total": 2,
+    "queue_database_unchanged_while_stopped": true,
+    "independent_timer_minutes": 15,
+    "timer_cancelled_verified_at_kst": "2026-11-18T10:11:59.971203+09:00",
+    "operating_current": "previous confirmed13-file state; new compact activation unapplied"
+  },
+  "cleanup": {
+    "at_kst": "2026-11-18T10:15:54.764619+09:00",
+    "removed_roots": [
+      "/var/lib/capstone-evidence-validation/activation-59580a464e",
+      "/var/lib/capstone-evidence-validation/activation-prepare-7ea6b26e4f"
+    ],
+    "removed_files": 645,
+    "removed_bytes": 28851050,
+    "removed_verified": true,
+    "retained_rollout_backup": "/var/lib/capstone-evidence-rollout/20261118-7ea6b26e4f",
+    "exported_artifacts": 15
+  },
+  "remaining": [
+    "Bind ordinary Native gateway selection and structured report phases to the same current-turn question, time, schema, receipts and model, without global environment mutation",
+    "Repeat exact frozen source regression and fresh real Hermes/Ollama chats; verify scope, claim correctness, Markdown rendering and latency",
+    "Update thesis reproduction after operating result is confirmed"
+  ],
+  "documentation": {
+    "state": "humanized_verified",
+    "run": "2026-11-18-012-27ce",
+    "route": "light",
+    "change_rate": 0.0007,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0
+  },
+  "publication": {
+    "state": "pending"
+  }
+}

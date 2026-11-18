@@ -75,6 +75,7 @@ User=soc-ollama
 Group=soc-ollama
 WorkingDirectory=/var/lib/capstone-ollama-trial/chat
 Environment=HOME=/var/lib/capstone-ollama-trial/chat TZ=Asia/Seoul PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+Environment=CAPSTONE_EVIDENCE_REPORT_COMPACT=1
 ExecStart=/opt/capstone-ollama-trial/venv/bin/python -I -B /opt/capstone-ollama-trial/chat.py
 Restart=on-failure
 RestartSec=5

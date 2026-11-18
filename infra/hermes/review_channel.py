@@ -141,6 +141,8 @@ def worker(job):
            'LANG': 'C.UTF-8', 'TZ': 'Asia/Seoul', 'PYTHONDONTWRITEBYTECODE': '1'}
     identity = {}
     if job['engine'] == 'ollama':
+        if job.get('readonly') is True:
+            env['CAPSTONE_EVIDENCE_REPORT_COMPACT'] = '1'
         account = pwd.getpwnam('soc-ollama')
         identity = {'user': account.pw_uid, 'group': account.pw_gid, 'extra_groups': os.getgrouplist(account.pw_name, account.pw_gid)}
         env['HOME'] = account.pw_dir

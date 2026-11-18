@@ -852,3 +852,8 @@ FW MCP는 바깥 JSON-RPC와 도구 텍스트 JSON을 따로 해석한다. 원�
 ## 2026-11-18 Native 첫 선택의 작은 정정
 
 [작은 정정·Native 경계·동결/정리와 운영 미검증](STATUS_HISTORY.md#2026-11-18-native-첫-선택의-작은-정정).
+
+
+## 2026-11-18 읽기 연결 후보 실제 채팅 실패·원복
+
+[게이트 생성 정정·실제1채팅·28파일 원복·후속 연결 공백](../infra/validation/management-latency/read-activation.validation.json).

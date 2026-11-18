@@ -118,15 +118,21 @@ class ChatRead(unittest.TestCase):
     def test_only_fresh_readonly_chat_lead_receives_root_metadata(self):
         case={'mode':'verify','chat_task':'lead','run_count':0,'session_id':None,
               'chat_request':self.context['request'],'chat_background':self.context['background']}
-        command=c.command_for(case)
+        command=c.verified_management_command(case)
         raw=next(x.split('=',1)[1] for x in command if x.startswith('CAPSTONE_CHAT_READ_JSON='))
         payload=json.loads(raw);self.assertEqual(payload['request'],case['chat_request'])
         self.assertEqual(payload['background'],case['chat_background']);self.assertIsNone(payload['tools'])
         self.assertNotIn('CAPSTONE_MANAGEMENT_REVIEW=1',command)
+        self.assertIn('CAPSTONE_EVIDENCE_REPORT_COMPACT=1',command)
+        if '-c' in command:
+            source=Path(c.__file__).with_name('soc_management_run.py').read_bytes()
+            self.assertEqual(command[command.index('-c')+1],c.management_gate_argument(source))
         for changes in ({'mode':'manage'},{'chat_task':'peer'},{'run_count':1},
-                        {'session_id':'valid-session'},{'operator_review':True}):
+                        {'session_id':'valid-session'},{'operator_review':True},
+                        {'mode':'manage','review_response_write':True}):
             command=c.command_for(dict(case,**changes))
             self.assertFalse(any(x.startswith('CAPSTONE_CHAT_READ_JSON=') for x in command))
+            self.assertFalse(any(x.startswith('CAPSTONE_EVIDENCE_REPORT_COMPACT=') for x in command))
 
     def test_oversized_root_context_is_refused(self):
         with self.assertRaisesRegex(c.ControllerError,'chat_read_context_invalid'):

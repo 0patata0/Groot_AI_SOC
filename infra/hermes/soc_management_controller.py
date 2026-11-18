@@ -2044,7 +2044,8 @@ def command_for(case):
                 or not isinstance(context['background'],str) or len(context['background'])>16000
                 or len(canonical(context).encode())>32768):raise ControllerError('chat_read_context_invalid')
         if case.get('chat_readonly_lookup'):chat_lookup_prompt(case,{})
-        command[2:2]=['-e','CAPSTONE_CHAT_READ_JSON='+canonical(context)]
+        command[2:2]=['-e','CAPSTONE_CHAT_READ_JSON='+canonical(context),
+                     '-e','CAPSTONE_EVIDENCE_REPORT_COMPACT=1']
     if dict(case).get("operator_review") or dict(case).get("fast_readonly") or dict(case).get('automatic_review'):
         command[2:2] = ["-e", "CAPSTONE_MANAGEMENT_REVIEW=1"]
     if dict(case).get('automatic_review'):

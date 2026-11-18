@@ -242,3 +242,9 @@ systemd 조회5건의 과거 시험 이력과 현재 상태를 분리해 보고�
 
 [완료·미수행·게시 결과](STATUS.md) · 내용 `9289cfc4420e807ed0661c3fa6a2fce66572a31f` / 원격 확인 `2026-11-19T06:07:43.982836+09:00`.
 <!-- /service-query-publication-20261118 -->
+
+
+<!-- service-cause-candidate-20261119 -->
+
+다음은 보고의 대상·관측 시각·표본 수와 실제 조회 한도의 연결, 기본 조사 구간의 표시, 거절된 문장의 정정 여부를 공통 계약에서 검증한다. 짧은 원인 질문에는 필요한 핵심 근거를 먼저 보여주고 개별 원문은 상세 요청과 구분한다. 실제 보고가 수용된 새 채팅을 확인하기 전에는 운영 후보를 확정하지 않는다. [원인·수행·미완료](infra/hermes/service-query-contract.md) · [실제 실패·후보 검증](infra/validation/service-query/cause-completion.validation.json).
+<!-- /service-cause-candidate-20261119 -->

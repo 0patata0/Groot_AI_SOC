@@ -6937,3 +6937,11 @@ MCP 기본 소스와 실제 core/journal2차이를 확인해 직접 배포하지
 | 보존·정리 | 원본/후보/제어기·실패 이력 보존·임시8경로/2790파일 제거 |
 | 미수행 | 일반 정확도/SLO·모든 브라우저·원인/전체 이력 전반·새 OS 전체 설치 |
 <!-- /service-current-publication-20261119 -->
+
+
+<!-- service-cause-candidate-20261119 -->
+
+## 2026-11-19 복합 원인 조사 후보의 실제 검증 실패
+
+현재 상태 단독 조회의 확정 결과와 복합 원인 질문의 실패를 분리했다. 실제 두 새 채팅과 격리 후보에서 추가 읽기 누락·보고 검증 거절을 확인하고, 단일 SDK 실행기 연결 후보와3반례를 만들었다. 회귀833·Linux 공식38/설치37은 통과했지만 실제 격리 최종 보고는 수용되지 않아 운영 적용을 보류했다. 원본·후보·현재 소스/스키마·실제 호출·실패·미수행 근거를 보존한다. [원인·수행·미완료](../infra/hermes/service-query-contract.md) · [실제 실패·후보 검증](../infra/validation/service-query/cause-completion.validation.json).
+<!-- /service-cause-candidate-20261119 -->

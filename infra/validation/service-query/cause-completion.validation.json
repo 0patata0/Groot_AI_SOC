@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "state": "candidate_failed_real_report_validation_not_applied",
+  "at_kst": "2026-11-19T06:37:46.638407+09:00",
+  "scope": "required-read completion after empty error journal; cause/current report remains incomplete",
+  "operating_sources_changed": 0,
+  "operating_last_confirmed_service_current_plan": "3a8ad92000b245bd255965e21fad5fae99f13104038035510dada177995799f8",
+  "fresh_before": {
+    "at_kst": "2026-11-19T06:12:04.994260+09:00",
+    "sources": 64,
+    "prior_confirmed_files": 11,
+    "protected_files": 61,
+    "status": "observed",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "access_mode": "hermes-parity",
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "observed_at_kst": "2026-11-19T06:13:14.767637+09:00",
+    "harness2_status": "passed"
+  },
+  "candidate": {
+    "plan_sha256": "f9adc5eeccaee0a0bc52cd4426a39294aacda63ab3f8884de30d9306e18cbff3",
+    "source": {
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "78e4d5ba113cbcb06c6c8cc3970b30eb85bb333af29f4d9e8b7730d16349fc4c",
+        "bytes": 60560
+      }
+    },
+    "changed_scope": "run.service_synthesis missing-read dispatch and audit only; outside added branch byte-identical",
+    "canonical_required_read_bridge_preexisted_this_work": true,
+    "canonical_runtime_change": "four audit lines; installer already copies canonical runtime",
+    "patch": "cause-completion.patch",
+    "patch_sha256": "10300bb2f7dfccd66e0e960c4dc1f8de6dcc5efd64ee24bbe53575815e51c101",
+    "packages_or_tools_added": 0,
+    "permissions_roles_approval_ttl_changed": false
+  },
+  "fresh_chat_trials": [
+    {
+      "engine": "hermes",
+      "source_url": "https://chat.grootlab.duckdns.org/soc/pl/mqi6x5gqabgfu8zwfyoaygqnkr",
+      "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/ztjp8nzampgezj96jo9tyhywdo",
+      "question": "A 서버 인증서 감시 왜 실패했어? 지금은 어때?",
+      "seconds_to_updated_reply": 46.066,
+      "actual_reads": 3,
+      "report_admitted_by_runtime": true,
+      "independent_quality_pass": false,
+      "message_sha256": "42db0bdf01bd66ea65b3f707fdc8243da212f63e42fec59b3e23038aa1f06677"
+    },
+    {
+      "engine": "ollama",
+      "source_url": "https://chat.grootlab.duckdns.org/soc/pl/sffrrwym7trktgd3mqnnkgc9xr",
+      "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/95yqu5p4epyebkngbcupykgjce",
+      "question": "A 서버 인증서 감시 왜 실패했어? 지금은 어때?",
+      "seconds_to_updated_reply": 7.56,
+      "actual_reads": 2,
+      "report_admitted_by_runtime": false,
+      "independent_quality_pass": false,
+      "message_sha256": "4698c037ad7b374e7dab32e434451960e5c1e51268694d32deb99bb758dfc759"
+    }
+  ],
+  "isolated_real_trial": {
+    "at_kst": "2026-11-19T06:27:32.174533+09:00",
+    "actor_scope": "existing unprivileged SDK actor; root-owned 21-source isolated copy; existing config and B-agent-to-Thor path",
+    "chat_posts": 0,
+    "operating_changes": 0,
+    "protected_calls": 0,
+    "seconds_cli_execution": 68.397,
+    "status": "partial",
+    "error_type": null,
+    "final_report_admitted": false,
+    "actual_read_count": 3,
+    "model_completions": 5,
+    "required_completion": [
+      {
+        "required": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "a:certificate-monitor",
+              "since_kst": "2026-11-18T06:26:24.454649+09:00",
+              "until_kst": "2026-11-19T06:26:24.454649+09:00",
+              "view": "journal",
+              "limit": 50,
+              "journal_scope": "all"
+            }
+          }
+        ],
+        "read_count": 1,
+        "result_sha256": [
+          "48d0f64de452725c75886f5bc554ac26399e877987c6d4490c9f79cef9382488"
+        ]
+      }
+    ],
+    "remaining_issues": [
+      "diagnostic_snapshot_is_not_functional_health",
+      "web_snapshot_is_not_application_health"
+    ],
+    "model_timing_seconds": [
+      0.802,
+      0.807,
+      18.208,
+      18.383,
+      17.952
+    ],
+    "source_file_copy_sha256": {
+      "SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef",
+      "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+      "chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "chat_contract.py": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+      "chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+      "grounding.py": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "harness.py": "f07630b6ddb4566d5181d3dfd9bcfa340cf2751419b2afbc06842673a7bddc1a",
+      "output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "query_grounding.py": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+      "read_contract.py": "fef53a915b6d9c20cde2c543136205407d2e5dcd7cc5e76a32b0251f37893d49",
+      "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+      "runtime.py": "78e4d5ba113cbcb06c6c8cc3970b30eb85bb333af29f4d9e8b7730d16349fc4c",
+      "skill-soc-change.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "skill-soc-investigate.md": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "skill-soc-query.md": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7",
+      "skill-soc-recover.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "soc_policy.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "workflow_contract.py": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871"
+    }
+  },
+  "tests": {
+    "counterexamples": {
+      "base": {
+        "rc": 1,
+        "summary": {
+          "run": 3,
+          "failures": [
+            "test_service_history.ServiceRuntime.test_empty_error_journal_reads_registered_all_source_before_judgment",
+            "test_service_history.ServiceRuntime.test_both_empty_journals_complete_evidence_without_repeating_or_claiming_health",
+            "test_service_history.ServiceRuntime.test_failed_all_source_preserves_successes_and_does_not_loop_or_conclude"
+          ],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate": {
+        "rc": 0,
+        "summary": {
+          "run": 3,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "canonical": {
+        "rc": 0,
+        "summary": {
+          "run": 3,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "same_actual_installation_regressions_mac": {
+      "base/legacy": {
+        "rc": 1,
+        "summary": {
+          "run": 33,
+          "failures": [
+            "test_service_history_legacy.ServiceRuntime.test_additional_journal_explicit_filter_is_validated_before_dispatch (scope=None)"
+          ],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/legacy": {
+        "rc": 1,
+        "summary": {
+          "run": 33,
+          "failures": [
+            "test_service_history_legacy.ServiceRuntime.test_additional_journal_explicit_filter_is_validated_before_dispatch (scope=None)"
+          ],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 384,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 331,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 52,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 384,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 331,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 52,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.427s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.571s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "all_skipped": 0,
+    "regression_counts_overlap": true,
+    "general_accuracy_or_slo_proven": false
+  },
+  "source_journal_semantics": {
+    "request_limit": 50,
+    "errors_returned": 0,
+    "all_returned": 7,
+    "has_more": false,
+    "response_size_limited": false,
+    "journal_retention_verified": false,
+    "scope_is_initial_24h_not_user_incident_time": true
+  },
+  "verified_gaps": [
+    "SDK installed runtime omitted completion dispatch required by shared evidence state",
+    "Native report confused returned 7 rows with a query limit and initial 24h with user-requested period",
+    "SDK candidate executed third read but report failed health-claim validation after repeated repair",
+    "SDK candidate prose mixed current snapshot observation time and journal query time; no resolved result accepted"
+  ],
+  "next_required": [
+    "bind current/historical claims to their own exact observation times",
+    "separate returned rows, requested cap, pagination and retention",
+    "label an automatic investigation window as initial scope",
+    "replay exact rejected sentences and new observations through the same guard",
+    "verify admitted actual bot replies before deployment"
+  ],
+  "unchanged": [
+    "trained model",
+    "MCP catalog and authorization",
+    "Native source and container",
+    "SDK installed source and receipt",
+    "common role skills and SOUL",
+    "FW/WAF/IDS policy and TTL",
+    "attack stop and training stop"
+  ],
+  "limitations": [
+    "two fresh cause/current requests; not broad accuracy",
+    "isolated runtime is not a chat round trip",
+    "833 plus 38/37 does not include the unchanged failing legacy assertion as a pass",
+    "initial canonical integration development run had pre-existing failures and wrong new-test windows; preserved as failed development evidence",
+    "no candidate operating apply or post-apply chat",
+    "no new OS install or independent recreation"
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-19T06:35:15.350508+09:00",
+    "removed_files": 719,
+    "removed_bytes": 26663373,
+    "absence_verified": true,
+    "operating_sources_changed": 0,
+    "framework_skills_weights_backups_preserved": true,
+    "removed_owned_paths": 3,
+    "operating_sources_revalidated_unchanged": 64
+  },
+  "publication": {
+    "state": "pending_commit_and_push"
+  },
+  "documentation": {
+    "markdown_documents": 23,
+    "unique_prose_templates": 5,
+    "humanize_run": "2026-11-19-003-7cab",
+    "route": "light",
+    "change_rate": 0.0004,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0,
+    "warnings": 0
+  }
+}

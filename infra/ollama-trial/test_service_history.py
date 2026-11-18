@@ -22,7 +22,7 @@ mcp=load('sdk_service_mcp',ROOT/'infra/mcp/system-diagnostics-mcp.py');mcp._libr
 
 @unittest.skipUnless(importlib.util.find_spec('jsonschema'),'existing server jsonschema required')
 class ServiceRuntime(unittest.TestCase):
-    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None,blocks=False,failed_blocks=False,selection_prompts=None,agent_response=None,extra_read=False,stale_first=False,stale_always=False,failed_extra=False,direct=False):
+    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None,blocks=False,failed_blocks=False,selection_prompts=None,agent_response=None,extra_read=False,stale_first=False,stale_always=False,failed_extra=False,direct=False,empty_error_journal=False,empty_all_journal=False,failed_all_journal=False):
         order=[];prompts=[];calls=[]
         class Connector:
             async def list_tools(self):return [types.SimpleNamespace(**mcp.tools()[0])]
@@ -51,11 +51,14 @@ class ServiceRuntime(unittest.TestCase):
                     journal=load('sdk_journal_fixture_excerpt',ROOT/'infra/mcp/diagnostic_journal.py');journal.core=core
                     with patch.object(core,'_history',history):
                         data=journal.answer(arguments,host,now=int(datetime.now(timezone.utc).timestamp())+1,
-                            runner=lambda *args:(0,json.dumps(row).encode()+b'\n'))
+                            runner=lambda *args:(0,b'' if (empty_error_journal and arguments.get('journal_scope','errors')=='errors'
+                                or empty_all_journal and arguments.get('journal_scope')=='all') else json.dumps(row).encode()+b'\n'))
                 if past and failed:data={'error':'history unavailable'}
+                all_failed=failed_all_journal and arguments.get('view')=='journal' and arguments.get('journal_scope')=='all'
+                if all_failed:data={'error':'unfiltered journal unavailable'}
                 if not past and (stale_always or stale_first and sum(a.get('target')==target and 'since_kst' not in a for a in calls)==1):
                     data['observed_at_kst']=(datetime.now(timezone(timedelta(hours=9)))-timedelta(seconds=181)).isoformat()
-                return types.SimpleNamespace(isError=bool(past and failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
+                return types.SimpleNamespace(isError=bool(past and failed or all_failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
         class Client:
             def __init__(self,**kw):pass
             def get_all_active_sessions(self):
@@ -106,7 +109,7 @@ class ServiceRuntime(unittest.TestCase):
                     order.append('select')
                     if selection_prompts is not None:selection_prompts.append(copy.deepcopy(messages))
                     body=json.loads(messages[1][1])
-                    if body.get('selection_reason')=='expired_current_refresh' and selection is None:
+                    if body.get('selection_reason') in ('expired_current_refresh','required_service_evidence_completion') and selection is None:
                         return {'indexes':list(range(len(body['options'])))}
                     if isinstance(selection,list):return copy.deepcopy(selection[min(order.count('select')-1,len(selection)-1)])
                     return {'indexes':[0,1,2]} if selection is None else selection
@@ -130,6 +133,46 @@ class ServiceRuntime(unittest.TestCase):
                 'mcpServers':{'system-diagnostics':{},**({'resp':{}} if blocks else {}),**({'rule-b':{}} if extra_read else {})}},
                 {'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
         return result,order,prompts,calls
+
+    def test_empty_error_journal_reads_registered_all_source_before_judgment(self):
+        selected=[]
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,selection_prompts=selected,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertNotIn('error_type',result)
+        self.assertEqual(order,['select','read','read','read','select','read','compact'])
+        history=[c for c in calls if c.get('view')=='journal']
+        self.assertEqual(len(history),2)
+        self.assertNotIn('journal_scope',history[0])
+        self.assertEqual(history[1],dict(history[0],journal_scope='all'))
+        self.assertEqual(json.loads(selected[1][1][1])['selection_reason'],'required_service_evidence_completion')
+        self.assertEqual(result['service_evidence_completions'][0]['read_count'],1)
+        self.assertEqual(len(result['service_evidence_completions'][0]['result_sha256']),1)
+        self.assertEqual(result['service_judgment']['assessment'],'unresolved')
+        self.assertEqual(result['protected_calls'],0)
+
+    def test_both_empty_journals_complete_evidence_without_repeating_or_claiming_health(self):
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,empty_all_journal=True,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertNotIn('error_type',result)
+        self.assertEqual(sum(c.get('journal_scope')=='all' for c in calls),1)
+        self.assertEqual(len(calls),4)
+        self.assertNotIn('assess',order)
+        self.assertEqual(result['service_judgment']['assessment'],'unresolved')
+        self.assertEqual(result['service_judgment']['status'],'needs_review')
+        self.assertEqual(result['protected_calls'],0)
+
+    def test_failed_all_source_preserves_successes_and_does_not_loop_or_conclude(self):
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,failed_all_journal=True,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertEqual(result['stop_reason'],'service_evidence_incomplete')
+        self.assertEqual(result['status'],'partial')
+        self.assertEqual(len(calls),4)
+        self.assertTrue(result['calls'][-1]['is_error'])
+        self.assertEqual(sum(not c.get('is_error') for c in result['calls']),3)
+        self.assertNotIn('compact',order)
+        self.assertNotIn('assess',order)
+        self.assertNotIn('service_judgment',result)
+        self.assertEqual(result['protected_calls'],0)
 
     def test_direct_plan_executes_identical_read_with_one_less_model_phase(self):
         tool='mcp__rule_b__get_service_action_target';call={'tool':tool,'arguments':{'target':'b:management'}}

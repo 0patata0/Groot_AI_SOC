@@ -492,3 +492,9 @@ Git 반영: 공개 제외 규칙과 현황 안내의 내용 커밋을 게시하�
 | 보존·정리 | 원본/후보/제어기·실패 이력 보존·임시8경로/2790파일 제거 |
 | 미수행 | 일반 정확도/SLO·모든 브라우저·원인/전체 이력 전반·새 OS 전체 설치 |
 <!-- /service-query-20261118 -->
+
+
+<!-- service-cause-candidate-20261119 -->
+
+복합 서비스 원인 질문에서 Ollama가 필요한 추가 조회를 누락하는 문제를 재현했다. 오류 표본0행 뒤 전체 journal 읽기를 요구하는 공통 검사와 운영 SDK 실행기 사이의 연결이 빠져 있었다. 후보는 같은 읽기 권한으로 추가 조회1회를 수행했지만 실제 격리 실행은 보고 검증에 거절돼68.397초 후 대체 문구로 끝났다. 운영에는 적용하지 않았으며 기존 현재 조회10소스·영수증1의 확정 상태를 유지한다. [원인·수행·미완료](infra/hermes/service-query-contract.md) · [실제 실패·후보 검증](infra/validation/service-query/cause-completion.validation.json).
+<!-- /service-cause-candidate-20261119 -->

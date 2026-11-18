@@ -1,0 +1,20 @@
+--- a/opt/capstone-ollama-trial/runtime.py
++++ b/opt/capstone-ollama-trial/runtime.py
+@@ -377,6 +377,17 @@
+                 for _ in range(steps):
+                     readable={t.name:t for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')}
+                     receipts=harness.service_report_receipts(report['calls'])
++                    missing=(harness.CONTRACT.service_history_state(service_plan,receipts)['pending']
++                        if service_plan and receipts is not None else [])
++                    if missing:
++                        before=len(report['calls'])
++                        await select_required_service_reads(missing[:4],'required_service_evidence_completion')
++                        require(len(report['calls'])>before,'required_service_evidence_not_selected')
++                        report.setdefault('service_evidence_completions',[]).append({
++                            'required':[copy.deepcopy(o) for o in missing[:4]],
++                            'read_count':len(report['calls'])-before,
++                            'result_sha256':[c.get('result_sha256') for c in report['calls'][before:]]})
++                        continue
+                     refresh=(harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+                         if service_plan and receipts is not None else [])
+                     if refresh:

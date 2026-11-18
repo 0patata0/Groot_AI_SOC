@@ -601,3 +601,9 @@ Mac관리자 경유 상태 조회가2회 연결 시간 초과로 중단됐으나
 
 현재 상태만 묻는 짧은 요청과 호스트만 답하는 후속 요청을 같은 공통 계약으로 처리한다. 현재 조회에는 필요한 실제 읽기만 사용하고 요청하지 않은 journal을 추가하지 않는다. 모호한 대상은 확인하며 과거 수치·판단·승인을 새 근거로 이어받지 않는다. 운영10소스·영수증1개와 새8요청/6읽기를 확인했다. 기존 단일 deploy.sh의 복사·영수증 경로를 유지하며 새 패키지·포트·키·일반 권한은 없다. [동작·재현·한계](../../hermes/service-query-contract.md) · [실제 검증](../../hermes/query-completion/service-catalog.validation.json).
 <!-- /service-query-20261118 -->
+
+
+<!-- service-cause-candidate-20261119 -->
+
+복합 원인 조사에는 별도 실패가 남아 있다. SDK 필수 조회 연결 후보는3반례와 회귀833검사·Linux 공식38/설치37검사를 통과했지만 실제 격리 실행에서 최종 보고가 수용되지 않았다. 후보 검증과 운영 적용을 구분하며 해당 후보를 배포하지 않는다. [원인·수행·미완료](../../hermes/service-query-contract.md) · [실제 실패·후보 검증](../service-query/cause-completion.validation.json).
+<!-- /service-cause-candidate-20261119 -->

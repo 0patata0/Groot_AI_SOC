@@ -691,5 +691,14 @@
     "previous_six_chat_result_retained_as_previous_observation": true,
     "tls_observer_not_rerun_in_this_followup": true,
     "general_accuracy_slo_verified": false
+  },
+  "cause_investigation_followup": {
+    "state": "candidate_failed_real_report_validation_not_applied",
+    "at_kst": "2026-11-19T06:27:32+09:00",
+    "new_source_changes_on_operating_B": 0,
+    "current_only_confirmed_result_retained": true,
+    "actual_two_fresh_cause_chat_trials": 2,
+    "isolated_candidate_final_report_admitted": false,
+    "validation": "../../validation/service-query/cause-completion.validation.json"
   }
 }

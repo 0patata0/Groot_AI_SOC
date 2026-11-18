@@ -2265,3 +2265,11 @@ canonical/운영소스·기존서비스변경0. 후보설치기는binding235/sys
 
 현재 상태 단독 조회의 첫 운영 후보는 SDK의 도구 사전 선택이 저장소 질문을 에이전트로 바꿔 원복했다. 이후 미인식 객체명을 암묵적 에이전트 조회로 소비하지 않도록 공통 판독을 보완했다. ID와 한국어 조사 경계의 회귀도 보정했다. 최종10소스·영수증1개를20:55 KST에 확정하고 새8요청/6읽기를 대조했다. 사실 조회5.068~12.014초와 확인문0.169~0.258초는 제한된 게시 관측이다. 이전 실패·원복·Mac830/Linux905 실행·실제 출력·복구와 미수행을 검증 원장에 구분했다. [동작·재현·한계](../infra/hermes/service-query-contract.md) · [실제 검증](../infra/hermes/query-completion/service-catalog.validation.json).
 <!-- /service-current-prefilter-20261118 -->
+
+
+<!-- service-cause-candidate-20261119 -->
+
+## 2026-11-19 복합 원인 조사 후보의 실제 검증 실패
+
+현재 상태 단독 조회의 확정 결과와 복합 원인 질문의 실패를 분리했다. 실제 두 새 채팅과 격리 후보에서 추가 읽기 누락·보고 검증 거절을 확인하고, 단일 SDK 실행기 연결 후보와3반례를 만들었다. 회귀833·Linux 공식38/설치37은 통과했지만 실제 격리 최종 보고는 수용되지 않아 운영 적용을 보류했다. 원본·후보·현재 소스/스키마·실제 호출·실패·미수행 근거를 보존한다. [원인·수행·미완료](../infra/hermes/service-query-contract.md) · [실제 실패·후보 검증](../infra/validation/service-query/cause-completion.validation.json).
+<!-- /service-cause-candidate-20261119 -->

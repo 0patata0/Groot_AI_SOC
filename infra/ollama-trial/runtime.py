@@ -420,6 +420,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         before=len(report['calls'])
                         await select_required_service_reads(missing[:4],'required_service_evidence_completion')
                         require(len(report['calls'])>before,'required_service_evidence_not_selected')
+                        report.setdefault('service_evidence_completions',[]).append({
+                            'required':[copy.deepcopy(o) for o in missing[:4]],
+                            'read_count':len(report['calls'])-before,
+                            'result_sha256':[c.get('result_sha256') for c in report['calls'][before:]]})
                         continue
                     refresh=(harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
                         if service_plan and receipts is not None else [])

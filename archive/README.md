@@ -1,5 +1,7 @@
 # 과거 기록과 복원 안내
 
+사용자 지정 [다섯 장 목차](DESIGN_ALTERNATIVES.md#thesis-five-chapter-20261118)와 [내용·출력 검증](DIAGNOSTIC_HISTORY.md#thesis-five-chapter-20261118)을 유형별 이력에 연결했다. 기존6장 조건은 후속 지시로 대체됐으며 전체98쪽/본문1~92쪽·151색인과 고정 결과 원장의 범위를 구분한다.
+
 <!-- chat-alignment:history -->
 
 [복합 조사 후보](../infra/validation/management-latency/README.md)의 실제 2채팅·동일 자료 재검사·실제 MCP 격리 실패·10파일 미승격을 유형별 이력에 추가했다. 앞선 13파일 운영 확정·새 8단순 채팅과 구분하며 원문·실패·복구 근거를 보존한다.

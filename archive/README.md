@@ -1,5 +1,11 @@
 # 과거 기록과 복원 안내
 
+<!-- certificate-bootstrap-20261118 -->
+단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
+<!-- /certificate-bootstrap-20261118 -->
+
+[초기 설치 연결](DEPLOYMENT_HISTORY.md#certificate-bootstrap-20261118) · [검사와 한계](DIAGNOSTIC_HISTORY.md#certificate-bootstrap-20261118)
+
 <!-- presentation-and-plain-toc-20261118 -->
 [표 없는 목차·발표 동기화](DESIGN_ALTERNATIVES.md#presentation-and-plain-toc-20261118)와 [출력 검수](DIAGNOSTIC_HISTORY.md#presentation-and-plain-toc-20261118)를 기록했다. 11월18일 후속 결과와5장 논문 좌표를 연결한20쪽 발표·편집 표/차트·메모의 갱신은 유형별 presentation-and-plain-toc-20261118 이력을 참조한다. 실제 리허설과 발표는 별도다.
 <!-- /presentation-and-plain-toc-20261118 -->

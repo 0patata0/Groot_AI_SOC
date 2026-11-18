@@ -40,6 +40,7 @@ PROFILES = {
         'b:soc-bot': 'soc-bot.service', 'b:management': 'capstone-management.service',
         'b:rule-worker': 'rule-change-worker.service', 'b:vector': 'capstone-vector.service',
         'b:wazuh-agent': 'wazuh-agent.service', 'b:docker': 'docker.service',
+        'b:certificate-monitor': 'capstone-cert-monitor.service',
     },
     'service': {
         'c:lab-api': 'capstone-offline-labs.service',

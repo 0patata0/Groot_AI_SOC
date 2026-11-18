@@ -9,6 +9,7 @@ import argparse
 import copy
 import fcntl
 import hashlib
+import importlib.util
 import ipaddress
 import json
 import os
@@ -79,7 +80,10 @@ FILES.update({V+'history-auto/run-a.sh': '/usr/local/sbin/capstone-vector-histor
 EXTRA = (V+'raw-operations/zz-capstone-evidence-v2.conf', V+'raw-operations/suricata-entrypoint-managed.sh',
          W+'capstone_vector_rules.xml', W+'agent-localfile.xml', W+'indexer-native/window-v2/monitor.json',
          W+'indexer-native/deploy-monitor-b.py',
-         'infra/groot-a/logrotate-capstone-secstack', 'deployment/log_pipeline.py')
+         'infra/groot-a/logrotate-capstone-secstack', 'deployment/log_pipeline.py',
+         'deployment/certificate_monitor.py',
+         *('infra/groot-a/certificate-monitor/'+n for n in
+           ('monitor.sh','capstone_certificate_rules.xml','capstone_certificate_decoders.xml')))
 # Sensor-host agent buffer. The package default (5000 events, 500/s) overflowed
 # during attack traffic (Wazuh rule 203 on A: 2026-10-29, 11-02, 11-05), dropping
 # IDS/WAF evidence. Same values as the existing-install controller
@@ -281,6 +285,12 @@ def fingerprint(files):
     return {'schema': 1, 'source_sha256': sha(canonical(hashes)), 'files': hashes}
 
 
+def certificate_adapter():
+    spec=importlib.util.spec_from_file_location('capstone_certificate_bootstrap',Path(__file__).with_name('certificate_monitor.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def settings(role, environ=None):
     e = dict(os.environ if environ is None else environ)
     need(role in ('security','siem'), 'invalid_role')
@@ -301,9 +311,11 @@ def settings(role, environ=None):
     except ValueError as exc:
         raise Refused('invalid_protected_address') from exc
     need(set(hosts.values()) <= set(protected), 'management_hosts_must_be_protected')
-    profile=sha(canonical({'role':role,'hosts':hosts,'protected_ips':protected}))
+    certificate_monitor=certificate_adapter()
+    certificate_specs=certificate_monitor.site_specs(e)
+    profile=sha(canonical({'role':role,'hosts':hosts,'protected_ips':protected,'certificate_specs':certificate_specs}))
     return {'schema':1,'role':role,'profile':profile,'hosts':hosts,'protected_ips':protected,
-            'role_dir':str(ROOT/role),'sensor':SENSOR}
+            'role_dir':str(ROOT/role),'sensor':SENSOR,'certificate_specs':certificate_specs}
 
 
 def text_render(raw, config):
@@ -675,15 +687,25 @@ class Bootstrap:
         if self.role=='siem':
             compose_path=self.root/'compose.core.json'; compose=parse(read(compose_path))
             rule=rule_config(self.files[W+'capstone_vector_rules.xml'],self.config)
+            certificate_monitor=certificate_adapter()
+            cert_rules=certificate_monitor.rules(self.files[certificate_monitor.BASE+'capstone_certificate_rules.xml'],self.config['certificate_specs'])
+            rule+=b'\n'+cert_rules
+            cert_decoder=self.files[certificate_monitor.BASE+'capstone_certificate_decoders.xml']
+            need(sha(cert_decoder)==certificate_monitor.PINS['capstone_certificate_decoders.xml'],'certificate_decoder_source_changed')
+            ids=ET.fromstring(b'<root>'+rule+b'</root>').findall('.//rule')
+            need(len({n.attrib['id'] for n in ids})==len(ids),'duplicate_pipeline_rule_id')
             write(self.base/'capstone_vector_rules.xml',rule,0o444)
+            write(self.base/'capstone_certificate_decoders.xml',cert_decoder,0o444)
             manager=compose['services']['wazuh.manager']
             add_mount(manager,self.base/'capstone_vector_rules.xml','/wazuh-config-mount/etc/rules/capstone_vector_rules.xml')
+            add_mount(manager,self.base/'capstone_certificate_decoders.xml','/wazuh-config-mount/etc/decoders/capstone_certificate_decoders.xml')
             options=self.root/'wazuh/capstone-internal-options.conf'; old=read(options)
             need(not re.search(rb'(?m)^analysisd\.(event_threads|rule_matching_threads)=',old),'analysis_threads_already_configured')
             need(b'analysisd.decoder_order_size=1024' in old,'decoder_1024_required')
             write(options,old.rstrip()+b'\nanalysisd.event_threads=1\nanalysisd.rule_matching_threads=1\n',0o444,True)
             write(compose_path,canonical(compose),0o600,True)
-            outputs={str(self.base/'capstone_vector_rules.xml'):sha(rule),str(options):sha(read(options))}
+            outputs={str(self.base/'capstone_vector_rules.xml'):sha(rule),str(options):sha(read(options)),
+                     str(self.base/'capstone_certificate_decoders.xml'):sha(cert_decoder)}
         else:
             compose_path=self.root/'compose.json'; compose=parse(read(compose_path))
             source_config=self.export_image_config(compose['services']['suricata']['image'])
@@ -736,6 +758,8 @@ class Bootstrap:
             self.docker(['exec',manager['Id'],'/var/ossec/bin/wazuh-analysisd','-t'])
             mounted=self.docker(['exec',manager['Id'],'cat','/var/ossec/etc/rules/capstone_vector_rules.xml'])
             need(sha(mounted)==data['files'][str(self.base/'capstone_vector_rules.xml')],'manager_rule_copy_mismatch')
+            decoder=self.docker(['exec',manager['Id'],'cat','/var/ossec/etc/decoders/capstone_certificate_decoders.xml'])
+            need(sha(decoder)==data['files'][str(self.base/'capstone_certificate_decoders.xml')],'certificate_decoder_copy_mismatch')
             native={}
             for name,raw in native_logtest_files(self.files,self.config,manager['Id']).items():
                 target=self.base/'native-logtest'/name;write(target,raw,0o400);data['files'][str(target)]=sha(raw)

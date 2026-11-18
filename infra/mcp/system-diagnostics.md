@@ -1,5 +1,13 @@
 # 고정 읽기 전용 시스템 진단
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.internal을 한 쌍씩 검사한다. 100300~100311의12규칙을 기존 초기 규칙과 함께 구성하고 중복 ID를 거절한다. 기존 진단 도구에는 b:certificate-monitor 고정 읽기 대상을 추가했다. 도구 수·일반 명령 권한을 늘리지 않으며 새 대상의 운영 설치는 이번 작업에서 수행하지 않았다.
+
+로컬190검사와 Linux 격리 감시52조건, 두 역할의 systemd 유닛 구문을 통과했다. Linux는 A에서 두 역할의 합성 인증서와 모의 TLS 전송으로 검사했으며 운영5파일의 SHA를 전후 대조했다. 실제 TLS 연결·운영 유닛 시작·운영 설정 변경은0이다. 새 B 규칙의 실제 엔진 판정과 새 Ubuntu 전체 설치·독립 재구현은 미수행이다.
+<!-- /certificate-bootstrap-20261118 -->
+
 <!-- journal-release-preparation:start -->
 [수집·캐시 후속 검증](../validation/journal-composition/README.md)은 운영 미적용입니다. A/B의4시간 수집 잘림은 격리 읽기에서 보완했고 기존 앱 오류4ID의 캐시 편입/복구를 확인했습니다. 수집기 자원/초기 설치·일관 배포·정확 승인·실제 MCP/새 채팅이 남습니다. 아래 현재 설치/사용 절차와 후보 능력을 구분합니다.
 <!-- journal-release-preparation:end -->
@@ -61,7 +69,7 @@ MCP SDK 2.0.0이 기본 전송하는 빈 `_meta`와 제한된 표준 `progressTo
 | 호스트 | 고정 대상과 systemd unit |
 | --- | --- |
 | A | `a:vector`→`capstone-vector.service`, `a:wazuh-agent`→`wazuh-agent.service`, `a:rule-worker`→`rule-change-worker.service`, `a:raw-waf`→`capstone-raw-operations@modsecurity.service`, `a:raw-suricata`→`capstone-raw-operations@suricata.service`, `a:certificate-monitor`→`capstone-cert-monitor.service`, `a:storage-monitor`→`capstone-storage-monitor.service`, `a:docker`→`docker.service` |
-| B | `b:soc-bot`→`soc-bot.service`, `b:management`→`capstone-management.service`, `b:rule-worker`→`rule-change-worker.service`, `b:vector`→`capstone-vector.service`, `b:wazuh-agent`→`wazuh-agent.service`, `b:docker`→`docker.service` |
+| B | `b:soc-bot`→`soc-bot.service`, `b:management`→`capstone-management.service`, `b:rule-worker`→`rule-change-worker.service`, `b:vector`→`capstone-vector.service`, `b:wazuh-agent`→`wazuh-agent.service`, `b:docker`→`docker.service`, `b:certificate-monitor`→`capstone-cert-monitor.service` |
 | C | `c:lab-api`→`capstone-offline-labs.service`, `c:lab-broker`→`capstone-offline-labs-broker.service`, `c:lab-guard`→`capstone-offline-labs-guard.service`, `c:lab-terminal`→`capstone-nonweb-terminal.service`, `c:terminal-guard`→`capstone-nonweb-guard.service`, `c:terminal-status`→`capstone-nonweb-status.service`, `c:sudo-status`→`capstone-sudo-status.service`, `c:sudo-user-manager`→`user@1991.service`, `c:apache`→`apache2.service`, `c:wazuh-agent`→`wazuh-agent.service`, `c:docker`→`docker.service` |
 
 root collector는60초마다 고정 `systemctl show` 필드만 읽고 `/var/lib/capstone-diagnostics/snapshot.json`을 원자 발행한다. 파일은 root:`capstone-diagnostics`·0640, 상위 경로는 root 소유·쓰기 보호, 최대128KiB, TTL180초다. 심볼릭 링크·hardlink·소유권/권한/호스트/스키마/시각 불일치는 거절한다. 상태·종료 코드·재시작 횟수·단조 시각·서비스 `Type`을 반환하되 `ExecStart`, `Environment`, 전체 설정이나 Docker 로그는 읽기 도구에 제공하지 않는다. `failed`, `inactive`, `not-found`도 조회 결과이며 조회 거절 조건이 아니다. `Type=oneshot`의 `inactive/dead` 자체를 장애로 판정하지 않는다.

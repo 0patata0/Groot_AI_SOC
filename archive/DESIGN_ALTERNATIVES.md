@@ -1,5 +1,15 @@
 # 설계 대안 이력
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
+
+A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:8443을 사용한다. B는 /etc/capstone-internal-tls/server.crt와 SIEM_HOST:8444를 사용한다. 공개 인증서 파일은 root:root/0444이며 개인키는 감시 서비스에서 접근할 수 없다. CA 신뢰·SAN과 hostname·실제 제공 인증서 지문을 대조한다. 자동 갱신이나 공개 DNS·외부443·HTTP·LLM 가용성까지 확인하는 기능은 아니다.
+
+Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.internal을 한 쌍씩 검사한다. 100300~100311의12규칙을 기존 초기 규칙과 함께 구성하고 중복 ID를 거절한다. 기존 진단 도구에는 b:certificate-monitor 고정 읽기 대상을 추가했다. 도구 수·일반 명령 권한을 늘리지 않으며 새 대상의 운영 설치는 이번 작업에서 수행하지 않았다.
+<!-- /certificate-bootstrap-20261118 -->
+
 <!-- presentation-and-plain-toc-20261118 -->
 <a id="presentation-and-plain-toc-20261118"></a>
 

@@ -1,5 +1,15 @@
 # 초기 설치·통합 패키지 준비 상태
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+초기 설치의 check는 입력·소스·호스트와 기존 설치 충돌을 검사한다. install은 기존 A lab-edge와 B 내부 TLS가 준비된 뒤, 관리 타이머와 진단 수집을 시작하기 전에 실행한다. 첫 실제 감시 결과가 verified여야 설치 영수증을 남기고 매일09:00 KST 타이머를 켠다. 부분 설치와 영수증·파일 변동은 자동으로 덮어쓰지 않고 중단한다.
+
+로컬190검사와 Linux 격리 감시52조건, 두 역할의 systemd 유닛 구문을 통과했다. Linux는 A에서 두 역할의 합성 인증서와 모의 TLS 전송으로 검사했으며 운영5파일의 SHA를 전후 대조했다. 실제 TLS 연결·운영 유닛 시작·운영 설정 변경은0이다. 새 B 규칙의 실제 엔진 판정과 새 Ubuntu 전체 설치·독립 재구현은 미수행이다.
+
+추가 deb·wheel·이미지·포트·사용자 설정 키는 없다. 기존 LAB_PUBLIC_ORIGIN/LAB_HTTPS_PORT/LAB_PROXY_SUBNET과 LAB_TLS_CERT/LAB_TLS_KEY 입력, B 내부 TLS의 별도 인증서를 사용한다. 단일 설치기의 기존 소스 묶음에 새 어댑터·검사와 고정 템플릿을 포함한다. 기존 운영 서버의 증분 수정과 새 서버 초기 설치를 구분한다.
+<!-- /certificate-bootstrap-20261118 -->
+
 [진단 설치 보완](../infra/validation/journal-composition/LIMITS.md): 수집/초기 이력에 MemoryMax256MiB·High192MiB·스왑0·Tasks64·FD1,024를 적용하는 후보와 고정 backfill unit을 준비했다. systemd 실제 로드 값·4개 unit 영수증·부분 수집 CLI1을 검사한다. Mac1,427/기존6생략·격리 Linux1,510/생략0과 실제 제한 실행은 새 OS 전체 설치의 증거가 아니다.
 
 [native journal 후보](../infra/validation/journal-adapter/README.md)에서 사용하는 단일 deploy.sh/helper, systemd255/binding235 API와 오프라인 의존 목록은 유지한다. 별도 [정확9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 회귀33회·복제 원복9회·중간 load18회를 거쳤다. A/B/C의 PREPARED 상태와 원본6개도 준비했다. 기존 운영 서버의 승인형 증분 작업이며 초기 설치기를 재실행하지 않는다. 실제 운영 적용과 원복 timer, 새 채팅과 새 OS 전체 설치는 아직 수행하지 않았다. 아래 날짜별 설명은 당시 범위다.

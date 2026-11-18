@@ -29,6 +29,14 @@ m._library = d
 NOW = 1900000000
 
 
+class CertificateTarget(unittest.TestCase):
+    def test_certificate_observers_are_host_bound_and_remain_unit_only_reads(self):
+        for role,prefix in [('security','a'),('siem','b')]:
+            self.assertEqual(d.PROFILES[role][prefix+':certificate-monitor'],'capstone-cert-monitor.service')
+        self.assertNotIn('c:certificate-monitor',d.TARGETS)
+        self.assertNotIn('certificate-monitor',d.TARGETS)
+
+
 def fields(unit, **changes):
     values = {'Id': unit, 'LoadState': 'loaded', 'ActiveState': 'failed', 'SubState': 'failed',
         'Result': 'exit-code', 'UnitFileState': 'static', 'Type': 'oneshot',

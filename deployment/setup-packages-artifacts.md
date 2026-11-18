@@ -1,5 +1,13 @@
 # 패키지·이미지·배포 자료 준비
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+추가 deb·wheel·이미지·포트·사용자 설정 키는 없다. 기존 LAB_PUBLIC_ORIGIN/LAB_HTTPS_PORT/LAB_PROXY_SUBNET과 LAB_TLS_CERT/LAB_TLS_KEY 입력, B 내부 TLS의 별도 인증서를 사용한다. 단일 설치기의 기존 소스 묶음에 새 어댑터·검사와 고정 템플릿을 포함한다. 기존 운영 서버의 증분 수정과 새 서버 초기 설치를 구분한다.
+
+A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:8443을 사용한다. B는 /etc/capstone-internal-tls/server.crt와 SIEM_HOST:8444를 사용한다. 공개 인증서 파일은 root:root/0444이며 개인키는 감시 서비스에서 접근할 수 없다. CA 신뢰·SAN과 hostname·실제 제공 인증서 지문을 대조한다. 자동 갱신이나 공개 DNS·외부443·HTTP·LLM 가용성까지 확인하는 기능은 아니다.
+<!-- /certificate-bootstrap-20261118 -->
+
 [수집기 한도 후보](../infra/validation/journal-composition/LIMITS.md)의 반입 소스는 deployment/soc_diagnostics.py와 infra/mcp/system_diagnostics.py이며 기존 source_bundle을 사용한다. 추가 deb/wheel/image·공개 포트·키·설정 입력은0이다. 기존 systemd255/binding235의 SYSTEM_ONLY와 Reader files API를 검사하고 수집·초기 이력·타이머·reader의4개 unit을 생성한다. [정확한 생성 내용·SHA](../infra/validation/journal-composition/limits-units.json)를 확인한다. 새 OS 전체 설치는 미검증이다.
 
 [정확 journal9코드 운영 적용안](../infra/validation/journal-adapter/application/README.md)은 기존 Python/systemd·이미 설치된 native binding을 사용해 추가 deb/wheel/image/포트/키0이다. operator-only 파일 트랜잭션/실행기는 root 전용 준비 폴더에 보관하며 MCP·초기 설치기의 새 진입점으로 등록하지 않는다. 초기설치의6개 local source/helper·의존 검사와 별도로 기존운영의 정확 승인·백업·독립 원복·실MCP/새채팅·확정을 수행한다. 현재는 준비/복제검사까지만 완료했다.

@@ -16,7 +16,8 @@ HERE=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('log_pipeline',HERE/'log_pipeline.py')
 lp=importlib.util.module_from_spec(spec); spec.loader.exec_module(lp)
 FILES=lp.source_files(HERE.parent,False)
-ENV={'SECURITY_HOST':'192.0.2.10','SIEM_HOST':'192.0.2.11','SERVICE_HOST':'192.0.2.12'}
+ENV={'SECURITY_HOST':'192.0.2.10','SIEM_HOST':'192.0.2.11','SERVICE_HOST':'192.0.2.12',
+     'LAB_PUBLIC_ORIGIN':'https://lab.example.org','LAB_HTTPS_PORT':'443','LAB_PROXY_SUBNET':'172.30.247.0/29'}
 CONFIG={**lp.settings('security',ENV),'machine_id':'a'*32,'docker':'/usr/bin/docker',
         'vector':'/usr/bin/vector','binding':'b'*64}
 
@@ -29,6 +30,19 @@ class Pipeline(unittest.TestCase):
 
     def test_settings_independent_parent_profile(self):
         self.assertEqual(lp.settings('security',ENV),lp.settings('security',{**ENV,'PROFILE':'f'*64}))
+
+    def test_certificate_domain_changes_pipeline_identity(self):
+        self.assertNotEqual(lp.settings('siem',ENV)['profile'],lp.settings('siem',{**ENV,'LAB_PUBLIC_ORIGIN':'https://other.example.org'})['profile'])
+
+    def test_certificate_rules_and_decoder_have_no_id_collision_with_existing_pipeline(self):
+        cm=lp.certificate_adapter()
+        raw=lp.rule_config(FILES[lp.W+'capstone_vector_rules.xml'],CONFIG)+cm.rules(FILES[cm.BASE+'capstone_certificate_rules.xml'],CONFIG['certificate_specs'])
+        import xml.etree.ElementTree as ET
+        nodes=ET.fromstring(b'<root>'+raw+b'</root>').findall('.//rule')
+        ids=[n.attrib['id'] for n in nodes]
+        self.assertEqual(len(ids),len(set(ids)))
+        self.assertTrue({str(i) for i in range(100300,100312)}<=set(ids))
+        self.assertEqual(lp.sha(FILES[cm.BASE+'capstone_certificate_decoders.xml']),cm.PINS['capstone_certificate_decoders.xml'])
 
     def test_admin_block_exemptions_do_not_filter_logs(self):
         self.assertEqual(lp.settings('security',ENV),lp.settings('security',{**ENV,'ADMIN_PROTECTED_CIDRS':'203.0.113.0/24'}))

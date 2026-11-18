@@ -1,5 +1,15 @@
 # 환경 값 입력과 단일 셸 실행
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+초기 설치의 check는 입력·소스·호스트와 기존 설치 충돌을 검사한다. install은 기존 A lab-edge와 B 내부 TLS가 준비된 뒤, 관리 타이머와 진단 수집을 시작하기 전에 실행한다. 첫 실제 감시 결과가 verified여야 설치 영수증을 남기고 매일09:00 KST 타이머를 켠다. 부분 설치와 영수증·파일 변동은 자동으로 덮어쓰지 않고 중단한다.
+
+A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:8443을 사용한다. B는 /etc/capstone-internal-tls/server.crt와 SIEM_HOST:8444를 사용한다. 공개 인증서 파일은 root:root/0444이며 개인키는 감시 서비스에서 접근할 수 없다. CA 신뢰·SAN과 hostname·실제 제공 인증서 지문을 대조한다. 자동 갱신이나 공개 DNS·외부443·HTTP·LLM 가용성까지 확인하는 기능은 아니다.
+
+Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.internal을 한 쌍씩 검사한다. 100300~100311의12규칙을 기존 초기 규칙과 함께 구성하고 중복 ID를 거절한다. 기존 진단 도구에는 b:certificate-monitor 고정 읽기 대상을 추가했다. 도구 수·일반 명령 권한을 늘리지 않으며 새 대상의 운영 설치는 이번 작업에서 수행하지 않았다.
+<!-- /certificate-bootstrap-20261118 -->
+
 > **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/DEPLOYMENT_HISTORY.md#source-5f5f782f6b670953).
 
 새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 취급하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**

@@ -1,5 +1,21 @@
 # 채팅 인증서 만료 감시·수동 갱신
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
+
+초기 설치의 check는 입력·소스·호스트와 기존 설치 충돌을 검사한다. install은 기존 A lab-edge와 B 내부 TLS가 준비된 뒤, 관리 타이머와 진단 수집을 시작하기 전에 실행한다. 첫 실제 감시 결과가 verified여야 설치 영수증을 남기고 매일09:00 KST 타이머를 켠다. 부분 설치와 영수증·파일 변동은 자동으로 덮어쓰지 않고 중단한다.
+
+A는 설치된 /opt/capstone/security/tls/lab.crt와 실습 프록시 /29의 .3:8443을 사용한다. B는 /etc/capstone-internal-tls/server.crt와 SIEM_HOST:8444를 사용한다. 공개 인증서 파일은 root:root/0444이며 개인키는 감시 서비스에서 접근할 수 없다. CA 신뢰·SAN과 hostname·실제 제공 인증서 지문을 대조한다. 자동 갱신이나 공개 DNS·외부443·HTTP·LLM 가용성까지 확인하는 기능은 아니다.
+
+Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.internal을 한 쌍씩 검사한다. 100300~100311의12규칙을 기존 초기 규칙과 함께 구성하고 중복 ID를 거절한다. 기존 진단 도구에는 b:certificate-monitor 고정 읽기 대상을 추가했다. 도구 수·일반 명령 권한을 늘리지 않으며 새 대상의 운영 설치는 이번 작업에서 수행하지 않았다.
+
+로컬190검사와 Linux 격리 감시52조건, 두 역할의 systemd 유닛 구문을 통과했다. Linux는 A에서 두 역할의 합성 인증서와 모의 TLS 전송으로 검사했으며 운영5파일의 SHA를 전후 대조했다. 실제 TLS 연결·운영 유닛 시작·운영 설정 변경은0이다. 새 B 규칙의 실제 엔진 판정과 새 Ubuntu 전체 설치·독립 재구현은 미수행이다.
+<!-- /certificate-bootstrap-20261118 -->
+
+검사 도구의 범위: [systemd255 유닛 검증](https://www.freedesktop.org/software/systemd/man/255/systemd-analyze.html) · [Wazuh 공식 로그 시험](https://documentation.wazuh.com/current/user-manual/reference/tools/wazuh-logtest.html).
+
 ## 현재 수정 후보와 운영 상태
 
 관리자231 경유로 정확 계획10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7의 두 파일을 적용하고17:13:01 KST에 확정했다. 현재 실제 run은exit0/verified이며 상태·journal의 인증서 지문이 일치한다. 5분 독립 원복은 해제했고 원본·후보·제어기는 root 전용 복구 위치에 보존했다. 프록시와 인증서·개인키·매일09:00 KST 타이머는 바꾸지 않았다.

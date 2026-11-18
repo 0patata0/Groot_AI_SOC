@@ -1,5 +1,13 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+<!-- certificate-bootstrap-20261118 -->
+<a id="certificate-bootstrap-20261118"></a>
+
+단일 deploy.sh에 신규 A의 실습용 TLS와 B의 내부 채팅 TLS 감시를 연결했다. 기존 감시기에서 검증한 코어를 재사용하고 공개 인증서 경로·고정 엔드포인트·호스트 machine-id를 각각 결속한다. 실습 도메인과 채팅 도메인은 서로 다른 센서 이름·Wazuh 규칙으로 연결한다. 기존 운영 A의 두 파일과 타이머·인증서는 바꾸지 않았다.
+
+로컬190검사와 Linux 격리 감시52조건, 두 역할의 systemd 유닛 구문을 통과했다. Linux는 A에서 두 역할의 합성 인증서와 모의 TLS 전송으로 검사했으며 운영5파일의 SHA를 전후 대조했다. 실제 TLS 연결·운영 유닛 시작·운영 설정 변경은0이다. 새 B 규칙의 실제 엔진 판정과 새 Ubuntu 전체 설치·독립 재구현은 미수행이다.
+<!-- /certificate-bootstrap-20261118 -->
+
 [수집기 한도·초기 이력 보완](../validation/journal-composition/LIMITS.md)은 실행 코드의 유한 자원과 부트스트랩 실패 처리를 보완한 후보다. 추가 MCP 도구/인자·일반 sudo/Docker 권한은0이며 기존 등록 읽기를 승인 없이 유지한다. 소스 회귀와 격리 검증을 완료했지만 운영 소스·캐시·연동 사본의 조정 배포와 실제 MCP/양봇 새 채팅은 남아 있다.
 
 <!-- journal-composition:start -->

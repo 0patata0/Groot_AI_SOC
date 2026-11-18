@@ -159,7 +159,7 @@
   },
   "pending": [
     "Repair common follow-up/repair/output scope: actual certificate query was replaced by Wazuh-agent inventory; Harness² and new chat tests required",
-    "Portable single deploy.sh integration: distinct lab-edge/chat certificate inputs, fixed endpoint, safe public-cert paths, host identity and domain-bound Wazuh rules",
+    "Fresh single deploy.sh execution and native evaluation of the12 new-initial rules; source integration complete, operating legacy observer unchanged",
     "Next scheduled 09:00 KST observation; public DNS/443/HTTP availability and fresh OS install are separate"
   ],
   "review": {
@@ -642,5 +642,15 @@
     "documents": 16,
     "preapproval_run_retained": "2026-11-18-027-2c83",
     "receipt_update": "Structured publication metadata and already-reviewed phrasing; prior input/intermediates/final preserved"
+  },
+  "bootstrap_followup": {
+    "at_kst": "2026-11-18T18:15:47.821244+09:00",
+    "source": "deployment/certificate-monitor.validation.json",
+    "state": "source_integrated_and_isolated_checks_passed; new_OS_execution_not_performed",
+    "local_tests": 190,
+    "linux_synthetic_conditions": 52,
+    "existing_operating_files_changed": 0,
+    "new_read_target_source_only": "b:certificate-monitor",
+    "machine_and_certificate_inputs": "new A lab-edge and B internal chat; legacy fixed A observer retained"
   }
 }

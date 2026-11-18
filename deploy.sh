@@ -337,6 +337,8 @@ if [[ $MODE == verify ]]; then
   remote_role "$SERVICE_HOST" service diag-verify
   remote_role "$SIEM_HOST" siem diag-verify
   remote_role "$SIEM_HOST" siem tls-verify
+  remote_role "$SECURITY_HOST" security cert-verify
+  remote_role "$SIEM_HOST" siem cert-verify
   remote_role "$SECURITY_HOST" security host-verify
   remote_role "$SERVICE_HOST" service host-verify
   remote_role "$SIEM_HOST" siem host-verify
@@ -372,6 +374,8 @@ remote_role "$SERVICE_HOST" service diag-check
 remote_role "$SECURITY_HOST" security host-check
 remote_role "$SERVICE_HOST" service host-check
 remote_role "$SIEM_HOST" siem host-check
+remote_role "$SECURITY_HOST" security cert-check
+remote_role "$SIEM_HOST" siem cert-check
 if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-check; fi
 if [[ $HARNESS2_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem harness-check; fi
 say '세 서버 사전검사 통과.'
@@ -411,6 +415,12 @@ remote_role "$SECURITY_HOST" security soc-apply > "$WORK/security-soc.json"
 remote_role "$SECURITY_HOST" security log-activate
 remote_role "$SIEM_HOST" siem log-monitor
 remote_role "$SIEM_HOST" siem dashboard-apply
+# Observe the already installed A lab-edge and B chat TLS independently.
+# Their templates are site/machine-bound and never adopt the legacy A monitor.
+remote_role "$SECURITY_HOST" security cert-install
+remote_role "$SIEM_HOST" siem cert-install
+remote_role "$SECURITY_HOST" security cert-verify
+remote_role "$SIEM_HOST" siem cert-verify
 # The LLM management timer starts after its evidence sources are configured.
 remote_role "$SIEM_HOST" siem soc-activate < "$WORK/security-soc.json"
 # A separate read-only key can fetch only each host's root-published snapshot.

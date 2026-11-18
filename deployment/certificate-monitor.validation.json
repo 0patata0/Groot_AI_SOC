@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T18:15:47.665724+09:00",
+  "state": "source_integrated_isolated_checks_passed_new_OS_not_tested",
+  "entrypoint": "deploy.sh",
+  "scope": "fresh Ubuntu24.04 A lab-edge and B internal chat TLS observers; no existing-host adoption",
+  "sources": {
+    "deploy.sh": {
+      "bytes": 27273,
+      "sha256": "45b8280a973758ce336a8ae3fed1f51d7e91cc58da2dea0ef283ff1d66f264df"
+    },
+    "deployment/certificate_monitor.py": {
+      "bytes": 13571,
+      "sha256": "3b0ad2d286a2cfa1dd0b7369a4b74addbc92ae58b466262aba3da1c8679f5bdb"
+    },
+    "deployment/remote.sh": {
+      "bytes": 7684,
+      "sha256": "d0d210c49fb524ac09e0e82c653714a139770ae5823f60c44fe9d2ee31ce4dfb"
+    },
+    "deployment/log_pipeline.py": {
+      "bytes": 65469,
+      "sha256": "d5e52763a5a7735bf515349e136ad743080b68d3b77896d20531b34a5e151c4f"
+    },
+    "deployment/test_log_pipeline.py": {
+      "bytes": 18494,
+      "sha256": "f6d85cbfac35250bb3a910b38313dc61842932e7a5c8a1167f29dd36784f67f5"
+    },
+    "deployment/tests/test_controller.py": {
+      "bytes": 32718,
+      "sha256": "27b14c3662e6fcc6bf98e0e694d6327ece77d925c714c357849debbd1b97e1b4"
+    },
+    "deployment/tests/test_remote_actions.py": {
+      "bytes": 2199,
+      "sha256": "6ba04bd5c6616dba760dcdfcf07c0205c251a40795ca41f86c13c9d3ac2743f9"
+    },
+    "deployment/tests/test_certificate_monitor.py": {
+      "bytes": 9172,
+      "sha256": "152241995753460db014800f02ea714c9d230a3584836d65822bbf07bdbb964e"
+    },
+    "deployment/tests/run_certificate_native.py": {
+      "bytes": 3847,
+      "sha256": "794732afaea7f6a49997e9fb299d04f545ce0132d6d2286c77add715e73f84b3"
+    },
+    "infra/mcp/system_diagnostics.py": {
+      "bytes": 36744,
+      "sha256": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c"
+    },
+    "infra/mcp/test_system_diagnostics.py": {
+      "bytes": 36587,
+      "sha256": "ccf28b4de9afa0a5e6d74a5a2df9c87e4e84c4e5ebbb2e545c39f15be3e02ee8"
+    }
+  },
+  "probe_templates": {
+    "monitor.sh": {
+      "bytes": 8672,
+      "sha256": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8"
+    },
+    "test-monitor.sh": {
+      "bytes": 9939,
+      "sha256": "c742e7a5aa8174b84487e23a8a8d538801171682275f6db7a36be20d73ee270a"
+    },
+    "capstone_certificate_rules.xml": {
+      "bytes": 3583,
+      "sha256": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d"
+    },
+    "capstone_certificate_decoders.xml": {
+      "bytes": 363,
+      "sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c"
+    }
+  },
+  "tests": {
+    "status": "passed",
+    "local_suites": [
+      {
+        "suite": "certificate",
+        "tests": 15,
+        "exit_code": 0,
+        "log": "certificate-final.log"
+      },
+      {
+        "suite": "remote-actions",
+        "tests": 3,
+        "exit_code": 0,
+        "log": "remote-actions-final.log"
+      },
+      {
+        "suite": "log-pipeline",
+        "tests": 42,
+        "exit_code": 0,
+        "log": "log-pipeline-final.log"
+      },
+      {
+        "suite": "controller",
+        "tests": 48,
+        "exit_code": 0,
+        "log": "controller-final.log"
+      },
+      {
+        "suite": "diagnostic",
+        "tests": 51,
+        "exit_code": 0,
+        "log": "diagnostic-final.log"
+      },
+      {
+        "suite": "diagnostic-bootstrap",
+        "tests": 31,
+        "exit_code": 0,
+        "log": "diagnostic-bootstrap-final.log"
+      }
+    ],
+    "local_total": 190,
+    "native_probe_conditions": 52,
+    "native_unit_syntax": 2,
+    "native_tls_transport": "simulated, zero network connections",
+    "new_operating_files_modified": 0,
+    "operating_A_hashes_unchanged": true,
+    "native_Wazuh_rules": "not executed; new-initial rules require fresh installed-manager evaluation",
+    "new_OS_installation": "not performed",
+    "synthetic_remote_cleanup": {
+      "path": "/var/tmp/capstone-cert-bootstrap-4b1155964f9ca79b661a976f",
+      "files": 11,
+      "bytes": 42637,
+      "absence_verified": true
+    },
+    "failure_history": [
+      "initial controller3 expected-phase lists omitted the new cert check/verify phases; updated exact lists and passed48",
+      "dispatcher draft preceded shared lock; moved behind lock/role guard and added regression test"
+    ],
+    "syntax_checks": [
+      "in-memory Python compile; no bytecode",
+      "bash -n deploy.sh/remote.sh"
+    ],
+    "runtime_versions": {
+      "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)",
+      "os": {
+        "BUG_REPORT_URL": "https://bugs.launchpad.net/ubuntu/",
+        "HOME_URL": "https://www.ubuntu.com/",
+        "ID": "ubuntu",
+        "ID_LIKE": "debian",
+        "LOGO": "ubuntu-logo",
+        "NAME": "Ubuntu",
+        "PRETTY_NAME": "Ubuntu 24.04.5 LTS",
+        "PRIVACY_POLICY_URL": "https://www.ubuntu.com/legal/terms-and-policies/privacy-policy",
+        "SUPPORT_URL": "https://help.ubuntu.com/",
+        "UBUNTU_CODENAME": "noble",
+        "VERSION": "24.04.5 LTS (Noble Numbat)",
+        "VERSION_CODENAME": "noble",
+        "VERSION_ID": "24.04"
+      },
+      "python": "Python 3.12.3",
+      "systemd": "systemd 255 (255.4-1ubuntu8.18)",
+      "writes": 0
+    },
+    "registered_read_target_addition": "source-only b:certificate-monitor -> capstone-cert-monitor.service; operating catalogs unchanged"
+  },
+  "humanize": {
+    "run": "2026-11-18-031-25d6",
+    "version": "v2.3-codex",
+    "route": "light",
+    "gate_exit": 0,
+    "change_rate_percent": 0.08,
+    "grade": "B",
+    "self_check": "6/6",
+    "summary_count": 1,
+    "residual_warnings": 0,
+    "edit": "기존 감시기의 검증한 → 기존 감시기에서 검증한"
+  },
+  "source_read_catalog_addition": {
+    "target": "b:certificate-monitor",
+    "unit": "capstone-cert-monitor.service",
+    "new_MCP_tools": 0,
+    "operating_MCP_deployment": false
+  },
+  "input_changes": {
+    "new_config_keys": 0,
+    "new_deb_wheel_images": 0,
+    "new_ports": 0,
+    "private_key_reads": 0
+  },
+  "remaining": [
+    "native installed-manager evaluation of12 portable rules",
+    "actual fresh3host OS installation",
+    "independent successor reproduction",
+    "current unrelated bot output scope repair",
+    "public443/HTTP availability and next09:00 actual observation"
+  ],
+  "publication": {
+    "state": "pending",
+    "public_files": 30
+  }
+}

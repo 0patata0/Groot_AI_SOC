@@ -1,0 +1,541 @@
+{
+  "schema": 1,
+  "state": "candidate_not_applied_semantic_and_latency_gaps",
+  "at_kst": "2026-11-19T08:35:28.926805+09:00",
+  "current_operating_plan_retained": "3a8ad92000b245bd255965e21fad5fae99f13104038035510dada177995799f8",
+  "operating_source_changes": 0,
+  "operating_restarts": 0,
+  "new_chat_posts": 0,
+  "candidate": {
+    "plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5",
+    "source_files": 14,
+    "receipt_updates_if_applied": 1,
+    "source": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e6840c24e9ef0dfa9730b62907ec79ecb63cbf9179bdc042c0a920dc2802cb0",
+        "bytes": 227300,
+        "kind": "source"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e6840c24e9ef0dfa9730b62907ec79ecb63cbf9179bdc042c0a920dc2802cb0",
+        "bytes": 227300,
+        "kind": "source"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e6840c24e9ef0dfa9730b62907ec79ecb63cbf9179bdc042c0a920dc2802cb0",
+        "bytes": 227300,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "8501a93fe6d0fad3d6d666cd7528094fdffc58581c96b7c5b892215ced015c54",
+        "bytes": 18501,
+        "kind": "skill"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "8501a93fe6d0fad3d6d666cd7528094fdffc58581c96b7c5b892215ced015c54",
+        "bytes": 18501,
+        "kind": "skill"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "8501a93fe6d0fad3d6d666cd7528094fdffc58581c96b7c5b892215ced015c54",
+        "bytes": 18501,
+        "kind": "skill"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "871d613e8368520bab835204f5edff1683443b2bda0a4861a943bb6106383d3d",
+        "bytes": 60991,
+        "kind": "source"
+      },
+      "/opt/capstone-management/soc_management_run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/capstone-ollama-trial/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/management-code/run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-ollama-trial/query_grounding.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-management/soc_management_controller.py": {
+        "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "after_sha256": "5641ecf00dcb9a4d0a48ad07900df701270a34991438f93362fe8aab29d94af8",
+        "bytes": 538882,
+        "kind": "bound_existing_gate_payload"
+      }
+    },
+    "modified_functions": [
+      "diagnostic_journal_fields",
+      "diagnostic_property_claim_violations",
+      "snapshot_health_violations",
+      "rejected_claim_sentences",
+      "service_report_messages",
+      "service_lookup_note",
+      "diagnostic_period_claim_violations"
+    ],
+    "added_functions": [
+      "diagnostic_property_time_claim_violations",
+      "diagnostic_journal_limit_claim_violations",
+      "diagnostic_journal_boundary_claim_violations"
+    ],
+    "scope": "three common contracts, three skill copies, SDK runtime, four evidence copies, two exact pins, one same-gate embedding",
+    "extra_packages_images_ports": 0,
+    "roles_permissions_protected_policy_changed": false,
+    "patch": "report-provenance.patch",
+    "files": 14,
+    "forward_and_reverse_all_sha256_matched": true,
+    "patch_bytes": 874341,
+    "patch_sha256": "611ce1385150d70a13dceff231bf1ce96da64145915d354439ba93f6a10c0809",
+    "operating_changes": 0
+  },
+  "canonical_source_sha256": {
+    "infra/hermes/chat_contract.py": "51532ef7ca4ee4524982d2ebc7403280975f75c45719e2ad7ef70c120928e527",
+    "infra/hermes/soc_management_run.py": "a4295a13d229e8c5d0f1236df2bf19bd29dacb966fb84d994128b0bc5c4589db",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "8e47e8b93eaf3e508ad2922837985521dbea939b5722a5e33a2f7036206743d0",
+    "infra/ollama-trial/runtime.py": "8a70f78e06021cbc8af6108742360dc9cdcaeaa21885c0ecd9911ecb6b638c6d",
+    "infra/ollama-trial/test_service_history.py": "7a6ec4f4e0e6e294c6e1b62d97894b531a49639f6eaf8bfb09b5e14627958198",
+    "infra/ollama-trial/test_service_report_provenance.py": "e52d44efdcb00657254351b782c2952212f90e800f86ce6f643db80423c7b50d",
+    "infra/ollama-trial/test_service_identity_scope.py": "0485601c39a76a5fbb7f23e29533264828a1f04d3583e5542db5c21240d7ed19"
+  },
+  "official_harness2_before": {
+    "observed_at_kst": "2026-11-19T07:19:04.820885+09:00",
+    "status": "passed",
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "access_mode": "hermes-parity"
+  },
+  "tests": {
+    "mac": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 409,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 358,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 52,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 409,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 358,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 52,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.400s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.584s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "mac_regression_count": 885,
+    "linux_regression_count": 885,
+    "linux_harness2_integration": 38,
+    "linux_installer": 37,
+    "new_shared_provenance_methods": 25,
+    "overlapping_runs_not_independent_accuracy": true,
+    "legacy_33": {
+      "base": {
+        "rc": 1,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 33 tests in 2.466s",
+          "",
+          "FAILED (failures=1)"
+        ],
+        "failures": [
+          "FAIL: test_additional_journal_explicit_filter_is_validated_before_dispatch (test_service_history_legacy.ServiceRuntime.test_additional_journal_explicit_filter_is_validated_before_dispatch) (scope=None)"
+        ]
+      },
+      "candidate": {
+        "rc": 1,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 33 tests in 2.450s",
+          "",
+          "FAILED (failures=1)"
+        ],
+        "failures": [
+          "FAIL: test_additional_journal_explicit_filter_is_validated_before_dispatch (test_service_history_legacy.ServiceRuntime.test_additional_journal_explicit_filter_is_validated_before_dispatch) (scope=None)"
+        ]
+      }
+    },
+    "all_repository_tests_green": false
+  },
+  "isolated_actual_model_trials": [
+    {
+      "label": "certificate_before_initial_scope_note",
+      "started_at_kst": "2026-11-19T07:45:10.593399+09:00",
+      "finished_at_kst": "2026-11-19T07:45:41.286670+09:00",
+      "seconds": 30.693,
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "actual_reads": 3,
+      "model_completions": 3,
+      "model_timing_seconds": [
+        0.784,
+        0.799,
+        17.049
+      ],
+      "model_input_tokens": [
+        286,
+        266,
+        11040
+      ],
+      "protected_calls": 0,
+      "report_sha256": "cbbcf6d0d1bc896809bf3c67d89caf227e08713861e721f9c721bc4555c6e1e0",
+      "pruned_model_sentences": 0,
+      "remaining_runtime_issues": [],
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    },
+    {
+      "label": "storage_before_duplicate_guard_sync",
+      "started_at_kst": "2026-11-19T08:00:57.630282+09:00",
+      "finished_at_kst": "2026-11-19T08:02:18.768220+09:00",
+      "seconds": 81.138,
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "actual_reads": 3,
+      "model_completions": 4,
+      "model_timing_seconds": [
+        0.851,
+        0.695,
+        33.507,
+        32.784
+      ],
+      "model_input_tokens": [
+        283,
+        263,
+        26416,
+        26705
+      ],
+      "protected_calls": 0,
+      "report_sha256": "97a8e785167c8fbf3e53d19de38e652611049dba6e67618e06d885e1c611e946",
+      "pruned_model_sentences": 0,
+      "remaining_runtime_issues": [],
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    },
+    {
+      "label": "storage_before_projection",
+      "started_at_kst": "2026-11-19T08:10:23.771498+09:00",
+      "finished_at_kst": "2026-11-19T08:11:50.667077+09:00",
+      "seconds": 86.896,
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "actual_reads": 3,
+      "model_completions": 5,
+      "model_timing_seconds": [
+        0.824,
+        0.653,
+        33.106,
+        31.322,
+        8.297
+      ],
+      "model_input_tokens": [
+        283,
+        263,
+        25896,
+        26520,
+        26601
+      ],
+      "protected_calls": 0,
+      "report_sha256": "4923cdbb638828f06b6228c92def21f6dfc6d496eacdac546682316ff0fcd3fc",
+      "pruned_model_sentences": 2,
+      "remaining_runtime_issues": [],
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    },
+    {
+      "label": "storage_before_boundary_guard",
+      "started_at_kst": "2026-11-19T08:18:14.087903+09:00",
+      "finished_at_kst": "2026-11-19T08:19:22.455729+09:00",
+      "seconds": 68.368,
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "actual_reads": 3,
+      "model_completions": 5,
+      "model_timing_seconds": [
+        0.742,
+        0.743,
+        23.143,
+        21.324,
+        8.295
+      ],
+      "model_input_tokens": [
+        283,
+        263,
+        15939,
+        16470,
+        16665
+      ],
+      "protected_calls": 0,
+      "report_sha256": "9f9d26372dc2ef457ed743eac93f7c56cc0dae71f7f0661bd99343a95c5751e5",
+      "pruned_model_sentences": 2,
+      "remaining_runtime_issues": [],
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    },
+    {
+      "label": "latest_frozen_candidate",
+      "started_at_kst": "2026-11-19T08:25:06.940498+09:00",
+      "finished_at_kst": "2026-11-19T08:26:40.109714+09:00",
+      "seconds": 93.169,
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "actual_reads": 3,
+      "model_completions": 5,
+      "model_timing_seconds": [
+        0.803,
+        0.652,
+        27.456,
+        25.29,
+        25.99
+      ],
+      "model_input_tokens": [
+        283,
+        263,
+        19085,
+        19598,
+        19817
+      ],
+      "protected_calls": 0,
+      "report_sha256": "1e3a6bb8710476d6925a2dfe8d9dddbdc0316c760e4ab3c143cb8d6b509b38e1",
+      "pruned_model_sentences": 2,
+      "remaining_runtime_issues": [],
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    }
+  ],
+  "same_question_or_data_not_controlled_latency_ab_test": true,
+  "projection_byte_comparison": {
+    "base": {
+      "model_body_bytes": 30152,
+      "journal_rows": 50,
+      "source_rows": 50,
+      "caller_context_unchanged": true
+    },
+    "candidate": {
+      "model_body_bytes": 22086,
+      "journal_rows": 50,
+      "source_rows": 50,
+      "caller_context_unchanged": true
+    },
+    "basis": "Saved actual receipt, empty tool descriptions; bytes only, no token/latency claim; record identities retained",
+    "plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5"
+  },
+  "saved_actual_draft_replay": {
+    "basis": "saved actual aa7 model drafts and receipts replayed offline, not a new live result",
+    "plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5",
+    "old_final_newly_detected": [
+      "diagnostic_period_coverage_unverified"
+    ],
+    "last_raw_report_issues": [
+      "diagnostic_period_coverage_unverified",
+      "diagnostic_snapshot_is_not_functional_health"
+    ],
+    "discarded_sentences": 3,
+    "remaining_issues": []
+  },
+  "manual_quality_decision": {
+    "at_kst": "2026-11-19T08:29:56.567547+09:00",
+    "state": "not_applied_semantic_and_latency_gaps",
+    "plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5",
+    "latest_detached_seconds": 93.16937539505307,
+    "report_final_synthesis": "pruned_model_report_not_independent_quality_pass",
+    "manual_quality_gaps": [
+      "unsupported design/periodic execution explanation based on oneshot and sampled history",
+      "initial scope prefix is explicit but model still calls its default the requested period",
+      "limitation prose confuses stopped oneshot process and functional interruption",
+      "93.169s isolated execution exceeds 30/60s target; not chat latency"
+    ],
+    "prepared_superseded_roots": [
+      "/var/lib/capstone-evidence-rollout/20261119-report-fb1dbf7127",
+      "/var/lib/capstone-evidence-rollout/20261119-report-f3dd26e662"
+    ],
+    "current_plan_prepared_or_applied": false,
+    "attack_and_training_resumed": false
+  },
+  "intermediate_failures_preserved": [
+    "old initial-note expectations failed after intentional scope extension",
+    "Native evidence pin mismatch refused import",
+    "SDK matching evidence pin mismatch refused import",
+    "embedded root gate mismatch refused invocation",
+    "pruned scope branch NameError caught in fixture",
+    "old legacy row-identity assumption caught missing model-projection identity and was preserved"
+  ],
+  "live_after_cleanup": {
+    "at_kst": "2026-11-19T08:33:50.861005+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "existing_bot_websocket_and_worker_alive": true,
+    "container_identity_image_start_and_restart_count_unchanged": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-19T08:32:38.257829+09:00",
+    "removed_files": 4325,
+    "verified_bytes": 167263730,
+    "actor_jobs_terminal": true,
+    "owned_parent_removed_if_empty": true,
+    "operating_and_rollback_roots_removed": 0,
+    "source_config_model_fw_changes": 0
+  },
+  "prepared_superseded_backups_retained": true,
+  "current_candidate_operating_prepared_or_applied": false,
+  "packages_installed_on_mac": 0,
+  "framework_and_humanize_skill_retained": true,
+  "not_done": [
+    "candidate operating apply and post-apply chats",
+    "30/60 second response target",
+    "global hallucination elimination",
+    "new OS installation",
+    "independent recreation",
+    "attack or training resume"
+  ],
+  "documentation": {
+    "markdown_documents": 23,
+    "unique_prose_templates": 5,
+    "humanize_run": "2026-11-19-008-c258",
+    "route": "light",
+    "change_rate": 0.0005,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0,
+    "warnings": 0
+  },
+  "publication": {
+    "state": "pending_commit_and_push"
+  }
+}

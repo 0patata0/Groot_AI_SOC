@@ -14,3 +14,9 @@
 
 [미적용 SDK 연결 패치](cause-completion.patch)는 해당 원본 SHA에서만 재현하는 자료다. 현재 확정된 operating.patch를 대체하지 않는다.
 <!-- /service-cause-candidate-20261119 -->
+
+
+<!-- service-report-provenance-candidate-20261119 -->
+
+현재 확정된 `operating.patch`는 유지한다. 새 `report-provenance.patch`는 특정14원본의 미적용 후보이며 양방향 복원 SHA를 확인했다. 운영 설치기에 직접 적용하지 않는다. 서비스 현재 조회의 기존 확정 결과는 유지한다. 원인·이력 조사는 현재 수집본과 실제 journal을 함께 읽으며 자동 선택한 최근 구간을 초기 확인 범위로 표시한다. 보고에서 근거를 넘는 문장을 제외하더라도 원래 판단·검토 상태와 조회 범위 안내를 유지한다. 모델·MCP·권한·보호 주소·승인·차단 TTL은 이번 보완의 변경 대상이 아니다. [검증·미적용·남은 문제](report-provenance.validation.json) · [공통 동작](../../hermes/service-query-contract.md).
+<!-- /service-report-provenance-candidate-20261119 -->

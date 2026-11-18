@@ -150,6 +150,40 @@ class ServiceRuntime(unittest.TestCase):
         self.assertEqual(result['service_judgment']['assessment'],'unresolved')
         self.assertEqual(result['protected_calls'],0)
 
+    def test_report_projection_keeps_journal_text_and_scope_with_hashes_in_audit(self):
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        contexts=[json.loads(p[1]['content']) for p in prompts if isinstance(p,list)
+                  and len(p)>1 and isinstance(p[1],dict) and 'content' in p[1]]
+        self.assertTrue(contexts)
+        context=contexts[0]
+        row=next(r for r in context['untrusted_completed_reads'] if r['arguments'].get('journal_scope')=='all')
+        original=next(json.loads(c['result']) for c in result['calls'] if c['arguments'].get('journal_scope')=='all')
+        self.assertEqual(row['data']['returned_entries'],original['returned_entries'])
+        self.assertEqual(row['data']['has_more'],original['has_more'])
+        self.assertEqual(row['data']['requested_since_kst'],original['requested_since_kst'])
+        self.assertEqual(row['data']['entries'],[{k:e[k] for k in
+            ('at_kst','priority','source_units','source_transport','message_state','message_excerpt','record_sha256') if k in e}
+            for e in original['entries']])
+        self.assertIn('model_projection',row['data'])
+        self.assertIn('record_sha256',original['entries'][0])
+        self.assertTrue(all(hashlib.sha256(c['result'].encode()).hexdigest()==c['result_sha256'] for c in result['calls']))
+
+    def test_pruned_service_report_keeps_verified_initial_scope_note(self):
+        bad={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'직접 원인은 미확인입니다. 서비스는 정상 작동 중입니다.',
+            'current_observation':'현재 서비스 관측과 과거 표본은 별도로 조회했습니다.',
+            'evidence_indexes':[0],'limitations':['전체 보존 구간과 기능 영향은 미확인입니다.'],'next_steps':[]}}
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,compact_report=bad,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertNotIn('error_type',result)
+        self.assertGreater(result.get('pruned_unverified_sentences',0),0)
+        self.assertNotIn('정상 작동 중입니다',result['final_response'])
+        self.assertIn('초기 확인 범위',result['final_response'])
+        self.assertIn('사용자가 지정한 사건 시각이 아닙니다',result['final_response'])
+        self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
+        self.assertEqual(result['protected_calls'],0)
+
     def test_both_empty_journals_complete_evidence_without_repeating_or_claiming_health(self):
         result,order,prompts,calls=self.run_case(empty_error_journal=True,empty_all_journal=True,
             question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')

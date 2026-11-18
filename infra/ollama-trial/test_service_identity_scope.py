@@ -186,7 +186,7 @@ class ServiceIdentityScope(unittest.TestCase):
         before=copy.deepcopy(context);note=h.CONTRACT.service_lookup_note(context)
         self.assertIn('37분',note);self.assertIn('수집 관측 시각은 실제 실행 시각과 다릅니다',note)
         self.assertIn('구간 밖',note);self.assertEqual(context,before)
-        for change in ({'lookup_only':False},{'history_window_origin':'user_specified_period'},
+        for change in ({'history_window_origin':'user_specified_period'},
                        {'initial_history_window_minutes':True},{'initial_history_window_minutes':0}):
             self.assertEqual(h.CONTRACT.service_lookup_note({**context,**change}),'')
 
@@ -202,7 +202,10 @@ class ServiceIdentityScope(unittest.TestCase):
                  'initial_history_window_minutes':15}
         rendered=h.CONTRACT.service_lookup_text(text,context)
         self.assertTrue(rendered.endswith(text));self.assertTrue(rendered.startswith('기간을 지정하지 않아'))
-        self.assertEqual(h.CONTRACT.service_lookup_text(text,{**context,'lookup_only':False}),text)
+        cause=h.CONTRACT.service_lookup_text(text,{**context,'lookup_only':False})
+        self.assertTrue(cause.endswith(text))
+        self.assertIn('초기 확인 범위',cause)
+        self.assertIn('추가 조회의 범위',cause)
 
 
 if __name__ == '__main__':

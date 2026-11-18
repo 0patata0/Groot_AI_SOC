@@ -700,5 +700,13 @@
     "actual_two_fresh_cause_chat_trials": 2,
     "isolated_candidate_final_report_admitted": false,
     "validation": "../../validation/service-query/cause-completion.validation.json"
+  },
+  "report_provenance_candidate": {
+    "state": "candidate_not_applied_semantic_and_latency_gaps",
+    "plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5",
+    "operating_source_changes": 0,
+    "latest_isolated_seconds": 93.169,
+    "independent_quality_pass": false,
+    "validation": "../../validation/service-query/report-provenance.validation.json"
   }
 }

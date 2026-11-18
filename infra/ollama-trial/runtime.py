@@ -785,7 +785,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     # the rest of the model's own judgment re-passed all checks.
                     report['pruned_unverified_sentences']=pruned[1]
                     report['pruned_issues']=sorted(set(issues))
-                    final=pruned_text
+                    context=harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
+                        report['at_kst'],harness.service_report_receipts(report['calls']),
+                        background=service_background,
+                        allowed_reads={t.name for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')})
+                    final=harness.CONTRACT.service_lookup_text(pruned_text,context or {})
                 elif issues:
                     report['remaining_issues'] = issues
                     final = (harness.action_fallback(current, report['calls']) if

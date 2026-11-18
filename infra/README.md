@@ -164,3 +164,9 @@ infra/
 
 복합 원인 조사에는 별도 실패가 남아 있다. SDK 필수 조회 연결 후보는3반례와 회귀833검사·Linux 공식38/설치37검사를 통과했지만 실제 격리 실행에서 최종 보고가 수용되지 않았다. 후보 검증과 운영 적용을 구분하며 해당 후보를 배포하지 않는다. [원인·수행·미완료](hermes/service-query-contract.md) · [실제 실패·후보 검증](validation/service-query/cause-completion.validation.json).
 <!-- /service-cause-candidate-20261119 -->
+
+
+<!-- service-report-provenance-candidate-20261119 -->
+
+이번 서비스 보고 후보는 실제 품질 검증을 통과하지 못해 운영에 적용하지 않았다. 서비스 현재 조회의 기존 확정 결과는 유지한다. 원인·이력 조사는 현재 수집본과 실제 journal을 함께 읽으며 자동 선택한 최근 구간을 초기 확인 범위로 표시한다. 보고에서 근거를 넘는 문장을 제외하더라도 원래 판단·검토 상태와 조회 범위 안내를 유지한다. 모델·MCP·권한·보호 주소·승인·차단 TTL은 이번 보완의 변경 대상이 아니다. [검증·미적용·남은 문제](validation/service-query/report-provenance.validation.json) · [공통 동작](hermes/service-query-contract.md).
+<!-- /service-report-provenance-candidate-20261119 -->

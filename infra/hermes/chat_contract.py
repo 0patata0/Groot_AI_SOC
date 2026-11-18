@@ -1222,11 +1222,13 @@ def service_lookup_scope(plan, question):
 def service_lookup_note(context):
     """Explain a registered initial sample without inventing execution times."""
     minutes=context.get('initial_history_window_minutes')
-    if (context.get('lookup_only') is not True
-            or context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
+    if (context.get('history_window_origin')!='initial_recent_sample_not_incident_time'
             or type(minutes) is not int or not 1<=minutes<=1440):return ''
+    outside=('이 구간 밖의 과거 실행·실패는 미확인입니다.' if context.get('lookup_only') is True
+             else '추가 조회의 범위는 아래 실제 근거를 따릅니다.')
     return ('\n\n기간을 지정하지 않아 도구에 등록된 최근 '+str(minutes)+'분 표본을 먼저 조회했습니다. '
-            '수집 관측 시각은 실제 실행 시각과 다릅니다. 이 구간 밖의 과거 실행·실패는 미확인입니다.')
+            '이 구간은 초기 확인 범위이며 사용자가 지정한 사건 시각이 아닙니다. '
+            '수집 관측 시각은 실제 실행 시각과 다릅니다. '+outside)
 
 
 def service_lookup_text(text, context):
@@ -1957,9 +1959,9 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
     for row in context.get('untrusted_completed_reads',[]):
         data=row.get('data',{})
         if isinstance(data,dict) and diagnostic_journal_fields(data).get('journal_valid'):
-            data['entries']=[{k:copy.deepcopy(entry[k]) for k in ('at_kst','priority','source_units','source_transport','message_state','message_excerpt') if k in entry}
+            data['entries']=[{k:copy.deepcopy(entry[k]) for k in ('at_kst','priority','source_units','source_transport','message_state','message_excerpt','record_sha256') if k in entry}
                 for entry in data['entries']]
-            data['model_projection']='All returned message text/time/source/priority/state retained; per-row integrity hashes remain in the original receipt audit.'
+            data['model_projection']='All returned message text/time/source/priority/state and record identity retained; message integrity hashes remain in the original receipt audit.'
     journal_targets={r.get('arguments',{}).get('target') for r in context.get('untrusted_completed_reads',[])
         if r.get('arguments',{}).get('view')=='journal'}
     for row in context.get('untrusted_completed_reads',[]):
@@ -2007,6 +2009,8 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
             'diagnostic_pipeline_pending_unverified':'실제 처리·전송·기한 초과 지표가0인데 대기가 존재한다고 했습니다. 검토 상태의 사건 합계와 구분하세요.',
             'diagnostic_history_return_denied':'해당 구간의 정제 오류 표본이 실제 반환됐는데 전체 조회·반환 실패라고 했습니다. 확보한 표본과 전체 수집 범위를 구분하세요. 별도 journal_excerpt가 있으면 message_excerpt/message_state의 실제 발췌 제공 여부도 확인하세요.',
             'diagnostic_property_value_unverified':'속성을 확인한 대상·시점과 문장 범위가 맞지 않습니다. 현재 스냅샷의 속성은 현재 관측으로, 과거 오류 이력은 해당 과거 구간으로 따로 설명하세요.',
+            'diagnostic_property_observation_time_mismatch':'속성값에 붙인 관측 시각이 같은 대상·값의 현재 수집본과 일치하지 않습니다. soc-investigate의 서비스 조사 절과 해당 수집본의 observed_at_kst를 대조하세요.',
+            'diagnostic_journal_return_count_is_not_truncation':'반환 행 수를 응답 잘림 한도로 바꿨지만 해당 journal의 has_more와 response_size_limited는 false입니다. soc-investigate의 반환·한도·보존 범위를 구분하세요.',
             'diagnostic_report_empty_field':'판단·한계·다음 조치에 빈 값이나 문장부호만 있는 항목이 있습니다. 실제 근거에 연결되는 문장으로 작성하세요. 칸을 채우려고 불필요한 작업을 만들지 마세요.',
             'diagnostic_error_code_total_unverified':'오류 색인 전체 수를 특정 코드의 발생 횟수로 옮겼습니다. 코드별로 반환된 표본과 색인 전체 일치 건수를 구분하세요. 해당 코드의 전체 횟수는 확인되지 않았습니다.',
             'diagnostic_error_code_sample_mismatch':'명시한 코드의 반환 표본 수가 실제 코드별 표본과 다릅니다. 다른 오류 유형이나 전체 색인 수를 해당 코드 표본 수로 사용하지 마세요.',
@@ -2200,7 +2204,8 @@ def diagnostic_journal_fields(data):
             if sha is not None and (not isinstance(sha,str) or not re.fullmatch('[0-9a-f]{64}',sha)):return out
         else:return out
     out.update(journal_valid=True,journal_entries=copy.deepcopy(rows),journal_scope=data['journal_scope'],
-               journal_has_more=data['has_more'],journal_returned_entries=len(rows),unit=data.get('unit'))
+               journal_has_more=data['has_more'],journal_response_size_limited=data['response_size_limited'],
+               journal_returned_entries=len(rows),unit=data.get('unit'))
     if aggregate:out['journal_target_scope']='host_system'
     if codes:out['error_code_observations']=codes
     return out
@@ -2523,7 +2528,7 @@ def diagnostic_exit_claim_violations(text, facts):
 
 def diagnostic_property_claim_violations(text, facts):
     """Literal current properties cannot be borrowed from another snapshot."""
-    issues=set()
+    issues=set(diagnostic_property_time_claim_violations(text,facts))
     for line in text.splitlines():
         clean=re.sub(r'[*`"\']','',line)
         for clause in re.split(r';|(?<=[.!?])\s+',clean):
@@ -2551,6 +2556,75 @@ def diagnostic_property_claim_violations(text, facts):
                     if isinstance(f.get('properties'),dict) and (f.get('diagnostic_mode')=='journal_history')==history}
                 if not values:issues.add('diagnostic_property_value_unverified')
                 elif len(values)==1 and match.groups() not in values:issues.add('diagnostic_property_value_mismatch')
+    return sorted(issues)
+
+
+def diagnostic_property_time_claim_violations(text, facts):
+    """A current property's observation time belongs to that same snapshot.
+
+    Only explicit observation/collection labels activate this check. Event,
+    start, exit and query-window times remain different types of evidence.
+    Minute precision is compared at minute precision, never rounded seconds.
+    """
+    issues=set()
+    stamp_pattern=(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}'
+        r'(?::\d{2}(?:\.\d{1,6})?)?(?:\+09:00|\s*KST)')
+    labelled=(r'(?:관측|수집|스냅샷)\s*(?:시각|시간)?\s*[:=(]?\s*('+stamp_pattern+r')')
+    properties=r'\b(LoadState|ActiveState|SubState|Result|Type|UnitFileState)\s*[:=]\s*([A-Za-z0-9_-]+)'
+    for line in text.splitlines():
+        clean=re.sub(r'[*`"\']','',line)
+        clauses=[clean] if clean.lstrip().startswith('|') else re.split(r';|(?<=[.!?])\s+',clean)
+        for clause in clauses:
+            claims=list(re.finditer(properties,clause))
+            if not claims:continue
+            rows=[f for f in diagnostic_subjects(clause,facts) if f.get('diagnostic_mode')=='snapshot'
+                and isinstance(f.get('properties'),dict)]
+            if not rows:continue  # Other property guards report unavailable/unsupported values.
+            for match in re.finditer(labelled,clause,re.I):
+                literal=match[1]
+                parsed=_diagnostic_instant(re.sub(r'\s*KST$','+09:00',literal,flags=re.I))
+                if parsed is None:continue
+                # A named journal observation is not this property's clock.
+                prefix=clause[max(0,match.start()-32):match.start()]
+                if re.search(r'(?:journal|원문|이력)\s*$',prefix,re.I):continue
+                if re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)',clause[match.end():]):continue
+                precision='second' if re.search(r'[T ]\d{2}:\d{2}:\d{2}',literal) else 'minute'
+                matching=[f for f in rows if all(f['properties'].get(c[1])==c[2] for c in claims)]
+                def same(row):
+                    at=_diagnostic_instant(row.get('observed_at_kst'))
+                    if at is None:return False
+                    if precision=='minute':return at.replace(second=0,microsecond=0)==parsed.replace(second=0,microsecond=0)
+                    if at.replace(microsecond=0)!=parsed.replace(microsecond=0):return False
+                    fraction=re.search(r':\d{2}\.(\d{1,6})',literal)
+                    if fraction:
+                        scale=10**(6-len(fraction[1]))
+                        return at.microsecond//scale==parsed.microsecond//scale
+                    return True
+                subjects={row.get('target') for row in rows}
+                if matching and not all(any(row.get('target')==target and same(row) for row in matching)
+                        for target in subjects):
+                    issues.add('diagnostic_property_observation_time_mismatch')
+    return sorted(issues)
+
+
+def diagnostic_journal_limit_claim_violations(text, facts):
+    """Returned rows are not proof that the response was cut at that count."""
+    issues=set()
+    for line in text.splitlines():
+        for clause in re.split(r';|(?<=[.!?])\s+',re.sub(r'[*`]', '',line)):
+            rows=[f for f in diagnostic_subjects(clause,facts) if f.get('journal_valid') is True
+                and f.get('journal_has_more') is False and f.get('journal_response_size_limited') is False]
+            if not rows:continue
+            pattern=(r'(?:반환\s*(?:표본|로그|원문|행)?|(?:조회|journal_scope\s*=\s*(?:all|errors))[^.!?;]{0,30}표본)'
+                r'[^.!?;]{0,32}?(?P<count>\d+)\s*(?:건|행)(?:으로|만|에서)?\s*'
+                r'(?:제한(?:되(?:었)?|됐|하여|해서|됨)|잘(?:렸|림)|잘라)')
+            for match in re.finditer(pattern,clause,re.I):
+                after=clause[match.end():]
+                if claim_modality(after) in ('not_asserted','conditional_or_unverified'):continue
+                negative=re.match(r'지\s*않(?:았(?:습니다|음|다)?|습니다|음|으며|는다|는|은)',after)
+                if negative and not re.match(r'\s*(?:는\s*)?(?:것은|건|것이)\s*(?:아니|아닙|아님)',after[negative.end():]):continue
+                if any(f.get('journal_returned_entries')==int(match['count']) for f in rows):
+                    issues.add('diagnostic_journal_return_count_is_not_truncation')
     return sorted(issues)
 
 
@@ -2926,7 +3000,8 @@ def rejected_claim_sentences(prose, facts, issues):
     if not wanted or not isinstance(prose, str) or not isinstance(facts, list):
         return []
     checks = [snapshot_health_violations]
-    for name in ('diagnostic_period_claim_violations', 'diagnostic_duration_claim_violations'):
+    for name in ('diagnostic_period_claim_violations', 'diagnostic_duration_claim_violations',
+                 'diagnostic_property_claim_violations'):
         if callable(globals().get(name)):
             checks.append(globals()[name])
     out, seen = [], set()
@@ -3101,7 +3176,7 @@ def diagnostic_period_claim_violations(text, facts):
     sample observation or an explicit unknown is still reportable.
     """
     if not any(f.get('kind')=='diagnostics' for f in facts):return []
-    issues=set()
+    issues=set(diagnostic_journal_boundary_claim_violations(text,facts))
     period=(r'내내|전\s*(?:구간|기간)|(?:구간|기간|시간대)(?:의|에는|은|는|에)?\s*전체|'
             r'(?:전체|모든)\s*(?:구간|기간|시간대)|throughout|entire\s+(?:period|window|interval)')
     predicate=(r'(?<!비)정상|성공|실패|오류|장애|건강|시작\s*[·/]\s*종료|'
@@ -3129,6 +3204,47 @@ def diagnostic_period_claim_violations(text, facts):
                     r'(?:단정|확정|판단|보장|입증)(?:할\s*수)?\s*(?:없|못|하지\s*않)',after):continue
             issues.add('diagnostic_period_coverage_unverified')
             break
+    return sorted(issues)
+
+
+def diagnostic_journal_boundary_claim_violations(text, facts):
+    """Explicit journal query endpoints must match a recorded query.
+
+    Unzoned displayed dates use this report's KST display contract. A returned
+    entry's event time cannot replace the requested query start or end.
+    """
+    issues=set()
+    stamp=(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,6})?)?'
+           r'(?:\+09:00|\s*KST)?(?![\d:+.Z-])')
+    query=(r'journal(?:_scope\s*=\s*(?P<scope>all|errors))?\s*조회\s*[:(]?\s*'
+           r'(?P<at>'+stamp+r')\s*(?P<edge>이전|이후|까지|부터)')
+    for line in text.splitlines():
+        if line.lstrip().startswith(('>','```')):continue
+        for clause in re.split(r';|(?<=[.!?])\s+',re.sub(r'[*`]', '',line)):
+            for match in re.finditer(query,clause,re.I):
+                if claim_modality(clause[match.end():]) in ('not_asserted','conditional_or_unverified'):continue
+                rows=[f for f in diagnostic_subjects(clause,facts) if f.get('journal_valid') is True
+                      and (not match['scope'] or f.get('journal_scope')==match['scope'].lower())]
+                if not rows:continue
+                literal=re.sub(r'\s*KST$','+09:00',match['at'],flags=re.I)
+                if not literal.endswith('+09:00'):literal+='+09:00'
+                claimed=_diagnostic_instant(literal)
+                if claimed is None:continue
+                key='requested_until_kst' if match['edge'] in ('이전','까지') else 'requested_since_kst'
+                minute=not re.search(r'[T ]\d{2}:\d{2}:\d{2}',literal)
+                def same(row):
+                    at=_diagnostic_instant(row.get(key))
+                    if at is None:return False
+                    if minute:return at.replace(second=0,microsecond=0)==claimed.replace(second=0,microsecond=0)
+                    if at.replace(microsecond=0)!=claimed.replace(microsecond=0):return False
+                    fraction=re.search(r':\d{2}\.(\d{1,6})',literal)
+                    if fraction:
+                        scale=10**(6-len(fraction[1]))
+                        return at.microsecond//scale==claimed.microsecond//scale
+                    return True
+                if not all(any(r.get('target')==target and same(r) for r in rows)
+                           for target in {r.get('target') for r in rows}):
+                    issues.add('diagnostic_period_coverage_unverified')
     return sorted(issues)
 
 
@@ -3195,6 +3311,7 @@ def snapshot_health_violations(text, facts):
     issues.update(diagnostic_error_code_count_violations(text,facts))
     issues.update(diagnostic_period_claim_violations(text,facts))
     issues.update(diagnostic_duration_claim_violations(text,facts))
+    issues.update(diagnostic_journal_limit_claim_violations(text,facts))
     host_rows=[f for f in facts if f.get('kind')=='diagnostics']
     if host_rows and all(f.get('journal_target_scope')=='host_system' for f in host_rows):
         names={u for f in host_rows for row in f.get('journal_entries',[]) for u in row.get('source_units',[])}
@@ -3228,7 +3345,8 @@ def snapshot_health_violations(text, facts):
         prose=re.sub(r'(?m)^(?:INCIDENT_DISPOSITION|MANAGEMENT_STATUS):[^\n]*$','',text)
         for clause in re.split(r'\n|;|(?<=[.!?])\s+|이며,?\s*|으며,?\s*',re.sub(r'[*`]', '',prose)):
             pattern=(r'(?:오류|장애|에러|실패)(?P<subject>[^\n.!?;]{0,30}?)'
-                r'(?:(?:관측|확인|발견)되지\s*않(?:았|음|습)|(?:발생|존재)하지\s*않(?:았|음|습))')
+                r'(?:(?:관측|확인|발견)되지\s*않(?:았|음|습)|(?:발생|존재)하지\s*않(?:았|음|습)|'
+                r'(?P<absence>없(?:었|습니다|음|는|으며|고|어|으므로|으나|(?=다))))')
             for match in re.finditer(pattern,clause):
                 # "오류의 원인은 확인되지 않았다" leaves the cause unknown;
                 # it does not claim the error itself was absent. Keep checking
@@ -3244,6 +3362,14 @@ def snapshot_health_violations(text, facts):
                         re.match(r'[^()]*\)\s*(?:은|는|이|가|을|를)?\s*(?:확인|관측|발견)',clause[match.start():])):
                     continue
                 prefix=clause[:match.end()];after=clause[match.end():]
+                if match['absence']:
+                    if claim_modality(after) in ('not_asserted','conditional_or_unverified'):continue
+                    near=re.split(r'(?:지만|건이고|나왔고|됐고|했고|있고|없고|이며|으며|으나|으므로|어서|[;,])\s*',
+                        clause[:match.start()])[-1]+match['subject']
+                    if re.search(r'표본|반환|검색\s*결과|발췌',near):continue
+                    if re.match(r'\s*\(\s*(?:반환|표본|검색\s*결과|발췌)',after):continue
+                    issues.add('sample_zero_presented_as_absence')
+                    continue
                 if re.search(r'표본|반환|검색\s*결과|발췌',prefix) and not re.search(r'전체|모든',prefix):continue
                 if re.search(r'(?:다고|다는|는지|는지는|는다는)\s*(?:것|판정|주장)?\s*(?:을|은|는)?\s*(?:미확인|단정.{0,10}(?:없|못|않)|확인.{0,6}(?:불가|못))',after):continue
                 issues.add('sample_zero_presented_as_absence')
@@ -3291,10 +3417,16 @@ def snapshot_health_violations(text, facts):
         termination=re.match(r'\s*종료',after)
         oneshot_termination=re.match(r'적인\s*작업\s*완료\s*후\s*종료일\s*수\s*있',after)
         if termination or oneshot_termination:
-            line=text[text.rfind('\n',0,match.start())+1:text.find('\n',match.end()) if '\n' in text[match.end():] else len(text)]
+            line_start=text.rfind('\n',0,match.start())+1
+            prefix=text[line_start:match.start()]
+            boundaries=list(re.finditer(r'(?<=[.!?])\s+',prefix))
+            if boundaries:line_start+=boundaries[-1].end()
+            end=re.search(r'\n|(?<=[.!?])\s+',text[match.end():])
+            line_end=match.end()+end.start() if end else len(text)
+            line=text[line_start:line_end]
             rows=diagnostic_subjects(line,facts)
             values=[f['process_termination'] for f in rows if f.get('process_termination')]
-            prior=text[max(0,text.rfind('\n',0,match.start())+1):match.start()]
+            prior=text[line_start:match.start()]
             past=[m.start() for m in re.finditer(r'과거|당시|이력|오류\s*(?:표본|기록)|process_exit',prior)]
             present=[m.start() for m in re.finditer(r'현재|지금|마지막\s*메인',prior)]
             if ((not past or present and max(present)>max(past)) and values
@@ -3304,7 +3436,7 @@ def snapshot_health_violations(text, facts):
                     and all(v.get('kind')=='exited' and v.get('exit_status')==0 for v in values)):continue
         # Only a directly attached negative predicate can qualify this claim.
         # A disclaimer elsewhere must not excuse a separate positive claim.
-        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)\s*(?:상태\s*)?'
+        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:상태\s*)?'
                 r'(?:을|를|임을|함을)?\s*(?:증명|입증|보장|의미|뜻)하지\s*않'
                 r'(?:습니다|으며|는다|음)(?=\s|[.,;!?|*`)]|$)',after):continue
         if re.match(r'\s*진입까지\s*(?:모니터링|확인|검증)(?:이|은|는)?\s*필요(?=\s|합니다|[.,;!?|*`(]|$)',after):continue

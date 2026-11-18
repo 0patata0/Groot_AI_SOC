@@ -1,5 +1,11 @@
 # Agentic SOC 실행 계획
 
+
+<!-- service-report-provenance-candidate-20261119 -->
+
+남은 검토는 복합 질문의 새 표현, 원문과 판단의 범위 일치, 실제 채팅 지연이다. 문장 검사는 제한된 형식을 다루므로 모든 할루시네이션을 차단했다고 표현하지 않는다. 회귀 실행을 합산한 수를 독립 정확도나 일반 30/60초 SLO로 사용하지 않는다. 기존 `scope=None` 레거시 반례의 실패는 원본·후보에 동일하게 남아 있다. 별도 승인 대기인 관리자 시각 변경과 Response MCP 후보, 공격 시험 중단, 새 OS 설치와 실제 발표도 이 작업으로 완료되지 않는다. [검증·미적용·남은 문제](infra/validation/service-query/report-provenance.validation.json) · [공통 동작](infra/hermes/service-query-contract.md).
+<!-- /service-report-provenance-candidate-20261119 -->
+
 <!-- coordinator-native-systemd-20261119 -->
 A/B/C27유닛의 운영 모드 읽기와 별도 systemd 합성6조건을 확인했다. 다음에는 운영 root 진입점과 Lifecycle.recover, 캐시·전역 정지·SSH 자식·B Docker를 연결한 전체 복구 및 실제 재부팅 조건을 검증한다. 시험용 변환을 운영 검증으로 승계하지 않는다. 현재 소스·모델·MCP 스키마·권한을 다시 대조하고 전체 payload 동결→공식 Harness²/회귀→정확 승인→관리자 경유 적용→새 실제 MCP·두 봇 채팅을 따른다. 기존 관리19/journal9 승인과 NTP390a 승인 대기는 그대로 유지한다.
 

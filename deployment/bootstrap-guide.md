@@ -134,3 +134,13 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 ## IPv4 전용 기본 정책
 
 새 설치의 prerequisites는 Docker 준비 후 역할 적용 전에 `ipv4_only.py`로 호스트 IPv6 주소·수신·전용 테이블과 재생성 설정을 정리한다. 기존 운영은 초기 설치기로 덮지 않고 `deploy.sh --ipv4-only`의 per-host 복구/검증 경로를 사용한다. IPv6 Docker network가 이미 활성화된 호스트는 자동 이관하지 않는다. [실제 범위·제약](../infra/mcp/fw-consolidation.md). 새3VM 전체 설치는 미시험이다.
+
+<!-- response-rpc-input-20261118 -->
+## 응답 MCP tools/call 입력형 보완 후보 — 2026-11-18
+
+초기 설치 진입점 deploy.sh는 기존 soc_management와 soc_runtime.render를 통해 같은 정본 소스를 설치한다. 실제 렌더 사본의 stdio 입력 검사도 통과했다. 갱신한 소스와 회귀 파일을 오프라인 소스 묶음에 포함하며 새 패키지·이미지·포트·키·설정 값은 없다. 운영 서버를 초기 설치기로 덮어쓰지 않는다. 새 OS 전체 설치 검증은 미수행이다.
+
+관리자231 경유 조회에서 A의 /opt/capstone-soc/response-mcp.py는 기존1.2.0 소스와 같은 SHA임을 확인했다. 후보1.2.1의 SHA는 f911e8d9274686589c51145d52386c452ce0616085dd09b795c121d835758bc2다. 적용 대상은 이 파일 하나이며 정확 후보 승인을 기다린다. 변경 전 해시·root:root/0600·보호 파일을 대조하고 백업과5분 독립 원복 타이머를 준비한 뒤 교체한다. 운영 적용·기존 봇 연결의 재로드·새 실제 채팅 검증은 미수행이다.
+
+[입력 검사와 범위](../infra/mcp/firewall-read.md#response-rpc-input-20261118)
+<!-- /response-rpc-input-20261118 -->

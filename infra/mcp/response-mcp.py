@@ -375,7 +375,7 @@ def handle(msg):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": ver,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-response-mcp", "version": "1.2.0"},
+            "serverInfo": {"name": "capstone-response-mcp", "version": "1.2.1"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None  # notification, no reply
@@ -384,9 +384,16 @@ def handle(msg):
     if method == "tools/list":
         return {"jsonrpc": "2.0", "id": mid, "result": {"tools": TOOLS}}
     if method == "tools/call":
-        params = msg.get("params") or {}
+        params = msg.get("params")
+        if not isinstance(params, dict):
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "tools/call params must be an object"}}
         name = params.get("name")
-        args = params.get("arguments") or {}
+        if not isinstance(name, str):
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "tool name must be a string"}}
+        # Only omission means no arguments; null/scalars/arrays are invalid.
+        args = params.get("arguments", {})
+        if not isinstance(args, dict):
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "tool arguments must be an object"}}
         res = call_tool(name, args)
         if res is None:
             return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "unknown tool: %s" % name}}

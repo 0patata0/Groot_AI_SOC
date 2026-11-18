@@ -729,3 +729,13 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 11/7 관리자 SSH/보고 이력 보완은 기존 Python·Suricata·soc_bot.py 설치 경로와 생성 JSON을 사용한다. 추가 deb/wheel/이미지 반입 항목은 없으며 초기 보고 이력은 빈 목록이다. [검증 범위](../infra/validation/admin-ssh/README.md).
 
 11/8 23:18 후속: 등록 journal reader는 A/B/C 운영 및 양봇 연결 확인을 마쳤다. 공개 진단 코드 과도 마스킹을 canonical `infra/mcp/diagnostic_journal.py`에서 보완했으며 기존 `deploy.sh` 복사 경로를 사용한다. 신규 패키지·이미지·TCP 포트0, 반입 목록 추가0. 새 OS 전체 설치는 미시험이다. [현재 검증](../infra/mcp/journal-excerpts.md).
+
+<!-- response-rpc-input-20261118 -->
+## 응답 MCP tools/call 입력형 보완 후보 — 2026-11-18
+
+초기 설치 진입점 deploy.sh는 기존 soc_management와 soc_runtime.render를 통해 같은 정본 소스를 설치한다. 실제 렌더 사본의 stdio 입력 검사도 통과했다. 갱신한 소스와 회귀 파일을 오프라인 소스 묶음에 포함하며 새 패키지·이미지·포트·키·설정 값은 없다. 운영 서버를 초기 설치기로 덮어쓰지 않는다. 새 OS 전체 설치 검증은 미수행이다.
+
+관리자231 경유 조회에서 A의 /opt/capstone-soc/response-mcp.py는 기존1.2.0 소스와 같은 SHA임을 확인했다. 후보1.2.1의 SHA는 f911e8d9274686589c51145d52386c452ce0616085dd09b795c121d835758bc2다. 적용 대상은 이 파일 하나이며 정확 후보 승인을 기다린다. 변경 전 해시·root:root/0600·보호 파일을 대조하고 백업과5분 독립 원복 타이머를 준비한 뒤 교체한다. 운영 적용·기존 봇 연결의 재로드·새 실제 채팅 검증은 미수행이다.
+
+[응답 MCP 검증 원장](../infra/mcp/response-rpc.validation.json)
+<!-- /response-rpc-input-20261118 -->

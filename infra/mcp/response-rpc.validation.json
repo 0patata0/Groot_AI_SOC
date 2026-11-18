@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-18T12:31:34.840330+09:00",
+  "scope": "tools/call containers before four existing tools; not full JSON-RPC conformance",
+  "status": "candidate tested; exact approval pending; not deployed",
+  "plan_sha256": "b66d662aa3b0227d11d9705f4412967ba88d050c48fbe66eb813c92741194f04",
+  "target": {
+    "path": "/opt/capstone-soc/response-mcp.py",
+    "before_sha256": "cffa1ac71cfcc9a2212be1f91e2d798d2b5d8b35c238dd609661616a79e98405",
+    "candidate_sha256": "f911e8d9274686589c51145d52386c452ce0616085dd09b795c121d835758bc2",
+    "candidate_source": "infra/mcp/response-mcp.py",
+    "owner": "root:root",
+    "mode": "0600",
+    "server_version_before": "1.2.0",
+    "server_version_candidate": "1.2.1"
+  },
+  "protected_unchanged": {
+    "/opt/resp/response-mcp.py": "8d664ef33ff8c6be866c8e0876a2981540e2fc5056b1fd7d63019c4ee2812e22",
+    "/usr/local/sbin/capstone-response-mcp": "a5d8cc966a91561ea7d14f12ec723ea754a79b743fab1c65c2f3dd33a530c65e",
+    "/usr/local/libexec/capstone-response-apply": "2387265201472570c2551836c0d5374f893fad2f787a5312373d59b04150117c"
+  },
+  "tool_count": 4,
+  "tool_schema_sha256": "505dcf219e305be779d68c65d70e827246ddf7aefa64c93586593601ba8f5ab8",
+  "source_only_handle_ast_changed": true,
+  "tests": {
+    "local": {
+      "rpc": 7,
+      "firewall": 5,
+      "common_harness": 9,
+      "root_entrypoint": 6,
+      "installer": 47,
+      "approval": 7,
+      "total": 81
+    },
+    "linux_isolated": {
+      "executor_uid": 65534,
+      "rpc": 6,
+      "firewall": 5,
+      "approval": 7,
+      "root_entrypoint": 6,
+      "total": 24,
+      "first_fixture_procfs_failure_preserved": true,
+      "production_source_same_sha": true
+    },
+    "actual_kernel_root_cache_owner": "not verified by mocked fixtures",
+    "actual_bot_chat": "not performed",
+    "operating_deployment": "not performed"
+  },
+  "rollback": {
+    "isolated_conditions": 5,
+    "all_passed": true,
+    "independent_timer_prepared_not_installed": true
+  },
+  "failure_history": [
+    "initial draft child argv count and string-name classification corrected before adopted red/green",
+    "Linux initial firewall fixture read real procfs as nobody; explicit procfs fixture substituted; production permissions unchanged"
+  ],
+  "test_files": {
+    "infra/mcp/response-mcp.py": "f911e8d9274686589c51145d52386c452ce0616085dd09b795c121d835758bc2",
+    "infra/mcp/test_response_rpc.py": "209fb03ccda680cc2c334e34214e05c392e5eeb4250215a8fc694fddb449fef1",
+    "infra/mcp/test_firewall_read.py": "8162c9ad84b6d458110f08db4f63777f7c50aa32a5acc2dbe3ab6c6226238643",
+    "infra/mcp/test_response_approval.py": "d35928ca8ea8fd8d13d8bb99e54e992a2cf5e86f4435b2c0a8cdc141e4246f0a",
+    "deployment/response_entrypoint.py": "a5d8cc966a91561ea7d14f12ec723ea754a79b743fab1c65c2f3dd33a530c65e",
+    "deployment/tests/test_response_entrypoint.py": "a1a5af37df4901d97914029494cf08d36b461a17e56f6cfa352ee3d15a95e69a"
+  },
+  "operating_code_changes": 0,
+  "operating_tool_calls": 0,
+  "model_calls": 0,
+  "attacks": 0,
+  "training": 0,
+  "new_packages_images_ports_keys": 0,
+  "paper_frozen_source": "4fcbbf4bf2ca89f8bea0b1bd69b67545e2b6f9c3",
+  "paper_fixed_failure_record_preserved": true,
+  "paper_body_docx_pdf_unchanged": true,
+  "review": {
+    "manual_defect_first": true,
+    "review_agent": "skill unavailable",
+    "semgrep": "not run",
+    "Harness2": "not rerun in this MCP server-only unit; harness/skills/model/tool schemas unchanged"
+  },
+  "humanize": {
+    "run": "2026-11-18-017-5735",
+    "route": "light",
+    "change_rate_percent": 0.03,
+    "grade": "B",
+    "self_checks": "6/6",
+    "gate_exit": 0
+  },
+  "spec": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"
+}

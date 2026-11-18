@@ -38,8 +38,14 @@ class FirewallRead(unittest.TestCase):
             self.assertNotIn('shell',kw)
             kw['stdout'].write(json.dumps({'nftables':fixture()['objects']}).encode())
             return type('P',(),{'returncode':0})()
-        with patch.object(m.subprocess,'run',side_effect=command):
-            self.assertEqual(m._fw_capture()['counts']['rule'],1)
+        # The protocol fixture must not depend on the host's procfs access.
+        with patch.object(m.subprocess,'run',side_effect=command), patch.object(m,'Path') as paths:
+            paths.return_value.exists.return_value=True
+            paths.return_value.read_text.return_value='filter\nnat\n'
+            captured=m._fw_capture()
+            self.assertEqual(captured['counts']['rule'],1)
+            self.assertEqual(captured['legacy_tables'],{'ipv4':['filter','nat'],'ipv6':['filter','nat']})
+            self.assertTrue(captured['coverage_warnings'])
         with patch.object(m,'_fw_cache'), patch.object(m,'_fw_capture',side_effect=ValueError('nft unavailable')):
             result=m.firewall_rules({})
         self.assertTrue(result['isError']);self.assertIn('미완료',result['content'][0]['text'])

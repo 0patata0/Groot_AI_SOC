@@ -8,6 +8,7 @@
 | 사건보고·복구 | 학습 모델 공통 처리·호스트 선택13파일을22:27 KST 확정. Mac/Linux각145·H2각38·설치각37·정본Native429 통과 | Native WAF/IDS 빈 표·systemd 지표와 SDK B 범위 확인. B Vector not-found 스냅샷은 전체 정상/장애 판정이 아님. 브라우저 미검수 |
 | Malvex 참고 | 고정75d86748 소스9파일 검토·기존 조사 스킬2문단 보완·공식 구조25→27/상시 증가0. 프레임워크 설치·MCP 추가0 | 상세 [관측·반영·한계](infra/validation/management-latency/README.md). 정적 샘플 재사용을 라이브 상태 조회에 그대로 적용하지 않음 |
 | 논문 | 2025년 기준6장·국문 초록 삭제·서론부터1~89쪽. 표지/목차 무번호·전체95쪽/1,899구간·목차143항목/꼬리말 전수 확인·표지2문구 삭제/팀원3명 표시 | 학교값·사진·학번·새 OS 설치·독립 재구현·추가 실측·고정 MCP 입력형 보완은 별도 |
+| 응답 MCP 입력형 | tools/call 공통 검사1.2.1 후보·로컬81/Linux격리24·원복5조건 | 정확 후보 승인 대기·운영1.2.0 유지·기존 봇 재로드/새 채팅 미검증 |
 | 발표자료 | 11/17 근거의20쪽·본문16/부록4·685초 계획 대본. 학습본 운용·실측6대화·혼합93요청·독립 평가 한계를 반영하고 PPTX/PDF·편집 표/차트·메모 검수 | 학교 발표 시간/제출 형식·실제 발표 환경 실행·리허설·12/1 최종 발표 |
 | TLS 반복 경고 | 서비스의 loopback 전용 IP 제한에서 timeout 재현. 고정 프록시172.18.0.3:8443와 그/32만 허용한 후보의 native26검사·unit 구문·실제 TLS helper 검증 통과 | 정확 후보 승인·독립 원복·설치 경로 연결·운영 unit/status/journal/색인 확인. 공개443 가용성은 별도 |
 | systemd 실패 | 설치 MCP의24시간 조회에서 반환된5건을 과거 시험 유닛과 대조. B 현재 failed0·해당5유닛 not-found/inactive | 전체 사건 수로 확대하지 않음. 신뢰된 시험 이력과 실제 새 장애를 구분하는 보고·LLM 복구 연결 |
@@ -16,6 +17,11 @@
 | 조정 실행기 | 15모듈·19보조 파일·50소스·39제어 문서. Mac252·Linux252/생략0·root 격리 namespace5조건 | 실제 systemd·부팅·독립 복구·전체 payload/정확 승인·MCP/봇 인수 |
 | 공식 Harness² | 실제 Native runtime policy 사본을 포함해49→50소스·Native19/SDK20/관리14.22:25 KST 운영 passed·영수증 대조 | 기존 동일 정책2사본을 이제 감사하여 census가 늘었음. 새 prompt 주입이 아니며 구조 통과와 정확도·4도구 E2E는 구분 |
 | 룰 제안·자산 | WAF/Suricata/Wazuh 커스텀 제안 도구와 로컬 판넬 로고13개·Method PNG/SVG 보존 | 새 공격의 자율 판단→승인→엔진 반영 E2E, Wazuh 룰 수·실제 로드 재검증은 미수행 |
+
+
+<!-- response-rpc-input-20261118 -->
+[입력 검사·범위·운영 미적용](infra/mcp/firewall-read.md#response-rpc-input-20261118) · [검증 원장](infra/mcp/response-rpc.validation.json)
+<!-- /response-rpc-input-20261118 -->
 
 ## 다음 작업과 경계
 

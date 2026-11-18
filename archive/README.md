@@ -161,3 +161,9 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 <a id="thesis-cover-20261118"></a>
 표지 문구2개 삭제와 기존 팀원3명의 표기·생성기/출력 검수는 [상태](STATUS_HISTORY.md#thesis-cover-20261118)·[계획](PLAN_HISTORY.md#thesis-cover-20261118)·[설계](DESIGN_ALTERNATIVES.md#thesis-cover-20261118)·[검증](DIAGNOSTIC_HISTORY.md#thesis-cover-20261118) 이력에 보존했다.
+
+<!-- response-rpc-input-20261118 -->
+## 응답 MCP tools/call 입력형 보완 후보 — 2026-11-18
+
+로컬81·Linux격리24·원복5조건을 확인한 개발 후보이며 운영 적용은 정확 승인 대기다. [현황](STATUS_HISTORY.md#response-rpc-input-20261118) · [계획](PLAN_HISTORY.md#response-rpc-input-20261118) · [적용 준비](DEPLOYMENT_HISTORY.md#response-rpc-input-20261118) · [선택 근거](DESIGN_ALTERNATIVES.md#response-rpc-input-20261118) · [실패·검사](DIAGNOSTIC_HISTORY.md#response-rpc-input-20261118)
+<!-- /response-rpc-input-20261118 -->

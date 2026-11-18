@@ -267,11 +267,14 @@
     "grounding4_pins2_embedded_management_gate": true
   },
   "publication": {
-    "status": "pending",
-    "expected_public_files": 18,
-    "source_test_files": 2,
-    "documentation_files": 15,
-    "validation_files": 1
+    "state": "content_published",
+    "content_commit": "d1c94bb2505c9b644207b4ed5660e364dbb4473e",
+    "remote_main_at_content_publication": "d1c94bb2505c9b644207b4ed5660e364dbb4473e",
+    "remote_match_at_kst": "2026-11-18T16:15:32.810745+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 18,
+    "secret_scan_tracked_files": 2410,
+    "new_secret_findings": 0
   },
   "operating": {
     "applied_at_kst": "2026-11-18T15:56:57.224247+09:00",
@@ -1175,5 +1178,17 @@
       "at_kst": "2026-11-18T16:04:43.537595+09:00"
     },
     "second_question_reposted": false
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-022-a58f",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0016,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "diagnostician_and_finalizer": "not required by light successful gate",
+    "receipt_update": "structured publication metadata with existing reviewed wording retained"
   }
 }

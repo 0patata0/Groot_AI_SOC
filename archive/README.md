@@ -148,3 +148,6 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 
 [읽기 경로의 실제 승격 시험](../infra/validation/management-latency/read-activation.validation.json)은 설치 사본 회귀와 일반 Hermes 채팅 실패, 원복 후 검증을 구분한다.
+
+<a id="thesis-page-one-20261118"></a>
+국문 초록 삭제와 서론1쪽 시작의 결과·계획·구역 설계·검수는 [상태](STATUS_HISTORY.md#thesis-page-one-20261118)·[계획](PLAN_HISTORY.md#thesis-page-one-20261118)·[설계](DESIGN_ALTERNATIVES.md#thesis-page-one-20261118)·[진단](DIAGNOSTIC_HISTORY.md#thesis-page-one-20261118) 이력에 연결했다. 운영 배포 변경은 없다.

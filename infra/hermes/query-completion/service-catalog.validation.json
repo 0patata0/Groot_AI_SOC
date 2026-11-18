@@ -631,7 +631,25 @@
     "Previous TLS observer run, next09:00 schedule and public Internet route remain distinct scopes"
   ],
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_commit_pushed_and_remote_equal",
+    "content_commit": "9289cfc4420e807ed0661c3fa6a2fce66572a31f",
+    "verified_at_kst": "2026-11-19T06:07:43.982836+09:00",
+    "published_paths": 32,
+    "public_markdown_documents": 23,
+    "credential_values_or_auth_traces_recorded": false,
+    "followup_status_receipt_committed_separately": true,
+    "live_observation_remains_2026_11_18_not_repeated_2026_11_19": true,
+    "scanner": {
+      "tracked_paths": 2431,
+      "unsafe_paths": 0,
+      "known_synthetic_or_code_matches": 10,
+      "new_matches": 0,
+      "coverage": "current tracked working-tree; frozen candidate hashes checked separately; not history"
+    },
+    "documentation": {
+      "new_broken_relative_links": 0,
+      "historical_relative_link_occurrences_unchanged": 813
+    }
   },
   "documentation": {
     "public_documents": 23,

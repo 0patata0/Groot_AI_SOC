@@ -228,5 +228,5 @@ systemd 조회5건의 과거 시험 이력과 현재 상태를 분리해 보고�
 
 <!-- service-query-publication-20261118 -->
 
-[현재 검증·복구·Git 상태](STATUS.md) · [서비스 조회 계약](infra/hermes/service-query-contract.md)
+[완료·미수행·게시 결과](STATUS.md) · 내용 `9289cfc4420e807ed0661c3fa6a2fce66572a31f` / 원격 확인 `2026-11-19T06:07:43.982836+09:00`.
 <!-- /service-query-publication-20261118 -->

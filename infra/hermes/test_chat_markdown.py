@@ -4,10 +4,57 @@ import sys
 import unittest
 from types import SimpleNamespace
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from chat_markdown import normalize_tables,labeled_report_tables
+from chat_markdown import normalize_tables,labeled_report_tables,public_control_text,split_tables
 import review_channel_policy as policy
 
 TABLE='| 항목 | 상태 |\n|---|---|\n| IDS | 정상 |'
+
+class PublicControlTests(unittest.TestCase):
+    def test_only_trailing_transport_copy_changes_and_is_idempotent(self):
+        body='**판단**\n영향은 미확인입니다.\n\n'+TABLE
+        original=body+'\n\nINCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review\n'
+        self.assertEqual(public_control_text(original),body)
+        self.assertEqual(public_control_text(public_control_text(original)),body)
+        self.assertIn('INCIDENT_DISPOSITION:',original)
+
+    def test_fenced_quoted_indented_raw_and_comment_examples_are_preserved(self):
+        controls='INCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review'
+        for text in ('```text\n'+controls+'\n```','~~~~\n'+controls,
+                     '> '+controls.replace('\n','\n> '),'    '+controls.replace('\n','\n    '),
+                     '<pre>\n'+controls,'<div>\n'+controls,'<!--\n'+controls):
+            with self.subTest(text=text):self.assertEqual(public_control_text(text),text)
+
+    def test_nested_short_fence_and_controls_in_the_body_are_not_a_footer(self):
+        for text in ('````\n```\nMANAGEMENT_STATUS: resolved',
+                     'MANAGEMENT_STATUS: resolved\n이것은 문서의 예시입니다.',
+                     '설명: MANAGEMENT_STATUS: resolved',r'\MANAGEMENT_STATUS: resolved'):
+            self.assertEqual(public_control_text(text),text)
+
+    def test_closed_examples_do_not_hide_a_real_trailing_footer(self):
+        body='```text\nMANAGEMENT_STATUS: resolved\n```\n\n'+TABLE
+        self.assertEqual(public_control_text(body+'\nMANAGEMENT_STATUS: needs_review'),body)
+
+    def test_crlf_blank_lines_and_single_status_do_not_change_table_cells(self):
+        body=TABLE.replace('\n','\r\n')
+        self.assertEqual(public_control_text(body+'\r\n\r\nMANAGEMENT_STATUS: needs_review\r\n\r\n'),body)
+        self.assertEqual(public_control_text(TABLE+'\n\n'),TABLE+'\n\n')
+
+    def test_native_splitter_removes_controls_before_packing_and_keeps_all_rows(self):
+        body='| IP | 결과 |\n| --- | --- |\n'+''.join('| 192.0.2.'+str(i)+' | 관측 |\n' for i in range(20))
+        source=body+'\nINCIDENT_DISPOSITION: {"evidence_tools":["mcp__resp__list_blocks"]}\nMANAGEMENT_STATUS: needs_review'
+        def fallback(text,max_length,len_fn):return [text]
+        parts=split_tables(source,180,fallback=fallback)
+        self.assertGreater(len(parts),1)
+        for part in parts:
+            self.assertLessEqual(len(part),180);self.assertNotIn('MANAGEMENT_STATUS',part);self.assertNotIn('INCIDENT_DISPOSITION',part)
+        rows=[l for part in parts for l in part.splitlines() if l.startswith('| 192.0.2.')]
+        self.assertEqual(rows,[l for l in body.splitlines() if l.startswith('| 192.0.2.')])
+
+    def test_review_uses_the_common_public_control_filter(self):
+        code='```text\nMANAGEMENT_STATUS: resolved\n```'
+        text=policy.render(code+'\n\n'+TABLE+'\nMANAGEMENT_STATUS: needs_review',
+            {'source_id':'a'*26,'phase':'peer','engine':'hermes'},'https://example.test')
+        self.assertIn(code,text);self.assertNotIn('MANAGEMENT_STATUS: needs_review',text)
 
 class LabelledReportTests(unittest.TestCase):
     def test_actual_operation_shape_preserves_values_context_and_decision(self):

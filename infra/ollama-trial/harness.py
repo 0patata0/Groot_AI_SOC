@@ -1674,9 +1674,22 @@ def evidence_capability_gap_violations(review, context):
     return sorted(issues)
 
 
+def evidence_event_details(question):
+    """Presentation choice only; no change to read scope, limits, or authority."""
+    text=READ.without_prohibitions(normalized(question))
+    text=re.sub(r'`+[^`]*`+|"(?:\\.|[^"\\])*"|“[^”]*”|‘[^’]*’', '',text)
+    text=re.sub(r'(?:상세(?:히|하게)?|자세(?:히|하게)?|개별|건별|전체|원문|JSON)\s*'
+        r'(?:(?:경보|로그|관측|내역|설명|조회|표)\s*)*(?:은|는|을|를)?\s*'
+        r'(?:제외(?:하고|해줘)?|말고|없이|하지\s*말고|생략(?:하고|해줘)?)','',text,flags=re.I)
+    return detailed_output(text) or bool(re.search(
+        r'개별|건별|한\s*건씩|하나씩|생략\s*없이|(?:전체|모든|각)\s*(?:경보|로그|관측|내역)|전부|'
+        r'\b(?:details?|individual|all\s+alerts?|raw)\b',text,re.I))
+
+
 def evidence_report_text(review, calls, context):
-    """Keep the existing raw fact tables and model decision, add requested comparison."""
-    rendered=EVIDENCE.render_model_review(CONTRACT.report_display(review),facts_for(calls))
+    """Render requested detail; full receipts still supply every judgment guard."""
+    details=evidence_event_details(context['question'])
+    rendered=EVIDENCE.render_model_review(CONTRACT.report_display(review),facts_for(calls),event_details=details)
     scope=review.get('unverified_blocking_scope')
     if (context.get('current_ip_inventory',{}).get('read_state')=='observed'
             and scope in ('과거 웹 요청의 차단·거부','과거 IP 차단 이력','차단 기능의 활성 설정')):
@@ -2435,7 +2448,7 @@ def action_fallback(question, calls):
 
 
 def footer_free(text):
-    text=re.sub(r'^(?:INCIDENT_DISPOSITION|MANAGEMENT_STATUS):[^\r\n]*(?:\r?\n|$)','',text,flags=re.M)
+    text=SHARED.CHAT_MARKDOWN.public_control_text(text)
     return re.sub(r'\n*(?:---\s*\n)?(?:읽기 전용 시험|SOC 비교 시험)\s*·[^\n]*', '', text).strip()
 
 
@@ -4427,7 +4440,7 @@ def fallback(question, calls):
             or any(f.get('kind')=='diagnostics' for f in facts_for(calls))):
         # Use the same factual table as Native, including backend limitations;
         # the short previous-answer summary deliberately omits such detail.
-        text = footer_free(EVIDENCE.factual_review_report(facts_for(calls)))
+        text = footer_free(EVIDENCE.factual_review_report(facts_for(calls),event_details=evidence_event_details(question)))
         failures = sorted({c.get('server','')+'.'+c.get('name','') for c in calls if c.get('is_error')})
         return ('위험 판단은 검증 미완료입니다.\n\n'+text+
                 ('\n\n조회 실패: '+', '.join(failures) if failures else ''))

@@ -23,6 +23,7 @@ class SourceComparison(unittest.TestCase):
     def test_comparison_retains_all_existing_fact_tables_and_the_model_decision(self):
         body,calls=context();review={'assessment':'unresolved','basis':'현재 표본의 출발지를 대조했으나 실제 영향과 승인 여부는 미확인입니다.',
             'evidence_tools':[fixture.MOD,fixture.SUR],'limitations':['표본 범위입니다.'],'next_steps':[],'status':'needs_review'}
+        body['question']=Q+' 상세 표로 보여줘'
         prior=h.EVIDENCE.render_model_review(review,h.facts_for(calls));text=h.evidence_report_text(review,calls,body)
         self.assertTrue(text.endswith(prior));self.assertTrue(text.startswith('**출발지 표본 비교**'))
         self.assertTrue(text.endswith('MANAGEMENT_STATUS: needs_review'));self.assertEqual(text.count('INCIDENT_DISPOSITION:'),1)

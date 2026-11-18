@@ -178,7 +178,7 @@ def render(answer, job, site_url):
         raise ValueError('source_identity')
     role = ('교차 검토 · 읽기 전용' if job['phase'] == 'peer' else '직접 요청 답변' if job.get('direct')
             else ('조회 담당' if job['engine'] == 'ollama' else '사건·변경 담당'))
-    text = re.sub(r'(?m)^(?:MANAGEMENT_STATUS|INCIDENT_DISPOSITION):[^\r\n]*$', '', answer).strip()
+    text = _format.public_control_text(answer).strip()
     if len(text) > 13500:
         text = text[:13500] + '\n(길이 제한으로 일부 생략됨)'
     text = normalize_tables(text)

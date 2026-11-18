@@ -13,6 +13,38 @@ _FENCE = re.compile(r'^ {0,3}(`{3,}|~{3,})(.*)$')
 _RAW = re.compile(r'^ {0,3}<(pre|script|style|textarea)(?:\s|>)',re.I)
 
 
+def public_control_text(text):
+    """Remove only trailing top-level transport controls from a display copy.
+
+    Validation and private session evidence retain the original text. Quoted,
+    indented, fenced, and raw code examples are never transport controls.
+    """
+    if not isinstance(text,str):raise TypeError('Markdown text must be a string')
+    lines=text.splitlines(keepends=True);controls=[];fence=None;raw=None;comment=False
+    for line in lines:
+        body=line.rstrip('\r\n');marker=_FENCE.match(body)
+        protected=bool(fence or raw or comment)
+        if fence:
+            if marker and marker[1][0]==fence[0] and len(marker[1])>=len(fence) and not marker[2].strip():fence=None
+        elif raw:
+            if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
+        elif comment:
+            if '-->' in body:comment=False
+        elif marker:fence=marker[1];protected=True
+        elif re.match(r'^ {0,3}<(pre|script|style|textarea|div|table|blockquote|details)(?:\s|>)',body,re.I):
+            raw=re.match(r'^ {0,3}<([a-z]+)',body,re.I)[1];protected=True
+            if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
+        elif re.match(r'^ {0,3}<!--',body):
+            comment='-->' not in body;protected=True
+        controls.append(not protected and bool(re.fullmatch(r'(?:INCIDENT_DISPOSITION|MANAGEMENT_STATUS):[^\r\n]*',body)))
+    end=len(lines);found=False
+    while end:
+        if controls[end-1]:found=True;end-=1
+        elif not lines[end-1].strip():end-=1
+        else:break
+    return ''.join(lines[:end]).rstrip('\r\n') if found else text
+
+
 def _cells(line):
     return re.split(r'(?<!\\)\|',line.strip()[1:-1])
 
@@ -169,6 +201,7 @@ def split_tables(text, max_length=4000, len_fn=None, *, fallback):
     native split contract return its unchanged result. That fallback preserves
     content but cannot promise a valid table for a row larger than one post.
     """
+    text=public_control_text(text)
     measure=len_fn or len
     if '|' not in text:
         return fallback(text,max_length,len_fn)

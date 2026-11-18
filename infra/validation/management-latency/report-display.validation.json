@@ -1,0 +1,494 @@
+{
+  "schema_version": 1,
+  "recorded_at_kst": "2026-11-18T12:56:18.392086+09:00",
+  "state": "display_rollout_confirmed_shared_calendar_gap_open",
+  "reference": {
+    "url": "https://github.com/JoasASantos/Malvex",
+    "commit": "75d86748c185aea0171b38682ab6a2bf15a5240c",
+    "scope": "stage verification and current evidence; no framework installation or MCP restructuring"
+  },
+  "candidate": {
+    "plan_sha256": "bf93f0a777bff7c8034a1faadc8c49432a27db102afe4d2cb63c27a4148e2db7",
+    "operating_sources": 17,
+    "generated_receipts": 3,
+    "public_source_sha256": {
+      "infra/hermes/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "infra/hermes/soc_management_run.py": "9097d93c2898c80dbce7d16475945c1a995ad6df530c86497b9308a404e63cdd",
+      "infra/ollama-trial/harness.py": "b0108f4a0d3f83cc22ee40c5157f2828253a4bb191a95b96af977edad6bf6d77",
+      "infra/hermes/review_channel_policy.py": "b2eb1f84ec838b0eee34d96a2ad969f4e8010106e1e2f75ee78255162deb7fe4",
+      "infra/hermes/query-completion/__init__.py": "b6718e7fe84253a33898798824fb5466530a2a82e1531106f08965ba9dd42bb7",
+      "infra/hermes/skills/soc-output/SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef",
+      "infra/hermes/test_chat_markdown.py": "89d4ecf9b0490d706df4636efd6ebb4784c2de5bad10148d260288b86dce8aff",
+      "infra/ollama-trial/test_evidence_display.py": "d3d86195691b8f35ff052dce720e5a870abac75417ec60a98ad4c4f98f0dd3fe",
+      "infra/ollama-trial/test_evidence_comparison.py": "4ef0620778dcd8d7ff88bd2c89fe5f0a4cf835e3e656fbc0e33f6f59d144720f"
+    },
+    "installed_grounding_sha256": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+    "canonical_grounding_sha256": "9097d93c2898c80dbce7d16475945c1a995ad6df530c86497b9308a404e63cdd",
+    "operating_after_sha256": {
+      "/opt/capstone-management/soc_management_run.py": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+      "/opt/hermes-data/management-code/run.py": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+      "/opt/capstone-ollama-trial/grounding.py": "90ae48a9e2aa34c71ddf530c36b5db7b73ea0beaf826ae3c2b15b6217aabe6fb",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "59d0302717a250cf04c71b6fd1a0a5f1d875ec9d50f43b12db918b0ae48686d1",
+      "/opt/capstone-ollama-trial/harness.py": "59d0302717a250cf04c71b6fd1a0a5f1d875ec9d50f43b12db918b0ae48686d1",
+      "/opt/capstone-review-chat/review_channel_policy.py": "b2eb1f84ec838b0eee34d96a2ad969f4e8010106e1e2f75ee78255162deb7fe4",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "/opt/capstone-ollama-trial/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "/opt/capstone-management/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "/opt/capstone-review-chat/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "11360c64e300b09f8038f0d1d3a694300d7c08c10cd6fa53d6e3fff08487ad43",
+      "/opt/capstone-ollama-trial/query_grounding.py": "11360c64e300b09f8038f0d1d3a694300d7c08c10cd6fa53d6e3fff08487ad43",
+      "/opt/capstone-management/soc_management_controller.py": "f86cc16e13e4fd31d380d3627fe6f5d3600379c970dc83c87fabf3a3cd626409",
+      "/opt/hermes-data/plugins/groot-query-completion/SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef",
+      "/opt/capstone-ollama-trial/SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef",
+      "/opt/capstone-management/SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef"
+    },
+    "historical_installed_service_api_branches_preserved": true
+  },
+  "boundaries": {
+    "model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "catalog_tools": 45,
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "management_route": "Mac-admin231-A-B",
+    "new_mcp_tools": 0,
+    "model_or_read_limits_or_roles_or_approvals_changed": false,
+    "full_private_receipts_and_judgment_guards_preserved": true,
+    "root_legacy_event_detail_default": true,
+    "question_scoped_summary_detail_for_validated_and_failed_judgments": true,
+    "control_filter": "trailing top-level controls on outgoing copies; fenced/quoted/indented/raw examples retained",
+    "existing_block_address_projection": "50 shown; if more, shown/total/remaining now explicit",
+    "server_ports_images_packages_changed": false,
+    "new_attacks_or_training": false
+  },
+  "verification": {
+    "mac": {
+      "native": {
+        "rc": 0,
+        "summary": {
+          "run": 311,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 215,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 311,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 215,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.350s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.561s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "selected_skips": 0,
+    "canonical_installer_gate_checks": 4,
+    "new_display_tests": 9,
+    "new_transport_tests": 7,
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_files": 140,
+    "operating_harness2_sources": 50,
+    "operating_harness2_status": "passed",
+    "actual_mcp_schema_hashes_verified": true,
+    "always_on_census_char_delta": 0,
+    "census_limit": "does not attest unchanged phase prompt size; three output skills gained576 bytes each",
+    "actual_gate_argument_bytes": 77456,
+    "actual_gate_boundary_conditions": 7,
+    "mac_provider_types": "stub for unavailable OpenAI package; Linux uses actual installed SDK",
+    "whole_canonical_suite_passed": false,
+    "prior_unrelated_canonical_failures_resolved": false,
+    "initial_fixture_failure": "review_channel_worker missing in isolated Mac/Linux fixture; added exact actual source and reran27 tests; final full selected runs pass",
+    "private_final_and_public_projection_match_cases": 4,
+    "fact_guard_pass_does_not_prove_user_period_match": true,
+    "previous_two_reports_reformatted": "actual earlier receipts, no new model/MCP observation"
+  },
+  "deployment": {
+    "applied_at_kst": "2026-11-18T12:25:40.234384+09:00",
+    "confirmation": {
+      "status": "confirmed",
+      "at_kst": "2026-11-18T12:40:22.508412+09:00",
+      "files": 20,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "protected": 51,
+      "rollback_timer": "inactive"
+    },
+    "last_live_check_at_kst": "2026-11-18T12:52:00.641206+09:00",
+    "same_native_container_and_image": true,
+    "planned_native_restarts": 1,
+    "sdk_and_review_workers_refreshed": true,
+    "automatic_restart_counters": 0,
+    "sdk_review_queue_bytes_same_while_stopped": true,
+    "whole_native_db_unchanged_claimed": false,
+    "protected_files": 51,
+    "prepare_rc": 0,
+    "early_readiness_check": "failed after restart; same running processes subsequently observed healthy, no reapply/restart",
+    "confirmed_scope": "display improvement; newly observed preexisting temporal parsing failure remains open",
+    "rollback_timer": "inactive after confirmation",
+    "retained_backup": "/var/lib/capstone-evidence-rollout/20261118-display-3755e36c29"
+  },
+  "actual_chats": [
+    {
+      "read_count": 3,
+      "read_sha256": [
+        "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+        "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-17T23:59:59.999999+09:00"
+          }
+        },
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "arguments": {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-17T23:59:59.999999+09:00"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
+      ],
+      "report_guard_issues": {
+        "facts": [],
+        "scope": [],
+        "capability": []
+      },
+      "private_controls_preserved": true,
+      "public_controls_absent": true,
+      "exact_public_projection_matches_private_final": true,
+      "requested_calendar_day_correct": true,
+      "view": "summary",
+      "status": "needs_review",
+      "assessment": "unresolved",
+      "seconds": 36.345,
+      "public_chars": 1731,
+      "post_id": "ab1dc8txu7885dkqorm71w4hgw",
+      "clock_source": "source-post reconstructed",
+      "case": "hermes-summary",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 임시 IP 차단은?",
+      "fresh_root": true,
+      "source_id": "5zbwh4ubt7by8boe19dfam5fbw",
+      "final_posts": 1,
+      "protected_calls": 0,
+      "native_api_stages": 2
+    },
+    {
+      "read_count": 3,
+      "read_sha256": [
+        "6e5b7b204112ffd0a54a7167638fcd3ad0df3a04feaae65c906e2590f8628234",
+        "7ba41abefb17bd0d1aafb62163fe8cb83dc9bc8fedf0b3c8d6d3e462bb73118e",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "until_kst": "2026-11-18T12:34:56.072661+09:00"
+          }
+        },
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "until_kst": "2026-11-18T12:34:56.072661+09:00"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
+      ],
+      "report_guard_issues": {
+        "facts": [],
+        "scope": [],
+        "capability": []
+      },
+      "private_controls_preserved": true,
+      "public_controls_absent": true,
+      "exact_public_projection_matches_private_final": true,
+      "requested_calendar_day_correct": false,
+      "view": "detail",
+      "status": "needs_review",
+      "assessment": "unresolved",
+      "seconds": 31.844,
+      "public_chars": 4000,
+      "post_id": "t47dsp64u7n9tmk9z4ek5k1k8c",
+      "clock_source": "source-post reconstructed",
+      "case": "hermes-detail",
+      "question": "어제 WAF·IDS 경보를 개별 내역까지 상세 표로 조사해줘. 출발지를 비교하고 지금 임시 IP 차단 목록도 보여줘",
+      "fresh_root": true,
+      "source_id": "hh1ydw94htdjtm9n58y4n8sp1c",
+      "final_posts": 1,
+      "protected_calls": 0,
+      "native_api_stages": 2
+    },
+    {
+      "read_count": 3,
+      "read_sha256": [
+        "5c67c6c32812b2c425957138d2cbe0515e1bb97899f8f460be850526762f517d",
+        "916b5966335be71ba2f7864ad9d3ebd709aaafa927194efcced67228efc831ef",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-17T23:59:59.999999+09:00"
+          }
+        },
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "arguments": {
+            "since_kst": "2026-11-17T00:00:00+09:00",
+            "until_kst": "2026-11-17T23:59:59.999999+09:00"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
+      ],
+      "report_guard_issues": {
+        "facts": [],
+        "scope": [],
+        "capability": []
+      },
+      "private_controls_preserved": false,
+      "public_controls_absent": true,
+      "exact_public_projection_matches_private_final": true,
+      "requested_calendar_day_correct": true,
+      "view": "summary",
+      "status": "needs_review",
+      "assessment": "unresolved",
+      "seconds": 45.829,
+      "public_chars": 1869,
+      "post_id": "biyc75nkcj8k7cedhmx8ibng9y",
+      "clock_source": "actual SDK turn_clock",
+      "case": "ollama-summary",
+      "question": "어제 WAF·IDS 경보 조사해줘. 출발지 겹쳤어? 지금 임시 IP 차단은?",
+      "fresh_root": true,
+      "source_id": "qdnoqxzrgprs58oc3fdwrq5g6r",
+      "final_posts": 1,
+      "protected_calls": 0,
+      "model_calls": 2
+    },
+    {
+      "read_count": 3,
+      "read_sha256": [
+        "9f21d9899d06964f5314d19fcef6d713948021fdc43cb3f72ba85024109768f9",
+        "13873cab159ecf986f0869c9bc96fed85e98ee4467e0887167f8226bb525e031",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "read_arguments": [
+        {
+          "server": "security-events",
+          "name": "search_modsecurity_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "until_kst": "2026-11-18T12:37:39.851227+09:00"
+          }
+        },
+        {
+          "server": "security-events",
+          "name": "search_suricata_alerts",
+          "arguments": {
+            "lookback_minutes": 1440,
+            "until_kst": "2026-11-18T12:37:39.851227+09:00"
+          }
+        },
+        {
+          "server": "resp",
+          "name": "list_blocks",
+          "arguments": {}
+        }
+      ],
+      "report_guard_issues": {
+        "facts": [],
+        "scope": [],
+        "capability": []
+      },
+      "private_controls_preserved": false,
+      "public_controls_absent": true,
+      "exact_public_projection_matches_private_final": true,
+      "requested_calendar_day_correct": false,
+      "view": "detail",
+      "status": "needs_review",
+      "assessment": "unresolved",
+      "seconds": 41.799,
+      "public_chars": 4049,
+      "post_id": "5m1yfxxk17r3jjuxkeiwjbse3h",
+      "clock_source": "actual SDK turn_clock",
+      "case": "ollama-detail",
+      "question": "어제 WAF·IDS 경보를 개별 내역까지 상세 표로 조사해줘. 출발지를 비교하고 지금 임시 IP 차단 목록도 보여줘",
+      "fresh_root": true,
+      "source_id": "dhoijrub4ibn9ey65fz57ijp5a",
+      "final_posts": 1,
+      "protected_calls": 0,
+      "model_calls": 2
+    }
+  ],
+  "actual_data_read_executions": 12,
+  "protected_calls": 0,
+  "actual_scope_results": {
+    "display_format_and_projection_correct": 4,
+    "requested_calendar_day_correct": 2,
+    "total_cases": 4,
+    "overall_task_accuracy_claimed": false,
+    "new_semantic_tests": 2
+  },
+  "calendar_gap": {
+    "state": "verified_existing_shared_gap",
+    "helper_unchanged_from_actual_before": true,
+    "helper_sha256": "d54f6363f92c97fffa4d11f3769ba6b138ca90a7d2550588cbc1597611457190",
+    "trigger": "개별 내역까지",
+    "reason": "unqualified global exclusion of temporal suffix 까지",
+    "summary_period_correct": true,
+    "detail_period_correct": false,
+    "operating_display_kept_confirmed": true,
+    "next": "qualify temporal operators by time operands; rerun identical failing questions"
+  },
+  "visual_qa": {
+    "surface": "Mattermost Desktop Electron, existing authenticated session",
+    "observed_post": "ab1dc8txu7885dkqorm71w4hgw",
+    "ax_table_blocks": 6,
+    "table_row_and_cell_roles_observed": true,
+    "screenshot_visually_checked": true,
+    "local_png_saved": false,
+    "external_browser_matrix_checked": false,
+    "scope": "Both fresh summary posts; explicit-detail visual inspection not recorded",
+    "existing_deleted_progress_placeholder_observed": true,
+    "at_kst": "2026-11-18T13:01:22.998684+09:00",
+    "summary_posts": {
+      "hermes": "ab1dc8txu7885dkqorm71w4hgw",
+      "ollama": "biyc75nkcj8k7cedhmx8ibng9y"
+    },
+    "table_blocks_per_post": 6,
+    "ax_table_row_cell_roles_observed": true,
+    "screenshots_visually_checked": true,
+    "expanded_view_readable": true,
+    "narrow_view_long_date_columns_overflow": true
+  },
+  "limits": [
+    "four chats are not a general30/60 second SLO or expert accuracy evaluation",
+    "sample limits and returned data differ from earlier chats; latency is not a controlled causal comparison",
+    "detail shows actual returned sample, not complete day coverage",
+    "detail questions misparsed calendar day; source facts are not proof the requested range was satisfied",
+    "historical posted messages were not rewritten",
+    "Narrow thread long date columns overflow; expanded view readable, duplicate windows/date width need further presentation work"
+  ],
+  "cleanup": {
+    "roots": [
+      "/var/lib/capstone-evidence-validation/gateway-169188acaf",
+      "/var/lib/capstone-evidence-validation/gateway-8f5a484bd8",
+      "/var/lib/capstone-evidence-validation/gateway-c6df69b490",
+      "/var/lib/capstone-evidence-validation/gateway-868be032e5",
+      "/var/lib/capstone-evidence-validation/display-prepare-3755e36c29"
+    ],
+    "files": 2623,
+    "bytes": 101361917,
+    "exported_results": 29,
+    "exported_bytes": 480213,
+    "operating_backups_framework_skills_weights_preserved": true,
+    "mac_task_package_downloads_or_installs": 0
+  },
+  "documentation": {
+    "state": "draft_pending_humanize"
+  },
+  "publication": {
+    "state": "pending"
+  }
+}

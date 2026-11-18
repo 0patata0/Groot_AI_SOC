@@ -2035,7 +2035,7 @@ def literal_evidence_summary(facts):
     return '\n'.join(rows)
 
 
-def literal_evidence_table(facts):
+def literal_evidence_table(facts, *, event_details=True):
     """Human view of observed facts; full literals remain in retry/audit evidence.
 
     Mirrors the common soc-output skill. This renderer makes no attack,
@@ -2044,7 +2044,7 @@ def literal_evidence_table(facts):
     def cell(value):
         return str(value).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('|',r'\|').replace('\r',' ').replace('\n',' ')
     def count(value):return str(value) if type(value) is int and value>=0 else '미확인'
-    rows=[];shown_times=set();deferred=[];sections=[];windows=[];observed=[]
+    rows=[];shown_times=set();summary_event_times=set();event_details_omitted=False;deferred=[];sections=[];windows=[];observed=[]
     def stamp(value):
         instant=parse_instant(value)
         if instant:shown_times.add(instant)
@@ -2081,12 +2081,24 @@ def literal_evidence_table(facts):
             observations=row.get('observations',[])
             observations=observations if isinstance(observations,list) else []
             rows.append((source+' 경보',result,
-                         label+' 상세 표; 시각 확인 관측 '+str(len(observations))+'행; 반환 표본 전체와 동일함을 뜻하지 않음'))
+                         label+(' 상세 표' if event_details else ' 요약 표')+'; 시각 확인 관측 '+str(len(observations))+'행; 반환 표본 전체와 동일함을 뜻하지 않음'))
             rules=[]
             for label,key in [('WAF 룰 ID' if source=='WAF' else 'Suricata SID','sensor_rule_ids'),('Wazuh 규칙 ID','wazuh_rule_ids')]:
                 ids=[v for v in row.get(key,[]) if isinstance(v,str) and re.fullmatch('[0-9]{1,10}',v)]
                 rules.extend((label,value) for value in ids)
             label=windows[-1][0]
+            if not event_details:
+                event_details_omitted=event_details_omitted or bool(observations or rules or row.get('source_ips') or row.get('returned_count'))
+                for o in observations:
+                    if isinstance(o,dict):
+                        instant=parse_instant(o.get('timestamp_kst'))
+                        if instant:summary_event_times.add(instant)
+                addresses={ip for ip in row.get('source_ips',[]) if isinstance(ip,str)}
+                summary=[('출발지 IP',str(len(addresses)),'표시용 근거의 서로 다른 주소 수; 전체·실제 호스트 수 미확인')]
+                for group in dict.fromkeys(group for group,value in rules):
+                    summary.append((group,str(len({value for name,value in rules if name==group})),'표시용 근거의 서로 다른 규칙 ID 수; 전체 미확인'))
+                append_table(label+' · 반환 표본 요약',('집계 항목','개수','범위'),summary)
+                continue
             append_table(label+' · 개별 관측',('번호','발생 시각(KST)','출발지 IP','목적지 IP','수집 에이전트'),
                   [(str(i),stamp(o.get('timestamp_kst')),o.get('source_ip') or 'IP 정보 없음',
                     o.get('destination_ip') or 'IP 정보 없음',o.get('sensor_agent') or '미확인')
@@ -2119,8 +2131,11 @@ def literal_evidence_table(facts):
         elif kind=='diagnostics':
             rows.extend(diagnostic_contract().diagnostic_evidence_rows(row,stamp))
         elif kind=='blocks':
-            rows.append(('차단 목록','현재 항목 '+count(row.get('count'))+'개','경보·서비스 상태 조회가 아님'))
-            append_table('현재 차단 주소',('번호','IP 주소'),list(enumerate(row.get('addresses',[]),1)))
+            addresses=row.get('addresses',[]);total=row.get('count');basis='경보·서비스 상태 조회가 아님'
+            if type(total) is int and total>len(addresses):
+                basis+='; 주소 '+str(len(addresses))+'/'+str(total)+'개 표시·나머지 '+str(total-len(addresses))+'개 표시 미완료'
+            rows.append(('차단 목록','현재 항목 '+count(total)+'개',basis))
+            append_table('현재 차단 주소',('번호','IP 주소'),list(enumerate(addresses,1)))
         else:
             # Non-event evidence already has bounded, literal labels. Do not
             # expose dictionary repr/JSON or model-provided prose as a table.
@@ -2129,7 +2144,7 @@ def literal_evidence_table(facts):
     remaining=[]
     for value in deferred:
         instant=parse_instant(value)
-        if instant and instant not in shown_times:
+        if instant and instant not in shown_times and instant not in summary_event_times:
             rendered=stamp(value)
             if rendered not in remaining:remaining.append(rendered)
     append_table('조회 구간',('조회 대상','시작(KST)','종료(KST)'),windows)
@@ -2138,15 +2153,18 @@ def literal_evidence_table(facts):
     if not rows:rows=[('조회 근거','구조화해 표시할 근거 미확인','누락·실패 원문과 실제 호출 기록 확인 필요')]
     table=['| 확인 항목 | 조회 결과 | 근거·범위 |','| --- | --- | --- |']
     table+=['| '+' | '.join(cell(v) for v in row)+' |' for row in rows]
-    return '\n\n'.join(['\n'.join(table),*sections])
+    text='\n\n'.join(['\n'.join(table),*sections])
+    if event_details_omitted:
+        text+='\n\n기본 요약 표시입니다. 조회한 경보의 개별 관측·주소·규칙 ID·시각은 표시에서 생략했습니다. 개별 경보 상세를 요청하면 상세 표로 확인할 수 있습니다. 실제 조회 원문과 검증 범위는 줄이지 않았습니다.'
+    return text
 
 
-def factual_review_report(facts):
+def factual_review_report(facts, *, event_details=True):
     return ('모델의 최종 판단이 완료되지 않았거나 조회 근거와 일치하지 않아 추가 검토가 필요합니다.\n\n'+
-            literal_evidence_table(facts)+'\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review')
+            literal_evidence_table(facts,event_details=event_details)+'\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review')
 
 
-def render_model_review(report, facts, *, lookup_identity=None):
+def render_model_review(report, facts, *, lookup_identity=None, event_details=True):
     """Model owns judgment; receipts supply the table without model retyping."""
     if report.get('scope')=='verified_service_lookup':
         if isinstance(lookup_identity,dict) and lookup_identity.get('missing_units'):raise ValueError('service_lookup_identity_not_verified')
@@ -2163,7 +2181,7 @@ def render_model_review(report, facts, *, lookup_identity=None):
     text='**판단**\n'+basis
     if 'current_observation' in report:
         text+='\n\n**현재 처리 상태**\n'+line(report['current_observation'])
-    text+='\n\n'+literal_evidence_table(facts)
+    text+='\n\n'+literal_evidence_table(facts,event_details=event_details)
     items=contract.report_list_display
     text+='\n\n**미확인·한계**\n'+items(report['limitations'])
     text+='\n\n**다음 조치**\n'+items(contract.service_follow_up_lines(report['next_steps']))

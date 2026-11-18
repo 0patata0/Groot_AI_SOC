@@ -12,6 +12,22 @@
 [관리자 경로·시각·정확 변경안 원장](../infra/groot-a/certificate-monitor/access-readiness-20261118.json)
 <!-- /chat-access-readiness-20261118 -->
 
+<!-- chat-access-publication-20261118 -->
+| 관리자 경로·시각 관측 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `80f0a0453e3a282c6df358e53290fac2b98c67b1` |
+| 실제 원격 main 일치 | `2026-11-18T19:43:55.051840+09:00` |
+| 관측 | 관리자LAN TLS1.3·CA/hostname·HTTP200/OK·A 저장 지문 일치. 정상HTTP1·NTP1 |
+| 관리자 시각 | NTP=yes/미동기·46.486~47.051초 지연. 학내131 실제 응답/stratum3·A도 같은 상류 |
+| 변경안 | 390a0f43·관리자231 파일1개/기존NTP1회 재시작·정확 승인 대기·아직 미적용 |
+| 별도 후보 검사 | 쓰기 없는 실물 inspect·원자 생성/기존 파일 보호·실제 타이머·제한 callback |
+| 정리 | 시험 unit/작업 경로 부재 재확인. 실제 NTP 변경/재시작0·Mac 설치/다운로드0 |
+| 문서/검사 | 공개12·추적2423·위험0·기존합성/코드10·신규0·정확stage12. 논문/발표55SHA 보존 |
+| 윤문 | 033 light0%·B·6/6·gate0·경고0 |
+| 미검증 | 외부인터넷·다른VPN·로그인/봇·실제 NTP적용/원복·SSH단절/재부팅·새OS·독립재구현 |
+<!-- /chat-access-publication-20261118 -->
+
+
 <!-- certificate-rules-native-20261118 -->
 <a id="certificate-rules-native-20261118"></a>
 

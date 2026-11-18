@@ -350,7 +350,20 @@
     "operating_sources_revalidated_unchanged": 64
   },
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_commit_pushed_and_remote_equal",
+    "content_commit": "f451a1dfc5e37bef253a04110286c86c54f71283",
+    "verified_at_kst": "2026-11-19T07:13:22.819127+09:00",
+    "public_paths": 29,
+    "markdown_documents": 23,
+    "source_candidate_operating_applied": false,
+    "followup_publication_receipt_is_separate_commit": true,
+    "secret_scan": {
+      "tracked_paths": 2433,
+      "unsafe_paths": 0,
+      "known_synthetic_or_code_matches": 10,
+      "new_matches": 0,
+      "coverage": "current tracked working-tree bytes using isolated index; frozen blobs separately checked; not history scan"
+    }
   },
   "documentation": {
     "markdown_documents": 23,

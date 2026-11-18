@@ -1434,7 +1434,11 @@ def incident_field_violations(answer, calls):
                 and not uncertain and not re.search(r'경보|기록|당시|가정|만약', line)):
             issues.add('event_mode_presented_as_current_configuration')
         http_status=re.search(r'(?:HTTP(?:[_\s-]*status)?|응답\s*(?:코드\s*)?|상태\s*(?:코드\s*)?)(?:는|은|이|가)?\s*[:=]?\s*[2345]\d{2}(?!\d)',line,re.I)
-        causal=(re.search(r'이므로|으므로|때문|뜻|의미|시사|보여|나타|따라서|보아|통해',line)
+        causal=(any(CONTRACT.claim_modality(line[m.start():]) not in
+                    ('not_asserted','conditional_or_unverified','planned_check')
+                    and CONTRACT.claim_modality(line[m.end():]) not in
+                    ('not_asserted','conditional_or_unverified','planned_check')
+                    for m in re.finditer(r'이므로|으므로|때문|뜻|의미|시사|보여|나타|따라서|보아|통해',line))
                 and re.search(r'(?:WAF|ModSecurity).{0,35}(?:차단|거부|리다이렉트)|'
                               r'(?:침해|명령\s*실행|공격).{0,15}(?:성공|실패)',line,re.I))
         block_matches=list(re.finditer(r'차단(?:이|을|은|는)?\s*(?:입증|확인|성공|됨|됐|되었|되었습니다|했다|했습니다|중)|'

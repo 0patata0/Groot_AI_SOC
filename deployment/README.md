@@ -1,6 +1,6 @@
 # 구축·운영 가이드
 
-[복합 조사 검증](../infra/validation/management-latency/README.md). 현재 차단 목록의 활성 주소를 차단 기능 활성 설정으로 오인하던 공통 가드를 수정했다. 검증된 최신 목록의 명시적0건·건수도 대조하고 직접 부정된 기능 상태는 별도 근거를 요구한다. 운영 하네스2사본+SDK영수증1을 확정·보호69파일을 확인했다. 새6채팅/18읽기에서 대상·기간6일치, 모델보고 수용5건이다. 첫 적용에서 이전 실패3문장은 Hermes짧은68.475→35.847초·상세66.737→45.966초, SDK인과63.074→44.141초로 수용됐다. Native짧은 표본은 줄었고 상세·SDK인과 표본은 같았다. 단회 결과이며 일반 SLO·전문가 정확도 점수로 확대하지 않는다. 실제 거절12초안 재검사·Mac/Linux333·295·39·27과 Linux공식38·설치37을 통과했다. MCP45도구·모델·권한·승인·기존스킬·상시지시량은 유지한다. [목록·기능 구분과 실제 보고 검증](../infra/validation/management-latency/membership-grounding.validation.json).
+[복합 조사 검증](../infra/validation/management-latency/README.md). 공통 어법/HTTP 인과 검사는 증거가 아니다·차단했는지·의미하는지는 추가 검증 필요라는 올바른 한계를 거절했다. 이를 보완했다. 계약3사본·하네스2사본·SDK영수증1을 운영6파일로 확정하고 보호66파일을 대조했다. 새3채팅/9읽기의 대상·기간이 일치했고 모델 보고는3건 수용됐다. 실제거절3초안 재생과 Mac/Linux336·298·39·27, Linux공식38·설치37을 통과했다. MCP45도구·모델·권한·승인·TTL·스킬·상시 지시량은 유지한다. 제한된 검증이며 일반 정확도/SLO는 별도다. [HTTP 어법·새 채팅 검증](../infra/validation/management-latency/http-modality.validation.json).
 
 초기 설치 소스는 [수집기 한도·이력 후보](../infra/validation/journal-composition/LIMITS.md)에 맞췄다. deploy.sh가 고정 역할의 수집·초기 이력을 순서대로 실행하고 실제 로드 한도나 이력 완전성이 맞지 않으면 타이머·reader 활성화로 넘어가지 않는다. 새 OS 전체 설치와 기존 운영의 조정 배포는 아직 검증하지 않았다.
 

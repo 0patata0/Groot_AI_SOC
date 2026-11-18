@@ -2623,18 +2623,19 @@ def claim_modality(after):
             r'(?:(?:한|된)\s*)?'
             r'(?:(?:것|음|사실|주장|판정|결론)(?:을|은|는|이|임을)?\s*)?'
             r'(?:(?:의\s*)?(?:증거|근거)(?:가|이|은|는)?\s*)?')
-    if re.match(coordinated+prefix+r'(?:아니라면|아니면|아니었다면|아니었으면|한다면|하면|할\s*경우|했는지|하는지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
+    proof=r'(?:의미|뜻|증명|입증|보장|단정|판단|확정|확인)'
+    modal_prefix=coordinated+prefix+r'(?:(?:'+proof+r')(?:를|을|이|가|은|는)?\s*)?'
+    if re.match(modal_prefix+r'(?:아니라면|아니면|아니었다면|아니었으면|한다면|하면|할\s*경우|했는지|하는지|되는지|되었는지|는지|은지|인지|일지|다면|으면|면|라면|이라면|이면|(?:있|없)(?:다면|으면)|인\s*경우|일\s*경우|발생(?:하면|할\s*경우))',after):
         return 'conditional_or_unverified'
-    if re.match(coordinated+prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):
+    if re.match(modal_prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):
         return 'conditional_or_unverified'
-    if re.match(coordinated+prefix+r'(?:(?:추가|직접|다시|상세히)\s*)?(?:조회|조사|확인|검토|대조|분석)'
+    if re.match(modal_prefix+r'(?:(?:추가|직접|다시|상세히)\s*)?(?:조회|조사|확인|검토|대조|분석)'
             r'(?:할\s*(?:예정|계획)|(?:이|가)?\s*필요|해야|하겠)', after):
         return 'planned_check'
     adverbs=r'(?:(?:직접|곧바로|반드시|전혀|아직|[가-힣]+히|[가-힣]+적으로)\s+)*'
-    proof=r'(?:의미|뜻|증명|입증|보장|단정|판단|확정|확인)'
     negative=re.match(coordinated+prefix+adverbs+r'(?:'+proof+r'(?:하지(?:는|도)?\s*'
         r'(?:않(?:습니다|음|으며|는다|는|은|았(?:습니다|음|다))|못(?:합니다|함|했(?:습니다|음|다)))|할\s*수\s*'
-        r'없(?:습니다|음|으며|다|는|고)?)|아닙니다|아니며|아님)',after)
+        r'없(?:습니다|음|으며|다|는|고)?)|아니다|아닙니다|아니며|아님)',after)
     if not negative:
         return 'asserted_or_unspecified'
     if re.match(r'\s*(?:는\s*)?(?:것은|건|것이)\s*(?:아니|아닙|아님)', after[negative.end():]):

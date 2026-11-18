@@ -536,6 +536,12 @@
     "warnings": 0
   },
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_committed_pushed_remote_verified",
+    "content_commit": "bb8b47fec0a9dfee7d8909f8567c5af130d8cd6c",
+    "remote_main_at_verification": "bb8b47fec0a9dfee7d8909f8567c5af130d8cd6c",
+    "verified_at_kst": "2026-11-19T08:44:06.432593+09:00",
+    "owned_public_paths": 33,
+    "credentials_logged": false,
+    "followup_receipt_commit_recorded_locally": true
   }
 }

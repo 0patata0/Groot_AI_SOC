@@ -13692,3 +13692,17 @@ Native 첫 도구 선택 오류의 재시도를 작은 요청에 연결했다. �
 | 정리 | 시험13경로·4,325파일 SHA 확인 후 제거. 운영·원복 백업 보존 |
 | 남은 문제 | 설정으로 확인하지 않은 설계/주기 설명·기간 명칭·한계 문장·실제 지연 | [검증·미적용·남은 문제](../infra/validation/service-query/report-provenance.validation.json) · [공통 동작](../infra/hermes/service-query-contract.md).
 <!-- /service-report-provenance-candidate-20261119 -->
+
+
+<!-- service-report-provenance-publication-20261119 -->
+
+| 서비스 보고 후보 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `bb8b47fec0a9dfee7d8909f8567c5af130d8cd6c` |
+| 실제 원격 main 일치 | `2026-11-19T08:44:06.432593+09:00` |
+| 범위 | 검수33파일·문서 윤문 대상MD23·운영 후보 미적용 |
+| 검사 | 추적2,438·위험 경로0·기존 합성/코드10·신규0. 격리 회귀와 실제 품질 미통과 구분 |
+| 정리·운영 | 시험13경로·4,325파일 제거, 운영64파일·봇 연결 동일. 원복 백업 보존 |
+| 윤문 | 008-c258/light·0.05%·B·자체6/6·gate0·경고0. 이 영수증은 기술 셀만 추가 |
+| 미완료 | 설계/주기·기간·한계 문장, 실제30/60초 목표, 운영 적용과 새 채팅, 별도 승인 항목 |
+<!-- /service-report-provenance-publication-20261119 -->

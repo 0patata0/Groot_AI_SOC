@@ -751,7 +751,19 @@
     "Known SDK full-suite failures, web path/intervention/impact gaps and other existing SOC tasks remain."
   ],
   "publication": {
-    "state": "pending_commit_and_push",
-    "private_traces_credentials_weights_excluded": true
+    "state": "content_published",
+    "content_commit": "63c2aceeb7d593271614f85a09bac440343844de",
+    "remote_main_at_content_publication": "63c2aceeb7d593271614f85a09bac440343844de",
+    "remote_match_at_kst": "2026-11-18T09:02:16.882666+09:00",
+    "receipt_committed_separately": true
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-010-ff72",
+    "route": "light",
+    "change_rate": 0.0001,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0
   }
 }

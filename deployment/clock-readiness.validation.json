@@ -159,7 +159,19 @@
     "independent reproduction/evaluation and real presentation"
   ],
   "publication": {
-    "state": "prepared_not_published",
+    "state": "content_published_scope_audited",
+    "content_commit": "6a2deeb5cc9362b2fd0ec05caa557491faf70b99",
+    "remote_main_at_publication": "6a2deeb5cc9362b2fd0ec05caa557491faf70b99",
+    "verified_at_kst": "2026-11-18T20:04:43.958024+09:00",
+    "own_public_files": 21,
+    "actual_commit_files": 22,
+    "concurrent_other_receipt_paths": 5,
+    "overlap_paths": 4,
+    "other_receipt_scope": "35-file service query commit8ec5946 publication metadata only",
+    "own_code_and_clock_blocks_unchanged": true,
+    "postpublication_scope_review": true,
+    "postpublication_original_secret_scan_new_findings": 0,
+    "receipt_committed_separately": true,
     "operating_deployment": false
   }
 }

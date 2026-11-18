@@ -294,11 +294,14 @@
     "grounding4_pins2_embedded_management_gate": true
   },
   "publication": {
-    "status": "pending",
-    "expected_public_files": 19,
-    "source_test_files": 3,
-    "documentation_files": 15,
-    "validation_files": 1
+    "state": "content_published",
+    "content_commit": "aad809d708a84e73232899be1aee08483ebbdc2e",
+    "remote_main_at_content_publication": "aad809d708a84e73232899be1aee08483ebbdc2e",
+    "remote_match_at_kst": "2026-11-18T16:37:26.750757+09:00",
+    "receipt_committed_separately": true,
+    "public_files": 19,
+    "secret_scan_tracked_files": 2412,
+    "new_secret_findings": 0
   },
   "upstream_reference": {
     "repository": "https://github.com/JoasASantos/Malvex",
@@ -550,5 +553,17 @@
     "same_read_retry_rc": 0,
     "question_reposts": 0,
     "claim": "Read-only administration observation retried, no evidence of a chat delivery failure; transport root cause not diagnosed"
+  },
+  "documentation": {
+    "state": "humanized_verified_content_published",
+    "run": "2026-11-18-024-930c",
+    "route": "light",
+    "route_source": "automatic metrics",
+    "change_rate": 0.0289,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit": 0,
+    "diagnostician_and_finalizer": "not required by light successful gate",
+    "receipt_update": "structured publication metadata with existing reviewed wording retained"
   }
 }

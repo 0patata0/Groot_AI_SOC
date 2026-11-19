@@ -1,10 +1,10 @@
 # Groot_AI_SOC
 
-<!-- thesis-google-docs-format-20261119 -->
-논문은 지정한 구글 독스 편집본에서 일반88·그림8·표58 기본 목차와 짧은 그림·표 제목을 적용했다. 글꼴은 맑은 고딕, 제목·소제목은 볼드체로 맞추고 본문366문단 양쪽 정렬·1.5pt 머리말/꼬리말 선·서론 PAGE 시작1을 유지한다. 본문 설명·표·그림과 사용자 입력은 보존했다. 기존 로컬102쪽 검수본과 별도로 관리한다. Brave 목차 세 개를 갱신한 뒤 PDF의154항목 한 줄 배치를 확인했으며 구글 독스 PDF의 글꼴 대체·쪽번호143항목의 차이는 남아 있다. 발표자료는 유지한다.
+<!-- thesis-google-docs-local-sync-20261119 -->
+사용자 지정 구글 독스 편집본을 로컬 MD·DOCX·PDF와 이미지25개에 맞췄다. 표69개·코드10블록·2,176문단을 대조하고 기존 로컬10파일을 보관했다. 로컬 DOCX는 목차의 용지 밖 탭 위치만 보정했다. 구글 독스 PDF123쪽과 로컬 맑은 고딕 렌더125쪽은 배치가 다르며PDF 목차154개 중91개 쪽번호 불일치는 남아 있다. 논문·이미지·개인 값은 Git 제외다.
 
-[검수와 출력 한계](archive/DIAGNOSTIC_HISTORY.md#thesis-google-docs-format-20261119) · [이전 로컬 검수본](archive/DIAGNOSTIC_HISTORY.md#thesis-local-layout-20261119)
-<!-- /thesis-google-docs-format-20261119 -->
+[검수·출력 차이와 남은 쪽번호](archive/DIAGNOSTIC_HISTORY.md#thesis-google-docs-local-sync-20261119) · [직전 표 배치 작업](archive/STATUS_HISTORY.md#thesis-google-docs-table-layout-20261119)
+<!-- /thesis-google-docs-local-sync-20261119 -->
 
 <!-- coordinator-native-systemd-20261119 -->
 조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).

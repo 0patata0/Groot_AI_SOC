@@ -1,10 +1,10 @@
 # 과거 기록과 복원 안내
 
-<!-- thesis-google-docs-format-20261119 -->
-지정 구글 독스의 기본 목차 세 개, 단축 제목·실제 본문 연결, 맑은 고딕·제목 볼드체·양쪽 정렬·1.5pt 선을 반영했다. 직접 연결점 방식의 실패·거절, 마지막 글꼴 선택과 화면/PDF 차이는 상태·설계·진단 이력에 보존한다. 조정 실행기 R15 준비·네 SSH 확인과 부분 적용 중단 시험 실패·정리·보류를 분리해 기록한다.
+<!-- thesis-google-docs-local-sync-20261119 -->
+구글 독스 논문 편집본의 로컬 MD·DOCX·PDF 동기화와 목차154개 쪽번호 검수를 현황·계획·설계·진단 이력에 연결한다. PDF123쪽과 DOCX 렌더125쪽의 차이, 목차91개 불일치와 이번 구글 독스 쓰기0을 구분한다. 앞선 표 배치 작업의 일시정지는 당시 이력으로 보존한다.
 
-[현황](STATUS_HISTORY.md#thesis-google-docs-format-20261119) · [계획](PLAN_HISTORY.md#thesis-google-docs-format-20261119) · [설계](DESIGN_ALTERNATIVES.md#thesis-google-docs-format-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-google-docs-format-20261119)
-<!-- /thesis-google-docs-format-20261119 -->
+[현황](STATUS_HISTORY.md#thesis-google-docs-local-sync-20261119) · [계획](PLAN_HISTORY.md#thesis-google-docs-local-sync-20261119) · [설계](DESIGN_ALTERNATIVES.md#thesis-google-docs-local-sync-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-google-docs-local-sync-20261119)
+<!-- /thesis-google-docs-local-sync-20261119 -->
 
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>

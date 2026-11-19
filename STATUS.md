@@ -63,6 +63,18 @@ B 전용 Docker 데몬과 새 BusyBox 컨테이너를 만들고 Native로 재시
 소비자 유닛과 계정·키·이미지는 시험용이다. 고정 root 진입점·Lifecycle.recover·실제50소스/캐시·전역 복구·호스트 재부팅과 운영 적용·MCP/두 봇 인수는 아직 미검증이다. 발표자료 추가 제작·공격·학습 중단과 정확 승인 대기는 유지한다.
 
 [검증 원장](infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- coordinator-private-backends-publication-20261119 -->
+| 격리 SSH·Docker 검증 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `2342b4f1dab0f1faa4a85272e43c87b5b6f8ca40` |
+| 실제 원격 main 일치 | `2026-11-19T12:33:47.906527+09:00` |
+| 공개 범위 | 검증 소스3·원장1·관련 문서11의15파일 |
+| 실제 확인 | 역할별27유닛 읽기·SSH4경로·잘못된 호스트 키 거절·Native Docker 정지/재개 |
+| 측정·정리 | 메모리 최대94,498,816B·pids.peak67·OOM0·9회 유닛/폴더/cgroup 부재 읽기 |
+| 구조·게시 전 검사 | 공식 Harness²82→85·기존 수정0·상시 증가0·추적2450·위험0·기존10/신규0 |
+| 미완료 | 고정 root/Lifecycle·50소스/캐시·전역 복구·실제 재부팅·정확 승인·운영 적용·MCP/두 봇 |
+<!-- /coordinator-private-backends-publication-20261119 -->
+
 <!-- /coordinator-private-backends-20261119 -->
 
 <!-- coordinator-native-systemd-publication-20261119 -->

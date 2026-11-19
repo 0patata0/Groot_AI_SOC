@@ -365,7 +365,9 @@
     "operating_deployment_or_MCP_or_bot_acceptance": false,
     "operating_host_socket_credentials_or_network_shared": false,
     "packages_downloaded_or_installed": 0,
-    "model_calls_or_attack_or_training": 0
+    "model_calls_or_attack_or_training": 0,
+    "Docker_resource_proof": "Docker inspect HostConfig memory/pids and Mounts RW flags; per-container kernel cgroup limits and mount enforcement were not independently read",
+    "container_kernel_NoNewPrivileges_and_namespace_identity_independently_read": true
   },
   "official_Harness2": {
     "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
@@ -558,7 +560,11 @@
     "operating_and_recovery_backups": true
   },
   "publication": {
-    "status": "prepared, not yet committed or pushed"
+    "commit": "2342b4f1dab0f1faa4a85272e43c87b5b6f8ca40",
+    "remote_main": "2342b4f1dab0f1faa4a85272e43c87b5b6f8ca40",
+    "push_performed": true,
+    "verified_at_kst": "2026-11-19T12:33:47.906527+09:00",
+    "credential_source": "project local credential file; per-Git-process environment only; helper disabled; trace/verbose environment absent; raw errors suppressed"
   },
   "humanize": {
     "run_id": "2026-11-19-019-cdf7",

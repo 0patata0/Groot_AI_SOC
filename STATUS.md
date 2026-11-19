@@ -690,3 +690,15 @@ B 전용 Docker 데몬과 새 BusyBox 컨테이너를 만들고 Native로 재시
 <!-- service-phase-resolution-publication-20261119 -->
 조회 요청 해소 후보와 실제 대상 완료 판정의 공백은 `bbeb20570f71e4959bda14626fa674a641cce795`로 게시했다. 원격 main 일치는 `2026-11-19T14:25:47.523231+09:00`에 확인했다. 후보는 운영 미적용이며, 다음 작업은 없는 unit을 유효 조회·완료로 집계하지 않는 공통 경계와 실제 서비스 종류·읽기 경로의 검증이다.
 <!-- /service-phase-resolution-publication-20261119 -->
+
+
+<!-- service-identity-publication-20261119 -->
+
+| SDK 실체 확인 검증 게시 | 결과 |
+| --- | --- |
+| 내용 커밋·원격 main | `f054e8073bdb33f70b9c4e0739db08335c5386f6` |
+| 실제 원격 일치 KST | `2026-11-19T15:30:11.097505+09:00` |
+| 이번 운영 배포 | 미적용 |
+| 재개 지점 | Hermes·공동 관리 연결, Vector의 실제 수집 경로 확인 |
+
+<!-- /service-identity-publication-20261119 -->

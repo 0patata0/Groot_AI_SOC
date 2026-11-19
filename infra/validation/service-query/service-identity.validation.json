@@ -222,7 +222,11 @@
     "new OS installation not run"
   ],
   "publication": {
-    "state": "prepared; commit and push still to be verified",
+    "state": "content committed and pushed; publication receipt commit follows",
+    "content_commit": "f054e8073bdb33f70b9c4e0739db08335c5386f6",
+    "remote_main_verified": "f054e8073bdb33f70b9c4e0739db08335c5386f6",
+    "verified_at_kst": "2026-11-19T15:30:11.097505+09:00",
+    "credential_source": "project local file; process only; helper and HTTP trace disabled",
     "no_local_evidence_or_credentials_included": true
   }
 }

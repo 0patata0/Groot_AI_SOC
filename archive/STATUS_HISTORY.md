@@ -14018,3 +14018,15 @@ Mac과 Linux에서 후보의 기존 SDK 328개·실체 확인 17개 검사가 �
 
 [검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
 <!-- /service-identity-completion-20261119 -->
+
+
+<!-- service-identity-publication-20261119 -->
+
+| SDK 실체 확인 검증 게시 | 결과 |
+| --- | --- |
+| 내용 커밋·원격 main | `f054e8073bdb33f70b9c4e0739db08335c5386f6` |
+| 실제 원격 일치 KST | `2026-11-19T15:30:11.097505+09:00` |
+| 이번 운영 배포 | 미적용 |
+| 재개 지점 | Hermes·공동 관리 연결, Vector의 실제 수집 경로 확인 |
+
+<!-- /service-identity-publication-20261119 -->

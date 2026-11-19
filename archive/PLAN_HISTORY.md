@@ -7204,3 +7204,16 @@ Abstract 제목과 한글 내용, 일반 목차만 반영한 MD·DOCX·PDF를 �
 
 발표자료는 사용자 지시에 따라 보존한다. 이번 문서 작업에서 새 채팅·MCP·공격·학습·운영 배포는 수행하지 않았다. 전체 native 통합 시험의 직전 R8은 실패 후 작업 공간과 입력을 정리한 상태이며 자동 재개하지 않았다. 시간·비용 비교와 새 환경 전체 재현, 독립 사건 판단 정확도·장기 안정성은 후속 과제로 남긴다.
 <!-- /thesis-justify-background-panel-20261119 -->
+
+
+<!-- service-identity-completion-20261119 -->
+<a id="service-identity-completion-20261119"></a>
+
+## 미존재 unit의 논리 서비스 완료 오판 방지 검증
+
+후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+
+사용자의 50분 전 마무리 지시에 따라 이번 검증과 기록 게시까지만 진행하고 새 작업은 시작하지 않는다. 다음에는 Hermes 공통 연결과 Vector의 실제 수집 경로 확인부터 이어간다. 발표자료는 보존했다. 전체 실전 운용 목표와 논문·발표의 남은 검증은 미완료다.
+
+[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

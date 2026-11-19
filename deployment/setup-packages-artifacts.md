@@ -788,9 +788,11 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-phase-resolution-20261119 -->
+<!-- service-identity-completion-20261119 -->
 
-새 후보는 해당 전환의 실행 오류 없이 보고를 반환했지만 내용 검증과 운용 기준을 충족하지 못해 운영에 적용하지 않았다. Vector의 실제 반환 unit은 capstone-vector.service이며 LoadState=not-found였다. 없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
+SDK 격리 후보는 실제 설치 원본의 7파일을 바탕으로 만들었다. 등록된 진단에서 LoadState=not-found가 반환되면 모델이 같은 호스트의 서비스·컨테이너 목록 읽기를 선택한다. 목록을 모두 읽어도 논리 구성요소를 식별하지 못하면 partial과 추가 확인 필요를 유지한다. inactive/dead·Result=success 기본값을 실제 정지·실행 성공의 근거로 쓰지 않는다. 명시적 unit 조회와 호출자가 지정한 도구 범위는 유지한다.
 
-[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](../archive/DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
-<!-- /service-phase-resolution-20261119 -->
+후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+
+[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](../archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

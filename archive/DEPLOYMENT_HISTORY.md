@@ -2385,3 +2385,16 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 <!-- service-phase-resolution-publication-20261119 -->
 조회 요청 해소 후보와 실제 대상 완료 판정의 공백은 `bbeb20570f71e4959bda14626fa674a641cce795`로 게시했다. 원격 main 일치는 `2026-11-19T14:25:47.523231+09:00`에 확인했다. 후보는 운영 미적용이며, 다음 작업은 없는 unit을 유효 조회·완료로 집계하지 않는 공통 경계와 실제 서비스 종류·읽기 경로의 검증이다.
 <!-- /service-phase-resolution-publication-20261119 -->
+
+
+<!-- service-identity-completion-20261119 -->
+<a id="service-identity-completion-20261119"></a>
+
+## 미존재 unit의 논리 서비스 완료 오판 방지 검증
+
+후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+
+시험 결과와 파일별 SHA를 로컬에 보존한 뒤 서버의 이번 시험 폴더 2개, 742파일, 27,086,470바이트를 정리했다. 15:17:06 KST에 운영 64파일 SHA 불변, Hermes 컨테이너의 동일 시작 상태와 두 봇의 채팅 연결·작업자 생존을 확인했다. 운영 복구본·공식 프레임워크·가중치는 삭제하지 않았다.
+
+[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

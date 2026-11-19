@@ -1033,17 +1033,21 @@ def service_identity_state(request, question, receipts, now=None):
     state={'pending':[], 'incomplete':[], 'missing_units':[], 'observations':[], 'read_calls':[]}
     if (not isinstance(receipts,(list,tuple)) or len(receipts)>128 or any(not isinstance(r,dict) for r in receipts)
             or not isinstance(question,str) or read_contract().wants_write(question)
-            or re.search(r'\.service\b|```|설명만|번역|예시|가정|조회\s*(?:하지|말)|도구\s*없이',question)):
+            or re.search(r'```|설명만|번역|예시|가정|조회\s*(?:하지|말)|도구\s*없이',question)):
         return state
     selected=service_target_selection(request,question)
     if not selected or selected['ambiguous']:return state
+    explicit_units=set(re.findall(
+        r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
     now=now or datetime.now(timezone(timedelta(hours=9)))
     diagnostic='mcp__system_diagnostics__get_system_diagnostics'
     for target in sorted(selected['targets']):
         unit=selected['mapping'].get(target)
-        if unit is None:continue
+        if unit is None or unit in explicit_units:continue
         rows=[r for r in receipts if r.get('tool')==diagnostic and isinstance(r.get('arguments'),dict)
-            and r['arguments'].get('target')==target and not set(r['arguments'])-{'target','limit','lookback_minutes'}]
+            and r['arguments'].get('target')==target
+            and r['arguments'].get('view','snapshot')=='snapshot'
+            and not set(r['arguments'])-{'target','limit','lookback_minutes','view'}]
         if not rows:continue
         row=rows[-1];data=row.get('data');stamp=_diagnostic_instant(data.get('observed_at_kst')) if isinstance(data,dict) else None
         if (row.get('is_error') is not False or not isinstance(data,dict)

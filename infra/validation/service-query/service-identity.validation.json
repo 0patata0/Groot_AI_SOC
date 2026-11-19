@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-19T15:18:53.338867+09:00",
+  "state": "SDK isolated identity discovery prototype validated; Native/common installation connection and rollout not completed",
+  "plan_sha256": "c9ac9e6ee62d945f64dda0eb14dbfdd0c677a47543e9782800f3fdc388665184",
+  "source_files": {
+    "/opt/capstone-ollama-trial/chat_contract.py": {
+      "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+      "after_sha256": "82c3090a812495462e42e99903a8529adf312c1d7edacff8242bd2e9847cf60b",
+      "bytes": 229401
+    },
+    "/opt/capstone-ollama-trial/grounding.py": {
+      "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "after_sha256": "6f954f85cd0c9aa3e368e43384aaf22cc8bf7b8270d774a724b911fb46a5bc6d",
+      "bytes": 305452
+    },
+    "/opt/capstone-ollama-trial/harness.py": {
+      "before_sha256": "f07630b6ddb4566d5181d3dfd9bcfa340cf2751419b2afbc06842673a7bddc1a",
+      "after_sha256": "1dcb96faaefaba74e166df98f4cca6f94d816a61d4c2e51656630e77fcb83822",
+      "bytes": 343153
+    },
+    "/opt/capstone-ollama-trial/query_grounding.py": {
+      "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+      "after_sha256": "380b5d405f7668e2dabfd48ea51cd953957d4dec4a81fc10a49aa0273b6bbcc1",
+      "bytes": 73909
+    },
+    "/opt/capstone-ollama-trial/runtime.py": {
+      "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+      "after_sha256": "98ef62be9c6a6893b46525310b88d921bd22a8a6bcd2c411dde8d2ff6b3b1b87",
+      "bytes": 61838
+    },
+    "/opt/capstone-ollama-trial/skill-soc-query.md": {
+      "before_sha256": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7",
+      "after_sha256": "41a33ec4c151d193d0489d8c168d1dd2635539c10896bd5c5dbe7234a609a7f9",
+      "bytes": 14071
+    },
+    "/opt/capstone-ollama-trial/workflow_contract.py": {
+      "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "after_sha256": "bf7c90e28f52389135d5f4f50ea729424aa103fb977357c344c8f94301eab511",
+      "bytes": 3665
+    }
+  },
+  "patch": {
+    "path": "service-identity.patch",
+    "sha256": "0198a2e60e7624681152b5ac841d30d963ce35b43f6483e0742d7045fd8a5740",
+    "bytes": 41496,
+    "installed_base_only": true,
+    "not_an_installer": true,
+    "forward_and_reverse_sha_verified_files": 7
+  },
+  "canonical_changes": {
+    "infra/hermes/chat_contract.py": {
+      "sha256": "cd7d77504b0d48788a8a4dad4dfb294331e0c8e32f96d96c17c61cded66a4d60",
+      "behavior": [
+        "explicit snapshot is a current observation",
+        "explicit unit exemption applies only to that unit, not all selected logical services"
+      ]
+    },
+    "infra/hermes/test_service_identity_discovery.py": {
+      "sha256": "7d7c8519d2474d8c470402ce61e2b4bda50a796a3d139234401433426335a585",
+      "tests": 12,
+      "overlaps_identity_suite": true
+    }
+  },
+  "actual_schema_catalog": {
+    "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+    "source": "actual B root-owned diagnostic tools metadata, no command execution or schema substitution",
+    "actual_schemas_used_in_private_regressions": true
+  },
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "access_mode": "hermes-parity",
+  "regression": {
+    "mac_sdk": 328,
+    "mac_identity": 17,
+    "linux_sdk": 328,
+    "linux_identity": 17,
+    "linux_harness2": 38,
+    "linux_installer": 37,
+    "skipped": 0,
+    "candidate_failures": 0,
+    "baseline_sdk_failures": [
+      "test_service_identity_scope.ServiceIdentityScope.test_transport_labels_use_common_normalization_without_erasing_device_or_other_actor_scope"
+    ],
+    "baseline_identity_failures_preserved": true,
+    "first_prototype_failed_notice_test_preserved": true,
+    "whole_repository_pass": false
+  },
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_locked_files_verified": 140,
+    "framework_manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc"
+  },
+  "framework_structure_is_model_quality": false,
+  "actual_trial": {
+    "question": "B 서버 Vector 오류랑 지금 상태 확인해줘",
+    "started_at_kst": "2026-11-19T15:14:20.158377+09:00",
+    "finished_at_kst": "2026-11-19T15:14:42.329747+09:00",
+    "collector_seconds": 22.171531993080862,
+    "runtime_total_seconds": 21.141427941038273,
+    "runtime_rc": 1,
+    "runtime_exception": null,
+    "status": "partial",
+    "read_calls": 4,
+    "model_calls": 3,
+    "reported_scope": "logical b:vector component identity remains unverified; not a completed service diagnosis",
+    "discovery": {
+      "pending": [],
+      "incomplete": [],
+      "missing_units": [
+        {
+          "target": "b:vector",
+          "unit": "capstone-vector.service",
+          "host": "b",
+          "observed_at_kst": "2026-11-19T15:14:02+09:00"
+        }
+      ],
+      "observations": [
+        {
+          "host": "b",
+          "view": "services",
+          "observed_at_kst": "2026-11-19T15:14:07+09:00",
+          "total": 185,
+          "returned_rows": 185,
+          "scope": "loaded_units",
+          "component_identity_verified": false
+        },
+        {
+          "host": "b",
+          "view": "containers",
+          "observed_at_kst": "2026-11-19T15:14:07+09:00",
+          "total": 7,
+          "returned_rows": 7,
+          "scope": "docker_containers",
+          "component_identity_verified": false
+        }
+      ],
+      "read_calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_host_inventory",
+          "arguments": {
+            "host": "b",
+            "view": "services",
+            "state": "all",
+            "limit": 100,
+            "offset": 0
+          }
+        },
+        {
+          "tool": "mcp__system_diagnostics__get_host_inventory",
+          "arguments": {
+            "host": "b",
+            "view": "services",
+            "state": "all",
+            "limit": 100,
+            "offset": 100
+          }
+        },
+        {
+          "tool": "mcp__system_diagnostics__get_host_inventory",
+          "arguments": {
+            "host": "b",
+            "view": "containers",
+            "state": "all",
+            "limit": 100,
+            "offset": 0
+          }
+        }
+      ]
+    },
+    "report_sha256": "eec45c2ed020bdab6e317f9ee3d67c8d8197f84cec7e1d45fab0eb1b289d5a35",
+    "protected_calls": 0,
+    "chat_posts": 0,
+    "new_actual_mattermost_chat": false
+  },
+  "interpretation": {
+    "previous_E16_same_question_seconds": 20.316,
+    "previous_E16_status": "completed despite missing unit",
+    "completion_overclaim_prevented_in_one_new_trial": true,
+    "speed_improvement_established": false,
+    "independent_accuracy_or_SLO_established": false,
+    "discovered_actual_Vector_component": false
+  },
+  "scope_boundaries": {
+    "new_tool_or_permission": false,
+    "explicit_caller_tool_list_expanded": false,
+    "protected_call_by_model": false,
+    "verdict_or_approval_invented": false,
+    "native_connected": false,
+    "management_connected": false,
+    "operating_applied": false,
+    "presentation_edits": 0
+  },
+  "cleanup": {
+    "roots": 2,
+    "files": 742,
+    "bytes": 27086470,
+    "terminal_jobs": true,
+    "locally_preserved_outputs_and_source_reproducibility": true,
+    "operating_backups_framework_weights_removed": false
+  },
+  "last_operating_check": {
+    "at_kst": "2026-11-19T15:17:06.412741+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "native_same_identity_and_start_state": true,
+    "both_chat_workers_alive_and_websockets_connected": true,
+    "operating_changes": 0,
+    "operating_restarts": 0
+  },
+  "remaining": [
+    "actual Vector component and collection pipeline evidence",
+    "Native and shared management integration with matching identity completion contract",
+    "fresh actual chats and production pooled transport validation",
+    "receipt/source/installer alignment and recovery before operating rollout",
+    "prior E16 causal scope and claim quality failures remain"
+  ],
+  "limitations": [
+    "single direct SDK interaction, not a fresh Mattermost chat or controlled timing A/B",
+    "partial is correct uncertainty, not a completed diagnosis",
+    "base and candidate repeated suites are not independent attack/accuracy cases",
+    "full Native Mac tests unavailable without openai dependency",
+    "Semgrep not run; CLI unavailable",
+    "new OS installation not run"
+  ],
+  "publication": {
+    "state": "prepared; commit and push still to be verified",
+    "no_local_evidence_or_credentials_included": true
+  }
+}

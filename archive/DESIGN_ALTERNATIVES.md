@@ -1163,3 +1163,16 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 본문 양쪽 정렬과 표 셀 정렬을 따로 지정하고 가로선은 일반 구역의 Word 문단 테두리로 출력한다. 비용 비교에서는 사람의 직접 작업시간을 채팅 경과시간과 구분하고 검토·승인·재작업과 추가 운영비를 포함한다.
 <!-- /thesis-justify-background-panel-20261119 -->
+
+
+<!-- service-identity-completion-20261119 -->
+<a id="service-identity-completion-20261119"></a>
+
+## 미존재 unit의 논리 서비스 완료 오판 방지 검증
+
+SDK 격리 후보는 실제 설치 원본의 7파일을 바탕으로 만들었다. 등록된 진단에서 LoadState=not-found가 반환되면 모델이 같은 호스트의 서비스·컨테이너 목록 읽기를 선택한다. 목록을 모두 읽어도 논리 구성요소를 식별하지 못하면 partial과 추가 확인 필요를 유지한다. inactive/dead·Result=success 기본값을 실제 정지·실행 성공의 근거로 쓰지 않는다. 명시적 unit 조회와 호출자가 지정한 도구 범위는 유지한다.
+
+이전 E16의 같은 질문은 20.316초에 없는 unit을 조회하고 완료로 집계했다. 이번 단회 관측은 그 완료 오판을 막았다는 근거이며 속도 개선이나 일반 정확도 향상의 근거로 쓰지 않는다. 실제 새 Mattermost 채팅과 운영 연결풀은 검증하지 않았다. 오류 원인·수집 경로·실제 Vector 구성요소는 추가 조사가 필요하다.
+
+[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

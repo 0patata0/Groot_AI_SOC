@@ -612,9 +612,13 @@ Mac관리자 경유 상태 조회가2회 연결 시간 초과로 중단됐으나
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-phase-resolution-20261119 -->
+<!-- service-identity-completion-20261119 -->
 
-새 후보는 해당 전환의 실행 오류 없이 보고를 반환했지만 내용 검증과 운용 기준을 충족하지 못해 운영에 적용하지 않았다. Vector의 실제 반환 unit은 capstone-vector.service이며 LoadState=not-found였다. 없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
+실제 질문은 ‘B 서버 Vector 오류랑 지금 상태 확인해줘’였다. B의 기존 SDK 계정에서 Thor의 soc-qwen36:35b-balanced-q4km-20261108 모델과 hermes-parity 권한을 사용했다. 진단 1회와 인벤토리 3회, 모델 3회로 22.172초에 partial 보고를 반환했다. 서비스 목록 185행과 컨테이너 목록 7행을 확인했지만 b:vector의 실체는 미확인이었다. 보호 도구 호출·채팅 게시·운영 재시작은 없었다.
 
-[검증·후보·미적용](../service-query/phase-resolution.validation.json) · [17원본 기준 패치](../service-query/phase-resolution.patch) · [전체 실패·정정·근거](../../../archive/DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
-<!-- /service-phase-resolution-20261119 -->
+이전 E16의 같은 질문은 20.316초에 없는 unit을 조회하고 완료로 집계했다. 이번 단회 관측은 그 완료 오판을 막았다는 근거이며 속도 개선이나 일반 정확도 향상의 근거로 쓰지 않는다. 실제 새 Mattermost 채팅과 운영 연결풀은 검증하지 않았다. 오류 원인·수집 경로·실제 Vector 구성요소는 추가 조사가 필요하다.
+
+후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+
+[검증·운영 미적용](../service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../service-query/service-identity.patch) · [전체 경과·한계](../../../archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

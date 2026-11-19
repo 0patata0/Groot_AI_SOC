@@ -10,14 +10,14 @@
 학교 지정값·팀원 사진/학번과 실제 리허설·12월1일 발표는 별도 확인 항목으로 유지한다. [검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-justify-background-panel-20261119).
 <!-- /thesis-justify-background-panel-20261119 -->
 
-<!-- service-phase-resolution-20261119 -->
+<!-- service-identity-completion-20261119 -->
 
-없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
+후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
 
-후속 개선에서는 필수 조회 뒤의 중복 선택 비용과 자유 서술의 근거 결속을 함께 다룬다. 첫 실패 실행에서 읽기 선택 두 단계는 각각20.628초와17.802초였다. 보고를 먼저 작성하고 추가 근거가 필요할 때만 실제 읽기 선택으로 넘어가는 방안을 다음 후보에서 검증한다. 시간이나 상태 수치를 자유 서술에 반복해 넣는 대신, 원문에 결속된 관측과 모델의 원인 판단·미확인을 구분한다. 현재 후보에 이 후속 방안을 구현했다고 표시하지 않는다.
+사용자의 50분 전 마무리 지시에 따라 이번 검증과 기록 게시까지만 진행하고 새 작업은 시작하지 않는다. 다음에는 Hermes 공통 연결과 Vector의 실제 수집 경로 확인부터 이어간다. 발표자료는 보존했다. 전체 실전 운용 목표와 논문·발표의 남은 검증은 미완료다.
 
-[검증·후보·미적용](infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](archive/DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
-<!-- /service-phase-resolution-20261119 -->
+[검증·운영 미적용](infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](infra/validation/service-query/service-identity.patch) · [전체 경과·한계](archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->
 
 
 <!-- service-provenance-summary-in-archive -->

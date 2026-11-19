@@ -14003,3 +14003,18 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 논문과 판넬 원본은 로컬 전용으로 유지하고 공개 현황 문서만 게시했다. 내용 커밋과 실제 원격 main의 일치를 확인했으며 최종 게시 기록은 후속 커밋으로 남긴다. 다른 작업의 변경은 보존했고 이번 작업의 스테이징 항목은 없다.
 <!-- /thesis-justify-panel-publication-20261119 -->
 <!-- /thesis-justify-background-panel-20261119 -->
+
+
+<!-- service-identity-completion-20261119 -->
+<a id="service-identity-completion-20261119"></a>
+
+## 미존재 unit의 논리 서비스 완료 오판 방지 검증
+
+Mac과 Linux에서 후보의 기존 SDK 328개·실체 확인 17개 검사가 각각 통과했다. Linux Harness² 38개와 설치기 37개 검사도 통과했다. 공식 Harness² 고정 버전 6868817518876de8fd170c6a8354daca273b6191의 140파일 SHA를 확인하고 세 경로의 구조를 점검했다. 이는 독립 정확도 점수나 실제 운영 검증 성공을 뜻하지 않는다. 기존 설치 원본의 실패와 첫 후보의 설명 문구 실패도 보존했다.
+
+실제 질문은 ‘B 서버 Vector 오류랑 지금 상태 확인해줘’였다. B의 기존 SDK 계정에서 Thor의 soc-qwen36:35b-balanced-q4km-20261108 모델과 hermes-parity 권한을 사용했다. 진단 1회와 인벤토리 3회, 모델 3회로 22.172초에 partial 보고를 반환했다. 서비스 목록 185행과 컨테이너 목록 7행을 확인했지만 b:vector의 실체는 미확인이었다. 보호 도구 호출·채팅 게시·운영 재시작은 없었다.
+
+시험 결과와 파일별 SHA를 로컬에 보존한 뒤 서버의 이번 시험 폴더 2개, 742파일, 27,086,470바이트를 정리했다. 15:17:06 KST에 운영 64파일 SHA 불변, Hermes 컨테이너의 동일 시작 상태와 두 봇의 채팅 연결·작업자 생존을 확인했다. 운영 복구본·공식 프레임워크·가중치는 삭제하지 않았다.
+
+[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
+<!-- /service-identity-completion-20261119 -->

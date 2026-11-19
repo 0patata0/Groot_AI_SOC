@@ -864,3 +864,11 @@ MD·DOCX·PDF96쪽·본문/표/코드1,902구간 누락0·82제목/62캡션의14
 | 윤문 | 008-c258/light·0.05%·B·자체6/6·gate0·경고0. 이 영수증은 기술 셀만 추가 |
 | 미완료 | 설계/주기·기간·한계 문장, 실제30/60초 목표, 운영 적용과 새 채팅, 별도 승인 항목 |
 <!-- /service-report-provenance-publication-20261119 -->
+
+## 2026-11-19 인증서 감시의 자연 예약 실행 확인
+
+<!-- certificate-scheduled-followup-20261119 -->
+첫 읽기에서 timedatectl에 쉼표로 묶은 속성 이름을 넘겨 출력이 비었다. 명령의 종료0만으로 시간 상태를 확인했다고 표시하지 않고 --property를3번 명시한 별도 읽기에서 Timezone=Asia/Seoul·NTP=yes·NTPSynchronized=yes를 확인했다. 이는09:48의 OS 보고 상태이며 절대UTC 정확도나09:00 당시 동기화 상태의 별도 측정이 아니다. 관측 스크립트의 가정만 바로잡았고 운영 감시기는 수정하지 않았다.
+
+[예약 관측·MCP 대조·한계](../infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- /certificate-scheduled-followup-20261119 -->

@@ -13706,3 +13706,15 @@ Native 첫 도구 선택 오류의 재시도를 작은 요청에 연결했다. �
 | 윤문 | 008-c258/light·0.05%·B·자체6/6·gate0·경고0. 이 영수증은 기술 셀만 추가 |
 | 미완료 | 설계/주기·기간·한계 문장, 실제30/60초 목표, 운영 적용과 새 채팅, 별도 승인 항목 |
 <!-- /service-report-provenance-publication-20261119 -->
+
+## 2026-11-19 인증서 감시의 자연 예약 실행 확인
+
+<!-- certificate-scheduled-followup-20261119 -->
+11/19 09:00 KST의 기존 인증서 감시 예약 실행을 확인했다. 서비스는 exit0/verified로 종료됐으며 상태 파일과 journal의 실행 식별자·인증서 지문이 일치했다. 메인 프로세스의 시작부터 종료까지는0.634134초였고 기존 실행파일·service·timer·공개 인증서4파일의 SHA는 승인된 적용본과 같았다. 타이머는 enabled/active이며 다음 예약은11/20 09:00 KST다.
+
+관리자231 경유 A 관측과 B의 기존 mcp 계정에서 수행한2읽기를 대조했다. 현재 MCP의 시작·종료 단조 시각과 종료값이 A와 같았고08:59~09:02의 실제 journal은4표본을 반환했다. verified 이벤트의 원문 해시도 A의 같은 이벤트와 일치했다. 현재 스냅샷의 journal_status=unavailable·오류 건수null은 보존하며 별도 실시간 journal 표본과 구분한다. has_more=false도 전체 보존 이력이나 오류 부재를 증명하지 않는다.
+
+이번에는 기존 예약 실행을 읽었으며 감시기를 수동 실행하거나 서비스·인증서·설정을 바꾸지 않았다. 새 TLS/HTTP 요청·개인키 읽기·모델 호출·봇 게시·공격·학습은0이다. 한 차례 예약 실행의 결과이며 장기 안정성, 외부 인터넷/DNS/443/HTTP, 새 봇 응답과 새 OS 전체 설치·운영12규칙 경보 전달은 별도다. 관리자 NTP390a와 응답 MCP1.2.1의 정확 승인 대기도 유지한다.
+
+[예약 관측·MCP 대조·한계](../infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- /certificate-scheduled-followup-20261119 -->

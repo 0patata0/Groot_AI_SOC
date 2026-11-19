@@ -159,7 +159,7 @@
   },
   "pending": [
     "Fresh single deploy.sh execution and operating12-rule/alert delivery; source integration and isolated native engine112 cases verified, operating legacy observer unchanged",
-    "Next scheduled 09:00 KST observation; public DNS/443/HTTP availability and fresh OS install are separate"
+    "Long-term scheduled reliability; public Internet/DNS/443/HTTP and other paths are not established by the single 2026-11-19 scheduled run"
   ],
   "review": {
     "approach": "Primary agent defect-first review; review-agent unavailable",
@@ -708,5 +708,156 @@
     "latest_isolated_seconds": 93.169,
     "independent_quality_pass": false,
     "validation": "../../validation/service-query/report-provenance.validation.json"
+  },
+  "scheduled_followup_20261119": {
+    "schema": 1,
+    "state": "natural_20261119_0900_observation_verified_read_only",
+    "observed_at_kst": "2026-11-19T09:50:49.221393+09:00",
+    "A_observed_at_kst": "2026-11-19T09:48:10.788716+09:00",
+    "route_A": "Mac-admin-A",
+    "route_B": "Mac-admin-A-B",
+    "scheduled_observation_at_kst": "2026-11-19T09:00:00+09:00",
+    "service_main_elapsed_seconds": 0.634134,
+    "service": {
+      "ActiveState": "inactive",
+      "DropInPaths": "",
+      "ExecMainExitTimestamp": "Thu 2026-11-19 09:00:00 KST",
+      "ExecMainExitTimestampMonotonic": "588435958242",
+      "ExecMainStartTimestamp": "Thu 2026-11-19 09:00:00 KST",
+      "ExecMainStartTimestampMonotonic": "588435324108",
+      "ExecMainStatus": "0",
+      "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.service",
+      "Group": "root",
+      "IPAddressAllow": "127.0.0.1/32 172.18.0.3/32",
+      "IPAddressDeny": "0.0.0.0/0 ::/0",
+      "Id": "capstone-cert-monitor.service",
+      "InvocationID": "e39e18b958e84246b5769cf392bac5fc",
+      "LoadState": "loaded",
+      "NeedDaemonReload": "no",
+      "Result": "success",
+      "SubState": "dead",
+      "UnitFileState": "static",
+      "User": "root"
+    },
+    "timer": {
+      "AccuracyUSec": "1min",
+      "ActiveState": "active",
+      "DropInPaths": "",
+      "FragmentPath": "/etc/systemd/system/capstone-cert-monitor.timer",
+      "Id": "capstone-cert-monitor.timer",
+      "LastTriggerUSec": "Thu 2026-11-19 09:00:00 KST",
+      "LastTriggerUSecMonotonic": "6d 19h 27min 15.315389s",
+      "LoadState": "loaded",
+      "NeedDaemonReload": "no",
+      "NextElapseUSecRealtime": "Fri 2026-11-20 09:00:00 KST",
+      "Persistent": "yes",
+      "Result": "success",
+      "SubState": "waiting",
+      "TimersCalendar": "{ OnCalendar=*-*-* 09:00:00 Asia/Seoul ; next_elapse=Fri 2026-11-20 09:00:00 KST }",
+      "UnitFileState": "enabled"
+    },
+    "event": {
+      "automatic_renewal": false,
+      "certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+      "domain": "chat.grootlab.duckdns.org",
+      "expiry_status": "ok",
+      "not_after_epoch": 1799814312,
+      "not_after_kst": "2027-01-13T13:25:12+09:00",
+      "observed_at_kst": "2026-11-19T09:00:00+09:00",
+      "observed_at_utc": "2026-11-19T00:00:00Z",
+      "probe_status": "verified",
+      "reason": "verified",
+      "schema_version": 1,
+      "seconds_remaining": 4767912,
+      "served_certificate_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427"
+    },
+    "event_invocation_id_matches": true,
+    "event_message_sha256": "db9e41c5d97e98614aed1331bd6699f15ad9a041408d00fe419320000e3eb2e8",
+    "public_certificate_DER_matches_event": true,
+    "approved_four_source_files_unchanged": true,
+    "source_sha256": {
+      "/etc/systemd/system/capstone-cert-monitor.service": "9c9f50343d7671890e8218352fa69922144d9c34fd50f67d1348a2caa314e97c",
+      "/etc/systemd/system/capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+      "/home/groot_a/capstone/chatproxy/tls/chatduck.crt": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794",
+      "/usr/local/sbin/capstone-cert-monitor": "ecc817ceb6dd8d6b24b3ab3087e9642631bea796fb2e3a4e18f81836091b77d8",
+      "/var/lib/capstone-cert-monitor/status.json": "e269d28318c8bc46853a5d983e2531295a27fe95378af9d5787fe13de996dc23"
+    },
+    "A_clock_observed_separately_at_kst": "2026-11-19T09:48:56.412410+09:00",
+    "A_clock": {
+      "NTP": "yes",
+      "NTPSynchronized": "yes",
+      "Timezone": "Asia/Seoul"
+    },
+    "actual_MCP": {
+      "process_user": "mcp",
+      "source_files": {
+        "/opt/mcp/run-wazuh-ro.sh": {
+          "gid": 988,
+          "mode": 488,
+          "sha256": "5702374983e3cd02029ffc39ff3e153f1d068d16aa9f45add26cecc4f9d4ab0c",
+          "uid": 0
+        },
+        "/opt/mcp/system-diagnostics-mcp.py": {
+          "gid": 988,
+          "mode": 360,
+          "sha256": "7ea5dbe0fe1ce188bade41a56ba24f1c3bce54443d38d1dd3823a1203135b964",
+          "uid": 0
+        }
+      },
+      "endpoint_tools_listed": 3,
+      "completed_read_calls": 2,
+      "current_snapshot_observed_at_kst": "2026-11-19T09:50:06+09:00",
+      "current_snapshot_age_seconds": 41,
+      "current_monotonic_fields_match_A": true,
+      "current_snapshot_journal_status": "unavailable",
+      "current_returned_error_count": null,
+      "live_journal_requested_since_kst": "2026-11-19T08:59:00+09:00",
+      "live_journal_requested_until_kst": "2026-11-19T09:02:00+09:00",
+      "live_journal_returned_entries": 4,
+      "has_more": false,
+      "retention_verified": false,
+      "source_event_hash_matches_A": true,
+      "matching_event_at_kst": "2026-11-19T09:00:00.830829+09:00",
+      "message_state": "redacted",
+      "source_files_unchanged": true
+    },
+    "observer_correction": {
+      "initial_clock_properties_empty": true,
+      "reason": "timedatectl did not select comma-delimited property names; repeated --property options returned all three required fields",
+      "operating_code_changed": false
+    },
+    "operating_changes": 0,
+    "manual_observer_runs": 0,
+    "new_TLS_HTTP_requests_by_validation": 0,
+    "private_key_reads": 0,
+    "model_calls": 0,
+    "bot_posts": 0,
+    "attacks": 0,
+    "training_runs": 0,
+    "scope_limits": [
+      "single natural scheduled observation, not long-term reliability",
+      "existing A proxy certificate; no public DNS/443/HTTP or other route observation in this unit",
+      "MCP endpoint2 reads; no new model/bot response validation",
+      "current snapshot journal unavailable and null count preserved; live excerpt4 not entire retained history",
+      "fresh deploy.sh OS installation and operating12-rule alert delivery remain unverified",
+      "administrator NTP390a and response MCP1.2.1 exact approvals not reused"
+    ],
+    "local_evidence_sha256": {
+      "a-readonly.result.json": "44e2e23630b05e7f69a873812babccff8e3f9ce42c21de0c6181d8a502df9e8b",
+      "a-clock-readonly.result.json": "65fdb580e0f2e2a9a8076dbde92eaa7b44256afcbfacd7d908e167cb0239dee2",
+      "b-mcp-readonly.result.json": "f62d5491481ef04ca23207f11143e96a4ac546e7ab218207bf951bef311dbd43"
+    },
+    "documentation": {
+      "run": "2026-11-19-010-cee6",
+      "route": "light",
+      "change_rate_percent": 0.0,
+      "grade": "B",
+      "self_checks": "6/6",
+      "gate_exit_code": 0,
+      "warnings": 0
+    },
+    "publication": {
+      "status": "prepared_not_committed_or_pushed"
+    }
   }
 }

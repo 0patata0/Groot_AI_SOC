@@ -186,7 +186,7 @@ systemctl list-timers capstone-block-reaper.timer      # TTL 만료 감사 리�
 
 ## 인증서 관측 실패 수정과 남은 출력 오류
 
-관리자231 경유로 승인된 감시 실행파일·service2개를 적용하고17:13:01 KST에 확정했다. 실제 oneshot은exit0/verified이며 인증서 지문이 일치한다. 기존 MCP의 현재 상태와 실제 journal4표본에서도 확인했다. 5분 독립 원복은 해제하고 원본·정확 후보·제어기는 보존했다. 프록시·인증서·개인키·매일09:00 타이머·MCP/모델은 유지한다. 새 채팅1건은 올바른 인증서 조회 뒤 불필요한 Wazuh 에이전트 조회가 추가되고 최종 표의 대상이 바뀌어 실패로 기록했다. 초기 설치 이식·공개443·내일 예약 실행은 별도 미완료다. [검증·미완료 범위](certificate-monitor/readiness.validation.json).
+관리자231 경유로 승인된 감시 실행파일·service2개를 적용하고17:13:01 KST에 확정했다. 실제 oneshot은exit0/verified이며 인증서 지문이 일치한다. 기존 MCP의 현재 상태와 실제 journal4표본에서도 확인했다. 5분 독립 원복은 해제하고 원본·정확 후보·제어기는 보존했다. 프록시·인증서·개인키·매일09:00 타이머·MCP/모델은 유지한다. 새 채팅1건은 올바른 인증서 조회 뒤 불필요한 Wazuh 에이전트 조회가 추가되고 최종 표의 대상이 바뀌어 실패로 기록했다. 11/19 09:00 KST의 자연 예약 실행과 exit0/verified를 확인했고 기존 MCP2읽기·journal4표본을 대조했다. 다음 예약은11/20 09:00 KST이며 수동 실행·운영 변경은0이다. 한 차례의 예약 관측으로 외부 인터넷 경로·장기 안정성·새 OS 전체 설치·독립 재구현까지 검증한 것은 아니다. [검증·미완료 범위](certificate-monitor/readiness.validation.json).
 <!-- /certificate-readiness:20261118 -->
 
 

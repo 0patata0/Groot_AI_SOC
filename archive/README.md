@@ -265,3 +265,11 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 
 이번 서비스 보고 후보는 실제 품질 검증을 통과하지 못해 운영에 적용하지 않았다. 서비스 현재 조회의 기존 확정 결과는 유지한다. 원인·이력 조사는 현재 수집본과 실제 journal을 함께 읽으며 자동 선택한 최근 구간을 초기 확인 범위로 표시한다. 보고에서 근거를 넘는 문장을 제외하더라도 원래 판단·검토 상태와 조회 범위 안내를 유지한다. 모델·MCP·권한·보호 주소·승인·차단 TTL은 이번 보완의 변경 대상이 아니다. [검증·미적용·남은 문제](../infra/validation/service-query/report-provenance.validation.json) · [공통 동작](../infra/hermes/service-query-contract.md).
 <!-- /service-report-provenance-candidate-20261119 -->
+
+## 2026-11-19 인증서 감시의 자연 예약 실행 확인
+
+<!-- certificate-scheduled-followup-20261119 -->
+11/19 09:00 KST의 자연 예약 실행과 exit0/verified를 확인했고 기존 MCP2읽기·journal4표본을 대조했다. 다음 예약은11/20 09:00 KST이며 수동 실행·운영 변경은0이다. 한 차례의 예약 관측으로 외부 인터넷 경로·장기 안정성·새 OS 전체 설치·독립 재구현까지 검증한 것은 아니다.
+
+[예약 관측·MCP 대조·한계](../infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- /certificate-scheduled-followup-20261119 -->

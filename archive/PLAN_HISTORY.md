@@ -7021,3 +7021,11 @@ A/B/C27유닛 읽기와 별도 systemd 합성6조건을 확인해 모의 backend
 | 윤문 | 008-c258/light·0.05%·B·자체6/6·gate0·경고0. 이 영수증은 기술 셀만 추가 |
 | 미완료 | 설계/주기·기간·한계 문장, 실제30/60초 목표, 운영 적용과 새 채팅, 별도 승인 항목 |
 <!-- /service-report-provenance-publication-20261119 -->
+
+## 2026-11-19 인증서 감시의 자연 예약 실행 확인
+
+<!-- certificate-scheduled-followup-20261119 -->
+11/19 09:00 KST 예약 실행 확인은 마쳤다. 장기 예약 관측, 외부 인터넷·다른 경로의 가용성, 운영12규칙의 실제 경고 전달, 새 OS 설치와 독립 재구현은 계속 별도 검증한다. 기존 MCP2읽기와 실시간 journal4표본을 새 모델/봇 응답 검증으로 대신하지 않는다. 현재 스냅샷 journal의 unavailable·오류 건수null도 유지한다.
+
+[예약 관측·MCP 대조·한계](../infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- /certificate-scheduled-followup-20261119 -->

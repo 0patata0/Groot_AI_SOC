@@ -896,3 +896,15 @@ MD·DOCX·PDF96쪽·본문/표/코드1,902구간 누락0·82제목/62캡션의14
 | 정리 | 자체 시험3경로·1,439파일 SHA 확인 후 제거·복구 백업 보존 |
 | Git | 검수된 자체 범위만 자동 게시·다른 작업 보존 | [候補・検証・未適用](../infra/validation/service-query/claim-types.validation.json)
 <!-- /service-claim-types-candidate-20261119 -->
+
+<!-- coordinator-private-pid1-20261119 -->
+<a id="coordinator-private-pid1-20261119"></a>
+
+## 2026-11-19 세 private PID1의 검증과 초기 실패
+
+B의 기존 Python3.12.3·systemd255.4-1ubuntu8.18에서 user namespace의 ID범위0..65535와7namespace 분리를 확인했다. 첫 매핑 시도는 newuidmap 미설치로 자식 실행127이었고 부모의 자체 자식 매핑으로 수정했다. 첫 PID1 시험은 관측 기한에 실패했다. chroot 뒤 진단 경로가 닿지 않아 원인이 저장되지 않았으므로 이를 미확인으로 보존했다. 진단 위치를 고친 다음 procfs 마운트의 EPERM을 확인했고 전용 procfs를 관리자가 먼저 준비하도록 바꿨다.
+
+최종 동일 검증기65935aaf…는 실제3PID1·보호 설정의 서비스·독립 타이머·기본 Native의 C 유닛4개를 각 환경에서 확인했다. 읽기 전용 /usr/lib의 쓰기 가능 remount는 세 역할 모두 EPERM이었다. 최신10:43:26 KST 회귀는 메모리 최대59,170,816바이트·pids.peak54·OOM0이며 다섯 시험의 자체 유닛·폴더·cgroup 부재를10:43:48 KST 별도 읽기로 확인했다.
+
+공식68688175… Harness² 구조 검사는80→82구성·추가2·기존 수정0·상시16,917자 증가0이다. 원본42소스는 그대로이며 서비스 이름/경로 변환이나 Native runner 주입은 없다. C 카탈로그의 합성 서비스를 세 역할에 배치했으므로 전체 운영 카탈로그·root 실행기·Lifecycle.recover·SSH/Docker·소스/캐시 복구·실제 호스트 재부팅·모델/봇 품질을 검증했다고 표시하지 않는다. [전체 범위와 지문](../infra/validation/journal-composition/private-pid1.validation.json).
+<!-- /coordinator-private-pid1-20261119 -->

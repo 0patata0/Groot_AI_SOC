@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "status": "three_private_PID1_foundation_verified_full_lifecycle_pending",
+  "at_kst": "2026-11-19T10:48:58.027084+09:00",
+  "source_sha256": {
+    "validate_private_pid1.py": "65935aaf67e456db739193064087acb994742bef77a79e44f1d79119e073ecb8",
+    "check_private_pid1_structure.py": "0e385bbaf5bc549cdd285c9144f715b0687f6756988d341f24296830254e4ee0"
+  },
+  "original_candidate_pins_verified": 42,
+  "original_operator_source_changes": 0,
+  "latest_native_regression": {
+    "observed_at_kst": "2026-11-19T10:43:26.510973+09:00",
+    "returncode": 0,
+    "raw_result_sha256": "a3858a842c6500828a11b58c301b0eba385e35d374af84698d743ead70db2698",
+    "roles": {
+      "a": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "default_native_backend": true,
+        "docker_lifecycle": false,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "2d045f9c9d15a68fa574cda0ae408391988c5d46500e7fe3b40e2d5a4b72135a",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533158]",
+          "ipc": "ipc:[4026533156]",
+          "mnt": "mnt:[4026533159]",
+          "net": "net:[4026532951]",
+          "pid": "pid:[4026533157]",
+          "user": "user:[4026533153]",
+          "uts": "uts:[4026533155]"
+        },
+        "native_C_collection_units": 4,
+        "operating_deployment": false,
+        "peer_SSH": false,
+        "pid1_cgroup": "0::/init.scope",
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "python_version": "3.12.3",
+        "read_only_usr_remount_errno": 1,
+        "role": "a",
+        "sandbox": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "0",
+          "FragmentPath": "/etc/systemd/system/capstone-proof-sandbox.service",
+          "Id": "capstone-proof-sandbox.service",
+          "MainPID": "0",
+          "MemoryMax": "67108864",
+          "Result": "success",
+          "SubState": "dead",
+          "TasksMax": "8"
+        },
+        "schema": 1,
+        "source_pins_verified": 42,
+        "status": "verified",
+        "systemd_pid1": 1,
+        "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+        "timer": {
+          "monotonic_ns": 594640913956214,
+          "pid": 38
+        },
+        "visible_interfaces": [
+          "lo"
+        ]
+      },
+      "b": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "default_native_backend": true,
+        "docker_lifecycle": false,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "715b6a41acc80d1d2f678929363e2bbdd0978a004222f6833186769f0f0782b1",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533164]",
+          "ipc": "ipc:[4026533162]",
+          "mnt": "mnt:[4026533165]",
+          "net": "net:[4026532951]",
+          "pid": "pid:[4026533163]",
+          "user": "user:[4026533154]",
+          "uts": "uts:[4026533161]"
+        },
+        "native_C_collection_units": 4,
+        "operating_deployment": false,
+        "peer_SSH": false,
+        "pid1_cgroup": "0::/init.scope",
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "python_version": "3.12.3",
+        "read_only_usr_remount_errno": 1,
+        "role": "b",
+        "sandbox": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "0",
+          "FragmentPath": "/etc/systemd/system/capstone-proof-sandbox.service",
+          "Id": "capstone-proof-sandbox.service",
+          "MainPID": "0",
+          "MemoryMax": "67108864",
+          "Result": "success",
+          "SubState": "dead",
+          "TasksMax": "8"
+        },
+        "schema": 1,
+        "source_pins_verified": 42,
+        "status": "verified",
+        "systemd_pid1": 1,
+        "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+        "timer": {
+          "monotonic_ns": 594640912968429,
+          "pid": 38
+        },
+        "visible_interfaces": [
+          "lo"
+        ]
+      },
+      "c": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "default_native_backend": true,
+        "docker_lifecycle": false,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "c7a06b94a79d63f66944c03dedb10cb9bb47a86ce1644dcb0a0e0ce5cf6949a8",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533170]",
+          "ipc": "ipc:[4026533168]",
+          "mnt": "mnt:[4026533172]",
+          "net": "net:[4026532951]",
+          "pid": "pid:[4026533169]",
+          "user": "user:[4026533171]",
+          "uts": "uts:[4026533167]"
+        },
+        "native_C_collection_units": 4,
+        "operating_deployment": false,
+        "peer_SSH": false,
+        "pid1_cgroup": "0::/init.scope",
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "python_version": "3.12.3",
+        "read_only_usr_remount_errno": 1,
+        "role": "c",
+        "sandbox": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "0",
+          "FragmentPath": "/etc/systemd/system/capstone-proof-sandbox.service",
+          "Id": "capstone-proof-sandbox.service",
+          "MainPID": "0",
+          "MemoryMax": "67108864",
+          "Result": "success",
+          "SubState": "dead",
+          "TasksMax": "8"
+        },
+        "schema": 1,
+        "source_pins_verified": 42,
+        "status": "verified",
+        "systemd_pid1": 1,
+        "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+        "timer": {
+          "monotonic_ns": 594640912834271,
+          "pid": 38
+        },
+        "visible_interfaces": [
+          "lo"
+        ]
+      }
+    },
+    "outer_loaded_boundaries": {
+      "CPUQuotaPerSecUSec": "1s",
+      "Delegate": "yes",
+      "DelegateSubgroup": "supervisor",
+      "KillMode": "control-group",
+      "LoadState": "loaded",
+      "MemoryMax": "536870912",
+      "MemorySwapMax": "0",
+      "NoNewPrivileges": "yes",
+      "PrivateDevices": "yes",
+      "PrivateNetwork": "yes",
+      "ProtectClock": "yes",
+      "ProtectKernelModules": "yes",
+      "ProtectKernelTunables": "yes",
+      "ProtectSystem": "strict",
+      "ReadWritePaths": "/run/capstone-pid1-0f44865430fd",
+      "RuntimeMaxUSec": "1min 15s",
+      "TasksMax": "256",
+      "TimeoutStopUSec": "5s",
+      "Transient": "yes"
+    },
+    "outer_memory_peak_bytes": 59170816,
+    "outer_pids_peak": 54,
+    "outer_memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "role_cgroups_populated_after_kill": {
+      "a": false,
+      "b": false,
+      "c": false
+    },
+    "workspace_removed": true,
+    "host_namespaces_unchanged": true,
+    "input_bundle_removed": true,
+    "input_sha256_unchanged": true
+  },
+  "scope": {
+    "actual_private_PID1_managers": 3,
+    "default_Native_backend_without_runner": true,
+    "catalog_in_each_role": "same synthetic C collection catalog, four actual systemd units",
+    "full_operating_A_B_C_catalog": false,
+    "production_root_entry": false,
+    "Lifecycle_recover": false,
+    "peer_SSH": false,
+    "Docker_lifecycle": false,
+    "source_cache_global_recovery": false,
+    "actual_host_reboot": false,
+    "operating_deployment": false,
+    "MCP_both_bot_acceptance": false
+  },
+  "cleanup": {
+    "independent_observed_at_kst": "2026-11-19T10:43:48.333589+09:00",
+    "owned_runs_checked": 5,
+    "all_owned_units_workspaces_inputs_cgroups_absent": true,
+    "raw_result_sha256": "c358c29a884849bdf4af8e9d0a74648327c5d3f539f6b97f6b350813231d3dca",
+    "host_namespaces_equal_pretest": true
+  },
+  "official_Harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 80,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 65,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 82,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 67,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [
+        "scripts/check_private_pid1_structure.py",
+        "scripts/validate_private_pid1.py"
+      ],
+      "removed": [],
+      "modified": [],
+      "always_on_char_delta": 0
+    },
+    "source_sha256": {
+      "validate_private_pid1.py": "65935aaf67e456db739193064087acb994742bef77a79e44f1d79119e073ecb8",
+      "check_private_pid1_structure.py": "0e385bbaf5bc549cdd285c9144f715b0687f6756988d341f24296830254e4ee0"
+    },
+    "original_pins_verified": 42,
+    "scope": "Official structure only. Not operating deployment, root Lifecycle, SSH/Docker, SOC accuracy or bot acceptance.",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "local_boundary_checks": {
+    "foreign_workspace_refusals": 5,
+    "missing_opt_in_refused": true
+  },
+  "failures_preserved": [
+    "newuidmap absent: namespace child exit127; replaced with own-child parent ID mapping",
+    "first private PID1 boot failure cause unavailable because post-chroot diagnostic used outside path",
+    "next run identified procfs EPERM; manager premount plus inherited restrictions retained"
+  ],
+  "preserved": {
+    "paper_presentation_panel": true,
+    "attacks_and_training_stopped": true,
+    "exact_operating_approvals_not_reused": true,
+    "new_packages_installed": 0
+  },
+  "publication": {
+    "status": "prepared_not_yet_committed_or_pushed"
+  },
+  "humanize": {
+    "run_id": "2026-11-19-012-4572",
+    "route": "light",
+    "change_rate_ratio": 0.0001,
+    "change_rate_percent": 0.01,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "gate_exit_code": 0,
+    "warnings": []
+  }
+}

@@ -80,6 +80,40 @@ python3 -IB infra/validation/journal-composition/validate_owned_systemd.py --run
 운영 root 진입점·Lifecycle.recover·실제 재부팅/SSH 단절·B Docker·캐시/전역 복구·정확 승인·운영 적용·새 MCP/봇 인수는 남는다. [검증 원장](native-systemd.validation.json)은 이 범위를 분리한다.
 <!-- /coordinator-native-systemd-20261119 -->
 
+<!-- coordinator-private-pid1-20261119 -->
+## 격리 PID1 검증 기반
+
+11/19 B의 기존 Python3.12.3과 systemd255.4-1ubuntu8.18로 세 개의 실제 PID1을 실행했다. 각 역할은 별도 계정 파일·machine-id·설정·저장소와 UID/mount/PID/UTS/IPC/cgroup 공간을 갖는다. 네트워크는 전용 공간의 loopback만 공유하며 호스트 Docker 소켓·운영 설정·자격 파일은 연결하지 않는다. 새 패키지나 큰 캐시 이미지 반출 없이 기존 실행 파일을 읽기 전용으로 사용했다.
+
+관리자가 전용 procfs와 제한된 장치를 준비한 뒤 user namespace로 권한을 낮춘다. 읽기 전용 마운트를 그대로 넘기고 systemd에 위임한 자체 cgroup 아래에서만 자식을 관리한다. 이 순서는 [systemd 컨테이너 인터페이스](https://systemd.io/CONTAINER_INTERFACE/), [cgroup 위임](https://systemd.io/CGROUP_DELEGATION/)과 [Linux mount namespace 제약](https://man7.org/linux/man-pages/man7/mount_namespaces.7.html)을 참고했다.
+
+| 검사 | 관측과 한계 |
+|---|---|
+| 실제 PID1 | 격리 역할3개에서 systemd가PID1, 서로 다른 namespace와 machine-id 확인 |
+| 서비스·타이머 | PrivateDevices·PrivateTmp·ProtectSystem 등 보호 설정의 실제 서비스 exit0, 별도PID의 타이머3개 실행 |
+| 기본 Native | 경로/명령 변환이나 runner 주입 없이 각 환경의 동일한 C 수집 유닛4개와 로드 자원 값 확인 |
+| 자원 | 외부 유닛512MiB/Tasks256/CPU100%/최대75초, 최신 메모리 최대59,170,816바이트·pids.peak54·OOM0 |
+| 소스·구조 | 기존42소스 SHA불변, 공식 Harness²80→82구성/추가2/수정0/상시16,917자 증가0 |
+| 정리 | 자체5회 시험 유닛·폴더·cgroup 부재를10:43:48 KST의 별도 읽기로 확인 |
+
+이 검사는 전체 전환·복구 시험의 기반이다. 현재 세 역할에는 동일한 C 카탈로그의 합성 서비스만 배치했다. 운영 A/B/C의 전체 소스·캐시·소비자를 실행하거나 고정 root 진입점·Lifecycle.recover·SSH/Docker를 연결한 결과로 쓰지 않는다. 실제 호스트 재부팅·운영 적용·새 MCP/두 봇 인수도 남는다. [검증 원장](private-pid1.validation.json).
+
+실행은 기존 도구가 있는 승인된 Linux 점검 호스트에서 root로 명시한다. 새 소프트웨어 설치나 운영 배포 명령은 포함하지 않는다. 검증기와 두 manifest 및 기존42소스를 같은 디렉터리에 보관한다.
+
+```sh
+python3 -IB infra/validation/journal-composition/validate_private_pid1.py --run-owned-units
+```
+
+공식 구조 검사는 기존 고정 후보를 저장소 밖에 복원한 뒤 실행한다. 출력 경로는 아직 없어야 한다.
+
+```sh
+python3 -B infra/validation/journal-composition/reproduce_limits.py --repo . --output /private/tmp/soc-private-pid1-base
+python3 -B infra/validation/journal-composition/check_private_pid1_structure.py --repo . --restored-root /private/tmp/soc-private-pid1-base/candidate --output /private/tmp/soc-private-pid1-base/private-pid1-harness2.json
+```
+
+초기 user namespace 시험은 newuidmap 부재로 실패했다. 보조 도구 설치 대신 부모가 자체 자식의 ID매핑만 설정했다. 첫 PID1 시험은 부팅 실패 뒤 chroot 밖의 진단 경로에 쓰려 해 원인을 기록하지 못했고 다음 시험에서 procfs 마운트 거절을 확인했다. 실패 보고 경로와 관리자 초기화 순서를 고쳤으며 읽기 전용·권한 격리 조건은 유지했다. 시작 응답 유실과 관측 기한을 서비스 부재로 간주하지 않고 자체 유닛의 종료를 확인한 뒤 작업 폴더를 제거한다.
+<!-- /coordinator-private-pid1-20261119 -->
+
 ## 재현과 운영 적용 조건
 
 기존 Python과 보존한 공식 `G_Harness2/`를 사용한다. 저장소 밖에 아직 없는 출력 경로를 지정하고 구조 검사 뒤 같은 소스 SHA로 회귀를 실행한다.

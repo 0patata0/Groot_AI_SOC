@@ -7071,3 +7071,13 @@ A/B/C27유닛 읽기와 별도 systemd 합성6조건을 확인해 모의 backend
 | 문서 검수 | 011-580a light·0.64%·B·6/6·gate0 |
 | 미완료 | 운영 적용/새 채팅·30/60초 목표·자원 기능 보장·새 OS·공격/학습 재개 |
 <!-- /service-claim-types-publication-20261119 -->
+
+<!-- coordinator-private-pid1-20261119 -->
+<a id="coordinator-private-pid1-20261119"></a>
+
+## 2026-11-19 전체 복구 시험의 격리 실행 기반
+
+기존27운영 유닛 읽기와 관리자 호스트의 변환된6조건 이후, B 안의 별도3PID1에서 실제 서비스 관리자와 기본 Native의 C 카탈로그를 확인했다. 이는 역할별 실제 소스/캐시/소비자를 연결하기 전의 기반이다. 다음은 B 전용 Docker와 새 격리 SSH, 고정 root 진입점의 전체 전환·부분 실패·독립 Lifecycle.recover·전역 근거·정리/current 검증이다.
+
+fixture 표지나 peer 단계를 실제 결과로 바꾸지 않으며 격리 관리자 재시작을 호스트 재부팅으로 표시하지 않는다. 현재 운영 소스/모델/MCP 스키마/권한 재대조와 전체 payload 정확 승인은 남는다. 기존 승인 재사용·발표자료 제작·공격/학습 재개는 하지 않는다. [현재 실행 조건](../infra/validation/journal-composition/COORDINATOR.md#격리-pid1-검증-기반).
+<!-- /coordinator-private-pid1-20261119 -->

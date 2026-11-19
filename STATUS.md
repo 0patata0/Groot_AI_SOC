@@ -46,6 +46,18 @@
 실패한 두 시험과 후속 읽기 검사의 가정 오류를 보존했다. 시험 유닛·파일·enable 링크·작업 폴더는 제거했고07:50:51 KST의 별도 읽기로 부재를 확인했다. 운영 소스·캐시·기존 유닛 변경, 패키지 설치, 모델·봇·공격·학습은0이다. 발표자료와 판넬은 보존한다. 공개10파일의 내용 커밋을 게시하고 원격 main 일치를 확인했다. 내용 커밋과 후속 현황 영수증은 구분한다.
 
 [실제 읽기와 격리 시험 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기 조건](infra/validation/journal-composition/COORDINATOR.md)
+<!-- coordinator-private-pid1-20261119 -->
+B 서버 안에 격리 역할a/b/c의 실제 systemd PID1을 각각 구성했다. 서로 다른 UID·mount·PID·UTS·IPC·cgroup 공간과 machine-id를 사용하고 네트워크는 외부 인터페이스가 없는 전용 loopback만 공유한다. 호스트의 읽기 전용 실행 파일은 그대로 사용하고 계정·설정·저장소는 시험용으로 만들었다. 세 환경에서 보호 설정을 적용한 서비스와 다른 PID의 타이머 실행이 성공했다.
+
+기존42소스를 바꾸지 않은 기본 Native로 각 환경의 동일한 C 수집 유닛4개를 읽고 로드 자원 값을 확인했다. B 안의 격리 시험이며 운영 A/B/C 전체 카탈로그나 고정 root 실행기·Lifecycle.recover를 검증한 결과는 아니다. SSH·Docker·소스/캐시·전역 복구와 실제 호스트 재부팅은 계속 미검증이다.
+
+최신 동일 소스 회귀는11/19 10:43:26 KST에 통과했다. 실제 메모리 최대값59,170,816바이트·pids.peak54·OOM0을 기록했다. 설정 한도는512MiB/Tasks256/CPU100%/최대75초다. 공식 Harness²는80→82구성·새 검증 도구2개·기존 수정0·상시16,917자 증가0을 확인했다. 구조 검사를 운영·모델 품질로 승격하지 않는다.
+
+실패 원문을 보존하고 초기화 순서와 실패 보고를 수정했다. 자체5회 시험의 유닛·작업 폴더·cgroup 부재는10:43:48 KST의 별도 읽기로 확인했다. 운영 소스·기존 유닛 변경과 패키지 설치는0이며 논문·발표자료·판넬을 보존한다. 공개 검증기·원장·설명은 이번 게시 대상이고 커밋·푸시 결과는 게시 뒤 별도로 기록한다.
+
+[격리 PID1 검증 범위](infra/validation/journal-composition/private-pid1.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#격리-pid1-검증-기반)
+<!-- /coordinator-private-pid1-20261119 -->
+
 <!-- coordinator-native-systemd-publication-20261119 -->
 | 조정 실행기 검증 게시 | 확인 값 |
 |---|---|

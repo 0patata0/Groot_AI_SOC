@@ -1,5 +1,9 @@
 # 과거 기록과 복원 안내
 
+<!-- coordinator-private-pid1-20261119 -->
+11/19 [격리 PID1 기반 검증](../infra/validation/journal-composition/private-pid1.validation.json)의 실제3systemd·기본 Native의 C 카탈로그·독립 타이머·초기 실패와 정리를 [현황 이력](STATUS_HISTORY.md#coordinator-private-pid1-20261119), [계획 이력](PLAN_HISTORY.md#coordinator-private-pid1-20261119), [진단 이력](DIAGNOSTIC_HISTORY.md#coordinator-private-pid1-20261119)에 연결했다. 전체 root 실행기·Lifecycle·SSH/Docker·소스/캐시 전역 복구와 실제 호스트 재부팅은 남는다.
+<!-- /coordinator-private-pid1-20261119 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

@@ -13771,3 +13771,13 @@ Native 첫 도구 선택 오류의 재시도를 작은 요청에 연결했다. �
 | 문서 검수 | 011-580a light·0.64%·B·6/6·gate0 |
 | 미완료 | 운영 적용/새 채팅·30/60초 목표·자원 기능 보장·새 OS·공격/학습 재개 |
 <!-- /service-claim-types-publication-20261119 -->
+
+<!-- coordinator-private-pid1-20261119 -->
+<a id="coordinator-private-pid1-20261119"></a>
+
+## 2026-11-19 격리 PID1의 실제 서비스 관리자 기반
+
+B 안의 격리 역할3개에서 실제 systemd PID1·보호 설정의 서비스·독립 타이머와 기본 Native의 동일한 C 수집 유닛4개를 확인했다. 기존42소스 SHA를 보존했고 운영 소스·기존 유닛 변경과 패키지 설치는0이다. 최신 회귀10:43:26 KST의 메모리 최대59,170,816바이트·pids.peak54·OOM0과 자체5회 시험의10:43:48 KST 별도 부재 읽기를 남겼다.
+
+공식 Harness²는 기존80→82구성·검증 도구2개 추가·기존 수정0·상시16,917자 증가0이다. 고정 root 실행기·Lifecycle.recover·SSH/Docker·전체 소스/캐시/전역 복구·실제 호스트 재부팅·정확 승인·운영 적용·새 MCP/두 봇 인수는 미검증으로 유지한다. 논문·발표자료·판넬과 공격/학습 중단도 보존한다. [검증 원장](../infra/validation/journal-composition/private-pid1.validation.json).
+<!-- /coordinator-private-pid1-20261119 -->

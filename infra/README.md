@@ -1,5 +1,9 @@
 # infra — 서버 구성·배포
 
+<!-- coordinator-private-pid1-20261119 -->
+B 내부의 세 격리 PID1에서 실제 systemd 서비스·타이머와 기본 Native의 동일한 C 수집 유닛4개를 확인했다. 운영 root 실행기·Lifecycle.recover·SSH/Docker·소스/캐시 전역 복구는 아직 검증하지 않았다. [기반 검증과 실행 조건](validation/journal-composition/private-pid1.validation.json) · [재현 방법](validation/journal-composition/COORDINATOR.md#격리-pid1-검증-기반).
+<!-- /coordinator-private-pid1-20261119 -->
+
 [복합 조사 검증](validation/management-latency/README.md). 공통 어법/HTTP 인과 검사는 증거가 아니다·차단했는지·의미하는지는 추가 검증 필요라는 올바른 한계를 거절했다. 이를 보완했다. 계약3사본·하네스2사본·SDK영수증1을 운영6파일로 확정하고 보호66파일을 대조했다. 새3채팅/9읽기의 대상·기간이 일치했고 모델 보고는3건 수용됐다. 실제거절3초안 재생과 Mac/Linux336·298·39·27, Linux공식38·설치37을 통과했다. MCP45도구·모델·권한·승인·TTL·스킬·상시 지시량은 유지한다. 제한된 검증이며 일반 정확도/SLO는 별도다. [HTTP 어법·새 채팅 검증](validation/management-latency/http-modality.validation.json).
 
 <!-- journal-composition:start -->

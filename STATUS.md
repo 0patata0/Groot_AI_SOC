@@ -9,6 +9,15 @@ Kali232·233에 Hermes Agent v0.23.2를 오프라인 반입해 설치했다. Lin
 무도구 실제 응답은232번40.381초·233번74.995초였고 각각 API1회·실제 context65536·completed=true를 확인했다. 두 요청은 동시에 시작했으므로 대기 시간이 포함된 단회 관측이다. 공격·시나리오 시험은 계속 중단이며 실제 취약점 재현·공격/탐지/차단/복구·관제 판단 품질·일반 응답시간은 이번에 검증하지 않았다. 논문·판넬·발표자료와 B→Thor 운영 추론 경로는 유지했다.
 
 [설치·역할·재현 방법](infra/hermes/kali-redteam/README.md) · [검증 원장](infra/hermes/kali-redteam/validation.json) · [실패와 context 보완](archive/DIAGNOSTIC_HISTORY.md#kali-hermes-offline-20261120)
+
+| 게시 확인 | 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `14ff933c05eb7c9fc9eec027f653efda952b0c8e`·21파일 |
+| 실제 원격 main 일치 | `2026-11-20T06:22:34.262164+09:00` |
+| 게시 전 검사 | 추적2471·위험경로0·기존10/신규0·경계12검사 |
+| 기록 검수 | light·변경0%·B·6/6·gate0; 후속 시험 수치12 반영 |
+| 확인 범위 | 두 Kali 설치·SOUL·무도구 API 응답·실제 context65536 |
+| 유지 조건 | 공격·시나리오 중단; 패키지·가중치·자격·원문 기록 Git 제외 |
 <!-- /kali-hermes-offline-20261120 -->
 
 <!-- thesis-google-docs-local-sync-20261119 -->

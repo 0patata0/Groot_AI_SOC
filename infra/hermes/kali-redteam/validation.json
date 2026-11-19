@@ -320,8 +320,17 @@
     "paper_panel_presentations": true
   },
   "publication": {
-    "state": "pending",
-    "scope": "source, fixed artifact metadata, public validation and related documentation only; credentials, weights, packages, raw evidence and conversations excluded"
+    "state": "content_published",
+    "scope": "source, fixed artifact metadata, public validation and related documentation only; credentials, weights, packages, raw evidence and conversations excluded",
+    "content_commit": "14ff933c05eb7c9fc9eec027f653efda952b0c8e",
+    "remote_main_matched_at_kst": "2026-11-20T06:22:34.262164+09:00",
+    "tracked_working_tree_scan": {
+      "paths": 2471,
+      "unsafe": 0,
+      "known_non_credentials": 10,
+      "new_findings": 0
+    },
+    "receipt_note": "This record attests the content commit; the follow-up receipt commit is recorded in local session evidence."
   },
   "source_files_sha256": {
     "deploy.sh": "03caa4e9b5d439fcb4ee6a2dfb9b1f029d541d10c61d4840e7d93e8d364068d3",

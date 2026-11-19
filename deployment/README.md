@@ -1,5 +1,12 @@
 # 구축·운영 가이드
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+Kali 레드팀의 진입점은 deploy.sh --kali-hermes다. --prepare-bundle은 고정 원본·Linux wheel·도구를 작업별 임시 폴더에 준비하며 송신 컴퓨터에 패키지를 설치하지 않는다. Kali의 --install은 --offline-bundle과--sha256을 필수로 받고 외부 다운로드 fallback 없이 사용자 소유 payload를 구성한다. --list-models·--configure·--verify로 모델과 역할 설정을 관리한다.
+
+Hermes의 최소64000 요구 때문에40B의65536태그를 사용한다. --ensure-model-context는 관리자231에서 기존 로컬 모델의 digest·가중치·파라미터를 확인하고 전용 태그를 준비한다. 기존 태그를 덮어쓰거나 모델을 다운로드하지 않는다. [고정 입력·실행 예·복구](../infra/hermes/kali-redteam/README.md)를 따르며 일반 A/B/C 설치와 운영 추론 경로는 이 분기로 바뀌지 않는다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

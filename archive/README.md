@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+[Kali232·233 오프라인 Hermes·40B](../infra/hermes/kali-redteam/README.md)의 설치·원본/캐시 보존은 [설치 이력](DEPLOYMENT_HISTORY.md#kali-hermes-offline-20261120), context·PM 실패와 보완은 [진단 이력](DIAGNOSTIC_HISTORY.md#kali-hermes-offline-20261120), 현재 검증 범위는 [상태 이력](STATUS_HISTORY.md#kali-hermes-offline-20261120)에 기록한다. 공격·시나리오 시험은 계속 중단 상태다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- thesis-google-docs-local-sync-20261119 -->
 구글 독스 논문 편집본의 로컬 MD·DOCX·PDF 동기화와 목차154개 쪽번호 검수를 현황·계획·설계·진단 이력에 연결한다. PDF123쪽과 DOCX 렌더125쪽의 차이, 목차91개 불일치와 이번 구글 독스 쓰기0을 구분한다. 앞선 표 배치 작업의 일시정지는 당시 이력으로 보존한다.
 

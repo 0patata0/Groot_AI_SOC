@@ -1,5 +1,14 @@
 # 설계 대안 이력
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+## 2026-11-20 Kali 설치·40B context 선택
+
+Kali의 공용 패키지 서버 접근을 프록시나 터널로 우회하지 않고 Mac 임시 폴더에서 고정 파일을 내려받아 오프라인으로 전달했다. Linux용 runtime·wheel의 검수와 설치는 구분했으며 Mac에는 패키지를 설치하지 않았다. 공식 PM·native assembler와 사용자 소유 payload를 사용하고 운영에 필요한 cache를 보존한다.
+
+Hermes의 최소64000 요구를 낮추거나 서버가32768인데 클라이언트만65536으로 표시하는 방안은 채택하지 않았다. 원본40B를 보존하고 같은 가중치의65536태그를 관리자231 경유로 추가해 실제 /api/ps를 확인했다. 두 Kali가 그 태그를 사용하며 기존 B→Thor 경로와 DGX의 다른 모델·학습 작업은 바꾸지 않았다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 ## 2026-11-19 소유권을 유지한 격리 Docker·SSH 구성

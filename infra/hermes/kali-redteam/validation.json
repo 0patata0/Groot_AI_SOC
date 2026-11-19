@@ -1,0 +1,334 @@
+{
+  "schema": 1,
+  "recorded_at_kst": "2026-11-20T06:20:00.143990+09:00",
+  "scope": "user-authorized Kali232/233 offline Hermes installation, designated DGX40B model connection and redteam SOUL; attack testing remains stopped",
+  "source": {
+    "repository": "https://github.com/NousResearch/hermes-agent",
+    "release": "v0.23.2",
+    "commit": "ae2a81ccc00e9b7c06301523e5bb09608397149c",
+    "archive_sha256": "2b14eaae68bc1961dee6651e65ff96eeb7bb49d163f0a0bde2aa3503db017bc4",
+    "locks_sha256": {
+      "uv.lock": "d0ae8bfd20db7a8ca0e75418df718315c58088b120366227cc62ee8fe25d4274",
+      "pm/uv.lock": "7cd886aebd40548efa8285f88e97394b74afca9df94cda6f12513219c8d6d03c",
+      "pm/lock.json": "aa3617e66ab2b69fd08402e49e633c78bd030c16d5c62610e04a6216605b63f3"
+    }
+  },
+  "offline_inputs": {
+    "artifacts": 110,
+    "wheels": 102,
+    "tools": 8,
+    "artifact_bytes": 563649904,
+    "bundle_bytes": 845148160,
+    "deployed_bundle_sha256": "e249bdcfcf7b4b3715eed6d0ed3a71cec164c82d72e12d5614fa0a257c352939",
+    "manifest_sha256": "0c7cd2570f56b240d7efa905aa5d80dd620db828a915f8e4d2e368f9aabd85d0",
+    "public_producer_rebuilt_members": 112,
+    "rebuilt_member_bytes_and_hashes_equal": true,
+    "mac_package_installations": 0,
+    "mac_temporary_files_removed": 26339,
+    "mac_temporary_bytes_removed": 2909899361,
+    "mac_temporary_root_absent": true
+  },
+  "model": {
+    "source_name": "qwen3.8-40b-heretic:latest",
+    "source_manifest_digest": "ed6fa9293f89e68614dff3c83e85934ef50efd7903a71cdc38b24dc45bbb0813",
+    "hermes_name": "qwen3.8-40b-heretic:hermes-64k",
+    "hermes_manifest_digest": "40c506744e4651a79ac045a3966c4c0d26f17dd13ad1de3085dd0b7b30e1f2ae",
+    "num_ctx": 65536,
+    "same_weight_blob_sha256": "ccf16c2874da7846268901ab300d5138e896f08ed16811ff0b58b7f0126ac426",
+    "original_five_registry_digests_unchanged": true,
+    "original_registry": {
+      "qwen3.8-40b-heretic:latest": "ed6fa9293f89e68614dff3c83e85934ef50efd7903a71cdc38b24dc45bbb0813",
+      "qwen3.8:27b": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+      "ipsi-qwen3.6:35b": "f9d59f2304ad2d8e55c2852656e6f74307c6c913b5387f138951c707d8d03269",
+      "qwen3.6:35b": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+      "gpt-oss:120b": "a951a23b46a1f6093dafee2ea481d634b4e31ac720a8a16f3f91e04f5a40ecd9"
+    },
+    "weight_downloads": 0,
+    "service_restarts": 0,
+    "management_route": "administrator231 -> DGX Ollama API",
+    "explanation": "OpenAI compatibility ignores per-request context size; a context-only alias references existing40B/Q8_0 weights."
+  },
+  "hosts": {
+    "232": {
+      "final_live_read_at_kst": "2026-11-20T06:19:28.884508+09:00",
+      "release": "0.23.2",
+      "source_commit": "ae2a81ccc00e9b7c06301523e5bb09608397149c",
+      "operator_source_sha256": "caaefecc03d47d8f0dd3487bacfcd2878b084ac4f826e42d66783f27fc2dfb1e",
+      "source_locks_match": true,
+      "soul_sha256": "e82c214484edfb14c789456451a7625420562e69b4b1bf63b86afc7856dbad23",
+      "soul_characters_including_final_lf": 3351,
+      "soul_body_characters": 3350,
+      "soul_loaded_exactly": true,
+      "attack_state": "paused",
+      "allow_lazy_installs": false,
+      "model": "qwen3.8-40b-heretic:hermes-64k",
+      "configured_context_length": 65536,
+      "tools": {
+        "chromium": {
+          "version": "1248+156.0.8078.80",
+          "target": "linux-x64",
+          "artifacts": [
+            "b711c720f774be355197f32edf37e0651418ba036d92446ee2da19ac017540a7"
+          ],
+          "digest": "adda1220d67f4445a0d2e5e09fe2e7cf18cbe51ef7872ad146446999b84d015c"
+        },
+        "cua-driver": {
+          "version": "0.21.0",
+          "target": "linux-x64",
+          "artifacts": [
+            "cf29bfaad16737e31e72f38dad2a6424f24b21a4ac2edea885e83cb9d5034135"
+          ],
+          "digest": "e689f8008b77e9d926cc2cd5914d099cef8839f5f49f5438cced142832f46330"
+        },
+        "ffmpeg": {
+          "version": "9.0.1",
+          "target": "linux-x64",
+          "artifacts": [
+            "182c1b509720e939bb47bfb47dc29cc0c298640401128e3dce8627d10707eb5a"
+          ],
+          "digest": "eb4cd5014499b17f23e18e26aa3eea52282ecd5fa8155772b55107740d1f3b0e"
+        },
+        "node": {
+          "version": "26.12.1",
+          "target": "linux-x64",
+          "artifacts": [
+            "6170b2d474e1c626f43cff3adc118df9fe3b573258a4fc3d850c8dbc6b079bbd"
+          ],
+          "digest": "5541a809744c2a9eda1ea6b652595b6a709588ae5e989751ab65c751b96a33a4"
+        },
+        "npm": {
+          "version": "12.2.2",
+          "target": "linux-x64",
+          "artifacts": [
+            "07fecbf753e2c3bc10ebeb3e9ed8738f6a0cc1292998b79e2e9f1dd2a5525e0c"
+          ],
+          "digest": "b54459800011200a151b238676256b03989277f378dca6fc23c298c21f4e712c"
+        },
+        "python": {
+          "version": "3.14.9+20261021",
+          "target": "linux-x64",
+          "artifacts": [
+            "dfa4c5a40c47f338f41658017be550c72247c391e6bfb1fa4da03ebc8451abdf"
+          ],
+          "digest": "7bbc7426f297f1a14c27d94514f92fab081b02896e9218c8666e6a6af497765a"
+        },
+        "ripgrep": {
+          "version": "15.2.0",
+          "target": "linux-x64",
+          "artifacts": [
+            "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c"
+          ],
+          "digest": "bef91d9f17b2676dca9549e2f851920ca86c13799ad1d8b5157a05b66001b4ce"
+        },
+        "uv": {
+          "version": "0.13.5",
+          "target": "linux-x64",
+          "artifacts": [
+            "f68d291c75783122dad58ab77def0e13f3233f358731db5d6d7e8715603b928f"
+          ],
+          "digest": "f25b67ce4984de2e143d107d18123ba10c27d5fbeadea1a5dedc8f1663c683bc"
+        }
+      },
+      "enabled_extras": [
+        "acp",
+        "computer-use",
+        "cron",
+        "doc-extract",
+        "google",
+        "mcp",
+        "nemo-relay",
+        "pty",
+        "uvloop",
+        "vertex",
+        "vision",
+        "web",
+        "wecom",
+        "youtube"
+      ],
+      "final_inference": {
+        "observed_at_kst": "2026-11-20T00:09:25.743191+09:00",
+        "api_calls": 1,
+        "seconds": 40.381347349029966,
+        "tools_available": 0,
+        "runtime_context_length": 65536,
+        "completed": true,
+        "failed": false,
+        "partial": false,
+        "soul_id_present_in_answer": true,
+        "prompt_tokens": 2179,
+        "completion_tokens": 148
+      },
+      "staging_absent": true,
+      "runtime_and_cache_preserved": true,
+      "shell_before_install_unchanged": true
+    },
+    "233": {
+      "final_live_read_at_kst": "2026-11-20T06:19:29.199259+09:00",
+      "release": "0.23.2",
+      "source_commit": "ae2a81ccc00e9b7c06301523e5bb09608397149c",
+      "operator_source_sha256": "caaefecc03d47d8f0dd3487bacfcd2878b084ac4f826e42d66783f27fc2dfb1e",
+      "source_locks_match": true,
+      "soul_sha256": "a3eceeb62f8960e96497b13abefe695723221f7cb434104fd9b042ef37f048f4",
+      "soul_characters_including_final_lf": 3351,
+      "soul_body_characters": 3350,
+      "soul_loaded_exactly": true,
+      "attack_state": "paused",
+      "allow_lazy_installs": false,
+      "model": "qwen3.8-40b-heretic:hermes-64k",
+      "configured_context_length": 65536,
+      "tools": {
+        "chromium": {
+          "version": "1248+156.0.8078.80",
+          "target": "linux-x64",
+          "artifacts": [
+            "b711c720f774be355197f32edf37e0651418ba036d92446ee2da19ac017540a7"
+          ],
+          "digest": "adda1220d67f4445a0d2e5e09fe2e7cf18cbe51ef7872ad146446999b84d015c"
+        },
+        "cua-driver": {
+          "version": "0.21.0",
+          "target": "linux-x64",
+          "artifacts": [
+            "cf29bfaad16737e31e72f38dad2a6424f24b21a4ac2edea885e83cb9d5034135"
+          ],
+          "digest": "e689f8008b77e9d926cc2cd5914d099cef8839f5f49f5438cced142832f46330"
+        },
+        "ffmpeg": {
+          "version": "9.0.1",
+          "target": "linux-x64",
+          "artifacts": [
+            "182c1b509720e939bb47bfb47dc29cc0c298640401128e3dce8627d10707eb5a"
+          ],
+          "digest": "eb4cd5014499b17f23e18e26aa3eea52282ecd5fa8155772b55107740d1f3b0e"
+        },
+        "node": {
+          "version": "26.12.1",
+          "target": "linux-x64",
+          "artifacts": [
+            "6170b2d474e1c626f43cff3adc118df9fe3b573258a4fc3d850c8dbc6b079bbd"
+          ],
+          "digest": "5541a809744c2a9eda1ea6b652595b6a709588ae5e989751ab65c751b96a33a4"
+        },
+        "npm": {
+          "version": "12.2.2",
+          "target": "linux-x64",
+          "artifacts": [
+            "07fecbf753e2c3bc10ebeb3e9ed8738f6a0cc1292998b79e2e9f1dd2a5525e0c"
+          ],
+          "digest": "b54459800011200a151b238676256b03989277f378dca6fc23c298c21f4e712c"
+        },
+        "python": {
+          "version": "3.14.9+20261021",
+          "target": "linux-x64",
+          "artifacts": [
+            "dfa4c5a40c47f338f41658017be550c72247c391e6bfb1fa4da03ebc8451abdf"
+          ],
+          "digest": "7bbc7426f297f1a14c27d94514f92fab081b02896e9218c8666e6a6af497765a"
+        },
+        "ripgrep": {
+          "version": "15.2.0",
+          "target": "linux-x64",
+          "artifacts": [
+            "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c"
+          ],
+          "digest": "bef91d9f17b2676dca9549e2f851920ca86c13799ad1d8b5157a05b66001b4ce"
+        },
+        "uv": {
+          "version": "0.13.5",
+          "target": "linux-x64",
+          "artifacts": [
+            "f68d291c75783122dad58ab77def0e13f3233f358731db5d6d7e8715603b928f"
+          ],
+          "digest": "f25b67ce4984de2e143d107d18123ba10c27d5fbeadea1a5dedc8f1663c683bc"
+        }
+      },
+      "enabled_extras": [
+        "acp",
+        "computer-use",
+        "cron",
+        "doc-extract",
+        "google",
+        "mcp",
+        "nemo-relay",
+        "pty",
+        "uvloop",
+        "vertex",
+        "vision",
+        "web",
+        "wecom",
+        "youtube"
+      ],
+      "final_inference": {
+        "observed_at_kst": "2026-11-20T00:10:40.432682+09:00",
+        "api_calls": 1,
+        "seconds": 74.99535091000143,
+        "tools_available": 0,
+        "runtime_context_length": 65536,
+        "completed": true,
+        "failed": false,
+        "partial": false,
+        "soul_id_present_in_answer": true,
+        "prompt_tokens": 2179,
+        "completion_tokens": 185
+      },
+      "staging_absent": true,
+      "runtime_and_cache_preserved": true,
+      "shell_before_install_unchanged": true
+    }
+  },
+  "local_checks": {
+    "offline_input_and_alias_boundary_tests": 12,
+    "bash_syntax": true,
+    "python_ast": true,
+    "plan_without_writes_or_network": true,
+    "humanize": {
+      "route": "light",
+      "change_rate": 0.0,
+      "grade": "B",
+      "self_checks_passed": 6,
+      "gate_exit_code": 0,
+      "scope": "13 explanatory document blocks; fixed SOUL contract untouched; subsequent technical test counter12 is factual metadata"
+    },
+    "review": {
+      "defect_first": "completed by primary agent; review-agent skill unavailable",
+      "open_findings": 0,
+      "semgrep": "not run; Mac CLI not installed"
+    }
+  },
+  "failures_preserved": [
+    "initial_online_install_network_failure_before_offline_correction",
+    "offline_first_attempt_rejected_runtime_network_fallback_before_DNS_or_connect",
+    "install_stamp_full_rejected_then_corrected_to_bundled",
+    "32768_context_rejected_by_Hermes_minimum64000",
+    "client65536_but_server32768_rejected_as_ready",
+    "new_alias_parent_provenance_strict_comparison_rejected_then_verified_read_only"
+  ],
+  "limitations": [
+    "no attack/scenario/exploit/traffic generation or detection/block/recovery E2E",
+    "no tool execution by the model in final inference probes",
+    "core AIAgent response and CLI startup verified; interactive gateway chat/tool execution not tested",
+    "one observation per host with concurrent starts; latency includes queueing and is not an SLO",
+    "two-sentence response format not followed; Chinese characters observed in233 response",
+    "all extra selected; not every optional integration or frontend built",
+    "not a clean OS installation or independent third-party reproduction"
+  ],
+  "unchanged_by_this_unit": {
+    "B_to_Thor_inference_route": true,
+    "original_DGX_weights_and_five_tags": true,
+    "training_jobs": true,
+    "A_B_C_operating_sources_and_policies": true,
+    "paper_panel_presentations": true
+  },
+  "publication": {
+    "state": "pending",
+    "scope": "source, fixed artifact metadata, public validation and related documentation only; credentials, weights, packages, raw evidence and conversations excluded"
+  },
+  "source_files_sha256": {
+    "deploy.sh": "03caa4e9b5d439fcb4ee6a2dfb9b1f029d541d10c61d4840e7d93e8d364068d3",
+    "deployment/kali_hermes.py": "caaefecc03d47d8f0dd3487bacfcd2878b084ac4f826e42d66783f27fc2dfb1e",
+    "deployment/kali_hermes_bundle.py": "0fcad0f9e70f69d9caf0b9df56451ab2469a9c2e7b90f976cf92eefc1c8e57bc",
+    "deployment/kali_hermes_model.py": "32fefb175dcac9dbd36c8e08f8e86c45689ec810ebc88165ba60bd115e59481e",
+    "deployment/tests/test_kali_hermes.py": "6aca36209d0d65543f94aa4600c311fb2046fb4d837a474bd42c7753c014cc27",
+    "deployment/tests/test_kali_hermes_model.py": "952110d7c484e717e21c565f2b7b71750a32e9e225ae351c5e5125ec4e127c1d"
+  }
+}

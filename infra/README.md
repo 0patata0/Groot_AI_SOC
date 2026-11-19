@@ -1,5 +1,10 @@
 # infra — 서버 구성·배포
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+[Kali 레드팀 Hermes](hermes/kali-redteam/README.md)는232·233에 오프라인으로 설치했다. 추론은 DGX111의 기존40B와 같은 가중치를 쓰는 Hermes용65536태그에 연결한다. 관리자231 경유 태그 추가 뒤 기존5모델 digest와 가중치 blob을 대조했다. B의 기존 Thor 추론 경로는 유지한다. SOUL 로드·무도구 모델 응답을 확인했으며 공격·시나리오 중단과 기존 관리·승인 경계는 계속 적용한다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 격리 PID1의 역할별27유닛을 기본 Native로 읽고 SSH4경로와 B 전용 Docker의 실제 정지·재개를 확인했다. 고정 root 진입점·Lifecycle.recover·50소스/캐시 전역 복구·운영 적용·새 MCP/두 봇 인수는 아직 미검증이다.

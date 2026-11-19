@@ -1,5 +1,16 @@
 # 현황 이력
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+## 2026-11-20 Kali232·233 오프라인 Hermes·40B 레드팀 역할
+
+사용자가 두 Kali의 Hermes 설치와 DGX11140B 사용, 상세 redteam SOUL을 요청한 뒤 오프라인 반입 방식을 확정했다. v0.23.2/ae2a81ccc00e9b7c06301523e5bb09608397149c의 소스와 Linux CPython3.14용wheel102·도구8을 반입했다. 110파일563,649,904B와 원본 archive를 검수하고845,148,160B 묶음을 두 Kali에서 재검증했다. 설치된 Python은3.14.9이며 공식all extra를 선택했다. 전체 선택 기능과 TUI·웹frontend를 빌드한 것으로 표시하지 않는다.
+
+Hermes 최소64000에32768이 미달했고 OpenAI 호환 요청의 context 옵션도 실제32768을 바꾸지 못했다. 관리자231을 경유해 동일40B/Q8_0 가중치의 hermes-64k 태그를 추가했다. 기존5태그 digest와 가중치 blob은 같고 새 파라미터는 num_ctx=65536이다. 두 SOUL3350자를 전체 로드하고 각 식별자와 공격 중단 상태를 실제 응답으로 확인했다. 무도구 최종 API는 각1회·232번40.381초/233번74.995초·runtime context65536이었다.
+
+Mac 신규 패키지 설치0, 자체 임시26,339파일·2,909,899,361B 정리와 두 Kali의 반입·실패 폴더 제거를 확인했다. 운영 runtime·필요한 오프라인 캐시·복구 백업은 보존했다. 공격·시나리오·학습·봇 메시지·논문/판넬/발표자료 수정은0이다. [검증 원장](../infra/hermes/kali-redteam/validation.json)을 설치·정적검사·실제 응답과 공격 E2E의 구분 근거로 사용한다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 ## 2026-11-19 격리 SSH·Docker 실제 정지와 재개

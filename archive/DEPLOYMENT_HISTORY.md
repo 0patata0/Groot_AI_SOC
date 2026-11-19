@@ -1,5 +1,16 @@
 # 설치·웹 정책 이력
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+## 2026-11-20 Kali 전용 오프라인 반입 경로
+
+루트 deploy.sh에 --kali-hermes 분기를 추가하고 설치·묶음 생성·모델 태그 준비 모듈과 고정 반입 목록을 연결했다. 공식 PM의 wheelhouse 설치와 native assembler를 사용해 사용자 소유 source·Python·venv·독립PM runtime·도구를 구성했다. 외부 패키지 다운로드는 offline/no-index/only-binary와 사전 반입 SHA 검증으로 차단했다. 임시 패키지 relay나 터널은 사용하지 않았다.
+
+초기 설치의 별도 런타임 다운로드 시도는 audit가 거절했고 공식 build_operations의 명시적 tool store로 수정했다. 최종 동일 반입 묶음으로232/233 설치를 확인했으며 공개 묶음 생성기로 재구성한112멤버의 크기·SHA가 기존 반입본과 같았다. archive header 때문에 외부 묶음 해시는 달라질 수 있으므로 실제 전송본의 SHA를 사용한다.
+
+관리자231에서 DGX의 원본40B digest를 대조하고 num_ctx65536의 전용 태그만 추가했다. 기존5모델·가중치 blob·다른 파라미터·template·system은 보존했다. Kali 설정 전 config/SOUL 백업을 만들고 사용자 경로의 런처·역할 문서와 복구 근거를 보관했다. 새 OS 전체 설치·공격 E2E·B 에이전트나 Thor 변경은 수행하지 않았다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

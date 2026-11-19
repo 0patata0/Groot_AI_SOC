@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+## 2026-11-20 레드팀 설치 범위와 후속 시험 조건
+
+두 Kali의 설치·모델 설정·SOUL 작성은 사용자의 직접 요청에 따라 수행했다. 기존 공격 시험 중단을 설치 승인으로 해제하지 않았다. 원본 시나리오·스크립트·PCAP·실행 결과 분석, 승인된 대상·송신 Kali·강도·복구 조건의 구분, 탐지·요청 차단·IP 차단·복구·LLM 판단별 보고를 SOUL에 연결했다.
+
+현재 설치와 무도구 모델 응답 확인은 끝났으며 실제 공격·탐지·대응 E2E는 미수행이다. 시험을 재개하면 사용자의 최신 범위와 scenarios/actual_scenario.md 원장을 따른다. 기존 운영 후보 검증과 논문91쪽번호 불일치, 독립 재구현·전체OS 설치·최종 발표를 이번 설치로 완료 처리하지 않는다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 ## 2026-11-19 실제 backend 뒤의 전체 복구 연결

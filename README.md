@@ -1,5 +1,10 @@
 # Groot_AI_SOC
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 동일40B 가중치를 Hermes용65536컨텍스트 태그로 연결했다. 두 SOUL의 역할·원본 분석·피드백 절차와 공격 중단 상태를 적용하고 무도구 실제 응답을 확인했다. 기존 공격 시험은 재개하지 않았다. 초기 진입점은 deploy.sh --kali-hermes이며 [반입·설치·모델·복구 절차](infra/hermes/kali-redteam/README.md)와 [실제 검증 범위](infra/hermes/kali-redteam/validation.json)를 따른다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- thesis-google-docs-local-sync-20261119 -->
 사용자 지정 구글 독스 편집본을 로컬 MD·DOCX·PDF와 이미지25개에 맞췄다. 표69개·코드10블록·2,176문단을 대조하고 기존 로컬10파일을 보관했다. 로컬 DOCX는 목차의 용지 밖 탭 위치만 보정했다. 구글 독스 PDF123쪽과 로컬 맑은 고딕 렌더125쪽은 배치가 다르며PDF 목차154개 중91개 쪽번호 불일치는 남아 있다. 논문·이미지·개인 값은 Git 제외다.
 

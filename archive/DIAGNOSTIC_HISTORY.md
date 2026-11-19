@@ -1,5 +1,18 @@
 # 진단 탐색 이력
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+## 2026-11-20 오프라인 설치와 모델 context 실패·보완
+
+최초 온라인 설치는 두 Kali의 외부HTTPS 연결 실패로 끝났고 오프라인 지시 뒤 종료를 확인했다. Mac의 임시 relay는 터널·클라이언트·전송 없이 종료했다. 오프라인 첫 시도에서는 공식 PM client가 별도 런타임을 확보하려 했으나 audit가 DNS/연결 전에 거절했다. 반입 runtime과 공식 build_operations를 직접 결속한 뒤 설치가 완료됐다. 설치 stamp의 full 값 거절은 공식 bundled 값으로 수정했고 v0.23.2/고정commit을 검증했다.
+
+32768 설정은 실제 AIAgent가 최소64000 미달로 거절했다. 클라이언트65536설정 뒤 짧은 모델 응답은 성공했지만 /api/ps는32768이어서 준비 완료로 채택하지 않았다. OpenAI 호환 API의 context 지정 한계는 [Ollama 공식 문서](https://docs.ollama.com/api/openai-compatibility#setting-the-local-context-size)와 일치했다. 관리자 경유로 같은 가중치에65536태그를 추가해 최종 두 응답과 실제 runtime context를 대조했다.
+
+태그 추가 후 details.parent_model의 출처 변경을 초기 검증기가 거절했다. 읽기 재대조에서 원본 GGUF blob·모델 정보·template·system·기타 파라미터와 기존5태그가 같음을 확인했다. 출처 필드는 원본 모델명과 일치해야 통과하도록 보완하고 이미 존재하는 태그의 재확인은 읽기로 끝냈다. 경계 검사12개와 공개 묶음 생성기의112멤버 재구성을 통과했다.
+
+최종 응답은 각 API1회·무도구였으며 두 문장 형식 지시는 지켜지지 않았고233번에는 한자 혼용도 관측됐다. 역할·식별자·중단 인식과 연결만 확인한 결과로서 일반 한국어 품질·보안 판단 정확도·공격 능력·속도를 검증한 것은 아니다. 원문 실패와 응답은 로컬 기록에 보존한다.
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 ## 2026-11-19 backend 통합의 실패와 수정

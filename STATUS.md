@@ -1,5 +1,16 @@
 # 현재 작업 상태
 
+<!-- kali-hermes-offline-20261120 -->
+<a id="kali-hermes-offline-20261120"></a>
+Kali232·233에 Hermes Agent v0.23.2를 오프라인 반입해 설치했다. Linux용wheel102개와 도구8개의 SHA를 대조하고845,148,160바이트 묶음을 두 호스트에서 다시 검증했다. Mac에는 패키지를 설치하지 않았으며 이번 임시26,339파일·2,909,899,361바이트를 정리했다. 두 Kali의 반입·실패 작업 폴더도 제거했고 운영 runtime·오프라인 캐시와 복구 백업은 보존했다.
+
+두 호스트는 DGX111의40B/Q8_0 모델을 qwen3.8-40b-heretic:hermes-64k로 사용한다. Hermes의 최소64000 요구와 OpenAI 호환 API의 context 옵션 미반영을 실제로 확인해 관리자231 경유로65536태그를 추가했다. 기존5모델 digest와 원본 가중치 blob은 같다. 각 SOUL3350자 전체 로드와 식별자·레드팀 역할·공격 중단 상태를 확인했다.
+
+무도구 실제 응답은232번40.381초·233번74.995초였고 각각 API1회·실제 context65536·completed=true를 확인했다. 두 요청은 동시에 시작했으므로 대기 시간이 포함된 단회 관측이다. 공격·시나리오 시험은 계속 중단이며 실제 취약점 재현·공격/탐지/차단/복구·관제 판단 품질·일반 응답시간은 이번에 검증하지 않았다. 논문·판넬·발표자료와 B→Thor 운영 추론 경로는 유지했다.
+
+[설치·역할·재현 방법](infra/hermes/kali-redteam/README.md) · [검증 원장](infra/hermes/kali-redteam/validation.json) · [실패와 context 보완](archive/DIAGNOSTIC_HISTORY.md#kali-hermes-offline-20261120)
+<!-- /kali-hermes-offline-20261120 -->
+
 <!-- thesis-google-docs-local-sync-20261119 -->
 사용자의 후속 요청에 따라 구글 독스 편집본의 같은 판본을 로컬 MD·DOCX·PDF에 반영했다. 기존 파일명은 유지하며 수정 전 원고·출력·설명·생성기10파일을 로컬 복구본에 보관했다. 원문의2,176문단 순서와 표69개 셀의 어휘·수치가 같고 코드10블록과 이미지25개도 대조했다. 추가된 사진3장은 로컬 전용으로 보관하며 개인 값이나 문서 식별자는 공개하지 않는다.
 

@@ -381,6 +381,17 @@
     "mutations": 0,
     "new_packages": 0,
     "model_inferences": 0,
-    "attack_traffic": 0
+    "attack_traffic": 0,
+    "publication": {
+      "content_commit": "f9c261e0412832b84f6f567c9d0f488469a3f841",
+      "remote_main_matched_at_kst": "2026-11-20T08:58:27.351602+09:00",
+      "scope": "only three read-only recheck metadata files; original installation publication retained separately",
+      "tracked_working_tree_scan": {
+        "paths": 2478,
+        "unsafe": 0,
+        "known_non_credentials": 10,
+        "new_findings": 0
+      }
+    }
   }
 }

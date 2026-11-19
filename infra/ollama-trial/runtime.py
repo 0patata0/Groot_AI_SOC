@@ -484,7 +484,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         value,removed_names=harness.CONTRACT.validated_service_report(value,schema)
                     except ValidationError:
                         count=report.get('service_schema_repairs',0)
-                        require(count<harness.CONTRACT.REPAIR_PASSES,'service_schema_repair_budget_exhausted')
+                        if count>=harness.CONTRACT.REPAIR_PASSES:
+                            report['stop_reason']='service_schema_repair_budget_exhausted'
+                            raise
                         feedback=harness.CONTRACT.service_schema_repair_feedback(value,schema)
                         report['service_schema_repairs']=count+1
                         report.setdefault('service_schema_rejections',[]).append(copy.deepcopy(feedback['schema_validation_errors']))

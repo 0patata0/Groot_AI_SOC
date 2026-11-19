@@ -2045,15 +2045,22 @@ def service_inquiry_schema(schema):
     Both permitted values remain choices; no arguments are injected at dispatch.
     """
     result=copy.deepcopy(schema)
+    inquiry_definitions={}
     def arguments(node):
         if isinstance(node,list):
             for item in node:arguments(item)
         elif isinstance(node,dict):
             props=node.get('properties',{})
-            if (node.get('type')=='object' and 'view' in node.get('required',[])
-                    and props.get('view',{}).get('enum')==['journal']
+            views=props.get('view',{}).get('enum',[])
+            if (node.get('type')=='object' and 'journal' in views
                     and props.get('journal_scope',{}).get('enum')==['errors','all']):
-                node['required']=list(dict.fromkeys(node['required']+['journal_scope']))
+                if views==['journal'] and 'view' in node.get('required',[]):
+                    node['required']=list(dict.fromkeys(node['required']+['journal_scope']))
+                else:
+                    condition={'if':{'required':['view'],'properties':{'view':{'const':'journal'}}},
+                        'then':{'required':['journal_scope']}}
+                    conditions=node.setdefault('allOf',[])
+                    if condition not in conditions:conditions.append(condition)
                 props['journal_scope'].pop('default',None)
             for key in ('anyOf','oneOf','allOf'):
                 if key in node:arguments(node[key])
@@ -2066,9 +2073,24 @@ def service_inquiry_schema(schema):
                 arg=props.get('arguments')
                 if isinstance(arg,dict) and '$ref' in arg:
                     parts=arg['$ref'].split('/')
-                    if len(parts)==3 and parts[:2]==['#','$defs']:arg=result.get('$defs',{}).get(parts[2])
+                    if len(parts)==3 and parts[:2]==['#','$defs'] and parts[2] in result.get('$defs',{}):
+                        original=parts[2]
+                        if original not in inquiry_definitions:
+                            restricted=copy.deepcopy(result['$defs'][original])
+                            arguments(restricted)
+                            name='service_journal_inquiry_'+str(len(inquiry_definitions))
+                            while name in result['$defs']:name+='_'
+                            result['$defs'][name]=restricted
+                            inquiry_definitions[original]=name
+                        arg['$ref']='#/$defs/'+inquiry_definitions[original]
+                        arg=None
                 arguments(arg)
-            for item in node.values():calls(item)
+            for key,item in node.items():
+                if key in ('$defs','definitions','properties','patternProperties','dependentSchemas','dependencies') and isinstance(item,dict):
+                    for child in item.values():calls(child)
+                elif key in ('allOf','anyOf','oneOf','prefixItems','items','contains','additionalProperties',
+                             'unevaluatedProperties','unevaluatedItems','propertyNames','not','if','then','else'):
+                    calls(item)
     calls(result)
     return result
 

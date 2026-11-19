@@ -200,6 +200,38 @@ class ServiceRuntime(unittest.TestCase):
         self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
         self.assertEqual(result['protected_calls'],0)
 
+    def test_oversized_report_is_corrected_without_repeating_successful_reads(self):
+        good={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'반환된 오류 표본의 배경 원인은 확인하지 못했으며 전체 기능 영향은 미확인입니다.',
+            'current_observation':'현재 서비스 관측과 과거 표본은 서로 다른 범위입니다.',
+            'evidence_indexes':[0],'limitations':['과거 원인과 전체 기능 영향은 미확인입니다.'],'next_steps':[]}}
+        bad=copy.deepcopy(good);bad['report']['basis']='가'*513
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,
+            compact_report=[bad,good],question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertNotIn('error_type',result)
+        self.assertEqual(order.count('compact'),2)
+        self.assertEqual(len(calls),4)
+        self.assertEqual(result['service_schema_repairs'],1)
+        self.assertEqual(result['service_report_audit'][0]['response'],bad)
+        self.assertEqual(result['service_report_audit'][1]['response'],good)
+        self.assertTrue(any(x['validator']=='maxLength' for x in result['service_schema_rejections'][0]))
+        self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
+        self.assertEqual(result['protected_calls'],0)
+
+    def test_repeated_invalid_report_stops_at_the_existing_schema_repair_budget(self):
+        bad={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'가'*513,'current_observation':'현재 서비스 관측과 과거 표본은 서로 다른 범위입니다.',
+            'evidence_indexes':[0],'limitations':['전체 기능 영향은 미확인입니다.'],'next_steps':[]}}
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,
+            compact_report=bad,question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertEqual(result['error_type'],'ValidationError')
+        self.assertEqual(result['stop_reason'],'service_schema_repair_budget_exhausted')
+        self.assertEqual(order.count('compact'),runtime.harness.CONTRACT.REPAIR_PASSES+1)
+        self.assertEqual(result['service_schema_repairs'],runtime.harness.CONTRACT.REPAIR_PASSES)
+        self.assertEqual(len(calls),4)
+        self.assertNotIn('service_judgment',result)
+        self.assertEqual(result['protected_calls'],0)
+
     def test_both_empty_journals_complete_evidence_without_repeating_or_claiming_health(self):
         result,order,prompts,calls=self.run_case(empty_error_journal=True,empty_all_journal=True,
             question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
@@ -351,7 +383,9 @@ class ServiceRuntime(unittest.TestCase):
         self.assertEqual(len(calls),5);self.assertEqual(calls[-1],{})
         self.assertEqual(result['protected_calls'],0);self.assertIn('compact',order)
         self.assertNotIn('agent',order)
-        self.assertIn('192.0.2.7',str(prompts));self.assertIn('journal_excerpt',str(prompts))
+        self.assertIn('192.0.2.7',result['final_response'])
+        self.assertIn('controller_already_running',result['final_response'])
+        self.assertIn('보고 전송 미확인',result['final_response'])
         receipts=runtime.harness.service_history_receipts(result['calls'])
         self.assertEqual(receipts[-1]['tool'],'mcp__resp__list_blocks')
         self.assertEqual(runtime.harness.missing_reads(question,result['calls']),[])

@@ -92,6 +92,65 @@ class ServiceLookupBoundary(unittest.TestCase):
 
 
 class ServiceReadContinuation(unittest.TestCase):
+    def test_flat_journal_schema_requires_explicit_filter_only_for_model_journal_calls(self):
+        from jsonschema import Draft202012Validator
+        original={'type':'object','additionalProperties':False,'required':['target'],
+            'properties':{'target':{'enum':['registered']},'view':{'enum':['snapshot','journal']},
+                'journal_scope':{'enum':['errors','all'],'default':'errors'}}}
+        before=copy.deepcopy(original)
+        schema=c.service_report_schema([NAME],available_reads=[NAME],read_schemas={NAME:original},direct_reads=2)
+        validator=Draft202012Validator(schema)
+        def request(args):return {'more_evidence':True,'report':None,'calls':[{'tool':NAME,'arguments':args}]}
+        for args in ({'target':'registered'},{'target':'registered','view':'snapshot'},
+                     {'target':'registered','view':'journal','journal_scope':'errors'},
+                     {'target':'registered','view':'journal','journal_scope':'all'}):
+            self.assertTrue(validator.is_valid(request(args)),args)
+        self.assertFalse(validator.is_valid(request({'target':'registered','view':'journal'})))
+        self.assertFalse(validator.is_valid(request({'target':'registered','view':'journal','journal_scope':'unknown'})))
+        self.assertEqual(original,before)
+        self.assertTrue(Draft202012Validator(original).is_valid({'target':'registered','view':'journal'}))
+
+    def test_journal_filter_constraint_does_not_leak_to_an_identical_other_tool(self):
+        from jsonschema import Draft202012Validator
+        other='mcp__fixture__read'
+        original={'type':'object','additionalProperties':False,'required':['target'],
+            'properties':{'target':{'enum':['registered']},'view':{'enum':['snapshot','journal']},
+                'journal_scope':{'enum':['errors','all'],'default':'errors'}}}
+        inputs={NAME:copy.deepcopy(original),other:copy.deepcopy(original)};before=copy.deepcopy(inputs)
+        schema=c.service_report_schema([NAME],available_reads=list(inputs),read_schemas=inputs,direct_reads=2)
+        validator=Draft202012Validator(schema)
+        def request(name):return {'more_evidence':True,'report':None,
+            'calls':[{'tool':name,'arguments':{'target':'registered','view':'journal'}}]}
+        self.assertTrue(validator.is_valid(request(other)))
+        self.assertFalse(validator.is_valid(request(NAME)))
+        self.assertEqual(inputs,before)
+
+    def test_journal_ref_keeps_sibling_target_constraint(self):
+        from jsonschema import Draft202012Validator
+        source={'$defs':{'args':{'type':'object','required':['target'],
+            'properties':{'target':{'enum':['a:unit','b:unit']},'view':{'enum':['journal']},
+                'journal_scope':{'enum':['errors','all']}}}},
+            'type':'object','properties':{'tool':{'const':NAME},'arguments':{
+                '$ref':'#/$defs/args','properties':{'target':{'const':'a:unit'}}}}}
+        before=copy.deepcopy(source);validator=Draft202012Validator(c.service_inquiry_schema(source))
+        self.assertTrue(validator.is_valid({'tool':NAME,'arguments':{'target':'a:unit'}}))
+        self.assertFalse(validator.is_valid({'tool':NAME,'arguments':{'target':'b:unit'}}))
+        self.assertFalse(validator.is_valid({'tool':NAME,'arguments':{'target':'a:unit','view':'journal'}}))
+        self.assertTrue(validator.is_valid({'tool':NAME,'arguments':{
+            'target':'a:unit','view':'journal','journal_scope':'all'}}))
+        self.assertEqual(source,before)
+
+    def test_inquiry_does_not_reinterpret_literal_tool_shaped_data(self):
+        from jsonschema import Draft202012Validator
+        literal={'properties':{'tool':{'const':NAME},'arguments':{'$ref':'#/$defs/service_follow_up_0'}}}
+        original={'type':'object','additionalProperties':False,'required':['target','value'],
+            'properties':{'target':{'enum':['a:unit']},'view':{'enum':['journal']},
+                'journal_scope':{'enum':['errors','all']},'value':{'const':literal}}}
+        schema=c.service_report_schema([NAME],available_reads=[NAME],read_schemas={NAME:original},direct_reads=2)
+        self.assertTrue(Draft202012Validator(schema).is_valid({'more_evidence':True,'report':None,
+            'calls':[{'tool':NAME,'arguments':{'target':'a:unit','value':literal}}]}))
+        self.assertEqual(original['properties']['value']['const'],literal)
+
     def test_identical_input_contracts_share_definitions_but_not_tool_authority(self):
         from jsonschema import Draft202012Validator
         original={'type':'object','required':['target'],'properties':{'target':{'$ref':'#/$defs/target'}},

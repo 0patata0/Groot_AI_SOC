@@ -1,0 +1,873 @@
+{
+  "schema": 1,
+  "state": "candidate_not_applied_actual_model_quality_and_latency_unmet",
+  "at_kst": "2026-11-19T11:25:43.084889+09:00",
+  "operating_source_changes": 0,
+  "operating_restarts": 0,
+  "new_chat_posts": 0,
+  "candidate": {
+    "plan_sha256": "0e237a5ce931b035c3816f9927264585f75fb3a1c9118cbd289e460ad65ac99d",
+    "parent_claim_plan_sha256": "e4c8f238cccf89cd0d2a3df6f189fbb99b5dfc7f8e02d622feafecc91af66b68",
+    "source_files": 17,
+    "receipt_updates_if_applied": 1,
+    "patch": "schema-recovery.patch",
+    "files": 17,
+    "patch_bytes": 949976,
+    "patch_sha256": "009b31813c6ddc9dadbf55a72322feaa47c6d5dce2e8b82112fa6da3405bb7a4",
+    "forward_and_reverse_sha256_verified": true,
+    "temporary_roundtrip_removed": true,
+    "sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "9e5ae98e8ab83ba1c57d8069c64bd707310997e68513c81d8fbf61470180e69b",
+        "bytes": 228159,
+        "kind": "explicit_journal_filter_for_flat_or_union_model_input_no_wire_default_change"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "9e5ae98e8ab83ba1c57d8069c64bd707310997e68513c81d8fbf61470180e69b",
+        "bytes": 228159,
+        "kind": "explicit_journal_filter_for_flat_or_union_model_input_no_wire_default_change"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "9e5ae98e8ab83ba1c57d8069c64bd707310997e68513c81d8fbf61470180e69b",
+        "bytes": 228159,
+        "kind": "explicit_journal_filter_for_flat_or_union_model_input_no_wire_default_change"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "ba0dd5c8ee5094d6745b670424f74025f5756c516d3eabe5c89197aa434bc37b",
+        "bytes": 61651,
+        "kind": "bounded_existing_service_schema_repair_no_read_replay"
+      },
+      "/opt/capstone-management/soc_management_run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/capstone-ollama-trial/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/management-code/run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-ollama-trial/query_grounding.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-management/soc_management_controller.py": {
+        "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "after_sha256": "5641ecf00dcb9a4d0a48ad07900df701270a34991438f93362fe8aab29d94af8",
+        "bytes": 538882,
+        "kind": "bound_existing_gate_payload"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      }
+    },
+    "authority_model_ports_packages_changes": 0,
+    "final_candidate_actual_model_trial_executed": false
+  },
+  "canonical_source_sha256": {
+    "infra/hermes/chat_contract.py": "bffac29e26082ccad2d579f13101d2ad7edcf03453636e0ab6f97682ca689ade",
+    "infra/hermes/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+    "infra/hermes/test_workflow_contract.py": "9b9bc49db872ffdcc1c1f9923630f4cc3e17aaf2ca3ef27efa90ebf24ebd5005",
+    "infra/hermes/test_service_history_contract.py": "d5cb9d471eba6c685bcd183df576b8192305cf785f11ae06b9c7741f9bf3a91c",
+    "infra/ollama-trial/test_diagnostic_claim_forms.py": "9b10057d46936c1af3e749b9231847ba0f94a749988214b0f2d3f4026e123b28",
+    "infra/ollama-trial/test_service_history.py": "7379cc26a8e8e21bd2d9855624a4c749a646283bc759dbadad930e1e184f1a78",
+    "infra/ollama-trial/runtime.py": "d31526a55ab5ac38baa333bcde50a659002ae1adb6783ae89d5507363d1a9069"
+  },
+  "resume_identity": {
+    "at_kst": "2026-11-19T10:53:47.558032+09:00",
+    "unchanged_sources": 64,
+    "changed": [],
+    "model_catalog_access": {
+      "model": "soc-qwen36:35b-balanced-q4km-20261108",
+      "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+      "access_mode": "hermes-parity"
+    },
+    "previously_cleaned_roots_not_reused": true,
+    "operating_changes": 0
+  },
+  "official_harness2": {
+    "at_kst": "2026-11-19T11:20:00.071007+09:00",
+    "live_snapshot_at_kst": "2026-11-19T10:53:06.668695+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_locked_files_verified": 140,
+    "framework_manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "arms": {
+      "base": {
+        "native": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 33505,
+            "n_files": 19,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 11
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "sdk": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 20,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 13
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "management": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 14,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 7
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        }
+      },
+      "candidate": {
+        "native": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 33505,
+            "n_files": 19,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 11
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "sdk": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 20,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 13
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "management": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 14,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 7
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        }
+      }
+    },
+    "same_surface_diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/query_grounding.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/query_grounding.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/soc_management_controller.py",
+          "scripts/soc_management_run.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0
+  },
+  "tests": {
+    "mac_count": 982,
+    "linux_count": 982,
+    "linux_official_integration": 38,
+    "linux_installer": 37,
+    "mac": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 415,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 71,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 415,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 71,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.393s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.568s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "full_sdk_service_runtime": 41,
+    "common_schema_cases": 13,
+    "two_new_schema_recovery_methods": 2,
+    "four_new_schema_isolation_methods": 4,
+    "canonical_full_native_ServiceReport_openai_environment_errors": 13,
+    "all_repository_tests_green": false,
+    "counts_are_overlapping_regressions_not_independent_accuracy": true
+  },
+  "actual_model_trials": [
+    {
+      "plan_sha256": "e4c8f238cccf89cd0d2a3df6f189fbb99b5dfc7f8e02d622feafecc91af66b68",
+      "started_at_kst": "2026-11-19T10:53:50.121821+09:00",
+      "finished_at_kst": "2026-11-19T10:54:59.919432+09:00",
+      "seconds": 69.798,
+      "reported_status": "partial",
+      "error_type": "ValidationError",
+      "actual_reads": 3,
+      "model_completions": 4,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "diagnostic_snapshot_is_not_functional_health"
+      ],
+      "model_calls": [
+        {
+          "seconds": 0.802,
+          "usage": {
+            "input_tokens": 283,
+            "output_tokens": 9,
+            "total_tokens": 292
+          }
+        },
+        {
+          "seconds": 0.838,
+          "usage": {
+            "input_tokens": 263,
+            "output_tokens": 7,
+            "total_tokens": 270
+          }
+        },
+        {
+          "seconds": 25.943,
+          "usage": {
+            "input_tokens": 18444,
+            "output_tokens": 390,
+            "total_tokens": 18834
+          }
+        },
+        {
+          "seconds": 29.461,
+          "usage": {
+            "input_tokens": 19126,
+            "output_tokens": 539,
+            "total_tokens": 19665
+          }
+        }
+      ],
+      "report_sha256": "7077b5f38034184f67b031e5cd6fd2ef482aeb18fc106a6dc816ec7c8768e31a",
+      "schema_repair_was_exercised": false,
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    },
+    {
+      "plan_sha256": "8bd734e5fa53caad18cced191a1be092b85ce923062dcc11663aacdcb90ce49c",
+      "started_at_kst": "2026-11-19T11:07:55.577860+09:00",
+      "finished_at_kst": "2026-11-19T11:09:09.235587+09:00",
+      "seconds": 73.658,
+      "reported_status": "partial",
+      "error_type": null,
+      "actual_reads": 3,
+      "model_completions": 5,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "diagnostic_duration_claim_unbound",
+        "diagnostic_period_coverage_unverified",
+        "diagnostic_snapshot_is_not_functional_health",
+        "sample_zero_presented_as_absence"
+      ],
+      "model_calls": [
+        {
+          "seconds": 0.841,
+          "usage": {
+            "input_tokens": 283,
+            "output_tokens": 9,
+            "total_tokens": 292
+          }
+        },
+        {
+          "seconds": 0.736,
+          "usage": {
+            "input_tokens": 263,
+            "output_tokens": 7,
+            "total_tokens": 270
+          }
+        },
+        {
+          "seconds": 26.14,
+          "usage": {
+            "input_tokens": 18477,
+            "output_tokens": 401,
+            "total_tokens": 18878
+          }
+        },
+        {
+          "seconds": 25.465,
+          "usage": {
+            "input_tokens": 19548,
+            "output_tokens": 368,
+            "total_tokens": 19916
+          }
+        },
+        {
+          "seconds": 7.304,
+          "usage": {
+            "input_tokens": 19548,
+            "output_tokens": 368,
+            "total_tokens": 19916
+          }
+        }
+      ],
+      "report_sha256": "3f6858a2d038d98010bf2e509f0d7c97f4066e48348af573846af5be0a08f515",
+      "schema_repair_was_exercised": false,
+      "independent_quality_pass": false,
+      "chat_round_trip": false,
+      "operating_changes": 0
+    }
+  ],
+  "not_a_controlled_latency_ab_test": true,
+  "payload_measurements": {
+    "observer_identity_test": {
+      "identity_preserved": true,
+      "schema_and_invocation_arguments_preserved": true,
+      "messages_unchanged": true,
+      "payload_values_not_retained": true,
+      "temporary_probe_directory_removed": true,
+      "actual_model_or_network_calls": 0
+    },
+    "isolated_observer_test": {
+      "isolated_python_script_directory_resolved": true,
+      "unchanged_result_and_input": true,
+      "only_sizes_and_hashes_retained": true,
+      "packages_installed": 0,
+      "temporary_fixture_removed": true
+    },
+    "values_saved_by_observer": false,
+    "counts_and_hashes": [
+      {
+        "ordinal": 1,
+        "schema_bytes": 207,
+        "schema_sha256": "576a2eca181e9533d99e4b6420c5bde7bd3ebcfe76aa5d8b256ed0b041a0158e",
+        "message_bytes": 932,
+        "messages_sha256": "c5b43b404dca12cc203146457e979c395eaec903c30c1bf697e6e5b31741a5c3",
+        "message_parts": [
+          {
+            "content_bytes": 313
+          },
+          {
+            "content_bytes": 539,
+            "body_top_level_bytes": {
+              "options": 347,
+              "request": 71,
+              "requested_at_kst": 34,
+              "selection_reason": 24
+            }
+          }
+        ],
+        "messages_unchanged": true
+      },
+      {
+        "ordinal": 2,
+        "schema_bytes": 207,
+        "schema_sha256": "60e680352d910deb870f16487f69f13c23a616369264936c7614d03751a39f00",
+        "message_bytes": 848,
+        "messages_sha256": "3c6a911b4ddec7ecc87785e02552f23357eb60a4d43887784ffb0b35ab9d6491",
+        "message_parts": [
+          {
+            "content_bytes": 313
+          },
+          {
+            "content_bytes": 463,
+            "body_top_level_bytes": {
+              "options": 257,
+              "request": 71,
+              "requested_at_kst": 34,
+              "selection_reason": 38
+            }
+          }
+        ],
+        "messages_unchanged": true
+      },
+      {
+        "ordinal": 3,
+        "schema_bytes": 65137,
+        "schema_sha256": "68ca92f122cec3fd173155e5f2c1843e637cbcbaf56779e9d6213a1cace60d9d",
+        "message_bytes": 58295,
+        "messages_sha256": "8ad52991d002c754caacb245390b752691887992f85c594532cc4e92e3eb3a5d",
+        "message_parts": [
+          {
+            "content_bytes": 5029
+          },
+          {
+            "content_bytes": 49572,
+            "body_top_level_bytes": {
+              "question": 71,
+              "requested_at_kst": 34,
+              "background": 2,
+              "history_window_origin": 41,
+              "initial_history_window_minutes": 4,
+              "requested_service_scope": 398,
+              "untrusted_completed_reads": 22160,
+              "journal_continuation_options": 512,
+              "untrusted_journal_structured_messages": 5745,
+              "available_read_descriptions": 20256,
+              "current_successful_tools": 55
+            },
+            "description_bytes_by_tool": {
+              "mcp__rule_a__get_security_rules": 713,
+              "mcp__rule_a__get_rule_change_target": 187,
+              "mcp__rule_a__get_rule_change_status": 92,
+              "mcp__rule_a__get_service_action_target": 748,
+              "mcp__rule_a__get_operation_status": 120,
+              "mcp__rule_b__get_security_rules": 702,
+              "mcp__rule_b__get_rule_change_target": 167,
+              "mcp__rule_b__get_rule_change_status": 92,
+              "mcp__rule_b__get_service_action_target": 740,
+              "mcp__rule_b__get_operation_status": 120,
+              "mcp__security_events__search_suricata_alerts": 276,
+              "mcp__security_events__search_modsecurity_alerts": 458,
+              "mcp__security_events__search_wazuh_alerts": 357,
+              "mcp__security_events__get_wazuh_sca_checks": 401,
+              "mcp__security_events__get_web_service_target": 329,
+              "mcp__security_events__search_web_access": 460,
+              "mcp__security_events__collect_incident_evidence": 553,
+              "mcp__system_diagnostics__get_system_diagnostics": 6655,
+              "mcp__system_diagnostics__calculate_time": 498,
+              "mcp__system_diagnostics__get_host_inventory": 1728,
+              "mcp__wazuh_ro__get_wazuh_remoted_stats": 138,
+              "mcp__wazuh_ro__search_wazuh_manager_logs": 176,
+              "mcp__wazuh_ro__get_wazuh_agent_ports": 224,
+              "mcp__wazuh_ro__get_wazuh_agents": 243,
+              "mcp__wazuh_ro__get_wazuh_manager_error_logs": 123,
+              "mcp__wazuh_ro__get_wazuh_agent_processes": 194,
+              "mcp__wazuh_ro__get_wazuh_vulnerability_summary": 220,
+              "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities": 239,
+              "mcp__wazuh_ro__get_wazuh_rules_summary": 175,
+              "mcp__wazuh_ro__get_wazuh_cluster_health": 116,
+              "mcp__wazuh_ro__get_wazuh_weekly_stats": 130,
+              "mcp__wazuh_ro__get_wazuh_cluster_nodes": 181,
+              "mcp__wazuh_ro__get_wazuh_log_collector_stats": 144,
+              "mcp__wazuh_ro__get_wazuh_alert_summary": 123,
+              "mcp__resp__get_firewall_rules": 400,
+              "mcp__resp__list_blocks": 73
+            }
+          }
+        ],
+        "messages_unchanged": true
+      },
+      {
+        "ordinal": 4,
+        "schema_bytes": 65137,
+        "schema_sha256": "68ca92f122cec3fd173155e5f2c1843e637cbcbaf56779e9d6213a1cace60d9d",
+        "message_bytes": 63164,
+        "messages_sha256": "4d5efa7b9d6b19c6881c341983d87efbf71456f37f3450fe86cdc37ea9a7168e",
+        "message_parts": [
+          {
+            "content_bytes": 7631
+          },
+          {
+            "content_bytes": 51763,
+            "body_top_level_bytes": {
+              "question": 71,
+              "requested_at_kst": 34,
+              "background": 2,
+              "history_window_origin": 41,
+              "initial_history_window_minutes": 4,
+              "requested_service_scope": 398,
+              "untrusted_completed_reads": 22160,
+              "journal_continuation_options": 512,
+              "untrusted_journal_structured_messages": 5745,
+              "available_read_descriptions": 20256,
+              "current_successful_tools": 55,
+              "report_validation_issues": 159,
+              "untrusted_rejected_model_claims": 1083,
+              "untrusted_rejected_sentences": 854
+            },
+            "description_bytes_by_tool": {
+              "mcp__rule_a__get_security_rules": 713,
+              "mcp__rule_a__get_rule_change_target": 187,
+              "mcp__rule_a__get_rule_change_status": 92,
+              "mcp__rule_a__get_service_action_target": 748,
+              "mcp__rule_a__get_operation_status": 120,
+              "mcp__rule_b__get_security_rules": 702,
+              "mcp__rule_b__get_rule_change_target": 167,
+              "mcp__rule_b__get_rule_change_status": 92,
+              "mcp__rule_b__get_service_action_target": 740,
+              "mcp__rule_b__get_operation_status": 120,
+              "mcp__security_events__search_suricata_alerts": 276,
+              "mcp__security_events__search_modsecurity_alerts": 458,
+              "mcp__security_events__search_wazuh_alerts": 357,
+              "mcp__security_events__get_wazuh_sca_checks": 401,
+              "mcp__security_events__get_web_service_target": 329,
+              "mcp__security_events__search_web_access": 460,
+              "mcp__security_events__collect_incident_evidence": 553,
+              "mcp__system_diagnostics__get_system_diagnostics": 6655,
+              "mcp__system_diagnostics__calculate_time": 498,
+              "mcp__system_diagnostics__get_host_inventory": 1728,
+              "mcp__wazuh_ro__get_wazuh_remoted_stats": 138,
+              "mcp__wazuh_ro__search_wazuh_manager_logs": 176,
+              "mcp__wazuh_ro__get_wazuh_agent_ports": 224,
+              "mcp__wazuh_ro__get_wazuh_agents": 243,
+              "mcp__wazuh_ro__get_wazuh_manager_error_logs": 123,
+              "mcp__wazuh_ro__get_wazuh_agent_processes": 194,
+              "mcp__wazuh_ro__get_wazuh_vulnerability_summary": 220,
+              "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities": 239,
+              "mcp__wazuh_ro__get_wazuh_rules_summary": 175,
+              "mcp__wazuh_ro__get_wazuh_cluster_health": 116,
+              "mcp__wazuh_ro__get_wazuh_weekly_stats": 130,
+              "mcp__wazuh_ro__get_wazuh_cluster_nodes": 181,
+              "mcp__wazuh_ro__get_wazuh_log_collector_stats": 144,
+              "mcp__wazuh_ro__get_wazuh_alert_summary": 123,
+              "mcp__resp__get_firewall_rules": 400,
+              "mcp__resp__list_blocks": 73
+            }
+          }
+        ],
+        "messages_unchanged": true
+      },
+      {
+        "ordinal": 5,
+        "schema_bytes": 65137,
+        "schema_sha256": "68ca92f122cec3fd173155e5f2c1843e637cbcbaf56779e9d6213a1cace60d9d",
+        "message_bytes": 63164,
+        "messages_sha256": "4d5efa7b9d6b19c6881c341983d87efbf71456f37f3450fe86cdc37ea9a7168e",
+        "message_parts": [
+          {
+            "content_bytes": 7631
+          },
+          {
+            "content_bytes": 51763,
+            "body_top_level_bytes": {
+              "question": 71,
+              "requested_at_kst": 34,
+              "background": 2,
+              "history_window_origin": 41,
+              "initial_history_window_minutes": 4,
+              "requested_service_scope": 398,
+              "untrusted_completed_reads": 22160,
+              "journal_continuation_options": 512,
+              "untrusted_journal_structured_messages": 5745,
+              "available_read_descriptions": 20256,
+              "current_successful_tools": 55,
+              "report_validation_issues": 159,
+              "untrusted_rejected_model_claims": 1083,
+              "untrusted_rejected_sentences": 854
+            },
+            "description_bytes_by_tool": {
+              "mcp__rule_a__get_security_rules": 713,
+              "mcp__rule_a__get_rule_change_target": 187,
+              "mcp__rule_a__get_rule_change_status": 92,
+              "mcp__rule_a__get_service_action_target": 748,
+              "mcp__rule_a__get_operation_status": 120,
+              "mcp__rule_b__get_security_rules": 702,
+              "mcp__rule_b__get_rule_change_target": 167,
+              "mcp__rule_b__get_rule_change_status": 92,
+              "mcp__rule_b__get_service_action_target": 740,
+              "mcp__rule_b__get_operation_status": 120,
+              "mcp__security_events__search_suricata_alerts": 276,
+              "mcp__security_events__search_modsecurity_alerts": 458,
+              "mcp__security_events__search_wazuh_alerts": 357,
+              "mcp__security_events__get_wazuh_sca_checks": 401,
+              "mcp__security_events__get_web_service_target": 329,
+              "mcp__security_events__search_web_access": 460,
+              "mcp__security_events__collect_incident_evidence": 553,
+              "mcp__system_diagnostics__get_system_diagnostics": 6655,
+              "mcp__system_diagnostics__calculate_time": 498,
+              "mcp__system_diagnostics__get_host_inventory": 1728,
+              "mcp__wazuh_ro__get_wazuh_remoted_stats": 138,
+              "mcp__wazuh_ro__search_wazuh_manager_logs": 176,
+              "mcp__wazuh_ro__get_wazuh_agent_ports": 224,
+              "mcp__wazuh_ro__get_wazuh_agents": 243,
+              "mcp__wazuh_ro__get_wazuh_manager_error_logs": 123,
+              "mcp__wazuh_ro__get_wazuh_agent_processes": 194,
+              "mcp__wazuh_ro__get_wazuh_vulnerability_summary": 220,
+              "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities": 239,
+              "mcp__wazuh_ro__get_wazuh_rules_summary": 175,
+              "mcp__wazuh_ro__get_wazuh_cluster_health": 116,
+              "mcp__wazuh_ro__get_wazuh_weekly_stats": 130,
+              "mcp__wazuh_ro__get_wazuh_cluster_nodes": 181,
+              "mcp__wazuh_ro__get_wazuh_log_collector_stats": 144,
+              "mcp__wazuh_ro__get_wazuh_alert_summary": 123,
+              "mcp__resp__get_firewall_rules": 400,
+              "mcp__resp__list_blocks": 73
+            }
+          }
+        ],
+        "messages_unchanged": true
+      }
+    ],
+    "inference_bottleneck_not_proven_by_bytes_alone": true
+  },
+  "review": {
+    "mode": "direct defect-first; review-agent skill unavailable",
+    "fixed_findings": [
+      "missing installed SDK bounded schema repair",
+      "flat journal filter omission in model inquiry",
+      "shared schema definition isolation",
+      "preserve $ref sibling constraints",
+      "do not interpret const/default literal data as schema"
+    ],
+    "pass_conditions": "982 candidate regressions including full SDK runtime41 and common schema13; Linux record separately",
+    "not_executed": "Semgrep CLI absent; no Mac install",
+    "remaining": [
+      "current final candidate actual inference not yet executed",
+      "prior actual model report quality failures and 60-second target unmet",
+      "full canonical Native OpenAI-dependent tests unavailable in Mac global Python",
+      "new OS install not tested"
+    ]
+  },
+  "cleanup": {
+    "root_count": 4,
+    "file_count": 1472,
+    "verified_bytes": 54091540,
+    "own_jobs_terminal": true,
+    "owned_report_parent_removed_if_empty": true,
+    "operating_and_rollback_roots_removed": 0,
+    "generated_results_retained_locally": true
+  },
+  "live_after_cleanup": {
+    "at_kst": "2026-11-19T11:25:42.870043+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "operating_source_changes": 0,
+    "operating_restarts": 0,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "chat_posts": 0
+  },
+  "humanize": {
+    "run": "2026-11-19-017-14f8",
+    "route": "light",
+    "change_rate": 0.0017,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0
+  },
+  "remaining": [
+    "final source actual model trial",
+    "cause/period/functional-health overclaiming",
+    "30/60 second response target",
+    "split inquiry/report candidate with same model and complete receipts",
+    "operating apply and fresh chat checks",
+    "new OS installation and independent recreation"
+  ],
+  "publication": {
+    "state": "pending_commit_and_push"
+  }
+}

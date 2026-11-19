@@ -1,16 +1,23 @@
 # Agentic SOC 실행 계획
 
 
-<!-- service-claim-types-candidate-20261119 -->
+<!-- service-report-schema-recovery-20261119 -->
 
-다음에는 최종 후보로 새 실제 추론을 실행하고 설정값·관측 시각·표본 범위·기능 판단을 원문과 대조한다. 품질과 지연을 모두 확인한 뒤 운영 반영 및 새 채팅 검증을 진행한다. 학습과 공격 시험은 재개하지 않는다. 후속 후보는17소스·영수증1이며 정확한 후보와 실제 채팅 검증을 분리한다. [候補・検証・未適用](infra/validation/service-query/claim-types.validation.json)
-<!-- /service-claim-types-candidate-20261119 -->
+측정한 첫 최종 보고 요청에는 읽기 도구 설명20,256바이트와 출력 스키마65,137바이트가 포함됐다. 크기 측정만으로 병목의 원인을 단정하지 않는다. 다음에는 같은 모델과 근거를 유지해 도구 선택과 최종 보고를 분리하고 내용 정확도·총 응답 시간·추가 조회 경계를 비교한다. 실제 품질 검수 후에만 운영 반영과 새 채팅 검증으로 넘어간다.
+
+| 항목 | 확인 결과 |
+|---|---|
+| 운영 | 기존 설정 유지·이번 후보 미적용·재시작0 |
+| 구현 | 서비스 형식 정정·추가 journal 필터·참조 제약/리터럴 보존 |
+| 검사 | 최종 Mac982·Linux982·공식 연계38·설치37 통과 |
+| 실제 추론 | 앞선 후보69.798/73.658초·각 읽기3·내용 검증 미통과 |
+| 최종 후보 | 참조 경계 보완 뒤 새 실제 추론·운영 적용·채팅 미수행 |
+| 다음 단계 | 같은 모델/근거로 읽기 선택과 최종 보고를 분리해 비교 |
+| 정리 | 자체 시험4경로/1472파일 제거·운영/복구 백업 보존 | [검증·후보·미적용](infra/validation/service-query/schema-recovery.validation.json).
+<!-- /service-report-schema-recovery-20261119 -->
 
 
-<!-- service-report-provenance-candidate-20261119 -->
-
-남은 검토는 복합 질문의 새 표현, 원문과 판단의 범위 일치, 실제 채팅 지연이다. 문장 검사는 제한된 형식을 다루므로 모든 할루시네이션을 차단했다고 표현하지 않는다. 회귀 실행을 합산한 수를 독립 정확도나 일반 30/60초 SLO로 사용하지 않는다. 기존 `scope=None` 레거시 반례의 실패는 원본·후보에 동일하게 남아 있다. 별도 승인 대기인 관리자 시각 변경과 Response MCP 후보, 공격 시험 중단, 새 OS 설치와 실제 발표도 이 작업으로 완료되지 않는다. [검증·미적용·남은 문제](infra/validation/service-query/report-provenance.validation.json) · [공통 동작](infra/hermes/service-query-contract.md).
-<!-- /service-report-provenance-candidate-20261119 -->
+<!-- service-provenance-summary-in-archive -->
 
 <!-- coordinator-native-systemd-20261119 -->
 A/B/C27유닛의 운영 모드 읽기와 별도 systemd 합성6조건을 확인했다. 다음에는 운영 root 진입점과 Lifecycle.recover, 캐시·전역 정지·SSH 자식·B Docker를 연결한 전체 복구 및 실제 재부팅 조건을 검증한다. 시험용 변환을 운영 검증으로 승계하지 않는다. 현재 소스·모델·MCP 스키마·권한을 다시 대조하고 전체 payload 동결→공식 Harness²/회귀→정확 승인→관리자 경유 적용→새 실제 MCP·두 봇 채팅을 따른다. 기존 관리19/journal9 승인과 NTP390a 승인 대기는 그대로 유지한다.

@@ -376,6 +376,10 @@
     "Response MCP 1.2.1 separate exact approval"
   ],
   "publication": {
-    "state": "prepared; not yet committed or pushed"
+    "state": "content published; this revision records the verified content publication",
+    "content_commit": "2ba9a99abd41c306986cc4ab099d89e3d4107dcb",
+    "remote_main_verified_at_kst": "2026-11-19T18:26:56.654091+09:00",
+    "project_credential_only": true,
+    "helper_and_HTTP_traces_disabled": true
   }
 }

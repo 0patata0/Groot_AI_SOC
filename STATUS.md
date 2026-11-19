@@ -50,6 +50,7 @@ Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 p
 | A 서버 Vector | 10.398초 | 13.549초 | loaded·active·running 관측, 각 2읽기 |
 
 [검증·적용·한계](infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](infra/validation/service-query/identity-parity.patch).
+게시 확인: 내용 `2ba9a99abd41c306986cc4ab099d89e3d4107dcb` · 실제 원격 main 일치 `2026-11-19T18:26:56.654091+09:00`. 이 기록은 해당 내용 커밋의 게시 확인이며, 운영 적용 확정과 새 실제 채팅 검증은 위 근거를 따른다.
 <!-- /native-identity-parity-20261119 -->
 
 

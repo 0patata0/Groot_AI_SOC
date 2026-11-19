@@ -21,6 +21,7 @@ Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 p
 이번 결과는 구성요소 식별과 현재 조회에 대한 단회 관측이다. 복합 원인 판단의 정확도, 일반적인 30~60초 응답 보장, 전체 OS 권한 승인·회수, 새 서버 전체 설치와 공격·탐지·대응 E2E 검증은 남아 있다. 보호 정책·권한·모델·MCP 스키마는 유지했다. 발표자료와 기존 논문은 보존했다. 사용자의 마무리 지시에 따라 현재 적용 건의 정리·문서·게시까지만 진행하고 이후 작업은 다음 지시를 기다린다.
 
 [검증·적용·한계](infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](infra/validation/service-query/identity-parity.patch).
+게시 확인: 내용 `2ba9a99abd41c306986cc4ab099d89e3d4107dcb` · 실제 원격 main 일치 `2026-11-19T18:26:56.654091+09:00`. 이 기록은 해당 내용 커밋의 게시 확인이며, 운영 적용 확정과 새 실제 채팅 검증은 위 근거를 따른다.
 <!-- /native-identity-parity-20261119 -->
 
 

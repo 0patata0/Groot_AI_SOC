@@ -14103,4 +14103,5 @@ Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 p
 서비스 이름을 실제 구성요소와 구분하는 공통 조회 계약을 Hermes·Ollama·공동 관리 경로에 연결했다. 등록된 논리 서비스의 unit이 LoadState=not-found이면 같은 호스트의 서비스·컨테이너 목록을 확인한다. 목록 조회가 끝나도 구성요소가 확인되지 않으면 unresolved_service_lookup과 needs_review 또는 partial을 유지한다. 명시적인 unit 조회와 실제 loaded 서비스의 현재 상태 조회는 이 구분을 따른다.
 
 [검증·적용·한계](../infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](../infra/validation/service-query/identity-parity.patch).
+게시 확인: 내용 `2ba9a99abd41c306986cc4ab099d89e3d4107dcb` · 실제 원격 main 일치 `2026-11-19T18:26:56.654091+09:00`. 이 기록은 해당 내용 커밋의 게시 확인이며, 운영 적용 확정과 새 실제 채팅 검증은 위 근거를 따른다.
 <!-- /native-identity-parity-20261119 -->

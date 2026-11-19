@@ -384,7 +384,10 @@
     "common regressions, administrator-route live comparison, rollout receipt/recovery and new actual chats"
   ],
   "publication": {
-    "state": "prepared; commit and push verification follow",
+    "state": "content committed and pushed; receipt publication follows",
+    "content_commit": "bbeb20570f71e4959bda14626fa674a641cce795",
+    "remote_main_at_verification": "bbeb20570f71e4959bda14626fa674a641cce795",
+    "verified_at_kst": "2026-11-19T14:25:47.523231+09:00",
     "credential_values_included": false
   }
 }

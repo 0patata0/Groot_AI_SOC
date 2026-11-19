@@ -13961,3 +13961,8 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 [검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
 <!-- /service-phase-resolution-20261119 -->
+
+
+<!-- service-phase-resolution-publication-20261119 -->
+조회 요청 해소 후보와 실제 대상 완료 판정의 공백은 `bbeb20570f71e4959bda14626fa674a641cce795`로 게시했다. 원격 main 일치는 `2026-11-19T14:25:47.523231+09:00`에 확인했다. 후보는 운영 미적용이며, 다음 작업은 없는 unit을 유효 조회·완료로 집계하지 않는 공통 경계와 실제 서비스 종류·읽기 경로의 검증이다.
+<!-- /service-phase-resolution-publication-20261119 -->

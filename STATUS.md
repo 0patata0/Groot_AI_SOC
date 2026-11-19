@@ -674,3 +674,8 @@ B 전용 Docker 데몬과 새 BusyBox 컨테이너를 만들고 Native로 재시
 <!-- service-phase-split-publication-20261119 -->
 조회 선택·보고 분리 후보의 실패 비교와 정리 기록은 `73bc04ef622f528279472209eb5a010744413e38`로 게시했다. 원격 main 일치는 `2026-11-19T13:08:52.687150+09:00`에 확인했다. 운영 적용은0이며, 실패한 후보를 보존하고 현재 작업을 마무리한다.
 <!-- /service-phase-split-publication-20261119 -->
+
+
+<!-- service-phase-resolution-publication-20261119 -->
+조회 요청 해소 후보와 실제 대상 완료 판정의 공백은 `bbeb20570f71e4959bda14626fa674a641cce795`로 게시했다. 원격 main 일치는 `2026-11-19T14:25:47.523231+09:00`에 확인했다. 후보는 운영 미적용이며, 다음 작업은 없는 unit을 유효 조회·완료로 집계하지 않는 공통 경계와 실제 서비스 종류·읽기 경로의 검증이다.
+<!-- /service-phase-resolution-publication-20261119 -->

@@ -112,6 +112,18 @@ python3 -B infra/validation/journal-composition/check_private_pid1_structure.py 
 ```
 
 초기 user namespace 시험은 newuidmap 부재로 실패했다. 보조 도구 설치 대신 부모가 자체 자식의 ID매핑만 설정했다. 첫 PID1 시험은 부팅 실패 뒤 chroot 밖의 진단 경로에 쓰려 해 원인을 기록하지 못했고 다음 시험에서 procfs 마운트 거절을 확인했다. 실패 보고 경로와 관리자 초기화 순서를 고쳤으며 읽기 전용·권한 격리 조건은 유지했다. 시작 응답 유실과 관측 기한을 서비스 부재로 간주하지 않고 자체 유닛의 종료를 확인한 뒤 작업 폴더를 제거한다.
+<!-- coordinator-private-pid1-publication-20261119 -->
+| 격리 PID1 기반 검증 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `5d8ce83730b8c27386ebf7a7d50d40e00ddc9aa7` |
+| 실제 원격 main 일치 | `2026-11-19T10:56:13.982331+09:00` |
+| 공개 범위 | 검증기2·원장1·문서10의13파일, 운영 runtime 변경0 |
+| 실제 검증 | B 안의3PID1·보호 서비스·독립 타이머·기본 Native의 동일 C4유닛 |
+| 자원·정리 | 메모리 최대59,170,816바이트·pids.peak54·OOM0, 10:43:48 KST 자체5회 부재 읽기 |
+| 공식 구조 | Harness²80→82구성·추가2·기존 수정0·상시16,917자 증가0 |
+| 게시 전 검사 | 추적2444·위험0·기존 합성/코드10·신규0·후보13SHA·윤문012 light0.01%/6/6/gate0 |
+| 남은 범위 | root Lifecycle·SSH/Docker·전체 소스/캐시 복구·호스트 재부팅·정확 승인·운영 적용·MCP/두 봇 |
+<!-- /coordinator-private-pid1-publication-20261119 -->
 <!-- /coordinator-private-pid1-20261119 -->
 
 ## 재현과 운영 적용 조건

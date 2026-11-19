@@ -278,7 +278,19 @@
     "new_packages_installed": 0
   },
   "publication": {
-    "status": "prepared_not_yet_committed_or_pushed"
+    "commit": "5d8ce83730b8c27386ebf7a7d50d40e00ddc9aa7",
+    "remote_main": "5d8ce83730b8c27386ebf7a7d50d40e00ddc9aa7",
+    "push_performed": true,
+    "verified_at_kst": "2026-11-19T10:56:13.982331+09:00",
+    "credential_source": "project local credential file; per-Git-process environment only; helper disabled; trace/verbose environment absent; raw errors suppressed",
+    "status": "content_published",
+    "exact_public_files": 13,
+    "prepublication_checks": {
+      "tracked": 2444,
+      "unsafe": 0,
+      "known_fixture_code_findings": 10,
+      "new_findings": 0
+    }
   },
   "humanize": {
     "run_id": "2026-11-19-012-4572",
@@ -289,5 +301,16 @@
     "self_checks_passed": 6,
     "gate_exit_code": 0,
     "warnings": []
+  },
+  "authorized_panel_followup_20261119": {
+    "user_requested": true,
+    "method_and_conclusion_openings_revised": true,
+    "conclusion_added_lines": 3,
+    "ABSTRACT_unchanged": true,
+    "unchanged_asset_and_placement_files": 36,
+    "current_main_characters": 2479,
+    "humanize_run": "2026-11-19-014-d6d0",
+    "panel_contents_uploaded": false,
+    "native_test_preservation_claim_applies_to": "native test observation before this later authorized text edit"
   }
 }

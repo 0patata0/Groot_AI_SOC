@@ -7081,3 +7081,11 @@ A/B/C27유닛 읽기와 별도 systemd 합성6조건을 확인해 모의 backend
 
 fixture 표지나 peer 단계를 실제 결과로 바꾸지 않으며 격리 관리자 재시작을 호스트 재부팅으로 표시하지 않는다. 현재 운영 소스/모델/MCP 스키마/권한 재대조와 전체 payload 정확 승인은 남는다. 기존 승인 재사용·발표자료 제작·공격/학습 재개는 하지 않는다. [현재 실행 조건](../infra/validation/journal-composition/COORDINATOR.md#격리-pid1-검증-기반).
 <!-- /coordinator-private-pid1-20261119 -->
+
+<!-- panel-wording-followup-20261119 -->
+<a id="panel-wording-followup-20261119"></a>
+
+## 2026-11-19 판넬 METHOD·CONCLUSION 문장 흐름 보강
+
+사용자의 CONCLUSION3줄 추가·도입부 개선과 METHOD의 부자연스러운 시작을 다듬는 요청을 반영했다. METHOD는 구현 목적을 먼저 설명하고 서버 구성·로그 처리·승인 흐름으로 이어지도록 연결했다. CONCLUSION은 연구의 구현 성과를 먼저 제시하고 혼합 시험·복합 조사 결과가 그 근거로 이어지도록 문장 순서를 다듬었다. 조사 근거와 처리 이력 검토, 승인한 변경과 실제 결과의 대조, 구현 사례의 활용 의미도 보강했다. 시험 수치·검증 한계와 ABSTRACT·이미지·표는 보존한다. 직전의 정확50% 확장 결과를 과거 기록으로 남기고 이번 수정을 현재 원고에 추가한다.
+<!-- /panel-wording-followup-20261119 -->

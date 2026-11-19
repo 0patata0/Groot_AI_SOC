@@ -13781,3 +13781,24 @@ B 안의 격리 역할3개에서 실제 systemd PID1·보호 설정의 서비스
 
 공식 Harness²는 기존80→82구성·검증 도구2개 추가·기존 수정0·상시16,917자 증가0이다. 고정 root 실행기·Lifecycle.recover·SSH/Docker·전체 소스/캐시/전역 복구·실제 호스트 재부팅·정확 승인·운영 적용·새 MCP/두 봇 인수는 미검증으로 유지한다. 논문·발표자료·판넬과 공격/학습 중단도 보존한다. [검증 원장](../infra/validation/journal-composition/private-pid1.validation.json).
 <!-- /coordinator-private-pid1-20261119 -->
+
+<!-- panel-wording-followup-20261119 -->
+<a id="panel-wording-followup-20261119"></a>
+
+## 2026-11-19 판넬 METHOD·CONCLUSION 문장 흐름 보강
+
+사용자의 CONCLUSION3줄 추가·도입부 개선과 METHOD의 부자연스러운 시작을 다듬는 요청을 반영했다. METHOD는 구현 목적을 먼저 설명하고 서버 구성·로그 처리·승인 흐름으로 이어지도록 연결했다. CONCLUSION은 연구의 구현 성과를 먼저 제시하고 혼합 시험·복합 조사 결과가 그 근거로 이어지도록 문장 순서를 다듬었다. 조사 근거와 처리 이력 검토, 승인한 변경과 실제 결과의 대조, 구현 사례의 활용 의미도 보강했다. 시험 수치·검증 한계와 ABSTRACT·이미지·표는 보존한다. 직전의 정확50% 확장 결과를 과거 기록으로 남기고 이번 수정을 현재 원고에 추가한다.
+
+<!-- coordinator-private-pid1-publication-20261119 -->
+| 격리 PID1 기반 검증 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `5d8ce83730b8c27386ebf7a7d50d40e00ddc9aa7` |
+| 실제 원격 main 일치 | `2026-11-19T10:56:13.982331+09:00` |
+| 공개 범위 | 검증기2·원장1·문서10의13파일, 운영 runtime 변경0 |
+| 실제 검증 | B 안의3PID1·보호 서비스·독립 타이머·기본 Native의 동일 C4유닛 |
+| 자원·정리 | 메모리 최대59,170,816바이트·pids.peak54·OOM0, 10:43:48 KST 자체5회 부재 읽기 |
+| 공식 구조 | Harness²80→82구성·추가2·기존 수정0·상시16,917자 증가0 |
+| 게시 전 검사 | 추적2444·위험0·기존 합성/코드10·신규0·후보13SHA·윤문012 light0.01%/6/6/gate0 |
+| 남은 범위 | root Lifecycle·SSH/Docker·전체 소스/캐시 복구·호스트 재부팅·정확 승인·운영 적용·MCP/두 봇 |
+<!-- /coordinator-private-pid1-publication-20261119 -->
+<!-- /panel-wording-followup-20261119 -->

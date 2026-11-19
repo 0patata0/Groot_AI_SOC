@@ -868,6 +868,18 @@
     "new OS installation and independent recreation"
   ],
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_committed_pushed_verified",
+    "content_commit": "dbc394e8e2cd42eb7d2dcb8cb66ff5ba98442d1a",
+    "observed_remote_main": "dbc394e8e2cd42eb7d2dcb8cb66ff5ba98442d1a",
+    "verified_at_kst": "2026-11-19T11:38:51.109241+09:00",
+    "public_paths": 27,
+    "preserved_other_staged_paths": 8,
+    "tracked_secret_scan": {
+      "paths": 2446,
+      "unsafe": 0,
+      "known_code_or_synthetic": 10,
+      "new": 0
+    },
+    "receipt_commit_reference": "final receipt commit/remote equality retained in local session"
   }
 }

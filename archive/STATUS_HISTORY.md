@@ -13717,4 +13717,15 @@ Native 첫 도구 선택 오류의 재시도를 작은 요청에 연결했다. �
 이번에는 기존 예약 실행을 읽었으며 감시기를 수동 실행하거나 서비스·인증서·설정을 바꾸지 않았다. 새 TLS/HTTP 요청·개인키 읽기·모델 호출·봇 게시·공격·학습은0이다. 한 차례 예약 실행의 결과이며 장기 안정성, 외부 인터넷/DNS/443/HTTP, 새 봇 응답과 새 OS 전체 설치·운영12규칙 경보 전달은 별도다. 관리자 NTP390a와 응답 MCP1.2.1의 정확 승인 대기도 유지한다.
 
 [예약 관측·MCP 대조·한계](../infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- certificate-scheduled-publication-20261119 -->
+| 予約 실행 확인 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `b0ddcfb549c376c740ab1a35d16d5f7fcca4cc16` |
+| 실제 원격 main 일치 | `2026-11-19T10:04:37.883227+09:00` |
+| 공개 범위 | 기존 예약 실행 근거·현황14파일. 운영 소스/설정 변경0 |
+| 실제 확인 | 11/19 09:00 exit0/verified·4SHA유지·MCP2읽기/journal4·원문해시일치 |
+| 보존한 한계 | snapshot journal unavailable/null·전체보존미확인·새봇/외부경로/장기/새OS 별도 |
+| 게시 전 검사 | 추적2438·위험0·기존합성/코드10·신규0·발표3/판넬38SHA보존 |
+| 문서 검수 | 010-cee6 light·변경0%·B·6/6·gate0·경고0 |
+<!-- /certificate-scheduled-publication-20261119 -->
 <!-- /certificate-scheduled-followup-20261119 -->

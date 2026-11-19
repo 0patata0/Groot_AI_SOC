@@ -127,6 +127,17 @@
 11/19 09:00 KST의 자연 예약 실행과 exit0/verified를 확인했고 기존 MCP2읽기·journal4표본을 대조했다. 다음 예약은11/20 09:00 KST이며 수동 실행·운영 변경은0이다. 한 차례의 예약 관측으로 외부 인터넷 경로·장기 안정성·새 OS 전체 설치·독립 재구현까지 검증한 것은 아니다.
 
 [예약 관측·MCP 대조·한계](infra/groot-a/certificate-monitor/readiness.validation.json)
+<!-- certificate-scheduled-publication-20261119 -->
+| 予約 실행 확인 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `b0ddcfb549c376c740ab1a35d16d5f7fcca4cc16` |
+| 실제 원격 main 일치 | `2026-11-19T10:04:37.883227+09:00` |
+| 공개 범위 | 기존 예약 실행 근거·현황14파일. 운영 소스/설정 변경0 |
+| 실제 확인 | 11/19 09:00 exit0/verified·4SHA유지·MCP2읽기/journal4·원문해시일치 |
+| 보존한 한계 | snapshot journal unavailable/null·전체보존미확인·새봇/외부경로/장기/새OS 별도 |
+| 게시 전 검사 | 추적2438·위험0·기존합성/코드10·신규0·발표3/판넬38SHA보존 |
+| 문서 검수 | 010-cee6 light·변경0%·B·6/6·gate0·경고0 |
+<!-- /certificate-scheduled-publication-20261119 -->
 <!-- /certificate-scheduled-followup-20261119 -->
 
 

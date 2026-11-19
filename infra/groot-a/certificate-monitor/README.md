@@ -69,9 +69,9 @@ Wazuh는 capstone-security/실습 도메인과 capstone-siem-host/capstone-siem.
 
 첫 읽기에서 timedatectl에 쉼표로 묶은 속성 이름을 넘겨 출력이 비었다. 명령의 종료0만으로 시간 상태를 확인했다고 표시하지 않고 --property를3번 명시한 별도 읽기에서 Timezone=Asia/Seoul·NTP=yes·NTPSynchronized=yes를 확인했다. 이는09:48의 OS 보고 상태이며 절대UTC 정확도나09:00 당시 동기화 상태의 별도 측정이 아니다. 관측 스크립트의 가정만 바로잡았고 운영 감시기는 수정하지 않았다.
 
-관리자231 경유로 정확 계획10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7의 두 파일을 적용하고17:13:01 KST에 확정했다. 현재 실제 run은exit0/verified이며 상태·journal의 인증서 지문이 일치한다. 5분 독립 원복은 해제했고 원본·후보·제어기는 root 전용 복구 위치에 보존했다. 프록시와 인증서·개인키·매일09:00 KST 타이머는 바꾸지 않았다.
+관리자231 경유로 정확 계획10a9be42f4bb316c8a6669ea598705ed88b9e19b34e5e38078bf2f76a759b9f7의 두 파일을 적용하고17:13:01 KST에 확정했다. 11/18 적용 직후 run은exit0/verified이며 상태·journal의 인증서 지문이 일치한다. 5분 독립 원복은 해제했고 원본·후보·제어기는 root 전용 복구 위치에 보존했다. 프록시와 인증서·개인키·매일09:00 KST 타이머는 바꾸지 않았다.
 
-적용 전 오늘09:00의 상태는 expiry_status=ok·probe_status=unavailable·reason=tls_timeout이었고 기존 MCP 검색에서 규칙100305의09:00:12.292 KST 경보1표본이 반환됐다. 이 과거 경보를 삭제하지 않으며 전체 구간 건수로 표현하지 않는다. A의 failed unit0·과거 Result=success/exit2는 인증서 검증 성공과 달랐다.
+적용 전 11/18 09:00의 상태는 expiry_status=ok·probe_status=unavailable·reason=tls_timeout이었고 기존 MCP 검색에서 규칙100305의09:00:12.292 KST 경보1표본이 반환됐다. 이 과거 경보를 삭제하지 않으며 전체 구간 건수로 표현하지 않는다. A의 failed unit0·과거 Result=success/exit2는 인증서 검증 성공과 달랐다.
 
 | 확인 | 실제 결과 |
 |---|---|

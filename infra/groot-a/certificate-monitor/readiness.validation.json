@@ -857,7 +857,17 @@
       "warnings": 0
     },
     "publication": {
-      "status": "prepared_not_committed_or_pushed"
+      "status": "content_committed_pushed_and_remote_verified",
+      "content_commit": "b0ddcfb549c376c740ab1a35d16d5f7fcca4cc16",
+      "remote_main_at_content_verification": "b0ddcfb549c376c740ab1a35d16d5f7fcca4cc16",
+      "verified_at_kst": "2026-11-19T10:04:37.883227+09:00",
+      "exact_public_files": 14,
+      "tracked_paths_scanned": 2438,
+      "unsafe_paths": 0,
+      "known_synthetic_or_code_findings": 10,
+      "new_secret_findings": 0,
+      "private_index_reviewed": true,
+      "receipt_update": "Structured publication metadata and absolute date clarification; Korean prose retained from reviewed010 input"
     }
   }
 }

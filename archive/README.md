@@ -1,16 +1,10 @@
 # 과거 기록과 복원 안내
 
-<!-- thesis-local-layout-20261119 -->
-논문은 전체102쪽·본문1~96쪽으로 맞췄다. 표지와 일반·그림·표 목차의 앞부분6쪽에는 번호를 표시하지 않고 PDF7쪽의 서론에서 본문 번호1을 시작한다. 목차는 일반88항목·그림8항목·표58항목이며 표 없이 일반 문단의 오른쪽 탭과 가운데점 · 리더로 연결한다.
+<!-- thesis-google-docs-format-20261119 -->
+지정 구글 독스의 기본 목차 세 개, 단축 제목·실제 본문 연결, 맑은 고딕·제목 볼드체·양쪽 정렬·1.5pt 선을 반영했다. 직접 연결점 방식의 실패·거절, 마지막 글꼴 선택과 화면/PDF 차이는 상태·설계·진단 이력에 보존한다. 조정 실행기 R15 준비·네 SSH 확인과 부분 적용 중단 시험 실패·정리·보류를 분리해 기록한다.
 
-본문 구역의 PAGE 필드는1부터 자동 갱신된다. 페이지 번호는 가운데 정렬한 별도 줄에 놓고 영남이공대학교 사이버보안과는 다음 꼬리말 문단으로 분리했다. 머리말 아래와 꼬리말 위 가로선은0.5pt에서1pt로 굵게 바꿨으며 표지는 번호·머리말·꼬리말 없이 유지한다.
-
-데이터 표58개의 헤더만 가운데 정렬하고 본문 셀과 코드 표는 왼쪽 정렬했다. 한글 어절이 한두 글자씩 끊기는 부분을 줄이기 위해 열 너비와 기존 공백 위치의 줄바꿈을 조정했다. 본문 원고의 바이트와69개 표의 단어·수치·경로, 코드10블록·그림/표 캡션66개·이미지22개·참고문헌32개는 보존했다. 원문2,026구간의 누락은0개다.
-
-논문은 로컬에서만 수정했다. 구글 독스로 업로드하거나 변환본을 수정하지 않았으며 가져온 뒤 탭 리더가 유지되는지는 미확인이다. 판넬 본문·그림·표와 기존 발표자료는 보존했다. 이번 작업은 새 운영 시험·공격 시험·모델 학습을 포함하지 않는다.
-
-[현황](STATUS_HISTORY.md#thesis-local-layout-20261119) · [계획](PLAN_HISTORY.md#thesis-local-layout-20261119) · [설계](DESIGN_ALTERNATIVES.md#thesis-local-layout-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-local-layout-20261119)
-<!-- /thesis-local-layout-20261119 -->
+[현황](STATUS_HISTORY.md#thesis-google-docs-format-20261119) · [계획](PLAN_HISTORY.md#thesis-google-docs-format-20261119) · [설계](DESIGN_ALTERNATIVES.md#thesis-google-docs-format-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-google-docs-format-20261119)
+<!-- /thesis-google-docs-format-20261119 -->
 
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>

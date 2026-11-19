@@ -1218,3 +1218,10 @@ Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확�
 
 [검증·적용·한계](../infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](../infra/validation/service-query/identity-parity.patch).
 <!-- /native-identity-parity-20261119 -->
+
+<!-- thesis-google-docs-format-20261119 -->
+<a id="thesis-google-docs-format-20261119"></a>
+## 2026-11-19 지정 구글 독스 서식·목차 검수
+
+직접 연결점을 채우는 방식은 글자 폭과 줄 길이에 영향을 받아 폐기했다. 구글 독스 기본 목차의 쪽번호와 점 탭 리더를 사용하고 본문1~3·그림4·표5의 제목 수준으로 범위를 구분했다. 원래 캡션의 상세 설명은 유지하며 목차 표시 제목만 줄였다. 목차 갱신은 긴 표시 제목과 글꼴을 다시 만들 수 있으므로 단축 제목·연결 범위·맑은 고딕 설정을 같은 작업에서 대조한다. 구글 독스 화면과 PDF 내보내기의 글꼴·쪽수 차이를 기록하고 사용자 지정 글꼴을 임의로 바꾸지 않는다.
+<!-- /thesis-google-docs-format-20261119 -->

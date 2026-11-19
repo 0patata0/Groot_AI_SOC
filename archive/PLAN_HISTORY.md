@@ -7259,3 +7259,10 @@ Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 p
 
 [검증·적용·한계](../infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](../infra/validation/service-query/identity-parity.patch).
 <!-- /native-identity-parity-20261119 -->
+
+<!-- thesis-google-docs-format-20261119 -->
+<a id="thesis-google-docs-format-20261119"></a>
+## 2026-11-19 지정 구글 독스 서식·목차 검수
+
+논문 서식 후속은 구글 독스의 지정 문서를 직접 편집하는 범위로 전환했다. 일반·그림·표 목차는 기본 목차 개체를 사용하고 각 범위를 구분한다. 마지막 글꼴 선택은 모두 맑은 고딕이며 제목과 소제목을 볼드체로 구분한다. 목차의 단축 제목과 본문의 상세 설명을 분리하고 새로 갱신한 목차의 제목·연결·글꼴·쪽번호를 다시 확인한다. 기존 로컬102쪽 검수본과 구글 독스 편집본을 같은 출력 검증으로 표시하지 않는다.
+<!-- /thesis-google-docs-format-20261119 -->

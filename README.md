@@ -11,12 +11,12 @@ Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 �
 [검수·출력 차이와 남은 쪽번호](archive/DIAGNOSTIC_HISTORY.md#thesis-google-docs-local-sync-20261119) · [직전 표 배치 작업](archive/STATUS_HISTORY.md#thesis-google-docs-table-layout-20261119)
 <!-- /thesis-google-docs-local-sync-20261119 -->
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-조정 실행기 후보의 수집 결과 보존을 수정하고 B의 세 격리 PID1에서 고정 root 진입점·50소스의 부분 적용 중단/복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+조정 실행기의 격리 검증을 Native 정리·현재 설치 조회까지 확장했다. 새 소스 확정과 부분 적용 원복의 두 경로에서50소스/보호 원본·전역 정리 결정/허가·변조 pointer 거절·정리 재호출과 기존 실행 PID 유지를 확인했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
-실제 인수 근거 없이 완료 처리하는 요청은 거절됐다. 운영 적용·호스트 재부팅·MCP/두 봇 인수와 정리/current의 Native 통합은 남아 있다. [검증 원장](infra/validation/journal-composition/private-full-native.validation.json)과 [현재 상태](STATUS.md)에서 과거 backend 시험·운영 읽기와 구분한다.
-<!-- /coordinator-collection-reference-20261120 -->
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 실제 운영 적용과 MCP/두 봇 인수·재부팅·장기 복구는 [현재 상태](STATUS.md)와 [검증 원장](infra/validation/journal-composition/private-full-native.validation.json)에서 별도로 관리한다.
+<!-- /coordinator-native-completion-20261120 -->
 
 <!-- panel-content-20261119 -->
 사용자 후속 요청에 따라 판넬 본문을 기존 표시 글자 수1,466자에서2,199자로 정확히50% 늘렸다. 공백과 본문 안 줄바꿈을 포함하고 마지막 줄바꿈1개는 제외한 기준이며 파일 길이는2,200자다. 세 항목의 문장 흐름을 유지하고 Method의 IP·포트·내부 경로·명령 인자는0으로 확인한다. 논문 표2-8·4-4는 셀 원문을 보존해 PNG·SVG·CSV로 재사용하고 Conclusion용 실제 동작 캡처5장을 별도 폴더와 캡션으로 모았다. 캡처는11/4~5의 보존 원본이며 새 실행·촬영은 없다. 판넬38파일은 모두 Git 제외하며 발표자료와 논문 원본은 보존한다.

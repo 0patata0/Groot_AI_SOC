@@ -1,11 +1,11 @@
 # 서비스·호스트 journal 통합 후보
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-고정 root 진입점과 실제50소스의 격리 통합을 확인했다. 부분 적용에서 두 파일 교체 뒤 SIGKILL한 자식의 durable intent를 독립 복구 타이머가 처리했고, 기한 복구·원래 소비자 재개와 정상 확정/재개도 통과했다. 수집 결과는 RefUnit 유지 중 읽고 기존 실행 기준을 적용한다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+고정 root 진입점의 Native 통합은 새 소스 확정과 부분 적용 원복 뒤의 인수 준비·정리·현재 설치 조회까지 확인했다.50소스와 보호 원본을 대조했고 잘못된 pointer는 거절했다. 중복 정리는 읽기 검증으로 끝났으며 기존 reader·B 채팅 PID와 Docker 상태를 유지했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
-아래252검사·이전 backend 미연결 문구는 당시 범위다. 최신 검증은 [새 원장](private-full-native.validation.json)과 [현재 조정 조건](COORDINATOR.md#coordinator-collection-reference-20261120)을 따른다. 실제 호스트 재부팅·운영 적용·MCP/봇 인수와 Native 정리/current는 미완료이며 인수 누락 시 완료 거절을 확인했다.
-<!-- /coordinator-collection-reference-20261120 -->
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. [최신 조건](COORDINATOR.md#coordinator-native-completion-20261120) · [원장](private-full-native.validation.json). 아래252검사와 초기 backend 미연결 문구는 당시 범위이며 실제 운영 인수·재부팅·장기 복구는 미완료다.
+<!-- /coordinator-native-completion-20261120 -->
 
 후속 [조정 실행기](COORDINATOR.md)에 50소스·39제어 문서와 정리·현재 설치 검증까지 연결했다. 동일 소스로 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0과 합성 root namespace5조건을 확인했다. 운영 적용·운영 유닛 정지/재개·실제 재부팅/독립 복구·정확 승인·MCP/두 봇 채팅은 미완료다. [정본 동기화](CANONICAL.md)와 [읽기/재개 판정](WITNESS.md)의 과거 근거를 보존하며 아래 이전 단계의 미연결 문구는 당시 범위로 읽는다.
 

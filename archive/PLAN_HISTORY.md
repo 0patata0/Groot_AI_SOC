@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+## 2026-11-20 인수 후 정리/current의 검증 범위 갱신
+
+격리 Native에서 candidate/baseline의 두 결과를 인수 준비·전역 정리 결정/허가·정리/current까지 확인했다. 잘못된 pointer는 거절했고 중복 정리는 읽기 검증으로 끝났다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+
+다음은 backup75 상태/intent 계약과 정확 운영 payload/현재 소스·모델·MCP 스키마·권한 대조다. 관리자 경유 적용과 새 수집·실제 MCP·Hermes/Ollama 채팅 인수·재부팅·장기 복구·새 서버 재구현은 별도다. 공격·학습·발표자료 중단과 논문 목차91불일치를 유지한다.
+<!-- /coordinator-native-completion-20261120 -->
+
 <!-- coordinator-collection-reference-20261120 -->
 <a id="coordinator-collection-reference-20261120"></a>
 ## 2026-11-20 Native 통합 검증의 범위 갱신

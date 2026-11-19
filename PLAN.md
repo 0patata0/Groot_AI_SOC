@@ -28,14 +28,14 @@
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-조정 실행기의 수집 결과 보존 후보는 격리 환경에서 부분 적용 SIGKILL 복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+격리 Native에서 새 소스 확정과 부분 적용 원복의 두 경로를 정리/current까지 확인했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
-다음은 backup 보류75의 잠금·durable intent를 대조하는 계약과 Native의 인수 후 정리/current를 검증한다. 실제 부팅과 운영 적용은 정확한 전체 payload 승인·현재 소스/모델/MCP 스키마/권한 대조 뒤 진행하며 새 수집→실제 MCP→Hermes·Ollama 새 채팅을 별도로 인수한다. 이전 승인이나 격리용 합성 인수를 재사용하지 않는다. 공격·학습 중단, 논문 목차91불일치와 발표자료 추가 제작 중단은 유지한다.
+다음은 backup75의 현재 잠금·durable intent와 동일 요청의 결과를 대조하는 계약, 실제 운영의 소스/모델/MCP 스키마/권한과 정확 전체 payload 승인 자료를 준비한다. 승인 뒤 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current를 별도로 인수한다. 실제 재부팅·장기 복구·새 서버 설치·독립 재구현과 논문 목차91불일치도 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
 
 [현재 근거와 미완료](infra/validation/journal-composition/private-full-native.validation.json)
-<!-- /coordinator-collection-reference-20261120 -->
+<!-- /coordinator-native-completion-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 기존 발표자료를 유지하고 추가 생성·수정은 사용자 명시 요청 전까지 진행하지 않는다. 판넬 문구와 배치용 자료는 보존한다. 전체 실전 운용·논문·최종 발표 목표는 활성 상태이며 이 지시를 목표 전체의 일시정지나 운영 후보 승인으로 확대하지 않는다.

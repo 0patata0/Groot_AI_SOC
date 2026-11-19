@@ -1,11 +1,11 @@
 # infra — 서버 구성·배포
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-수집 oneshot의 결과 속성이 정리되는 문제를 고정 system-bus 참조로 보완했다. B의 세 격리 PID1에서 실제 systemd·SSH·별도 Docker·50소스와 합성 캐시를 사용해 고정 root 진입점의 부분 적용 중단/복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+기존 PID1·실제 SSH·별도 Docker 기반에서 같은 root CLI의 인수 준비·전역 정리 결정/허가·정리/current를 확인했다. 새 소스 확정과 부분 적용 원복의 두 경로가 세 역할 모두 통과했고50소스/보호 원본·변조 pointer 거절·정리 재호출을 대조했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
-운영 설정·권한·모델은 바꾸지 않았다. backup 보류75의 재시도 계약, Native 정리/current와 실제 재부팅·정확 승인·운영 MCP/두 봇 인수는 남아 있다. [조정 실행기 검증](validation/journal-composition/private-full-native.validation.json).
-<!-- /coordinator-collection-reference-20261120 -->
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 운영 변경0이며 [정확 승인·실제 인수 등 남은 조건](validation/journal-composition/private-full-native.validation.json)은 유지한다.
+<!-- /coordinator-native-completion-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>

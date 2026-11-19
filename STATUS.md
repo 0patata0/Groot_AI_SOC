@@ -65,27 +65,18 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-검증이 실패한 원인을 확인했다. 수집 oneshot은 정상 종료됐지만 systemd가 그 뒤 결과 속성을 정리했다. 고정 수집 유닛의 RefUnit을 결과 조회까지 유지하도록 후보를 수정했으며 조건 충족·성공 종료·새 실행 시각 기준은 유지했다.
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+조정 실행기 후보의 Native 정리·현재 설치 조회를 두 경로에서 확인했다. 새 소스 확정/재개 뒤와 두 파일의 실제 교체 중 SIGKILL→독립 원복/재개 뒤에 같은 고정 root 진입점으로 인수 준비·전역 정리 결정/허가·정리·현재 조회를 실행했다. 세 역할 모두7/36/7개 소스와 보호 원본을 대조했고 잘못된 pointer는 거절했다. 정리를 다시 호출해도 읽기 검증으로 끝났으며 실행 중이던 reader·B 채팅 서비스 PID와 Docker 상태는 같았다.
 
-B 안의 별도 PID1 세 역할에서50소스·합성 캐시와 고정 root 진입점을 실행했다. 부분 적용 중 두 실제 파일을 교체한 뒤 SIGKILL한 경우, 독립 복구·원래 소비자 재개가 통과했다. 기한 만료에서도 같은 결과를 확인했다. 정상 적용·검증·A/C/B 소스 확정·재개와 실제 인수 근거가 없을 때 완료 거절도 확인했다. 운영 배포와 실제 호스트 재부팅·MCP/봇 인수는 미수행이다.
+인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
-같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다.
 
-공식 Harness²는 조정 구성80개 중2소스 수정과 검증85→91, 정적 payload44개를 포함한135구성을 확인했다. 상시16,917자 증가0이며 구조 검사와 실제 실행 근거를 구분한다. 이전 backup 보류75와 상태/intent 대조 뒤 재시도 계약은 남은 항목으로 보존했다. 논문 목차91불일치·운영 인수·최종 발표도 미완료다. Kali 설치 단위의 완료와 공격·학습 중단은 유지한다.
+운영 적용·정확 전체승인·현재 소스/모델/MCP 스키마/권한 대조와 실제 수집/MCP/두 봇 인수, 실제 재부팅·장기 복구 및 backup75의 상태/intent 재시도 계약은 남았다. 논문 목차91불일치·독립 재구현·최종 발표도 미완료이며 공격/학습·발표자료 추가 제작 중단을 유지한다.
 
-[검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법·한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-collection-reference-20261120) · [실패 이력](archive/DIAGNOSTIC_HISTORY.md#coordinator-collection-reference-20261120)
-
-| 게시 확인 | 값 |
-| --- | --- |
-| 내용 커밋·공개 범위 | `e971712452043e6d697d03fc4c3d895c9b9521da`·21파일 |
-| 실제 원격 main 일치 | `2026-11-20T07:40:15.166267+09:00` |
-| 회귀·실행 범위 | Mac/Linux258·생략0; 격리 부분/기한 복구·정상 확정/재개·인수 누락 거절 |
-| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.6%·B·6/6·gate0 |
-| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험8회 부재; 기존111자료 SHA 동일 |
-| 별도 조건 | 운영 미적용; 실제 재부팅·Native 정리/current·정확 승인·MCP/봇 인수 미완료 |
-<!-- /coordinator-collection-reference-20261120 -->
+[검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법과 한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-native-completion-20261120)
+<!-- /coordinator-native-completion-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 사용자 지시에 따라 발표자료 생성·수정 작업을 중단했다. 메모 글자색 시험은 검사 실패로 종료됐고 완성 후보는 없다. 자체 부분 출력·렌더 캐시를 제거했으며 기존 PPTX·PDF·발표 메모의 SHA가 작업 전과 같음을 확인했다. 판넬 본문1,467자와 기존 이미지·표는 유지한다. Keynote의 메모 대비 보완과 PowerPoint·실제 리허설은 미완료로 남기며 새 발표자료를 만들지 않는다.

@@ -184,7 +184,9 @@ def start(case):
 
 def own(root):
     path,owner=base.own_root(root)
-    base.require(owner['schema']==1 and owner['case'] in ('bootstrap','partial','deadline','confirmed'), 'owned_full_test_identity')
+    base.require(owner['schema']==1 and owner['case'] in
+                 ('bootstrap','partial','deadline','confirmed','complete-candidate','complete-baseline'),
+                 'owned_full_test_identity')
     base.require(owner['validator_sha256']==base.sha((path/'code/validate_full_native.py').read_bytes()),'owned_validator_changed')
     return path,owner
 
@@ -358,12 +360,12 @@ def supervisor(root):
             rpc('quiesce')
             rpc('backup')
             proofs=rpc('peers',roles='a')['a']['reply']['result']
-            if owner['case']=='partial':
+            if owner['case']in ('partial','complete-baseline'):
                 rpc('apply_partial',proofs=proofs)
             else:
                 rpc('apply',proofs=proofs)
                 rpc('verify')
-            if owner['case']=='confirmed':
+            if owner['case']in ('confirmed','complete-candidate'):
                 for role in 'acb':
                     proofs=rpc('peers',roles='a')['a']['reply']['result']
                     rpc('confirm',roles=role,proofs=proofs)
@@ -387,6 +389,21 @@ def supervisor(root):
                 for role in 'acb':
                     rpc('resume',roles=role,proofs=proofs)
                 rpc('assert_restored')
+            if owner['case']in ('complete-candidate','complete-baseline'):
+                # Explicitly synthetic attestations in disposable roots. The
+                # same root CLI performs every protected completion mutation.
+                rpc('acceptance_fixture')
+                proofs=rpc('peers',roles='a')['a']['reply']['result']
+                rpc('completion_prepare',proofs=proofs)
+                prepared=rpc('completion_status')
+                rpc('cleanup_decide',proofs={h:r['reply']['result']for h,r in prepared.items()})
+                decided=rpc('completion_status')
+                rpc('cleanup_authorize',proofs={h:r['reply']['result']for h,r in decided.items()})
+                rpc('cleanup')
+                rpc('current')
+                rpc('current_pointer_denied')
+                rpc('cleanup')
+                rpc('assert_completed')
         rpc('finish')
         wait([item['output']/'report.json'for item in children.values()],5)
         result['roles']={role:json.loads(item['output'].joinpath('report.json').read_text())for role,item in children.items()}
@@ -471,7 +488,8 @@ def main():
     mode.add_argument('--collect-owned',type=Path)
     mode.add_argument('--supervisor',type=Path,help=argparse.SUPPRESS)
     mode.add_argument('--network-controller',type=Path,help=argparse.SUPPRESS)
-    parser.add_argument('--case',choices=('bootstrap','partial','deadline','confirmed'))
+    parser.add_argument('--case',choices=('bootstrap','partial','deadline','confirmed',
+                                        'complete-candidate','complete-baseline'))
     args=parser.parse_args()
     base.require(bool(args.case)==args.start_owned,'case_only_for_start')
     if args.start_owned:

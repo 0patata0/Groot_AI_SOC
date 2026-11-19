@@ -339,6 +339,82 @@ def immutable(name,value):
         stream.write(raw);stream.flush();os.fsync(stream.fileno())
 
 
+def acceptance_fixture():
+    need(ROLE in ('a','b','c')and Path('/proc/self/uid_map').read_text().split()==['0','0','65536'],
+         'owned_synthetic_acceptance_scope')
+    state=json.loads((STORE/'state.json').read_bytes())
+    need(state['pending']is None and state['phase']in ('confirmed','rolled_back'),
+         'owned_synthetic_acceptance_stable_phase')
+    outcome='candidate'if state['phase']=='confirmed'else'baseline'
+    backend=load('release_services.py').Native(ROLE,ready['container'])
+    snapshot=backend.snapshot()
+    before={'units':{n:{k:v.get(k)for k in ('ActiveState','MainPID','ExecMainStartTimestampMonotonic')}
+                     for n,v in snapshot.items()},'protected':NODE['protected'],
+            'container':backend.docker()if ROLE=='b'else None}
+    checks={}
+    for check in ('collection','mcp','hermes_chat','ollama_chat'):
+        name='synthetic-acceptance-'+check+'.json'
+        evidence={'schema':1,'kind':'synthetic-native-completion-fixture-only','check':check,
+                  'host':ROLE,'release_id':RELEASE,'plan_sha256':PLAN_SHA,
+                  'actual_MCP_or_bot_acceptance':False,'model_calls':0}
+        immutable(name,evidence)
+        checks[check]={'status':'passed','evidence_sha256':hashlib.sha256((STORE/name).read_bytes()).hexdigest()}
+    bundle=json.loads((STORE/'bundle.json').read_bytes())
+    canonical=lambda value:json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+    immutable('acceptance.json',{'schema':1,'host':ROLE,'release_id':RELEASE,'plan_sha256':PLAN_SHA,
+        'bundle_sha256':hashlib.sha256(canonical(bundle)).hexdigest(),'outcome':outcome,
+        'at_kst':datetime.now(KST).isoformat(),
+        'reference':'owned-native-synthetic-acceptance-not-operating-bots','checks':checks})
+    report['completion_before']=before
+    return {'returncode':0,'synthetic_acceptance_only':True,'actual_MCP_or_bot_acceptance':False,
+            'outcome':outcome,'checks':checks}
+
+
+def current_pointer_denied():
+    path=STORE.parent.parent/'current.json'
+    before=path.read_bytes();meta=path.stat();value=json.loads(before)
+    need(meta.st_uid==meta.st_gid==0 and stat.S_IMODE(meta.st_mode)==0o600,
+         'owned_current_pointer_metadata')
+    value['receipt_sha256']='0'*64 if value['receipt_sha256']!='0'*64 else'1'*64
+    try:
+        path.write_text(json.dumps(value,sort_keys=True,separators=(',',':')))
+        result=native('current')
+        need(result['returncode']!=0 and result['reply']['reason']=='current_pointer_changed',
+             'changed_pointer_must_not_verify')
+        result['expected_denial']=True
+        return result
+    finally:
+        path.write_bytes(before)
+        need(path.read_bytes()==before and path.stat().st_ino==meta.st_ino,
+             'owned_current_pointer_restore')
+
+
+def assert_completed():
+    result=native('current')
+    need(result['returncode']==0 and result['reply']['result']['status']=='verified',
+         'native_current_required')
+    backend=load('release_services.py').Native(ROLE,ready['container'])
+    snapshot=backend.snapshot();before=report['completion_before'];same=[]
+    for name,old in before['units'].items():
+        if int(old.get('MainPID')or 0)>1:
+            need(snapshot[name]['MainPID']==old['MainPID']and snapshot[name]['ActiveState']=='active',
+                 'completion_restarted_consumer')
+            same.append(name)
+    for target,expected in before['protected'].items():
+        path=Path(target)
+        if expected is None:
+            need(not path.exists(),'completion_initial_protected_created')
+        else:
+            meta=path.stat()
+            actual={'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+                    'uid':meta.st_uid,'gid':meta.st_gid,'mode':stat.S_IMODE(meta.st_mode)}
+            need(actual==expected,'completion_initial_protected_changed')
+    if ROLE=='b':
+        need(backend.docker()==before['container'],'completion_restarted_container')
+    return {**result,'same_running_unit_pids':same,'original_protected_unchanged':True,
+            'synthetic_acceptance_only':True,'actual_MCP_or_bot_acceptance':False}
+
+
 def assert_sources(which):
     source=load('release_files.py')
     files=source.FileSet(ROLE,RELEASE,NODE['rows'],NODE['diagnostic_gid'])
@@ -494,7 +570,9 @@ try:
         operation=request['operation']
         need(operation in {'install_plan','initialize','prepare','arm','quiesce','backup','apply','apply_partial',
              'verify','confirm','resume','rollback','status','peers','assert_restored','assert_candidate',
-             'completion_denied','peers_denied','collection_reference','regressions','finish'},'fixed_test_operation')
+             'completion_denied','peers_denied','collection_reference','regressions','acceptance_fixture',
+             'completion_prepare','completion_status','cleanup_decide','cleanup_authorize','cleanup','current',
+             'current_pointer_denied','assert_completed','finish'},'fixed_test_operation')
         if operation=='install_plan':
             plans=load('release_plan.py');plan=plans.Plan(request['plan'])
             need(plan.value['hosts'][ROLE]['rows']==NODE['rows'] and plan.sha256==request['plan_sha256'],
@@ -534,6 +612,12 @@ try:
             result=collection_reference_diagnostic()
         elif operation=='regressions':
             result=unprivileged_regressions()
+        elif operation=='acceptance_fixture':
+            result=acceptance_fixture()
+        elif operation=='current_pointer_denied':
+            result=current_pointer_denied()
+        elif operation=='assert_completed':
+            result=assert_completed()
         elif operation=='finish':
             finish=True;result={'returncode':0}
         else:

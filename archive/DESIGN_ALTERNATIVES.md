@@ -1,5 +1,14 @@
 # 설계 대안 이력
 
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+## 2026-11-20 정리 성공과 실제 인수의 구분
+
+기존 root 실행기와 권한·승인 계약은 그대로 두고 검증기2파일만 확장했다. 시험용 인수를 명시한 candidate/baseline 두 결과로 정리와 현재 설치 조회를 검증한다. 동일50소스·보호 원본·실행 PID/컨테이너 상태를 대조하고 변조 pointer 거절과 정리 재호출을 확인한다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+
+current 성공은 고정 소스/권한·캐시 정책·원래 서비스·현재 영수증/포인터를 읽은 결과다. 모델의 사건 판단 정확도나 새 실제 채팅의 성공으로 확대하지 않는다. 운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 운영의 정확 승인·현재 상태 대조·실제 인수는 별도다.
+<!-- /coordinator-native-completion-20261120 -->
+
 <!-- coordinator-collection-reference-20261120 -->
 <a id="coordinator-collection-reference-20261120"></a>
 ## 2026-11-20 수집 결과 보존과 격리 통합의 선택

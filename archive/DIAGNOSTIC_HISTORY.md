@@ -1,5 +1,14 @@
 # 진단 탐색 이력
 
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+## 2026-11-20 Native 정리/current의 실제 경계 확인
+
+두 경로에서 같은 root CLI가 completion_prepare/status→cleanup_decide/authorize→cleanup→current를 통과했다. 임시 중계/제어를 제거한 뒤 pointer의 receipt SHA를 바꾼 경우 current_pointer_changed로 거절됐으며 동일 inode의 원문을 복구했다. cleanup 재호출은 mutation_performed=false로 끝났고 보호 원본·기존 실행 PID/Docker 상태를 유지했다.
+
+인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다. 새 실패를 통과로 숨기지 않았으며 이전 GC 실패·backup75·D-Bus/manifest/회귀 제한 실패는 직전 이력에 보존한다. 운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 실제 재부팅·운영 인수와 backup75 재시도 계약은 미완료다.
+<!-- /coordinator-native-completion-20261120 -->
+
 <!-- coordinator-collection-reference-20261120 -->
 <a id="coordinator-collection-reference-20261120"></a>
 ## 2026-11-20 oneshot 결과 정리와 검증 환경 실패

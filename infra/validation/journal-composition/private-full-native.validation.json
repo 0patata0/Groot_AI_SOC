@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "status": "owned_native_workflows_verified_operating_pending",
-  "at_kst": "2026-11-20T07:23:41.357553+09:00",
+  "status": "owned_native_workflows_and_completion_verified_operating_pending",
+  "at_kst": "2026-11-20T07:58:45.279142+09:00",
   "source_sha256": {
-    "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
-    "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+    "validate_full_native.py": "56ea5e3f1d864db9cf9b770d1132b8df6402aff3763db24bedafd9c0aead82d6",
     "private_full_fixture.py": "c1f3e7ac082a5fd043ad791f2aadf33d124dc91283e30ac76bc1ef5908897713",
-    "private_full_native_probe.py": "e59f63b772e25a8dffbb7e01f7adfb0392d5a43003c571710ae9ab1fcf932e4f",
-    "test_full_native_observation.py": "64e6eee44519e4789d1907f16ebd76e6f245ba6abb6fc22c7963ff7fb1145547",
-    "validate_full_native.py": "bfe1ca38b3858596fce96952349bff3bf8e8d9fe7b99eff7fac29fa449180ed9"
+    "private_full_native_probe.py": "364123a3a262052f19964eef11c8d326bb465b275f8b77e794c2cb8a0a2a7f1b",
+    "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+    "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
+    "test_full_native_observation.py": "64e6eee44519e4789d1907f16ebd76e6f245ba6abb6fc22c7963ff7fb1145547"
   },
   "operator_manifest_sha256": "95aa36d20d63a4a360296aaa32b6ad1f745330854825f338dc38c41889469247",
   "operator_source_sha256": {
@@ -282,7 +282,7 @@
       "matches_current_operator_sources": true
     }
   },
-  "source_version_note": "Deadline/partial/confirmed and final bootstrap/Linux regression bind the same32 operator sources. The Linux extension changed only private validators; per-run input hashes preserve those versions. Earlier bootstrap-r2 is a separate prototype causal observation.",
+  "source_version_note": "Native completion extends only two validators. All42 pinned operator/dependency sources and44 static payload files equal the preceding run. Prior258 Mac/Linux tests are reused for the identical32 operator sources; no new258-test run is claimed.",
   "preserved_failures": [
     {
       "case": "previous_partial-r5",
@@ -322,7 +322,7 @@
   },
   "unfinished": [
     "State/durable-intent reconciliation contract before any bounded retry after backup exit75.",
-    "Native accepted completion cleanup/current, actual reboot, long-term recovery and operating deployment.",
+    "Actual host reboot, long-term recovery and operating deployment; synthetic Native completion does not establish real acceptance.",
     "Fresh exact full payload approval, live source/schema/model/permissions compare, collection/MCP/both-bot acceptance.",
     "Independent new-server installation, SOC accuracy and attack/detection/response E2E. Attacks remain paused."
   ],
@@ -335,60 +335,54 @@
     "attack_or_training_runs": 0
   },
   "publication": {
-    "state": "content_published",
-    "local_evidence": "Excluded from Git; public hashes and summaries only.",
-    "content_commit": "e971712452043e6d697d03fc4c3d895c9b9521da",
-    "remote_main_matched_at_kst": "2026-11-20T07:40:15.166267+09:00",
-    "receipt_note": "This record attests the content commit. Final receipt commit and remote match are recorded in local session evidence."
+    "state": "not_published",
+    "local_evidence": "Excluded from Git; public hashes and summaries only."
   },
   "fresh_read_after_tests": {
-    "at_kst": "2026-11-20T07:25:42.797049+09:00",
+    "at_kst": "2026-11-20T08:01:01.928954+09:00",
     "hosts": {
       "a": {
         "targets": 12,
         "source_metadata_unchanged": true,
-        "observed_at_kst": "2026-11-20T07:24:07.231780+09:00"
+        "observed_at_kst": "2026-11-20T07:56:46.732242+09:00"
       },
       "b": {
         "targets": 41,
         "source_metadata_unchanged": true,
-        "observed_at_kst": "2026-11-20T07:24:07.627717+09:00"
+        "observed_at_kst": "2026-11-20T07:56:47.059435+09:00"
       },
       "c": {
         "targets": 12,
         "source_metadata_unchanged": true,
-        "observed_at_kst": "2026-11-20T07:24:07.542363+09:00"
+        "observed_at_kst": "2026-11-20T07:56:46.999706+09:00"
       }
     },
-    "owned_units_absent": 8,
+    "owned_units_absent": 2,
     "operating_writes": 0
   },
   "mac_cleanup": {
-    "at_kst": "2026-11-20T07:33:32.658429+09:00",
-    "task_root": "/private/tmp/capstone-full-native-apply-20261119-xm5ksfjp",
-    "regular_files_removed": 4625,
-    "bytes_removed": 73093991,
+    "at_kst": "2026-11-20T08:18:15.901904+09:00",
+    "task_root": "/private/tmp/capstone-native-completion-20261120-c0py8ka6",
+    "regular_files_removed": 4546,
+    "bytes_removed": 73014911,
     "links_removed": 0,
     "root_absent": true,
-    "process_audit_rows": 828,
+    "process_audit_rows": 827,
     "active_owned_processes": 0,
     "G_Harness2_preserved": true,
-    "humanize_skill_preserved": true,
-    "source_and_logs_preserved_in_local_evidence": true,
-    "prior_cleanup_guard": "Full stat equality refused because directory read may change atime; no deletion occurred before identity-only validation."
+    "humanize_skill_preserved": true
   },
   "local_review": {
-    "defect_first": "primary-agent source review; review-agent skill unavailable",
+    "defect_first": "Primary agent reviewed fixed CLI, namespace/synthetic acceptance, pointer restoration, cleanup idempotence and source/protected/PID assertions; review-agent skill unavailable.",
     "open_findings": 0,
-    "semgrep": "not run; not installed in approved environment; no Mac installation",
+    "semgrep": "not run; no Mac CLI installation performed",
     "humanize": {
-      "run_id": "2026-11-20-002-5af4",
+      "run_id": "2026-11-20-003-0f75",
       "route": "light",
-      "change_rate_percent": 0.6,
+      "change_rate_percent": 0.06,
       "grade": "B",
       "self_checks_passed": 6,
-      "gate_exit": 0,
-      "subsequent_changes": "Technical publication metadata only; explanatory body preserved."
+      "gate_exit": 0
     }
   },
   "prepublication_scan": {
@@ -396,6 +390,166 @@
     "unsafe_paths": 0,
     "known_non_credentials": 10,
     "new_findings": 0,
-    "values_or_snippets_saved": false
+    "values_or_snippets_saved": false,
+    "at_kst": "2026-11-20T08:20:08.856003+09:00",
+    "phase": "native_completion"
+  },
+  "historical_validator_versions": [
+    {
+      "source_sha256": {
+        "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
+        "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+        "private_full_fixture.py": "c1f3e7ac082a5fd043ad791f2aadf33d124dc91283e30ac76bc1ef5908897713",
+        "private_full_native_probe.py": "e59f63b772e25a8dffbb7e01f7adfb0392d5a43003c571710ae9ab1fcf932e4f",
+        "test_full_native_observation.py": "64e6eee44519e4789d1907f16ebd76e6f245ba6abb6fc22c7963ff7fb1145547",
+        "validate_full_native.py": "bfe1ca38b3858596fce96952349bff3bf8e8d9fe7b99eff7fac29fa449180ed9"
+      },
+      "last_content_commit": "e971712452043e6d697d03fc4c3d895c9b9521da",
+      "scope": "Previous source/GC/partial/deadline/confirmation evidence; preserved per-run hashes.",
+      "mac_cleanup": {
+        "at_kst": "2026-11-20T07:33:32.658429+09:00",
+        "task_root": "/private/tmp/capstone-full-native-apply-20261119-xm5ksfjp",
+        "regular_files_removed": 4625,
+        "bytes_removed": 73093991,
+        "links_removed": 0,
+        "root_absent": true,
+        "process_audit_rows": 828,
+        "active_owned_processes": 0,
+        "G_Harness2_preserved": true,
+        "humanize_skill_preserved": true,
+        "source_and_logs_preserved_in_local_evidence": true,
+        "prior_cleanup_guard": "Full stat equality refused because directory read may change atime; no deletion occurred before identity-only validation."
+      }
+    }
+  ],
+  "native_completion": {
+    "synthetic_acceptance_only": true,
+    "same_fixed_root_CLI": true,
+    "actual_MCP_or_bot_acceptance": false,
+    "cases": {
+      "complete-candidate-r1": {
+        "status": "verified",
+        "observed_at_kst": "2026-11-20T07:53:12.561973+09:00",
+        "raw_result_sha256": "3b5862f54b059a5e1997212c923e665d45abf16b909837caeda10d98be20cd68",
+        "memory_peak_bytes": 410320896,
+        "pids_peak": 122,
+        "roles": {
+          "a": {
+            "outcome": "candidate",
+            "installed_sources": 7,
+            "initial_stage": "active_record_present",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          },
+          "b": {
+            "outcome": "candidate",
+            "installed_sources": 36,
+            "initial_stage": "prepared_only",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service",
+              "capstone-ollama-chat.service",
+              "capstone-review-chat.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          },
+          "c": {
+            "outcome": "candidate",
+            "installed_sources": 7,
+            "initial_stage": "active_record_present",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          }
+        },
+        "input_files": 52,
+        "input_files_removed": true,
+        "input_source_SHA_unchanged": true,
+        "workspace_removed": true,
+        "role_cgroups_empty": true,
+        "synthetic_acceptance_only": true,
+        "actual_MCP_or_bot_acceptance": false,
+        "operating_deployment": false,
+        "actual_host_reboot": false
+      },
+      "complete-baseline-r1": {
+        "status": "verified",
+        "observed_at_kst": "2026-11-20T07:55:18.368439+09:00",
+        "raw_result_sha256": "37fb293f38dad17b59de29859e6943be0e0110d717da300b633088b547aaa3e6",
+        "memory_peak_bytes": 360669184,
+        "pids_peak": 109,
+        "roles": {
+          "a": {
+            "outcome": "baseline",
+            "installed_sources": 7,
+            "initial_stage": "active_record_present",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          },
+          "b": {
+            "outcome": "baseline",
+            "installed_sources": 36,
+            "initial_stage": "prepared_only",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service",
+              "capstone-ollama-chat.service",
+              "capstone-review-chat.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          },
+          "c": {
+            "outcome": "baseline",
+            "installed_sources": 7,
+            "initial_stage": "active_record_present",
+            "same_running_unit_pids": [
+              "capstone-journal-reader.service"
+            ],
+            "original_protected_unchanged": true,
+            "current_pointer_denial": "current_pointer_changed",
+            "cleanup_calls": 2,
+            "second_cleanup_read_only": true
+          }
+        },
+        "input_files": 52,
+        "input_files_removed": true,
+        "input_source_SHA_unchanged": true,
+        "workspace_removed": true,
+        "role_cgroups_empty": true,
+        "synthetic_acceptance_only": true,
+        "actual_MCP_or_bot_acceptance": false,
+        "operating_deployment": false,
+        "actual_host_reboot": false
+      }
+    },
+    "scope": "Disposable PID1, real systemd/SSH/private Docker and50 installed sources; operator attestations are synthetic. Not operating acceptance.",
+    "validator_source_sha256": {
+      "validate_full_native.py": "56ea5e3f1d864db9cf9b770d1132b8df6402aff3763db24bedafd9c0aead82d6",
+      "private_full_fixture.py": "c1f3e7ac082a5fd043ad791f2aadf33d124dc91283e30ac76bc1ef5908897713",
+      "private_full_native_probe.py": "364123a3a262052f19964eef11c8d326bb465b275f8b77e794c2cb8a0a2a7f1b",
+      "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+      "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
+      "test_full_native_observation.py": "64e6eee44519e4789d1907f16ebd76e6f245ba6abb6fc22c7963ff7fb1145547"
+    },
+    "input_manifest_sha256": "71a4e5e6e677f2ebff33031f4a190b68d054e595a58206f7da6001de75a9fea8",
+    "source_commit": "836fa97ea056290aacd2ec6889f8725f6f2fcb24"
   }
 }

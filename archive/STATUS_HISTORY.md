@@ -1,5 +1,14 @@
 # 현황 이력
 
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+## 2026-11-20 Native 정리/current의 두 결과 경로
+
+complete-candidate와 complete-baseline을 기존 PID1 기반에 추가했다. 새 소스 확정 뒤와 두 실제 교체 중 SIGKILL→독립 원복/재개 뒤에 같은 root CLI의 인수 준비·공통 정리 결정/허가·정리/current가 세 역할 모두 통과했다.50소스와 보호 원본·B prepared-only 출처·변조 pointer 거절·원문 복구·중복 정리의 읽기 결과와 기존 실행 PID/Docker 상태를 대조했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. candidate 최대410,320,896B/pids122·baseline 최대360,669,184B/pids109이며 각52입력/작업 폴더 제거·빈 역할 cgroup과 입력 SHA를 확인했다. 실제 운영 적용·정확 승인·MCP/두 봇 인수·재부팅·장기 복구와 backup75 계약은 남았다. [원장](../infra/validation/journal-composition/private-full-native.validation.json).
+<!-- /coordinator-native-completion-20261120 -->
+
 <!-- coordinator-collection-reference-20261120 -->
 <a id="coordinator-collection-reference-20261120"></a>
 ## 2026-11-20 고정 root 진입점 통합과 수집 결과 보존 후보

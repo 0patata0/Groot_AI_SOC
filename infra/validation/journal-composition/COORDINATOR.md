@@ -1,34 +1,29 @@
 # 소스·캐시·소비자 조정 실행기
 
-<!-- coordinator-collection-reference-20261120 -->
-<a id="coordinator-collection-reference-20261120"></a>
-## 고정 root 진입점의 격리 통합과 수집 결과 보존
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+## Native 인수 후 정리와 현재 설치 조회
 
-B의 기존 PID1·SSH·별도 Docker 기반을 확장해 A7/B36/C7의50소스와 합성 캐시를 실제 고정 경로에 배치했다. 운영 소스는 관리자231 경유로 읽은65경로의 SHA·메타데이터에 결속하며 B의 누락된 기준 소스는 B 안에서만 읽었다. 운영 설정·자격·대화 DB·원시 journal은 반입하지 않았다. 소비자·승인·계정·키·이미지와 캐시는 시험용이다.
+기존 검증기에 complete-candidate와 complete-baseline을 추가했다. 첫 경로는 apply/verify→A/C/B확정→재개, 둘째는 두 실제 파일 교체 뒤 같은 자식 SIGKILL→독립 원복→재개를 따른다. 이후 같은 고정 root CLI로 completion_prepare·completion_status·cleanup_decide·cleanup_authorize·cleanup·current를 실행한다. 소스나 backend를 패치하지 않는다.
 
-부분 적용 시험은 같은 실행기 자식의 renameat/renameat2 종료를 ptrace로 관측했다. 두 승인 대상의 실제 after SHA와 applying/pending apply를 확인한 뒤 그 자식만 SIGKILL했다. 실행기·backend를 패치하지 않았으며 독립 복구 뒤 원본50소스/캐시와 원래 활성 소비자·동일 Docker CID/이미지를 대조했다. 이는 프로세스 유실 시험이며 전원 유실·호스트 재부팅 시험은 남아 있다.
+인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다. 승인과 인수는 별도다. 인수 없는 완료 거절을 보존하고 시험용 근거4개의 SHA를 담은 고유 인수 파일을 각 격리 root에 둔다. 이를 운영 서버의 인수 기록으로 반입하거나 실제 모델·채팅 응답으로 표시하지 않는다.
 
-기한 시험은 apply/verify 뒤 독립 원복을, 정상 시험은 A/C 뒤 B의 소스 확정과 재개를 확인했다. collection/MCP/Hermes/Ollama의 실제 인수 근거 없이 completion_prepare를 요청했다. 세 역할 모두 operator_acceptance_required로 거절됐다. 정리/current의 Native 성공과 실제 운영 인수는 별도 조건이다.
+두 경로 모두 세 역할에서 정리와 현재 조회가 통과했다. 설치 소스7/36/7개, 최초 보호 파일의 SHA/uid/gid/mode와 B의 prepared-only 출처를 대조했다. 정리 뒤 current pointer의 receipt SHA만 시험 중 바꾸자 current_pointer_changed로 거절됐고 원문을 같은 inode에 복구했다. 정리 재호출은 mutation_performed=false였다. 계속 실행 중이던 reader3개와 B의 Ollama/review 채팅 PID, 같은 Docker 상태를 확인했다. 합성 oneshot 소비자의 독립적인 실서비스 인수나 실제 봇 응답을 증명하지 않는다.
 
-정상 종료한 oneshot이 systemd에서 정리되면서 ConditionResult=no·실행 시각0이 됐다. 수집 검증 실패는 이 현상과 연결됐다. 같은 _UnitReference로 실행 유닛의 RefUnit을 유지하자 세 번의 속성 조회에서 실행 시각·조건 결과가 유지됐고 해제 뒤 정리됐다. 조건 불충족 유닛은 참조 중에도 실행0/no였다. 후보 Native는 두 고정 수집 유닛만 참조하며 기존 조건·종료값·새 실행 시각 기준을 유지한다. 연결 실패나 중첩 획득 실패·본문/해제 예외에서도 연결을 닫고 임의 fallback을 하지 않는다. [systemd Manager의 RefUnit 계약](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.systemd1.html)을 따른다.
-
-같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다. 수집 서비스 검사는22→28이며 별도 상태 관측8검사·AST6파일·부정 CLI3조건을 확인했다. 공식 Harness²의80구성 중2수정, 검증85→91과 정적44payload를 포함한135구성의 상시16,917자 증가0을 대조했다. 구조 통과는 실행·SOC 정확도·운영 인수를 뜻하지 않는다.
-
-검증은 기존 Python·dbus-daemon·libsystemd를 사용했다. 외부 송신 없는 별도 namespace와1GiB·Tasks384·CPU100%를 유지하며 일반 경로는180초다. 비특권 Linux 회귀의 자식210초·관측220초·프로브250초와 bootstrap 전체300초를 구분한다. 기존90초 회귀 제한 실패와 원문 로그를 남기지 못한 한계도 보존했다. 시험 종료 뒤 빈 역할 cgroup·호스트 namespace 유지·52입력 SHA 동일과 자체 작업 폴더 제거를 확인한다. 관측이 running이면 같은 실행만 다시 읽고 새 실행으로 대체하지 않는다.
-
-재현에는 고정42소스와 두 manifest, 검증 기반·full-input.json을 합한52입력이 필요하다. full-input은 schema/source_commit/live_metadata/known_before/after/after_provenance/backend_probe_sha256/scope를 포함한다. live_metadata는 각 고정 경로의 exists/SHA/bytes/uid/gid/mode이며 A/C 기준은 같은 SHA의 확보 소스, B 누락 기준은 B 내부의 고정 경로 읽기만 허용한다. after44파일은 지정 commit의 원본과 unit 생성기로 만들고 reader3·MCP launcher1·무결성 영수증2는 시험 안에서 정확한 전후 SHA에 결속해 생성한다. 자격/키/운영 설정을 입력에 섞지 않는다. 실제 반입 manifest·case별 해시와 결과 원문은 로컬 전용이다.
+실행은 기존52입력·실제 systemd/SSH·별도 Docker·50소스/합성 캐시를 재사용한다.1GiB·Tasks384·CPU100%·180초와 namespace 경계는 유지했다. complete-candidate 최대410,320,896B/pids122, complete-baseline 최대360,669,184B/pids109였다. 각 실행의 terminal·빈 역할 cgroup·52입력 SHA 동일·입력/작업 폴더 제거를 확인한다. running은 같은 handle을 관측하며 재시작으로 대체하지 않는다.
 
 ```sh
-# 승인된 Linux B에서52입력이 있는 별도 작업 디렉터리의 검증기를 사용한다.
-python3 -IB validate_full_native.py --start-owned --case bootstrap
-python3 -IB validate_full_native.py --collect-owned /run/capstone-pid1-<출력된 고유값>
-# partial / deadline / confirmed도 각각 고유 작업으로 실행하고 terminal 수집 뒤 정리한다.
+# 승인된 Linux 점검 호스트의 별도52입력 폴더에서 실행한다.
+python3 -IB validate_full_native.py --start-owned --case complete-candidate
+# WORKSPACE는 위 명령이 출력한 workspace의 실제 경로다.
+python3 -IB validate_full_native.py --collect-owned "$WORKSPACE"
+# 정리 완료 뒤 complete-baseline을 별도 고유 실행으로 확인한다.
 ```
 
-backup75는 성공이나 자동 재시도 권한이 아니다. 잠금·현재 단계·durable intent와 같은 요청의 결과를 대조하는 계약은 남았다. 실제 호스트 재부팅·장기 복구·Native 정리/current·새 OS 설치·운영 payload 정확 승인·현재 소스/모델/MCP 스키마/권한 대조와 새 실제 MCP/두 봇 인수도 남아 있다. 아래252검사와 초기 backend 기록은 당시 근거로 보존한다.
+운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 전체32소스의 회귀를 새로 실행했다고 표시하지 않는다. 재현 입력 형식과 이전 GC/부분 복구/기한 근거는 [직전 이력](../../../archive/STATUS_HISTORY.md#coordinator-collection-reference-20261120)에 보존한다.
 
-[실행·출처·실패·제한 원장](private-full-native.validation.json)
-<!-- /coordinator-collection-reference-20261120 -->
+backup75의 상태/intent 대조와 재시도 계약, 운영 payload의 정확 승인과 실제 MCP/두 봇 인수·재부팅·장기 복구·새 OS 설치는 남았다. [검증 원장](private-full-native.validation.json).
+<!-- /coordinator-native-completion-20261120 -->
 
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>

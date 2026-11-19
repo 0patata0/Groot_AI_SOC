@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- coordinator-native-completion-20261120 -->
+<a id="coordinator-native-completion-20261120"></a>
+[정리/current 상태 이력](STATUS_HISTORY.md#coordinator-native-completion-20261120)과 [실제 경계](DIAGNOSTIC_HISTORY.md#coordinator-native-completion-20261120)에 candidate/baseline의 Native 통과와 pointer 거절·중복 정리 근거를 연결했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다. 운영후보32소스의 기존258회귀 재사용과 검증기2파일 확장을 구분한다.
+<!-- /coordinator-native-completion-20261120 -->
+
 <!-- coordinator-collection-reference-20261120 -->
 <a id="coordinator-collection-reference-20261120"></a>
 고정 root 진입점의 격리 통합은 [상태 이력](STATUS_HISTORY.md#coordinator-collection-reference-20261120)과 [실패 이력](DIAGNOSTIC_HISTORY.md#coordinator-collection-reference-20261120)에 연결했다. oneshot 결과 보존, 두 교체 뒤 SIGKILL 복구·기한 복구·정상 확정/재개·인수 누락 거절을 구분하며 이전 GC/backup75와 검증 환경 실패를 보존한다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다. 운영 적용·실제 재부팅·MCP/봇 인수와 Native 정리/current는 남아 있다.

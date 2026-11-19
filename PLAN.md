@@ -1,6 +1,12 @@
 # Agentic SOC 실행 계획
 
 
+<!-- service-claim-types-candidate-20261119 -->
+
+다음에는 최종 후보로 새 실제 추론을 실행하고 설정값·관측 시각·표본 범위·기능 판단을 원문과 대조한다. 품질과 지연을 모두 확인한 뒤 운영 반영 및 새 채팅 검증을 진행한다. 학습과 공격 시험은 재개하지 않는다. 후속 후보는17소스·영수증1이며 정확한 후보와 실제 채팅 검증을 분리한다. [候補・検証・未適用](infra/validation/service-query/claim-types.validation.json)
+<!-- /service-claim-types-candidate-20261119 -->
+
+
 <!-- service-report-provenance-candidate-20261119 -->
 
 남은 검토는 복합 질문의 새 표현, 원문과 판단의 범위 일치, 실제 채팅 지연이다. 문장 검사는 제한된 형식을 다루므로 모든 할루시네이션을 차단했다고 표현하지 않는다. 회귀 실행을 합산한 수를 독립 정확도나 일반 30/60초 SLO로 사용하지 않는다. 기존 `scope=None` 레거시 반례의 실패는 원본·후보에 동일하게 남아 있다. 별도 승인 대기인 관리자 시각 변경과 Response MCP 후보, 공격 시험 중단, 새 OS 설치와 실제 발표도 이 작업으로 완료되지 않는다. [검증·미적용·남은 문제](infra/validation/service-query/report-provenance.validation.json) · [공통 동작](infra/hermes/service-query-contract.md).

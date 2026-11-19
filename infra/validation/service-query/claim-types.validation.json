@@ -1,0 +1,522 @@
+{
+  "schema": 1,
+  "state": "candidate_not_applied_post_guard_model_trial_pending",
+  "at_kst": "2026-11-19T10:42:59.170840+09:00",
+  "operating_source_changes": 0,
+  "operating_restarts": 0,
+  "new_chat_posts": 0,
+  "authority_changes": false,
+  "candidate": {
+    "plan_sha256": "e4c8f238cccf89cd0d2a3df6f189fbb99b5dfc7f8e02d622feafecc91af66b68",
+    "inherited_unpromoted_plan_sha256": "8fac8e92b52c01535ca84a5660f9d22b6826349e683b6cd99bf1e832f3a088e5",
+    "source_files": 17,
+    "receipt_updates_if_applied": 1,
+    "patch": "claim-types.patch",
+    "files": 17,
+    "patch_bytes": 939197,
+    "patch_sha256": "e707639aaeb0bc2810bd2cf925955813c9f1a7e614c86f702ecd78ad2ec2b3e9",
+    "forward_and_reverse_sha256_verified": true,
+    "roundtrip_directory_removed": true,
+    "sources": {
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "70248ccefddaa6017b45964575e6db0b978eb62b66c53acf538d9c1fdb4714ae",
+        "bytes": 226677,
+        "kind": "scoped_report_policy_and_field_meaning"
+      },
+      "/opt/capstone-ollama-trial/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "70248ccefddaa6017b45964575e6db0b978eb62b66c53acf538d9c1fdb4714ae",
+        "bytes": 226677,
+        "kind": "scoped_report_policy_and_field_meaning"
+      },
+      "/opt/capstone-management/chat_contract.py": {
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "70248ccefddaa6017b45964575e6db0b978eb62b66c53acf538d9c1fdb4714ae",
+        "bytes": 226677,
+        "kind": "scoped_report_policy_and_field_meaning"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-management/skill-soc-investigate.md": {
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "162a5fe795fb9e7d484683355c5d4aa8d3311dddd2f53ce9c2bf386c2ddfe9f6",
+        "bytes": 22563,
+        "kind": "existing_skill_scoped_investigation_and_report_sections"
+      },
+      "/opt/capstone-ollama-trial/runtime.py": {
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "871d613e8368520bab835204f5edff1683443b2bda0a4861a943bb6106383d3d",
+        "bytes": 60991,
+        "kind": "source"
+      },
+      "/opt/capstone-management/soc_management_run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/capstone-ollama-trial/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/management-code/run.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923,
+        "kind": "source"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-ollama-trial/query_grounding.py": {
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909,
+        "kind": "source_pin"
+      },
+      "/opt/capstone-management/soc_management_controller.py": {
+        "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "after_sha256": "5641ecf00dcb9a4d0a48ad07900df701270a34991438f93362fe8aab29d94af8",
+        "bytes": 538882,
+        "kind": "bound_existing_gate_payload"
+      },
+      "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      },
+      "/opt/capstone-ollama-trial/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      },
+      "/opt/capstone-management/workflow_contract.py": {
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646,
+        "kind": "explicit_report_phase_route_no_global_report_injection"
+      }
+    }
+  },
+  "canonical_source_sha256": {
+    "infra/hermes/chat_contract.py": "fc610b9b8adadade0211e1fcca28a87a9401493919310b9241fe2438eebc948c",
+    "infra/hermes/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+    "infra/hermes/skills/soc-investigate/SKILL.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+    "infra/hermes/test_workflow_contract.py": "9b9bc49db872ffdcc1c1f9923630f4cc3e17aaf2ca3ef27efa90ebf24ebd5005",
+    "infra/hermes/test_service_history_contract.py": "6da9b11b9683a13a2f19ec0d66cd44609c37fa76201f8b77e5ca4183e896de60",
+    "infra/ollama-trial/test_diagnostic_claim_forms.py": "9b10057d46936c1af3e749b9231847ba0f94a749988214b0f2d3f4026e123b28",
+    "infra/ollama-trial/test_service_history.py": "a11b799ae6e7a0bab9dc5c2754266fe252f209bf74a65a8ee0c6ef8fc14dd4f9"
+  },
+  "skill_loader": {
+    "limit_unchanged_bytes": 24576,
+    "canonical_before_bytes": 25626,
+    "canonical_after_bytes": 24141,
+    "candidate_installed_copy_bytes": 22563,
+    "global_report_section_injection": false,
+    "complete_new_os_install_not_tested": true
+  },
+  "official_structure": {
+    "at_kst": "2026-11-19T10:30:51.528436+09:00",
+    "live_snapshot_at_kst": "2026-11-19T09:47:21.129050+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_locked_files_verified": 140,
+    "framework_manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "arms": {
+      "base": {
+        "native": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 33505,
+            "n_files": 19,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 11
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "sdk": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 20,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 13
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "management": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 14,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 7
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        }
+      },
+      "candidate": {
+        "native": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 33505,
+            "n_files": 19,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 11
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "sdk": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 20,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 13
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        },
+        "management": {
+          "status": "passed",
+          "census": {
+            "always_on_chars": 16835,
+            "n_files": 14,
+            "skills": 5,
+            "sub_agents": 0,
+            "scripts": 7
+          },
+          "code_routed_skills": [
+            "soc-change",
+            "soc-investigate",
+            "soc-query",
+            "soc-recover"
+          ]
+        }
+      }
+    },
+    "same_surface_diff": {
+      "native": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/query_grounding.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "sdk": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/grounding.py",
+          "scripts/query_grounding.py",
+          "scripts/runtime.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      },
+      "management": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/chat_contract.py",
+          "scripts/soc_management_controller.py",
+          "scripts/soc_management_run.py",
+          "scripts/workflow_contract.py",
+          "skills/soc-investigate/SKILL.md"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0
+  },
+  "tests": {
+    "mac": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 380,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 58,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      }
+    },
+    "linux": {
+      "candidate/native": {
+        "rc": 0,
+        "summary": {
+          "run": 430,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/sdk": {
+        "rc": 0,
+        "summary": {
+          "run": 380,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/native_phase": {
+        "rc": 0,
+        "summary": {
+          "run": 39,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/transport": {
+        "rc": 0,
+        "summary": {
+          "run": 27,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "candidate/service_contract": {
+        "rc": 0,
+        "summary": {
+          "run": 58,
+          "failures": [],
+          "errors": [],
+          "skipped": 0
+        }
+      },
+      "harness2": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 38 tests in 3.482s",
+          "",
+          "OK"
+        ]
+      },
+      "installer": {
+        "rc": 0,
+        "summary": [
+          "",
+          "----------------------------------------------------------------------",
+          "Ran 37 tests in 0.588s",
+          "",
+          "OK"
+        ]
+      }
+    },
+    "mac_count": 934,
+    "linux_count": 934,
+    "linux_official_integration": 38,
+    "linux_installer": 37,
+    "canonical_full_ServiceReport_environment_errors": 13,
+    "canonical_full_ServiceReport_error_reason": "openai absent in Mac global Python; no install; focused actual-installation fixtures tested",
+    "all_repository_tests_green": false,
+    "counts_are_overlapping_regressions_not_independent_accuracy": true
+  },
+  "prompt_bytes": {
+    "operating_base": {
+      "policy_bytes": 8659,
+      "evidence_body_bytes": 30152,
+      "evidence_body_sha256": "d03a58e080eed5a9ec23c76b4bb87b6136abd7f78b1de825778a4c1be1117b55"
+    },
+    "e12_unpromoted": {
+      "policy_bytes": 9724,
+      "evidence_body_bytes": 22086,
+      "evidence_body_sha256": "eb71d82bdc9998821820ef2bd6823dbeb604245f2eeb4ac8158a0fd6bc3ae8c8"
+    },
+    "candidate": {
+      "policy_bytes": 3979,
+      "evidence_body_bytes": 22086,
+      "evidence_body_sha256": "eb71d82bdc9998821820ef2bd6823dbeb604245f2eeb4ac8158a0fd6bc3ae8c8"
+    },
+    "basis": "Identical saved real MCP receipts and empty tool descriptions; prompt-byte comparison only, no token/latency claim",
+    "plan_sha256": "e5a51ba5f91477b3f9447b1da7096e7cb771ad6fcea6ca2ea07be79d9bfc3df8",
+    "non_report_full_workflow_body": {
+      "operating_base": {
+        "body_bytes": 13121,
+        "has_report_section": false
+      },
+      "e12_unpromoted": {
+        "body_bytes": 14186,
+        "has_report_section": false
+      },
+      "candidate": {
+        "body_bytes": 14627,
+        "has_report_section": false
+      }
+    }
+  },
+  "actual_trial": {
+    "plan_sha256": "e5a51ba5f91477b3f9447b1da7096e7cb771ad6fcea6ca2ea07be79d9bfc3df8",
+    "phase": "report skill split before subsequent typed-claim guard",
+    "seconds": 78.191,
+    "runtime_rc": 1,
+    "actual_reads": 3,
+    "model_completions": 5,
+    "protected_calls": 0,
+    "independent_quality_pass": false,
+    "remaining_false_claims": [
+      "static described as enabled",
+      "bounded sample generalized to every execution",
+      "resource availability assurance"
+    ],
+    "post_guard_model_trial_executed": false,
+    "chat_round_trip": false
+  },
+  "live_unchanged": {
+    "at_kst": "2026-11-19T10:40:18.699966+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "existing_bot_connections_alive": true,
+    "native_container_identity_unchanged": true
+  },
+  "cleanup": {
+    "at_kst": "2026-11-19T10:40:55.365664+09:00",
+    "removed_roots": [
+      "/var/lib/capstone-evidence-validation/gateway-919f8c726e",
+      "/var/lib/capstone-evidence-validation/gateway-982c2d6f6f",
+      "/var/lib/capstone-report-probe/report-f232a3d48d"
+    ],
+    "removed_files": 1439,
+    "verified_bytes": 52625037,
+    "actor_jobs_terminal": true,
+    "owned_parent_removed_if_empty": true,
+    "operating_and_rollback_roots_removed": 0,
+    "source_config_model_fw_changes": 0
+  },
+  "direct_review": {
+    "scope": "7 canonical files and exact 17-file candidate patch; no operating deployment",
+    "defect_first_review": true,
+    "blocking_findings": [],
+    "remaining_known_risks": [
+      "post-field-guard actual model trial not executed",
+      "resource-health assurance can remain unsupported",
+      "negative-property semantics do not establish the inverse fact",
+      "global OpenAI package absent; full canonical ServiceReport suite not green",
+      "installer copies source but complete new-OS workflow preflight not verified"
+    ],
+    "mitigation": "candidate retained without operating promotion; failed phase-only model trial preserved",
+    "unwired_resource_helper": "private preserved draft; removed from canonical freeze rather than presenting untested code as complete",
+    "semgrep": "not executed; no Mac install",
+    "review_agent_skill": "unavailable; direct defect-first review recorded"
+  },
+  "humanize": {
+    "run": "2026-11-19-011-580a",
+    "route": "light",
+    "gate_exit": 0,
+    "change_rate": 0.0064,
+    "grade": "B",
+    "self_check": "6/6"
+  },
+  "not_done": [
+    "post-guard actual inference",
+    "operating apply and fresh actual chats",
+    "30/60-second response target",
+    "resource assurance coverage",
+    "new OS install and independent recreation",
+    "attack/training resume"
+  ],
+  "publication": {
+    "state": "pending_commit_and_push"
+  }
+}

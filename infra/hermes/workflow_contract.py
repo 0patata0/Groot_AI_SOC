@@ -10,6 +10,7 @@ MARKERS={
     'soc-recover':'SOC_WORKFLOW_RECOVER_V1',
 }
 SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사'),
+          'service-report':('soc-investigate','## 서비스 조사 보고'),
           'incident-read-selection':('soc-query','## 사건 읽기 선택'),
           'factual-service-lookup':('soc-query','## 서비스 사실 조회 확인'),
           'investigation-evidence':('soc-investigate','## 조사 근거 확인과 인용'),
@@ -19,7 +20,7 @@ SECTIONS={'service-investigation':('soc-investigate','## 서비스 원인 조사
           'peer-review':('soc-investigate','## 교차 검토 대조')}
 # Loaded only by their own phase (the peer review), never in the full
 # workflow body of an investigation or query prompt.
-SECTION_ONLY=frozenset({'peer-review', 'control-status', 'factual-service-lookup', 'incident-read-selection'})
+SECTION_ONLY=frozenset({'peer-review', 'control-status', 'factual-service-lookup', 'incident-read-selection', 'service-report'})
 
 def policy_text(name,raw):
     if name not in MARKERS:raise ValueError('soc_workflow_unknown')

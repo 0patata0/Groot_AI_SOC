@@ -184,6 +184,22 @@ class ServiceRuntime(unittest.TestCase):
         self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
         self.assertEqual(result['protected_calls'],0)
 
+    def test_unknown_enablement_claim_is_removed_without_losing_observations_or_scope(self):
+        bad={'more_evidence':False,'report':{'assessment':'unresolved','status':'needs_review',
+            'basis':'현재 관측과 journal 표본을 별도로 확보했으며 반환 범위 밖의 배경은 미확인입니다.',
+            'current_observation':'자동 시작 설정(enabled)입니다. 현재 ActiveState=active입니다.',
+            'evidence_indexes':[0],'limitations':['설정과 전체 기능 영향은 미확인입니다.'],'next_steps':[]}}
+        result,order,prompts,calls=self.run_case(empty_error_journal=True,compact_report=bad,
+            question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')
+        self.assertNotIn('error_type',result)
+        self.assertIn('diagnostic_property_value_unverified',result['pruned_issues'])
+        self.assertEqual(result['pruned_unverified_sentences'],1)
+        self.assertNotIn('자동 시작 설정(enabled)',result['final_response'])
+        self.assertIn('ActiveState=active',result['final_response'])
+        self.assertIn('초기 확인 범위',result['final_response'])
+        self.assertEqual(result['service_judgment'],{'assessment':'unresolved','status':'needs_review'})
+        self.assertEqual(result['protected_calls'],0)
+
     def test_both_empty_journals_complete_evidence_without_repeating_or_claiming_health(self):
         result,order,prompts,calls=self.run_case(empty_error_journal=True,empty_all_journal=True,
             question='B 서버 capstone-management.service 왜 실패했어? 지금은 어때?')

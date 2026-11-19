@@ -789,3 +789,9 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 
 이번 서비스 보고 후보는 실제 품질 검증을 통과하지 못해 운영에 적용하지 않았다. 서비스 현재 조회의 기존 확정 결과는 유지한다. 원인·이력 조사는 현재 수집본과 실제 journal을 함께 읽으며 자동 선택한 최근 구간을 초기 확인 범위로 표시한다. 보고에서 근거를 넘는 문장을 제외하더라도 원래 판단·검토 상태와 조회 범위 안내를 유지한다. 모델·MCP·권한·보호 주소·승인·차단 TTL은 이번 보완의 변경 대상이 아니다. [검증·미적용·남은 문제](../infra/validation/service-query/report-provenance.validation.json) · [공통 동작](../infra/hermes/service-query-contract.md).
 <!-- /service-report-provenance-candidate-20261119 -->
+
+
+<!-- service-claim-types-candidate-20261119 -->
+
+서비스 조사와 최종 보고의 지침을 기존 공통 스킬 안에서 분리했다. 최종 보고에 같은 조사 지침을 모두 반복해서 넣지 않으며 원문과 조회 근거는 유지한다. 자동 시작 설정의 한국어 설명도 실제 UnitFileState와 대조하고 일부 표본을 매 실행의 결과로 확대하는 문장을 검사한다. 지침을 분리한 첫 실제 추론은 78.191초가 걸렸다. 읽기 3회·모델 호출 5회였으며 자동 시작 설정과 기능 정상 판단에 오류가 남았다. 후속 속성 검사 후보의 실제 추론과 운영 적용은 아직 수행하지 않았다. 기존 운영 소스와 승인 경계는 유지한다. [候補・検証・未適用](../infra/validation/service-query/claim-types.validation.json)
+<!-- /service-claim-types-candidate-20261119 -->

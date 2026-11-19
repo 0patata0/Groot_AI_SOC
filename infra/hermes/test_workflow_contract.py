@@ -5,6 +5,12 @@ import unittest
 import workflow_contract as w
 
 class WorkflowContract(unittest.TestCase):
+    def skill_file(self,name):
+        root=Path(w.__file__).parent
+        candidates=[p for p in (root/'skills'/name/'SKILL.md',root/('skill-'+name+'.md')) if p.is_file()]
+        self.assertEqual(len(candidates),1)
+        return candidates[0]
+
     def test_every_project_skill_is_valid_and_selection_is_bounded(self):
         for name,marker in w.MARKERS.items():
             text=w.policy((name,))
@@ -42,8 +48,22 @@ class WorkflowContract(unittest.TestCase):
         self.assertIn('질문이 장비·경보 종류를 지정한 조사는',w.policy(('soc-investigate',)))
         with self.assertRaises(ValueError):w.section_policy(('soc-query',),'peer-review')
 
+    def test_service_report_is_phase_scoped_and_keeps_failure_and_design_unknown(self):
+        section=w.section_policy(('soc-investigate',),'service-report')
+        self.assertIn('실패 자체가 확인되지 않았으면',section)
+        self.assertIn('타이머/cron 설정',section)
+        self.assertIn('초기 확인 구간',section)
+        self.assertNotIn('## 서비스 조사 보고',w.policy(('soc-investigate',)))
+        self.assertNotIn('## 서비스 조사 보고',w.section_policy(('soc-investigate',),'service-investigation'))
+        with self.assertRaises(ValueError):w.section_policy(('soc-query',),'service-report')
+
+    def test_canonical_install_skill_fits_the_unchanged_loader_limit(self):
+        raw=self.skill_file('soc-investigate').read_bytes()
+        self.assertLessEqual(len(raw),24576)
+        self.assertIn('SOC_WORKFLOW_INVESTIGATE_V1',w.policy_text('soc-investigate',raw))
+
     def test_service_section_missing_or_duplicate_is_not_silently_omitted(self):
-        raw=(Path(w.__file__).parent/'skills/soc-investigate/SKILL.md').read_text()
+        raw=self.skill_file('soc-investigate').read_text()
         for value in (raw.replace('## 서비스 원인 조사','## 다른 절차'),raw+'\n## 서비스 원인 조사\n중복'):
             with tempfile.TemporaryDirectory() as directory:
                 folder=Path(directory)/'skills/soc-investigate';folder.mkdir(parents=True)
@@ -58,7 +78,7 @@ class WorkflowContract(unittest.TestCase):
             with self.assertRaises(ValueError):w.policy(('soc-query',),directory)
 
     def test_wrong_identity_and_duplicate_marker_are_rejected(self):
-        raw=(Path(w.__file__).parent/'skills/soc-query/SKILL.md').read_bytes()
+        raw=self.skill_file('soc-query').read_bytes()
         for invalid in (raw.replace(b'name: soc-query',b'name: soc-change'),raw+b'\nSOC_WORKFLOW_QUERY_V1'):
             with self.assertRaises(ValueError):w.policy_text('soc-query',invalid)
 

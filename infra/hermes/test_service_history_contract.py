@@ -1203,9 +1203,10 @@ class ServiceReport(unittest.TestCase):
         self.assertEqual(body['untrusted_completed_reads'],self.rows)
         self.assertEqual(body['available_read_descriptions'],{NAME:'원래 도구 설명'})
         self.assertIn('more_evidence=true',messages[0]['content'])
-        self.assertEqual(messages[0]['content'].count(c.SERVICE_STATE_GUIDANCE),1)
-        self.assertIn(c.workflow_policy(('soc-investigate',),section='service-investigation'),messages[0]['content'])
-        self.assertIn('journal_scope=all',messages[0]['content'])
+        self.assertNotIn(c.SERVICE_STATE_GUIDANCE,messages[0]['content'])
+        self.assertIn(c.workflow_policy(('soc-investigate',),section='service-report'),messages[0]['content'])
+        self.assertNotIn(c.workflow_policy(('soc-investigate',),section='service-investigation'),messages[0]['content'])
+        self.assertIn('실패 자체가 확인되지 않았으면',messages[0]['content'])
     def test_inquiry_keeps_same_skill_and_full_evidence_when_selecting_arguments(self):
         value=self.context();schema={'type':'object','properties':{'calls':{'type':'array'}}}
         execution={'tool_calls_used':2,'tool_calls_limit':12}

@@ -20,3 +20,9 @@
 
 현재 확정된 `operating.patch`는 유지한다. 새 `report-provenance.patch`는 특정14원본의 미적용 후보이며 양방향 복원 SHA를 확인했다. 운영 설치기에 직접 적용하지 않는다. 서비스 현재 조회의 기존 확정 결과는 유지한다. 원인·이력 조사는 현재 수집본과 실제 journal을 함께 읽으며 자동 선택한 최근 구간을 초기 확인 범위로 표시한다. 보고에서 근거를 넘는 문장을 제외하더라도 원래 판단·검토 상태와 조회 범위 안내를 유지한다. 모델·MCP·권한·보호 주소·승인·차단 TTL은 이번 보완의 변경 대상이 아니다. [검증·미적용·남은 문제](report-provenance.validation.json) · [공통 동작](../../hermes/service-query-contract.md).
 <!-- /service-report-provenance-candidate-20261119 -->
+
+
+<!-- service-claim-types-candidate-20261119 -->
+
+`claim-types.patch`는 기존 운영 원본17개에 대한 미적용 후보다. 원본/후보 SHA와 양방향 복원을 확인했다. 기존 `operating.patch`의 운영 확정을 대체하지 않는다. 지침을 분리한 첫 실제 추론은 78.191초가 걸렸다. 읽기 3회·모델 호출 5회였으며 자동 시작 설정과 기능 정상 판단에 오류가 남았다. 후속 속성 검사 후보의 실제 추론과 운영 적용은 아직 수행하지 않았다. 기존 운영 소스와 승인 경계는 유지한다. [候補・検証・未適用](claim-types.validation.json)
+<!-- /service-claim-types-candidate-20261119 -->

@@ -700,3 +700,15 @@ B 전용 Docker 데몬과 새 BusyBox 컨테이너를 만들고 Native로 재시
 | 재개 지점 | Hermes·공동 관리 연결, Vector의 실제 수집 경로 확인 |
 
 <!-- /service-identity-publication-20261119 -->
+
+
+<!-- native-identity-publication-20261119 -->
+
+| Native 완료 경계 보완 게시 | 결과 |
+| --- | --- |
+| 내용 커밋·원격 main | `67ed0746ec40d27106f2e6ba296d7a423ad16946` |
+| 실제 원격 일치 KST | `2026-11-19T15:44:02.378562+09:00` |
+| 운영 상태 | 미적용·실제 Native/채팅 검증 미완료 |
+| 작업 상태 | 15:50 KST 전 마감·추가 작업 중단 |
+
+<!-- /native-identity-publication-20261119 -->

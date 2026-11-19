@@ -228,7 +228,11 @@
     "actual Vector component/collection path evidence"
   ],
   "publication": {
-    "state": "prepared; not yet committed or pushed"
+    "state": "content committed and pushed; final publication receipt follows",
+    "content_commit": "67ed0746ec40d27106f2e6ba296d7a423ad16946",
+    "remote_main": "67ed0746ec40d27106f2e6ba296d7a423ad16946",
+    "verified_at_kst": "2026-11-19T15:44:02.378562+09:00",
+    "credential_source": "project local credential, per-Git-process environment only; helper/trace disabled"
   },
   "installer_regression": {
     "suite": "deployment.tests.test_soc_management",

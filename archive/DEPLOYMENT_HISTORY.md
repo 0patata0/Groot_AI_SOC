@@ -2425,3 +2425,15 @@ Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확�
 
 [검증·미적용](../infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](../infra/validation/service-query/service-identity.validation.json).
 <!-- /native-identity-boundary-20261119 -->
+
+
+<!-- native-identity-publication-20261119 -->
+
+| Native 완료 경계 보완 게시 | 결과 |
+| --- | --- |
+| 내용 커밋·원격 main | `67ed0746ec40d27106f2e6ba296d7a423ad16946` |
+| 실제 원격 일치 KST | `2026-11-19T15:44:02.378562+09:00` |
+| 운영 상태 | 미적용·실제 Native/채팅 검증 미완료 |
+| 작업 상태 | 15:50 KST 전 마감·추가 작업 중단 |
+
+<!-- /native-identity-publication-20261119 -->

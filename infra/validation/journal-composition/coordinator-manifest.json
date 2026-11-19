@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "isolated_completion_and_current_receipt_candidate_not_deployed",
+  "status": "native_collection_reference_candidate_not_deployed",
   "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
   "witness_manifest_sha256": "e42296de7b89989b6b5379d8c1cf3cb916bd7c7bc44c25ecf1b09d4b9f3e755b",
   "source_sha256": {
@@ -8,7 +8,7 @@
     "release_reader.py": "ada6d7358233066be9c7292af9f668d8b5ca13c4c15a0d79098de5419ef9552c",
     "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
     "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
-    "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57",
+    "release_services.py": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801",
     "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
     "release_storage.py": "20f28e00b21c7266de4923302122256bf20068fd8b811cba2fd6bdd0a7e02958",
     "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
@@ -22,7 +22,7 @@
     "test_release_reader.py": "bc17d3ab111ae65ab878f811b199e2b8fabce16665de55ceac30e2aa39f60e14",
     "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
     "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
-    "test_release_services.py": "e526f30dfa2f3cdab6fc8181915f785854163801e62a0e60b63c728ff71a9f96",
+    "test_release_services.py": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7",
     "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
     "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
     "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
@@ -73,7 +73,7 @@
   },
   "scope": "Fixed root-only coordination plus accepted-outcome cleanup and read-only current-installation verification. Original initial receipts are preserved, including B prepared-only provenance. Official structure and fixture acceptance do not establish operating or SOC detection accuracy.",
   "known_unfinished": [
-    "Native systemd, reboot fences, independent recovery and production root-entry success have not been validated.",
+    "Operating deployment, reboot fences, actual host reboot and production recovery remain unvalidated; disposable PID1 root-entry/recovery evidence is recorded separately.",
     "Fresh exact operating payload approval, source/schema/model/permission compare, actual MCP and both-bot chat acceptance remain.",
     "Completion artifacts use operator attestations; fixture acceptance records do not prove any real bot or operating verification."
   ],
@@ -90,7 +90,7 @@
     "reader": 9,
     "mcp_launcher": 5,
     "state": 24,
-    "services": 22,
+    "services": 28,
     "controls": 14,
     "storage": 17,
     "helpers": 15,
@@ -106,6 +106,6 @@
     "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
     "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc"
   },
-  "parent_commit": "67ba5ce8b7b85c1f2ab45b7e8296997ad7d2d709",
-  "parent_manifest_sha256": "87d7e33266130de5d31c886b5b49a88a8adf731afdc6699cbd61700ff8dcb36a"
+  "parent_commit": "42cd8d3c18dd6ad286f95e50f36532e36b82c9fe",
+  "parent_manifest_sha256": "a7868339b5b0880f50df42e8538b0d462527b740db08a0db6626f9b287cb2fc6"
 }

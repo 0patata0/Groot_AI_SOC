@@ -1,0 +1,397 @@
+{
+  "schema": 1,
+  "status": "owned_native_workflows_verified_operating_pending",
+  "at_kst": "2026-11-20T07:23:41.357553+09:00",
+  "source_sha256": {
+    "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
+    "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+    "private_full_fixture.py": "c1f3e7ac082a5fd043ad791f2aadf33d124dc91283e30ac76bc1ef5908897713",
+    "private_full_native_probe.py": "e59f63b772e25a8dffbb7e01f7adfb0392d5a43003c571710ae9ab1fcf932e4f",
+    "test_full_native_observation.py": "64e6eee44519e4789d1907f16ebd76e6f245ba6abb6fc22c7963ff7fb1145547",
+    "validate_full_native.py": "bfe1ca38b3858596fce96952349bff3bf8e8d9fe7b99eff7fac29fa449180ed9"
+  },
+  "operator_manifest_sha256": "95aa36d20d63a4a360296aaa32b6ad1f745330854825f338dc38c41889469247",
+  "operator_source_sha256": {
+    "release_files.py": "8ea85437ff7dd4fc40f0e0c47a36b401afa0265d0369bce5b673f2e67a94abe2",
+    "release_reader.py": "ada6d7358233066be9c7292af9f668d8b5ca13c4c15a0d79098de5419ef9552c",
+    "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
+    "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+    "release_services.py": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801",
+    "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
+    "release_storage.py": "20f28e00b21c7266de4923302122256bf20068fd8b811cba2fd6bdd0a7e02958",
+    "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
+    "release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
+    "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
+    "release_lifecycle.py": "eccb3085b048bf1fde3d444fd2e3158077ebbed87316843a27c8ce3495894e50",
+    "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
+    "release_plan.py": "0680d56323b18d27ea0dbe5e1c0b50a66753d335d983ed32b0b6aafc44184509",
+    "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
+    "test_release_files.py": "b1561b85af99f18817f974117ad1fd02acc20f48ddac259ecc54d1621aaced51",
+    "test_release_reader.py": "bc17d3ab111ae65ab878f811b199e2b8fabce16665de55ceac30e2aa39f60e14",
+    "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
+    "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
+    "test_release_services.py": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7",
+    "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
+    "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
+    "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
+    "test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
+    "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
+    "test_release_lifecycle.py": "a75a09e2fdd108902ea4504f8c1756279e7f70ca606d0f7a020f76817c9b209f",
+    "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
+    "test_release_plan.py": "79f312216da9f1bf1ceade1523ab0f3d73bad9d29bf267619407ea1e38b0c487",
+    "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+    "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+    "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+    "release_completion.py": "9d7a2fcf7086e1fab80bf2e70e180bb35c98abd85094947dc6e9c2fb1ae43b91",
+    "test_release_completion.py": "c87d8285fd97ca4c24b6e76e82dd86b07ae69007a0b1d14fa165f90547d7f607"
+  },
+  "payload_source_commit": "42cd8d3c18dd6ad286f95e50f36532e36b82c9fe",
+  "input_sha256": "8b233e73883bda423a33be58aa417da6621725455eb88140bf32196bf7bbc551",
+  "static_payload_sha256": {
+    "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+    "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+    "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+    "scripts/native-payload/a/opt/capstone-diagnostics/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+    "scripts/native-payload/a/etc/systemd/system/capstone-system-diagnostics.service": "370b97d6dea075bf8f5ceabc9c9fbf12eb871a4157a5a304a1664636f10347be",
+    "scripts/native-payload/a/etc/systemd/system/capstone-diagnostic-history-backfill.service": "7475e7fa254afe5da9760ea54b01dac1d7a0dc958a9daaf3537eb7e79dd8f718",
+    "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+    "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+    "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+    "scripts/native-payload/b/opt/capstone-diagnostics/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+    "scripts/native-payload/b/opt/capstone-management/skill-soc-investigate.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+    "scripts/native-payload/b/opt/capstone-management/skill-soc-query.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+    "scripts/native-payload/b/opt/capstone-management/soc_management_controller.py": "3ed03fb7717381e5a065fcc83dda836e766f77d103e012895d92e17541273089",
+    "scripts/native-payload/b/opt/capstone-management/soc_management_run.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "scripts/native-payload/b/opt/capstone-management/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/chat_contract.py": "62bf832c4b194966726edc1a62eb54b8b128db7e247477a653d43d2557a89d17",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/grounding.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/harness.py": "c37c7016c03660527a05b4543a601ecc5b934cd199b4272da49e269658fd43f0",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/query_grounding.py": "cec4d3fcf1f4d8828b77cd3bb59087e7255558ea5de76aa99f754e1bf0a175a1",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/read_contract.py": "14809d9d1f796cbcf3514ce34213bce19960ece56996284cb3086815c8a281fd",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/runtime.py": "d31526a55ab5ac38baa333bcde50a659002ae1adb6783ae89d5507363d1a9069",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/skill-soc-investigate.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/skill-soc-query.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+    "scripts/native-payload/b/opt/capstone-ollama-trial/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+    "scripts/native-payload/b/opt/capstone-review-chat/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+    "scripts/native-payload/b/opt/hermes-data/management-code/run.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/__init__.py": "cec4d3fcf1f4d8828b77cd3bb59087e7255558ea5de76aa99f754e1bf0a175a1",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/alignment.py": "bbb938d546d2ced5cadb970faf76d527a5395ef36b36dbb297d3c18b4bc9fe47",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "62bf832c4b194966726edc1a62eb54b8b128db7e247477a653d43d2557a89d17",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "c37c7016c03660527a05b4543a601ecc5b934cd199b4272da49e269658fd43f0",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/grounding.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/read_contract.py": "14809d9d1f796cbcf3514ce34213bce19960ece56996284cb3086815c8a281fd",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+    "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+    "scripts/native-payload/b/opt/mcp/system-diagnostics-mcp.py": "81bb24ffa355646ca2d19cd99f2b694f45430c03f3d35bc20b7aab41094a695a",
+    "scripts/native-payload/b/etc/systemd/system/capstone-system-diagnostics.service": "ca37a1906ef6a2d02c105923de86d804df621455d89b6cef5a83106d7c07a9b8",
+    "scripts/native-payload/b/etc/systemd/system/capstone-diagnostic-history-backfill.service": "c1ae062e6488021dd248b0e19ef68c53ac423b72b59bcffb1487081a46ea4321",
+    "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+    "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+    "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+    "scripts/native-payload/c/opt/capstone-diagnostics/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+    "scripts/native-payload/c/etc/systemd/system/capstone-system-diagnostics.service": "671645ed2cd489da113e762104cca50e4701f8ee01490b3e0aef271d62af7df6",
+    "scripts/native-payload/c/etc/systemd/system/capstone-diagnostic-history-backfill.service": "e7290ee1fa223c1ed7cc055dc268780caaef11756f51f034844eaaf1678936fe"
+  },
+  "dynamic_payload_rows": {
+    "reader": 3,
+    "mcp_launcher": 1,
+    "integrity_receipts": 2
+  },
+  "candidate_change": {
+    "purpose": "Keep completed collection oneshot results observable through the unchanged execution gate.",
+    "service_regressions_before": 22,
+    "service_regressions_after": 28,
+    "root_helper_count": 19,
+    "allowed_targets": [
+      "capstone-system-diagnostics.service",
+      "capstone-diagnostic-history-backfill.service"
+    ],
+    "bus": "unix:path=/run/dbus/system_bus_socket",
+    "method_timeout_usec": 2000000,
+    "commands_or_permissions_added": false
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "coordinator_components": 80,
+    "coordinator_modified_sources": 2,
+    "validation_before": 85,
+    "validation_after": 91,
+    "with_static_payload": 135,
+    "always_on_chars": 16917,
+    "always_on_char_delta": 0
+  },
+  "regressions": {
+    "mac": {
+      "complete": true,
+      "tests": 258,
+      "skipped": 0,
+      "source_unchanged": true,
+      "platform": "darwin"
+    },
+    "linux": {
+      "complete": true,
+      "tests": 258,
+      "skipped": 0,
+      "source_unchanged": true,
+      "identity": {
+        "egid": 50123,
+        "euid": 50123,
+        "gid": 50123,
+        "supplementary_groups": [],
+        "uid": 50123
+      }
+    },
+    "changing_read_predicate_tests": 8,
+    "ast_files": 6,
+    "negative_cli_cases": 3
+  },
+  "verified_cases": {
+    "deadline-r1": {
+      "status": "verified",
+      "reason": null,
+      "observed_at_kst": "2026-11-20T07:03:23.962386+09:00",
+      "raw_result_sha256": "540c04311b88c5347b33bf57c4066cd5d8381819f32c7909b201331ddcb9cd1f",
+      "memory_peak_bytes": 431349760,
+      "pids_peak": 125,
+      "input_files_removed": 52,
+      "input_source_SHA_unchanged": true,
+      "workspace_removed": true,
+      "role_cgroups_empty": true,
+      "operating_deployment": false,
+      "actual_host_reboot": false,
+      "actual_MCP_or_bot_acceptance": false,
+      "input_manifest_sha256": "cc9fad5242b30aa6bb45b090ec486b0c0dcc38d71c1ee6ee5a4d9f2f444867f0",
+      "matches_current_operator_sources": true
+    },
+    "partial-r1": {
+      "status": "verified",
+      "reason": null,
+      "observed_at_kst": "2026-11-20T07:09:51.149709+09:00",
+      "raw_result_sha256": "6271938611bf3f223893be5397fdb351bd20508c79799851450cfca7ea61f172",
+      "memory_peak_bytes": 363192320,
+      "pids_peak": 126,
+      "input_files_removed": 52,
+      "input_source_SHA_unchanged": true,
+      "workspace_removed": true,
+      "role_cgroups_empty": true,
+      "operating_deployment": false,
+      "actual_host_reboot": false,
+      "actual_MCP_or_bot_acceptance": false,
+      "interruptions": {
+        "a": {
+          "status": "interrupted_after_real_replacements",
+          "signal": 9,
+          "actual_replacements": [
+            "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+            "/opt/capstone-diagnostics/diagnostic_history.py"
+          ],
+          "source_or_runtime_patched": false,
+          "backend_patched": false,
+          "host_reboot": false
+        },
+        "b": {
+          "status": "interrupted_after_real_replacements",
+          "signal": 9,
+          "actual_replacements": [
+            "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+            "/opt/capstone-diagnostics/diagnostic_history.py"
+          ],
+          "source_or_runtime_patched": false,
+          "backend_patched": false,
+          "host_reboot": false
+        },
+        "c": {
+          "status": "interrupted_after_real_replacements",
+          "signal": 9,
+          "actual_replacements": [
+            "/opt/capstone-diagnostics/diagnostic_journal_native.py",
+            "/opt/capstone-diagnostics/diagnostic_history.py"
+          ],
+          "source_or_runtime_patched": false,
+          "backend_patched": false,
+          "host_reboot": false
+        }
+      },
+      "input_manifest_sha256": "cc9fad5242b30aa6bb45b090ec486b0c0dcc38d71c1ee6ee5a4d9f2f444867f0",
+      "matches_current_operator_sources": true
+    },
+    "confirmed-r1": {
+      "status": "verified",
+      "reason": null,
+      "observed_at_kst": "2026-11-20T07:12:50.954300+09:00",
+      "raw_result_sha256": "b832f01e29fb7588c1145724a37bd00ade8b82d9ff9612d0f99fdd93f8e4cde7",
+      "memory_peak_bytes": 425713664,
+      "pids_peak": 108,
+      "input_files_removed": 52,
+      "input_source_SHA_unchanged": true,
+      "workspace_removed": true,
+      "role_cgroups_empty": true,
+      "operating_deployment": false,
+      "actual_host_reboot": false,
+      "actual_MCP_or_bot_acceptance": false,
+      "missing_acceptance_denials": {
+        "a": "operator_acceptance_required",
+        "b": "operator_acceptance_required",
+        "c": "operator_acceptance_required"
+      },
+      "input_manifest_sha256": "c37f449cbdbe8581016cf2b6c98ef52e8e1e162466b10e19971b76be0f278afa",
+      "matches_current_operator_sources": true
+    },
+    "bootstrap-r2": {
+      "status": "verified",
+      "reason": null,
+      "observed_at_kst": "2026-11-20T06:45:05.074628+09:00",
+      "raw_result_sha256": "866da9a7b6f34ceec5ffab3595d05e3d3158dea12e6d863ef210919edf384179",
+      "memory_peak_bytes": 349413376,
+      "pids_peak": 120,
+      "input_files_removed": 52,
+      "input_source_SHA_unchanged": true,
+      "workspace_removed": true,
+      "role_cgroups_empty": true,
+      "operating_deployment": false,
+      "actual_host_reboot": false,
+      "actual_MCP_or_bot_acceptance": false,
+      "input_manifest_sha256": "8d57e6fd1aa5351882abe1fc7d16644498d51f2b7e99ceb8a9853a419580d743",
+      "matches_current_operator_sources": false,
+      "scope": "Reference/GC causal diagnostic before production primitive was shared; not a full workflow."
+    },
+    "bootstrap-r5": {
+      "status": "verified",
+      "reason": null,
+      "observed_at_kst": "2026-11-20T07:23:00.298624+09:00",
+      "raw_result_sha256": "3c925bb2fca3de711c7139548b67ff9ac1c1e121759090b79d14cb1fb387d46a",
+      "memory_peak_bytes": 418365440,
+      "pids_peak": 111,
+      "input_files_removed": 52,
+      "input_source_SHA_unchanged": true,
+      "workspace_removed": true,
+      "role_cgroups_empty": true,
+      "operating_deployment": false,
+      "actual_host_reboot": false,
+      "actual_MCP_or_bot_acceptance": false,
+      "linux_identity": {
+        "egid": 50123,
+        "euid": 50123,
+        "gid": 50123,
+        "supplementary_groups": [],
+        "uid": 50123
+      },
+      "linux_regression_complete": true,
+      "input_manifest_sha256": "c85968df1d83a735ffc467c13f1cace5be48c576f11a79cafeb480fd47fb33ea",
+      "matches_current_operator_sources": true
+    }
+  },
+  "source_version_note": "Deadline/partial/confirmed and final bootstrap/Linux regression bind the same32 operator sources. The Linux extension changed only private validators; per-run input hashes preserve those versions. Earlier bootstrap-r2 is a separate prototype causal observation.",
+  "preserved_failures": [
+    {
+      "case": "previous_partial-r5",
+      "reason": "B backup host_operation_busy, exit75",
+      "automatic_mutation_retry": false
+    },
+    {
+      "case": "previous_deadline-r1/r2",
+      "reason": "Completed oneshot results garbage-collected before verification"
+    },
+    {
+      "case": "bootstrap-r1",
+      "reason": "Private D-Bus config lacked listen address",
+      "own_inputs_removed": 52
+    },
+    {
+      "case": "bootstrap-r3",
+      "reason": "Regression manifests absent from private code directory",
+      "own_inputs_removed": 52
+    },
+    {
+      "case": "bootstrap-r4",
+      "reason": "Whole regression child exceeded90s; per-profile logs not retained before cleanup",
+      "own_inputs_removed": 52
+    }
+  ],
+  "bounded_test_limits": {
+    "memory_max_bytes": 1073741824,
+    "tasks_max": 384,
+    "cpu_quota_percent": 100,
+    "workflow_runtime_max_seconds": 180,
+    "bootstrap_runtime_max_seconds": 300,
+    "regression_child_timeout_seconds": 210,
+    "regression_profile_timeout_seconds": 150,
+    "instruction_wait_seconds": 240,
+    "regression_controller_wait_seconds": 220
+  },
+  "unfinished": [
+    "State/durable-intent reconciliation contract before any bounded retry after backup exit75.",
+    "Native accepted completion cleanup/current, actual reboot, long-term recovery and operating deployment.",
+    "Fresh exact full payload approval, live source/schema/model/permissions compare, collection/MCP/both-bot acceptance.",
+    "Independent new-server installation, SOC accuracy and attack/detection/response E2E. Attacks remain paused."
+  ],
+  "preserved": {
+    "operating_source_writes": 0,
+    "model_calls": 0,
+    "new_mac_packages": 0,
+    "operating_approval_or_roles_changed": false,
+    "presentation_edits": 0,
+    "attack_or_training_runs": 0
+  },
+  "publication": {
+    "state": "not_published",
+    "local_evidence": "Excluded from Git; public hashes and summaries only."
+  },
+  "fresh_read_after_tests": {
+    "at_kst": "2026-11-20T07:25:42.797049+09:00",
+    "hosts": {
+      "a": {
+        "targets": 12,
+        "source_metadata_unchanged": true,
+        "observed_at_kst": "2026-11-20T07:24:07.231780+09:00"
+      },
+      "b": {
+        "targets": 41,
+        "source_metadata_unchanged": true,
+        "observed_at_kst": "2026-11-20T07:24:07.627717+09:00"
+      },
+      "c": {
+        "targets": 12,
+        "source_metadata_unchanged": true,
+        "observed_at_kst": "2026-11-20T07:24:07.542363+09:00"
+      }
+    },
+    "owned_units_absent": 8,
+    "operating_writes": 0
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-20T07:33:32.658429+09:00",
+    "task_root": "/private/tmp/capstone-full-native-apply-20261119-xm5ksfjp",
+    "regular_files_removed": 4625,
+    "bytes_removed": 73093991,
+    "links_removed": 0,
+    "root_absent": true,
+    "process_audit_rows": 828,
+    "active_owned_processes": 0,
+    "G_Harness2_preserved": true,
+    "humanize_skill_preserved": true,
+    "source_and_logs_preserved_in_local_evidence": true,
+    "prior_cleanup_guard": "Full stat equality refused because directory read may change atime; no deletion occurred before identity-only validation."
+  },
+  "local_review": {
+    "defect_first": "primary-agent source review; review-agent skill unavailable",
+    "open_findings": 0,
+    "semgrep": "not run; not installed in approved environment; no Mac installation",
+    "humanize": {
+      "run_id": "2026-11-20-002-5af4",
+      "route": "light",
+      "change_rate_percent": 0.6,
+      "grade": "B",
+      "self_checks_passed": 6,
+      "gate_exit": 0
+    }
+  },
+  "prepublication_scan": {
+    "tracked_paths": 2478,
+    "unsafe_paths": 0,
+    "known_non_credentials": 10,
+    "new_findings": 0,
+    "values_or_snippets_saved": false
+  }
+}

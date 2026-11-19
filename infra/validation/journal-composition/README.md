@@ -1,15 +1,11 @@
 # 서비스·호스트 journal 통합 후보
 
-<!-- coordinator-native-systemd-20261119 -->
-후속으로 A/B/C27유닛을 후보 Native의 운영 모드로 읽었고 관리자231의 고유 시험 유닛과 C 합성 파일에서6조건을 통과했다. 원래 활성 유닛만 재개하고 별도 타이머가 중단된 합성 파일2개를 복구했으며 시험 유닛·작업 파일은 제거했다. 운영 root 진입점·Lifecycle.recover·실제 재부팅·B Docker/SSH·전체 캐시/전역 복구는 미검증이다. [새 검증 원장](native-systemd.validation.json) · [시험용 변환과 실행 조건](COORDINATOR.md#실제-systemd의-격리-시험).
-<!-- coordinator-private-backends-20261119 -->
-<a id="coordinator-private-backends-20261119"></a>
-기존 PID1 기반을 확장해 역할별27유닛 읽기, 실제 UID50124의 SSH 조회와 잘못된 호스트 키 거절, B 전용 Docker 컨테이너의 Native 정지·재개를 확인했다. 시험용 유닛·계정·키·이미지를 사용했으며 고정 root 실행기·Lifecycle.recover·소스/캐시·전역 복구와 실제 호스트 재부팅은 아직 검증하지 않았다.
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+고정 root 진입점과 실제50소스의 격리 통합을 확인했다. 부분 적용에서 두 파일 교체 뒤 SIGKILL한 자식의 durable intent를 독립 복구 타이머가 처리했고, 기한 복구·원래 소비자 재개와 정상 확정/재개도 통과했다. 수집 결과는 RefUnit 유지 중 읽고 기존 실행 기준을 적용한다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
 
-[검증 원장](private-backends.validation.json) · [실행 조건과 남은 작업](COORDINATOR.md#coordinator-private-backends-20261119).
-<!-- /coordinator-private-backends-20261119 -->
-
-<!-- /coordinator-native-systemd-20261119 -->
+아래252검사·이전 backend 미연결 문구는 당시 범위다. 최신 검증은 [새 원장](private-full-native.validation.json)과 [현재 조정 조건](COORDINATOR.md#coordinator-collection-reference-20261120)을 따른다. 실제 호스트 재부팅·운영 적용·MCP/봇 인수와 Native 정리/current는 미완료이며 인수 누락 시 완료 거절을 확인했다.
+<!-- /coordinator-collection-reference-20261120 -->
 
 후속 [조정 실행기](COORDINATOR.md)에 50소스·39제어 문서와 정리·현재 설치 검증까지 연결했다. 동일 소스로 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0과 합성 root namespace5조건을 확인했다. 운영 적용·운영 유닛 정지/재개·실제 재부팅/독립 복구·정확 승인·MCP/두 봇 채팅은 미완료다. [정본 동기화](CANONICAL.md)와 [읽기/재개 판정](WITNESS.md)의 과거 근거를 보존하며 아래 이전 단계의 미연결 문구는 당시 범위로 읽는다.
 

@@ -28,33 +28,14 @@
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-native-systemd-20261119 -->
-A/B/C27유닛의 운영 모드 읽기와 별도 systemd 합성6조건을 확인했다. 다음에는 운영 root 진입점과 Lifecycle.recover, 캐시·전역 정지·SSH 자식·B Docker를 연결한 전체 복구 및 실제 재부팅 조건을 검증한다. 시험용 변환을 운영 검증으로 승계하지 않는다. 현재 소스·모델·MCP 스키마·권한을 다시 대조하고 전체 payload 동결→공식 Harness²/회귀→정확 승인→관리자 경유 적용→새 실제 MCP·두 봇 채팅을 따른다. 기존 관리19/journal9 승인과 NTP390a 승인 대기는 그대로 유지한다.
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+조정 실행기의 수집 결과 보존 후보는 격리 환경에서 부분 적용 SIGKILL 복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
 
-[확인한 범위와 미검증 항목](infra/validation/journal-composition/native-systemd.validation.json)
-<!-- coordinator-private-backends-20261119 -->
-<a id="coordinator-private-backends-20261119"></a>
-격리 PID1 안에서 역할별27유닛 읽기·새 키의 SSH4경로와 B 전용 Docker의 실제 Native 정지·재개를 확인했다. 다음에는 고정 root 진입점에 동결한50소스와 캐시, 실제 reader 프로토콜·Context.peers를 연결한다. 정상 전환뿐 아니라 적용 중단·독립 Lifecycle.recover·전역 복구 근거·원래 소비자 재개·정리/current를 같은 backend로 검증한다.
+다음은 backup 보류75의 잠금·durable intent를 대조하는 계약과 Native의 인수 후 정리/current를 검증한다. 실제 부팅과 운영 적용은 정확한 전체 payload 승인·현재 소스/모델/MCP 스키마/권한 대조 뒤 진행하며 새 수집→실제 MCP→Hermes·Ollama 새 채팅을 별도로 인수한다. 이전 승인이나 격리용 합성 인수를 재사용하지 않는다. 공격·학습 중단, 논문 목차91불일치와 발표자료 추가 제작 중단은 유지한다.
 
-이번 합성 유닛·계정·키·BusyBox 이미지의 통과를 실제 운영 payload의 성공으로 바꾸지 않는다. 정확 승인과 관리자231 경유 적용·새 MCP/두 봇 채팅, 실제 호스트 재부팅·새 OS 전체 설치는 별도다. 발표자료 추가 생성·수정과 공격·학습 중단을 유지한다.
-
-[검증 원장](infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
-<!-- /coordinator-private-backends-20261119 -->
-
-<!-- coordinator-native-systemd-publication-20261119 -->
-| 조정 실행기 검증 게시 | 확인 값 |
-|---|---|
-| 내용 커밋 | `b7e1b739a7e17aef5a05e7b4ff7a1607c15b28df` |
-| 실제 원격 main 일치 | `2026-11-19T08:22:12.662160+09:00` |
-| 공개 범위 | 새 검증기·원장·설명/현황10파일. 운영 runtime 소스 변경0 |
-| 실제 읽기 | A6/B17/C4의27유닛, 운영 모드 생성자·카탈로그·속성 해석 |
-| 별도 systemd | 합성6조건·다른 PID의 파일2개 복구9.421초·원래 활성 집합만 재개 |
-| 정리 | 자체 유닛·파일·링크·폴더 부재, 별도07:50:51 KST 읽기 확인 |
-| 게시 전 검사 | 추적2435·위험경로0·기존 합성/코드10·신규0·명령 범위 음성6 |
-| 문서/자료 | 윤문006-5121 light·0.01%·B·6/6·gate0. 기존 발표3SHA·판넬23SHA 보존 |
-| 미검증 | 운영 root/Lifecycle·실제 재부팅/SSH·B Docker·캐시/전역 복구·정확 승인·새 MCP/봇 |
-<!-- /coordinator-native-systemd-publication-20261119 -->
-<!-- /coordinator-native-systemd-20261119 -->
+[현재 근거와 미완료](infra/validation/journal-composition/private-full-native.validation.json)
+<!-- /coordinator-collection-reference-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 기존 발표자료를 유지하고 추가 생성·수정은 사용자 명시 요청 전까지 진행하지 않는다. 판넬 문구와 배치용 자료는 보존한다. 전체 실전 운용·논문·최종 발표 목표는 활성 상태이며 이 지시를 목표 전체의 일시정지나 운영 후보 승인으로 확대하지 않는다.

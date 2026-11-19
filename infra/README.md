@@ -1,5 +1,12 @@
 # infra — 서버 구성·배포
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+수집 oneshot의 결과 속성이 정리되는 문제를 고정 system-bus 참조로 보완했다. B의 세 격리 PID1에서 실제 systemd·SSH·별도 Docker·50소스와 합성 캐시를 사용해 고정 root 진입점의 부분 적용 중단/복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+
+운영 설정·권한·모델은 바꾸지 않았다. backup 보류75의 재시도 계약, Native 정리/current와 실제 재부팅·정확 승인·운영 MCP/두 봇 인수는 남아 있다. [조정 실행기 검증](validation/journal-composition/private-full-native.validation.json).
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 [Kali 레드팀 Hermes](hermes/kali-redteam/README.md)는232·233에 오프라인으로 설치했다. 추론은 DGX111의 기존40B와 같은 가중치를 쓰는 Hermes용65536태그에 연결한다. 관리자231 경유 태그 추가 뒤 기존5모델 digest와 가중치 blob을 대조했다. B의 기존 Thor 추론 경로는 유지한다. SOUL 로드·무도구 모델 응답을 확인했으며 공격·시나리오 중단과 기존 관리·승인 경계는 계속 적용한다.

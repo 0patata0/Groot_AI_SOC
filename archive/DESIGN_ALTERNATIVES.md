@@ -1,5 +1,14 @@
 # 설계 대안 이력
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+## 2026-11-20 수집 결과 보존과 격리 통합의 선택
+
+systemctl start의 성공만으로 수집 코드 실행을 인정하지 않는다. oneshot이 정리돼 실행 속성을 잃는 현상을 RefUnit 유지/해제와 조건 불충족 유닛으로 대조했다. RemainAfterExit나 조건/시각 gate 완화 대신 고정 수집 유닛의 참조를 결과 조회까지 유지한다. 버스 주소·두 메서드·2초 호출 한도를 고정하고 연결/해제 실패와 fixture 경계를 검사한다.
+
+기존 PID1·실제 SSH·별도 Docker를 재사용했다. 두 파일의 실제 교체와 durable apply intent를 관측한 뒤 같은 자식만 중단해 원본 소스/캐시·원래 소비자를 대조했다. 운영 모델/봇·실제 데이터·호스트 재부팅의 증거로 확대하지 않는다. backup75의 임의 쓰기 반복은 허용하지 않으며 상태/intent를 대조한 재시도 계약은 남았다. [원장](../infra/validation/journal-composition/private-full-native.validation.json).
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 ## 2026-11-20 Kali 설치·40B context 선택

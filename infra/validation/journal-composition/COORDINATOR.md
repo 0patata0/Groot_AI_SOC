@@ -1,5 +1,35 @@
 # 소스·캐시·소비자 조정 실행기
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+## 고정 root 진입점의 격리 통합과 수집 결과 보존
+
+B의 기존 PID1·SSH·별도 Docker 기반을 확장해 A7/B36/C7의50소스와 합성 캐시를 실제 고정 경로에 배치했다. 운영 소스는 관리자231 경유로 읽은65경로의 SHA·메타데이터에 결속하며 B의 누락된 기준 소스는 B 안에서만 읽었다. 운영 설정·자격·대화 DB·원시 journal은 반입하지 않았다. 소비자·승인·계정·키·이미지와 캐시는 시험용이다.
+
+부분 적용 시험은 같은 실행기 자식의 renameat/renameat2 종료를 ptrace로 관측했다. 두 승인 대상의 실제 after SHA와 applying/pending apply를 확인한 뒤 그 자식만 SIGKILL했다. 실행기·backend를 패치하지 않았으며 독립 복구 뒤 원본50소스/캐시와 원래 활성 소비자·동일 Docker CID/이미지를 대조했다. 이는 프로세스 유실 시험이며 전원 유실·호스트 재부팅 시험은 남아 있다.
+
+기한 시험은 apply/verify 뒤 독립 원복을, 정상 시험은 A/C 뒤 B의 소스 확정과 재개를 확인했다. collection/MCP/Hermes/Ollama의 실제 인수 근거 없이 completion_prepare를 요청했다. 세 역할 모두 operator_acceptance_required로 거절됐다. 정리/current의 Native 성공과 실제 운영 인수는 별도 조건이다.
+
+정상 종료한 oneshot이 systemd에서 정리되면서 ConditionResult=no·실행 시각0이 됐다. 수집 검증 실패는 이 현상과 연결됐다. 같은 _UnitReference로 실행 유닛의 RefUnit을 유지하자 세 번의 속성 조회에서 실행 시각·조건 결과가 유지됐고 해제 뒤 정리됐다. 조건 불충족 유닛은 참조 중에도 실행0/no였다. 후보 Native는 두 고정 수집 유닛만 참조하며 기존 조건·종료값·새 실행 시각 기준을 유지한다. 연결 실패나 중첩 획득 실패·본문/해제 예외에서도 연결을 닫고 임의 fallback을 하지 않는다. [systemd Manager의 RefUnit 계약](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.systemd1.html)을 따른다.
+
+같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다. 수집 서비스 검사는22→28이며 별도 상태 관측8검사·AST6파일·부정 CLI3조건을 확인했다. 공식 Harness²의80구성 중2수정, 검증85→91과 정적44payload를 포함한135구성의 상시16,917자 증가0을 대조했다. 구조 통과는 실행·SOC 정확도·운영 인수를 뜻하지 않는다.
+
+검증은 기존 Python·dbus-daemon·libsystemd를 사용했다. 외부 송신 없는 별도 namespace와1GiB·Tasks384·CPU100%를 유지하며 일반 경로는180초다. 비특권 Linux 회귀의 자식210초·관측220초·프로브250초와 bootstrap 전체300초를 구분한다. 기존90초 회귀 제한 실패와 원문 로그를 남기지 못한 한계도 보존했다. 시험 종료 뒤 빈 역할 cgroup·호스트 namespace 유지·52입력 SHA 동일과 자체 작업 폴더 제거를 확인한다. 관측이 running이면 같은 실행만 다시 읽고 새 실행으로 대체하지 않는다.
+
+재현에는 고정42소스와 두 manifest, 검증 기반·full-input.json을 합한52입력이 필요하다. full-input은 schema/source_commit/live_metadata/known_before/after/after_provenance/backend_probe_sha256/scope를 포함한다. live_metadata는 각 고정 경로의 exists/SHA/bytes/uid/gid/mode이며 A/C 기준은 같은 SHA의 확보 소스, B 누락 기준은 B 내부의 고정 경로 읽기만 허용한다. after44파일은 지정 commit의 원본과 unit 생성기로 만들고 reader3·MCP launcher1·무결성 영수증2는 시험 안에서 정확한 전후 SHA에 결속해 생성한다. 자격/키/운영 설정을 입력에 섞지 않는다. 실제 반입 manifest·case별 해시와 결과 원문은 로컬 전용이다.
+
+```sh
+# 승인된 Linux B에서52입력이 있는 별도 작업 디렉터리의 검증기를 사용한다.
+python3 -IB validate_full_native.py --start-owned --case bootstrap
+python3 -IB validate_full_native.py --collect-owned /run/capstone-pid1-<출력된 고유값>
+# partial / deadline / confirmed도 각각 고유 작업으로 실행하고 terminal 수집 뒤 정리한다.
+```
+
+backup75는 성공이나 자동 재시도 권한이 아니다. 잠금·현재 단계·durable intent와 같은 요청의 결과를 대조하는 계약은 남았다. 실제 호스트 재부팅·장기 복구·Native 정리/current·새 OS 설치·운영 payload 정확 승인·현재 소스/모델/MCP 스키마/권한 대조와 새 실제 MCP/두 봇 인수도 남아 있다. 아래252검사와 초기 backend 기록은 당시 근거로 보존한다.
+
+[실행·출처·실패·제한 원장](private-full-native.validation.json)
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 ## 실제 SSH·Docker backend 연결
@@ -85,32 +115,6 @@ Mac에 패키지를 추가하지 않았다. 관리자231을 경유하고 기존 
 
 초기 실패도 보존했다. 실제 Docker 경로는 `/usr/local/bin/docker`였고 재현기에서 Mac 그룹/flat 경로/`Path.chown`에 관한 가정을 고쳤다. namespace 시험은 이미지의 `/opt/data` volume과 작업 경로, 비어 있는 캐시 디렉터리 누락 때문에 처음 실패했다. 자체 bind를 명시하고 디렉터리를 보존해 수정했으며 보호 검사를 완화하지 않았다.
 
-<!-- coordinator-native-systemd-20261119 -->
-## 실제 systemd의 격리 시험
-
-11/19 관리자231 경유 A/B/C의 실제27유닛을 후보 Native의 운영 모드로 읽었다. 생성자·고정 카탈로그·systemctl 속성 해석을 확인했으며 정지·시작 명령은 실행하지 않았다. B의 컨테이너도 선택한 상태 필드만 읽었다.
-
-별도 시험은 관리자231의 기존 systemd255.4와 Python을 사용했다. 고유한 /run 시험 유닛과 C 합성 파일을 만들고 후보40소스·별도 캐시 의존2개 지문을 확인했다. 유닛 이름·파일 경로·그룹·ExecStart, runtime enable과 조회 속성을 명시적으로 변환했다. 시험 영수증을 쓰도록 합성 루트를 ReadWritePaths에 추가했다. 실제 서비스 관리자의 로드·자원 제한·시작 조건·타이머를 사용하지만 운영 진입점과 전체 Lifecycle 복구는 아직 검증하지 않았다.
-
-| 확인 조건 | 실제 관측 |
-|---|---|
-| 수집기와 보조 유닛 로드 | 후보의 유한 자원 값과 상태 검사 통과 |
-| 로드 값 변경 | 시험 watchdog의 MemoryMax를 바꾸자 실행 준비 거절 |
-| 시작 차단 | collection 표식이 있는 시험 reader의 시작을 건너뛰고 PID0·시작 시각 불변 |
-| 중단 뒤 독립 복구 | 시험 apply 프로세스가 파일2개 교체 후 종료23. 다른 PID의 타이머가 약9.42초 뒤 원본 복구·reader 차단 보존 |
-| 재개 | 시작 전 활성 상태였던 시험 reader와 타이머만 재개 |
-| 정리 | 자체 유닛·enable 링크·작업 폴더 제거와 별도 부재 읽기 통과 |
-
-검증기는 Linux root와 명시적 --run-owned-units 옵션을 요구한다. 이번처럼 관리자 경유로 승인된 점검 호스트에 고정 소스와 두 manifest를 함께 전달해 실행한다. Mac 설치나 운영 A/B/C의 고정 유닛 변경은 필요하지 않다.
-
-```sh
-python3 -IB infra/validation/journal-composition/validate_owned_systemd.py --run-owned-units
-```
-
-처음에는 시험 기반 설정의 netlink drop-in 누락과 여러 경로의 변환 누락으로 거절됐다. 다음 시험은 여러 파일이 있는 drop-in 디렉터리를 일찍 지우려다 정리 오류로 종료됐다. 남은 자체39파일을 크기·SHA로 기록하고 제거한 뒤 정리 순서를 수정해6조건을 다시 확인했다. 후속 읽기 검사는 빈 list-unit-files가 종료1을 반환하는 경우를 반영했다. 원본 실행기와 고정 후보는 변경하지 않았다.
-
-운영 root 진입점·Lifecycle.recover·실제 재부팅/SSH 단절·B Docker·캐시/전역 복구·정확 승인·운영 적용·새 MCP/봇 인수는 남는다. [검증 원장](native-systemd.validation.json)은 이 범위를 분리한다.
-<!-- /coordinator-native-systemd-20261119 -->
 
 <!-- coordinator-private-pid1-20261119 -->
 ## 격리 PID1 검증 기반

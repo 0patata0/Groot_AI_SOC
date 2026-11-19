@@ -1,5 +1,18 @@
 # 현황 이력
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+## 2026-11-20 고정 root 진입점 통합과 수집 결과 보존 후보
+
+B 안의 세 격리 PID1에서50소스·합성 캐시·실제 systemd/SSH/별도 Docker를 사용했다. 부분 적용에서 실제 두 교체 뒤 같은 실행기 자식만 SIGKILL했으며 독립 복구·원본 소스/캐시·원래 소비자 재개를 확인했다. 기한 만료의 apply/verify→복구와 정상 확정/재개도 통과했다. 인수 없는 완료는 세 역할 모두 거절됐다.
+
+정상 종료 oneshot 결과의 정리를 RefUnit 유지/해제로 대조하고 고정 수집 유닛의 결과 조회에 연결했다. 기존 실행 gate와19root helper·도구/권한은 유지했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다. 공식 Harness²80구성2수정·검증85→91·정적44payload 포함135·상시16,917자 증가0이다.
+
+deadline-r1 최대431,349,760B/pids125, partial-r1 최대363,192,320B/pids126, confirmed-r1 최대425,713,664B/pids108이었다. 각52입력 SHA·제거·빈 역할 cgroup·자체 작업 폴더 정리를 확인했다. 과거 GC 실패와 backup 보류75, D-Bus listen 누락·회귀 manifest 누락·90초 제한 실패를 보존한다. 최신 검증 확장과 이전 case의 validator 지문은 구분하며 같은 운영 후보32소스만 공통으로 결속한다.
+
+운영 배포·호스트 재부팅·실제 MCP/봇 인수·Native 정리/current와 승인 전 재시도 계약은 남았다. 발표자료·논문·공격·학습과 운영 소스 쓰기0이다. 이전 현재 요약은 Git42cd8d3c의 각 파일과 이 통합 이력에서 복원한다. [새 원장](../infra/validation/journal-composition/private-full-native.validation.json).
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 ## 2026-11-20 Kali232·233 오프라인 Hermes·40B 레드팀 역할

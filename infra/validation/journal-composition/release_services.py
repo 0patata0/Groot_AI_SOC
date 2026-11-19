@@ -5,6 +5,8 @@ fences, a durable baseline and fresh coherent proofs. This module neither
 installs those fences nor authorizes resumption merely because a unit is idle.
 Fixtures require an explicit Python runner; production cannot inject one.
 """
+from contextlib import ExitStack
+import ctypes
 import importlib.util
 import json
 import os
@@ -52,6 +54,65 @@ def catalog(host):
     services=A_SERVICES if host=='a'else B_SERVICES if host=='b'else ()
     return {'collection_timers':COLLECTION_TIMERS,'collection_services':COLLECTION_SERVICES,
             'consumer_timers':timers,'consumer_services':services}
+
+
+class _UnitReference:
+    """Keep a real system-bus sender alive until the unit result is read.
+
+    Native supplies its fixed collection targets. The diagnostic validator
+    also uses this primitive for isolated, explicitly owned test units.
+    No start/stop or property mutation is exposed by this connection.
+    """
+    def __init__(self,name):
+        need(isinstance(name,str)and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.@:-]{0,255}\.service',name),
+             'unit_reference_name')
+        self.name=name;self.bus=ctypes.c_void_p();self.held=False
+        self.lib=ctypes.CDLL('libsystemd.so.0')
+        ptr=ctypes.c_void_p
+        declarations={
+            'sd_bus_new':([ctypes.POINTER(ptr)],ctypes.c_int),
+            'sd_bus_set_address':([ptr,ctypes.c_char_p],ctypes.c_int),
+            'sd_bus_set_bus_client':([ptr,ctypes.c_int],ctypes.c_int),
+            'sd_bus_set_method_call_timeout':([ptr,ctypes.c_uint64],ctypes.c_int),
+            'sd_bus_start':([ptr],ctypes.c_int),
+            'sd_bus_call_method':([ptr,ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p,
+                ctypes.c_char_p,ptr,ctypes.POINTER(ptr),ctypes.c_char_p],ctypes.c_int),
+            'sd_bus_message_unref':([ptr],ptr),'sd_bus_flush_close_unref':([ptr],ptr)}
+        for symbol,(args,result)in declarations.items():
+            function=getattr(self.lib,symbol);function.argtypes=args;function.restype=result
+
+    def method(self,method):
+        need(method in ('RefUnit','UnrefUnit'),'unit_reference_method')
+        reply=ctypes.c_void_p()
+        try:
+            code=self.lib.sd_bus_call_method(self.bus,b'org.freedesktop.systemd1',
+                b'/org/freedesktop/systemd1',b'org.freedesktop.systemd1.Manager',method.encode(),
+                None,ctypes.byref(reply),b's',ctypes.c_char_p(self.name.encode()))
+            need(code>=0,'unit_'+method+'_failed')
+        finally:
+            if reply:self.lib.sd_bus_message_unref(reply)
+
+    def __enter__(self):
+        try:
+            for symbol,args in (
+                ('sd_bus_new',(ctypes.byref(self.bus),)),
+                ('sd_bus_set_address',(self.bus,b'unix:path=/run/dbus/system_bus_socket')),
+                ('sd_bus_set_bus_client',(self.bus,1)),
+                ('sd_bus_set_method_call_timeout',(self.bus,2000000)),
+                ('sd_bus_start',(self.bus,))):
+                need(getattr(self.lib,symbol)(*args)>=0,'unit_reference_connection_failed')
+            self.method('RefUnit');self.held=True;return self
+        except BaseException:
+            if self.bus:self.lib.sd_bus_flush_close_unref(self.bus)
+            self.bus=ctypes.c_void_p();raise
+
+    def __exit__(self,*exc):
+        try:
+            if self.held:self.method('UnrefUnit')
+        finally:
+            self.held=False
+            if self.bus:self.lib.sd_bus_flush_close_unref(self.bus)
+            self.bus=ctypes.c_void_p()
 
 
 class Native:
@@ -161,17 +222,30 @@ class Native:
         """After applied sources and collection-fence removal, before bots."""
         self.run(['/usr/bin/systemctl','daemon-reload'])
         self.collection_resources()
-        old_reader=self.probe('capstone-journal-reader.service')
-        need(old_reader['ActiveState']in ('inactive','failed')and old_reader.get('MainPID','0')=='0','reader_must_be_stopped')
-        self.run(['/usr/bin/systemctl','start','capstone-journal-reader.service'],timeout=15)
-        reader=self.probe('capstone-journal-reader.service')
-        need(reader['ActiveState']=='active'and int(reader.get('MainPID','0'))>1
-             and int(reader.get('ExecMainStartTimestampMonotonic','0'))>int(old_reader.get('ExecMainStartTimestampMonotonic','0')),'reader_not_restarted')
-        for name,timeout in [('capstone-system-diagnostics.service',100)]+([(OPTIONAL,165)]if backfill else []):
-            before=self.probe(name);self.run(['/usr/bin/systemctl','start',name],timeout=timeout);after=self.probe(name)
-            need(after.get('ConditionResult')=='yes'and after.get('Result')=='success'and after.get('ExecMainStatus')=='0'
-                 and int(after.get('ExecMainStartTimestampMonotonic','0'))>int(before.get('ExecMainStartTimestampMonotonic','0')),
-                 'collection_did_not_execute')
+        oneshots=[('capstone-system-diagnostics.service',100)]+([(OPTIONAL,165)]if backfill else [])
+        with ExitStack()as references:
+            # Pin every target before the first start. A successful inactive
+            # oneshot may otherwise be GCed and reloaded with zero timestamps.
+            for name,_ in oneshots:references.enter_context(self.unit_reference(name))
+            old_reader=self.probe('capstone-journal-reader.service')
+            need(old_reader['ActiveState']in ('inactive','failed')and old_reader.get('MainPID','0')=='0','reader_must_be_stopped')
+            self.run(['/usr/bin/systemctl','start','capstone-journal-reader.service'],timeout=15)
+            reader=self.probe('capstone-journal-reader.service')
+            need(reader['ActiveState']=='active'and int(reader.get('MainPID','0'))>1
+                 and int(reader.get('ExecMainStartTimestampMonotonic','0'))>int(old_reader.get('ExecMainStartTimestampMonotonic','0')),'reader_not_restarted')
+            for name,timeout in oneshots:
+                before=self.probe(name);self.run(['/usr/bin/systemctl','start',name],timeout=timeout);after=self.probe(name)
+                need(after.get('ConditionResult')=='yes'and after.get('Result')=='success'and after.get('ExecMainStatus')=='0'
+                     and int(after.get('ExecMainStartTimestampMonotonic','0'))>int(before.get('ExecMainStartTimestampMonotonic','0')),
+                     'collection_did_not_execute')
+
+    def unit_reference(self,name):
+        need(name in ('capstone-system-diagnostics.service',OPTIONAL),'collection_reference_target')
+        if self.fixture:
+            reference=getattr(self.runner,'unit_reference',None)
+            need(callable(reference),'fixture_unit_reference_required')
+            return reference(name)
+        return _UnitReference(name)
 
     def collection_resources(self,*,release_dropins=True):
         need(release_dropins is None or type(release_dropins)is bool,'collection_dropin_scope')

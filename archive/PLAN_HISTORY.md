@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+## 2026-11-20 Native 통합 검증의 범위 갱신
+
+이전 단계의 실제 systemd·고정 root 진입점·부분 실패·독립 복구 공백 가운데 격리 PID1에서 검증한 범위를 갱신했다. 두 파일 교체 뒤 SIGKILL 복구·기한 복구·정상 소스 확정/재개와 인수 없는 완료 거절을 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
+
+다음 범위는 backup 보류75의 상태/intent 대조와 재시도 계약, Native 정리/current·실제 호스트 재부팅·장기 복구다. 운영 payload 정확 승인과 관리자 경유 적용·새 수집/실제 MCP/두 봇 채팅 인수는 계속 별도다. 공격·학습·발표자료 추가 제작 중단은 유지한다. [검증 원장](../infra/validation/journal-composition/private-full-native.validation.json).
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 ## 2026-11-20 레드팀 설치 범위와 후속 시험 조건

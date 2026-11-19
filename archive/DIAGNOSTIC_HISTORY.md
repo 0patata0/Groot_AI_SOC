@@ -1,5 +1,16 @@
 # 진단 탐색 이력
 
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+## 2026-11-20 oneshot 결과 정리와 검증 환경 실패
+
+이전 deadline 시험은 정상 수집 후 ConditionResult=no·실행 시각0 때문에 실패했다. 실제 journal의 수집 완료와 systemd 유닛 정리를 분리해 읽고, 같은 유닛을 RefUnit으로 유지할 때 정상 결과가 남고 해제 뒤 정리되는 것을 확인했다. 조건 불충족 유닛은 유지해도 실행되지 않았다. 실행 기준을 유지한 보완본에서 deadline-r1·partial-r1·confirmed-r1이 각각 세 역할을 통과했다.
+
+bootstrap-r1은 사설 D-Bus listen 주소 누락으로 실패했고 구성 수정 뒤 r2에서 인과 대조가 통과했다. Linux 회귀 확장의 r3는 두 manifest 미반입으로 실패했다. r4는90초 자식 제한을 넘었고 개별 profile 로그는 정리 전에 보존하지 못했다. 이 실패를 삭제하거나 통과로 바꾸지 않았다. r5는 profile별150초와 별개로 전체 자식210초·관측220초·프로브250초·bootstrap300초의 한도와 실패 로그 보존을 적용한다. 메모리1GiB·Tasks384·CPU100%와 운영 경계는 유지한다.
+
+같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다. 과거 partial-r5의 B backup host_operation_busy(75)는 보호 작업과 충돌한 보류이며 A/C의0과 구분한다. 현재 단계와 durable intent를 대조한 쓰기 재시도 계약은 미완료다. 각 실행의 입력·validator SHA, terminal·52입력/작업 폴더 제거와 이전 실패를 [원장](../infra/validation/journal-composition/private-full-native.validation.json)에 연결한다.
+<!-- /coordinator-collection-reference-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 ## 2026-11-20 오프라인 설치와 모델 context 실패·보완

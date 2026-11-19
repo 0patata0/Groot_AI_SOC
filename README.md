@@ -11,16 +11,12 @@ Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 �
 [검수·출력 차이와 남은 쪽번호](archive/DIAGNOSTIC_HISTORY.md#thesis-google-docs-local-sync-20261119) · [직전 표 배치 작업](archive/STATUS_HISTORY.md#thesis-google-docs-table-layout-20261119)
 <!-- /thesis-google-docs-local-sync-20261119 -->
 
-<!-- coordinator-native-systemd-20261119 -->
-조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).
-<!-- coordinator-private-backends-20261119 -->
-<a id="coordinator-private-backends-20261119"></a>
-격리 PID1의 역할별27유닛을 기본 Native로 읽고 SSH4경로와 B 전용 Docker의 실제 정지·재개를 확인했다. 고정 root 진입점·Lifecycle.recover·50소스/캐시 전역 복구·운영 적용·새 MCP/두 봇 인수는 아직 미검증이다.
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+조정 실행기 후보의 수집 결과 보존을 수정하고 B의 세 격리 PID1에서 고정 root 진입점·50소스의 부분 적용 중단/복구·기한 복구·정상 확정/재개를 확인했다. 같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
 
-[검증 원장](infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
-<!-- /coordinator-private-backends-20261119 -->
-
-<!-- /coordinator-native-systemd-20261119 -->
+실제 인수 근거 없이 완료 처리하는 요청은 거절됐다. 운영 적용·호스트 재부팅·MCP/두 봇 인수와 정리/current의 Native 통합은 남아 있다. [검증 원장](infra/validation/journal-composition/private-full-native.validation.json)과 [현재 상태](STATUS.md)에서 과거 backend 시험·운영 읽기와 구분한다.
+<!-- /coordinator-collection-reference-20261120 -->
 
 <!-- panel-content-20261119 -->
 사용자 후속 요청에 따라 판넬 본문을 기존 표시 글자 수1,466자에서2,199자로 정확히50% 늘렸다. 공백과 본문 안 줄바꿈을 포함하고 마지막 줄바꿈1개는 제외한 기준이며 파일 길이는2,200자다. 세 항목의 문장 흐름을 유지하고 Method의 IP·포트·내부 경로·명령 인자는0으로 확인한다. 논문 표2-8·4-4는 셀 원문을 보존해 PNG·SVG·CSV로 재사용하고 Conclusion용 실제 동작 캡처5장을 별도 폴더와 캡션으로 모았다. 캡처는11/4~5의 보존 원본이며 새 실행·촬영은 없다. 판넬38파일은 모두 Git 제외하며 발표자료와 논문 원본은 보존한다.

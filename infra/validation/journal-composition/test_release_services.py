@@ -1,5 +1,6 @@
 """Native action scope and state checks with no operating commands executed."""
 import copy
+from contextlib import contextmanager
 import importlib.util
 import json
 import os
@@ -7,7 +8,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock,patch
 
 SPEC=importlib.util.spec_from_file_location('release_services_tested',Path(__file__).with_name('release_services.py'))
 m=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(m)
@@ -16,6 +17,7 @@ m=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(m)
 class Backend:
     def __init__(self,host='b'):
         self.calls=[];self.rows={};self.skip_collection=False;self.refuse_stop=False;self.fail=False
+        self.references=set();self.reference_events=[];self.fail_reference=None;self.simulate_gc=False
         for names in m.catalog(host).values():
             for name in names:
                 active=name.endswith('.timer')or name in ('capstone-journal-reader.service','capstone-ollama-chat.service','capstone-review-chat.service')
@@ -32,11 +34,24 @@ class Backend:
         self.container={'id':'a'*64,'image':'sha256:'+'b'*64,'running':True,'paused':False,'dead':False,'restarting':False,'pid':100,
                         'restart':{'Name':'unless-stopped','MaximumRetryCount':0}}
 
+    @contextmanager
+    def unit_reference(self,name):
+        if self.fail_reference==name:raise m.Refused('unit_reference_unavailable')
+        self.references.add(name);self.reference_events.append(('ref',name))
+        try:yield
+        finally:
+            self.references.remove(name);self.reference_events.append(('unref',name))
+            if self.simulate_gc:self.rows[name].update(ExecMainStartTimestampMonotonic='0',ConditionResult='no')
+
     def __call__(self,args,*,timeout):
         self.calls.append((list(args),timeout));out=b''
         if self.fail:return subprocess.CompletedProcess(args,1,b'',b'not returned to caller')
         if args[0]=='/usr/bin/systemctl':
-            if args[1]=='show':out='\n'.join(k+'='+v for k,v in self.rows[args[2]].items()).encode()
+            if args[1]=='show':
+                row=self.rows[args[2]]
+                if self.simulate_gc and args[2]not in self.references and row['Type']=='oneshot'and row['ActiveState']=='inactive':
+                    row.update(ExecMainStartTimestampMonotonic='0',ConditionResult='no')
+                out='\n'.join(k+'='+v for k,v in row.items()).encode()
             elif args[1]=='stop'and not self.refuse_stop:self.rows[args[-1]].update(ActiveState='inactive',MainPID='0',SubState='dead')
             elif args[1]=='start':
                 row=self.rows[args[-1]]
@@ -120,6 +135,65 @@ class NativeTests(unittest.TestCase):
         self.backend.skip_collection=True
         self.native.stop('collection')
         with self.assertRaisesRegex(m.Refused,'collection_did_not_execute'):self.native.bootstrap_collection()
+
+    def test_successful_oneshot_survives_gc_until_its_result_is_checked(self):
+        self.backend.simulate_gc=True;self.native.stop('collection')
+        self.native.bootstrap_collection()
+        self.assertEqual(self.backend.reference_events,[('ref','capstone-system-diagnostics.service'),
+                                                       ('unref','capstone-system-diagnostics.service')])
+        self.assertEqual(self.backend.references,set())
+        self.assertEqual(self.backend.rows['capstone-system-diagnostics.service']['ExecMainStartTimestampMonotonic'],'0')
+
+    def test_missing_second_pin_unwinds_first_before_any_publisher_start(self):
+        self.native.stop('collection');self.backend.calls=[];self.backend.fail_reference=m.OPTIONAL
+        with self.assertRaisesRegex(m.Refused,'unit_reference_unavailable'):
+            self.native.bootstrap_collection(backfill=True)
+        self.assertFalse(any(args[1]=='start'for args,_ in self.backend.calls))
+        self.assertEqual(self.backend.references,set())
+
+    def test_reference_scope_and_fixture_adapter_cannot_fall_through(self):
+        with self.assertRaisesRegex(m.Refused,'collection_reference_target'):
+            self.native.unit_reference('sshd.service')
+        self.native.stop('collection');self.backend.calls=[];self.native.runner=self.backend.__call__
+        with self.assertRaisesRegex(m.Refused,'fixture_unit_reference_required'):
+            self.native.bootstrap_collection()
+        self.assertFalse(any(args[1]=='start'for args,_ in self.backend.calls))
+
+    def reference_library(self):
+        library=MagicMock()
+        for name in ('sd_bus_new','sd_bus_set_address','sd_bus_set_bus_client',
+                     'sd_bus_set_method_call_timeout','sd_bus_start','sd_bus_call_method'):
+            getattr(library,name).return_value=0
+        def allocate(pointer):pointer._obj.value=42;return 0
+        library.sd_bus_new.side_effect=allocate
+        return library
+
+    def test_reference_connection_failure_closes_and_cannot_redirect_bus(self):
+        library=self.reference_library();library.sd_bus_start.return_value=-111
+        with patch.object(m.ctypes,'CDLL',return_value=library),\
+             patch.dict(m.os.environ,{'DBUS_SYSTEM_BUS_ADDRESS':'unix:path=/unapproved'}):
+            with self.assertRaisesRegex(m.Refused,'unit_reference_connection_failed'):
+                with m._UnitReference('capstone-system-diagnostics.service'):pass
+        self.assertEqual(library.sd_bus_set_address.call_args.args[1],b'unix:path=/run/dbus/system_bus_socket')
+        library.sd_bus_call_method.assert_not_called()
+        library.sd_bus_flush_close_unref.assert_called_once()
+
+    def test_reference_is_released_on_body_exception(self):
+        library=self.reference_library()
+        with patch.object(m.ctypes,'CDLL',return_value=library):
+            with self.assertRaisesRegex(ValueError,'body_failure'):
+                with m._UnitReference('capstone-system-diagnostics.service'):
+                    raise ValueError('body_failure')
+        self.assertEqual([call.args[4]for call in library.sd_bus_call_method.call_args_list],
+                         [b'RefUnit',b'UnrefUnit'])
+        library.sd_bus_flush_close_unref.assert_called_once()
+
+    def test_reference_release_failure_still_closes_connection(self):
+        library=self.reference_library();library.sd_bus_call_method.side_effect=[1,-5]
+        with patch.object(m.ctypes,'CDLL',return_value=library):
+            with self.assertRaisesRegex(m.Refused,'unit_UnrefUnit_failed'):
+                with m._UnitReference('capstone-system-diagnostics.service'):pass
+        library.sd_bus_flush_close_unref.assert_called_once()
 
     def test_resource_mismatch_blocks_publishers_before_the_first_start(self):
         self.native.stop('collection');self.backend.calls=[];self.backend.rows[m.OPTIONAL]['MemoryMax']='infinity'

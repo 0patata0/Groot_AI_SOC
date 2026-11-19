@@ -65,53 +65,18 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-native-systemd-20261119 -->
-조정 실행기 후보의 실제 읽기와 별도 systemd 시험을 진행했다. 관리자231 경유 A6/B17/C4의27유닛을 후보 Native의 운영 모드로 읽어 생성자·고정 카탈로그·속성 해석을 확인했다. 실제 서비스 상태를 읽은 결과이며 운영 정지·재개·자원 제한 검증까지 완료한 것으로 보지 않는다.
+<!-- coordinator-collection-reference-20261120 -->
+<a id="coordinator-collection-reference-20261120"></a>
+검증이 실패한 원인을 확인했다. 수집 oneshot은 정상 종료됐지만 systemd가 그 뒤 결과 속성을 정리했다. 고정 수집 유닛의 RefUnit을 결과 조회까지 유지하도록 후보를 수정했으며 조건 충족·성공 종료·새 실행 시각 기준은 유지했다.
 
-관리자231의 고유 시험 유닛과 C 합성 파일에서는6조건을 통과했다. 로드된 자원 제한과 변경 거절, 시작 차단, 프로세스 중단 뒤 별도 타이머의 복구, 원래 활성 유닛만 재개하는 동작을 확인했다. 합성 파일2개는 약9.42초 후 복구됐고 reader 차단 파일은 유지됐다. 이름·경로·그룹·ExecStart 등을 시험용으로 변환했으므로 운영 root 진입점·Lifecycle.recover·실제 재부팅·B Docker/SSH 검증은 남는다.
+B 안의 별도 PID1 세 역할에서50소스·합성 캐시와 고정 root 진입점을 실행했다. 부분 적용 중 두 실제 파일을 교체한 뒤 SIGKILL한 경우, 독립 복구·원래 소비자 재개가 통과했다. 기한 만료에서도 같은 결과를 확인했다. 정상 적용·검증·A/C/B 소스 확정·재개와 실제 인수 근거가 없을 때 완료 거절도 확인했다. 운영 배포와 실제 호스트 재부팅·MCP/봇 인수는 미수행이다.
 
-실패한 두 시험과 후속 읽기 검사의 가정 오류를 보존했다. 시험 유닛·파일·enable 링크·작업 폴더는 제거했고07:50:51 KST의 별도 읽기로 부재를 확인했다. 운영 소스·캐시·기존 유닛 변경, 패키지 설치, 모델·봇·공격·학습은0이다. 발표자료와 판넬은 보존한다. 공개10파일의 내용 커밋을 게시하고 원격 main 일치를 확인했다. 내용 커밋과 후속 현황 영수증은 구분한다.
+같은 운영 후보32소스로 Mac·Linux가 각각15군258검사·생략0을 통과했다. Linux는 별도 PID1의 UID/GID50123·보조 그룹0에서 실행했다.
 
-[실제 읽기와 격리 시험 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기 조건](infra/validation/journal-composition/COORDINATOR.md)
-<!-- coordinator-private-backends-20261119 -->
-<a id="coordinator-private-backends-20261119"></a>
-B 내부의 세 격리 PID1에 역할별 유닛 이름을 배치하고 기본 Native로 A6/B17/C4의27유닛을 읽었다. A·B에서 다른 두 역할로 SSH 공개키 인증4경로를 통과했고 B의 실제 클라이언트 UID는50124였다. 다른 호스트 키를 넣은 A→B 조회는 거절됐다.
+공식 Harness²는 조정 구성80개 중2소스 수정과 검증85→91, 정적 payload44개를 포함한135구성을 확인했다. 상시16,917자 증가0이며 구조 검사와 실제 실행 근거를 구분한다. 이전 backup 보류75와 상태/intent 대조 뒤 재시도 계약은 남은 항목으로 보존했다. 논문 목차91불일치·운영 인수·최종 발표도 미완료다. Kali 설치 단위의 완료와 공격·학습 중단은 유지한다.
 
-B 전용 Docker 데몬과 새 BusyBox 컨테이너를 만들고 Native로 재시작 정책을 no로 바꿔 정지했다. PID0·정지를 확인한 뒤 같은 CID·이미지의 새 PID와 unless-stopped 정책으로 재개했다. 64MiB/Tasks16·비특권·NoNewPrivileges와 읽기 전용 마운트를 실제 조회했다. 기존42운영 후보 소스와 PID1 기반 검증기는 바꾸지 않았다.
-
-최종12:19:01 KST 실행은 메모리 최대94,498,816바이트·pids.peak67·OOM0이었다. 공식 Harness²는82→85구성·검증 소스3개 추가·기존 수정0·상시16,917자 증가0을 확인했다. 자체9회 시험의 유닛·입력·작업 폴더·cgroup 부재는12:20:45 KST의 별도 읽기로 확인했다.
-
-소비자 유닛과 계정·키·이미지는 시험용이다. 고정 root 진입점·Lifecycle.recover·실제50소스/캐시·전역 복구·호스트 재부팅과 운영 적용·MCP/두 봇 인수는 아직 미검증이다. 발표자료 추가 제작·공격·학습 중단과 정확 승인 대기는 유지한다.
-
-[검증 원장](infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
-<!-- coordinator-private-backends-publication-20261119 -->
-| 격리 SSH·Docker 검증 게시 | 확인 값 |
-|---|---|
-| 내용 커밋 | `2342b4f1dab0f1faa4a85272e43c87b5b6f8ca40` |
-| 실제 원격 main 일치 | `2026-11-19T12:33:47.906527+09:00` |
-| 공개 범위 | 검증 소스3·원장1·관련 문서11의15파일 |
-| 실제 확인 | 역할별27유닛 읽기·SSH4경로·잘못된 호스트 키 거절·Native Docker 정지/재개 |
-| 측정·정리 | 메모리 최대94,498,816B·pids.peak67·OOM0·9회 유닛/폴더/cgroup 부재 읽기 |
-| 구조·게시 전 검사 | 공식 Harness²82→85·기존 수정0·상시 증가0·추적2450·위험0·기존10/신규0 |
-| 미완료 | 고정 root/Lifecycle·50소스/캐시·전역 복구·실제 재부팅·정확 승인·운영 적용·MCP/두 봇 |
-<!-- /coordinator-private-backends-publication-20261119 -->
-
-<!-- /coordinator-private-backends-20261119 -->
-
-<!-- coordinator-native-systemd-publication-20261119 -->
-| 조정 실행기 검증 게시 | 확인 값 |
-|---|---|
-| 내용 커밋 | `b7e1b739a7e17aef5a05e7b4ff7a1607c15b28df` |
-| 실제 원격 main 일치 | `2026-11-19T08:22:12.662160+09:00` |
-| 공개 범위 | 새 검증기·원장·설명/현황10파일. 운영 runtime 소스 변경0 |
-| 실제 읽기 | A6/B17/C4의27유닛, 운영 모드 생성자·카탈로그·속성 해석 |
-| 별도 systemd | 합성6조건·다른 PID의 파일2개 복구9.421초·원래 활성 집합만 재개 |
-| 정리 | 자체 유닛·파일·링크·폴더 부재, 별도07:50:51 KST 읽기 확인 |
-| 게시 전 검사 | 추적2435·위험경로0·기존 합성/코드10·신규0·명령 범위 음성6 |
-| 문서/자료 | 윤문006-5121 light·0.01%·B·6/6·gate0. 기존 발표3SHA·판넬23SHA 보존 |
-| 미검증 | 운영 root/Lifecycle·실제 재부팅/SSH·B Docker·캐시/전역 복구·정확 승인·새 MCP/봇 |
-<!-- /coordinator-native-systemd-publication-20261119 -->
-<!-- /coordinator-native-systemd-20261119 -->
+[검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법·한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-collection-reference-20261120) · [실패 이력](archive/DIAGNOSTIC_HISTORY.md#coordinator-collection-reference-20261120)
+<!-- /coordinator-collection-reference-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 사용자 지시에 따라 발표자료 생성·수정 작업을 중단했다. 메모 글자색 시험은 검사 실패로 종료됐고 완성 후보는 없다. 자체 부분 출력·렌더 캐시를 제거했으며 기존 PPTX·PDF·발표 메모의 SHA가 작업 전과 같음을 확인했다. 판넬 본문1,467자와 기존 이미지·표는 유지한다. Keynote의 메모 대비 보완과 PowerPoint·실제 리허설은 미완료로 남기며 새 발표자료를 만들지 않는다.

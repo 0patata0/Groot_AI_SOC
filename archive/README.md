@@ -1,5 +1,11 @@
 # 과거 기록과 복원 안내
 
+<!-- thesis-korean-abstract-code-tables-20261119 -->
+후반 국문 초록과 코드 표의 변경·검수 결과를 현황·계획·설계 대안·진단 이력에 연결했다. 98쪽·서론1쪽 시작·5장·표 없는 목차와 기존 재현 근거를 유지하며 실제 운영·독립 재구현 완료와 구분한다.
+
+[현황](STATUS_HISTORY.md#thesis-korean-abstract-code-tables-20261119) · [계획](PLAN_HISTORY.md#thesis-korean-abstract-code-tables-20261119) · [설계 대안](DESIGN_ALTERNATIVES.md#thesis-korean-abstract-code-tables-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-korean-abstract-code-tables-20261119)
+<!-- /thesis-korean-abstract-code-tables-20261119 -->
+
 <!-- coordinator-private-pid1-20261119 -->
 11/19 [격리 PID1 기반 검증](../infra/validation/journal-composition/private-pid1.validation.json)의 실제3systemd·기본 Native의 C 카탈로그·독립 타이머·초기 실패와 정리를 [현황 이력](STATUS_HISTORY.md#coordinator-private-pid1-20261119), [계획 이력](PLAN_HISTORY.md#coordinator-private-pid1-20261119), [진단 이력](DIAGNOSTIC_HISTORY.md#coordinator-private-pid1-20261119)에 연결했다. 전체 root 실행기·Lifecycle·SSH/Docker·소스/캐시 전역 복구와 실제 호스트 재부팅은 남는다.
 <!-- /coordinator-private-pid1-20261119 -->

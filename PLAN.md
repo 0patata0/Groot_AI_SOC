@@ -1,5 +1,8 @@
 # Agentic SOC 실행 계획
 
+<!-- thesis-korean-abstract-code-tables-20261119 -->
+국문 초록과 코드 표를 반영한 MD·DOCX·PDF를 현재 정본으로 사용한다. 이전 영문 초록과 출력·생성기·서식 계약은 복구본에 보존한다. 학교 지정값·팀원 사진/학번, 독립 사건 평가·장기 안정성·새 OS 전체 설치·제3자 독립 재구현과 실제 리허설·12/1 발표는 별도다. 발표자료 추가 생성·수정과 공격·학습 중단을 유지한다.
+<!-- /thesis-korean-abstract-code-tables-20261119 -->
 
 <!-- service-report-schema-recovery-20261119 -->
 

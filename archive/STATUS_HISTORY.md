@@ -13803,6 +13803,14 @@ B 안의 격리 역할3개에서 실제 systemd PID1·보호 설정의 서비스
 <!-- /coordinator-private-pid1-publication-20261119 -->
 <!-- /panel-wording-followup-20261119 -->
 
+<!-- thesis-korean-abstract-code-tables-20261119 -->
+<a id="thesis-korean-abstract-code-tables-20261119"></a>
+
+## 2026-11-19 논문 국문 초록과 코드 표
+
+사용자 요청에 따라 후반 영문 Abstract/Keywords를 한글 초록/주제어로 옮기고 코드10블록을 편집 가능한 표로 바꾸었다. 코드 원문과 설정·명령·경로, 실제 수치·승인 조건·실패·미확인은 보존한다. 기존 영문 초록과 정본·생성기·서식 계약은 로컬 복구본에 보관했다. 전체98쪽/본문1~92·151색인·1,980구간 누락0·67표·이미지22SHA를 확인했다. 변경41쪽의 직접 검수와57쪽의 전체 RGB 일치, 짧은 코드 표의 분할 수정은 진단 이력에 구분한다. 고정50소스/4발췌·2,365파일 재현 자료와 발표자료는 보존하며 운영·공격·학습·새 OS 설치·독립 재구현은 이번에 수행하지 않았다.
+<!-- /thesis-korean-abstract-code-tables-20261119 -->
+
 
 <!-- service-report-schema-recovery-20261119 -->
 

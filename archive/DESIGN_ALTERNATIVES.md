@@ -1060,6 +1060,14 @@ Word 문서는 표지·목차와 본문을 두 구역으로 나눈다. 본문 �
 | Git | 검수된 자체 범위만 자동 게시·다른 작업 보존 | [候補・検証・未適用](../infra/validation/service-query/claim-types.validation.json)
 <!-- /service-claim-types-candidate-20261119 -->
 
+<!-- thesis-korean-abstract-code-tables-20261119 -->
+<a id="thesis-korean-abstract-code-tables-20261119"></a>
+
+## 2026-11-19 논문 국문 초록과 코드 표
+
+기존 후반 영문 초록의 위치를 유지하면서 제목·본문·주제어를 국문으로 옮겼다. 앞쪽에 초록을 다시 넣지 않아 서론1쪽 시작과5장 본문을 유지한다. 코드 원문은 Markdown fence로 보존하고 출력물에는 셀1개인 편집 가능한 표를 사용한다. 목차는 표로 바꾸지 않는다. 짧은 코드 표의 분할만 막고 긴 표는 흐르게 하며 글자10pt·행간17.3pt를 유지한다.
+<!-- /thesis-korean-abstract-code-tables-20261119 -->
+
 
 <!-- service-report-schema-recovery-20261119 -->
 

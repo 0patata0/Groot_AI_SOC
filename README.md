@@ -1,8 +1,10 @@
 # Groot_AI_SOC
 
-<!-- thesis-korean-abstract-code-tables-20261119 -->
-논문 후반 초록·주제어를 한글로 바꾸고 코드10블록을 편집 가능한 표 안에 배치했다. 전체98쪽·서론1쪽 시작·5장·표 없는151항목 목차를 유지하며 코드 원문·실제 수치·검증 한계와 고정 재현 자료는 보존한다. 논문 파일은 계속 로컬/Git 제외다.
-<!-- /thesis-korean-abstract-code-tables-20261119 -->
+<!-- thesis-abstract-title-main-toc-20261119 -->
+논문은 Abstract 제목 아래 한글 내용을 두고 일반 목차만 제공한다. 전체95쪽·본문1~92쪽·목차87항목이며 본문 그림·표·편집 가능한 코드10표를 유지한다. 이전98쪽·151색인은 제목 정정과 그림·표 목차 제거 전의 기록이다. 논문 파일은 로컬/Git 제외다.
+
+[현재 검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-abstract-title-main-toc-20261119).
+<!-- /thesis-abstract-title-main-toc-20261119 -->
 
 <!-- coordinator-native-systemd-20261119 -->
 조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).

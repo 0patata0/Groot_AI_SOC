@@ -7172,3 +7172,11 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 [후보·실측·한계](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-split.patch).
 <!-- /service-phase-split-20261119 -->
+
+<!-- thesis-abstract-title-main-toc-20261119 -->
+<a id="thesis-abstract-title-main-toc-20261119"></a>
+
+## 2026-11-19 Abstract 제목 정정과 그림·표 목차 제거
+
+Abstract 제목과 한글 내용, 일반 목차만 반영한 MD·DOCX·PDF를 현재 정본으로 사용한다. 이전 제목과 그림·표 목차가 있는 출력·생성기·서식 계약은 복구본에 보존한다. 학교 지정값·팀원 사진/학번, 독립 사건 평가·장기 안정성·새 OS 전체 설치·제3자 독립 재구현과 실제 리허설·12/1 발표는 별도다. 발표자료 추가 생성·수정과 공격·학습 중단을 유지한다.
+<!-- /thesis-abstract-title-main-toc-20261119 -->

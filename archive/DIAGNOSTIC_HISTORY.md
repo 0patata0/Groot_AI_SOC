@@ -999,3 +999,11 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 [후보·실측·한계](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-split.patch).
 <!-- /service-phase-split-20261119 -->
+
+<!-- thesis-abstract-title-main-toc-20261119 -->
+<a id="thesis-abstract-title-main-toc-20261119"></a>
+
+## 2026-11-19 Abstract 제목과 일반 목차 출력 검수
+
+제목 변경을 제외한 서론 이후 MD 본문과 한글 요약 내용, 코드10블록은 이전 정본과 같다. DOCX는 일반 목차87항목·목차 구간 표0·TOC필드0·중점 연결선87개·전체67표·이미지22개를 대조했다. 95쪽의 꼬리말과 본문1~92쪽, Abstract91쪽을 확인했다. 문서 검수는 실제 운영·새 OS 설치·독립 재구현의 성공 증거가 아니다.
+<!-- /thesis-abstract-title-main-toc-20261119 -->

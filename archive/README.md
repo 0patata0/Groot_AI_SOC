@@ -1,5 +1,11 @@
 # 과거 기록과 복원 안내
 
+<!-- thesis-abstract-title-main-toc-20261119 -->
+논문은 Abstract 제목 아래 한글 내용을 두고 일반 목차만 제공한다. 전체95쪽·본문1~92쪽·목차87항목이며 본문 그림·표·편집 가능한 코드10표를 유지한다. 이전98쪽·151색인은 제목 정정과 그림·표 목차 제거 전의 기록이다. 논문 파일은 로컬/Git 제외다.
+
+[현황](STATUS_HISTORY.md#thesis-abstract-title-main-toc-20261119) · [계획](PLAN_HISTORY.md#thesis-abstract-title-main-toc-20261119) · [설계 대안](DESIGN_ALTERNATIVES.md#thesis-abstract-title-main-toc-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-abstract-title-main-toc-20261119)
+<!-- /thesis-abstract-title-main-toc-20261119 -->
+
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>
 11/19 격리 SSH4경로와 B 전용 Docker의 실제 Native 정지·재개,7회 초기 실패·소유권 가드 보완·9회 정리를 현황·계획·설계·진단 이력에 연결한다. 전체 root Lifecycle·소스/캐시 복구·호스트 재부팅과 운영 인수는 남는다.

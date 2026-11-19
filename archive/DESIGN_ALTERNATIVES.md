@@ -1129,3 +1129,11 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 [후보·실측·한계](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-split.patch).
 <!-- /service-phase-split-20261119 -->
+
+<!-- thesis-abstract-title-main-toc-20261119 -->
+<a id="thesis-abstract-title-main-toc-20261119"></a>
+
+## 2026-11-19 Abstract 제목 정정과 일반 목차 유지
+
+사용자 정정에 따라 Abstract 제목을 유지하고 내용만 한글로 작성한다. 별도 그림 목차와 표 목차를 생성하던 부분을 제거하고 실제 본문 캡션은 보존한다. 목차 번호는 렌더한 PDF의 본문 쪽수에서 구하며 캡션64개의 위치는 출력 검수용 원장에 따로 기록한다. 기존5장 구성·서론1쪽 시작·중점 연결선·코드 표의 서식은 유지한다.
+<!-- /thesis-abstract-title-main-toc-20261119 -->

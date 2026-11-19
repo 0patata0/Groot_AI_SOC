@@ -76,6 +76,15 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 운영 적용·정확 전체승인·현재 소스/모델/MCP 스키마/권한 대조와 실제 수집/MCP/두 봇 인수, 실제 재부팅·장기 복구 및 backup75의 상태/intent 재시도 계약은 남았다. 논문 목차91불일치·독립 재구현·최종 발표도 미완료이며 공격/학습·발표자료 추가 제작 중단을 유지한다.
 
 [검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법과 한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-native-completion-20261120)
+
+| 게시 확인 | 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `5bec562493c2a524abfedf495507a4dcd30b10c0`·14파일 |
+| 실제 원격 main 일치 | `2026-11-20T08:22:17.704401+09:00` |
+| 회귀·실행 범위 | 격리 candidate/baseline의 Native 정리/current; 시험용 인수4항목 |
+| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.06%·B·6/6·gate0 |
+| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험2회 부재; 기존111자료 SHA 동일 |
+| 별도 조건 | 운영 미적용; 정확 승인·실제 MCP/두 봇 인수·재부팅·backup75 계약 미완료 |
 <!-- /coordinator-native-completion-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

@@ -335,8 +335,11 @@
     "attack_or_training_runs": 0
   },
   "publication": {
-    "state": "not_published",
-    "local_evidence": "Excluded from Git; public hashes and summaries only."
+    "state": "content_published",
+    "local_evidence": "Excluded from Git; public hashes and summaries only.",
+    "content_commit": "5bec562493c2a524abfedf495507a4dcd30b10c0",
+    "remote_main_matched_at_kst": "2026-11-20T08:22:17.704401+09:00",
+    "receipt_note": "This record attests the content commit. Final receipt commit and remote match are recorded in local session evidence."
   },
   "fresh_read_after_tests": {
     "at_kst": "2026-11-20T08:01:01.928954+09:00",
@@ -382,7 +385,8 @@
       "change_rate_percent": 0.06,
       "grade": "B",
       "self_checks_passed": 6,
-      "gate_exit": 0
+      "gate_exit": 0,
+      "subsequent_changes": "Technical publication metadata only; explanatory body preserved."
     }
   },
   "prepublication_scan": {

@@ -7,6 +7,15 @@
 complete-candidate와 complete-baseline을 기존 PID1 기반에 추가했다. 새 소스 확정 뒤와 두 실제 교체 중 SIGKILL→독립 원복/재개 뒤에 같은 root CLI의 인수 준비·공통 정리 결정/허가·정리/current가 세 역할 모두 통과했다.50소스와 보호 원본·B prepared-only 출처·변조 pointer 거절·원문 복구·중복 정리의 읽기 결과와 기존 실행 PID/Docker 상태를 대조했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
 
 운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. candidate 최대410,320,896B/pids122·baseline 최대360,669,184B/pids109이며 각52입력/작업 폴더 제거·빈 역할 cgroup과 입력 SHA를 확인했다. 실제 운영 적용·정확 승인·MCP/두 봇 인수·재부팅·장기 복구와 backup75 계약은 남았다. [원장](../infra/validation/journal-composition/private-full-native.validation.json).
+
+| 게시 확인 | 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `5bec562493c2a524abfedf495507a4dcd30b10c0`·14파일 |
+| 실제 원격 main 일치 | `2026-11-20T08:22:17.704401+09:00` |
+| 회귀·실행 범위 | 격리 candidate/baseline의 Native 정리/current; 시험용 인수4항목 |
+| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.06%·B·6/6·gate0 |
+| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험2회 부재; 기존111자료 SHA 동일 |
+| 별도 조건 | 운영 미적용; 정확 승인·실제 MCP/두 봇 인수·재부팅·backup75 계약 미완료 |
 <!-- /coordinator-native-completion-20261120 -->
 
 <!-- coordinator-collection-reference-20261120 -->

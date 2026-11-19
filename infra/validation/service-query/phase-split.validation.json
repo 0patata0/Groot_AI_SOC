@@ -241,7 +241,10 @@
     "Semgrep not executed; CLI unavailable"
   ],
   "publication": {
-    "state": "content prepared; commit and remote verification follow",
+    "state": "content committed and pushed; receipt publication follows",
+    "content_commit": "73bc04ef622f528279472209eb5a010744413e38",
+    "remote_main_at_verification": "73bc04ef622f528279472209eb5a010744413e38",
+    "verified_at_kst": "2026-11-19T13:08:52.687150+09:00",
     "credential_values_included": false
   }
 }

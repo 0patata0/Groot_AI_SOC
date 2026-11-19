@@ -2364,3 +2364,8 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 [후보·실측·한계](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-split.patch).
 <!-- /service-phase-split-20261119 -->
+
+
+<!-- service-phase-split-publication-20261119 -->
+조회 선택·보고 분리 후보의 실패 비교와 정리 기록은 `73bc04ef622f528279472209eb5a010744413e38`로 게시했다. 원격 main 일치는 `2026-11-19T13:08:52.687150+09:00`에 확인했다. 운영 적용은0이며, 실패한 후보를 보존하고 현재 작업을 마무리한다.
+<!-- /service-phase-split-publication-20261119 -->

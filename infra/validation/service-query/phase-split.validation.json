@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-19T12:43:07.924621+09:00",
+  "state": "candidate-not-operating-applied; both model replays failed",
+  "plan_sha256": "eb7b1386cde9186cb3f2228bb4ebf2f58023f6152a84736e1d6c7a62d8856e72",
+  "parent_candidate_sha256": "0e237a5ce931b035c3816f9927264585f75fb3a1c9118cbd289e460ad65ac99d",
+  "model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "mode": "frozen-input-model-replay-not-live-chat",
+  "input_sha256": "9aa412837aa1e7674a590c159538e6c8f1c8148489e603b321707f97046e7d38",
+  "captured_input_bytes": 122350,
+  "capture_actual_read_calls": 3,
+  "capture_prefetch_model_calls": 2,
+  "capture_seconds": 14.257060798,
+  "capture_report_synthesis_calls": 0,
+  "new_tool_dispatches_in_pair": 0,
+  "profiles": [
+    {
+      "profile": "combined",
+      "state": "claim_checks_failed_after_existing_repairs",
+      "seconds": 81.0250290860422,
+      "model_call_count": 3,
+      "remaining_issues": [
+        "diagnostic_duration_claim_unbound",
+        "diagnostic_snapshot_is_not_functional_health",
+        "sample_zero_presented_as_absence"
+      ],
+      "error_type": null
+    },
+    {
+      "profile": "split",
+      "state": "replay_failed",
+      "seconds": 37.82976401108317,
+      "model_call_count": 6,
+      "remaining_issues": null,
+      "error_type": "RuntimeError"
+    }
+  ],
+  "read_choice_report_handoff_loops": 3,
+  "split_report_requested_view": "properties; not a registered view",
+  "replay_clock": {
+    "mode": "recorded-time-replay-only",
+    "recorded_incomplete": [],
+    "reference_at_kst": "2026-11-19T12:21:11.466876+09:00",
+    "wallclock_incomplete": [
+      "a:storage-monitor:current:stale"
+    ]
+  },
+  "new_live_chat_test": false,
+  "operating_applied": false,
+  "operating_source_changes": 0,
+  "operating_restarts": 0,
+  "protected_calls": 0,
+  "chat_posts": 0,
+  "regression": {
+    "mac_candidate": 998,
+    "linux_candidate": 998,
+    "linux_harness2": 38,
+    "linux_installer": 37,
+    "skipped": 0,
+    "overlapping_suites": true,
+    "whole_repository_pass": false,
+    "native_split_runtime_connected": false
+  },
+  "framework": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "files_sha_verified": 140,
+    "manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "surfaces_checked": 3,
+    "structure_is_quality_result": false
+  },
+  "patch": {
+    "path": "phase-split.patch",
+    "sha256": "7a70e677bfdc6265d3ea03f9444751bc1a6f6c0fd51670d5ff00d93baec4aa78",
+    "bytes": 966498,
+    "source_files": [
+      {
+        "path": "/opt/capstone-management/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e2d07693b5b51b8a7f0e89e1959e13d3491d82a66bc7c6c43d911dcc4286d58",
+        "bytes": 231739
+      },
+      {
+        "path": "/opt/capstone-management/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "21af8030394f375fee76ab231be7c2c9bfe3763786d33e26bd27e2f1e09d0dbc",
+        "bytes": 22775
+      },
+      {
+        "path": "/opt/capstone-management/soc_management_controller.py",
+        "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "after_sha256": "5641ecf00dcb9a4d0a48ad07900df701270a34991438f93362fe8aab29d94af8",
+        "bytes": 538882
+      },
+      {
+        "path": "/opt/capstone-management/soc_management_run.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/capstone-management/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e2d07693b5b51b8a7f0e89e1959e13d3491d82a66bc7c6c43d911dcc4286d58",
+        "bytes": 231739
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/grounding.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/query_grounding.py",
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/runtime.py",
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "89594b42c3479ad5587ec4e3207338fc2588dce9119c10b42da8692e4083663a",
+        "bytes": 65046
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "21af8030394f375fee76ab231be7c2c9bfe3763786d33e26bd27e2f1e09d0dbc",
+        "bytes": 22775
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      },
+      {
+        "path": "/opt/hermes-data/management-code/run.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "3e2d07693b5b51b8a7f0e89e1959e13d3491d82a66bc7c6c43d911dcc4286d58",
+        "bytes": 231739
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "21af8030394f375fee76ab231be7c2c9bfe3763786d33e26bd27e2f1e09d0dbc",
+        "bytes": 22775
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      }
+    ],
+    "forward_and_reverse_verified": 17
+  },
+  "cleanup": {
+    "at_kst": "2026-11-19T12:40:53.126546+09:00",
+    "removed_roots": [
+      "/var/lib/capstone-evidence-validation/gateway-9be73b7098",
+      "/var/lib/capstone-report-probe/report-abad1fecef",
+      "/var/lib/capstone-phase-probe/pair-0bb716167e",
+      "/var/lib/capstone-phase-probe/pair-b198bb4fa5"
+    ],
+    "removed_files": 755,
+    "verified_bytes": 27296102,
+    "actor_jobs_terminal": true,
+    "owned_parent_removed_if_empty": true,
+    "operating_and_rollback_roots_removed": 0,
+    "source_config_model_fw_changes": 0
+  },
+  "last_operating_check": {
+    "at_kst": "2026-11-19T12:41:01.580354+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "websocket_connected": true,
+        "worker_alive": true,
+        "checked_at": 1795059647
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "websocket_connected": true,
+        "worker_alive": true,
+        "checked_at": 1795059658
+      }
+    },
+    "identity": {
+      "Id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "Image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "State.StartedAt": "2026-11-18T11:45:01.061267438Z",
+      "RestartCount": 0
+    },
+    "prepared_only": {
+      "/var/lib/capstone-evidence-rollout/20261119-report-fb1dbf7127": {
+        "prepared": true,
+        "applied": false
+      },
+      "/var/lib/capstone-evidence-rollout/20261119-report-f3dd26e662": {
+        "prepared": true,
+        "applied": false
+      }
+    },
+    "operating_source_changes": 0,
+    "operating_restarts": 0,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "chat_posts": 0
+  },
+  "limitations": [
+    "one fixed-input sequential combined/split comparison; not independent quality or current chat E2E",
+    "time to failed result is not latency improvement",
+    "first replay preflight used wall-clock and rejected expired captured snapshot; preserved failure",
+    "replay-only recorded clock did not change production freshness policy",
+    "raw inputs/audits and prototype tests remain local-only",
+    "full Native OpenAI-dependent suite unavailable in Mac global Python",
+    "no new OS installation test",
+    "Semgrep not executed; CLI unavailable"
+  ],
+  "publication": {
+    "state": "content prepared; commit and remote verification follow",
+    "credential_values_included": false
+  }
+}

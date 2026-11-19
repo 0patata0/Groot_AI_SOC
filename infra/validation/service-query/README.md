@@ -19,7 +19,9 @@
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-report-schema-recovery-20261119 -->
+<!-- service-phase-split-20261119 -->
 
-`schema-recovery.patch`는 기존 운영17원본에 대한 미적용 후보다. 앞선 `claim-types.patch`와 `report-provenance.patch`는 과거 후보로 보존하며 `operating.patch`의 확정을 대체하지 않는다. 격리한 실제 추론2회는69.798초와73.658초였으며 각각 읽기3회를 수행했다. 후속 시험에서는 형식 정정이 발동하지 않았고 원인·주기·기능 상태를 과도하게 단정하는 문장이 남아 내용 검증을 통과하지 못했다. 모델 호출은4회와5회였고 보호 작업·새 채팅·운영 변경은0이다. 응답 속도와 정확도의 개선을 입증하지 못했으므로 운영에 적용하지 않았다. 이후 참조 경계를 보완한 최종 후보의 실제 추론도 아직 수행하지 않았다. [검증·후보·미적용](schema-recovery.validation.json).
-<!-- /service-report-schema-recovery-20261119 -->
+조회 선택·최종 보고 분리 후보는 운영 미적용이다. 같은 실제 조회 자료로 통합81.025초·3호출, 분리37.830초·6호출을 측정했지만 각각 내용 검증 실패와 조회 요구/보고 준비 판단 반복으로 유효한 보고를 완성하지 못했다. Mac·Linux 각각998검사·공식 연계38·설치37통과와 실제 품질·속도 개선은 구분한다. 시험용4폴더를 정리했고 운영64파일·봇 연결·작업자·기존 Hermes 실행 식별자는 유지됐다. 이전 schema-recovery 후보도 미적용이며 확정 운영 패치를 대체하지 않는다.
+
+[후보·실측·미완료](phase-split.validation.json) · [17원본 기준 미적용 패치](phase-split.patch).
+<!-- /service-phase-split-20261119 -->

@@ -788,7 +788,9 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-report-schema-recovery-20261119 -->
+<!-- service-phase-split-20261119 -->
 
-Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정 처리가 빠진 것을 확인했다. 원문과 성공한 조회는 보존하고 같은 형식 오류가 반복되면 기존 정정 한도에서 중단하도록 후보를 보완했다. 추가 journal 조회의 필터 생략 공백도 수정했다. 모델이 선택하는 journal에만 errors/all을 명시하도록 하며 MCP 기본값과 권한은 바꾸지 않는다. 동일 입력 스키마를 쓰는 다른 도구에는 진단 전용 제한이 번지지 않으며 참조에 붙은 인자 제약과 원문 데이터도 보존한다. 격리한 실제 추론2회는69.798초와73.658초였으며 각각 읽기3회를 수행했다. 후속 시험에서는 형식 정정이 발동하지 않았고 원인·주기·기능 상태를 과도하게 단정하는 문장이 남아 내용 검증을 통과하지 못했다. 모델 호출은4회와5회였고 보호 작업·새 채팅·운영 변경은0이다. 응답 속도와 정확도의 개선을 입증하지 못했으므로 운영에 적용하지 않았다. 이후 참조 경계를 보완한 최종 후보의 실제 추론도 아직 수행하지 않았다. [검증·후보·미적용](../infra/validation/service-query/schema-recovery.validation.json).
-<!-- /service-report-schema-recovery-20261119 -->
+조회 선택·최종 보고 분리 후보는 격리 비교에서 두 방식 모두 실패해 운영과 초기 설치에 연결하지 않았다. 현재 단일 deploy.sh와 확정된 운영 패치는 유지한다. Mac·Linux 각각998검사, 공식 연계38·설치37통과는 새 OS 전체 설치·현재 채팅 품질·응답 목표 달성의 근거가 아니다.
+
+[후보·실측·미완료](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 미적용 패치](../infra/validation/service-query/phase-split.patch).
+<!-- /service-phase-split-20261119 -->

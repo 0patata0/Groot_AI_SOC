@@ -1,12 +1,16 @@
 # 과거 기록과 복원 안내
 
-<!-- thesis-justify-background-panel-20261119 -->
-논문은 전체99쪽·본문1~96쪽·일반 목차88항목으로 맞췄다. Abstract 제목과 한글 내용, 서론1쪽 시작, 다섯 장 구조와 중점 연결선을 유지한다. 본문과 한글 Abstract에는 양쪽 정렬을 명시하고 머리말 아래와 쪽번호 위에는0.5pt 가로선을 넣었다. 표지는 기존 형식을 유지한다.
+<!-- thesis-local-layout-20261119 -->
+논문은 전체102쪽·본문1~96쪽으로 맞췄다. 표지와 일반·그림·표 목차의 앞부분6쪽에는 번호를 표시하지 않고 PDF7쪽의 서론에서 본문 번호1을 시작한다. 목차는 일반88항목·그림8항목·표58항목이며 표 없이 일반 문단의 오른쪽 탭과 가운데점 · 리더로 연결한다.
 
-판넬은 Abstract·Method·Result·Conclusion의 네 항목으로 정리했다. Abstract451→245자·Method1,199→596자·기존 Conclusion697→Result328자로 줄이고 새 Conclusion104자를 두 문장으로 추가했다. 네 항목의 본문은2,347→1,273자(54.24%)이며 제목·팀원·항목명을 포함한 파일은2,479→1,415자다. 정상90건·공격 대조3건·복합 조사6대화/18읽기/보고 수용3건의 범위와 승인 조건을 보존한다. 결과 화면과 표는 Result에 배치하도록 안내하고 기존 이미지 경로와 다른35파일은 바꾸지 않았다.
+본문 구역의 PAGE 필드는1부터 자동 갱신된다. 페이지 번호는 가운데 정렬한 별도 줄에 놓고 영남이공대학교 사이버보안과는 다음 꼬리말 문단으로 분리했다. 머리말 아래와 꼬리말 위 가로선은0.5pt에서1pt로 굵게 바꿨으며 표지는 번호·머리말·꼬리말 없이 유지한다.
 
-[현황](STATUS_HISTORY.md#thesis-justify-background-panel-20261119) · [계획](PLAN_HISTORY.md#thesis-justify-background-panel-20261119) · [설계 대안](DESIGN_ALTERNATIVES.md#thesis-justify-background-panel-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-justify-background-panel-20261119). 이전 제목·목차 정정 기록은 각 이력의 `thesis-abstract-title-main-toc-20261119` 절에 보존한다.
-<!-- /thesis-justify-background-panel-20261119 -->
+데이터 표58개의 헤더만 가운데 정렬하고 본문 셀과 코드 표는 왼쪽 정렬했다. 한글 어절이 한두 글자씩 끊기는 부분을 줄이기 위해 열 너비와 기존 공백 위치의 줄바꿈을 조정했다. 본문 원고의 바이트와69개 표의 단어·수치·경로, 코드10블록·그림/표 캡션66개·이미지22개·참고문헌32개는 보존했다. 원문2,026구간의 누락은0개다.
+
+논문은 로컬에서만 수정했다. 구글 독스로 업로드하거나 변환본을 수정하지 않았으며 가져온 뒤 탭 리더가 유지되는지는 미확인이다. 판넬 본문·그림·표와 기존 발표자료는 보존했다. 이번 작업은 새 운영 시험·공격 시험·모델 학습을 포함하지 않는다.
+
+[현황](STATUS_HISTORY.md#thesis-local-layout-20261119) · [계획](PLAN_HISTORY.md#thesis-local-layout-20261119) · [설계](DESIGN_ALTERNATIVES.md#thesis-local-layout-20261119) · [검수](DIAGNOSTIC_HISTORY.md#thesis-local-layout-20261119)
+<!-- /thesis-local-layout-20261119 -->
 
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>

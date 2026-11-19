@@ -1123,3 +1123,24 @@ Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확�
 
 Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 peer_observation_unavailable로 실패 종료했다. 작업 경로와 입력52파일의 정리를 확인한 뒤 논문 요청을 우선해 보류했다. 운영 후보 승인과 새 환경 전체 설치·독립 재구현·시간/비용 절감 실측·실제 리허설/발표는 여전히 남아 있다.
 <!-- /thesis-local-layout-20261119 -->
+
+
+<!-- native-identity-parity-20261119 -->
+<a id="native-identity-parity-20261119"></a>
+## 서비스 구성요소 식별 공통 계약 운영 확정
+
+서비스 이름을 실제 구성요소와 구분하는 공통 조회 계약을 Hermes·Ollama·공동 관리 경로에 연결했다. 등록된 논리 서비스의 unit이 LoadState=not-found이면 같은 호스트의 서비스·컨테이너 목록을 확인한다. 목록 조회가 끝나도 구성요소가 확인되지 않으면 unresolved_service_lookup과 needs_review 또는 partial을 유지한다. 명시적인 unit 조회와 실제 loaded 서비스의 현재 상태 조회는 이 구분을 따른다.
+
+공식 Harness² 고정판의 140파일 무결성과 세 실행 경로의 구조를 점검했다. 실제 설치 원본으로 만든 후보는 Linux 회귀검사 944건을 통과했다. 검사군에는 중복이 있으므로 독립적인 공격 사례 944개로 계산하지 않는다. 23개 소스와 SDK 설치 영수증을 관리자231 경유로 B에 반영하고 24개 파일·보호 파일 48개·같은 컨테이너와 이미지를 대조한 뒤 적용을 확정했다. 복구 백업은 보존했으며 원복 타이머는 비활성 상태다.
+
+새 실제 채팅에서 B 서버 Vector 조회는 Hermes 16.892초·Ollama 11.652초에 끝났다. 두 봇은 반환된 188개 서비스·7개 컨테이너의 범위에서 구성요소 미확인을 표시했다. A 서버 Vector 조회는 Hermes 10.398초·Ollama 13.549초였고 loaded·active·running 관측과 수집본 시각을 함께 표시했다. 네 응답은 코드 블록 밖 Markdown 표로 게시됐다. 실제 화면의 표 렌더링은 별도로 확인하지 않았다. Native의 실제 MCP 호출과 구조화된 최종 응답은 해당 대화의 세션 DB로 대조했다. 없는 신규 로드 영수증이나 INFO 로그를 확인 근거로 사용하지 않았다.
+
+이번 결과는 구성요소 식별과 현재 조회에 대한 단회 관측이다. 복합 원인 판단의 정확도, 일반적인 30~60초 응답 보장, 전체 OS 권한 승인·회수, 새 서버 전체 설치와 공격·탐지·대응 E2E 검증은 남아 있다. 보호 정책·권한·모델·MCP 스키마는 유지했다. 발표자료와 기존 논문은 보존했다. 사용자의 마무리 지시에 따라 현재 적용 건의 정리·문서·게시까지만 진행하고 이후 작업은 다음 지시를 기다린다.
+
+| 새 대화 시험 | Hermes | Ollama | 확인 결과 |
+|---|---:|---:|---|
+| B 서버 Vector | 16.892초 | 11.652초 | 구성요소 미확인·추가 검토, 각 5읽기 |
+| A 서버 Vector | 10.398초 | 13.549초 | loaded·active·running 관측, 각 2읽기 |
+
+[검증·적용·한계](../infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](../infra/validation/service-query/identity-parity.patch).
+<!-- /native-identity-parity-20261119 -->

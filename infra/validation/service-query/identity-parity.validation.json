@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-19T18:25:15.310762+09:00",
+  "state": "operating parity applied and confirmed; four fresh actual chat lookups verified; broader causal quality remains unqualified",
+  "candidate_plan_sha256": "78ab740cd1e7401ef6de8ecd537fcadb3e723554997f4a2853ae75d91ff74f5a",
+  "installed_source_overlay": {
+    "/opt/capstone-ollama-trial/chat_contract.py": {
+      "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+      "after_sha256": "3daa8aed29510adf42949894cb208c189e8b55aa65ff7359871762da69558fd2",
+      "bytes": 228091
+    },
+    "/opt/capstone-ollama-trial/grounding.py": {
+      "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "after_sha256": "47c97bf9dd1cd8aa0a508327a53088f3f0a55d95f17f6b635defd47a34b6fc69",
+      "bytes": 306380
+    },
+    "/opt/capstone-ollama-trial/query_grounding.py": {
+      "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+      "after_sha256": "98949624fd7a47153eda3a53d87ff259acc546fcac9e3a817f531f823d00cf92",
+      "bytes": 73909
+    },
+    "/opt/capstone-ollama-trial/harness.py": {
+      "before_sha256": "f07630b6ddb4566d5181d3dfd9bcfa340cf2751419b2afbc06842673a7bddc1a",
+      "after_sha256": "1dcb96faaefaba74e166df98f4cca6f94d816a61d4c2e51656630e77fcb83822",
+      "bytes": 343153
+    },
+    "/opt/capstone-ollama-trial/runtime.py": {
+      "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+      "after_sha256": "98ef62be9c6a6893b46525310b88d921bd22a8a6bcd2c411dde8d2ff6b3b1b87",
+      "bytes": 61838
+    },
+    "/opt/capstone-ollama-trial/skill-soc-query.md": {
+      "before_sha256": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7",
+      "after_sha256": "41a33ec4c151d193d0489d8c168d1dd2635539c10896bd5c5dbe7234a609a7f9",
+      "bytes": 14071
+    },
+    "/opt/capstone-ollama-trial/workflow_contract.py": {
+      "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "after_sha256": "6b578846fe5496f4e1ae7395e1a09286d0bf4f94944be2be2398af19f1d631d3",
+      "bytes": 3754
+    },
+    "/opt/capstone-management/chat_contract.py": {
+      "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+      "after_sha256": "3daa8aed29510adf42949894cb208c189e8b55aa65ff7359871762da69558fd2",
+      "bytes": 228091
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": {
+      "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+      "after_sha256": "3daa8aed29510adf42949894cb208c189e8b55aa65ff7359871762da69558fd2",
+      "bytes": 228091
+    },
+    "/opt/capstone-management/soc_management_run.py": {
+      "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "after_sha256": "47c97bf9dd1cd8aa0a508327a53088f3f0a55d95f17f6b635defd47a34b6fc69",
+      "bytes": 306380
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+      "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "after_sha256": "47c97bf9dd1cd8aa0a508327a53088f3f0a55d95f17f6b635defd47a34b6fc69",
+      "bytes": 306380
+    },
+    "/opt/hermes-data/management-code/run.py": {
+      "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+      "after_sha256": "47c97bf9dd1cd8aa0a508327a53088f3f0a55d95f17f6b635defd47a34b6fc69",
+      "bytes": 306380
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+      "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+      "after_sha256": "98949624fd7a47153eda3a53d87ff259acc546fcac9e3a817f531f823d00cf92",
+      "bytes": 73909
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+      "before_sha256": "f07630b6ddb4566d5181d3dfd9bcfa340cf2751419b2afbc06842673a7bddc1a",
+      "after_sha256": "1dcb96faaefaba74e166df98f4cca6f94d816a61d4c2e51656630e77fcb83822",
+      "bytes": 343153
+    },
+    "/opt/capstone-management/workflow_contract.py": {
+      "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "after_sha256": "6b578846fe5496f4e1ae7395e1a09286d0bf4f94944be2be2398af19f1d631d3",
+      "bytes": 3754
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py": {
+      "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+      "after_sha256": "6b578846fe5496f4e1ae7395e1a09286d0bf4f94944be2be2398af19f1d631d3",
+      "bytes": 3754
+    },
+    "/opt/capstone-management/skill-soc-query.md": {
+      "before_sha256": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7",
+      "after_sha256": "41a33ec4c151d193d0489d8c168d1dd2635539c10896bd5c5dbe7234a609a7f9",
+      "bytes": 14071
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md": {
+      "before_sha256": "16a93c7380a8fb029878fcb3d0cb72a4a8f831b3ee3ddc4a82e836e09097d6e7",
+      "after_sha256": "41a33ec4c151d193d0489d8c168d1dd2635539c10896bd5c5dbe7234a609a7f9",
+      "bytes": 14071
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/alignment.py": {
+      "before_sha256": "f3d723b193da4f4bf3b4989baf29163536dbba9da09088c6da691345e0295aa5",
+      "after_sha256": "9742525a117731936db43be546408c50b6f8f44825152af38d1c422b2d0b0410",
+      "bytes": 71139
+    },
+    "/opt/capstone-management/soc_management_controller.py": {
+      "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+      "after_sha256": "97b517c654372c056dc891e7f2b2dd12fe021e7335f7014d94facbc0c79eb2b9",
+      "bytes": 539029
+    },
+    "/opt/capstone-management/skill-soc-investigate.md": {
+      "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "after_sha256": "ba74a53678619a232a8b3f419e4865806469944359bd36eb94123c9445372ad1",
+      "bytes": 21057
+    },
+    "/opt/capstone-ollama-trial/skill-soc-investigate.md": {
+      "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "after_sha256": "ba74a53678619a232a8b3f419e4865806469944359bd36eb94123c9445372ad1",
+      "bytes": 21057
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": {
+      "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+      "after_sha256": "ba74a53678619a232a8b3f419e4865806469944359bd36eb94123c9445372ad1",
+      "bytes": 21057
+    }
+  },
+  "patch_roundtrip": {
+    "files": 23,
+    "bytes": 949821,
+    "patch_sha256": "f2807f6a50af5b8c2d0d71bfe963c0f619a87834ff8804d4469e93296904af93",
+    "forward_reverse_SHA_verified": true,
+    "own_tmp_removed": true
+  },
+  "official_structure": {
+    "at_kst": "2026-11-19T17:42:05.136465+09:00",
+    "basis": "official API over frozen actual-installation and candidate source bytes; no live agent/model evaluation",
+    "live_snapshot_at_kst": "2026-11-19T17:14:25.816838+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_locked_files_verified": 140,
+    "framework_manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "plan_sha256": "78ab740cd1e7401ef6de8ecd537fcadb3e723554997f4a2853ae75d91ff74f5a",
+    "extra_local_environment_files_executed": false,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "operating_changes": 0
+  },
+  "linux_candidate_regression": {
+    "candidate/sdk": {
+      "rc": 0,
+      "summary": {
+        "run": 328,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "1d0ff918aad0c33477c76264d9eb2ad65c26017390b0a2748e256fd968492626"
+    },
+    "candidate/sdk_identity": {
+      "rc": 0,
+      "summary": {
+        "run": 17,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "2f7881300d02c9806d5bb7b241b8175755bc1478e65846043e7f136ee07780fd"
+    },
+    "candidate/native": {
+      "rc": 0,
+      "summary": {
+        "run": 384,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "94e1947934e7166d3b70631d92ce3e3c81477865a1faf3db3ff36041d34a4d4c"
+    },
+    "candidate/native_identity": {
+      "rc": 0,
+      "summary": {
+        "run": 5,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "82bf3819b8af6c1ad5cfa9ca3f272bc307f452a6295ab9f6a6fd3ecc1d37d264"
+    },
+    "candidate/native_phase": {
+      "rc": 0,
+      "summary": {
+        "run": 39,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "cb8518f97d3a17e66087286aa4f04a40951fb1bbc114fb1f4da136254d10bd0d"
+    },
+    "candidate/service_contract": {
+      "rc": 0,
+      "summary": {
+        "run": 152,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "91295ece7e212dad13b0feea7bab3edacc311e3dd50810a6560dce320b3b7deb"
+    },
+    "candidate/management_identity": {
+      "rc": 0,
+      "summary": {
+        "run": 19,
+        "failures": [],
+        "errors": [],
+        "skipped": 0
+      },
+      "log_sha256": "fc1f60790e43c3f293939834c30f3fd9dfdbc626d4d0c49d0d9cffa39663efa6"
+    }
+  },
+  "linux_candidate_total": 944,
+  "overlapping_suites_not_independent_attacks": true,
+  "deployment": {
+    "applied_at_kst": "2026-11-19T17:56:41.097295+09:00",
+    "confirmed": {
+      "status": "confirmed",
+      "at_kst": "2026-11-19T18:09:15.371327+09:00",
+      "files": 24,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "protected": 48,
+      "rollback_timer": "inactive"
+    },
+    "manifest_sha256": "f6dadc7c1619230d18cbb3e14ef4227d51422002e87ecf333a39f7b37f08a69c",
+    "operating_file_count": 24,
+    "protected_unchanged": 48,
+    "receipt_counts": [
+      20,
+      5
+    ],
+    "same_container_and_image": true,
+    "planned_Hermes_restart": 1,
+    "unplanned_restart_count": 0,
+    "operating_backup_root": "/var/lib/capstone-evidence-rollout/20261119-identity-fb152791df",
+    "final_read_at_kst": "2026-11-19T18:23:22.970035+09:00",
+    "queues": {
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": {
+        "done": 573
+      },
+      "/var/lib/capstone-review-chat/queue.sqlite": {
+        "cancelled": 1,
+        "done": 568
+      }
+    },
+    "rollback_timer": "inactive"
+  },
+  "actual_chats": [
+    {
+      "engine": "hermes",
+      "case": "vector-identity",
+      "source_id": "f1wyejd81i8m5y5781frk7r7wy",
+      "seconds": 16.892,
+      "table": true,
+      "model_calls": 4,
+      "MCP_reads": 5,
+      "report": {
+        "assessment": "unresolved",
+        "evidence_indexes": [
+          0,
+          1
+        ],
+        "scope": "unresolved_service_lookup",
+        "status": "needs_review"
+      },
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/f1wyejd81i8m5y5781frk7r7wy"
+    },
+    {
+      "engine": "hermes",
+      "case": "vector-loaded",
+      "source_id": "o97qcsjasbywjdjtu19e59k1eo",
+      "seconds": 10.398,
+      "table": true,
+      "model_calls": 2,
+      "MCP_reads": 2,
+      "report": {
+        "assessment": "observed",
+        "evidence_indexes": [
+          0
+        ],
+        "scope": "verified_service_lookup",
+        "status": "resolved"
+      },
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/o97qcsjasbywjdjtu19e59k1eo"
+    },
+    {
+      "engine": "ollama",
+      "case": "vector-identity",
+      "source_id": "gcga13dxd3rsxynjow1zthufzh",
+      "seconds": 11.652,
+      "table": true,
+      "job_status": "done",
+      "evidence_keys": [
+        "question",
+        "at_kst",
+        "calls"
+      ],
+      "MCP_reads": 5,
+      "model_calls": 4,
+      "report_status": "partial",
+      "protected_calls": 0,
+      "service_lookup_complete": false,
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/gcga13dxd3rsxynjow1zthufzh"
+    },
+    {
+      "engine": "ollama",
+      "case": "vector-loaded",
+      "source_id": "h6uoigzxuf85tqjfqekdurwyxy",
+      "seconds": 13.549,
+      "table": true,
+      "job_status": "done",
+      "evidence_keys": [
+        "question",
+        "at_kst",
+        "calls"
+      ],
+      "MCP_reads": 2,
+      "model_calls": 2,
+      "report_status": "completed",
+      "protected_calls": 0,
+      "service_lookup_complete": true,
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/h6uoigzxuf85tqjfqekdurwyxy"
+    }
+  ],
+  "actual_model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "permissions_roles_model_MCP_schema_changed": false,
+  "Native_load_evidence": {
+    "new_load_receipt_available": false,
+    "registration_INFO_log_observed": false,
+    "actual_thread_scoped_SQLite_MCP_and_structured_report_verified": true,
+    "missing_unit_read_count": 5,
+    "loaded_unit_read_count": 2
+  },
+  "cleanup": {
+    "at_kst": "2026-11-19T18:22:58.453393+09:00",
+    "host_roots_removed": 6,
+    "host_files_removed": 2373,
+    "native": {
+      "roots_removed": 4,
+      "files_removed": 2306,
+      "remaining_owned_roots": []
+    },
+    "operating_backup_preserved": "/var/lib/capstone-evidence-rollout/20261119-identity-fb152791df",
+    "remaining_owned_roots": []
+  },
+  "humanize": {
+    "version": "v2.3-codex",
+    "route": "light",
+    "change_rate_percent": 0.0,
+    "grade": "B",
+    "self_checks_passed": 6,
+    "self_checks_total": 6,
+    "gate_exit_code": 0
+  },
+  "retained_failures": [
+    "collector syntax failed before tests",
+    "first Native host-path permissions and old contract fixture failures",
+    "second contract stale string assertion and missing skill fixture",
+    "cleanup command argument length exceeded before deletion; stdin retry succeeded",
+    "new load receipt/INFO registration assumptions corrected to actual thread-scoped session evidence"
+  ],
+  "not_proved": [
+    "controlled timing improvement or general 30-60-second SLA",
+    "all service/process/config identities globally absent",
+    "browser-rendered table visual QA",
+    "complex causal judgment quality",
+    "temporary full OS authority approval/revocation and root lifecycle",
+    "new OS full installation or independent reproduction",
+    "attack/detection/response E2E; attack testing remains stopped"
+  ],
+  "unchanged_pending": [
+    "NTP candidate 390a0f43",
+    "Response MCP 1.2.1 separate exact approval"
+  ],
+  "publication": {
+    "state": "prepared; not yet committed or pushed"
+  }
+}

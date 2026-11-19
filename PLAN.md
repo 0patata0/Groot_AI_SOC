@@ -14,14 +14,14 @@ Native R12는 세 역할의 initialize·prepare를 통과했으나 peers에서 p
 학교 지정값·팀원 사진/학번·실제 리허설·12월1일 발표는 별도 확인 항목이다. [검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-local-layout-20261119).
 <!-- /thesis-local-layout-20261119 -->
 
-<!-- native-identity-boundary-20261119 -->
+<!-- native-identity-parity-20261119 -->
 
-추가 조회의 완료와 구성요소 확인을 분리했다. LoadState=not-found인 논리 서비스에는 component_unverified를 남기며 같은 목록을 반복 조회하도록 pending을 다시 만들지 않는다. 기존 최종 처리기는 incomplete가 있으면 needs_review 보고를 사용한다. 명시적인 unit 조회, loaded 상태의 비활성 oneshot, 채팅 밖 경로와 수집 파이프라인의 필수 동반 조회는 유지한다. 새 권한·도구·승인이나 정상·장애 판단을 코드로 추가하지 않았다.
+서비스 이름을 실제 구성요소와 구분하는 공통 조회 계약을 Hermes·Ollama·공동 관리 경로에 연결했다. 등록된 논리 서비스의 unit이 LoadState=not-found이면 같은 호스트의 서비스·컨테이너 목록을 확인한다. 목록 조회가 끝나도 구성요소가 확인되지 않으면 unresolved_service_lookup과 needs_review 또는 partial을 유지한다. 명시적인 unit 조회와 실제 loaded 서비스의 현재 상태 조회는 이 구분을 따른다.
 
-이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
+이번 결과는 구성요소 식별과 현재 조회에 대한 단회 관측이다. 복합 원인 판단의 정확도, 일반적인 30~60초 응답 보장, 전체 OS 권한 승인·회수, 새 서버 전체 설치와 공격·탐지·대응 E2E 검증은 남아 있다. 보호 정책·권한·모델·MCP 스키마는 유지했다. 발표자료와 기존 논문은 보존했다. 사용자의 마무리 지시에 따라 현재 적용 건의 정리·문서·게시까지만 진행하고 이후 작업은 다음 지시를 기다린다.
 
-[Native 완료 경계 검증·미적용](infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](infra/validation/service-query/service-identity.validation.json) · [전체 경과](archive/DIAGNOSTIC_HISTORY.md#native-identity-boundary-20261119).
-<!-- /native-identity-boundary-20261119 -->
+[검증·적용·한계](infra/validation/service-query/identity-parity.validation.json) · [설치 원본 23파일 기준 패치](infra/validation/service-query/identity-parity.patch).
+<!-- /native-identity-parity-20261119 -->
 
 
 <!-- service-provenance-summary-in-archive -->

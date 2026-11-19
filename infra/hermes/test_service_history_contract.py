@@ -732,7 +732,8 @@ class ServiceHistory(unittest.TestCase):
 
     def test_every_registered_history_target_and_terminal_punctuation(self):
         targets={k:v for k,v in d.TARGETS.items() if isinstance(v,str)}
-        self.assertEqual(len(targets),25)
+        schema=catalog()['tools'][0]['function']['parameters']
+        self.assertEqual(c.diagnostic_journal_catalog(schema)[0],targets)
         for target,unit in targets.items():
             with self.subTest(target=target):
                 for q in (f'오늘 {target} 오류와 현재 상태 확인',f'오늘 {target[0].upper()} 서버 {unit}. 실패와 지금 상태 확인'):
@@ -1069,7 +1070,8 @@ class ServiceFollowUp(unittest.TestCase):
         step={'kind':'capability_gap','needed_evidence':'해당 시각의 잠금 소유자와 실행 이력'}
         self.validator.validate(self.value(step))
         rendered=c.service_follow_up_lines([step])[0]
-        self.assertIn('기능 보완 필요',rendered);self.assertNotIn('조회 제안',rendered)
+        self.assertIn('추가 근거 필요',rendered);self.assertIn('지원 여부 미확인',rendered)
+        self.assertNotIn('조회 제안',rendered);self.assertNotIn('기능 보완 필요',rendered)
         self.assertFalse(self.validator.is_valid(self.value({**step,'tool':NAME})))
 
     def test_no_proposal_is_allowed_without_blank_heading_or_closure(self):
@@ -1370,7 +1372,8 @@ class ServiceReport(unittest.TestCase):
         self.assertEqual(json.loads(decoded.choices[0].message.tool_calls[0].function.arguments),value['calls'][0]['arguments'])
         self.assertFalse(hasattr(a,'_capstone_more_evidence_turn'))
         self.assertEqual(wire['max_tokens'],2048)
-        self.assertIn('calls에 등록된 읽기 도구',wire['messages'][0]['content'])
+        self.assertIn('실행할 calls와 최종 report를 섞지 않습니다.',wire['messages'][0]['content'])
+        self.assertNotIn('report=null, read_tools',wire['messages'][0]['content'])
 
     def test_native_direct_time_rejection_and_duplicate_read_keep_guards(self):
         from openai.types.chat import ChatCompletion

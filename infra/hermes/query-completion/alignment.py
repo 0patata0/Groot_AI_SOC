@@ -123,7 +123,9 @@ def gateway_evidence_request(agent, data, catalog_request, question, calls, harn
         receipts=harness.service_report_receipts(calls) if calls else []
         if receipts is None:raise ValueError('gateway_service_receipts_invalid')
         service_state=harness.CONTRACT.service_history_state(service_plan,receipts)
-        pending=service_state['pending']+harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+        component=harness.CONTRACT.service_identity_state(catalog_request,question,receipts)
+        pending=(service_state['pending']+harness.CONTRACT.service_current_refresh_reads(service_plan,receipts)
+                 +component['pending'])
         if pending:
             if remaining<1:raise ValueError('gateway_service_read_budget_exhausted')
             options=pending[:remaining]
@@ -143,7 +145,8 @@ def gateway_evidence_request(agent, data, catalog_request, question, calls, harn
             citations=sorted({r['tool'] for r in context['untrusted_completed_reads']})
             schema=harness.CONTRACT.service_report_schema(citations,nonce=nonce,available_reads=list(catalog),
                 facts=harness.facts_for(calls),read_schemas=catalog,direct_reads=remaining,
-                allow_more=remaining>0,lookup_only=context.get('lookup_only') is True)
+                allow_more=remaining>0,lookup_only=context.get('lookup_only') is True,
+                lookup_incomplete=context.get('lookup_incomplete') is True)
             descriptions={t['function']['name']:harness.CONTRACT.service_tool_description(
                 t['function'].get('description',''),t['function']['parameters'])
                 for t in catalog_request.get('tools',[]) if t.get('function',{}).get('name') in catalog}
@@ -249,7 +252,9 @@ def gateway_evidence_response(response, phase, agent, harness):
     citations=(sorted({r['tool'] for r in phase['context']['untrusted_completed_reads']})
         if phase['kind']=='service' else list(phase['context']['evidence_tools'].values()))
     review['evidence_tools']=[citations[i] for i in indexes]
-    text=(harness.EVIDENCE.render_model_review(review,harness.facts_for(phase['calls'])) if phase['kind']=='service'
+    text=(harness.EVIDENCE.render_model_review(review,harness.facts_for(phase['calls']),
+            lookup_identity=phase['context'].get('service_identity_discovery')
+                if phase['context'].get('lookup_incomplete') is True else None) if phase['kind']=='service'
         else harness.evidence_report_text(review,phase['calls'],phase['context']))
     if phase['kind']=='service':text=harness.CONTRACT.service_lookup_text(text,phase['context'])
     issues=(harness.violations(phase['binding']['question'],text,phase['calls'],service_plan=phase.get('service_plan'))+

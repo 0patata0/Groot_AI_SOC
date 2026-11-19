@@ -1929,8 +1929,6 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
         +service_scoped_guidance(context)+'\n'+
         workflow_policy(('soc-investigate',),section='service-report'))
     if direct_reads:
-        policy=policy.replace('report=null, read_tools에 등록된 도구 이름을 선택합니다.',
-            'report=null, calls에 등록된 읽기 도구와 정확한 arguments를 함께 선택합니다.')
         policy+=(' 추가 조회는 도구 선택과 인자 생성을 한 번에 합니다. 실행할 calls와 최종 report를 섞지 않습니다. '
             'journal을 추가로 읽을 때 journal_scope를 명시하고, 필요한 앞부분은 journal_continuation_options를 검토합니다. '
             'requested_service_scope의 요청 기간을 유지하며 현재 스냅샷의 구간으로 과거 사건 기간을 바꾸지 않습니다. ')

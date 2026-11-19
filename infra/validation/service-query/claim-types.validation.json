@@ -517,6 +517,27 @@
     "attack/training resume"
   ],
   "publication": {
-    "state": "pending_commit_and_push"
+    "state": "content_committed_pushed_verified",
+    "content_commit": "bfcc28a7bf73de97bd3294e1c9fc338a52e38973",
+    "remote_main_at_content_verification": "bfcc28a7bf73de97bd3294e1c9fc338a52e38973",
+    "verified_at_kst": "2026-11-19T10:44:44.663323+09:00",
+    "public_paths": 30,
+    "tracked_secret_scan": {
+      "paths": 2441,
+      "unsafe_paths": 0,
+      "known_code_or_synthetic": 10,
+      "new_findings": 0
+    },
+    "unrelated_work_preserved": true,
+    "receipt_commit_reference": "final receipt commit and remote equality recorded in local session"
+  },
+  "live_after_cleanup": {
+    "at_kst": "2026-11-19T10:45:09.772414+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "operating_source_changes": 0,
+    "operating_restarts": 0,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "chat_posts": 0
   }
 }

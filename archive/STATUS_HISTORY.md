@@ -11,6 +11,15 @@ B 안의 세 격리 PID1에서50소스·합성 캐시·실제 systemd/SSH/별도
 deadline-r1 최대431,349,760B/pids125, partial-r1 최대363,192,320B/pids126, confirmed-r1 최대425,713,664B/pids108이었다. 각52입력 SHA·제거·빈 역할 cgroup·자체 작업 폴더 정리를 확인했다. 과거 GC 실패와 backup 보류75, D-Bus listen 누락·회귀 manifest 누락·90초 제한 실패를 보존한다. 최신 검증 확장과 이전 case의 validator 지문은 구분하며 같은 운영 후보32소스만 공통으로 결속한다.
 
 운영 배포·호스트 재부팅·실제 MCP/봇 인수·Native 정리/current와 승인 전 재시도 계약은 남았다. 발표자료·논문·공격·학습과 운영 소스 쓰기0이다. 이전 현재 요약은 Git42cd8d3c의 각 파일과 이 통합 이력에서 복원한다. [새 원장](../infra/validation/journal-composition/private-full-native.validation.json).
+
+| 게시 확인 | 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `e971712452043e6d697d03fc4c3d895c9b9521da`·21파일 |
+| 실제 원격 main 일치 | `2026-11-20T07:40:15.166267+09:00` |
+| 회귀·실행 범위 | Mac/Linux258·생략0; 격리 부분/기한 복구·정상 확정/재개·인수 누락 거절 |
+| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.6%·B·6/6·gate0 |
+| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험8회 부재; 기존111자료 SHA 동일 |
+| 별도 조건 | 운영 미적용; 실제 재부팅·Native 정리/current·정확 승인·MCP/봇 인수 미완료 |
 <!-- /coordinator-collection-reference-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->

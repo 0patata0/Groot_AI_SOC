@@ -76,6 +76,15 @@ B 안의 별도 PID1 세 역할에서50소스·합성 캐시와 고정 root 진�
 공식 Harness²는 조정 구성80개 중2소스 수정과 검증85→91, 정적 payload44개를 포함한135구성을 확인했다. 상시16,917자 증가0이며 구조 검사와 실제 실행 근거를 구분한다. 이전 backup 보류75와 상태/intent 대조 뒤 재시도 계약은 남은 항목으로 보존했다. 논문 목차91불일치·운영 인수·최종 발표도 미완료다. Kali 설치 단위의 완료와 공격·학습 중단은 유지한다.
 
 [검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법·한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-collection-reference-20261120) · [실패 이력](archive/DIAGNOSTIC_HISTORY.md#coordinator-collection-reference-20261120)
+
+| 게시 확인 | 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `e971712452043e6d697d03fc4c3d895c9b9521da`·21파일 |
+| 실제 원격 main 일치 | `2026-11-20T07:40:15.166267+09:00` |
+| 회귀·실행 범위 | Mac/Linux258·생략0; 격리 부분/기한 복구·정상 확정/재개·인수 누락 거절 |
+| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.6%·B·6/6·gate0 |
+| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험8회 부재; 기존111자료 SHA 동일 |
+| 별도 조건 | 운영 미적용; 실제 재부팅·Native 정리/current·정확 승인·MCP/봇 인수 미완료 |
 <!-- /coordinator-collection-reference-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

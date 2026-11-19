@@ -18,6 +18,13 @@ Kali232·233에 Hermes Agent v0.23.2를 오프라인 반입해 설치했다. Lin
 | 기록 검수 | light·변경0%·B·6/6·gate0; 후속 시험 수치12 반영 |
 | 확인 범위 | 두 Kali 설치·SOUL·무도구 API 응답·실제 context65536 |
 | 유지 조건 | 공격·시나리오 중단; 패키지·가중치·자격·원문 기록 Git 제외 |
+
+| 설치 재대조 | 2026-11-20 KST |
+| --- | --- |
+| 232·233 설치본·모델·SOUL | `08:55:37`·원본 SHA 일치·40B/65536·SOUL 전체 로드 |
+| 오프라인 설치 영수증 | `08:56:26` / `08:56:27`·동일 bundle SHA·`network_acquisition=false` |
+| 현재 상태 | `allow_lazy_installs=false`·`attack_state=paused`·반입 staging 부재 |
+| 이번 변경 범위 | 조회·검증 기록만·재설치/다운로드/추론/공격0 |
 <!-- /kali-hermes-offline-20261120 -->
 
 <!-- thesis-google-docs-local-sync-20261119 -->

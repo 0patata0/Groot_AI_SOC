@@ -339,5 +339,48 @@
     "deployment/kali_hermes_model.py": "32fefb175dcac9dbd36c8e08f8e86c45689ec810ebc88165ba60bd115e59481e",
     "deployment/tests/test_kali_hermes.py": "6aca36209d0d65543f94aa4600c311fb2046fb4d837a474bd42c7753c014cc27",
     "deployment/tests/test_kali_hermes_model.py": "952110d7c484e717e21c565f2b7b71750a32e9e225ae351c5e5125ec4e127c1d"
+  },
+  "read_only_recheck": {
+    "scope": "read-only verification of the existing installation; no reinstall, package download, model inference or attack traffic",
+    "hosts": {
+      "232": {
+        "installation_and_role_checked_at_kst": "2026-11-20T08:55:37.039678+09:00",
+        "offline_receipt_checked_at_kst": "2026-11-20T08:56:26.791057+09:00",
+        "receipt_sha256": "32ee88011da21529e6255547c4cfeadcc24856a18a5fa153f8d6aa03c817b050",
+        "network_acquisition": false,
+        "offline_bundle_sha256": "e249bdcfcf7b4b3715eed6d0ed3a71cec164c82d72e12d5614fa0a257c352939",
+        "source_locks_match": true,
+        "operator_source_sha256": "caaefecc03d47d8f0dd3487bacfcd2878b084ac4f826e42d66783f27fc2dfb1e",
+        "model": "qwen3.8-40b-heretic:hermes-64k",
+        "configured_context_length": 65536,
+        "soul_loaded_exactly": true,
+        "soul_sha256": "e82c214484edfb14c789456451a7625420562e69b4b1bf63b86afc7856dbad23",
+        "allow_lazy_installs": false,
+        "attack_state": "paused",
+        "staging_absent": true,
+        "runtime_cache_preserved": true
+      },
+      "233": {
+        "installation_and_role_checked_at_kst": "2026-11-20T08:55:37.367783+09:00",
+        "offline_receipt_checked_at_kst": "2026-11-20T08:56:27.044616+09:00",
+        "receipt_sha256": "89964f97ee533aef7737719d5928ca14c1f0e3cd94df387e7d84f29ebc58b32c",
+        "network_acquisition": false,
+        "offline_bundle_sha256": "e249bdcfcf7b4b3715eed6d0ed3a71cec164c82d72e12d5614fa0a257c352939",
+        "source_locks_match": true,
+        "operator_source_sha256": "caaefecc03d47d8f0dd3487bacfcd2878b084ac4f826e42d66783f27fc2dfb1e",
+        "model": "qwen3.8-40b-heretic:hermes-64k",
+        "configured_context_length": 65536,
+        "soul_loaded_exactly": true,
+        "soul_sha256": "a3eceeb62f8960e96497b13abefe695723221f7cb434104fd9b042ef37f048f4",
+        "allow_lazy_installs": false,
+        "attack_state": "paused",
+        "staging_absent": true,
+        "runtime_cache_preserved": true
+      }
+    },
+    "mutations": 0,
+    "new_packages": 0,
+    "model_inferences": 0,
+    "attack_traffic": 0
   }
 }

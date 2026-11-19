@@ -121,17 +121,15 @@
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-identity-completion-20261119 -->
+<!-- native-identity-boundary-20261119 -->
 
-없는 unit을 서비스의 현재 상태로 오인하는 문제를 점검했다. 운영 설치본에는 정본에 있는 실체 확인 연결이 빠져 있었다. 정본에서도 명시적 snapshot 인자를 인식하지 못하고 질문에 다른 .service 이름이 있으면 모든 논리 서비스의 확인을 생략하는 두 조건을 수정했다. 공통 회귀 12개는 통과했으며 운영 파일은 바꾸지 않았다.
+Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확인했다. 서비스·컨테이너 목록을 모두 읽으면 pending은 비지만 논리 서비스의 실체가 확인됐다는 뜻은 아니다. 기존 chat_diagnostic_state는 이 미확인 상태를 최종 incomplete에 남기지 않았다. 이 때문에 짧은 요청에서 service_history_plan이 없을 때도 완료 방어가 유지되도록 정본에 4줄을 추가했다.
 
-SDK 격리 후보는 실제 설치 원본의 7파일을 바탕으로 만들었다. 등록된 진단에서 LoadState=not-found가 반환되면 모델이 같은 호스트의 서비스·컨테이너 목록 읽기를 선택한다. 목록을 모두 읽어도 논리 구성요소를 식별하지 못하면 partial과 추가 확인 필요를 유지한다. inactive/dead·Result=success 기본값을 실제 정지·실행 성공의 근거로 쓰지 않는다. 명시적 unit 조회와 호출자가 지정한 도구 범위는 유지한다.
+추가 조회의 완료와 구성요소 확인을 분리했다. LoadState=not-found인 논리 서비스에는 component_unverified를 남기며 같은 목록을 반복 조회하도록 pending을 다시 만들지 않는다. 기존 최종 처리기는 incomplete가 있으면 needs_review 보고를 사용한다. 명시적인 unit 조회, loaded 상태의 비활성 oneshot, 채팅 밖 경로와 수집 파이프라인의 필수 동반 조회는 유지한다. 새 권한·도구·승인이나 정상·장애 판단을 코드로 추가하지 않았다.
 
-실제 질문은 ‘B 서버 Vector 오류랑 지금 상태 확인해줘’였다. B의 기존 SDK 계정에서 Thor의 soc-qwen36:35b-balanced-q4km-20261108 모델과 hermes-parity 권한을 사용했다. 진단 1회와 인벤토리 3회, 모델 3회로 22.172초에 partial 보고를 반환했다. 서비스 목록 185행과 컨테이너 목록 7행을 확인했지만 b:vector의 실체는 미확인이었다. 보호 도구 호출·채팅 게시·운영 재시작은 없었다.
+새 집중검사 7개는 수정 후 통과했다. 수정 전에는 완료된 인벤토리·최종 보류·다른 명시 unit·조회 진행 중 상태를 다룬 반례 4개가 실패했다. 첫 시험에서 명시 unit 조회의 필수 b:collection 동반 읽기를 빠뜨린 fixture 가정을 고쳤고 원래 실패 로그는 보존했다. 기존 검사 152개는 수정 전후 모두 같은 실패 2개·오류 13개를 반환했으며 새로 생긴 실패·오류는 없었다. 실패 2개는 capability_gap 문구와 이력 대상 개수 기대값의 불일치이고 오류 13개는 Mac의 openai 부재다. 전체 검사 통과로 표현하지 않는다.
 
-이전 E16의 같은 질문은 20.316초에 없는 unit을 조회하고 완료로 집계했다. 이번 단회 관측은 그 완료 오판을 막았다는 근거이며 속도 개선이나 일반 정확도 향상의 근거로 쓰지 않는다. 실제 새 Mattermost 채팅과 운영 연결풀은 검증하지 않았다. 오류 원인·수집 경로·실제 Vector 구성요소는 추가 조사가 필요하다.
+이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
 
-후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
-
-[검증·운영 미적용](../validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../validation/service-query/service-identity.patch) · [전체 경과·한계](../../archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
-<!-- /service-identity-completion-20261119 -->
+[Native 완료 경계 검증·미적용](../validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](../validation/service-query/service-identity.validation.json) · [전체 경과](../../archive/DIAGNOSTIC_HISTORY.md#native-identity-boundary-20261119).
+<!-- /native-identity-boundary-20261119 -->

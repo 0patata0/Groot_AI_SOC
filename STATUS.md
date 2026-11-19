@@ -34,25 +34,23 @@
 <!-- /thesis-justify-panel-publication-20261119 -->
 <!-- /thesis-justify-background-panel-20261119 -->
 
-<!-- service-identity-completion-20261119 -->
+<!-- native-identity-boundary-20261119 -->
 
-없는 unit을 서비스의 현재 상태로 오인하는 문제를 점검했다. 운영 설치본에는 정본에 있는 실체 확인 연결이 빠져 있었다. 정본에서도 명시적 snapshot 인자를 인식하지 못하고 질문에 다른 .service 이름이 있으면 모든 논리 서비스의 확인을 생략하는 두 조건을 수정했다. 공통 회귀 12개는 통과했으며 운영 파일은 바꾸지 않았다.
+Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확인했다. 서비스·컨테이너 목록을 모두 읽으면 pending은 비지만 논리 서비스의 실체가 확인됐다는 뜻은 아니다. 기존 chat_diagnostic_state는 이 미확인 상태를 최종 incomplete에 남기지 않았다. 이 때문에 짧은 요청에서 service_history_plan이 없을 때도 완료 방어가 유지되도록 정본에 4줄을 추가했다.
 
-| 구분 | 이번 확인 | 남은 범위 |
+| 경로 | 검증 결과 | 운영 상태 |
 | --- | --- | --- |
-| 후보 회귀 | Mac·Linux 각각 SDK 328개 + 실체 확인 17개 통과 | 독립 정확도·전체 저장소 통과 아님 |
-| 실제 SDK 읽기 | 22.172초·4읽기·3모델·partial | Vector 실체 미확인 |
-| 운영 반영 | 미적용·64파일 SHA 불변 | Hermes·공동 관리 연결과 새 채팅 검증 |
-| 정리 | 시험 폴더 2개·742파일 제거 | 운영 복구본·프레임워크·가중치 보존 |
+| E17 SDK | 실제 22.172초·partial, 목록 185/7행에도 구성요소 미확인 유지 | 미적용 |
+| E18 Native 완료 경계 | 집중 7개 통과·수정 전 반례 4개 실패 | 정본 수정·운영 미적용 |
+| 기존 Native 계약 검사 | 수정 전후 같은 실패 2개·Mac 의존성 오류 13개 | 전체 통과 아님 |
+| 설치기 | 관련 47개 통과·정본 SHA pin 갱신/모듈 로드 확인 | 새 OS 설치 미시험 |
 
-이전 E16의 같은 질문은 20.316초에 없는 unit을 조회하고 완료로 집계했다. 이번 단회 관측은 그 완료 오판을 막았다는 근거이며 속도 개선이나 일반 정확도 향상의 근거로 쓰지 않는다. 실제 새 Mattermost 채팅과 운영 연결풀은 검증하지 않았다. 오류 원인·수집 경로·실제 Vector 구성요소는 추가 조사가 필요하다.
+공식 Harness²의 고정 버전 6868817518876de8fd170c6a8354daca273b6191과 140파일 SHA를 확인했다. 15:34:33 KST에 다시 대조한 운영 64파일은 이전과 같았다. 실제 설치 원본에 함수와 E17 공통 계약을 투영한 세 경로의 구조 검사도 통과했다. 이 투영본은 설치 SHA pin과 영수증을 다시 결속하지 않은 구조 확인 자료이며 실행 가능한 운영 반영 묶음이나 실제 Native 모델 응답 검증을 뜻하지 않는다.
 
-후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
 
-시험 결과와 파일별 SHA를 로컬에 보존한 뒤 서버의 이번 시험 폴더 2개, 742파일, 27,086,470바이트를 정리했다. 15:17:06 KST에 운영 64파일 SHA 불변, Hermes 컨테이너의 동일 시작 상태와 두 봇의 채팅 연결·작업자 생존을 확인했다. 운영 복구본·공식 프레임워크·가중치는 삭제하지 않았다.
-
-[검증·운영 미적용](infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](infra/validation/service-query/service-identity.patch) · [전체 경과·한계](archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
-<!-- /service-identity-completion-20261119 -->
+[Native 완료 경계 검증·미적용](infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](infra/validation/service-query/service-identity.validation.json) · [전체 경과](archive/DIAGNOSTIC_HISTORY.md#native-identity-boundary-20261119).
+<!-- /native-identity-boundary-20261119 -->
 
 
 <!-- service-provenance-summary-in-archive -->

@@ -1,0 +1,241 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-19T15:41:10.138142+09:00",
+  "state": "canonical Native completion guard strengthened; operating installation and actual Native interaction unverified",
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "infra/hermes/query-completion/__init__.py": "cec4d3fcf1f4d8828b77cd3bb59087e7255558ea5de76aa99f754e1bf0a175a1",
+    "infra/hermes/test_native_service_identity.py": "d3285c4e936b738ce41b4e000776aff974df3093937b50955020e51641ff0b60"
+  },
+  "change": "unverified logical service identity remains incomplete after inventory reads; no duplicate pending reads",
+  "canonical_evidence_pin": {
+    "path": "infra/hermes/query-completion/__init__.py",
+    "before": "a4295a13d229e8c5d0f1236df2bf19bd29dacb966fb84d994128b0bc5c4589db",
+    "after": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+    "source": "infra/hermes/soc_management_run.py",
+    "one_literal_changed": true
+  },
+  "focused_paired": {
+    "base": {
+      "run": 7,
+      "failures": [
+        "test_completed_inventory_does_not_resolve_component (native_identity_boundary_test.NativeIdentityCompletion.test_completed_inventory_does_not_resolve_component)",
+        "test_existing_final_fallback_cannot_claim_resolved (native_identity_boundary_test.NativeIdentityCompletion.test_existing_final_fallback_cannot_claim_resolved)",
+        "test_other_explicit_unit_does_not_exempt_vector (native_identity_boundary_test.NativeIdentityCompletion.test_other_explicit_unit_does_not_exempt_vector)",
+        "test_pending_inventory_and_identity_are_distinct_requirements (native_identity_boundary_test.NativeIdentityCompletion.test_pending_inventory_and_identity_are_distinct_requirements)"
+      ],
+      "errors": [],
+      "skipped": 0
+    },
+    "candidate": {
+      "run": 7,
+      "failures": [],
+      "errors": [],
+      "skipped": 0
+    }
+  },
+  "existing_paired": {
+    "results": {
+      "base": {
+        "run": 152,
+        "failures": [
+          "test_capability_gap_is_distinct_from_executable_read (native_identity_existing_contract.ServiceFollowUp.test_capability_gap_is_distinct_from_executable_read)",
+          "test_every_registered_history_target_and_terminal_punctuation (native_identity_existing_contract.ServiceHistory.test_every_registered_history_target_and_terminal_punctuation)"
+        ],
+        "errors": [
+          "test_additional_inquiry_exposes_only_model_selected_argument_schemas (native_identity_existing_contract.ServiceReport.test_additional_inquiry_exposes_only_model_selected_argument_schemas)",
+          "test_invalid_new_or_repeated_input_is_still_rejected_before_deduplication (native_identity_existing_contract.ServiceReport.test_invalid_new_or_repeated_input_is_still_rejected_before_deduplication)",
+          "test_native_additional_journal_requires_explicit_filter_without_changing_registry (native_identity_existing_contract.ServiceReport.test_native_additional_journal_requires_explicit_filter_without_changing_registry)",
+          "test_native_direct_read_dispatches_without_second_model_selection (native_identity_existing_contract.ServiceReport.test_native_direct_read_dispatches_without_second_model_selection)",
+          "test_native_direct_time_rejection_and_duplicate_read_keep_guards (native_identity_existing_contract.ServiceReport.test_native_direct_time_rejection_and_duplicate_read_keep_guards)",
+          "test_native_duplicate_batch_is_not_dispatched_and_feedback_keeps_receipts (native_identity_existing_contract.ServiceReport.test_native_duplicate_batch_is_not_dispatched_and_feedback_keeps_receipts)",
+          "test_native_followup_is_bound_to_input_schema_and_never_dispatches (native_identity_existing_contract.ServiceReport.test_native_followup_is_bound_to_input_schema_and_never_dispatches)",
+          "test_native_lookup_acknowledges_actual_reads_without_incident_closure (native_identity_existing_contract.ServiceReport.test_native_lookup_acknowledges_actual_reads_without_incident_closure)",
+          "test_native_more_evidence_returns_to_real_read_selection (native_identity_existing_contract.ServiceReport.test_native_more_evidence_returns_to_real_read_selection)",
+          "test_native_time_rejection_retains_context_and_can_request_corrected_read (native_identity_existing_contract.ServiceReport.test_native_time_rejection_retains_context_and_can_request_corrected_read)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'b:management', 'limit': 50}, non_service=False)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'a:vector'}, non_service=False)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'b:management'}, non_service=True)"
+        ],
+        "skipped": 0
+      },
+      "candidate": {
+        "run": 152,
+        "failures": [
+          "test_capability_gap_is_distinct_from_executable_read (native_identity_existing_contract.ServiceFollowUp.test_capability_gap_is_distinct_from_executable_read)",
+          "test_every_registered_history_target_and_terminal_punctuation (native_identity_existing_contract.ServiceHistory.test_every_registered_history_target_and_terminal_punctuation)"
+        ],
+        "errors": [
+          "test_additional_inquiry_exposes_only_model_selected_argument_schemas (native_identity_existing_contract.ServiceReport.test_additional_inquiry_exposes_only_model_selected_argument_schemas)",
+          "test_invalid_new_or_repeated_input_is_still_rejected_before_deduplication (native_identity_existing_contract.ServiceReport.test_invalid_new_or_repeated_input_is_still_rejected_before_deduplication)",
+          "test_native_additional_journal_requires_explicit_filter_without_changing_registry (native_identity_existing_contract.ServiceReport.test_native_additional_journal_requires_explicit_filter_without_changing_registry)",
+          "test_native_direct_read_dispatches_without_second_model_selection (native_identity_existing_contract.ServiceReport.test_native_direct_read_dispatches_without_second_model_selection)",
+          "test_native_direct_time_rejection_and_duplicate_read_keep_guards (native_identity_existing_contract.ServiceReport.test_native_direct_time_rejection_and_duplicate_read_keep_guards)",
+          "test_native_duplicate_batch_is_not_dispatched_and_feedback_keeps_receipts (native_identity_existing_contract.ServiceReport.test_native_duplicate_batch_is_not_dispatched_and_feedback_keeps_receipts)",
+          "test_native_followup_is_bound_to_input_schema_and_never_dispatches (native_identity_existing_contract.ServiceReport.test_native_followup_is_bound_to_input_schema_and_never_dispatches)",
+          "test_native_lookup_acknowledges_actual_reads_without_incident_closure (native_identity_existing_contract.ServiceReport.test_native_lookup_acknowledges_actual_reads_without_incident_closure)",
+          "test_native_more_evidence_returns_to_real_read_selection (native_identity_existing_contract.ServiceReport.test_native_more_evidence_returns_to_real_read_selection)",
+          "test_native_time_rejection_retains_context_and_can_request_corrected_read (native_identity_existing_contract.ServiceReport.test_native_time_rejection_retains_context_and_can_request_corrected_read)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'b:management', 'limit': 50}, non_service=False)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'a:vector'}, non_service=False)",
+          "test_new_scope_and_non_service_lease_can_still_select_actual_reads (native_identity_existing_contract.ServiceReport.test_new_scope_and_non_service_lease_can_still_select_actual_reads) (arguments={'target': 'b:management'}, non_service=True)"
+        ],
+        "skipped": 0
+      }
+    },
+    "new_candidate_failures": {
+      "failures": [],
+      "errors": []
+    },
+    "Mac_environment_missing_openai": true
+  },
+  "first_fixture_failure_preserved": "incorrect assumption omitted mandatory b:collection companion read; production contract preserved",
+  "framework": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "framework_locked_files_verified": 140,
+    "framework_manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc"
+  },
+  "official_surfaces": {
+    "base": {
+      "native": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 33505,
+          "n_files": 19,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 11
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      },
+      "sdk": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 20,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 13
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      },
+      "management": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 14,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 7
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      }
+    },
+    "candidate": {
+      "native": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 33505,
+          "n_files": 19,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 11
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      },
+      "sdk": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 20,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 13
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      },
+      "management": {
+        "status": "passed",
+        "census": {
+          "always_on_chars": 16835,
+          "n_files": 14,
+          "skills": 5,
+          "sub_agents": 0,
+          "scripts": 7
+        },
+        "code_routed_skills": [
+          "soc-change",
+          "soc-investigate",
+          "soc-query",
+          "soc-recover"
+        ]
+      }
+    }
+  },
+  "structure_projection": {
+    "plan_sha256": "4decb45b5fb2ce4a52ea864d70b93ce127528424348a7a13d7a549a47754ed0a",
+    "files": 7,
+    "actual_installation_base": true,
+    "runtime_installation_pins_and_receipts_rebound": false,
+    "is_executable_rollout_bundle": false,
+    "is_model_quality_proof": false
+  },
+  "last_operating_check": {
+    "at_kst": "2026-11-19T15:34:33.507221+09:00",
+    "source_hashes_unchanged": 64,
+    "same_native_identity_and_start": true,
+    "both_chat_workers_and_connections_alive": true
+  },
+  "operating_applied": false,
+  "operating_restarts": 0,
+  "new_model_calls": 0,
+  "new_MCP_diagnostic_calls": 0,
+  "chat_posts": 0,
+  "remote_test_roots_created": 0,
+  "presentation_edits": 0,
+  "whole_repository_pass": false,
+  "new_OS_installation_tested": false,
+  "Semgrep": "not executed; unavailable",
+  "remaining": [
+    "Linux/full Native dependency-complete regression",
+    "complete exact installed source/pin/receipt/controller bundle and recovery verification",
+    "Native actual model and fresh Mattermost chat",
+    "actual Vector component/collection path evidence"
+  ],
+  "publication": {
+    "state": "prepared; not yet committed or pushed"
+  },
+  "installer_regression": {
+    "suite": "deployment.tests.test_soc_management",
+    "tests": 47,
+    "failures": 0,
+    "errors": 0,
+    "after_canonical_pin_update": true,
+    "new_OS_installation": false
+  }
+}

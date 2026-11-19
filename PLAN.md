@@ -10,14 +10,14 @@
 학교 지정값·팀원 사진/학번과 실제 리허설·12월1일 발표는 별도 확인 항목으로 유지한다. [검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-justify-background-panel-20261119).
 <!-- /thesis-justify-background-panel-20261119 -->
 
-<!-- service-identity-completion-20261119 -->
+<!-- native-identity-boundary-20261119 -->
 
-후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+추가 조회의 완료와 구성요소 확인을 분리했다. LoadState=not-found인 논리 서비스에는 component_unverified를 남기며 같은 목록을 반복 조회하도록 pending을 다시 만들지 않는다. 기존 최종 처리기는 incomplete가 있으면 needs_review 보고를 사용한다. 명시적인 unit 조회, loaded 상태의 비활성 oneshot, 채팅 밖 경로와 수집 파이프라인의 필수 동반 조회는 유지한다. 새 권한·도구·승인이나 정상·장애 판단을 코드로 추가하지 않았다.
 
-사용자의 50분 전 마무리 지시에 따라 이번 검증과 기록 게시까지만 진행하고 새 작업은 시작하지 않는다. 다음에는 Hermes 공통 연결과 Vector의 실제 수집 경로 확인부터 이어간다. 발표자료는 보존했다. 전체 실전 운용 목표와 논문·발표의 남은 검증은 미완료다.
+이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
 
-[검증·운영 미적용](infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](infra/validation/service-query/service-identity.patch) · [전체 경과·한계](archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
-<!-- /service-identity-completion-20261119 -->
+[Native 완료 경계 검증·미적용](infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](infra/validation/service-query/service-identity.validation.json) · [전체 경과](archive/DIAGNOSTIC_HISTORY.md#native-identity-boundary-20261119).
+<!-- /native-identity-boundary-20261119 -->
 
 
 <!-- service-provenance-summary-in-archive -->

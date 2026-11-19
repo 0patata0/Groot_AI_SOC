@@ -2926,6 +2926,10 @@ def chat_diagnostic_state(request, receipts=()):
     if chat:
         identity=diagnostic_contract().service_identity_state(request,chat['request'],receipts)
         state['pending']+=identity['pending'];state['incomplete']+=identity['incomplete']
+        # A completed inventory read is not verification of a logical service.
+        # Keep finalization unresolved without scheduling the same reads again.
+        state['incomplete'] += ['service_identity:'+row['target']+':component_unverified'
+                                for row in identity['missing_units']]
     return state
 
 

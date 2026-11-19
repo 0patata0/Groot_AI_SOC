@@ -2410,3 +2410,18 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 | 재개 지점 | Hermes·공동 관리 연결, Vector의 실제 수집 경로 확인 |
 
 <!-- /service-identity-publication-20261119 -->
+
+
+<!-- native-identity-boundary-20261119 -->
+<a id="native-identity-boundary-20261119"></a>
+
+## 논리 서비스 실체 미확인의 최종 완료 경계
+
+Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확인했다. 서비스·컨테이너 목록을 모두 읽으면 pending은 비지만 논리 서비스의 실체가 확인됐다는 뜻은 아니다. 기존 chat_diagnostic_state는 이 미확인 상태를 최종 incomplete에 남기지 않았다. 이 때문에 짧은 요청에서 service_history_plan이 없을 때도 완료 방어가 유지되도록 정본에 4줄을 추가했다.
+
+새 집중검사 7개는 수정 후 통과했다. 수정 전에는 완료된 인벤토리·최종 보류·다른 명시 unit·조회 진행 중 상태를 다룬 반례 4개가 실패했다. 첫 시험에서 명시 unit 조회의 필수 b:collection 동반 읽기를 빠뜨린 fixture 가정을 고쳤고 원래 실패 로그는 보존했다. 기존 검사 152개는 수정 전후 모두 같은 실패 2개·오류 13개를 반환했으며 새로 생긴 실패·오류는 없었다. 실패 2개는 capability_gap 문구와 이력 대상 개수 기대값의 불일치이고 오류 13개는 Mac의 openai 부재다. 전체 검사 통과로 표현하지 않는다.
+
+이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
+
+[검증·미적용](../infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](../infra/validation/service-query/service-identity.validation.json).
+<!-- /native-identity-boundary-20261119 -->

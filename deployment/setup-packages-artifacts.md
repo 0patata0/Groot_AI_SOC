@@ -788,11 +788,11 @@ query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 �
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-identity-completion-20261119 -->
+<!-- native-identity-boundary-20261119 -->
 
-SDK 격리 후보는 실제 설치 원본의 7파일을 바탕으로 만들었다. 등록된 진단에서 LoadState=not-found가 반환되면 모델이 같은 호스트의 서비스·컨테이너 목록 읽기를 선택한다. 목록을 모두 읽어도 논리 구성요소를 식별하지 못하면 partial과 추가 확인 필요를 유지한다. inactive/dead·Result=success 기본값을 실제 정지·실행 성공의 근거로 쓰지 않는다. 명시적 unit 조회와 호출자가 지정한 도구 범위는 유지한다.
+Hermes·공동 관리 경로의 최종 완료 경계에서 추가 공백을 확인했다. 서비스·컨테이너 목록을 모두 읽으면 pending은 비지만 논리 서비스의 실체가 확인됐다는 뜻은 아니다. 기존 chat_diagnostic_state는 이 미확인 상태를 최종 incomplete에 남기지 않았다. 이 때문에 짧은 요청에서 service_history_plan이 없을 때도 완료 방어가 유지되도록 정본에 4줄을 추가했다.
 
-후보는 SDK에만 연결한 시험본이다. Hermes·공동 관리 경로의 연결, 두 경로의 같은 계약 검증, 설치 영수증·복구·새 실제 채팅 확인을 마치기 전에는 운영 반영 후보로 승격하지 않는다. 앞선 E16의 복합 원인 조사 품질 문제도 해결된 것으로 처리하지 않는다. 보호 정책·권한·모델과 실행 중인 학습은 바꾸지 않았다.
+이번 변경은 정본과 집중검사에만 반영했다. 운영 파일·서비스·권한·모델을 바꾸지 않았고 새 모델 호출·MCP 도구 실행·채팅 게시·공격·학습도 하지 않았다. E17의 실제 SDK 단회 22.172초·partial 결과는 별도 근거로 유지한다. Native 전체 설치 사본 연결·SHA pin·영수증·복구·실제 채팅과 Vector의 실제 수집 경로 확인은 남아 있다. 15:50 KST 전에 기록·게시를 마치고 새 작업은 시작하지 않는다.
 
-[검증·운영 미적용](../infra/validation/service-query/service-identity.validation.json) · [설치 원본 7파일 기준 패치](../infra/validation/service-query/service-identity.patch) · [전체 경과·한계](../archive/DIAGNOSTIC_HISTORY.md#service-identity-completion-20261119).
-<!-- /service-identity-completion-20261119 -->
+[Native 완료 경계 검증·미적용](../infra/validation/service-query/native-identity.validation.json) · [E17 SDK 실제 관측](../infra/validation/service-query/service-identity.validation.json) · [전체 경과](../archive/DIAGNOSTIC_HISTORY.md#native-identity-boundary-20261119).
+<!-- /native-identity-boundary-20261119 -->

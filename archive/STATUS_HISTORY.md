@@ -13943,3 +13943,21 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 | 미수행 | 운영 변경·새 모델/MCP/공격/학습·새 OS 전체 설치·독립 재구현·실제 리허설/발표 |
 <!-- /thesis-abstract-main-toc-publication-20261119 -->
 <!-- /thesis-abstract-title-main-toc-20261119 -->
+
+
+<!-- service-phase-resolution-20261119 -->
+<a id="service-phase-resolution-20261119"></a>
+
+## 조회 요청 해소 후보와 실제 대상 완료 판정의 공백
+
+처음 준비한 후보는 실제 실행에서 한계로 분류한 자료를 다시 요구하며 중단됐다. 이 실패를 보존한 뒤 최종 보고 경계를 보완한 후보5298ca3e를 동결했다. 새 후보는 해당 전환의 실행 오류 없이 보고를 반환했지만 내용 검증과 운용 기준을 충족하지 못해 운영에 적용하지 않았다.
+
+| 실제 질문 | 소요 시간 | 실제 진단 조회 / 모델 호출 | 결과 |
+|---|---|---|---|
+| A 서버 저장소 감시 오류 원인과 지금 상태 확인 — 첫 후보 | 125.891초 | 4 / 11 | 추가 근거 요구가 반복돼 RuntimeError·미확인 보고 |
+| 같은 질문 — 보고 경계 보완 후 | 109.190초 | 3 / 8 | 실행 오류는 없었으나 근거를 넘는 문장5개가 제외된 부분 보고 |
+| B 서버 백업 오류랑 지금 상태 확인해줘 | 6.251초 | 0 / 0 | 실제 카탈로그에 b:backup이 없어 대상 미지원·미확인으로 종료 |
+| B 서버 Vector 오류랑 지금 상태 확인해줘 | 20.316초 | 1 / 1 | 조회 완료로 표시했지만 요청한 구성요소의 실체는 검증하지 못함 |
+
+[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->

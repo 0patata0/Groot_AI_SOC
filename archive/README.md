@@ -295,12 +295,12 @@ FW MCP의 전송·페이지 수용·원문 SHA 명세와 실제 로컬 재현·�
 <!-- /certificate-scheduled-followup-20261119 -->
 
 
-<!-- service-phase-split-20261119 -->
+<!-- service-phase-resolution-20261119 -->
 
-조회 선택·최종 보고 분리 후보는 운영 미적용이다. 같은 실제 조회 자료로 통합81.025초·3호출, 분리37.830초·6호출을 측정했지만 각각 내용 검증 실패와 조회 요구/보고 준비 판단 반복으로 유효한 보고를 완성하지 못했다. Mac·Linux 각각998검사·공식 연계38·설치37통과와 실제 품질·속도 개선은 구분한다. 시험용4폴더를 정리했고 운영64파일·봇 연결·작업자·기존 Hermes 실행 식별자는 유지됐다. 이전 schema-recovery 후보도 미적용이며 확정 운영 패치를 대체하지 않는다.
+새 후보는 해당 전환의 실행 오류 없이 보고를 반환했지만 내용 검증과 운용 기준을 충족하지 못해 운영에 적용하지 않았다. Vector의 실제 반환 unit은 capstone-vector.service이며 LoadState=not-found였다. 없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
 
-[후보·실측·미완료](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 미적용 패치](../infra/validation/service-query/phase-split.patch).
-<!-- /service-phase-split-20261119 -->
+[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->
 
 <!-- panel-wording-followup-20261119 -->
 판넬 METHOD를 구현 목적에서 구성·처리 흐름으로 이어지도록 다듬고 CONCLUSION은 연구의 구현 성과로 시작하도록 바꾸어 설명3줄을 보강했다. 기존 시험 수치·검증 한계와 ABSTRACT·이미지·표를 보존한다. 판넬 자료는 계속 로컬/Git 제외다.

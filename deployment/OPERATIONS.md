@@ -97,9 +97,9 @@ capstone-cert-monitor의 Result=success/exit2와 probe_status=unavailable은 인
 <!-- service-provenance-summary-in-archive -->
 
 
-<!-- service-phase-split-20261119 -->
+<!-- service-phase-resolution-20261119 -->
 
-조회 선택·최종 보고 분리 후보는 격리 비교에서 두 방식 모두 실패해 운영과 초기 설치에 연결하지 않았다. 현재 단일 deploy.sh와 확정된 운영 패치는 유지한다. Mac·Linux 각각998검사, 공식 연계38·설치37통과는 새 OS 전체 설치·현재 채팅 품질·응답 목표 달성의 근거가 아니다.
+새 후보는 해당 전환의 실행 오류 없이 보고를 반환했지만 내용 검증과 운용 기준을 충족하지 못해 운영에 적용하지 않았다. Vector의 실제 반환 unit은 capstone-vector.service이며 LoadState=not-found였다. 없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
 
-[후보·실측·미완료](../infra/validation/service-query/phase-split.validation.json) · [17원본 기준 미적용 패치](../infra/validation/service-query/phase-split.patch).
-<!-- /service-phase-split-20261119 -->
+[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](../archive/DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->

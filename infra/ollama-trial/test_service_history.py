@@ -96,7 +96,8 @@ class ServiceRuntime(unittest.TestCase):
                     if args[0].get('properties',{}).get('report',{}).get('properties',{}).get('scope',{}).get('const')=='verified_service_lookup':
                         order.append('compact');prompts.append(messages)
                         return {'more_evidence':False,'report':{k:v['const'] for k,v in args[0]['properties']['report']['properties'].items()}}
-                    if 'anyOf' in args[0]:
+                    if ('anyOf' in args[0] or 'current_observation' in
+                            args[0].get('properties',{}).get('report',{}).get('properties',{})):
                         order.append('compact');prompts.append(messages)
                         return copy.deepcopy((compact_report[min(order.count('compact')-1,len(compact_report)-1)] if isinstance(compact_report,list) else compact_report) or self_report())
                     if 'request_nonce' in args[0].get('properties',{}):

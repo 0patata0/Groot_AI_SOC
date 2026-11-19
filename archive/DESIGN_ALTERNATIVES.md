@@ -1137,3 +1137,16 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 
 사용자 정정에 따라 Abstract 제목을 유지하고 내용만 한글로 작성한다. 별도 그림 목차와 표 목차를 생성하던 부분을 제거하고 실제 본문 캡션은 보존한다. 목차 번호는 렌더한 PDF의 본문 쪽수에서 구하며 캡션64개의 위치는 출력 검수용 원장에 따로 기록한다. 기존5장 구성·서론1쪽 시작·중점 연결선·코드 표의 서식은 유지한다.
 <!-- /thesis-abstract-title-main-toc-20261119 -->
+
+
+<!-- service-phase-resolution-20261119 -->
+<a id="service-phase-resolution-20261119"></a>
+
+## 조회 요청 해소 후보와 실제 대상 완료 판정의 공백
+
+조회 선택과 보고 사이에서 같은 근거를 반복 요청하던 문제를 후보에서 보완했다. 보고 단계가 추가 근거를 요청하면, 모델은 실제 등록 읽기를 선택하거나 기존 영수증의 필드를 지정하거나 도구의 한계를 밝힌다. 기존 근거나 도구 한계로 요청을 해소하기로 선택한 뒤에는 확보한 자료와 미확인을 담은 보고를 작성하도록 했다. 보호 권한과 실제 도구 목록은 변경하지 않았다.
+
+첫 실패 실행에서 읽기 선택 두 단계는 각각20.628초와17.802초였다.
+
+[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->

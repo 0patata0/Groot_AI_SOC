@@ -4,12 +4,14 @@
 Abstract 제목과 한글 내용, 일반 목차만 반영한 MD·DOCX·PDF를 현재 정본으로 사용한다. 이전 제목과 그림·표 목차가 있는 출력·생성기·서식 계약은 복구본에 보존한다. 학교 지정값·팀원 사진/학번, 독립 사건 평가·장기 안정성·새 OS 전체 설치·제3자 독립 재구현과 실제 리허설·12/1 발표는 별도다. 발표자료 추가 생성·수정과 공격·학습 중단을 유지한다.
 <!-- /thesis-abstract-title-main-toc-20261119 -->
 
-<!-- service-phase-split-20261119 -->
+<!-- service-phase-resolution-20261119 -->
 
-조회 선택·보고 분리 원형은 격리 비교에서 실패해 운영에 적용하지 않는다. 후속 순서는 조회 형식·추가 근거 요구와 보고 준비 판단의 충돌 해소 → 반례 회귀 → 같은 근거의 비교 → 관리자 경유 운영 대조·정확 후보 적용 → 새 실제 채팅 검증이다. 통합81.025초·분리37.830초는 모두 실패 시간이며30초/60초 목표 달성이 아니다. 현 작업은 후보·실패·정리 기록 게시까지 마무리한다. 공격·학습·발표자료 추가 생성/수정 중단을 유지한다.
+없는 unit의 기본 속성을 요청 서비스의 유효한 현재 관측으로 집계하는 완료 경계를 먼저 수정해야 한다. 백업도 이름만 매핑해 조회가 성공한 것처럼 처리하지 않고 실제 서비스 종류와 가능한 읽기를 연결해야 한다.
 
-[후보·실측·미완료](infra/validation/service-query/phase-split.validation.json) · [17원본 기준 미적용 패치](infra/validation/service-query/phase-split.patch).
-<!-- /service-phase-split-20261119 -->
+후속 개선에서는 필수 조회 뒤의 중복 선택 비용과 자유 서술의 근거 결속을 함께 다룬다. 첫 실패 실행에서 읽기 선택 두 단계는 각각20.628초와17.802초였다. 보고를 먼저 작성하고 추가 근거가 필요할 때만 실제 읽기 선택으로 넘어가는 방안을 다음 후보에서 검증한다. 시간이나 상태 수치를 자유 서술에 반복해 넣는 대신, 원문에 결속된 관측과 모델의 원인 판단·미확인을 구분한다. 현재 후보에 이 후속 방안을 구현했다고 표시하지 않는다.
+
+[검증·후보·미적용](infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](archive/DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->
 
 
 <!-- service-provenance-summary-in-archive -->

@@ -2369,3 +2369,14 @@ Ollama 운영 설치본에서 서비스 보고 형식 오류의 제한된 정정
 <!-- service-phase-split-publication-20261119 -->
 조회 선택·보고 분리 후보의 실패 비교와 정리 기록은 `73bc04ef622f528279472209eb5a010744413e38`로 게시했다. 원격 main 일치는 `2026-11-19T13:08:52.687150+09:00`에 확인했다. 운영 적용은0이며, 실패한 후보를 보존하고 현재 작업을 마무리한다.
 <!-- /service-phase-split-publication-20261119 -->
+
+
+<!-- service-phase-resolution-20261119 -->
+<a id="service-phase-resolution-20261119"></a>
+
+## 조회 요청 해소 후보와 실제 대상 완료 판정의 공백
+
+시험용 원격 폴더7개·파일2,241개·82,540,002바이트는 결과와 SHA를 로컬에 보존한 뒤 제거했다. 마지막 관리자 경유 확인에서 운영64파일 SHA와 기존 Hermes 실행 식별자가 유지됐으며 두 봇의 채팅 연결과 작업자가 살아 있음을 확인했다. 이번 시험의 운영 변경·서비스 재시작·보호 작업·새 채팅 게시는0이다. 공격·학습·발표자료 추가 생성과 수정은 재개하지 않았다. 로컬에는 Mac 패키지를 설치하지 않았다.
+
+[검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
+<!-- /service-phase-resolution-20261119 -->

@@ -1,0 +1,390 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-19T13:48:43.209891+09:00",
+  "state": "experimental candidate not operating applied; quality, scope and timing gates unmet",
+  "plan_sha256": "5298ca3e0e1e4141cb630fd5455dca52a4ba51b0cea5a0c36a0dde12087dfc90",
+  "previous_phase_plan_sha256": "eb7b1386cde9186cb3f2228bb4ebf2f58023f6152a84736e1d6c7a62d8856e72",
+  "schema_parent_plan_sha256": "0e237a5ce931b035c3816f9927264585f75fb3a1c9118cbd289e460ad65ac99d",
+  "configured_model": "soc-qwen36:35b-balanced-q4km-20261108",
+  "catalog_sha256": "7b8f53a7834d3fc072ad0bafc838d7870eaaafed11b8a4de8a46bb9143e26140",
+  "access_mode": "hermes-parity",
+  "protocol": {
+    "implementation": "private SDK candidate only; Native phase not connected",
+    "pending_request_choices": [
+      "original registered reads",
+      "existing receipt and field reference",
+      "capability_gap"
+    ],
+    "after_model_resolution": "settled report schema; no evidence-request branch until bound input identity changes",
+    "verdict_created_by_code": false,
+    "new_tool_or_authority": false,
+    "prior_turn_verdicts_or_approvals_reused": false,
+    "turn_local_receipts_reused_for_resolution": true
+  },
+  "patch": {
+    "path": "phase-resolution.patch",
+    "sha256": "24e8782c0550453b54db3969686ed775171592c907a5ea8c786c05c13a7749f4",
+    "bytes": 975306,
+    "source_files": [
+      {
+        "path": "/opt/capstone-management/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "5fc3974ec53560b0ac0b74804ed2c4b00d9384be53ae21665a0cea558dcf48e6",
+        "bytes": 233852
+      },
+      {
+        "path": "/opt/capstone-management/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "5c07ca2ec8473af51be856686702a0fd8615da069ae9a958b02c70222cdeb44b",
+        "bytes": 22979
+      },
+      {
+        "path": "/opt/capstone-management/soc_management_controller.py",
+        "before_sha256": "7e31affbfd4401bcc38266382a1968cdc153c26fa31397b756aee7e472cce8e2",
+        "after_sha256": "5641ecf00dcb9a4d0a48ad07900df701270a34991438f93362fe8aab29d94af8",
+        "bytes": 538882
+      },
+      {
+        "path": "/opt/capstone-management/soc_management_run.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/capstone-management/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "5fc3974ec53560b0ac0b74804ed2c4b00d9384be53ae21665a0cea558dcf48e6",
+        "bytes": 233852
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/grounding.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/query_grounding.py",
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/runtime.py",
+        "before_sha256": "d50405f4972f7c1390ed6ccfd92ac1965a76bf863839907e4191a157c8830ff3",
+        "after_sha256": "8bcf9a8561eeb578772247da3f6670f26f01f6115c51380dce7d1b1c5795c218",
+        "bytes": 66784
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "5c07ca2ec8473af51be856686702a0fd8615da069ae9a958b02c70222cdeb44b",
+        "bytes": 22979
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      },
+      {
+        "path": "/opt/hermes-data/management-code/run.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+        "before_sha256": "f35d89c7380e237e8fba69bcea5f6a0faeb9d64f9059fc7007502587955c762b",
+        "after_sha256": "fcaf9108f1df1ced647fd59fbaed562c5ac68154e956e58d3f6d6747ed40214b",
+        "bytes": 73909
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "before_sha256": "8bf0ae994476dffaa5bd5cf5c7951822d4caadadea976cd0e96d1ec512d456c4",
+        "after_sha256": "5fc3974ec53560b0ac0b74804ed2c4b00d9384be53ae21665a0cea558dcf48e6",
+        "bytes": 233852
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+        "before_sha256": "c625d03da75e044062e15aaf50cf0301712d8072690a697ac619d1d8be5f8cb7",
+        "after_sha256": "6f4e32a064f9f95ba4abf99b19bd26c1795e38fa9cae34659bcc186ed491436d",
+        "bytes": 305923
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md",
+        "before_sha256": "3233ad45957dd93ca30c1e212f966e9dd16695ecaf387e66ed34b5a649354cef",
+        "after_sha256": "5c07ca2ec8473af51be856686702a0fd8615da069ae9a958b02c70222cdeb44b",
+        "bytes": 22979
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py",
+        "before_sha256": "3d7e0dc96048e8f8fe419e61de63716bfc4f96d5af1391daba79236d4a375871",
+        "after_sha256": "3bfdf1f429f46dd3daec0c4b1706348522647e64bc5466f17e0396880099347e",
+        "bytes": 3646
+      }
+    ],
+    "forward_and_reverse_verified": 17
+  },
+  "prototype_sha256": {
+    "phase_plan.py": "e4e5c5e196400a0184c79e6a86df6d08f152d3b303c04712f53facf3baf670b4",
+    "split_model.py": "4c2aa6aeeb773e66d6f881d3f1f47227de1c464222f3a1b5296eb166746c83c4",
+    "test_phase_split.py": "6ca39ce4a0bf69a9a88667f4e36fbe325688045143b12b1ff45279e54aa892e2",
+    "test_phase_split_resolution.py": "c7bc53ffa96ce846f7d09d03d9771c9dd3a09dd8067d77c47d3b54172d087492",
+    "test_phase_split_runtime.py": "154df08d9bb9f1a3ffe3123bb8e729754f527b92a6d856823901805e5dfd8d83",
+    "proposed-soc-investigate.md": "67b0a90bc0f3b16b635b07d1143e0fca7b7f4d6d344f322e3111051494bda335"
+  },
+  "canonical_test_fixture": {
+    "path": "infra/ollama-trial/test_service_history.py",
+    "sha256": "86a72f0204518c6d9c44267ff3e1708a3ca6563dbf565c41f334ad3615601a2e",
+    "change": "test provider accepts root object report schemas as well as anyOf; no production schema adapted to the fake"
+  },
+  "regression": {
+    "mac_candidate": 1012,
+    "linux_candidate": 1012,
+    "linux_harness2": 38,
+    "linux_installer": 37,
+    "focused_phase_tests": 25,
+    "skipped": 0,
+    "overlapping_suites": true,
+    "whole_repository_pass": false,
+    "fixture_failures_preserved": {
+      "mac": 2,
+      "linux": 2,
+      "cause": "fake routed a valid root report object as selection",
+      "orchestration": "mac runner now returns nonzero on a failed candidate suite"
+    }
+  },
+  "framework": {
+    "commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "files_sha_verified": 140,
+    "manifest_sha256": "24fdd3ca70a52a41594350b14714ba016197e171b72a38f3ff690f1e5ab70cfc",
+    "surfaces_checked": 3,
+    "structure_is_quality_result": false
+  },
+  "trials": [
+    {
+      "question": "A 서버 저장소 감시 오류 원인과 지금 상태 확인해줘",
+      "plan_sha256": "f4736bdfd248997244ea35b4fa3980519962c616851242856e588a59ac5b8e72",
+      "seconds": 125.89144184801262,
+      "started_at_kst": "2026-11-19T13:19:51.907031+09:00",
+      "finished_at_kst": "2026-11-19T13:21:57.798295+09:00",
+      "report_sha256": "7b0226c463a23431c08789ae2a2cbf2ddbb4976c112c29c220fd6b4074a30dd0",
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "error_type": "RuntimeError",
+      "actual_diagnostic_reads": 4,
+      "model_completions": 11,
+      "phase_calls": [
+        "read_choice",
+        "read_choice",
+        "report_only",
+        "report_only",
+        "report_only",
+        "evidence_resolution",
+        "report_only",
+        "evidence_resolution",
+        "report_only"
+      ],
+      "pruned_unverified_sentences": 0,
+      "qualified_for_operation": false,
+      "classification": "failed handoff loop",
+      "new_live_chat": false,
+      "protected_calls": 0
+    },
+    {
+      "question": "A 서버 저장소 감시 오류 원인과 지금 상태 확인해줘",
+      "plan_sha256": "5298ca3e0e1e4141cb630fd5455dca52a4ba51b0cea5a0c36a0dde12087dfc90",
+      "seconds": 109.19014701806009,
+      "started_at_kst": "2026-11-19T13:31:14.773914+09:00",
+      "finished_at_kst": "2026-11-19T13:33:03.963897+09:00",
+      "report_sha256": "8984b5970958814c40c16b788374f2682d8660066c2a257f8986b8897b015da7",
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "error_type": null,
+      "actual_diagnostic_reads": 3,
+      "model_completions": 8,
+      "phase_calls": [
+        "read_choice",
+        "report_only",
+        "report_only",
+        "evidence_resolution",
+        "report_only",
+        "report_only"
+      ],
+      "pruned_unverified_sentences": 5,
+      "qualified_for_operation": false,
+      "classification": "partial; rejected claims pruned",
+      "new_live_chat": false,
+      "protected_calls": 0
+    },
+    {
+      "question": "B 서버 백업 오류랑 지금 상태 확인해줘",
+      "plan_sha256": "5298ca3e0e1e4141cb630fd5455dca52a4ba51b0cea5a0c36a0dde12087dfc90",
+      "seconds": 6.250537918996997,
+      "started_at_kst": "2026-11-19T13:34:59.121687+09:00",
+      "finished_at_kst": "2026-11-19T13:35:05.372066+09:00",
+      "report_sha256": "e3691144eec09142d2c4fbc77cff44fd330ce8e40ca43b7c27f9c2b7991ec521",
+      "runtime_rc": 1,
+      "reported_status": "partial",
+      "error_type": null,
+      "actual_diagnostic_reads": 0,
+      "model_completions": 0,
+      "phase_calls": [],
+      "pruned_unverified_sentences": 0,
+      "qualified_for_operation": false,
+      "classification": "unsupported scope; no diagnostic read or model call",
+      "new_live_chat": false,
+      "protected_calls": 0
+    },
+    {
+      "question": "B 서버 Vector 오류랑 지금 상태 확인해줘",
+      "plan_sha256": "5298ca3e0e1e4141cb630fd5455dca52a4ba51b0cea5a0c36a0dde12087dfc90",
+      "seconds": 20.316198460990563,
+      "started_at_kst": "2026-11-19T13:37:15.295252+09:00",
+      "finished_at_kst": "2026-11-19T13:37:35.611304+09:00",
+      "report_sha256": "783497b603d21c6295d0843f9d1ff989cb2115ad95503ccf2284b80ca7ef452e",
+      "runtime_rc": 0,
+      "reported_status": "completed",
+      "error_type": null,
+      "actual_diagnostic_reads": 1,
+      "model_completions": 1,
+      "phase_calls": [],
+      "pruned_unverified_sentences": 0,
+      "qualified_for_operation": false,
+      "classification": "incorrect completion boundary; missing unit identity",
+      "new_live_chat": false,
+      "protected_calls": 0
+    }
+  ],
+  "backup_scope_gap": {
+    "registered_target_present": false,
+    "actual_diagnostic_reads": 0,
+    "model_calls": 0,
+    "not_a_successful_latency_or_quality_case": true
+  },
+  "vector_completion_gap": {
+    "at_kst": "2026-11-19T13:43:56.619062+09:00",
+    "case": "B 서버 Vector 오류랑 지금 상태 확인해줘",
+    "runtime_marked_completed": true,
+    "actual_read_target": "b:vector",
+    "returned_unit": "capstone-vector.service",
+    "returned_load_state": "not-found",
+    "displayed_valid_count": 1,
+    "displayed_unknown_count": 0,
+    "systemctl_exact_unit_observation": "LoadState=not-found\nActiveState=inactive\nSubState=dead\n",
+    "container_name_check_scope": "docker ps --all; only names containing vector",
+    "container_name_matches": [],
+    "actual_vector_component_identity_proven": false,
+    "classification": "completion and target-identity gap; not a successful causal investigation or performance result",
+    "model_synthesis_phase_exercised": false,
+    "next_action": "common missing-unit identity/completion guard first, then actual discovered service type and supported read path; no fabricated alias or permission change"
+  },
+  "manual_claim_audit": {
+    "scope": "manual source audit of actual final rejected model draft; no guard changes",
+    "rejected_sentences": [
+      {
+        "sentence": "A 서버의 `capstone-storage-monitor.service`는 Type=oneshot 서비스로, 요청 기간(2026-11-18 13:31 ~ 2026-11-19 13:31) 동안 약 15분 간격으로 주기적으로 실행되었습니다.",
+        "issues": [
+          "diagnostic_duration_claim_unbound"
+        ]
+      },
+      {
+        "sentence": "제공된 journal 로그에는 해당 서비스의 실행 중 발생한 예외(Exception), 오류(Error), 또는 비정상 종료 기록이 확인되지 않았습니다.",
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ]
+      },
+      {
+        "sentence": "journal_retention_verified=false이므로 전체 보존 로그의 오류 부재는 확인되지 않았습니다.",
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ]
+      },
+      {
+        "sentence": "requested_window_total_count가 null인 현재 조회 한계 내에서 오류 원인을 특정할 수 없습니다.",
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ]
+      },
+      {
+        "sentence": "journal_scope='errors' 조회에서 returned_entries=0이지만 journal_retention_verified=false이므로 전체 보존 구간 내 오류 부재는 확인되지 않았습니다.",
+        "issues": [
+          "sample_zero_presented_as_absence"
+        ]
+      }
+    ],
+    "observations": {
+      "returned_error_excerpt_rows": 0,
+      "all_journal_excerpt_rows": 50,
+      "retention_verified": false,
+      "has_more": true
+    },
+    "confirmed_unsupported": [
+      "automatic initial window named as user requested period",
+      "15-minute periodic schedule asserted without configuration or a bound calculated event pair"
+    ],
+    "requires_further_review": [
+      "generic provided-data absence wording may be narrower than a whole-period absence claim; inspect separately before altering a guard"
+    ],
+    "decision": "do not weaken guards or mark response accurate; isolate typed source facts from free causal prose and remove duplicate read planning next"
+  },
+  "cleanup": {
+    "roots": 7,
+    "files": 2241,
+    "verified_bytes": 82540002,
+    "all_actor_jobs_terminal": true,
+    "results_locally_preserved": true,
+    "operating_backups_framework_weights_removed": false
+  },
+  "last_operating_check": {
+    "at_kst": "2026-11-19T13:45:06.775379+09:00",
+    "source_hashes_verified_unchanged": 64,
+    "native_container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "native_image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "native_started_at_kst": "2026-11-18T20:45:01.061267+09:00",
+    "native_restart_count": 0,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "websocket_connected": true,
+        "worker_alive": true,
+        "checked_at_kst": "2026-11-19T13:44:48+09:00"
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "websocket_connected": true,
+        "worker_alive": true,
+        "checked_at_kst": "2026-11-19T13:44:59+09:00"
+      }
+    },
+    "operating_source_changes": 0,
+    "operating_restarts": 0
+  },
+  "operating_applied": false,
+  "operating_source_or_permission_changes_on_servers": 0,
+  "chat_posts": 0,
+  "limitations": [
+    "four different live input trials, not a controlled paired timing comparison",
+    "backup and Vector did not exercise new report synthesis",
+    "partial or incorrectly completed responses are not accepted quality or SLO results",
+    "Native split flow and new live chats not verified",
+    "full Native OpenAI-dependent test suite unavailable in Mac global Python",
+    "new OS installation not tested",
+    "Semgrep not executed; CLI unavailable"
+  ],
+  "next": [
+    "common missing-unit identity and completion guard before target or service-type mapping",
+    "discover actual registered service type/read path; never fabricate an alias",
+    "avoid duplicate read planning after mandatory evidence; report first candidate not implemented yet",
+    "bind selected source observations separately from free causal prose",
+    "common regressions, administrator-route live comparison, rollout receipt/recovery and new actual chats"
+  ],
+  "publication": {
+    "state": "prepared; commit and push verification follow",
+    "credential_values_included": false
+  }
+}

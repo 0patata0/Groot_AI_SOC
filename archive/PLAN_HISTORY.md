@@ -7193,3 +7193,14 @@ Abstract 제목과 한글 내용, 일반 목차만 반영한 MD·DOCX·PDF를 �
 
 [검증·후보·미적용](../infra/validation/service-query/phase-resolution.validation.json) · [17원본 기준 패치](../infra/validation/service-query/phase-resolution.patch) · [전체 실패·정정·근거](DIAGNOSTIC_HISTORY.md#service-phase-resolution-20261119).
 <!-- /service-phase-resolution-20261119 -->
+
+<!-- thesis-justify-background-panel-20261119 -->
+<a id="thesis-justify-background-panel-20261119"></a>
+## 2026-11-19 논문 배경·서식과 판넬 분량 정정
+
+논문은 전체99쪽·본문1~96쪽·일반 목차88항목으로 맞췄다. Abstract 제목과 한글 내용, 서론1쪽 시작, 다섯 장 구조와 중점 연결선을 유지한다. 본문과 한글 Abstract에는 양쪽 정렬을 명시하고 머리말 아래와 쪽번호 위에는0.5pt 가로선을 넣었다. 표지는 기존 형식을 유지한다.
+
+판넬은 Abstract·Method·Result·Conclusion의 네 항목으로 정리했다. Abstract451→245자·Method1,199→596자·기존 Conclusion697→Result328자로 줄이고 새 Conclusion104자를 두 문장으로 추가했다. 네 항목의 본문은2,347→1,273자(54.24%)이며 제목·팀원·항목명을 포함한 파일은2,479→1,415자다. 정상90건·공격 대조3건·복합 조사6대화/18읽기/보고 수용3건의 범위와 승인 조건을 보존한다. 결과 화면과 표는 Result에 배치하도록 안내하고 기존 이미지 경로와 다른35파일은 바꾸지 않았다.
+
+발표자료는 사용자 지시에 따라 보존한다. 이번 문서 작업에서 새 채팅·MCP·공격·학습·운영 배포는 수행하지 않았다. 전체 native 통합 시험의 직전 R8은 실패 후 작업 공간과 입력을 정리한 상태이며 자동 재개하지 않았다. 시간·비용 비교와 새 환경 전체 재현, 독립 사건 판단 정확도·장기 안정성은 후속 과제로 남긴다.
+<!-- /thesis-justify-background-panel-20261119 -->

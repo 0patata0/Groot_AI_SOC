@@ -1,10 +1,14 @@
 # Groot_AI_SOC
 
-<!-- thesis-abstract-title-main-toc-20261119 -->
-논문은 Abstract 제목 아래 한글 내용을 두고 일반 목차만 제공한다. 전체95쪽·본문1~92쪽·목차87항목이며 본문 그림·표·편집 가능한 코드10표를 유지한다. 이전98쪽·151색인은 제목 정정과 그림·표 목차 제거 전의 기록이다. 논문 파일은 로컬/Git 제외다.
+<!-- thesis-justify-background-panel-20261119 -->
+논문은 전체99쪽·본문1~96쪽·일반 목차88항목으로 맞췄다. Abstract 제목과 한글 내용, 서론1쪽 시작, 다섯 장 구조와 중점 연결선을 유지한다. 본문과 한글 Abstract에는 양쪽 정렬을 명시하고 머리말 아래와 쪽번호 위에는0.5pt 가로선을 넣었다. 표지는 기존 형식을 유지한다.
 
-[현재 검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-abstract-title-main-toc-20261119).
-<!-- /thesis-abstract-title-main-toc-20261119 -->
+1.1 배경 및 목적에 AI 활용 공격과 관제 인력 제약의 공개 지표, 실제 AI 악용 캠페인을 두 표로 추가했다. CrowdStrike·Anthropic·FBI·ISACA의 공식 자료4개를 인용하고 관측 대상과 조사 범위를 함께 적었다. 반복 조회·대조·초기 판단·보고와 대응안 작성을 LLM이 수행하여 사람의 직접 작업시간과 인건비 부담을 줄이는 것을 연구 목적으로 구체화했다. 보호된 변경의 관리자 승인과 실행기 검사는 유지한다. 시간·인건비 절감은 실측 결과가 아니며3.3.4에 같은 사건·품질 기준의 수작업 대조와 추론·서버·유지보수 비용을 포함하는 후속 평가 기준을 제시했다.
+
+판넬은 Abstract·Method·Result·Conclusion의 네 항목으로 정리했다. Abstract451→245자·Method1,199→596자·기존 Conclusion697→Result328자로 줄이고 새 Conclusion104자를 두 문장으로 추가했다. 네 항목의 본문은2,347→1,273자(54.24%)이며 제목·팀원·항목명을 포함한 파일은2,479→1,415자다. 정상90건·공격 대조3건·복합 조사6대화/18읽기/보고 수용3건의 범위와 승인 조건을 보존한다. 결과 화면과 표는 Result에 배치하도록 안내하고 기존 이미지 경로와 다른35파일은 바꾸지 않았다.
+
+논문과 판넬 원문은 로컬/Git 제외다. [현재 검수 이력](archive/DIAGNOSTIC_HISTORY.md#thesis-justify-background-panel-20261119).
+<!-- /thesis-justify-background-panel-20261119 -->
 
 <!-- coordinator-native-systemd-20261119 -->
 조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).

@@ -1,5 +1,20 @@
 # 진단 탐색 이력
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+## 2026-11-19 backend 통합의 실패와 수정
+
+첫 시험은 역할 파일의 줄바꿈을 그대로 읽어 카탈로그 선택에 실패했다. 다음은 nonrecursive root bind가 앞서 연결한 실행 파일 마운트를 가리는 문제였고 bind 순서를 바꿔 읽기 전용 실행 파일을 유지했다. 이후 /var/run 부재를 보완했다.
+
+Docker 데몬은 기동했으나 새 procfs 마운트·마스크된 proc의 sysctl·상위 네트워크 setns가 차례로 거절됐다. 마스크를 제거하지 않고 읽기 전용 proc/sys와 B 소유 네트워크·시험 전용 veth로 연결했다. 컨테이너의 실행 거절은 작업 저장소의 noexec를 실제로 확인하고 기존 BusyBox를 읽기 전용으로 연결해 해결했다.7회 실패 원문·입력 SHA·소스는 보존했다.
+
+R8에서 실제 정지·재개가 통과했다. 검토 중 supervisor가 소유 범위를 확인하기 전에 네트워크 명령을 실행할 수 있는 진입 순서를 발견해 자체 cgroup·별도 네트워크 확인을 첫 명령 앞으로 옮겼다. 완성 전 보고가 관측될 수 있는 순서도 고쳐 교차 대조가 끝난 결과만 게시한다. 이 두 문제로 운영 호스트가 변경된 관측은 없으며 앞선 실행도 자체 유닛 안에서만 진행했다.
+
+R9는 잘못된 호스트 키 거절과 실제 컨테이너 제한·마운트·namespace·새 PID를 포함해 통과했다. Mac의 AST3개와 거절4조건에서 자체 공간 밖의 명령 호출은0이었다.9회 시험 자원 부재를 별도 읽기로 확인했다. 이 결과는 root Lifecycle·소스/캐시 전역 복구·실제 재부팅·운영 적용이나 모델 품질을 증명하지 않는다.
+
+[검증 원장](../infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](../infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+## 2026-11-19 실제 backend 뒤의 전체 복구 연결
+
+기존 계획의 B 전용 Docker와 새 SSH 연결을 실제로 확인했다. 후속으로 고정 root 진입점과 실제50소스·캐시·reader 프로토콜·Context.peers를 연결해 전체 전환·부분 실패·독립 Lifecycle.recover·전역 근거·원래 소비자 재개·정리/current를 검증한다. 합성 응답이나 단계 표기를 운영 근거로 바꾸지 않는다. 실제 호스트 재부팅·정확 승인·관리자 경유 적용·새 MCP/두 봇 채팅과12/1 최종 발표는 별도다.
+
+[검증 원장](../infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](../infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
+
 <!-- presentation-preserve-user-20261119 -->
 ## 2026-11-19 기존 발표자료 유지 결정
 

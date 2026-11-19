@@ -2,9 +2,12 @@
 
 <!-- coordinator-native-systemd-20261119 -->
 후속으로 A/B/C27유닛을 후보 Native의 운영 모드로 읽었고 관리자231의 고유 시험 유닛과 C 합성 파일에서6조건을 통과했다. 원래 활성 유닛만 재개하고 별도 타이머가 중단된 합성 파일2개를 복구했으며 시험 유닛·작업 파일은 제거했다. 운영 root 진입점·Lifecycle.recover·실제 재부팅·B Docker/SSH·전체 캐시/전역 복구는 미검증이다. [새 검증 원장](native-systemd.validation.json) · [시험용 변환과 실행 조건](COORDINATOR.md#실제-systemd의-격리-시험).
-<!-- coordinator-private-pid1-20261119 -->
-B 내부의 격리 역할3개에서 실제 systemd PID1·보호된 서비스·독립 타이머·기본 Native의 C 수집 유닛4개를 확인했다. 기존42소스와 운영 서비스는 보존했다. 각 역할은 합성 계정·설정·저장소를 사용하며 전체 root 실행기/Lifecycle·SSH/Docker·캐시/전역 복구와 실제 호스트 재부팅은 미검증이다. [검증 원장](private-pid1.validation.json) · [격리 경계와 재현](COORDINATOR.md#격리-pid1-검증-기반).
-<!-- /coordinator-private-pid1-20261119 -->
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+기존 PID1 기반을 확장해 역할별27유닛 읽기, 실제 UID50124의 SSH 조회와 잘못된 호스트 키 거절, B 전용 Docker 컨테이너의 Native 정지·재개를 확인했다. 시험용 유닛·계정·키·이미지를 사용했으며 고정 root 실행기·Lifecycle.recover·소스/캐시·전역 복구와 실제 호스트 재부팅은 아직 검증하지 않았다.
+
+[검증 원장](private-backends.validation.json) · [실행 조건과 남은 작업](COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
 
 <!-- /coordinator-native-systemd-20261119 -->
 

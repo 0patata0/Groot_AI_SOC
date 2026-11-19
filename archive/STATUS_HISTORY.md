@@ -1,5 +1,16 @@
 # 현황 이력
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+## 2026-11-19 격리 SSH·Docker 실제 정지와 재개
+
+세 PID1의 역할별27유닛 읽기·SSH4경로와 잘못된 호스트 키 거절, B 전용 Docker 컨테이너의 Native 정지·재개를 확인했다. 최신12:19:01 KST 결과는 메모리 최대94,498,816바이트·pids.peak67·OOM0이었다. 자체9회 시험의 유닛·입력·작업 폴더·cgroup은12:20:45 KST 별도 읽기에서 없었다.
+
+기존42소스와 PID1 기반은 그대로이며 공식 Harness²82→85구성·추가3·기존 수정0·상시16,917자 증가0이다. 시험용 계정·키·서비스·이미지의 통과다. 전체 root 실행기·Lifecycle.recover·50소스/캐시 전역 복구·실제 호스트 재부팅·정확 승인·운영 적용·새 MCP/두 봇 인수는 남는다.
+
+[검증 원장](../infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](../infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
+
 <!-- presentation-preserve-user-20261119 -->
 ## 2026-11-19 발표자료 생성·수정 중단
 

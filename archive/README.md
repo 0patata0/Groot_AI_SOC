@@ -1,5 +1,12 @@
 # 과거 기록과 복원 안내
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+11/19 격리 SSH4경로와 B 전용 Docker의 실제 Native 정지·재개,7회 초기 실패·소유권 가드 보완·9회 정리를 현황·계획·설계·진단 이력에 연결한다. 전체 root Lifecycle·소스/캐시 복구·호스트 재부팅과 운영 인수는 남는다.
+
+[현황](STATUS_HISTORY.md#coordinator-private-backends-20261119) · [계획](PLAN_HISTORY.md#coordinator-private-backends-20261119) · [설계](DESIGN_ALTERNATIVES.md#coordinator-private-backends-20261119) · [진단](DIAGNOSTIC_HISTORY.md#coordinator-private-backends-20261119)
+<!-- /coordinator-private-backends-20261119 -->
+
 <!-- thesis-korean-abstract-code-tables-20261119 -->
 후반 국문 초록과 코드 표의 변경·검수 결과를 현황·계획·설계 대안·진단 이력에 연결했다. 98쪽·서론1쪽 시작·5장·표 없는 목차와 기존 재현 근거를 유지하며 실제 운영·독립 재구현 완료와 구분한다.
 

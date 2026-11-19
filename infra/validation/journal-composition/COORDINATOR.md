@@ -1,5 +1,37 @@
 # 소스·캐시·소비자 조정 실행기
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+## 실제 SSH·Docker backend 연결
+
+11/19 기존 PID1 기반 검증기를 그대로 재사용해 A6/B17/C4의27유닛을 기본 Native로 읽었다. 유닛 이름과 실제 systemd 속성을 사용하지만 소비자 프로그램은 sleep·타이머의 합성 입력이다. 운영 서비스나50소스 전체를 실행한 결과로 표시하지 않는다.
+
+시험 안에서 새 Ed25519 키와 고정 known_hosts를 만들었다. A→B/C와 B→A/C의4경로에서 실제 SSH 공개키 인증과 원격 UID50123·역할·machine-id 지문을 대조했다. B 클라이언트는 UID50124로 실행했다. A→B에 C의 호스트 키를 넣으면 거절되며 C에는 클라이언트 키를 두지 않는다. 운영 키를 복사하거나 StrictHostKeyChecking을 끄지 않았다. 이 응답은 시험용 신원 응답이며 운영 reader 프로토콜과 Context.peers 검증은 남는다.
+
+B의 user namespace가 소유하는 별도 network namespace를 만들고 시험 전용 veth로 외부 연결이 없는 상위 시험 네트워크에 붙였다. Docker의 host PID/network 옵션은 이 B 역할 안의 공간만 공유한다. 운영 호스트의 PID·네트워크·Docker 소켓은 연결하지 않는다. /proc·/sys의 기존 마스크를 읽기 전용으로 보존하고 noexec인 이미지 저장소에서는 기존 BusyBox 실행 파일을 읽기 전용으로 연결해 사용한다.
+
+실제 별도 Docker 데몬에 새 이미지를 반입해 만든 컨테이너에서 Native의 정지·재개를 확인했다. 정책 no·running=false·PID0에서 같은 CID/이미지의 새 PID·unless-stopped로 돌아왔다. 실제 로드된 메모리64MiB·pids16·비특권·NoNewPrivileges와 세 마운트의 읽기 전용 속성도 확인했다. 실제 Hermes 이미지와 격리 설정의 동등성을 검증한 것은 아니다.
+
+최종12:19:01 KST 실행은 외부512MiB/Tasks256/CPU100%/최대75초 제한에서 메모리 최대94,498,816바이트·pids.peak67·OOM0이었다.9회 자체 시험의 유닛·작업/입력 폴더·cgroup 부재를12:20:45 KST에 별도로 읽었다. Mac에 패키지를 설치하거나 대형 운영 이미지를 반출하지 않았다.
+
+검증기와 기존42소스·두 manifest, PID1 기반 검증기·probe를 같은 디렉터리에 둔다. 기존 도구가 있는 승인된 Linux 점검 호스트의 root가 명시적으로 실행한다.
+
+```sh
+python3 -IB infra/validation/journal-composition/validate_private_backends.py --run-owned-units
+```
+
+공식 Harness²는 기존 고정 후보를 복원한 뒤 새 소스3개를 검사한다.82→85구성·기존 수정0·상시16,917자 증가0이며 모델 품질 점수는 아니다.
+
+```sh
+python3 -B infra/validation/journal-composition/reproduce_limits.py --repo . --output /private/tmp/soc-private-backends
+python3 -B infra/validation/journal-composition/check_private_backends_structure.py --repo . --restored-root /private/tmp/soc-private-backends/candidate --output /private/tmp/soc-private-backends/backends-harness2.json
+```
+
+고정 root 실행기·독립 Lifecycle.recover·실제50소스와 캐시·전역 복구·원래 소비자 재개·정리/current·실제 호스트 재부팅은 다음 통합 단계다. 정확 승인·운영 적용과 새 MCP/두 봇 인수도 계속 별도로 확인한다.
+
+[검증 원장](private-backends.validation.json) · [실행 조건과 남은 작업](COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
+
 소스와 캐시를 함께 전환하고 원래 소비자를 재개한 뒤 임시 장치를 정리하도록 연결했다. **격리 검증을 마친 후보이며 운영 서버에는 아직 적용하지 않았다.** 운영 유닛의 정지·재개·실제 부팅·독립 복구 검증과 전체 payload의 정확 승인, MCP·두 봇 새 채팅 인수가 남았다. [소스 고정](coordinator-manifest.json) · [검증 원장](coordinator-validation.json) · [현재 상태](../../../STATUS.md).
 
 ## 공통 계약과 고정 범위

@@ -6,9 +6,12 @@
 
 <!-- coordinator-native-systemd-20261119 -->
 조정 실행기의 A/B/C27유닛 읽기와 관리자 호스트의 별도 systemd 합성6조건을 확인했다. 운영 소스·캐시·기존 유닛은 변경하지 않았으며 실제 운영 복구·재부팅·정확 승인·새 MCP/봇 인수는 남는다. [근거와 범위](infra/validation/journal-composition/native-systemd.validation.json) · [실행기](infra/validation/journal-composition/COORDINATOR.md).
-<!-- coordinator-private-pid1-20261119 -->
-B 내부의 세 격리 PID1에서 실제 systemd 서비스·타이머와 기본 Native의 동일한 C 수집 유닛4개를 확인했다. 운영 root 실행기·Lifecycle.recover·SSH/Docker·소스/캐시 전역 복구는 아직 검증하지 않았다. [기반 검증과 실행 조건](infra/validation/journal-composition/private-pid1.validation.json) · [재현 방법](infra/validation/journal-composition/COORDINATOR.md#격리-pid1-검증-기반).
-<!-- /coordinator-private-pid1-20261119 -->
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+격리 PID1의 역할별27유닛을 기본 Native로 읽고 SSH4경로와 B 전용 Docker의 실제 정지·재개를 확인했다. 고정 root 진입점·Lifecycle.recover·50소스/캐시 전역 복구·운영 적용·새 MCP/두 봇 인수는 아직 미검증이다.
+
+[검증 원장](infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
 
 <!-- /coordinator-native-systemd-20261119 -->
 

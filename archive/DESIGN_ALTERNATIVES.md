@@ -1,5 +1,18 @@
 # 설계 대안 이력
 
+<!-- coordinator-private-backends-20261119 -->
+<a id="coordinator-private-backends-20261119"></a>
+## 2026-11-19 소유권을 유지한 격리 Docker·SSH 구성
+
+운영 Docker 소켓을 연결하거나 큰 이미지를 내보내는 대신 기존 실행 파일을 읽기 전용으로 사용하고 별도 데몬·저장소·BusyBox 이미지를 만들었다. 기존 PID1 기반의 소스와 마스크·읽기 전용 조건은 유지했다. Docker가 새 procfs를 마운트하고 상위 네트워크로 setns하는 단계에서 거절되자 보호된 proc/sys를 읽기 전용으로 전달하고 B의 user namespace가 직접 소유하는 네트워크를 시험 전용 veth에 연결했다.
+
+Docker의 host PID/network 공유는 B 시험 역할 내부로 한정한다. 컨테이너의 세 마운트는 읽기 전용이며 비특권·NoNewPrivileges·64MiB/pids16을 실제 조회했다. noexec인 작업 공간에서는 기존 BusyBox 바이너리를 읽기 전용으로 연결해 실행했다. 이는 실제 Hermes 컨테이너 구성과 같다는 주장이 아니다.
+
+SSH는 새 키·고정 known_hosts·강제 명령으로 신원만 반환한다. B의 클라이언트는 실제 UID50124이고 잘못된 호스트 키는 거절된다. Native runner를 주입하거나 경로/명령을 번역하지 않았다. 운영 reader와 Context.peers 연결은 남는다.
+
+[검증 원장](../infra/validation/journal-composition/private-backends.validation.json) · [실행 조건과 남은 작업](../infra/validation/journal-composition/COORDINATOR.md#coordinator-private-backends-20261119).
+<!-- /coordinator-private-backends-20261119 -->
+
 <!-- bootstrap-clock-gate-20261118 -->
 <a id="bootstrap-clock-gate-20261118"></a>
 

@@ -1,0 +1,571 @@
+{
+  "schema": 1,
+  "status": "private_real_SSH_and_Docker_native_stop_resume_verified_full_coordinator_pending",
+  "at_kst": "2026-11-19T12:23:28.835122+09:00",
+  "source_sha256": {
+    "validate_private_backends.py": "9867227db61f3a75c9039173e14283da18cc0da27461dae87d3dc6b016588aa7",
+    "private_backend_probe.py": "a00b4a3f6f29c5036c261a42d7ff3750b89bb1570ef0e2a90d41df830037a06b",
+    "check_private_backends_structure.py": "ea81f9db0d84d12fc254b19e4750b3294efd265bea03f7c91ad3613a977a25e5"
+  },
+  "foundation_sha256": "65935aaf67e456db739193064087acb994742bef77a79e44f1d79119e073ecb8",
+  "original_operator_source_sha256": {
+    "release_status.py": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4",
+    "reader_bridge.py": "062b675e3398eb75a323e2618a34c549396ffee7927c7ff04a2318702b9adede",
+    "cohort_guard.py": "b6ee448e01576bf7b8a868f2d9bedd6b9872eac2b762be94de50dbf1f239548e",
+    "test_release_status.py": "790517785aac917bb4568db16c2b055e2960fbbcf6508ab05466da4b1092978e",
+    "test_reader_bridge.py": "8e00b5cd237cd68205626abe5f20a65e78d9b4b9d1223022fa07cad5a08d81a5",
+    "test_release_ipc.py": "4c36d68c976eea4119816d1460451561c05ac24b4083290ad84a8f1e1ca1a473",
+    "test_cohort_guard.py": "e79db78bc081a549c741565a844ff2854b1fb14df85bdf1b6a773b1be88771e1",
+    "check_release_structure.py": "2df9f77ae5ad42d52794300df112e6dd387debcd6f639749770759809156908d",
+    "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
+    "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc",
+    "release_files.py": "8ea85437ff7dd4fc40f0e0c47a36b401afa0265d0369bce5b673f2e67a94abe2",
+    "release_reader.py": "ada6d7358233066be9c7292af9f668d8b5ca13c4c15a0d79098de5419ef9552c",
+    "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
+    "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+    "release_services.py": "7222bd11e9cd9a26b9cbbebd82986d62daa7bac88a199761a2bc9b7c3814ac57",
+    "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
+    "release_storage.py": "20f28e00b21c7266de4923302122256bf20068fd8b811cba2fd6bdd0a7e02958",
+    "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
+    "release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
+    "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
+    "release_lifecycle.py": "eccb3085b048bf1fde3d444fd2e3158077ebbed87316843a27c8ce3495894e50",
+    "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
+    "release_plan.py": "0680d56323b18d27ea0dbe5e1c0b50a66753d335d983ed32b0b6aafc44184509",
+    "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
+    "test_release_files.py": "b1561b85af99f18817f974117ad1fd02acc20f48ddac259ecc54d1621aaced51",
+    "test_release_reader.py": "bc17d3ab111ae65ab878f811b199e2b8fabce16665de55ceac30e2aa39f60e14",
+    "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
+    "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
+    "test_release_services.py": "e526f30dfa2f3cdab6fc8181915f785854163801e62a0e60b63c728ff71a9f96",
+    "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
+    "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
+    "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
+    "test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
+    "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
+    "test_release_lifecycle.py": "a75a09e2fdd108902ea4504f8c1756279e7f70ca606d0f7a020f76817c9b209f",
+    "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
+    "test_release_plan.py": "79f312216da9f1bf1ceade1523ab0f3d73bad9d29bf267619407ea1e38b0c487",
+    "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+    "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+    "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+    "release_completion.py": "9d7a2fcf7086e1fab80bf2e70e180bb35c98abd85094947dc6e9c2fb1ae43b91",
+    "test_release_completion.py": "c87d8285fd97ca4c24b6e76e82dd86b07ae69007a0b1d14fa165f90547d7f607"
+  },
+  "original_operator_source_changes": 0,
+  "latest_actual_native_run": {
+    "observed_at_kst": "2026-11-19T12:19:01.731601+09:00",
+    "raw_result_sha256": "e7c31fce1cc9c3cd5eb5ed561e9d93d3f31541df5449707b07c611b44b5fb45d",
+    "input_files": 47,
+    "input_sha256_unchanged": true,
+    "input_bundle_removed": true,
+    "role_proofs": {
+      "a": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "at_kst": "2026-11-19T12:18:57.609523+09:00",
+        "default_native_backend": true,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "41377d21278766bd93ee233b488542f6d2e211010777766b16295840a0574d3f",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533158]",
+          "ipc": "ipc:[4026533156]",
+          "mnt": "mnt:[4026533159]",
+          "net": "net:[4026532955]",
+          "pid": "pid:[4026533157]",
+          "user": "user:[4026532951]",
+          "uts": "uts:[4026533155]"
+        },
+        "native_catalog_units": 6,
+        "operating_deployment": false,
+        "peer_ssh_verified": true,
+        "peers": {
+          "b": {
+            "machine_sha256": "bb8406dff17dbb63624579ab8e02a8680a93969feacc5f749b2e25a610d59397",
+            "pid": 41,
+            "role": "b",
+            "schema": 1,
+            "uid": 50123
+          },
+          "c": {
+            "machine_sha256": "d344fa220531afabf940b8572e87c1e0274305fd3e5dec3a4a7d22c3a364cd1c",
+            "pid": 52,
+            "role": "c",
+            "schema": 1,
+            "uid": 50123
+          }
+        },
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "readonly_local_bin_remount_errno": 1,
+        "role": "a",
+        "schema": 1,
+        "ssh_client_uid": 0,
+        "ssh_server": {
+          "ActiveState": "active",
+          "ExecMainStatus": "0",
+          "MainPID": "34",
+          "Result": "success"
+        },
+        "status": "verified",
+        "systemd_pid1": 1,
+        "wrong_host_key_denied": true
+      },
+      "b": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "at_kst": "2026-11-19T12:18:57.821324+09:00",
+        "busybox_sha256": "dbac288c29ba568459550a2da9e7ae0ded6b1fc728ee9fad3044c44e62d6ac14",
+        "container_baseline": {
+          "dead": false,
+          "id": "4ffc832d3977831e6fbfb4636c6855b5b4527cbbfc0bdc4c421c49759abcdbb3",
+          "image": "sha256:921875b6b47042fb712d408bbe6062a9b1dc75f594fa0b03e562657cfc445d57",
+          "paused": false,
+          "pid": 173,
+          "restart": {
+            "MaximumRetryCount": 0,
+            "Name": "unless-stopped"
+          },
+          "restarting": false,
+          "running": true
+        },
+        "container_isolation_fixture": {
+          "entrypoint": "read-only existing /usr/bin/busybox; copied image bytes remain in the owned workspace",
+          "network_namespace": "shares only the user-owned private B network connected to the test-private outer network",
+          "operating_host_namespace_or_socket_shared": false,
+          "pid_namespace": "shares only this private B-role PID namespace",
+          "privileged_container": false,
+          "proc_sys": "read-only binds of this private root with inherited masks retained"
+        },
+        "container_loaded_limits_and_mounts": {
+          "memory": 67108864,
+          "mounts": [
+            {
+              "Destination": "/busybox",
+              "Mode": "",
+              "Propagation": "rprivate",
+              "RW": false,
+              "Source": "/usr/bin/busybox",
+              "Type": "bind"
+            },
+            {
+              "Destination": "/proc",
+              "Mode": "",
+              "Propagation": "rprivate",
+              "RW": false,
+              "Source": "/proc",
+              "Type": "bind"
+            },
+            {
+              "Destination": "/sys",
+              "Mode": "",
+              "Propagation": "rprivate",
+              "RW": false,
+              "Source": "/sys",
+              "Type": "bind"
+            }
+          ],
+          "network": "host",
+          "pid_mode": "host",
+          "pids": 16,
+          "privileged": false
+        },
+        "container_namespaces": {
+          "mnt": "mnt:[4026533224]",
+          "net": "net:[4026533167]",
+          "pid": "pid:[4026533163]",
+          "user": "user:[4026532954]"
+        },
+        "container_no_new_privileges": true,
+        "container_resumed": {
+          "dead": false,
+          "id": "4ffc832d3977831e6fbfb4636c6855b5b4527cbbfc0bdc4c421c49759abcdbb3",
+          "image": "sha256:921875b6b47042fb712d408bbe6062a9b1dc75f594fa0b03e562657cfc445d57",
+          "paused": false,
+          "pid": 388,
+          "restart": {
+            "MaximumRetryCount": 0,
+            "Name": "unless-stopped"
+          },
+          "restarting": false,
+          "running": true
+        },
+        "container_stopped": {
+          "dead": false,
+          "id": "4ffc832d3977831e6fbfb4636c6855b5b4527cbbfc0bdc4c421c49759abcdbb3",
+          "image": "sha256:921875b6b47042fb712d408bbe6062a9b1dc75f594fa0b03e562657cfc445d57",
+          "paused": false,
+          "pid": 0,
+          "restart": {
+            "MaximumRetryCount": 0,
+            "Name": "no"
+          },
+          "restarting": false,
+          "running": false
+        },
+        "default_native_backend": true,
+        "docker_native_stop_resume_verified": true,
+        "image_workspace_noexec": true,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "bb8406dff17dbb63624579ab8e02a8680a93969feacc5f749b2e25a610d59397",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533164]",
+          "ipc": "ipc:[4026533162]",
+          "mnt": "mnt:[4026533166]",
+          "net": "net:[4026533167]",
+          "pid": "pid:[4026533163]",
+          "user": "user:[4026532954]",
+          "uts": "uts:[4026533161]"
+        },
+        "native_catalog_units": 17,
+        "operating_deployment": false,
+        "peer_ssh_verified": true,
+        "peers": {
+          "a": {
+            "machine_sha256": "41377d21278766bd93ee233b488542f6d2e211010777766b16295840a0574d3f",
+            "pid": 43,
+            "role": "a",
+            "schema": 1,
+            "uid": 50123
+          },
+          "c": {
+            "machine_sha256": "d344fa220531afabf940b8572e87c1e0274305fd3e5dec3a4a7d22c3a364cd1c",
+            "pid": 49,
+            "role": "c",
+            "schema": 1,
+            "uid": 50123
+          }
+        },
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "readonly_local_bin_remount_errno": 1,
+        "role": "b",
+        "schema": 1,
+        "ssh_client_uid": 50124,
+        "ssh_server": {
+          "ActiveState": "active",
+          "ExecMainStatus": "0",
+          "MainPID": "34",
+          "Result": "success"
+        },
+        "status": "verified",
+        "systemd_pid1": 1
+      },
+      "c": {
+        "actual_host_reboot": false,
+        "actual_systemd": true,
+        "at_kst": "2026-11-19T12:18:57.814433+09:00",
+        "default_native_backend": true,
+        "lifecycle_recover": false,
+        "machine_id_sha256": "d344fa220531afabf940b8572e87c1e0274305fd3e5dec3a4a7d22c3a364cd1c",
+        "namespaces": {
+          "cgroup": "cgroup:[4026533228]",
+          "ipc": "ipc:[4026533226]",
+          "mnt": "mnt:[4026533229]",
+          "net": "net:[4026532955]",
+          "pid": "pid:[4026533227]",
+          "user": "user:[4026533165]",
+          "uts": "uts:[4026533225]"
+        },
+        "native_catalog_units": 4,
+        "operating_deployment": false,
+        "peer_client_key_present": false,
+        "peer_ssh_verified": true,
+        "private_pid1": true,
+        "probe_pid": 31,
+        "production_root_entry": false,
+        "readonly_local_bin_remount_errno": 1,
+        "role": "c",
+        "schema": 1,
+        "ssh_server": {
+          "ActiveState": "active",
+          "ExecMainStatus": "0",
+          "MainPID": "34",
+          "Result": "success"
+        },
+        "status": "verified",
+        "systemd_pid1": 1
+      }
+    },
+    "private_B_network": {
+      "B_net": "net:[4026533167]",
+      "host_pid": 2091458,
+      "operating_host_interfaces_changed": 0,
+      "outer_net": "net:[4026532955]",
+      "schema": 1,
+      "scope": "owned_outer_to_user_owned_B_veth_only"
+    },
+    "network_controller_returncode": 0,
+    "outer_loaded_boundaries": {
+      "CPUQuotaPerSecUSec": "1s",
+      "Delegate": "yes",
+      "DelegateSubgroup": "supervisor",
+      "KillMode": "control-group",
+      "LoadState": "loaded",
+      "MemoryMax": "536870912",
+      "MemorySwapMax": "0",
+      "NoNewPrivileges": "yes",
+      "PrivateDevices": "yes",
+      "PrivateNetwork": "yes",
+      "ProtectClock": "yes",
+      "ProtectKernelModules": "yes",
+      "ProtectKernelTunables": "yes",
+      "ProtectSystem": "strict",
+      "ReadWritePaths": "/run/capstone-pid1-caee47d165f7",
+      "RuntimeMaxUSec": "1min 15s",
+      "TasksMax": "256",
+      "TimeoutStopUSec": "5s",
+      "Transient": "yes"
+    },
+    "outer_memory_peak_bytes": 94498816,
+    "outer_pids_peak": 67,
+    "outer_memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "role_cgroups_populated_after_kill": {
+      "a": false,
+      "b": false,
+      "c": false
+    },
+    "workspace_removed": true,
+    "host_namespaces_unchanged": true
+  },
+  "scope": {
+    "actual_private_PID1_managers": 3,
+    "default_Native_without_runner_or_command_translation": true,
+    "actual_role_catalog_names_loaded": {
+      "a": 6,
+      "b": 17,
+      "c": 4
+    },
+    "consumer_unit_payloads": "synthetic sleep/timer fixtures, not installed operating application payloads",
+    "real_SSH_authenticated_flows": [
+      "a-to-b",
+      "a-to-c",
+      "b-to-a",
+      "b-to-c"
+    ],
+    "B_client_real_uid": 50124,
+    "strict_wrong_host_key_negative_control": true,
+    "production_Context_peers_and_reader_protocol": false,
+    "real_private_Docker_daemon_and_container": true,
+    "actual_Native_Docker_stop_policy_no_pid_zero_then_resume_same_CID_and_image_new_PID_policy_unless_stopped": true,
+    "container_configuration_matches_operating_Hermes": false,
+    "production_root_entry": false,
+    "Lifecycle_recover": false,
+    "full_source_cache_or_global_restore": false,
+    "actual_host_reboot": false,
+    "operating_deployment_or_MCP_or_bot_acceptance": false,
+    "operating_host_socket_credentials_or_network_shared": false,
+    "packages_downloaded_or_installed": 0,
+    "model_calls_or_attack_or_training": 0
+  },
+  "official_Harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 82,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 67,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 85,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 70,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [
+        "scripts/check_private_backends_structure.py",
+        "scripts/private_backend_probe.py",
+        "scripts/validate_private_backends.py"
+      ],
+      "removed": [],
+      "modified": [],
+      "always_on_char_delta": 0
+    },
+    "source_sha256": {
+      "validate_private_backends.py": "9867227db61f3a75c9039173e14283da18cc0da27461dae87d3dc6b016588aa7",
+      "private_backend_probe.py": "a00b4a3f6f29c5036c261a42d7ff3750b89bb1570ef0e2a90d41df830037a06b",
+      "check_private_backends_structure.py": "ea81f9db0d84d12fc254b19e4750b3294efd265bea03f7c91ad3613a977a25e5"
+    },
+    "original_operator_pins_verified": 42,
+    "scope": "Official structural check only; not native execution, root Lifecycle, operating deployment, SOC accuracy or bot acceptance.",
+    "operating_changes": 0,
+    "model_calls": 0
+  },
+  "local_boundary_checks": {
+    "AST_sources": 3,
+    "cases": [
+      {
+        "case": "supervisor_outside_owned_workspace",
+        "denied": true
+      },
+      {
+        "case": "network_controller_outside_owned_workspace",
+        "denied": true
+      },
+      {
+        "case": "no_opt_in",
+        "denied": true
+      },
+      {
+        "case": "non_Linux_root_execution",
+        "denied": true
+      }
+    ],
+    "external_commands_during_unowned_dispatch": 0,
+    "package_installations": 0
+  },
+  "cleanup": {
+    "observed_at_kst": "2026-11-19T12:20:45.370571+09:00",
+    "read_only": true,
+    "owned_runs_absent": 9,
+    "owned_veth_names_absent_from_operating_host": true,
+    "raw_result_sha256": "805d4e2b523d9a7ef19ebf5f5839deac2299b90a299274ffe578468983ec16d2",
+    "temporary_local_replay_cleanup": {
+      "at_kst": "2026-11-19T12:28:34.186328+09:00",
+      "removed": true,
+      "file_count": 4561,
+      "local_inventory_sha256": "6520689f24a3f1becca553f9d23496a00ece5a6156c24ee49cac115dffebc3dd",
+      "original_source_and_Harness2_skills_preserved": true
+    }
+  },
+  "failures_preserved": [
+    {
+      "iteration": 1,
+      "raw_result_sha256": "ab2adc635f23a10995a741c434133320cb3fd3a526c1579e28892805c680b6a2",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": "RuntimeError:C_client_key_not_required",
+        "b": "RuntimeError:C_client_key_not_required",
+        "c": "Refused:service_host"
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 2,
+      "raw_result_sha256": "ed535e8b066ec9bd446a666b8b0d4b7fe5d750f9d8d030f9652b12a44d89abcc",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "FileNotFoundError:[Errno 2] No such file or directory: '/usr/local/bin/docker'",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 3,
+      "raw_result_sha256": "8f20206a5bf1f1765f7be15cad8d25d1d607ca898048dabb3f54ef9cb593ce9a",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "RuntimeError:private_docker_terminal",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 4,
+      "raw_result_sha256": "0084e2fbe4206090b4a4665d132d2b05f9a2800af6e785759d568c8a6050b7a5",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "RuntimeError:command_failed_docker_docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error mounting \"proc\" to rootfs at \"/proc\": mount src=proc, dst=/proc, dstFd=/proc/threa",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 5,
+      "raw_result_sha256": "70928e042744bdb348b4f5eccc279cc4a3a7028dab243f1957dcae9f79bb145d",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "RuntimeError:command_failed_docker_docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: open sysctl net.ipv4.ip_unprivileged_port_start file: unsafe procfs detected: openat2 /p",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 6,
+      "raw_result_sha256": "1277139f5d3e2fc1d43db7cc7a4771ad9423748b5f2e459ec9ef46ee0e041a8e",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "RuntimeError:command_failed_docker_docker: Error response from daemon: failed to create default sandbox: failed to create a netlink handle: failed to enter network namespace: operation not permitted\n\nRun 'docker run --help' for more information\n",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    },
+    {
+      "iteration": 7,
+      "raw_result_sha256": "1cded7eec34d7fac8593984302a723b7d344356533c871856df69ad7f49e905c",
+      "status": "failed",
+      "reason": "RuntimeError:private_role_probe_failed",
+      "role_reasons": {
+        "a": null,
+        "b": "RuntimeError:command_failed_docker_docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: \"/busybox\": permission denied\n\nRun 'docker run --help' for more information\n",
+        "c": null
+      },
+      "workspace_removed": true,
+      "input_bundle_removed": true
+    }
+  ],
+  "review_corrections": [
+    "strip role-file line ending before catalog selection",
+    "bind existing /usr/local/bin after nonrecursive owned-root bind",
+    "supply the private root var/run symlink",
+    "retain masked proc/sys with read-only binds instead of mounting fresh unmasked procfs",
+    "own the B network namespace under its user namespace and attach a test-private veth",
+    "reuse read-only existing busybox executable while the owned image store remains noexec",
+    "deny supervisor dispatch outside the owned cgroup/private network before any network command",
+    "publish only the complete cross-checked supervisor result to the outer observer"
+  ],
+  "preserved": {
+    "paper_MD_DOCX_PDF_and_presentation_SHA": {
+      "논문/졸업논문_초안.md": "54a707fb8adfb41650bac1052d4f2e8acaf74248463b4a117542f6a0dc63d74e",
+      "논문/졸업논문_초안.docx": "48bffb277508e52296a6975a283fa58bf274ee8eac28b92b6dc0c4c1b0675867",
+      "논문/졸업논문_초안.pdf": "da20bbb9c3157bace76f2969617ff1d8a6441654305f67a68a9759f708482b78",
+      "발표자료/Groot_최종발표_초안.pptx": "238071b98f02ce30a7ef29299878ccc1de4d8eef90e0cca042f93d6929de773a",
+      "발표자료/Groot_최종발표_초안.pdf": "ce1f80222d0e59b757c1e3cc8b309b0019c552416872784560bf5c376c4e82c4",
+      "발표자료/발표자_메모.md": "31ce4b946421a49839fae68936805f16daac313954997acc25e16256d0ad1cd9"
+    },
+    "installed_skills_and_Harness2": true,
+    "operating_and_recovery_backups": true
+  },
+  "publication": {
+    "status": "prepared, not yet committed or pushed"
+  },
+  "humanize": {
+    "run_id": "2026-11-19-019-cdf7",
+    "route": "light",
+    "change_percent": 0.04,
+    "gate_exit": 0,
+    "grade": "B",
+    "self_check_passed": 6
+  }
+}

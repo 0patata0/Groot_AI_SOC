@@ -609,7 +609,30 @@
     "allowed_tools": 45,
     "existing_B_model": "soc-qwen36:35b-balanced-q4km-20261108",
     "resident_context_length": 65536,
-    "source_and_protected_state_unchanged": true
+    "source_and_protected_state_unchanged": true,
+    "final_after_cleanup": {
+      "a": {
+        "at_kst": "2026-11-20T09:46:48.473653+09:00",
+        "source_paths": 12,
+        "protected_paths": 11,
+        "source_metadata_and_protected_state_equal": true,
+        "coordinator_base_still_absent": true
+      },
+      "b": {
+        "at_kst": "2026-11-20T09:46:48.885783+09:00",
+        "source_paths": 41,
+        "protected_paths": 28,
+        "source_metadata_and_protected_state_equal": true,
+        "coordinator_base_still_absent": true
+      },
+      "c": {
+        "at_kst": "2026-11-20T09:46:48.755498+09:00",
+        "source_paths": 12,
+        "protected_paths": 6,
+        "source_metadata_and_protected_state_equal": true,
+        "coordinator_base_still_absent": true
+      }
+    }
   },
   "humanize": {
     "run_id": "2026-11-20-004-328c",
@@ -660,5 +683,18 @@
     "new Native integration for this changed operator and bound real controller, then actual collection/MCP/Hermes/Ollama acceptance",
     "backup75 durable intent/retry contract, actual reboot/long recovery, broader OS approval and management address policy",
     "paper91TOC page mismatches, fresh OS full installation, independent reproduction and final presentation"
-  ]
+  ],
+  "publication": {
+    "state": "content_published_application_review_held",
+    "content_commit": "c35d7f56f8c4e82f359684bea2dc6a9e337a2b76",
+    "remote_main_matched_at_kst": "2026-11-20T09:46:26.623130+09:00",
+    "public_files": 22,
+    "tracked_working_tree_scan": {
+      "paths": 2481,
+      "unsafe": 0,
+      "known_non_credentials": 10,
+      "new_findings": 0
+    },
+    "note": "content publication only; operating application and actual model/MCP acceptance remain unperformed; the follow-up receipt commit is recorded in local session evidence"
+  }
 }

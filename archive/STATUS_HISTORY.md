@@ -17,6 +17,8 @@
 | 스키마 차이 | 진단3도구 이름 동일·b:certificate-monitor 추가·host journal 조건 변경 |
 | 정리 | Mac9,526파일/165,800,119B·B65파일·자체3유닛 부재 |
 | 문서 검수 | standard·2.83%·B·6/6·gate0·수치 소실0 |
+| 내용 게시·공개 범위 | `c35d7f56f8c4e82f359684bea2dc6a9e337a2b76`·22파일·원격 main 일치 `2026-11-20T09:46:26.623130+09:00` |
+| 게시 전 검사·최종 읽기 | 추적2481·위험0·기존10/신규0·09:46 KST 운영65/보호45 SHA·권한 동일 |
 
 
 [검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)

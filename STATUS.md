@@ -95,6 +95,16 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 12:23 KST 관리자231 경유로 운영 65경로·보호 45경로의 SHA/소유자/권한과 기존 모델 설정·컨테이너가 같음을 재확인했다. 새 패키지 설치·모델 추론·실제 MCP 호출·채팅 게시·운영 적용·공격·학습은 0이다. 이전 b895353a 계획은 수정 전 검토 자료다. 다음에는 새 소스의 전체 payload와 영수증·스키마·복구를 다시 고정해 검토하고 정확 승인을 받은 뒤 운영 인수를 진행해야 한다. 실제 수집/MCP/두 봇·새 Native/재부팅/장기 복구·backup75 intent·논문 목차 91불일치·독립 재구현·새OS 전체 설치·최종 발표는 남아 있다.
 
 [현재 검증 원장](infra/validation/journal-composition/current-application.validation.json) · [이전 반입 준비](infra/validation/journal-composition/operating-preparation.validation.json) · [실패 이력](archive/DIAGNOSTIC_HISTORY.md#operating-application-review-20261120)
+
+| 이번 내용 게시 | 확인 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `85be519de8ae6687feee9dfc1936076cd46a7117`·24파일 |
+| 실제 원격 main 일치 | `2026-11-20T12:37:54.438328+09:00` |
+| 게시 전 검사 | 추적2485·위험경로0·기존10/신규0·24파일 staged 바이트 일치 |
+| 문서 검수 | light·변경0.6%·B·6/6·gate0·수치 소실0 |
+| 결함 검토 | 설치된 review-agent 절차·No findings.·Semgrep 미수행 |
+| 운영 범위 | 적용·모델·실제 MCP·채팅·공격·학습0·전체 목표 active |
+
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

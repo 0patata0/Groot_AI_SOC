@@ -9,6 +9,16 @@ SDK 지연 식별 조회 영수증 누락·병렬 미확인 문구의 센서 수
 Mac 32군1,652실행/10생략과 기존 Hermes Linux 32군1,739실행/생략0은 통과했다. 공식 Harness²는 37→41구성·4추가/4수정·상시16,917자 증가0이다. 첫 Linux 집계 실패148/152는 진단 이력에 보존했다. Mac5,110파일/168,240,807B와 B5,110파일·컨테이너2/익명 볼륨2를 정리했다. 12:23 KST 운영65/보호45·모델/컨테이너가 같았으며 새 패키지·모델·실제 MCP·채팅·운영 적용·공격·학습은0이다. 이전 계획의 재고정과 정확 승인·운영 인수는 남아 있다.
 
 [검증 원장](../infra/validation/journal-composition/current-application.validation.json)
+
+| 이번 내용 게시 | 확인 값 |
+| --- | --- |
+| 내용 커밋·공개 범위 | `85be519de8ae6687feee9dfc1936076cd46a7117`·24파일 |
+| 실제 원격 main 일치 | `2026-11-20T12:37:54.438328+09:00` |
+| 게시 전 검사 | 추적2485·위험경로0·기존10/신규0·24파일 staged 바이트 일치 |
+| 문서 검수 | light·변경0.6%·B·6/6·gate0·수치 소실0 |
+| 결함 검토 | 설치된 review-agent 절차·No findings.·Semgrep 미수행 |
+| 운영 범위 | 적용·모델·실제 MCP·채팅·공격·학습0·전체 목표 active |
+
 <!-- /operating-application-review-20261120 -->
 
 <!-- coordinator-operating-preparation-20261120 -->

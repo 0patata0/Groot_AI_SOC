@@ -928,7 +928,17 @@
     "paper91 TOC page mismatches and final presentation acceptance; existing presentation files preserved"
   ],
   "publication": {
-    "state": "pending_content_and_receipt_push",
+    "state": "content_published_remote_verified",
+    "content_commit": "85be519de8ae6687feee9dfc1936076cd46a7117",
+    "remote_main_at_verification": "85be519de8ae6687feee9dfc1936076cd46a7117",
+    "verified_at_kst": "2026-11-20T12:37:54.438328+09:00",
+    "public_files": 24,
+    "tracked_paths_scanned": 2485,
+    "unsafe_paths": 0,
+    "known_reviewed_findings": 10,
+    "new_findings": 0,
+    "only_explicit_candidate_bytes_staged": true,
+    "credential_source": "project local; per Git process; helpers and HTTP trace disabled",
     "local_records_private": true
   },
   "code_review": {
@@ -939,5 +949,15 @@
       "No live model/MCP/chat acceptance or operating apply",
       "Previous payload must be refrozen before exact approval"
     ]
+  },
+  "document_review": {
+    "skill": "humanize-korean v2.3-codex",
+    "run_id": "2026-11-20-005-a9fe",
+    "route": "light",
+    "change_rate": 0.006,
+    "grade": "B",
+    "self_checks": "6/6",
+    "gate_exit_code": 0,
+    "numeric_sequences_and_codes_preserved": true
   }
 }

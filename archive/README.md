@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- goal-input-wait-20261120 -->
+<a id="goal-input-wait-20261120"></a>
+[전체 목표의 확인 범위·입력 대기](STATUS_HISTORY.md#goal-input-wait-20261120) · [재개 조건과 실제 승인 대기](PLAN_HISTORY.md#goal-input-wait-20261120) · [영상 검색 범위 정정·공식asset대조](DIAGNOSTIC_HISTORY.md#goal-input-wait-20261120)
+<!-- /goal-input-wait-20261120 -->
+
 <!-- demo-read-evidence-20261120 -->
 <a id="demo-read-evidence-20261120"></a>
 [기존 운영 MCP·수집본 최신성·남은 상태](STATUS_HISTORY.md#demo-read-evidence-20261120) · [누적 카운터·다른 CPU 구간·읽기 집계 거절](DIAGNOSTIC_HISTORY.md#demo-read-evidence-20261120)

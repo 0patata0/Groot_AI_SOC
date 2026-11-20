@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- thesis-pagination-freeze-20261120 -->
+<a id="thesis-pagination-freeze-20261120"></a>
+논문 현재 수정과 동기화의 마감·동결 범위를 보존했다. [현황](STATUS_HISTORY.md#thesis-pagination-freeze-20261120) · [계획](PLAN_HISTORY.md#thesis-pagination-freeze-20261120) · [검수와 한계](DIAGNOSTIC_HISTORY.md#thesis-pagination-freeze-20261120) · [서식 선택](DESIGN_ALTERNATIVES.md#thesis-pagination-freeze-20261120)
+<!-- /thesis-pagination-freeze-20261120 -->
+
 <!-- presentation-workspace-cleanup-20261120 -->
 <a id="presentation-workspace-cleanup-20261120"></a>
 논문 제출 이후의 작업 범위와 임시 발표자료 조사를 기록했다. [현황](STATUS_HISTORY.md#presentation-workspace-cleanup-20261120) · [계획](PLAN_HISTORY.md#presentation-workspace-cleanup-20261120) · [조사 범위](DIAGNOSTIC_HISTORY.md#presentation-workspace-cleanup-20261120)

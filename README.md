@@ -2,7 +2,7 @@
 
 <!-- presentation-workspace-cleanup-20261120 -->
 <a id="presentation-workspace-cleanup-20261120"></a>
-논문은 사용자가 보고한 최종 제출 이후 현재 진행 중인 목차·쪽번호와 로컬 동기화까지만 마감하고 동결한다. 후속 결과는 별도 기록에 남긴다. 발표자료는 루트 최종발표/에서 기존 자료를 이어서 작업하며 확인 가능한 임시 경로에는 삭제할 발표자료가 없었다. [현재 범위와 남은 검수](STATUS.md#presentation-workspace-cleanup-20261120)를 기준으로 아래 과거 기록과 구분한다.
+사용자 지시에 따라 현재 수정과 로컬 동기화를 마치고 논문을 동결했다. 후속 결과는 별도 기록한다. 발표자료는 루트 최종발표/에서 기존 자료를 이어가며 확인 가능한 임시 경로에는 삭제할 발표자료가 없었다. [현재 마감 결과](STATUS.md#thesis-pagination-freeze-20261120)를 기준으로 과거 기록과 구분한다.
 <!-- /presentation-workspace-cleanup-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->
@@ -10,11 +10,12 @@
 Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 동일40B 가중치를 Hermes용65536컨텍스트 태그로 연결했다. 두 SOUL의 역할·원본 분석·피드백 절차와 공격 중단 상태를 적용하고 무도구 실제 응답을 확인했다. 기존 공격 시험은 재개하지 않았다. 초기 진입점은 deploy.sh --kali-hermes이며 [반입·설치·모델·복구 절차](infra/hermes/kali-redteam/README.md)와 [실제 검증 범위](infra/hermes/kali-redteam/validation.json)를 따른다.
 <!-- /kali-hermes-offline-20261120 -->
 
-<!-- thesis-google-docs-local-sync-20261119 -->
-사용자 지정 구글 독스 편집본을 로컬 MD·DOCX·PDF와 이미지25개에 맞췄다. 표69개·코드10블록·2,176문단을 대조하고 기존 로컬10파일을 보관했다. 로컬 DOCX는 목차의 용지 밖 탭 위치만 보정했다. 구글 독스 PDF123쪽과 로컬 맑은 고딕 렌더125쪽은 배치가 다르며PDF 목차154개 중91개 쪽번호 불일치는 남아 있다. 논문·이미지·개인 값은 Git 제외다.
+<!-- thesis-pagination-freeze-20261120 -->
+<a id="thesis-pagination-freeze-20261120"></a>
+논문의 목차·쪽번호와 로컬 동기화를 마친 뒤 사용자 지시에 따라 동결했다. 구글 독스 PDF122쪽과 같은 DOCX에서 만든 로컬 PDF124쪽은 배치가 다르지만 각각 목차154개가 모두 실제 본문 쪽번호와 일치하며 서론은1쪽이다. MD·DOCX·PDF의 본문과 표69개·코드10블록·이미지25개를 대조했다.
 
-[검수·출력 차이와 남은 쪽번호](archive/DIAGNOSTIC_HISTORY.md#thesis-google-docs-local-sync-20261119) · [직전 표 배치 작업](archive/STATUS_HISTORY.md#thesis-google-docs-table-layout-20261119)
-<!-- /thesis-google-docs-local-sync-20261119 -->
+이후 결과는 논문에 추가하지 않고 별도 기록한다. 발표자료는 루트 최종발표/에서 이어서 작업한다. [현재 검증과 남은 작업](STATUS.md#thesis-pagination-freeze-20261120)을 기준으로 아래 과거 이력과 구분한다. 논문·원문 검증·발표 산출물은 Git 제외다.
+<!-- /thesis-pagination-freeze-20261120 -->
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>

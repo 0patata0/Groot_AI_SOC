@@ -1,5 +1,14 @@
 # 과거 기록과 복원 안내
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+운영 반입 준비의 원문 결속·실제 0755대조·50대상 검토안과 전체 후보 1,650실행의 실패 9건·의존성 10생략을 기록했다. 설치 준비·격리 검사와 실제 승인·운영 적용·MCP/봇 인수의 완료 범위를 구분한다.
+
+[현황](STATUS_HISTORY.md#coordinator-operating-preparation-20261120) · [계획](PLAN_HISTORY.md#coordinator-operating-preparation-20261120) · [설계](DESIGN_ALTERNATIVES.md#coordinator-operating-preparation-20261120) · [실패](DIAGNOSTIC_HISTORY.md#coordinator-operating-preparation-20261120)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- coordinator-native-completion-20261120 -->
 <a id="coordinator-native-completion-20261120"></a>
 [정리/current 상태 이력](STATUS_HISTORY.md#coordinator-native-completion-20261120)과 [실제 경계](DIAGNOSTIC_HISTORY.md#coordinator-native-completion-20261120)에 candidate/baseline의 Native 통과와 pointer 거절·중복 정리 근거를 연결했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다. 운영후보32소스의 기존258회귀 재사용과 검증기2파일 확장을 구분한다.

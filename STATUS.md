@@ -73,27 +73,31 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-native-completion-20261120 -->
-<a id="coordinator-native-completion-20261120"></a>
-조정 실행기 후보의 Native 정리·현재 설치 조회를 두 경로에서 확인했다. 새 소스 확정/재개 뒤와 두 파일의 실제 교체 중 SIGKILL→독립 원복/재개 뒤에 같은 고정 root 진입점으로 인수 준비·전역 정리 결정/허가·정리·현재 조회를 실행했다. 세 역할 모두7/36/7개 소스와 보호 원본을 대조했고 잘못된 pointer는 거절했다. 정리를 다시 호출해도 읽기 검증으로 끝났으며 실행 중이던 reader·B 채팅 서비스 PID와 Docker 상태는 같았다.
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+운영 반입 준비에서 관리 실행 코드의 결속 누락을 보완했다. 반입 생성기는 고정 Git 원본으로 정적 대상 44개를 만들고 관리 controller에 같은 run.py 원문을 결속한다. 기존 경로·계정·컨테이너·보호 정책을 유지하며 초기 설치기도 같은 변환을 사용한다. 실제 설치 영수증 2개는 B에서 메모리로만 계산하고 원문을 내보내지 않았다. reader 3개·MCP launcher 1개를 더한 검토용 변경안은 A7/B36/C7의 50대상, 보조 파일 19개, 제어 문서 39개, 보호 파일 45개로 구성한다. 승인 파일은 만들지 않았다.
 
-인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+Mac의 조정 실행기 259검사·생략 0과 설치 결속 49검사·생성기 6검사를 확인했다. 49·6검사는 아래 전체 후보 실행에도 포함돼 있으므로 합산하지 않는다. 공식 Harness²는 조정 80구성 중 2수정, 검증기 91→반입·준비 포함 139구성, 상시 16,917자 증가 0을 확인했다. 보호 파일의 기존 0755모드도 계획에 기록해 정확히 대조하며 호스트 권한은 바꾸지 않았다. Linux 비특권 실행과 Native 실행은 검증 원장에서 별도 범위로 구분한다.
 
-운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다.
+현재 원본의 32검사군·1,650실행에는 실패 9건과 의존성 생략 10건이 남았다. 24군이 통과했고 7군에서 기대값이 달랐으며 다른 1군은 의존성 4생략으로 보류했다. B 인증서 감시 대상이 추가돼 43대상이 된 차이를 확인했다. 나머지 조회 범위·센서 이름·근거 전달·호스트 표기·행 해시 검사는 원인을 더 검토해야 한다. 기록된 운영 소스 16종을 같은 검사에 대조한 결과도 보존했으나 새 기능과 의존 구성이 같지 않아 직접적인 품질 비교로 쓰지 않는다.
 
-운영 적용·정확 전체승인·현재 소스/모델/MCP 스키마/권한 대조와 실제 수집/MCP/두 봇 인수, 실제 재부팅·장기 복구 및 backup75의 상태/intent 재시도 계약은 남았다. 논문 목차91불일치·독립 재구현·최종 발표도 미완료이며 공격/학습·발표자료 추가 제작 중단을 유지한다.
+09:20 KST 관리자231 경유로 운영 65경로와 보호 45경로의 SHA·소유자·권한 및 기존 모델 설정·컨테이너 식별자가 작업 전과 같음을 확인했다. 08:41에는 MCP 8서버의 45허용 스키마와 기존 35.5B모델·실제 context 65536을 조회했다. 전체 후보 기능 검토와 정확 승인은 남았다. 실제 수집/MCP/두 봇 인수·새 Native 실행·재부팅/장기 복구·backup75의 상태/intent 계약도 남은 범위다. 운영 적용·공격·학습·논문/발표자료 수정은 0이며 논문 목차 91불일치·독립 재구현·새OS 전체 설치·최종 발표는 미완료다.
 
-[검증 원장](infra/validation/journal-composition/private-full-native.validation.json) · [방법과 한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-native-completion-20261120)
-
-| 게시 확인 | 값 |
+| 현재 검토 근거 | 값 |
 | --- | --- |
-| 내용 커밋·공개 범위 | `5bec562493c2a524abfedf495507a4dcd30b10c0`·14파일 |
-| 실제 원격 main 일치 | `2026-11-20T08:22:17.704401+09:00` |
-| 회귀·실행 범위 | 격리 candidate/baseline의 Native 정리/current; 시험용 인수4항목 |
-| 게시 전 검사 | 추적2478·위험0·기존10/신규0; light0.06%·B·6/6·gate0 |
-| 재확인·보존 | 운영65경로 SHA/권한 동일; 시험2회 부재; 기존111자료 SHA 동일 |
-| 별도 조건 | 운영 미적용; 정확 승인·실제 MCP/두 봇 인수·재부팅·backup75 계약 미완료 |
-<!-- /coordinator-native-completion-20261120 -->
+| 상태 | `application_review_held_not_deployed`·승인 파일0 |
+| 계획 SHA256 | `b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a` |
+| 대상·동적 자료 | A7/B36/C7·44정적+2영수증+4읽기 장치 |
+| 조정 실행기 | Mac259/0생략·Linux259/0생략·동일32핀 |
+| Linux 시험 신원 | UID/GID997·보조그룹[997]·CapEff0·NoNewPrivs1 |
+| 전체 후보 | 32군·1,650실행·실패9·의존성10생략 |
+| 스키마 차이 | 진단3도구 이름 동일·b:certificate-monitor 추가·host journal 조건 변경 |
+| 정리 | Mac9,526파일/165,800,119B·B65파일·자체3유닛 부재 |
+| 문서 검수 | standard·2.83%·B·6/6·gate0·수치 소실0 |
+
+
+[검증 원장](infra/validation/journal-composition/operating-preparation.validation.json) · [반입 준비와 한계](infra/validation/journal-composition/COORDINATOR.md#coordinator-operating-preparation-20261120)
+<!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 사용자 지시에 따라 발표자료 생성·수정 작업을 중단했다. 메모 글자색 시험은 검사 실패로 종료됐고 완성 후보는 없다. 자체 부분 출력·렌더 캐시를 제거했으며 기존 PPTX·PDF·발표 메모의 SHA가 작업 전과 같음을 확인했다. 판넬 본문1,467자와 기존 이미지·표는 유지한다. Keynote의 메모 대비 보완과 PowerPoint·실제 리허설은 미완료로 남기며 새 발표자료를 만들지 않는다.

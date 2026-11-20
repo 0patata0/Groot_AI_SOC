@@ -88,7 +88,7 @@ class Plan:
                 need(isinstance(row,dict)and set(row)=={'sha256','uid','gid','mode'}
                      and isinstance(row['sha256'],str)and c.HEX.fullmatch(row['sha256'])
                      and all(type(row[k])is int and 0<=row[k]<65534 for k in ('uid','gid'))
-                     and type(row['mode'])is int and row['mode']in (0o550,0o600,0o640,0o644,0o750),'plan_protected_metadata')
+                     and type(row['mode'])is int and row['mode']in (0o550,0o600,0o640,0o644,0o750,0o755),'plan_protected_metadata')
             need(protected[ACTIVE_PROTECTED]is not None or host=='b'and protected[OPTIONAL_PROTECTED]is not None,
                  'installation_provenance_missing')
         self.value=value;self.sha256=digest(value)

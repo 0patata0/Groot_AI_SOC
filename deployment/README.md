@@ -1,5 +1,14 @@
 # 구축·운영 가이드
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+기존 서버의 journal 반입 준비는 고정 소스용 prepare_payload.py를 사용한다. 새 초기 설치기의 soc_runtime.render와 반입 생성기는 같은 관리 실행 원문 결속 함수를 사용하지만 기존 서버의 반입에는 신규 profile의 경로·계정·컨테이너 치환을 적용하지 않는다. 원본 실행기는 선언한 root 참조 파일과 결속된 run.py가 다르면 거절한다. 보호 파일의 실제 0755도 계획에서 정확히 대조하며 권한을 바꾸지 않는다. 초기 설치 진입점 deploy.sh와 운영 반입 검토·정확 승인·적용은 각각 구분한다.
+
+[정적 반입 준비](../infra/validation/journal-composition/README.md#coordinator-operating-preparation-20261120) · [검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 Kali 레드팀의 진입점은 deploy.sh --kali-hermes다. --prepare-bundle은 고정 원본·Linux wheel·도구를 작업별 임시 폴더에 준비하며 송신 컴퓨터에 패키지를 설치하지 않는다. Kali의 --install은 --offline-bundle과--sha256을 필수로 받고 외부 다운로드 fallback 없이 사용자 소유 payload를 구성한다. --list-models·--configure·--verify로 모델과 역할 설정을 관리한다.

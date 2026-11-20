@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+기존 합성 조정 실행기 검증 다음 단계로 실제 소스·모델·MCP 스키마·권한을 관측하고 50대상 검토안을 구성했다. 원문 결속 누락과 실제 0755메타데이터 거절을 보완했으나 전체 후보의 실패 9건·의존성 10생략을 확인해 기능 검토를 우선한다. 새 정확 승인 전 운영 적용을 진행하지 않는다. 실제 수집/MCP/두 봇 인수와 Native·재부팅/장기 복구·backup75 계약·논문 목차 91불일치·최종 발표는 계속 남긴다.
+
+[현재 계획](../PLAN.md#coordinator-operating-preparation-20261120) · [검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- coordinator-native-completion-20261120 -->
 <a id="coordinator-native-completion-20261120"></a>
 ## 2026-11-20 인수 후 정리/current의 검증 범위 갱신

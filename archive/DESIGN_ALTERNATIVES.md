@@ -1,5 +1,14 @@
 # 설계 대안 이력
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+관리 controller는 운영에서 정확한 run.py를 -I -B -c 인자로 실행하지만 이전 반입 입력은 파일경로를 호출하는 개발 원본이었다. 신규 profile 전체를 다시 렌더하면 기존 경로·계정·컨테이너·정책이 바뀔 수 있어 초기 설치기의 원문 결속만 순수 변환으로 공유했다. 고정 소스 매핑과 결과 SHA로 정적 대상 44개를 만들고, 관측한 원본 SHA에 결속한 영수증·읽기 장치로 50대상 계획을 구성했다. 영수증의 관계없는 출처 필드를 보존하고 자격 형태의 문자열·누락된 무결성 항목을 거절한다. 운영 보호 파일의 0755는 정확한 기존 메타데이터이며 변경 권한 부여로 해석하지 않는다.
+
+[반입 생성기](../infra/validation/journal-composition/prepare_payload.py) · [검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- coordinator-native-completion-20261120 -->
 <a id="coordinator-native-completion-20261120"></a>
 ## 2026-11-20 정리 성공과 실제 인수의 구분

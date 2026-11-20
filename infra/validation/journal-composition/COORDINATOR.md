@@ -1,29 +1,28 @@
 # 소스·캐시·소비자 조정 실행기
 
-<!-- coordinator-native-completion-20261120 -->
-<a id="coordinator-native-completion-20261120"></a>
-## Native 인수 후 정리와 현재 설치 조회
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+실제 운영 관측으로 A7/B36/C7의 50대상 계획과 보조 파일 19개·제어 문서 39개·보호 파일 45개를 구성했다. 정적 대상 44개의 원본은 고정 Git에서 읽고 관리 실행 원문을 controller에 결속한다. 동적 읽기 장치 4개는 관측한 원본 SHA에 결속하며 실제 영수증 2개는 B의 메모리에서만 준비한다. 계획은 검토용이며 승인 파일·운영 단계 initialize/prepare·실제 배포는 실행하지 않았다.
 
-기존 검증기에 complete-candidate와 complete-baseline을 추가했다. 첫 경로는 apply/verify→A/C/B확정→재개, 둘째는 두 실제 파일 교체 뒤 같은 자식 SIGKILL→독립 원복→재개를 따른다. 이후 같은 고정 root CLI로 completion_prepare·completion_status·cleanup_decide·cleanup_authorize·cleanup·current를 실행한다. 소스나 backend를 패치하지 않는다.
+보호된 nftables.conf의 실제 0755모드를 기존 계획 검증기가 거절하는 문제를 확인했다. 기존 0755의 정확한 메타데이터 대조를 허용하고 다른 모드로 달라지면 거절한다. 그룹/전체 쓰기와 특수 비트의 거절을 검증했으며 운영 파일의 권한을 바꾸지 않았다. 조정 실행기 32핀·15군 259검사의 Mac 결과와 별도 Linux 결과는 새 원장으로 연결한다.
 
-인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다. 승인과 인수는 별도다. 인수 없는 완료 거절을 보존하고 시험용 근거4개의 SHA를 담은 고유 인수 파일을 각 격리 root에 둔다. 이를 운영 서버의 인수 기록으로 반입하거나 실제 모델·채팅 응답으로 표시하지 않는다.
+전체 후보 기능 검토는 32군·1,650실행 중 실패 9건·의존성 10생략으로 보류했다. B 인증서 감시 대상이 추가돼 43대상이 된 차이는 확인했으며 다른 불일치는 현재 요구와 반례를 대조해야 한다. 정확 전체 승인·실제 수집/MCP/두 봇 인수·새 Native 실행·재부팅/장기 복구·backup75 상태/intent 계약은 남아 있다. 과거 합성 통과나 공식 구조 139구성을 현재 운영 인수로 표시하지 않는다.
 
-두 경로 모두 세 역할에서 정리와 현재 조회가 통과했다. 설치 소스7/36/7개, 최초 보호 파일의 SHA/uid/gid/mode와 B의 prepared-only 출처를 대조했다. 정리 뒤 current pointer의 receipt SHA만 시험 중 바꾸자 current_pointer_changed로 거절됐고 원문을 같은 inode에 복구했다. 정리 재호출은 mutation_performed=false였다. 계속 실행 중이던 reader3개와 B의 Ollama/review 채팅 PID, 같은 Docker 상태를 확인했다. 합성 oneshot 소비자의 독립적인 실서비스 인수나 실제 봇 응답을 증명하지 않는다.
+| 현재 검토 근거 | 값 |
+| --- | --- |
+| 상태 | `application_review_held_not_deployed`·승인 파일0 |
+| 계획 SHA256 | `b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a` |
+| 대상·동적 자료 | A7/B36/C7·44정적+2영수증+4읽기 장치 |
+| 조정 실행기 | Mac259/0생략·Linux259/0생략·동일32핀 |
+| Linux 시험 신원 | UID/GID997·보조그룹[997]·CapEff0·NoNewPrivs1 |
+| 전체 후보 | 32군·1,650실행·실패9·의존성10생략 |
+| 스키마 차이 | 진단3도구 이름 동일·b:certificate-monitor 추가·host journal 조건 변경 |
+| 정리 | Mac9,526파일/165,800,119B·B65파일·자체3유닛 부재 |
+| 문서 검수 | standard·2.83%·B·6/6·gate0·수치 소실0 |
 
-실행은 기존52입력·실제 systemd/SSH·별도 Docker·50소스/합성 캐시를 재사용한다.1GiB·Tasks384·CPU100%·180초와 namespace 경계는 유지했다. complete-candidate 최대410,320,896B/pids122, complete-baseline 최대360,669,184B/pids109였다. 각 실행의 terminal·빈 역할 cgroup·52입력 SHA 동일·입력/작업 폴더 제거를 확인한다. running은 같은 handle을 관측하며 재시작으로 대체하지 않는다.
 
-```sh
-# 승인된 Linux 점검 호스트의 별도52입력 폴더에서 실행한다.
-python3 -IB validate_full_native.py --start-owned --case complete-candidate
-# WORKSPACE는 위 명령이 출력한 workspace의 실제 경로다.
-python3 -IB validate_full_native.py --collect-owned "$WORKSPACE"
-# 정리 완료 뒤 complete-baseline을 별도 고유 실행으로 확인한다.
-```
-
-운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. 전체32소스의 회귀를 새로 실행했다고 표시하지 않는다. 재현 입력 형식과 이전 GC/부분 복구/기한 근거는 [직전 이력](../../../archive/STATUS_HISTORY.md#coordinator-collection-reference-20261120)에 보존한다.
-
-backup75의 상태/intent 대조와 재시도 계약, 운영 payload의 정확 승인과 실제 MCP/두 봇 인수·재부팅·장기 복구·새 OS 설치는 남았다. [검증 원장](private-full-native.validation.json).
-<!-- /coordinator-native-completion-20261120 -->
+[현재 검증 원장](operating-preparation.validation.json) · [정적 반입 생성기](prepare_payload.py)
+<!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- coordinator-private-backends-20261119 -->
 <a id="coordinator-private-backends-20261119"></a>

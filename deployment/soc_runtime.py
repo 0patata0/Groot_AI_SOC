@@ -118,6 +118,38 @@ def replace_profile_paths(value, mapping, containers):
     return value
 
 
+def _bind_management_gate(tree, run_source):
+    need(isinstance(run_source, bytes) and 0 < len(run_source) <= 2 * 1024 * 1024,
+         "immutable_management_gate_required")
+    ast.parse(run_source)
+    commands = [n for n in ast.walk(tree) if isinstance(n, ast.List) and
+                any(isinstance(x, ast.Constant) and x.value == "/opt/data/management-code/run.py"
+                    for x in n.elts)]
+    need(len(commands) == 1, "management_command_source")
+    node = commands[0]
+    index = next(i for i, x in enumerate(node.elts) if isinstance(x, ast.Constant) and
+                 x.value == "/opt/data/management-code/run.py")
+    node.elts[index:index + 1] = [ast.Constant("-I"), ast.Constant("-B"), ast.Constant("-c"),
+        ast.Call(func=ast.Name(id='management_gate_argument', ctx=ast.Load()),
+                 args=[ast.Constant(run_source)], keywords=[])]
+    return tree
+
+
+def bind_management_gate(raw, run_source):
+    """Bind an existing installation's controller without a fresh profile.
+
+    Keep its paths, container selector, identities, targets and policy literals.
+    The initial installer shares the same command binding below, then applies
+    its separate installation-time profile substitutions.
+    """
+    need(isinstance(raw, bytes) and 0 < len(raw) <= 2 * 1024 * 1024, "management_controller_source")
+    tree = _bind_management_gate(ast.parse(raw), run_source)
+    ast.fix_missing_locations(tree)
+    data = (ast.unparse(tree) + "\n").encode()
+    compile(data, "bound_soc_management_controller.py", "exec")
+    return data
+
+
 def render(name, raw, profile, run_source=None):
     """Pure transform, suitable for tests with no system or network access."""
     p = validate_profile(profile)
@@ -191,15 +223,7 @@ def render(name, raw, profile, run_source=None):
                 return node
         tree = Identity().visit(tree)
     if name == "soc_management_controller.py":
-        need(isinstance(run_source, bytes), "immutable_management_gate_required")
-        commands = [n for n in ast.walk(tree) if isinstance(n, ast.List) and
-                    any(isinstance(x, ast.Constant) and x.value == "/opt/data/management-code/run.py" for x in n.elts)]
-        need(len(commands) == 1, "management_command_source")
-        node = commands[0]
-        index = next(i for i, x in enumerate(node.elts) if isinstance(x, ast.Constant) and x.value == "/opt/data/management-code/run.py")
-        node.elts[index:index + 1] = [ast.Constant("-I"), ast.Constant("-B"), ast.Constant("-c"),
-            ast.Call(func=ast.Name(id='management_gate_argument',ctx=ast.Load()),
-                     args=[ast.Constant(run_source)],keywords=[])]
+        tree = _bind_management_gate(tree, run_source)
         mapping.update({"995:986": str(p["hermes_uid"]) + ":" + str(p["hermes_gid"]),
                         "hermes": p["container_ids"]["capstone-hermes"],
                         "http://10.200.10.": "http://" + p["siem_host"] + ":8065/hooks/"})

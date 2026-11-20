@@ -181,6 +181,39 @@ class BindingTests(unittest.TestCase):
             reference.write_bytes(b'# stale reference\n')
             with self.assertRaisesRegex(Exception,'embedded_gate_source_mismatch'):m.verified_management_command(case)
 
+    def test_existing_installation_binds_gate_without_replacing_its_identity(self):
+        raw=source('soc_management_controller.py')
+        self.assertEqual(raw.count(b'"995:986"'),1)
+        self.assertEqual(raw.count(b'"hermes"'),1)
+        raw=raw.replace(b'"995:986"',b'"1201:1202"').replace(b'"hermes"',b'"existing-hermes"')
+        gate=source('soc_management_run.py')
+        bound=runtime.bind_management_gate(raw,gate)
+        m=types.ModuleType('bound_existing_controller')
+        sys.modules[m.__name__]=m;self.addCleanup(sys.modules.pop,m.__name__,None)
+        with tempfile.TemporaryDirectory()as d:
+            m.__file__=str(Path(d)/'controller.py')
+            exec(compile(bound,m.__file__,'exec'),m.__dict__)
+            reference=Path(d)/'soc_management_run.py';reference.write_bytes(gate)
+            case={'mode':'verify','session_id':None}
+            command=m.verified_management_command(case)
+            self.assertEqual(command[0],'/usr/local/bin/docker')
+            self.assertEqual(command[command.index('-u')+1],'1201:1202')
+            self.assertIn('existing-hermes',command)
+            self.assertNotIn('/opt/data/management-code/run.py',command)
+            self.assertEqual(command[command.index('-c')+1],m.management_gate_argument(gate))
+            reference.write_bytes(gate+b'\n# changed after binding\n')
+            with self.assertRaisesRegex(Exception,'embedded_gate_source_mismatch'):
+                m.verified_management_command(case)
+
+    def test_existing_gate_binding_refuses_missing_invalid_or_already_bound_source(self):
+        raw=source('soc_management_controller.py');gate=source('soc_management_run.py')
+        with self.assertRaisesRegex(runtime.Refused,'immutable_management_gate_required'):
+            runtime.bind_management_gate(raw,b'')
+        with self.assertRaises(SyntaxError):
+            runtime.bind_management_gate(raw,b'not valid Python !!!')
+        with self.assertRaisesRegex(runtime.Refused,'management_command_source'):
+            runtime.bind_management_gate(runtime.bind_management_gate(raw,gate),gate)
+
     def test_rendered_controller_keeps_exact_read_scope_and_embedded_gate(self):
         m = module('soc_management_controller.py', 'b')
         command = m.command_for({'mode':'verify','session_id':None,

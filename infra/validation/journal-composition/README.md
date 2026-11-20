@@ -1,11 +1,20 @@
 # 서비스·호스트 journal 통합 후보
 
-<!-- coordinator-native-completion-20261120 -->
-<a id="coordinator-native-completion-20261120"></a>
-고정 root 진입점의 Native 통합은 새 소스 확정과 부분 적용 원복 뒤의 인수 준비·정리·현재 설치 조회까지 확인했다.50소스와 보호 원본을 대조했고 잘못된 pointer는 거절했다. 중복 정리는 읽기 검증으로 끝났으며 기존 reader·B 채팅 PID와 Docker 상태를 유지했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+반입 생성기는 고정 Git commit에서 정적 대상 44개의 코드·스킬·unit을 읽는다. management controller에는 같은 묶음의 run.py 원문을 결속하며 기존 설치 경로·계정·컨테이너 선택을 바꾸는 신규 호스트용 profile 변환은 적용하지 않는다. 파일별 원본·입력 SHA·결과 SHA와 생성기 SHA를 manifest에 남긴다.
 
-운영후보32소스·의존 포함42핀과 정적payload44파일은 그대로다. 같은32소스의 기존Mac/Linux258검사·생략0 근거를 재사용했고 이번에는 검증기2파일만 확장했다. 공식Harness²는 검증85→91·정적44포함135구성·상시16,917자 증가0을 확인했다. [최신 조건](COORDINATOR.md#coordinator-native-completion-20261120) · [원장](private-full-native.validation.json). 아래252검사와 초기 backend 미연결 문구는 당시 범위이며 실제 운영 인수·재부팅·장기 복구는 미완료다.
-<!-- /coordinator-native-completion-20261120 -->
+아래 명령은 로컬 반입 파일만 만든다. COMMIT은 40자리 원본 commit, TASK는 기존 작업 폴더다. 출력 폴더가 이미 있으면 덮어쓰지 않는다. 이 출력에는 실제 설치 영수증 2개와 reader 3개·MCP launcher 1개가 없어 별도의 실제 관측으로 50대상 계획을 완성해야 한다. 영수증 변환은 기존 출처·관계없는 필드를 보존하며 원문을 내보내지 않고 B에서 결과 SHA만 계산할 수 있다. 승인 생성·서비스 제어·배포 기능은 없다.
+
+현재 검토용 계획은 50대상·보조 19·제어 39·보호 45이며 기능 검토 대기다. Mac의 259검사·설치 결속 49검사·생성기 6검사와 공식 구조 139구성은 해당 범위의 근거다. 전체 후보 32군·1,650실행의 실패 9건·의존성 10생략은 해결하지 못했다. 앞선 258검사·Native 합성 인수는 당시 원본의 기록으로 보존하며 새 0755보호 메타데이터 처리나 결속된 실제 controller의 운영 검증으로 승계하지 않는다.
+
+```sh
+python3 -B infra/validation/journal-composition/prepare_payload.py \
+  --source-commit "$COMMIT" --output "$TASK/static"
+```
+
+[검증 원장](operating-preparation.validation.json) · [정확 계획·인수 조건](COORDINATOR.md#coordinator-operating-preparation-20261120)
+<!-- /coordinator-operating-preparation-20261120 -->
 
 후속 [조정 실행기](COORDINATOR.md)에 50소스·39제어 문서와 정리·현재 설치 검증까지 연결했다. 동일 소스로 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0과 합성 root namespace5조건을 확인했다. 운영 적용·운영 유닛 정지/재개·실제 재부팅/독립 복구·정확 승인·MCP/두 봇 채팅은 미완료다. [정본 동기화](CANONICAL.md)와 [읽기/재개 판정](WITNESS.md)의 과거 근거를 보존하며 아래 이전 단계의 미연결 문구는 당시 범위로 읽는다.
 

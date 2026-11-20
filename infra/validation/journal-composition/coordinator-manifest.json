@@ -16,7 +16,7 @@
     "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
     "release_lifecycle.py": "eccb3085b048bf1fde3d444fd2e3158077ebbed87316843a27c8ce3495894e50",
     "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
-    "release_plan.py": "0680d56323b18d27ea0dbe5e1c0b50a66753d335d983ed32b0b6aafc44184509",
+    "release_plan.py": "942f51f95da83ccf1094ee1c3d3bc858687337b5db3f66e39cdf1b5323e602b3",
     "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
     "test_release_files.py": "b1561b85af99f18817f974117ad1fd02acc20f48ddac259ecc54d1621aaced51",
     "test_release_reader.py": "bc17d3ab111ae65ab878f811b199e2b8fabce16665de55ceac30e2aa39f60e14",
@@ -30,7 +30,7 @@
     "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
     "test_release_lifecycle.py": "a75a09e2fdd108902ea4504f8c1756279e7f70ca606d0f7a020f76817c9b209f",
     "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
-    "test_release_plan.py": "79f312216da9f1bf1ceade1523ab0f3d73bad9d29bf267619407ea1e38b0c487",
+    "test_release_plan.py": "1e804cea47a7fc9718d273d30f0fcebfcbd42535efb5f87e460627bacee62418",
     "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
     "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
     "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
@@ -98,7 +98,7 @@
     "cache": 42,
     "lifecycle": 19,
     "atomic": 5,
-    "plan": 12,
+    "plan": 13,
     "runtime": 11,
     "completion": 22
   },
@@ -106,6 +106,6 @@
     "cache_transaction.py": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864",
     "test_cache_transaction.py": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc"
   },
-  "parent_commit": "42cd8d3c18dd6ad286f95e50f36532e36b82c9fe",
-  "parent_manifest_sha256": "a7868339b5b0880f50df42e8538b0d462527b740db08a0db6626f9b287cb2fc6"
+  "parent_commit": "ca047d80ac212d3584aed8a2e4b2898f8591d069",
+  "parent_manifest_sha256": "95aa36d20d63a4a360296aaa32b6ad1f745330854825f338dc38c41889469247"
 }

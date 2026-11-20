@@ -1,5 +1,16 @@
 # 진단 탐색 이력
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+전체 후보의 기존 27군과 현재 서비스 식별·controller·설치 결속·반입 생성기 5군을 같은 원본에서 실행했다. 1,650실행의 24군 통과·7군 기대값 불일치·1군 의존성 4생략을 기록했다. 실패 9건은 초기 조회 범위·Wazuh/IDS 표기·실제 도구 정체성 전달·공통 스킬 문구·a:b 호스트 표기·현재 systemd 조회·SDK typed 읽기·행 해시 전달·대상 수 43/42다. root의 의존성 6생략을 합쳐 총 10생략이며 Mac에 패키지를 설치하지 않았다.
+
+기록된 운영 소스 16종을 현재 B의 SHA와 대조해 같은 7군의 비교 입력을 만들었다. 새 기능과 지원 의존성이 같지 않아 두 결과를 정확도 향상이나 실제 운영 인수의 비교 점수로 쓰지 않는다. 대상 수의 차이는 b:certificate-monitor 추가이며 나머지 8검사 결과는 각각 현재 계약과 대조해야 한다. 첫 0755검사는 시험 fixture의 잘못된 속성 참조로 실패했으며 수정 후 13검사·전체 259검사를 통과했다. Linux 첫 실행은 존재하지 않는 UID의 217/USER로, 두 번째는 권한 전환에서 실패해 검사 0이었다. 종료와 빈 cgroup을 확인한 뒤 같은 44입력으로 새 실행을 준비했다. 실제 운영 파일과 권한·계정은 바꾸지 않았다.
+
+[검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- coordinator-native-completion-20261120 -->
 <a id="coordinator-native-completion-20261120"></a>
 ## 2026-11-20 Native 정리/current의 실제 경계 확인

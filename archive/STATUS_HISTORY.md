@@ -1,5 +1,27 @@
 # 현황 이력
 
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+## 2026-11-20 정확 운영 반입 준비와 기능 검토
+
+2026-11-20 운영 반입 준비에서 관리 controller의 설치 전 템플릿이 그대로 포함되는 문제를 보완했다. 고정 Git 기반 정적 대상 44개의 생성기와 실제 50대상 검토안을 만들었다. 초기 설치기와 공유하는 원문 결속·보호 0755의 정확 대조·Mac 259검사·공식 80구성 2수정/139구성을 확인했다. 전체 후보 1,650실행에는 실패 9건·의존성 10생략이 남아 적용 승인용 최종안으로 표시하지 않는다. 09:20 운영 65경로·보호 45경로·기존 모델 설정과 컨테이너가 같았고 실제 운영 적용·공격·학습·논문/발표자료 변경은 0이다.
+
+| 현재 검토 근거 | 값 |
+| --- | --- |
+| 상태 | `application_review_held_not_deployed`·승인 파일0 |
+| 계획 SHA256 | `b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a` |
+| 대상·동적 자료 | A7/B36/C7·44정적+2영수증+4읽기 장치 |
+| 조정 실행기 | Mac259/0생략·Linux259/0생략·동일32핀 |
+| Linux 시험 신원 | UID/GID997·보조그룹[997]·CapEff0·NoNewPrivs1 |
+| 전체 후보 | 32군·1,650실행·실패9·의존성10생략 |
+| 스키마 차이 | 진단3도구 이름 동일·b:certificate-monitor 추가·host journal 조건 변경 |
+| 정리 | Mac9,526파일/165,800,119B·B65파일·자체3유닛 부재 |
+| 문서 검수 | standard·2.83%·B·6/6·gate0·수치 소실0 |
+
+
+[검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
+
 <!-- coordinator-native-completion-20261120 -->
 <a id="coordinator-native-completion-20261120"></a>
 ## 2026-11-20 Native 정리/current의 두 결과 경로

@@ -120,5 +120,10 @@
     "linux_result": "39a5943ed6a709526c7f085d93261cc65cf1be4eebc873bd591d642b852b6720",
     "harness2": "685321395bde4fe6c5d576142713846916de3e93b8256964384644bbd55d6a82",
     "root_namespace": "409660e0bc073d184eb8321d4caf520993888d402df609fb956425b221667315"
+  },
+  "current_source_followup": {
+    "path": "operating-preparation.validation.json",
+    "scope": "current producer/plan changes are separate from this historical validation; new Native execution has not been performed",
+    "old_counts_and_source_hashes_retained": true
   }
 }

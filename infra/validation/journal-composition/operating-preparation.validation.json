@@ -1,0 +1,664 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-20T09:40:10.132364+09:00",
+  "status": "exact_operating_review_payload_prepared_application_review_held_not_deployed",
+  "scope": "fixed operating payload preparation, existing-installation inline management binding and exact protected0755 metadata; not approval, deployment or successful application/model acceptance",
+  "source_files_sha256": {
+    "deployment/soc_runtime.py": "2aeabd263f9ab0cd8645b1302e8372797cfbca3fb357937dbb4928425bf4ac26",
+    "deployment/tests/test_soc_management.py": "98d63d33ec62ff013061c7fe675f4a028b77cb84f374c84f54a2fcb490f76e0f",
+    "infra/validation/journal-composition/prepare_payload.py": "6fceb9105e52cb1b407ccac21b7d840ee95a586635cde673d16e1c036678ca6b",
+    "infra/validation/journal-composition/test_prepare_payload.py": "1465ef567d447cce4b831ff75dc46c67c2af2aba2520f81086f6a130d16a534e",
+    "infra/validation/journal-composition/release_plan.py": "942f51f95da83ccf1094ee1c3d3bc858687337b5db3f66e39cdf1b5323e602b3",
+    "infra/validation/journal-composition/test_release_plan.py": "1e804cea47a7fc9718d273d30f0fcebfcbd42535efb5f87e460627bacee62418",
+    "infra/validation/journal-composition/coordinator-manifest.json": "dbaad40232e1fce8520991538846622061befc26fc5b0415ede7b98430eb0ef8"
+  },
+  "source_code_commit": "ca047d80ac212d3584aed8a2e4b2898f8591d069",
+  "static_payload": {
+    "manifest_sha256": "3c2fa1c0925f45ba025d1e53a6743a7f8c4a483d0d548d4b69367b4896760d97",
+    "target_counts": {
+      "a": 6,
+      "b": 32,
+      "c": 6
+    },
+    "unique_blobs": 23,
+    "bytes": 2099862,
+    "producer_sha256": "6fceb9105e52cb1b407ccac21b7d840ee95a586635cde673d16e1c036678ca6b",
+    "management_binding_sha256": "2aeabd263f9ab0cd8645b1302e8372797cfbca3fb357937dbb4928425bf4ac26",
+    "source_inputs": {
+      "deployment/soc_diagnostics.py": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9",
+      "infra/hermes/chat_contract.py": "62bf832c4b194966726edc1a62eb54b8b128db7e247477a653d43d2557a89d17",
+      "infra/hermes/query-completion/__init__.py": "cec4d3fcf1f4d8828b77cd3bb59087e7255558ea5de76aa99f754e1bf0a175a1",
+      "infra/hermes/query-completion/alignment.py": "bbb938d546d2ced5cadb970faf76d527a5395ef36b36dbb297d3c18b4bc9fe47",
+      "infra/hermes/read_contract.py": "14809d9d1f796cbcf3514ce34213bce19960ece56996284cb3086815c8a281fd",
+      "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+      "infra/hermes/skills/soc-query/SKILL.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+      "infra/hermes/soc_management_controller.py": "3ed03fb7717381e5a065fcc83dda836e766f77d103e012895d92e17541273089",
+      "infra/hermes/soc_management_run.py": "bb2f98b4fcb938faeead89ba2eba34517c926daa403507a0978624fc0669a43c",
+      "infra/hermes/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+      "infra/mcp/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+      "infra/mcp/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+      "infra/mcp/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+      "infra/mcp/system-diagnostics-mcp.py": "81bb24ffa355646ca2d19cd99f2b694f45430c03f3d35bc20b7aab41094a695a",
+      "infra/mcp/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+      "infra/ollama-trial/harness.py": "c37c7016c03660527a05b4543a601ecc5b934cd199b4272da49e269658fd43f0",
+      "infra/ollama-trial/runtime.py": "d31526a55ab5ac38baa333bcde50a659002ae1adb6783ae89d5507363d1a9069"
+    },
+    "dynamic_exclusions": [
+      "two live integrity receipts",
+      "three bound reader barriers",
+      "one bound MCP launcher"
+    ],
+    "only_transformed_existing_source_file": "b:/opt/capstone-management/soc_management_controller.py"
+  },
+  "review_plan": {
+    "release_id": "a72664caa2d84657bc071689c23ffa93",
+    "plan_sha256": "b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a",
+    "plan_file_sha256": "4b3a7d414253a766d20153840f5f3f312290c28ece823507cd6ac83045f7c78a",
+    "bundle_file_sha256": "12c259a256d759afaeb5bebb8e8f8ffd0da9b80f516834f1a4bf5e046bfb8ae4",
+    "target_counts": {
+      "a": 7,
+      "b": 36,
+      "c": 7
+    },
+    "protected_counts": {
+      "a": 11,
+      "b": 28,
+      "c": 6
+    },
+    "helper_count": 19,
+    "control_documents": 39,
+    "receipt_changes": 10,
+    "preexisting_receipt_drifts": 0
+  },
+  "review_plan_limits": [
+    "review artifact built from observed source metadata, not an approval or initialized operating release",
+    "raw source code commit and independently hashed current producer/operator helpers are separate provenance",
+    "the complete candidate must be reviewed/fixed and refrozen after application QA",
+    "two receipt candidates calculated on B in memory; no raw receipt/config export"
+  ],
+  "coordinator": {
+    "source_pins": 32,
+    "dependency_and_witness_pins": 42,
+    "mac": {
+      "tests": 259,
+      "profiles": 15,
+      "skipped": 0,
+      "complete": true
+    },
+    "linux": {
+      "tests": 259,
+      "profiles": 15,
+      "skipped": 0,
+      "complete": true,
+      "identity": {
+        "uid": 997,
+        "gid": 997,
+        "groups": [
+          997
+        ],
+        "effective_capabilities": "0000000000000000",
+        "no_new_privileges": "1"
+      },
+      "source_unchanged": true,
+      "network": "private; AF_UNIX only",
+      "new_accounts": 0,
+      "scope": "15 kernel-backed fixture profiles in a transient restricted service; not the real operating root lifecycle or Native consumers"
+    },
+    "same_source_pins_on_mac_and_linux": true,
+    "early_linux_setup_failures": [
+      "217/USER for a nonexistent numeric account; tests not started",
+      "explicit privilege-drop wrapper failed before identity attestation; tests not started"
+    ],
+    "new_native_cases_run": 0,
+    "prior_native_evidence_is_historical": true
+  },
+  "application_replay": {
+    "tests": 1650,
+    "groups": 32,
+    "passed_groups": 24,
+    "assertion_failures": 9,
+    "dependency_skips": 10,
+    "source_tree_files": 2480,
+    "source_files_unchanged": true,
+    "socket_connections_denied": true,
+    "complete": false,
+    "groups_summary": [
+      {
+        "group": "new-targets",
+        "rc": 0,
+        "tests": 39,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.272
+      },
+      {
+        "group": "new-intents",
+        "rc": 0,
+        "tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.221
+      },
+      {
+        "group": "new",
+        "rc": 0,
+        "tests": 40,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.636
+      },
+      {
+        "group": "prior-claim",
+        "rc": 1,
+        "tests": 28,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.298
+      },
+      {
+        "group": "root",
+        "rc": 1,
+        "tests": 236,
+        "skipped": 6,
+        "passed": false,
+        "seconds": 0.826
+      },
+      {
+        "group": "sdk",
+        "rc": 0,
+        "tests": 107,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.676
+      },
+      {
+        "group": "native",
+        "rc": 0,
+        "tests": 181,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 1.217
+      },
+      {
+        "group": "common-new",
+        "rc": 1,
+        "tests": 22,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.237
+      },
+      {
+        "group": "workflow",
+        "rc": 0,
+        "tests": 14,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.142
+      },
+      {
+        "group": "sdk-flow",
+        "rc": 0,
+        "tests": 68,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.729
+      },
+      {
+        "group": "root-flow",
+        "rc": 0,
+        "tests": 94,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.383
+      },
+      {
+        "group": "host-journal",
+        "rc": 1,
+        "tests": 19,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.245
+      },
+      {
+        "group": "journal",
+        "rc": 0,
+        "tests": 85,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.621
+      },
+      {
+        "group": "installation",
+        "rc": 0,
+        "tests": 38,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.112
+      },
+      {
+        "group": "common-service-mac",
+        "rc": 0,
+        "tests": 65,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.429
+      },
+      {
+        "group": "partitions",
+        "rc": 0,
+        "tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.102
+      },
+      {
+        "group": "new-scope",
+        "rc": 0,
+        "tests": 17,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.48
+      },
+      {
+        "group": "new-clock",
+        "rc": 0,
+        "tests": 13,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.097
+      },
+      {
+        "group": "new-typed",
+        "rc": 1,
+        "tests": 36,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.846
+      },
+      {
+        "group": "new-factual",
+        "rc": 0,
+        "tests": 31,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.434
+      },
+      {
+        "group": "new-provenance",
+        "rc": 0,
+        "tests": 41,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.77
+      },
+      {
+        "group": "new-errors",
+        "rc": 1,
+        "tests": 49,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.767
+      },
+      {
+        "group": "new-app",
+        "rc": 0,
+        "tests": 24,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.123
+      },
+      {
+        "group": "new-composition",
+        "rc": 0,
+        "tests": 16,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.135
+      },
+      {
+        "group": "diagnostic-core",
+        "rc": 0,
+        "tests": 51,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.42
+      },
+      {
+        "group": "runtime-health",
+        "rc": 1,
+        "tests": 33,
+        "skipped": 0,
+        "passed": false,
+        "seconds": 0.115
+      },
+      {
+        "group": "host-inventory",
+        "rc": 0,
+        "tests": 15,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.082
+      },
+      {
+        "group": "current-native-identity",
+        "rc": 0,
+        "tests": 7,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.221
+      },
+      {
+        "group": "current-sdk-identity",
+        "rc": 0,
+        "tests": 55,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.348
+      },
+      {
+        "group": "current-controller",
+        "rc": 0,
+        "tests": 139,
+        "skipped": 4,
+        "passed": false,
+        "seconds": 0.816
+      },
+      {
+        "group": "deployment-gate-binding",
+        "rc": 0,
+        "tests": 49,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 6.07
+      },
+      {
+        "group": "payload-producer",
+        "rc": 0,
+        "tests": 6,
+        "skipped": 0,
+        "passed": true,
+        "seconds": 0.6
+      }
+    ],
+    "failures": [
+      {
+        "group": "prior-claim",
+        "test": "test_first_scope_keeps_reference_mixed_and_later_reads (__main__.CommonContract.test_first_scope_keeps_reference_mixed_and_later_reads)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "root",
+        "test": "test_real_suricata_claims_are_still_rejected (test_sensor_abbreviation_boundary.UnobservedSourceNames.test_real_suricata_claims_are_still_rejected) (line='| **Wazuh IDS/상관 경보** | **표본 반환 10건 · 전체 건수 미확인** |')",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "common-new",
+        "test": "test_observation_prompt_exposes_exact_successful_tool_identity (__main__.EvidenceContract.test_observation_prompt_exposes_exact_successful_tool_identity)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "common-new",
+        "test": "test_skills_load_through_the_shared_section_contract (__main__.EvidenceContract.test_skills_load_through_the_shared_section_contract)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "common-new",
+        "test": "test_lowercase_article_names_paths_and_addresses_are_not_short_hosts (__main__.HostScope.test_lowercase_article_names_paths_and_addresses_are_not_short_hosts) (text='a:b')",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "host-journal",
+        "test": "test_ambiguity_unknown_host_and_current_only_do_not_invent_history (frozen_host_contract_compat.FixedHost.test_ambiguity_unknown_host_and_current_only_do_not_invent_history) (question='B systemd 현재 상태 보여줘')",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "new-typed",
+        "test": "test_current_short_lookup_uses_deferred_registered_read_without_initial_exposure (__main__.SDK.test_current_short_lookup_uses_deferred_registered_read_without_initial_exposure)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "new-errors",
+        "test": "test_per_row_hashes_stay_in_original_audit_without_model_repetition (__main__.HostAndProjection.test_per_row_hashes_stay_in_original_audit_without_model_repetition)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      },
+      {
+        "group": "runtime-health",
+        "test": "test_catalog_has_no_arbitrary_paths_and_matches_validator (test_runtime_health.RuntimeTests.test_catalog_has_no_arbitrary_paths_and_matches_validator)",
+        "state": "requires current-contract review; not automatically classified as a product defect"
+      }
+    ],
+    "confirmed_expectation_delta": {
+      "additional_target": "b:certificate-monitor",
+      "systemd_unit": "capstone-cert-monitor.service",
+      "before_targets": 42,
+      "candidate_targets": 43
+    },
+    "installed_contract_comparison": {
+      "source_families_bound_to_B_metadata": 16,
+      "groups": 7,
+      "not_a_full_installed_runtime": true,
+      "no_accuracy_score_or_baseline_completion_claim": true
+    },
+    "live_model_calls": 0,
+    "live_MCP_handler_calls": 0,
+    "note": "49 initial-installation binding and6 payload-producer executions are included in1650; counts are overlapping developer checks, not independent incidents or accuracy scores"
+  },
+  "schema_delta": {
+    "observed_at_kst": "2026-11-20T08:41:04.001708+09:00",
+    "diagnostic_tool_names_unchanged": true,
+    "diagnostic_tools": 3,
+    "schema_sha256": {
+      "get_system_diagnostics": {
+        "before": "7b25de939edbe33815850e972b83c864fc847ed688f50b1cf6dc60f01e5c76f6",
+        "after": "511c93fe31896ca6c644218459b493e496c9dc47825348f5d412412e0d0fe603"
+      },
+      "calculate_time": {
+        "before": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd",
+        "after": "6ee9e1ef2e6e620993e5fa1cec4f8ba8284fe503e86f5201fd1341de7e5851dd"
+      },
+      "get_host_inventory": {
+        "before": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579",
+        "after": "e14dac348a9977b9e0e42aa7af40cb8d2b86c6aabf3b904d9e3285e1aa55a579"
+      }
+    },
+    "changed_paths": [
+      "get_system_diagnostics/allOf",
+      "get_system_diagnostics/properties/target/description",
+      "get_system_diagnostics/properties/target/enum",
+      "get_system_diagnostics/properties/target/x-capstone-host-journal-targets",
+      "get_system_diagnostics/properties/target/x-capstone-service-labels/b:certificate-monitor"
+    ],
+    "changes_summary": [
+      "get_system_diagnostics target adds b:certificate-monitor",
+      "host systemd journal targets require explicit view=journal and bounded timestamps; implicit history remains unit-scoped"
+    ],
+    "full_delta_evidence_sha256": "9055d92b914efa1a4501b7f7c64e13d6ce254bcf5ce0cad4dfa617502e0066b8"
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "coordinator": {
+      "before": {
+        "always_on_chars": 16917,
+        "n_files": 80,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 65,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 80,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 65,
+        "plugins": 0
+      },
+      "diff": {
+        "added": [],
+        "removed": [],
+        "modified": [
+          "scripts/coordinator_release_plan.py",
+          "scripts/coordinator_test_release_plan.py"
+        ],
+        "always_on_char_delta": 0
+      }
+    },
+    "preparation": {
+      "before": {
+        "always_on_chars": 16917,
+        "n_files": 91,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 76,
+        "plugins": 0
+      },
+      "candidate": {
+        "always_on_chars": 16917,
+        "n_files": 139,
+        "skills": 5,
+        "sub_agents": 0,
+        "scripts": 76,
+        "plugins": 0
+      },
+      "diff": {
+        "added": [
+          "scripts/operating-payload/a/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+          "scripts/operating-payload/a/etc/systemd/system/capstone-system-diagnostics.service",
+          "scripts/operating-payload/a/opt/capstone-diagnostics/diagnostic_history.py",
+          "scripts/operating-payload/a/opt/capstone-diagnostics/diagnostic_journal.py",
+          "scripts/operating-payload/a/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "scripts/operating-payload/a/opt/capstone-diagnostics/system_diagnostics.py",
+          "scripts/operating-payload/b/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+          "scripts/operating-payload/b/etc/systemd/system/capstone-system-diagnostics.service",
+          "scripts/operating-payload/b/opt/capstone-diagnostics/diagnostic_history.py",
+          "scripts/operating-payload/b/opt/capstone-diagnostics/diagnostic_journal.py",
+          "scripts/operating-payload/b/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "scripts/operating-payload/b/opt/capstone-diagnostics/system_diagnostics.py",
+          "scripts/operating-payload/b/opt/capstone-management/skill-soc-investigate.md",
+          "scripts/operating-payload/b/opt/capstone-management/skill-soc-query.md",
+          "scripts/operating-payload/b/opt/capstone-management/soc_management_controller.py",
+          "scripts/operating-payload/b/opt/capstone-management/soc_management_run.py",
+          "scripts/operating-payload/b/opt/capstone-management/workflow_contract.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/chat_contract.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/grounding.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/harness.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/query_grounding.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/read_contract.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/runtime.py",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/skill-soc-investigate.md",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/skill-soc-query.md",
+          "scripts/operating-payload/b/opt/capstone-ollama-trial/workflow_contract.py",
+          "scripts/operating-payload/b/opt/capstone-review-chat/review_channel_worker.py",
+          "scripts/operating-payload/b/opt/hermes-data/management-code/run.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/alignment.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/read_contract.py",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md",
+          "scripts/operating-payload/b/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py",
+          "scripts/operating-payload/b/opt/mcp/system-diagnostics-mcp.py",
+          "scripts/operating-payload/c/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+          "scripts/operating-payload/c/etc/systemd/system/capstone-system-diagnostics.service",
+          "scripts/operating-payload/c/opt/capstone-diagnostics/diagnostic_history.py",
+          "scripts/operating-payload/c/opt/capstone-diagnostics/diagnostic_journal.py",
+          "scripts/operating-payload/c/opt/capstone-diagnostics/diagnostic_journal_native.py",
+          "scripts/operating-payload/c/opt/capstone-diagnostics/system_diagnostics.py",
+          "scripts/preparation/deployment/soc_runtime.py",
+          "scripts/preparation/deployment/tests/test_soc_management.py",
+          "scripts/preparation/infra/validation/journal-composition/prepare_payload.py",
+          "scripts/preparation/infra/validation/journal-composition/test_prepare_payload.py"
+        ],
+        "removed": [],
+        "modified": [],
+        "always_on_char_delta": 0
+      }
+    },
+    "model_calls": 0,
+    "scope": "structure only; does not override failed application replay or prove operating quality"
+  },
+  "live_observations": {
+    "after": {
+      "a": {
+        "at_kst": "2026-11-20T09:20:25.040418+09:00",
+        "source_paths": 12,
+        "protected_paths": 11,
+        "source_and_protected_metadata_equal": true,
+        "identity_and_previous_coordinator_state_equal": true
+      },
+      "b": {
+        "at_kst": "2026-11-20T09:20:25.461869+09:00",
+        "source_paths": 41,
+        "protected_paths": 28,
+        "source_and_protected_metadata_equal": true,
+        "identity_and_previous_coordinator_state_equal": true
+      },
+      "c": {
+        "at_kst": "2026-11-20T09:20:25.327544+09:00",
+        "source_paths": 12,
+        "protected_paths": 6,
+        "source_and_protected_metadata_equal": true,
+        "identity_and_previous_coordinator_state_equal": true
+      }
+    },
+    "catalog_and_model_observed_at_kst": "2026-11-20T08:41:04+09:00",
+    "MCP_servers": 8,
+    "allowed_tools": 45,
+    "existing_B_model": "soc-qwen36:35b-balanced-q4km-20261108",
+    "resident_context_length": 65536,
+    "source_and_protected_state_unchanged": true
+  },
+  "humanize": {
+    "run_id": "2026-11-20-004-328c",
+    "route": "standard",
+    "change_rate": 0.0283,
+    "sentence_touch": {
+      "rate": 0.5172,
+      "touched": 60,
+      "total": 116
+    },
+    "grade": "B",
+    "self_check_passed": 6,
+    "gate_exit": 0,
+    "numeric_sequences_preserved": true
+  },
+  "review": {
+    "primary_defect_oriented_review": true,
+    "review_agent_skill": "not available in current catalog; primary review used",
+    "semgrep": "not run; no Mac CLI installation",
+    "unresolved_application_assertions": 9
+  },
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-20T09:37:40.959340+09:00",
+      "removed_files": 65,
+      "removed_bytes": 401489,
+      "root_absent": true
+    },
+    "mac": {
+      "at_kst": "2026-11-20T09:38:22.477943+09:00",
+      "removed_files": 9526,
+      "removed_bytes": 165800119,
+      "root_absent": true
+    },
+    "owned_transient_units_absent": 3,
+    "runtime_backups_framework_user_assets_preserved": true,
+    "mac_packages_installed": 0
+  },
+  "operating_changes": 0,
+  "model_inferences": 0,
+  "attack_tests": 0,
+  "training_runs": 0,
+  "paper_panel_presentation_changes": 0,
+  "approval_files_created": 0,
+  "known_unfinished": [
+    "classify9 assertion failures against current requirements and fix actual defects; replay the10 dependency-limited cases in an existing approved environment",
+    "refreeze complete source/schema/helper/permission/payload evidence and obtain fresh exact approval",
+    "new Native integration for this changed operator and bound real controller, then actual collection/MCP/Hermes/Ollama acceptance",
+    "backup75 durable intent/retry contract, actual reboot/long recovery, broader OS approval and management address policy",
+    "paper91TOC page mismatches, fresh OS full installation, independent reproduction and final presentation"
+  ]
+}

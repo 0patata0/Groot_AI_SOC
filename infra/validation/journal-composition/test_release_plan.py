@@ -53,6 +53,20 @@ class PlanTests(unittest.TestCase):
         changed=copy.deepcopy(self.value);changed['hosts']['b']['protected']['/opt/hermes-data/.env']=None
         with self.assertRaisesRegex(ValueError,'plan_required_protected_file'):m.Plan(changed)
 
+    def test_existing_executable_protected_file_is_bound_without_changing_its_mode(self):
+        changed=copy.deepcopy(self.value)
+        changed['hosts']['a']['protected']['/etc/nftables.conf']['mode']=0o755
+        plan=m.Plan(changed);files=self.fixture.nodes['a']['files']
+        path=files.root/'etc/nftables.conf'
+        self.assertNotEqual(path.stat().st_mode & 0o777,0o755)
+        with self.assertRaisesRegex(ValueError,'protected_state_changed'):plan.verify(files)
+        path.chmod(0o755)
+        plan.verify(files)
+        self.assertEqual(path.stat().st_mode & 0o777,0o755)
+        for unsafe in (0o775,0o766,0o4755,0o777):
+            changed['hosts']['a']['protected']['/etc/nftables.conf']['mode']=unsafe
+            with self.assertRaisesRegex(ValueError,'plan_protected_metadata'):m.Plan(changed)
+
     def test_model_configuration_drift_blocks_forward_but_not_restore_inspection(self):
         path=self.ctl.files.root/'opt/hermes-data/config.yaml';path.write_bytes(b'external fixture configuration')
         with self.assertRaisesRegex(ValueError,'protected_state_changed'):self.plan.verify(self.ctl.files)

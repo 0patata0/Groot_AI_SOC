@@ -28,14 +28,14 @@
 
 <!-- service-provenance-summary-in-archive -->
 
-<!-- coordinator-native-completion-20261120 -->
-<a id="coordinator-native-completion-20261120"></a>
-격리 Native에서 새 소스 확정과 부분 적용 원복의 두 경로를 정리/current까지 확인했다. 인수 자료는 synthetic-native-completion-fixture-only로 표시한 시험용4항목이며 실제 collection/MCP/두 봇 인수나 운영 성공을 뜻하지 않는다.
+<!-- coordinator-operating-preparation-20261120 -->
+<a id="coordinator-operating-preparation-20261120"></a>
+검토용 50대상 반입 목록과 현재 소스·모델·MCP 스키마·권한 근거를 확보했다. 다음 작업은 전체 후보 1,650실행의 실패 9건을 현재 요구와 맞춰 분류하고 실제 결함을 보완하는 것이다. 과거 검사와 현재 계약이 다른 경우에도 기대값만 바꿔 통과로 만들지 않고 현재 동작의 근거와 반례를 함께 남긴다. 의존성 10생략은 기존 Linux 환경에서 확인해야 한다.
 
-다음은 backup75의 현재 잠금·durable intent와 동일 요청의 결과를 대조하는 계약, 실제 운영의 소스/모델/MCP 스키마/권한과 정확 전체 payload 승인 자료를 준비한다. 승인 뒤 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current를 별도로 인수한다. 실제 재부팅·장기 복구·새 서버 설치·독립 재구현과 논문 목차91불일치도 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
+기능 검토를 마친 전체 payload·새 조정 실행기·스키마 차이·검증·복구를 다시 고정한 뒤 정확 승인을 요청한다. 승인 후에는 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current 순서로 인수한다. 새 Native 실행·실제 재부팅/장기 복구·backup75 상태/intent는 계속 남은 범위다. 전체 OS 승인과 관리 주소 정책·독립 재구현·새OS 전체 설치·논문 목차 91불일치·최종 발표도 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
 
-[현재 근거와 미완료](infra/validation/journal-composition/private-full-native.validation.json)
-<!-- /coordinator-native-completion-20261120 -->
+[반입 준비·실패·다음 인수 조건](infra/validation/journal-composition/operating-preparation.validation.json)
+<!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->
 기존 발표자료를 유지하고 추가 생성·수정은 사용자 명시 요청 전까지 진행하지 않는다. 판넬 문구와 배치용 자료는 보존한다. 전체 실전 운용·논문·최종 발표 목표는 활성 상태이며 이 지시를 목표 전체의 일시정지나 운영 후보 승인으로 확대하지 않는다.

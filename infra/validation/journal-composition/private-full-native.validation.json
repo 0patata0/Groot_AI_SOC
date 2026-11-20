@@ -555,5 +555,10 @@
     },
     "input_manifest_sha256": "71a4e5e6e677f2ebff33031f4a190b68d054e595a58206f7da6001de75a9fea8",
     "source_commit": "836fa97ea056290aacd2ec6889f8725f6f2fcb24"
+  },
+  "current_source_followup": {
+    "path": "operating-preparation.validation.json",
+    "scope": "current producer/plan changes are separate from this historical validation; new Native execution has not been performed",
+    "old_counts_and_source_hashes_retained": true
   }
 }

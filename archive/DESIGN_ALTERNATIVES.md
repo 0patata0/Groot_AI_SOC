@@ -1,5 +1,10 @@
 # 설계 대안 이력
 
+<!-- final-presentation-refresh-20261120 -->
+<a id="final-presentation-refresh-20261120"></a>
+기존 PPTX를 가져와 같은 마스터·서체·배치에서 텍스트와 표를 편집했다. 11/18 응답 차트와 입력 크기 차트의 범주·수치·단위는 유지한다. 원본의 두 workbook은 수식 셀 0인 literal snapshot이며 제공 값에 맞춘 새 snapshot을 내보내기에 연결한다. 원본·작성 소스와 측정 근거를 함께 보존한다.
+<!-- /final-presentation-refresh-20261120 -->
+
 <!-- thesis-pagination-freeze-20261120 -->
 <a id="thesis-pagination-freeze-20261120"></a>
 구글 독스 편집본의 본문과 서식을 보존하면서 로컬 목차만 보정했다. 기존 TOC 필드3개와 짧은 제목을 유지하고154쪽번호에 PAGEREF를 사용했다. 스타일별 범위를 사용하는 TOC에서 불필요한 outline 수집 옵션을 제거했으며 목차를 표나 수동 점 문자열로 바꾸지 않았다.

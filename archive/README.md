@@ -1,5 +1,12 @@
 # 과거 기록과 복원 안내
 
+<!-- final-presentation-refresh-20261120 -->
+<a id="final-presentation-refresh-20261120"></a>
+최종발표/에서 기존 20장 이어서 갱신·날짜별 근거와 승인 대기 구분·동결 논문 보존
+
+[현황](STATUS_HISTORY.md#final-presentation-refresh-20261120) · [계획](PLAN_HISTORY.md#final-presentation-refresh-20261120) · [설계](DESIGN_ALTERNATIVES.md#final-presentation-refresh-20261120) · [검수](DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+<!-- /final-presentation-refresh-20261120 -->
+
 <!-- thesis-pagination-freeze-20261120 -->
 <a id="thesis-pagination-freeze-20261120"></a>
 논문 현재 수정과 동기화의 마감·동결 범위를 보존했다. [현황](STATUS_HISTORY.md#thesis-pagination-freeze-20261120) · [계획](PLAN_HISTORY.md#thesis-pagination-freeze-20261120) · [검수와 한계](DIAGNOSTIC_HISTORY.md#thesis-pagination-freeze-20261120) · [서식 선택](DESIGN_ALTERNATIVES.md#thesis-pagination-freeze-20261120)

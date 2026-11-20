@@ -1,5 +1,23 @@
 # 현황 이력
 
+<!-- final-presentation-refresh-20261120 -->
+<a id="final-presentation-refresh-20261120"></a>
+기존 11/18 PPTX를 기준으로 최종발표/에서 갱신했다. 20장·14표·2차트와 원형 이미지를 유지하고 11/19 서비스 4대화·11/20 후보 검증, 35B SOC와 별도 40B Kali를 구분했다. 동결 논문의 좌표만 읽었으며 논문과 다른 발표 폴더는 수정하지 않았다.
+
+| 출력 검수 | 실제 확인 |
+|---|---|
+| 발표 | 20장·본문16/부록4·계획685초 |
+| 편집 구조 | 표14·차트2·literal workbook2·메모20 |
+| 내용 | PPTX256텍스트/셀·PDF287줄·누락0·용지 밖 글자0 |
+| 화면 | 원본20/최종PDF20 직접 검수·미수정14장 SDK PNG SHA 동일 |
+| 본문·원본 보존 | 동결 논문9SHA·발표자료/ 전체 원본·10/30 HTML 원본 보존 |
+| 임시 정리 | 277파일·25,872,276B·임시PPTX8 제거·작업 폴더 부재 |
+| 문장 검수 | standard1.56%·B·6/6; gate1은 문장 정렬 오탐·당위 원문 보존·finalizer accept |
+| 미수행 | 실제 PowerPoint/Keynote·발표 기기/리허설·학교 시간/형식·12/1 발표 |
+
+[Kali 요청 파일 반입](DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+<!-- /final-presentation-refresh-20261120 -->
+
 <!-- thesis-pagination-freeze-20261120 -->
 <a id="thesis-pagination-freeze-20261120"></a>
 구글 독스의2장 제목과 끊긴 목차 연결을 복구하고 세 목차의 쪽번호를 실제 본문과 맞췄다. 구글 독스 PDF122쪽과 로컬 PDF124쪽에서 각각154개(본문88·그림8·표58)가 모두 일치하며 서론은1쪽이다. 로컬 PDF는 최종 DOCX에서 직접 출력했다. 두 환경의 페이지 배치가 같다고 표시하지 않는다.

@@ -1,5 +1,12 @@
 # Groot_AI_SOC
 
+<!-- final-presentation-refresh-20261120 -->
+<a id="final-presentation-refresh-20261120"></a>
+기존 20장 발표자료를 최종발표/에서 이어서 갱신했다. 11/18 복합 조사 6대화와 후속 3대화의 기존 차트를 보존하고 11/19 서비스 조회 4대화, 11/20 운영 후보 검증을 별도 표와 부록에 연결했다. SOC 35B와 Kali의 별도 40B·공격 중단 상태를 구분한다. 논문은 동결했고 이후 결과는 발표와 별도 기록에만 반영한다. 본문 16장·부록 4장·계획 685초이며 실제 리허설과 학교 시간·형식은 미확정이다.
+
+[현재 결과와 남은 확인](STATUS.md#final-presentation-refresh-20261120) · [두 Kali 파일 반입](STATUS.md#kali-scenario-file-import-20261120)
+<!-- /final-presentation-refresh-20261120 -->
+
 <!-- presentation-workspace-cleanup-20261120 -->
 <a id="presentation-workspace-cleanup-20261120"></a>
 사용자 지시에 따라 현재 수정과 로컬 동기화를 마치고 논문을 동결했다. 후속 결과는 별도 기록한다. 발표자료는 루트 최종발표/에서 기존 자료를 이어가며 확인 가능한 임시 경로에는 삭제할 발표자료가 없었다. [현재 마감 결과](STATUS.md#thesis-pagination-freeze-20261120)를 기준으로 과거 기록과 구분한다.

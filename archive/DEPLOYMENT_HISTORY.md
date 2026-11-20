@@ -1,5 +1,17 @@
 # 설치·웹 정책 이력
 
+<!-- kali-scenario-file-import-20261120 -->
+<a id="kali-scenario-file-import-20261120"></a>
+| 요청 파일 반입 | 실제 확인 |
+|---|---|
+| 원본 | scenarios/시나리오.md·18,098B·로컬 원본/미추적 상태 보존 |
+| Kali232 | /home/att/시나리오.md·att 소유·0644·16:05 KST |
+| Kali233 | /home/attack/시나리오.md·attack 소유·0644·16:08 KST |
+| SHA256 | `011514528ba49d09e1df4ccc7ac9f7caa17666e75edbb57affe9e1920d493efb`·두 서버/원본 일치 |
+| 목적지 확인 | 233 att 계정 부재 확인 후 사용자가 기존 attack 홈을 선택 |
+| 범위 | 파일 복사·소유/크기/SHA 대조·임시 파일 부재; 새 계정·권한 정책·시나리오 실행·서비스 변경0 |
+<!-- /kali-scenario-file-import-20261120 -->
+
 <!-- operating-payload-refreeze-20261120 -->
 <a id="operating-payload-refreeze-20261120"></a>
 ## 2026-11-20 소스만 반입한 별도 PID1 검증

@@ -1,5 +1,34 @@
 # 현재 작업 상태
 
+<!-- final-presentation-refresh-20261120 -->
+<a id="final-presentation-refresh-20261120"></a>
+기존 20장 발표자료를 최종발표/에서 이어서 갱신했다. 11/18 복합 조사 6대화와 후속 3대화의 기존 차트를 보존하고 11/19 서비스 조회 4대화, 11/20 운영 후보 검증을 별도 표와 부록에 연결했다. SOC 35B와 Kali의 별도 40B·공격 중단 상태를 구분한다. 논문은 동결했고 이후 결과는 발표와 별도 기록에만 반영한다. 본문 16장·부록 4장·계획 685초이며 실제 리허설과 학교 시간·형식은 미확정이다.
+
+| 출력 검수 | 실제 확인 |
+|---|---|
+| 발표 | 20장·본문16/부록4·계획685초 |
+| 편집 구조 | 표14·차트2·literal workbook2·메모20 |
+| 내용 | PPTX256텍스트/셀·PDF287줄·누락0·용지 밖 글자0 |
+| 화면 | 원본20/최종PDF20 직접 검수·미수정14장 SDK PNG SHA 동일 |
+| 본문·원본 보존 | 동결 논문9SHA·발표자료/ 전체 원본·10/30 HTML 원본 보존 |
+| 임시 정리 | 277파일·25,872,276B·임시PPTX8 제거·작업 폴더 부재 |
+| 문장 검수 | standard1.56%·B·6/6; gate1은 문장 정렬 오탐·당위 원문 보존·finalizer accept |
+| 미수행 | 실제 PowerPoint/Keynote·발표 기기/리허설·학교 시간/형식·12/1 발표 |
+
+<a id="kali-scenario-file-import-20261120"></a>
+
+| 요청 파일 반입 | 실제 확인 |
+|---|---|
+| 원본 | scenarios/시나리오.md·18,098B·로컬 원본/미추적 상태 보존 |
+| Kali232 | /home/att/시나리오.md·att 소유·0644·16:05 KST |
+| Kali233 | /home/attack/시나리오.md·attack 소유·0644·16:08 KST |
+| SHA256 | `011514528ba49d09e1df4ccc7ac9f7caa17666e75edbb57affe9e1920d493efb`·두 서버/원본 일치 |
+| 목적지 확인 | 233 att 계정 부재 확인 후 사용자가 기존 attack 홈을 선택 |
+| 범위 | 파일 복사·소유/크기/SHA 대조·임시 파일 부재; 새 계정·권한 정책·시나리오 실행·서비스 변경0 |
+
+[현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+<!-- /final-presentation-refresh-20261120 -->
+
 <!-- presentation-workspace-cleanup-20261120 -->
 <a id="presentation-workspace-cleanup-20261120"></a>
 논문 최종 제출 완료는 사용자 보고다. 진행 중이던 목차·쪽번호와 로컬 동기화를 마쳐 논문을 동결했다. [현재 마감 결과](#thesis-pagination-freeze-20261120)를 기준으로 아래 과거 판본과 구분한다.

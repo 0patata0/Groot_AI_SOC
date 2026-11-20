@@ -877,6 +877,13 @@
     "numeric_fact_followup": "observation test count19→20 after added negative retry boundary"
   },
   "publication": {
-    "state": "unpublished"
-  }
+    "commit": "48e61b46aa12f0a789a0434e631ef24a92e739af",
+    "remote_main": "48e61b46aa12f0a789a0434e631ef24a92e739af",
+    "push_performed": true,
+    "verified_at_kst": "2026-11-20T13:55:12.018938+09:00",
+    "credential_source": "project local credential file; per-Git-process environment only; helper disabled; trace/verbose environment absent; raw errors suppressed",
+    "state": "content_published_remote_main_verified",
+    "receipt_metadata_followup": "This record is committed in a follow-up; the final follow-up commit is recorded in the local session and final answer."
+  },
+  "source_publication_commit": "48e61b46aa12f0a789a0434e631ef24a92e739af"
 }

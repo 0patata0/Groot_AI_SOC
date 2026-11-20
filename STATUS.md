@@ -97,6 +97,15 @@ Mac15군270검사·생략0과 보류/유실 판정20검사, 반입 생성기7검
 | 정리 | 서버 자체9작업의 root/input/unit 부재·Mac4,598파일/116,539,015B 제거 |
 | 운영 승인·적용·모델/MCP·공격·학습 | 0 |
 
+
+| 게시 확인 | 결과 |
+| --- | --- |
+| 내용38파일 | `48e61b46aa12f0a789a0434e631ef24a92e739af` |
+| 실제 원격main 일치 | `2026-11-20T13:55:12.018938+09:00` |
+| 원본 secret-scanner | 추적2,487·위험경로0·기존10/신규0·값/스니펫 저장0 |
+| 검토·문서 | review-agent No findings·Semgrep 미수행·humanize light0.2%/B/6/6/gate0 |
+| 범위 | 운영 미승인·미적용·실제MCP/양봇 인수 미수행 |
+
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

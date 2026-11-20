@@ -16,6 +16,14 @@
 | 미수행 | 실제 PowerPoint/Keynote·발표 기기/리허설·학교 시간/형식·12/1 발표 |
 
 [Kali 요청 파일 반입](DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+
+
+| 기록 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `3007500882aa14dcd2b0caf1b1f417ed918365db`·공개9문서 |
+| 실제 원격 main 일치 | `2026-11-20T16:25:02.297477+09:00` |
+| 게시 검사 | 추적2,487·위험경로0·기존10/신규0·값/스니펫 저장0 |
+| 별도 상태 | 발표 산출물·원문 기록·사용자 시나리오 파일은 Git 제외/미추적 상태 보존; 운영 후보 승인 대기 |
 <!-- /final-presentation-refresh-20261120 -->
 
 <!-- thesis-pagination-freeze-20261120 -->

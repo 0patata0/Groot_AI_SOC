@@ -27,6 +27,14 @@
 | 범위 | 파일 복사·소유/크기/SHA 대조·임시 파일 부재; 새 계정·권한 정책·시나리오 실행·서비스 변경0 |
 
 [현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+
+
+| 기록 게시 | 확인 값 |
+|---|---|
+| 내용 커밋 | `3007500882aa14dcd2b0caf1b1f417ed918365db`·공개9문서 |
+| 실제 원격 main 일치 | `2026-11-20T16:25:02.297477+09:00` |
+| 게시 검사 | 추적2,487·위험경로0·기존10/신규0·값/스니펫 저장0 |
+| 별도 상태 | 발표 산출물·원문 기록·사용자 시나리오 파일은 Git 제외/미추적 상태 보존; 운영 후보 승인 대기 |
 <!-- /final-presentation-refresh-20261120 -->
 
 <!-- presentation-workspace-cleanup-20261120 -->

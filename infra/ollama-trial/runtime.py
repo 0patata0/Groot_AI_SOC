@@ -359,6 +359,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
                           if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
             service_background=question if service_plan and question!=current else ''
+            def service_receipt_tools():
+                # Deferred identity tools may have completed verified reads even
+                # though they were never exposed to the general model. Accept
+                # their receipts without adding them to subsequent tool choices.
+                return {t.name for t in agent.adapter.tools+agent.adapter.identity_tools
+                        if harness.EVIDENCE.allowed(t.name,'verify')}
             async def select_required_service_reads(options, phase):
                 nonlocal selection_active
                 schema={'type':'object','additionalProperties':False,'required':['indexes'],
@@ -445,7 +451,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     await complete_service_identity_reads()
                     receipts=harness.service_report_receipts(report['calls'])
                     service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
-                        report['at_kst'],receipts,background=service_background,allowed_reads=set(readable))
+                        report['at_kst'],receipts,background=service_background,allowed_reads=service_receipt_tools())
                         if service_plan and receipts is not None else None)
                     if service_context is None:
                         if service_plan and service_plan.get('compact_scope'):
@@ -790,7 +796,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     context=harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
                         report['at_kst'],harness.service_report_receipts(report['calls']),
                         background=service_background,
-                        allowed_reads={t.name for t in agent.adapter.tools if harness.EVIDENCE.allowed(t.name,'verify')})
+                        allowed_reads=service_receipt_tools())
                     final=harness.CONTRACT.service_lookup_text(pruned_text,context or {})
                 elif issues:
                     report['remaining_issues'] = issues

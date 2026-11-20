@@ -1271,7 +1271,10 @@ def unobserved_event_source_violations(text, observed_sources):
                             r'확인\s*불가|확인되지', between)
                             or re.search(r'[.!?;]', between)):
                         continue
-                    after = tail[value.end():]
+                    # A following table cell or parallel field has its own
+                    # proposition. "sample10; total unknown" must not erase
+                    # the asserted sample count of an unobserved sensor.
+                    after = re.split(r'[|·]', tail[value.end():], maxsplit=1)[0]
                     connective = bool(re.fullmatch(r'없(?:으며|고|어|으므로|으나)', value[0]))
                     if not connective and contract.claim_modality(after) in ('not_asserted', 'conditional_or_unverified', 'planned_check'):
                         continue

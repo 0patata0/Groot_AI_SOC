@@ -2,18 +2,20 @@
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-반입 생성기는 고정 Git commit에서 정적 대상 44개의 코드·스킬·unit을 읽는다. management controller에는 같은 묶음의 run.py 원문을 결속하며 기존 설치 경로·계정·컨테이너 선택을 바꾸는 신규 호스트용 profile 변환은 적용하지 않는다. 파일별 원본·입력 SHA·결과 SHA와 생성기 SHA를 manifest에 남긴다.
+<a id="operating-application-review-20261120"></a>
+정적 반입 생성기는 고정 Git의 44대상과 관리 실행 원문 결속을 재사용한다. 실제 영수증 2개·reader 3개·MCP launcher 1개는 관측한 설치본에 별도로 결속해야 한다. 이번에 SDK의 지연 식별 조회 영수증·센서 수치·호스트 표기 세 결함을 보완했으므로 이전 50대상 검토안을 새 소스로 다시 생성해야 한다. 승인 파일·운영 initialize/prepare·배포는 실행하지 않았다.
 
-아래 명령은 로컬 반입 파일만 만든다. COMMIT은 40자리 원본 commit, TASK는 기존 작업 폴더다. 출력 폴더가 이미 있으면 덮어쓰지 않는다. 이 출력에는 실제 설치 영수증 2개와 reader 3개·MCP launcher 1개가 없어 별도의 실제 관측으로 50대상 계획을 완성해야 한다. 영수증 변환은 기존 출처·관계없는 필드를 보존하며 원문을 내보내지 않고 B에서 결과 SHA만 계산할 수 있다. 승인 생성·서비스 제어·배포 기능은 없다.
+[회귀 실행기](run_operating_regressions.py)는 기존 27군과 현재 기능 5군을 실행한다. [계약 목록](current-application-contracts.json)에 고정한 원본 시험 SHA를 확인한다. 6군의 7개 단정만 별도 어댑터로 대체해 현재 요구를 검사한다. 조회 도구 노출·실제 호출·보호 검사·반환 근거는 어댑터가 바꾸지 않는다. 새 반례와 수정 전 코드 비교는 코드 결함의 근거이며 현재 계약 대체를 숨기는 통과 집계로 사용하지 않는다.
 
-현재 검토용 계획은 50대상·보조 19·제어 39·보호 45이며 기능 검토 대기다. Mac의 259검사·설치 결속 49검사·생성기 6검사와 공식 구조 139구성은 해당 범위의 근거다. 전체 후보 32군·1,650실행의 실패 9건·의존성 10생략은 해결하지 못했다. 앞선 258검사·Native 합성 인수는 당시 원본의 기록으로 보존하며 새 0755보호 메타데이터 처리나 결속된 실제 controller의 운영 검증으로 승계하지 않는다.
+ROOT는 기준 Git와 기록된 변경 SHA로 복원한 불변 소스 사본, COMPARISON은 기존 재현기의 comparison-base 3파일이다. MANIFEST는 ROOT의 모든 파일 SHA와 비교 입력 SHA를 담은 schema1 JSON이다. 실제 기록의 전체 파일 수는 2,484이며 공개 원장에 기준 commit·변경 SHA·manifest SHA를 남겼다. 출력 폴더는 ROOT 밖의 새 경로여야 한다.
 
 ```sh
-python3 -B infra/validation/journal-composition/prepare_payload.py \
-  --source-commit "$COMMIT" --output "$TASK/static"
+python3 -I -B "$ROOT/infra/validation/journal-composition/run_operating_regressions.py"   --root "$ROOT" --comparison "$COMPARISON" --source-manifest "$MANIFEST"   --environment mac --output "$TASK/checks"
 ```
 
-[검증 원장](operating-preparation.validation.json) · [정확 계획·인수 조건](COORDINATOR.md#coordinator-operating-preparation-20261120)
+기존 Hermes 의존성이 있는 격리 환경에서는 hermes 모드를 사용한다. Mac은 1,652실행/의존성10생략, Linux는 공통 서비스 152개를 포함한 1,739실행/생략0을 확인했다. 모든 자식의 Python socket 연결을 거절하고 소스의 전후 SHA를 대조한다. 첫 Linux의 예상 수148/실제152 집계 실패도 보존한다. 새 패키지 설치·모델·MCP·운영 배포를 실행하는 검사가 아니다.
+
+[현재 검증 원장](current-application.validation.json) · [이전 반입 준비](operating-preparation.validation.json) · [정확 승인·인수 조건](COORDINATOR.md#operating-application-review-20261120)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 후속 [조정 실행기](COORDINATOR.md)에 50소스·39제어 문서와 정리·현재 설치 검증까지 연결했다. 동일 소스로 Mac252·Linux252/생략0·공식78→80구성/추가2/수정14/상시 증가0과 합성 root namespace5조건을 확인했다. 운영 적용·운영 유닛 정지/재개·실제 재부팅/독립 복구·정확 승인·MCP/두 봇 채팅은 미완료다. [정본 동기화](CANONICAL.md)와 [읽기/재개 판정](WITNESS.md)의 과거 근거를 보존하며 아래 이전 단계의 미연결 문구는 당시 범위로 읽는다.

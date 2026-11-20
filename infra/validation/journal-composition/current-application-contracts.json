@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "parent_source_commit": "f7d0ff40aaeab0df0402953332a571bf31562ea9",
+  "scope": "explicit current-contract replay of immutable parent tests, not an operating or model-quality score",
+  "groups": {
+    "prior-claim": {
+      "entry": "infra/validation/claim-modality/test_claims.py",
+      "replacements": [
+        {
+          "test": "CommonContract.test_first_scope_keeps_reference_mixed_and_later_reads",
+          "previous_assumption": "Any completed read unlocks the later investigation catalog; a referenced card can replace the explicitly requested sensor.",
+          "current_requirement": "Only a successful matching requested-sensor receipt completes its pending read; a card adds its missing reads without discarding the user request.",
+          "evidence": "infra/ollama-trial/harness.py:incident_required_read_gaps, investigation_first_scope, incident_selection_scope"
+        }
+      ],
+      "parent_sha256": {
+        "infra/validation/claim-modality/test_claims.py": "648ad6f2c682bef32c774dbb4007a3773a154fb92b66a9a8101201ad721f4e15"
+      }
+    },
+    "common-new": {
+      "entry": "infra/validation/common-read-contract/test_contract.py",
+      "replacements": [
+        {
+          "test": "EvidenceContract.test_observation_prompt_exposes_exact_successful_tool_identity",
+          "previous_assumption": "JSON whitespace is part of the observation identity.",
+          "current_requirement": "Parse the bounded observation JSON and verify exact tool alias, successful-reference set and zero sample; corrupted receipts must not become observations.",
+          "evidence": "infra/ollama-trial/harness.py:incident_observation_prompt, untrusted_observation_json, payload"
+        },
+        {
+          "test": "EvidenceContract.test_skills_load_through_the_shared_section_contract",
+          "previous_assumption": "The evidence section repeats exact zero-sample wording and the disposition schema.",
+          "current_requirement": "Evidence interpretation and disposition schema load from their declared shared sections; zero samples remain distinct from normality or absence.",
+          "evidence": "infra/hermes/skills/soc-investigate/SKILL.md; infra/hermes/workflow_contract.py"
+        }
+      ],
+      "parent_sha256": {
+        "infra/validation/common-read-contract/test_contract.py": "41a3a889709be94bcbfbe22ecb4d9c9c84f70b83e53c83d405ba6fc310e15d4e"
+      }
+    },
+    "host-journal": {
+      "entry": "infra/validation/host-journal-cost/test_host_compat.py",
+      "replacements": [
+        {
+          "test": "FixedHost.test_ambiguity_unknown_host_and_current_only_do_not_invent_history",
+          "previous_assumption": "A current-only aggregate inquiry has no service plan.",
+          "current_requirement": "An explicit current-only aggregate inquiry has exactly its current target requirement, no journal/view/history window; ambiguous or unknown subjects remain rejected.",
+          "evidence": "infra/hermes/chat_contract.py:service_history_plan, service_lookup_scope"
+        }
+      ],
+      "parent_sha256": {
+        "infra/validation/host-journal-cost/test_host_compat.py": "54f0481114928ffe5ee6cedac1058a44b5590b9d7c47b5c9d79bee547c9b8ee9",
+        "infra/validation/host-journal/test_host_journal.py": "1ea2bc604fac5a3a6b1bd4f91652ab2997fadbafb07ed7737d361c3a2609823b"
+      }
+    },
+    "new-errors": {
+      "entry": "infra/validation/service-error-coverage/test_error_coverage.py",
+      "replacements": [
+        {
+          "test": "HostAndProjection.test_per_row_hashes_stay_in_original_audit_without_model_repetition",
+          "previous_assumption": "All row hashes, including the record identity, are removed from model input.",
+          "current_requirement": "The authenticated record identity and every message/scope field remain; redundant message/excerpt integrity hashes stay in the original immutable receipt audit.",
+          "evidence": "infra/hermes/chat_contract.py:service_report_messages; infra/validation/service-query/report-provenance.validation.json:intermediate_failures_preserved"
+        }
+      ],
+      "parent_sha256": {
+        "infra/validation/service-error-coverage/test_error_coverage.py": "35fd49323542db2aff082cb37a36d1461842a62d7a3f1803674658040905f6ad"
+      }
+    },
+    "runtime-health": {
+      "entry": "infra/mcp/test_runtime_health.py",
+      "replacements": [
+        {
+          "test": "RuntimeTests.test_catalog_has_no_arbitrary_paths_and_matches_validator",
+          "previous_assumption": "The diagnostic catalog contains42 targets.",
+          "current_requirement": "The43-target catalog includes the fixed B certificate-monitor unit and matches the actual generated MCP enum; arbitrary paths remain unavailable.",
+          "evidence": "infra/mcp/system_diagnostics.py:PROFILES; deployment/certificate-monitor.validation.json"
+        }
+      ],
+      "parent_sha256": {
+        "infra/mcp/test_runtime_health.py": "11715a40b7334006be01d9ec60d854c05aaf0a25e0a594fe5da2925be3e2ae01"
+      }
+    },
+    "new-typed": {
+      "entry": "infra/validation/service-provenance/test_typed_compat.py",
+      "replacements": [
+        {
+          "test": "SDK.test_current_short_lookup_uses_deferred_registered_read_without_initial_exposure",
+          "previous_assumption": "The final partial lookup uses the old exact title and negative-proof wording.",
+          "current_requirement": "The same constrained current inquiry completes all registered deferred inventory pages, preserves the initial tool exposure, and reports typed unresolved identity with observed scopes and explicit limits.",
+          "evidence": "infra/ollama-trial/runtime.py:service_receipt_tools, complete_service_identity_reads; infra/hermes/chat_contract.py:service_lookup_report"
+        }
+      ],
+      "parent_sha256": {
+        "infra/validation/service-provenance/test_typed_compat.py": "e6b46c804dedd6adf9bcc27d1fa6c6971a007f44d6ef0bacdf1e738b5770f187",
+        "infra/validation/typed-service/test_typed_service.py": "092bdbfbc58bc43a6a7d21470c6c7cc40175795602768a38b427e69bc883038b"
+      }
+    }
+  },
+  "added_checks": [
+    "logical target qualifiers must not reinterpret letter ratios; known and unknown multi-character targets retain their host"
+  ],
+  "runtime_defects_repaired_separately": [
+    "deferred identity receipts were omitted from the SDK service context allowlist",
+    "uncertainty in a parallel field erased an asserted unobserved sensor count",
+    "single-letter ratios were parsed as project host qualifiers"
+  ],
+  "assertion_replacements": 7,
+  "parent_test_sources_modified": false,
+  "runtime_validation_or_dispatch_patched_by_adapters": false
+}

@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- operating-application-review-20261120 -->
+<a id="operating-application-review-20261120"></a>
+## 2026-11-20 기능 검토에서 정확 후보 재고정으로 진행
+
+이전 1,650실행의 실패9와 의존성10생략을 검토해 실제 세 결함을 보완했다. 과거 계약의 단정7개는 원본 보존·현재 계약 반례로 구분하고 수정 전 코드 실패와 최종 Mac1,652/10생략·Linux1,739/0생략을 기록했다. 다음에는 새 소스·실제 영수증·reader/MCP 결속과 스키마·복구 조건을 포함한 전체50대상 후보를 재고정한다. 과거 b895353a 계획은 승인 대상으로 재사용하지 않는다.
+
+정확 승인 후 관리자 경유 적용·새 수집·실제 MCP·두 봇 새 채팅·확정/복구·정리/current를 확인한다. 새 Native·실제 재부팅/장기 복구·backup75 intent·논문 목차91·독립 재구현·새OS 전체 설치·최종 발표는 계속 남는다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
+<!-- /operating-application-review-20261120 -->
+
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 ## 2026-11-20 정확 운영 반입 준비와 기능 검토

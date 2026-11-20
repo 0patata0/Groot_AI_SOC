@@ -2,26 +2,14 @@
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-실제 운영 관측으로 A7/B36/C7의 50대상 계획과 보조 파일 19개·제어 문서 39개·보호 파일 45개를 구성했다. 정적 대상 44개의 원본은 고정 Git에서 읽고 관리 실행 원문을 controller에 결속한다. 동적 읽기 장치 4개는 관측한 원본 SHA에 결속하며 실제 영수증 2개는 B의 메모리에서만 준비한다. 계획은 검토용이며 승인 파일·운영 단계 initialize/prepare·실제 배포는 실행하지 않았다.
+<a id="operating-application-review-20261120"></a>
+50대상 검토안을 검사하면서 SDK 영수증 누락·센서 수치의 잘못된 불확실성 처리·비율의 호스트 오인을 보완했다. 원본 시험을 보존한 현재 계약 검사와 수정 전 코드 반례를 확인했다. 동일 manifest의 Mac 1,652실행/10생략·Linux 1,739실행/생략0은 통과했으며 운영 적용은 0이다.
 
-보호된 nftables.conf의 실제 0755모드를 기존 계획 검증기가 거절하는 문제를 확인했다. 기존 0755의 정확한 메타데이터 대조를 허용하고 다른 모드로 달라지면 거절한다. 그룹/전체 쓰기와 특수 비트의 거절을 검증했으며 운영 파일의 권한을 바꾸지 않았다. 조정 실행기 32핀·15군 259검사의 Mac 결과와 별도 Linux 결과는 새 원장으로 연결한다.
+조정 실행기 자체의 32소스 핀과 보조42핀은 이전과 같아 Mac/Linux259 결과를 해당 범위에서 재사용한다. query1.19.153과 공통 계약·SDK가 바뀌었으므로 b895353a 계획의 payload·영수증·관리 실행 원문 결속을 새 소스로 다시 고정해야 한다. 과거 승인이나 합성 인수로 대체할 수 없다. 실제 0755 보호 메타데이터의 정확 대조도 유지한다.
 
-전체 후보 기능 검토는 32군·1,650실행 중 실패 9건·의존성 10생략으로 보류했다. B 인증서 감시 대상이 추가돼 43대상이 된 차이는 확인했으며 다른 불일치는 현재 요구와 반례를 대조해야 한다. 정확 전체 승인·실제 수집/MCP/두 봇 인수·새 Native 실행·재부팅/장기 복구·backup75 상태/intent 계약은 남아 있다. 과거 합성 통과나 공식 구조 139구성을 현재 운영 인수로 표시하지 않는다.
+12:23 KST 운영 65경로·보호 45경로와 계정·모델 설정·컨테이너가 같고 coordinator 운영 기반 경로는 없었다. 정확 전체 승인·실제 수집/MCP/두 봇 인수·새 Native·실제 재부팅/장기 복구·backup75 상태/intent는 남아 있다. 공식 Harness² 37→41구성과 앞선 조정/검증기 구조 통과는 운영 인수의 증거로 표시하지 않는다.
 
-| 현재 검토 근거 | 값 |
-| --- | --- |
-| 상태 | `application_review_held_not_deployed`·승인 파일0 |
-| 계획 SHA256 | `b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a` |
-| 대상·동적 자료 | A7/B36/C7·44정적+2영수증+4읽기 장치 |
-| 조정 실행기 | Mac259/0생략·Linux259/0생략·동일32핀 |
-| Linux 시험 신원 | UID/GID997·보조그룹[997]·CapEff0·NoNewPrivs1 |
-| 전체 후보 | 32군·1,650실행·실패9·의존성10생략 |
-| 스키마 차이 | 진단3도구 이름 동일·b:certificate-monitor 추가·host journal 조건 변경 |
-| 정리 | Mac9,526파일/165,800,119B·B65파일·자체3유닛 부재 |
-| 문서 검수 | standard·2.83%·B·6/6·gate0·수치 소실0 |
-
-
-[현재 검증 원장](operating-preparation.validation.json) · [정적 반입 생성기](prepare_payload.py)
+[현재 기능 검증](current-application.validation.json) · [이전 50대상 관측과 반입 준비](operating-preparation.validation.json)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- coordinator-private-backends-20261119 -->

@@ -49,8 +49,9 @@ def host_mentions(text):
              for m in re.finditer(r'(?<![A-Za-z0-9_.:/@-])(?:' + pattern + r')(?![A-Za-z0-9_.:/@-])', text, re.I)]
     # A complete logical target also carries an explicit host. Do not read the
     # same letter in a URL, path, unit name or ordinary lowercase prose as one.
+    # Project target names have at least two characters; a:b can be a ratio.
     found.extend((m.start(), m.end(), m[1]) for m in re.finditer(
-        r'(?<![A-Za-z0-9_.:/@-])([abc]):[a-z][a-z0-9-]*(?![A-Za-z0-9_.:/@-])', text))
+        r'(?<![A-Za-z0-9_.:/@-])([abc]):[a-z][a-z0-9-]+(?![A-Za-z0-9_.:/@-])', text))
     for match in re.finditer(r'(?<![A-Za-z0-9_.:/@-])([ABC])(?=$|[\s,;/·]|(?:의|은|는|도|만)(?![A-Za-z]))', text):
         if not any(a <= match.start() and match.end() <= b for a, b, _ in found):
             found.append((match.start(), match.end(), match[1].lower()))

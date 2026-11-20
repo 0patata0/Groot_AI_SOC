@@ -696,5 +696,11 @@
       "new_findings": 0
     },
     "note": "content publication only; operating application and actual model/MCP acceptance remain unperformed; the follow-up receipt commit is recorded in local session evidence"
+  },
+  "current_application_followup": {
+    "record": "current-application.validation.json",
+    "status": "current_application_contract_regressions_passed_operating_unapplied_refreeze_required",
+    "old_failures_and_plan_retained_as_historical_observation": true,
+    "old_review_plan_must_be_refrozen_after_source_changes": true
   }
 }

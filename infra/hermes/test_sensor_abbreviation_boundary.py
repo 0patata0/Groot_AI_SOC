@@ -59,6 +59,19 @@ class UnobservedSourceNames(unittest.TestCase):
                 self.assertIn(SURICATA, m.evidence_claim_violations(line, FACTS))
         self.assertNotIn(SURICATA, m.evidence_claim_violations('Suricata 경보는 이번에 조회하지 않음', FACTS))
 
+    def test_parallel_uncertainty_does_not_erase_an_asserted_sensor_count(self):
+        for text in ('Suricata 경보 표본 10건 · 전체 건수 미확인',
+                     '| IDS 경보 | 표본 10건 | 전체 건수 미확인 |',
+                     'WAF 경보 표본 2건 · 전체 건수 미확인'):
+            issue=MODSECURITY if text.startswith('WAF') else SURICATA
+            with self.subTest(text=text):
+                self.assertIn(issue,m.evidence_claim_violations(text,[]))
+        for text in ('Suricata 경보 10건인지 미확인입니다.',
+                     'Suricata 경보 10건을 조회할 예정입니다.',
+                     'Suricata 경보 10건이면 추가 조사합니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn(SURICATA,m.evidence_claim_violations(text,[]))
+
     def test_modsecurity_names_keep_target_spelling_but_not_field_names(self):
         self.assertIn(MODSECURITY, m.evidence_claim_violations('a:waf 경보 0건', WAZUH_ONLY))
         self.assertIn(MODSECURITY, m.evidence_claim_violations('WAF는 경보가 없었음', WAZUH_ONLY))

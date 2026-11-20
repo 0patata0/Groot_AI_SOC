@@ -2,9 +2,10 @@
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-고정 원본의 정적 대상 44개를 만드는 반입 생성기와 50대상 검토안을 준비했다. 기존 관리 경로·계정·모델·보호 정책을 유지하고 관리 실행 원문을 controller에 결속한다. 실제 운영 65경로·보호 45경로는 09:20 재조회에서 같았다. 전체 후보 검사에는 실패 9건·의존성 10생략이 남아 있으며 운영 적용은 보류한다.
+<a id="operating-application-review-20261120"></a>
+운영 반입 후보의 세 결함을 보완하고 query1.19.153으로 고정했다. Mac 1,652실행/의존성10생략·기존 Hermes Linux 1,739실행/생략0을 확인했다. 12:23 KST 관리자 경유 운영 65경로·보호 45경로와 모델/컨테이너는 같았다. 이전 50대상 검토안의 갱신·정확 승인·운영 인수는 남아 있다.
 
-[반입 준비](validation/journal-composition/README.md#coordinator-operating-preparation-20261120) · [검증 원장](validation/journal-composition/operating-preparation.validation.json)
+[반입·현재 검사](validation/journal-composition/README.md#operating-application-review-20261120) · [검증 원장](validation/journal-composition/current-application.validation.json)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->

@@ -1,0 +1,943 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-20T12:27:38.737034+09:00",
+  "status": "current_application_contract_regressions_passed_operating_unapplied_refreeze_required",
+  "scope": "Current source defects, explicit current-contract assertion replacements and isolated regression replay; not live model/MCP acceptance or permission to deploy",
+  "source": {
+    "base_commit": "f7d0ff40aaeab0df0402953332a571bf31562ea9",
+    "files": 2484,
+    "changed_files_sha256": {
+      "infra/hermes/read_contract.py": "597c1e5cce4f9f14cc780be3057f4a2cd1d4d6d21aa36b2bf9a8622348a8b04d",
+      "infra/hermes/soc_management_run.py": "67a91b4bde70a2a1aa1ce38a3f2dd51e0998a57793eb5f1c10c458f00293fa97",
+      "infra/hermes/query-completion/__init__.py": "fcb86634a3f52b3af9a0f0f40ac277088c0d5693ad715943a22fd2014291f513",
+      "infra/hermes/test_sensor_abbreviation_boundary.py": "b376cd9a96853c1ad01fa2ebec3861db89cc12f9a439a617db58eece849a3c73",
+      "infra/ollama-trial/runtime.py": "1adf674375ae7f7ee25d04ccb48b71812218f3d554766c82403ac7798b920c76",
+      "infra/validation/journal-composition/test_current_application.py": "e4f642df4ceb822456527739129d81d07724287b549d37072571720c7854eeee",
+      "infra/validation/journal-composition/run_operating_regressions.py": "26420bee11f7c93d96ad2c363a2ede71a3b628c873adf8656258f3b51e401a82",
+      "infra/validation/journal-composition/current-application-contracts.json": "04d8657970f079a495829e900e375a121efc5241760970730700a2e2ff0a77f5"
+    },
+    "source_manifest_sha256": "d781cb64baca724e6d3ae52ddc545ecd3338270e5608633f4fb1a80d01129d3a",
+    "source_layout": "Git base plus the eight explicitly hashed source overlays; documentation and this record are outside the frozen replay",
+    "query_version": "1.19.153",
+    "gate_sha256": "67a91b4bde70a2a1aa1ce38a3f2dd51e0998a57793eb5f1c10c458f00293fa97"
+  },
+  "runtime_defects_repaired": [
+    "deferred identity receipts were omitted from the SDK service context allowlist",
+    "uncertainty in a parallel field erased an asserted unobserved sensor count",
+    "single-letter ratios were parsed as project host qualifiers"
+  ],
+  "contract_replay": {
+    "registry": "current-application-contracts.json",
+    "registry_sha256": "04d8657970f079a495829e900e375a121efc5241760970730700a2e2ff0a77f5",
+    "adapter": "test_current_application.py",
+    "adapter_sha256": "e4f642df4ceb822456527739129d81d07724287b549d37072571720c7854eeee",
+    "parent_groups": 6,
+    "assertion_replacements": 7,
+    "original_parent_sources_sha256": {
+      "infra/validation/claim-modality/test_claims.py": "648ad6f2c682bef32c774dbb4007a3773a154fb92b66a9a8101201ad721f4e15",
+      "infra/validation/common-read-contract/test_contract.py": "41a3a889709be94bcbfbe22ecb4d9c9c84f70b83e53c83d405ba6fc310e15d4e",
+      "infra/validation/host-journal-cost/test_host_compat.py": "54f0481114928ffe5ee6cedac1058a44b5590b9d7c47b5c9d79bee547c9b8ee9",
+      "infra/validation/host-journal/test_host_journal.py": "1ea2bc604fac5a3a6b1bd4f91652ab2997fadbafb07ed7737d361c3a2609823b",
+      "infra/validation/service-error-coverage/test_error_coverage.py": "35fd49323542db2aff082cb37a36d1461842a62d7a3f1803674658040905f6ad",
+      "infra/mcp/test_runtime_health.py": "11715a40b7334006be01d9ec60d854c05aaf0a25e0a594fe5da2925be3e2ae01",
+      "infra/validation/service-provenance/test_typed_compat.py": "e6b46c804dedd6adf9bcc27d1fa6c6971a007f44d6ef0bacdf1e738b5770f187",
+      "infra/validation/typed-service/test_typed_service.py": "092bdbfbc58bc43a6a7d21470c6c7cc40175795602768a38b427e69bc883038b"
+    },
+    "original_parent_sources_modified": false,
+    "other_parent_cases_retained": true,
+    "added_host_qualifier_case": 1,
+    "added_parallel_sensor_count_case": 1,
+    "adapter_does_not_patch_runtime_validation_or_dispatch": true,
+    "previously_existing_provider_schema_fixture_adapter_retained": "service-provenance/test_typed_compat.py",
+    "inherited_fixture_mocks_retained": [
+      "original forced incident evidence gap and card-gap fixtures; not relaxed production guards",
+      "existing provider response-schema factory and Linux fd fixture"
+    ]
+  },
+  "pre_fix_control": {
+    "base_commit": "f7d0ff40aaeab0df0402953332a571bf31562ea9",
+    "same_current_tests_and_adapters": true,
+    "runtime_sources_reverted": 4,
+    "all_three_repaired_paths_fail": true,
+    "comparison_scope": "Pre-fix candidate, not the installed operating baseline or an incident-quality score"
+  },
+  "mac": {
+    "schema": 1,
+    "environment": "mac",
+    "groups": [
+      {
+        "group": "new-targets",
+        "rc": 0,
+        "tests": 39,
+        "expected_tests": 39,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.252
+      },
+      {
+        "group": "new-intents",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.22
+      },
+      {
+        "group": "new",
+        "rc": 0,
+        "tests": 40,
+        "expected_tests": 40,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.613
+      },
+      {
+        "group": "prior-claim",
+        "rc": 0,
+        "tests": 28,
+        "expected_tests": 28,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.307
+      },
+      {
+        "group": "root",
+        "rc": 0,
+        "tests": 237,
+        "expected_tests": 237,
+        "skipped": 6,
+        "allowed_dependency_skips": 6,
+        "passed": true,
+        "seconds": 0.815
+      },
+      {
+        "group": "sdk",
+        "rc": 0,
+        "tests": 107,
+        "expected_tests": 107,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.668
+      },
+      {
+        "group": "native",
+        "rc": 0,
+        "tests": 181,
+        "expected_tests": 181,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.234
+      },
+      {
+        "group": "common-new",
+        "rc": 0,
+        "tests": 23,
+        "expected_tests": 23,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.234
+      },
+      {
+        "group": "workflow",
+        "rc": 0,
+        "tests": 14,
+        "expected_tests": 14,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.141
+      },
+      {
+        "group": "sdk-flow",
+        "rc": 0,
+        "tests": 68,
+        "expected_tests": 68,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.723
+      },
+      {
+        "group": "root-flow",
+        "rc": 0,
+        "tests": 94,
+        "expected_tests": 94,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.383
+      },
+      {
+        "group": "host-journal",
+        "rc": 0,
+        "tests": 19,
+        "expected_tests": 19,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.241
+      },
+      {
+        "group": "journal",
+        "rc": 0,
+        "tests": 85,
+        "expected_tests": 85,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.623
+      },
+      {
+        "group": "installation",
+        "rc": 0,
+        "tests": 38,
+        "expected_tests": 38,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.107
+      },
+      {
+        "group": "common-service-mac",
+        "rc": 0,
+        "tests": 65,
+        "expected_tests": 65,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.434
+      },
+      {
+        "group": "partitions",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.099
+      },
+      {
+        "group": "new-scope",
+        "rc": 0,
+        "tests": 17,
+        "expected_tests": 17,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.482
+      },
+      {
+        "group": "new-clock",
+        "rc": 0,
+        "tests": 13,
+        "expected_tests": 13,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.095
+      },
+      {
+        "group": "new-typed",
+        "rc": 0,
+        "tests": 36,
+        "expected_tests": 36,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.861
+      },
+      {
+        "group": "new-factual",
+        "rc": 0,
+        "tests": 31,
+        "expected_tests": 31,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.424
+      },
+      {
+        "group": "new-provenance",
+        "rc": 0,
+        "tests": 41,
+        "expected_tests": 41,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.757
+      },
+      {
+        "group": "new-errors",
+        "rc": 0,
+        "tests": 49,
+        "expected_tests": 49,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.764
+      },
+      {
+        "group": "new-app",
+        "rc": 0,
+        "tests": 24,
+        "expected_tests": 24,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.121
+      },
+      {
+        "group": "new-composition",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.135
+      },
+      {
+        "group": "diagnostic-core",
+        "rc": 0,
+        "tests": 51,
+        "expected_tests": 51,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.418
+      },
+      {
+        "group": "runtime-health",
+        "rc": 0,
+        "tests": 33,
+        "expected_tests": 33,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.12
+      },
+      {
+        "group": "host-inventory",
+        "rc": 0,
+        "tests": 15,
+        "expected_tests": 15,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.079
+      },
+      {
+        "group": "current-native-identity",
+        "rc": 0,
+        "tests": 7,
+        "expected_tests": 7,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.223
+      },
+      {
+        "group": "current-sdk-identity",
+        "rc": 0,
+        "tests": 55,
+        "expected_tests": 55,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.347
+      },
+      {
+        "group": "current-controller",
+        "rc": 0,
+        "tests": 139,
+        "expected_tests": 139,
+        "skipped": 4,
+        "allowed_dependency_skips": 4,
+        "passed": true,
+        "seconds": 0.828
+      },
+      {
+        "group": "deployment-gate-binding",
+        "rc": 0,
+        "tests": 49,
+        "expected_tests": 49,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 6.125
+      },
+      {
+        "group": "payload-producer",
+        "rc": 0,
+        "tests": 6,
+        "expected_tests": 6,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.601
+      }
+    ],
+    "complete": true,
+    "tests": 1652,
+    "skipped": 10,
+    "source_manifest_sha256": "d781cb64baca724e6d3ae52ddc545ecd3338270e5608633f4fb1a80d01129d3a",
+    "runner_sha256": "26420bee11f7c93d96ad2c363a2ede71a3b628c873adf8656258f3b51e401a82",
+    "contract_adapter_sha256": "e4f642df4ceb822456527739129d81d07724287b549d37072571720c7854eeee",
+    "contract_registry_sha256": "04d8657970f079a495829e900e375a121efc5241760970730700a2e2ff0a77f5",
+    "candidate_sources_unchanged": true,
+    "socket_connections_denied": true,
+    "operating_changes": 0,
+    "model_calls": 0,
+    "live_MCP_calls": 0,
+    "scope": "32 current-source regression profiles with immutable parent assertions and explicit current-contract replacements; not live operating or model-quality acceptance"
+  },
+  "linux": {
+    "schema": 1,
+    "environment": "hermes",
+    "groups": [
+      {
+        "group": "new-targets",
+        "rc": 0,
+        "tests": 39,
+        "expected_tests": 39,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.647
+      },
+      {
+        "group": "new-intents",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.571
+      },
+      {
+        "group": "new",
+        "rc": 0,
+        "tests": 40,
+        "expected_tests": 40,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.609
+      },
+      {
+        "group": "prior-claim",
+        "rc": 0,
+        "tests": 28,
+        "expected_tests": 28,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.755
+      },
+      {
+        "group": "root",
+        "rc": 0,
+        "tests": 237,
+        "expected_tests": 237,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 3.296
+      },
+      {
+        "group": "sdk",
+        "rc": 0,
+        "tests": 107,
+        "expected_tests": 107,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.711
+      },
+      {
+        "group": "native",
+        "rc": 0,
+        "tests": 181,
+        "expected_tests": 181,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 4.648
+      },
+      {
+        "group": "common-new",
+        "rc": 0,
+        "tests": 23,
+        "expected_tests": 23,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.603
+      },
+      {
+        "group": "workflow",
+        "rc": 0,
+        "tests": 14,
+        "expected_tests": 14,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.423
+      },
+      {
+        "group": "sdk-flow",
+        "rc": 0,
+        "tests": 68,
+        "expected_tests": 68,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.782
+      },
+      {
+        "group": "root-flow",
+        "rc": 0,
+        "tests": 94,
+        "expected_tests": 94,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.206
+      },
+      {
+        "group": "host-journal",
+        "rc": 0,
+        "tests": 19,
+        "expected_tests": 19,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.671
+      },
+      {
+        "group": "journal",
+        "rc": 0,
+        "tests": 85,
+        "expected_tests": 85,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.085
+      },
+      {
+        "group": "installation",
+        "rc": 0,
+        "tests": 38,
+        "expected_tests": 38,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.249
+      },
+      {
+        "group": "common-service-mac",
+        "rc": 0,
+        "tests": 152,
+        "expected_tests": 152,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 4.67
+      },
+      {
+        "group": "partitions",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.232
+      },
+      {
+        "group": "new-scope",
+        "rc": 0,
+        "tests": 17,
+        "expected_tests": 17,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.275
+      },
+      {
+        "group": "new-clock",
+        "rc": 0,
+        "tests": 13,
+        "expected_tests": 13,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.211
+      },
+      {
+        "group": "new-typed",
+        "rc": 0,
+        "tests": 36,
+        "expected_tests": 36,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 2.229
+      },
+      {
+        "group": "new-factual",
+        "rc": 0,
+        "tests": 31,
+        "expected_tests": 31,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.133
+      },
+      {
+        "group": "new-provenance",
+        "rc": 0,
+        "tests": 41,
+        "expected_tests": 41,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.984
+      },
+      {
+        "group": "new-errors",
+        "rc": 0,
+        "tests": 49,
+        "expected_tests": 49,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 2.189
+      },
+      {
+        "group": "new-app",
+        "rc": 0,
+        "tests": 24,
+        "expected_tests": 24,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.26
+      },
+      {
+        "group": "new-composition",
+        "rc": 0,
+        "tests": 16,
+        "expected_tests": 16,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.294
+      },
+      {
+        "group": "diagnostic-core",
+        "rc": 0,
+        "tests": 51,
+        "expected_tests": 51,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.941
+      },
+      {
+        "group": "runtime-health",
+        "rc": 0,
+        "tests": 33,
+        "expected_tests": 33,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.227
+      },
+      {
+        "group": "host-inventory",
+        "rc": 0,
+        "tests": 15,
+        "expected_tests": 15,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.176
+      },
+      {
+        "group": "current-native-identity",
+        "rc": 0,
+        "tests": 7,
+        "expected_tests": 7,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.614
+      },
+      {
+        "group": "current-sdk-identity",
+        "rc": 0,
+        "tests": 55,
+        "expected_tests": 55,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 0.831
+      },
+      {
+        "group": "current-controller",
+        "rc": 0,
+        "tests": 139,
+        "expected_tests": 139,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 3.052
+      },
+      {
+        "group": "deployment-gate-binding",
+        "rc": 0,
+        "tests": 49,
+        "expected_tests": 49,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 15.394
+      },
+      {
+        "group": "payload-producer",
+        "rc": 0,
+        "tests": 6,
+        "expected_tests": 6,
+        "skipped": 0,
+        "allowed_dependency_skips": 0,
+        "passed": true,
+        "seconds": 1.558
+      }
+    ],
+    "complete": true,
+    "tests": 1739,
+    "skipped": 0,
+    "source_manifest_sha256": "d781cb64baca724e6d3ae52ddc545ecd3338270e5608633f4fb1a80d01129d3a",
+    "runner_sha256": "26420bee11f7c93d96ad2c363a2ede71a3b628c873adf8656258f3b51e401a82",
+    "contract_adapter_sha256": "e4f642df4ceb822456527739129d81d07724287b549d37072571720c7854eeee",
+    "contract_registry_sha256": "04d8657970f079a495829e900e375a121efc5241760970730700a2e2ff0a77f5",
+    "candidate_sources_unchanged": true,
+    "socket_connections_denied": true,
+    "operating_changes": 0,
+    "model_calls": 0,
+    "live_MCP_calls": 0,
+    "scope": "32 current-source regression profiles with immutable parent assertions and explicit current-contract replacements; not live operating or model-quality acceptance",
+    "python_version": "3.13.5",
+    "identity": {
+      "uid": 50123,
+      "gid": 50123,
+      "groups": [
+        50123
+      ],
+      "effective_capabilities": "0000000000000000",
+      "no_new_privileges": "1"
+    },
+    "network": "none",
+    "read_only_root": true,
+    "memory_bytes": 1073741824,
+    "pids_limit": 256,
+    "cpu_limit": 1,
+    "new_packages": 0,
+    "new_image_pulls": 0,
+    "operating_keys_volumes_or_socket_mounted": false
+  },
+  "official_harness2": {
+    "at_kst": "2026-11-20T10:34:00.860136+09:00",
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "base_commit": "f7d0ff40aaeab0df0402953332a571bf31562ea9",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 37,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 22,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 41,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 25,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [
+        "scripts/current_application_contracts.json",
+        "scripts/current_sensor_counterexamples.py",
+        "scripts/run_operating_regressions.py",
+        "scripts/test_current_application.py"
+      ],
+      "removed": [],
+      "modified": [
+        "scripts/evidence_gate.py",
+        "scripts/native_query.py",
+        "scripts/read_contract.py",
+        "scripts/sdk_runtime.py"
+      ],
+      "always_on_char_delta": 0
+    },
+    "source_sha256": {
+      "infra/hermes/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+      "infra/hermes/skills/soc-query/SKILL.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+      "infra/ollama-trial/runtime.py": "1adf674375ae7f7ee25d04ccb48b71812218f3d554766c82403ac7798b920c76",
+      "infra/validation/journal-composition/current-application-contracts.json": "04d8657970f079a495829e900e375a121efc5241760970730700a2e2ff0a77f5",
+      "infra/validation/journal-composition/test_current_application.py": "e4f642df4ceb822456527739129d81d07724287b549d37072571720c7854eeee",
+      "infra/hermes/soc_management_controller.py": "3ed03fb7717381e5a065fcc83dda836e766f77d103e012895d92e17541273089",
+      "infra/hermes/skills/soc-output/SKILL.md": "4cac8fc2e0fe807f832ee5d0ca3e348cfbecd36424e906c6c87de3a7a8d392ef",
+      "infra/mcp/read-system-diagnostics.py": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+      "infra/hermes/query-completion/alignment.py": "bbb938d546d2ced5cadb970faf76d527a5395ef36b36dbb297d3c18b4bc9fe47",
+      "infra/mcp/test_diagnostic_history.py": "7a4bf7d0c69db62bc3f71bedeef89ff1d802992543371009c4846149a4121c41",
+      "infra/mcp/system-diagnostics-mcp.py": "81bb24ffa355646ca2d19cd99f2b694f45430c03f3d35bc20b7aab41094a695a",
+      "infra/hermes/chat_markdown.py": "d82247072a5ee0bbf6dfbeb43aa434a131464acaa07815f94449bb3cc0f4783c",
+      "deployment/soc_monitoring.py": "6fd93774554616084b0f36bc2badeb909d13e766f3dab5468ff683f2c7b236fb",
+      "infra/hermes/review_channel_policy.py": "b2eb1f84ec838b0eee34d96a2ad969f4e8010106e1e2f75ee78255162deb7fe4",
+      "infra/hermes/skills/soc-change/SKILL.md": "f5564ef6d67eef1b36e2d88f66159d2d8e8b8d5f6acfa2ede8f6a5a412ce0bdb",
+      "infra/mcp/soc_bot.py": "7fc2b3c4abc9406e2f15e080f78e9a4ba3efd5062140129fa039f7e9ed03136d",
+      "infra/hermes/chat_contract.py": "62bf832c4b194966726edc1a62eb54b8b128db7e247477a653d43d2557a89d17",
+      "infra/mcp/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+      "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "infra/hermes/test_service_history_contract.py": "64e18eb7dfaf150ffd2f441df31d7f9642ad214eaa3cdafa4c9af52062c5856c",
+      "infra/hermes/read_contract.py": "597c1e5cce4f9f14cc780be3057f4a2cd1d4d6d21aa36b2bf9a8622348a8b04d",
+      "infra/ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+      "infra/hermes/skills/soc-recover/SKILL.md": "dd2b6d586a18a3b11b7a0fca80a20f6ad469bec796a5b035a1995a5e52e6ad68",
+      "deployment/soc_diagnostics.py": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9",
+      "infra/mcp/test_diagnostic_journal.py": "a7aaf6e50bcb07fe6e956369c072aa9414950595f1273096568fe5085e8120c6",
+      "infra/hermes/output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+      "infra/hermes/test_sensor_abbreviation_boundary.py": "b376cd9a96853c1ad01fa2ebec3861db89cc12f9a439a617db58eece849a3c73",
+      "infra/ollama-trial/policy.py": "832d8c691a9721b40c894b69ad3f004b52a6348a4ec49514871bcd57f916ff9b",
+      "infra/ollama-trial/harness.py": "c37c7016c03660527a05b4543a601ecc5b934cd199b4272da49e269658fd43f0",
+      "infra/mcp/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+      "infra/mcp/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+      "infra/validation/journal-composition/run_operating_regressions.py": "26420bee11f7c93d96ad2c363a2ede71a3b628c873adf8656258f3b51e401a82",
+      "infra/mcp/test_diagnostic_journal_native.py": "4a8aaa1977ec0ac09e0a18f3962f6a43cdb85bb8e826f297480438afee50de59",
+      "infra/mcp/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+      "infra/ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+      "infra/hermes/SOUL.groot.md": "d8bdd4f51107cd031c5fcd7938bbcac5a41e22e5002f2bf62112f06e8176b871",
+      "infra/hermes/soc_management_run.py": "67a91b4bde70a2a1aa1ce38a3f2dd51e0998a57793eb5f1c10c458f00293fa97",
+      "infra/hermes/review_channel.py": "779cd996aa63cdc5eeea8f57b875af04571cd9da9e61edc644fefd46a08a8456",
+      "infra/hermes/query-completion/__init__.py": "fcb86634a3f52b3af9a0f0f40ac277088c0d5693ad715943a22fd2014291f513"
+    },
+    "model_calls": 0,
+    "operating_changes": 0,
+    "scope": "Official static structure; not live model, MCP, deployment or approval"
+  },
+  "initial_linux_failure_preserved": {
+    "tests": 1739,
+    "skipped": 0,
+    "complete": false,
+    "only_aggregate_failure_group": "common-service-mac",
+    "all_unittest_groups_rc": 0,
+    "expected_count_before": 148,
+    "actual_method_census": 152,
+    "parent_sha256": "64e18eb7dfaf150ffd2f441df31d7f9642ad214eaa3cdafa4c9af52062c5856c",
+    "fix": "Only runner expected count changed; exact final source replayed on Mac and Linux",
+    "initial_runner_sha256": "0688ddd5bb6e81d2c7befe8a04bfc29eccb09b285275bd02d426375e16a84bc1",
+    "final_runner_sha256": "26420bee11f7c93d96ad2c363a2ede71a3b628c873adf8656258f3b51e401a82",
+    "initial_source_manifest_sha256": "7d1c725810194075ec26c84a4262ae6670d87fbc79b7af17b32a1490dfd359c8"
+  },
+  "operator_proof_reused": {
+    "source_pins_unchanged": 32,
+    "dependency_and_witness_pins": 42,
+    "mac_tests": 259,
+    "linux_tests": 259,
+    "skipped": 0,
+    "prior_record": "operating-preparation.validation.json",
+    "not_rerun_as_live_operating_acceptance": true
+  },
+  "live_operating_comparison": {
+    "hosts": [
+      {
+        "host": "a",
+        "at_kst": "2026-11-20T12:23:00.441202+09:00",
+        "source_paths": 12,
+        "protected_paths": 11,
+        "unchanged": true
+      },
+      {
+        "host": "b",
+        "at_kst": "2026-11-20T12:23:00.832827+09:00",
+        "source_paths": 41,
+        "protected_paths": 28,
+        "unchanged": true
+      },
+      {
+        "host": "c",
+        "at_kst": "2026-11-20T12:23:00.702138+09:00",
+        "source_paths": 12,
+        "protected_paths": 6,
+        "unchanged": true
+      }
+    ],
+    "operating_writes": 0,
+    "source_paths": 65,
+    "protected_paths": 45,
+    "coordinator_base_absent": true
+  },
+  "cleanup": {
+    "mac": {
+      "files": 5110,
+      "bytes": 168240807,
+      "absent_verified": true
+    },
+    "linux": {
+      "files": 5110,
+      "bytes": 93911387,
+      "containers_removed": 2,
+      "anonymous_volumes_removed": 2,
+      "absent_verified": true
+    },
+    "source_evidence_and_all_logs_retained_locally": true,
+    "existing_user_asset_sha_preserved": 111,
+    "official_harness2_and_humanize_installations_preserved": true
+  },
+  "not_performed": {
+    "operating_source_apply": 0,
+    "new_package_install": 0,
+    "model_calls": 0,
+    "live_MCP_calls": 0,
+    "chat_posts": 0,
+    "attacks_or_scenarios": 0,
+    "training": 0,
+    "paper_or_presentation_edits": 0,
+    "fresh_OS_installation": 0
+  },
+  "remaining": [
+    "refreeze full50-target payload and actual receipts/reader/MCP inline bindings from the new published source",
+    "complete review of exact schema/source/permission/recovery conditions before requesting exact approval",
+    "administrator-routed operating apply and actual collection/MCP/Hermes/Ollama acceptance",
+    "new Native execution, actual reboot/long-term recovery and backup75 state/intent reconciliation",
+    "OS approval/expiry and management-address policies, independent rebuild, new OS installation",
+    "paper91 TOC page mismatches and final presentation acceptance; existing presentation files preserved"
+  ],
+  "publication": {
+    "state": "pending_content_and_receipt_push",
+    "local_records_private": true
+  },
+  "code_review": {
+    "procedure": "Installed review-agent SKILL; read-only primary review",
+    "result": "No findings.",
+    "scope": "Complete eight-source diff, contract registry, parent cases and actual dispatch/context call sites",
+    "residual_gaps": [
+      "No live model/MCP/chat acceptance or operating apply",
+      "Previous payload must be refrozen before exact approval"
+    ]
+  }
+}

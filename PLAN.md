@@ -30,11 +30,12 @@
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-검토용 50대상 반입 목록과 현재 소스·모델·MCP 스키마·권한 근거를 확보했다. 다음 작업은 전체 후보 1,650실행의 실패 9건을 현재 요구와 맞춰 분류하고 실제 결함을 보완하는 것이다. 과거 검사와 현재 계약이 다른 경우에도 기대값만 바꿔 통과로 만들지 않고 현재 동작의 근거와 반례를 함께 남긴다. 의존성 10생략은 기존 Linux 환경에서 확인해야 한다.
+<a id="operating-application-review-20261120"></a>
+전체 후보의 세 결함을 보완하고 현재 계약·거절 반례를 검사했다. Mac 1,652실행/의존성10생략과 기존 Hermes Linux 1,739실행/생략0은 통과했으며 운영 적용은 하지 않았다. 수정 전 코드에서 같은 반례가 실패하는 근거와 과거 시험 원본을 보존한다.
 
-기능 검토를 마친 전체 payload·새 조정 실행기·스키마 차이·검증·복구를 다시 고정한 뒤 정확 승인을 요청한다. 승인 후에는 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current 순서로 인수한다. 새 Native 실행·실제 재부팅/장기 복구·backup75 상태/intent는 계속 남은 범위다. 전체 OS 승인과 관리 주소 정책·독립 재구현·새OS 전체 설치·논문 목차 91불일치·최종 발표도 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
+다음 작업에서 새 소스로 50대상 전체 payload·실제 영수증·reader/MCP 결속·스키마 차이·복구 조건을 다시 고정한다. 이전 b895353a 검토안은 새 후보의 승인에 사용할 수 없다. 검토와 정확 승인 후 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current 순서로 인수한다. 새 Native·실제 재부팅/장기 복구·backup75 상태/intent·전체 OS 승인·관리 주소 정책과 논문 목차 91불일치·독립 재구현·새OS 전체 설치·최종 발표는 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
 
-[반입 준비·실패·다음 인수 조건](infra/validation/journal-composition/operating-preparation.validation.json)
+[현재 검사와 남은 인수 조건](infra/validation/journal-composition/current-application.validation.json)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

@@ -1,5 +1,12 @@
 # Mattermost 조회 응답 보완
 
+<!-- operating-application-review-20261120 -->
+<a id="operating-application-review-20261120"></a>
+현재 반입 후보의 query 버전은 1.19.153이다. 같은 관리 실행 소스의 SHA 핀을 갱신했고 공통 호스트 파서는 a:b 같은 한 글자 비율과 등록된 논리 대상을 구분한다. SDK의 지연 식별 조회 영수증과 센서 수치 검사도 함께 보완했다. 아래 과거 버전·미채택 결과는 당시 이력으로 보존한다.
+
+Mac 1,652실행/10생략·기존 Hermes Linux 1,739실행/생략0은 현재 계약 어댑터를 포함한 격리 근거다. 실제 운영 파일·모델·MCP·봇 채팅은 바꾸지 않았다. 전체 payload 재고정·정확 승인·새 실제 채팅 검증이 남아 있다. [현재 원장](../../validation/journal-composition/current-application.validation.json)을 기준으로 읽는다.
+<!-- /operating-application-review-20261120 -->
+
 <!-- chat-alignment:current -->
 
 [복합 조사 검증](../../validation/management-latency/README.md). 공통 어법/HTTP 인과 검사는 증거가 아니다·차단했는지·의미하는지는 추가 검증 필요라는 올바른 한계를 거절했다. 이를 보완했다. 계약3사본·하네스2사본·SDK영수증1을 운영6파일로 확정하고 보호66파일을 대조했다. 새3채팅/9읽기의 대상·기간이 일치했고 모델 보고는3건 수용됐다. 실제거절3초안 재생과 Mac/Linux336·298·39·27, Linux공식38·설치37을 통과했다. MCP45도구·모델·권한·승인·TTL·스킬·상시 지시량은 유지한다. 제한된 검증이며 일반 정확도/SLO는 별도다. [HTTP 어법·새 채팅 검증](../../validation/management-latency/http-modality.validation.json).

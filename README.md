@@ -13,9 +13,10 @@ Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 �
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-운영 반입 생성기를 추가해 관리 실행 코드의 정확한 원문 결속을 초기 설치기와 공유한다. 정적 44대상과 실제 영수증·읽기 장치를 합친 50대상 검토안을 만들었다. 조정 실행기 259검사와 공식 구조 검사를 확인했으나 전체 후보 1,650실행의 실패 9건·의존성 10생략은 남아 있다. 현재는 기능 검토 단계이며 운영 적용이나 승인 완료가 아니다.
+<a id="operating-application-review-20261120"></a>
+운영 반입 후보에서 SDK 식별 조회 영수증 누락·센서 수치의 잘못된 불확실성 처리·비율의 호스트 오인을 보완했다. 원본 시험과 현재 계약의 차이를 명시하고 Mac 1,652실행/10생략·기존 Hermes Linux 1,739실행/생략0을 확인했다. query1.19.153은 운영 미적용 후보이며 이전 50대상 계획은 새 소스로 다시 고정해야 한다.
 
-[현재 상태](STATUS.md#coordinator-operating-preparation-20261120) · [반입 방법](infra/validation/journal-composition/README.md#coordinator-operating-preparation-20261120)
+[현재 상태](STATUS.md#operating-application-review-20261120) · [검사 방법·한계](infra/validation/journal-composition/README.md#operating-application-review-20261120)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- panel-content-20261119 -->

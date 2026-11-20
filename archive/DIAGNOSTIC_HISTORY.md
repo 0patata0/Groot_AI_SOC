@@ -1,5 +1,18 @@
 # 진단 탐색 이력
 
+<!-- operating-application-review-20261120 -->
+<a id="operating-application-review-20261120"></a>
+## 2026-11-20 세 코드 결함·과거 단정7개·Linux 집계 오류
+
+완료한 inventory 영수증이 SDK의 일반 노출 도구에 없다는 이유로 service_evidence_incomplete가 됐다. 실제 등록된 지연 식별 도구의 영수증을 포함해 보완했다. 센서 표본10건 뒤 다른 필드의 전체 미확인 문구와 a:b 비율도 별도 코드 결함이었다. 양성/거절 반례와 수정 전 실패를 보존한다.
+
+현재 계약 대체7개는 요청 센서 일치, JSON 공백 대신 구조, 공통 스킬 절 분리, 현재 systemd와 과거 이력 구분, 원문 record_sha256 보존, 등록 대상42→43, 미확인 식별의 구조화된 최종 결과다. 원본 시험은 수정하지 않았고 실제 호출·노출·보호·실패 경계는 유지했다. 초기 provider fixture의 스키마 차이·SOC_TYPED_ROOT 누락·사설 wrapper 구문 오류도 환경/시험 준비 실패로 구분한다.
+
+첫 Linux는 모든1,739검사·생략0이었으나 실행기의 공통 서비스 예상148과 실제152가 달라 complete=false였다. 원본 SHA와152메서드 목록을 확인해 실행기 집계만 고쳤다. 동일 기능 소스에서 실행기1파일만 달라진 최종 Mac1,652/10생략·Linux1,739/0생략을 다시 확인했다. 첫 실패와 각 stdout/stderr·신원·manifest를 보존한다. Mac의 전체 ps 출력은 잘려 판정에 쓰지 않았고 정확 작업 경로를 거른 별도 ps에서 관련 실행 부재를 확인했다.
+
+운영 적용·모델 판단 품질·지연·MCP/두 봇 인수는 이 결과로 입증하지 않는다. 이전50대상 검토안은 새 소스로 다시 고정해야 한다.
+<!-- /operating-application-review-20261120 -->
+
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 ## 2026-11-20 정확 운영 반입 준비와 기능 검토

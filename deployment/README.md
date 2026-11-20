@@ -2,11 +2,12 @@
 
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
-## 2026-11-20 정확 운영 반입 준비와 기능 검토
+<a id="operating-application-review-20261120"></a>
+기존 deploy.sh와 soc_runtime의 같은 소스 복사·관리 실행 원문 결속 경로가 query1.19.153·공통 읽기 계약·SDK 수정본을 전달한다. 새 패키지·이미지·포트·키·설정 입력은 없다. 초기 설치 결속49·반입 생성기6검사는 Mac/Linux 전체 검사에 포함되므로 따로 더하지 않는다.
 
-기존 서버의 journal 반입 준비는 고정 소스용 prepare_payload.py를 사용한다. 새 초기 설치기의 soc_runtime.render와 반입 생성기는 같은 관리 실행 원문 결속 함수를 사용하지만 기존 서버의 반입에는 신규 profile의 경로·계정·컨테이너 치환을 적용하지 않는다. 원본 실행기는 선언한 root 참조 파일과 결속된 run.py가 다르면 거절한다. 보호 파일의 실제 0755도 계획에서 정확히 대조하며 권한을 바꾸지 않는다. 초기 설치 진입점 deploy.sh와 운영 반입 검토·정확 승인·적용은 각각 구분한다.
+Mac 1,652실행/10생략·기존 Hermes Linux 1,739실행/생략0은 격리 검사다. 운영 서버를 초기 설치기로 덮어쓰지 않았으며 새 OS 전체 설치도 수행하지 않았다. 이전 50대상 검토안은 새 소스·실제 영수증·읽기 장치에 다시 결속한 후 정확 승인과 운영 인수를 거쳐야 한다. Kali232·233은 앞서 검수된 묶음으로 오프라인 설치했고 이번 검사에서도 패키지를 추가로 내려받지 않았다.
 
-[정적 반입 준비](../infra/validation/journal-composition/README.md#coordinator-operating-preparation-20261120) · [검증 원장](../infra/validation/journal-composition/operating-preparation.validation.json)
+[현재 검사·반입 조건](../infra/validation/journal-composition/current-application.validation.json)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->

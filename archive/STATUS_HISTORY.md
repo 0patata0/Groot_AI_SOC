@@ -1,5 +1,16 @@
 # 현황 이력
 
+<!-- operating-application-review-20261120 -->
+<a id="operating-application-review-20261120"></a>
+## 2026-11-20 전체 운영 후보의 실제 결함 보완과 현재 계약 검사
+
+SDK 지연 식별 조회 영수증 누락·병렬 미확인 문구의 센서 수치 소거·한 글자 비율의 호스트 오인을 보완했다. query1.19.153과 8개 변경 SHA·기준 f7d0ff40/2,484파일을 고정했다. 원본 6군의 7개 단정은 보존된 SHA로 대조하고 현재 계약의 양성·거절 반례를 별도 실행했다. 같은 검사에서 수정 전 세 결함의 실패를 확인했다.
+
+Mac 32군1,652실행/10생략과 기존 Hermes Linux 32군1,739실행/생략0은 통과했다. 공식 Harness²는 37→41구성·4추가/4수정·상시16,917자 증가0이다. 첫 Linux 집계 실패148/152는 진단 이력에 보존했다. Mac5,110파일/168,240,807B와 B5,110파일·컨테이너2/익명 볼륨2를 정리했다. 12:23 KST 운영65/보호45·모델/컨테이너가 같았으며 새 패키지·모델·실제 MCP·채팅·운영 적용·공격·학습은0이다. 이전 계획의 재고정과 정확 승인·운영 인수는 남아 있다.
+
+[검증 원장](../infra/validation/journal-composition/current-application.validation.json)
+<!-- /operating-application-review-20261120 -->
+
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 ## 2026-11-20 정확 운영 반입 준비와 기능 검토

@@ -11,12 +11,18 @@
 | 사용 프로그램 | PowerPoint·사용자 확정·이 Mac에는 없음 |
 | 영상 | 16번 촬영 구성·영상90초/전후설명10초·실제 원본/내장/재생은 미완료 |
 | 전체 시간 | 본문16/부록4·685초 계획에 영상 포함·실제 리허설 미수행 |
-| 이번 출력 | 20장·표14·차트2·메모20·256필드/287줄 누락0 |
+| 영상 구성본 출력 | 20장·표14·차트2·메모20·256필드/287줄 누락0 |
 | 화면 차이 | 16번 전후 직접 검수·나머지19쪽은 같은 Poppler로 원본/새PDF RGB 동일 |
 | PowerPoint 글꼴 | 원형 Apple SD Gothic Neo·PPTX 글꼴 내장0·대체/줄바꿈은 실제 기기에서 확인 |
-| 접속 | 16:37 관리자 경유 TLS1.3·CA/호스트 검증·HTTP200/OK; 새 MCP/채팅 시험0 |
+| 접속 경로 관측 | 16:37 관리자 경유 TLS1.3·CA/호스트 검증·HTTP200/OK |
+| 기존 MCP 읽기 | 16:56~17:14 진단1.4.2·실제UID/EUID999·최초3응답1.932초·원문5응답/실행6(첫복합1본문 없음) |
+| 수집 범위 | 41항목: ok38/degraded2/not_installed1/unavailable0·첫수집본8~37초 |
+| 누적 경고 대조 | Suricata 엔진통계240초·패킷+2312·드롭1565/깊이도달2315 증가0·경고 유지 |
+| 사건 작업 상태 | 검토대기368·실행/기한초과/전송/공동채팅 대기 각0·사건 종결 판단과 별도 |
+| journal 한계 | A8 unit 캐시 메타데이터 unavailable·추가 a:vector 원문조회는 observed/0행·전체건수/보존 미확인 |
+| 기존 수집 프로브 | 수집본 나이12초·프로브504초·입력627초·성공 카나리 결과/이번 신규실행0 |
 | 시각 | A/B/C 동기화 보고·관리자 미동기, Mac 대비53.263~61.613초 지연 구간 |
-| 보존·정리 | 논문9SHA·다른23변경 보존·임시138파일/13,404,369B·PPTX4 제거 |
+| 보존·정리 | 논문9SHA·발표5SHA·다른23변경 보존·영상 임시138파일 정리 유지·이번읽기 스크립트7개/25,904B 제거 |
 | 문장 | light0.1%·B·6/6·gate0; 원문/중간 산출물 보존 |
 | 승인·중단 | 운영 후보·시각 보정안 승인 대기·공격/시나리오/학습 중단 유지 |
 
@@ -31,7 +37,7 @@
 | 목적지 확인 | 233 att 계정 부재 확인 후 사용자가 기존 attack 홈을 선택 |
 | 범위 | 파일 복사·소유/크기/SHA 대조·임시 파일 부재; 새 계정·권한 정책·시나리오 실행·서비스 변경0 |
 
-[영상 구성·후속 접속 관측](archive/STATUS_HISTORY.md#presentation-video-plan-20261120) · [현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+[기존 운영 MCP·수집본 해석](archive/STATUS_HISTORY.md#demo-read-evidence-20261120) · [영상 구성·후속 접속 관측](archive/STATUS_HISTORY.md#presentation-video-plan-20261120) · [현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
 
 
 | 이전 판본 기록 게시 | 확인 값 |
@@ -42,7 +48,7 @@
 | 별도 상태 | 발표 산출물·원문 기록·사용자 시나리오 파일은 Git 제외/미추적 상태 보존; 운영 후보 승인 대기 |
 
 
-| 영상 구성 기록 게시 | 확인 값 |
+| 이전 영상 구성 기록 게시 | 확인 값 |
 |---|---|
 | 내용 커밋 | `5358bfcec343eaf06aab2e26acda78a383306efd`·공개9문서 |
 | 실제 원격 main 일치 | `2026-11-20T16:52:24.192259+09:00` |

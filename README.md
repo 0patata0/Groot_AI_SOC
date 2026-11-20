@@ -10,6 +10,11 @@
 사용자가 최종 발표에 PowerPoint를 사용하며 이 Mac에는 PowerPoint가 없다고 확인했다. 현재 PPTX의 원형 글꼴은 Apple SD Gothic Neo이며 실제 발표 기기의 글꼴 대체와 줄바꿈은 아직 확인하지 않았다. 로컬 검수와 실제 PowerPoint 재생 검수를 구분한다.
 
 [현재 준비와 한계](STATUS.md#final-presentation-refresh-20261120)
+
+
+이번 확인은 기존 운영의 읽기와 수집본 해석이다. 운영 후보807ea69f/0a3de6ee의 적용 후 수집·MCP·두 봇 인수는 여전히 정확 승인 대기다. 시연 영상 원본·촬영·삽입·실제 PowerPoint 재생과 리허설도 남아 있다. 논문은 동결하고 이번 확인에서는 기존 PPTX/PDF를 보존했다.
+
+[기존 운영 읽기와 확인 한계](archive/STATUS_HISTORY.md#demo-read-evidence-20261120)
 <!-- /final-presentation-refresh-20261120 -->
 
 <!-- presentation-workspace-cleanup-20261120 -->

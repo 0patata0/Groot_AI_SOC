@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- demo-read-evidence-20261120 -->
+<a id="demo-read-evidence-20261120"></a>
+[기존 운영 MCP·수집본 최신성·남은 상태](STATUS_HISTORY.md#demo-read-evidence-20261120) · [누적 카운터·다른 CPU 구간·읽기 집계 거절](DIAGNOSTIC_HISTORY.md#demo-read-evidence-20261120)
+<!-- /demo-read-evidence-20261120 -->
+
 <!-- presentation-video-plan-20261120 -->
 <a id="presentation-video-plan-20261120"></a>
 [PowerPoint 대상·시연 영상 구성과 접속 준비](STATUS_HISTORY.md#presentation-video-plan-20261120) · [시간 배정과 남은 촬영·재생](PLAN_HISTORY.md#presentation-video-plan-20261120) · [기존 구조 유지](DESIGN_ALTERNATIVES.md#presentation-video-plan-20261120) · [화면·시각·확인 한계](DIAGNOSTIC_HISTORY.md#presentation-video-plan-20261120)

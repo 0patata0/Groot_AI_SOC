@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "recorded_at_kst": "2026-11-20T18:56:00.349421+09:00",
+  "scope": "User-requested Kali232 att and Kali233 attack CLI PATH registration and explicit redteam Korean responses in SOUL.",
+  "original_install_validation": "validation.json",
+  "source_sha256": {
+    "deployment/kali_hermes.py": "5a799d1b4e4449ff5e0739318d0c1be0d9a423e3bfb244bacec4817f2e554e51",
+    "deployment/tests/test_kali_hermes.py": "61118afc26d8215bad36861755a1509fae94ab1d07d4a4a53c15a85039433adc",
+    "infra/hermes/kali-redteam/SOUL.md": "55919621c00320d8e4260b137c561772b0022b46df855813c07b84f3996642d4"
+  },
+  "cause": "Both passwd login shells are /usr/bin/zsh. CLI launchers existed; zsh startup files did not register ~/.local/bin. Existing .profile PATH settings are not automatically read by zsh.",
+  "hosts": {
+    "232": {
+      "user": "att",
+      "shell": "/usr/bin/zsh",
+      "cli_path": "/home/att/.local/bin/hermes",
+      "path_profiles": {
+        ".zprofile": {
+          "sha256": "dd770e0f6d0dd7e5227e8e05c3bb7e0640f8163962de843eab1402556da4d907",
+          "uid": 1000,
+          "mode": "0o600",
+          "block_count": 1
+        },
+        ".zshrc": {
+          "sha256": "7a581de99b5c89c03e975887a005174fea332d665dac348a14fee7caeb8a161d",
+          "uid": 1000,
+          "mode": "0o644",
+          "block_count": 1
+        }
+      },
+      "shell_backup": "/home/att/.local/share/capstone-hermes/shell-backups/639df8bcf0ef4ce5bf188d41a2892e96",
+      "path_registration_idempotent": true,
+      "version": "0.23.2",
+      "help_rc": 0,
+      "soul": {
+        "user": "att",
+        "file": "/home/att/.hermes/SOUL.md",
+        "backup": "/home/att/.hermes/backups/capstone-korean-soul-fb742b95e66c413da449e060d39725d6/SOUL.md",
+        "before_sha256": "e82c214484edfb14c789456451a7625420562e69b4b1bf63b86afc7856dbad23",
+        "after_sha256": "44fa36d902872ac9dbeb792e4572b7981d1fdab948044ac3476ea408c0a070f5",
+        "bytes": 8111,
+        "characters": 3651,
+        "body_characters": 3650,
+        "template_sha256": "55919621c00320d8e4260b137c561772b0022b46df855813c07b84f3996642d4",
+        "only_added_language_section": true,
+        "prior_instructions_unchanged": true,
+        "config_sha256_preserved": {
+          "config.yaml": "f9dc0e374298aa8a580161fa7172dad0258c086140e4390d924e5a27ad294d78"
+        },
+        "model_requests": 0,
+        "prompts_sent": 0,
+        "process_restarts": 0
+      }
+    },
+    "233": {
+      "user": "attack",
+      "shell": "/usr/bin/zsh",
+      "cli_path": "/home/attack/.local/bin/hermes",
+      "path_profiles": {
+        ".zprofile": {
+          "sha256": "dd770e0f6d0dd7e5227e8e05c3bb7e0640f8163962de843eab1402556da4d907",
+          "uid": 1000,
+          "mode": "0o600",
+          "block_count": 1
+        },
+        ".zshrc": {
+          "sha256": "7a581de99b5c89c03e975887a005174fea332d665dac348a14fee7caeb8a161d",
+          "uid": 1000,
+          "mode": "0o644",
+          "block_count": 1
+        }
+      },
+      "shell_backup": "/home/attack/.local/share/capstone-hermes/shell-backups/d24860e234934ef69afab6e232ff6715",
+      "path_registration_idempotent": true,
+      "version": "0.23.2",
+      "help_rc": 0,
+      "soul": {
+        "user": "attack",
+        "file": "/home/attack/.hermes/SOUL.md",
+        "backup": "/home/attack/.hermes/backups/capstone-korean-soul-3d159ff08d15475db7129a49a9c8885d/SOUL.md",
+        "before_sha256": "a3eceeb62f8960e96497b13abefe695723221f7cb434104fd9b042ef37f048f4",
+        "after_sha256": "a68566019896f40e08dde813aa9f2c0ac9ca545354f75cc2f7fb2a71a99a5615",
+        "bytes": 8111,
+        "characters": 3651,
+        "body_characters": 3650,
+        "template_sha256": "55919621c00320d8e4260b137c561772b0022b46df855813c07b84f3996642d4",
+        "only_added_language_section": true,
+        "prior_instructions_unchanged": true,
+        "config_sha256_preserved": {
+          "config.yaml": "2a85d2759e18d475aa6a288815fbf01b552400c61be4f53d49a0cbc437fae09c"
+        },
+        "model_requests": 0,
+        "prompts_sent": 0,
+        "process_restarts": 0
+      }
+    }
+  },
+  "verification": {
+    "mac_tests": 18,
+    "kali_tests_each": 14,
+    "skips": 0,
+    "overlapping_checks_not_independent_sum": true,
+    "version_shell_modes": [
+      "login",
+      "interactive",
+      "login_interactive"
+    ],
+    "help_rc_each": 0,
+    "help_warning": "pnpm not installed or outdated; separate from command search and not suppressed",
+    "pty_startup_sample": "Two 15-second no-prompt PTY samples were stopped before readiness. EOF, then SIGTERM/SIGKILL and reaped own CLI child. Traceback occurred during forced termination; this is not successful interactive/model acceptance.",
+    "user_confirmation": "User reported command works after shell restart. This is user report, distinct from our PATH/version/help checks."
+  },
+  "soul_change": "Added only Korean output section; all prior instructions, redteam role, paused testing and approval conditions preserved. Commands, paths, code, identifiers and original logs remain exact with Korean explanations.",
+  "preserved": [
+    "config.yaml",
+    "CLI payload and install receipt hashes during PATH repair",
+    "bash startup files from modification",
+    "old shell startup bytes in per-user backups",
+    "old SOUL in per-user backups",
+    "existing model and inference route"
+  ],
+  "not_performed": [
+    "package installation or download",
+    "model inference prompt or Korean output acceptance test",
+    "attack or scenario testing",
+    "OS login-shell switch",
+    "thesis or presentation edits"
+  ],
+  "notes": "New Hermes process is required to ensure updated SOUL loading; existing user session was not terminated."
+}

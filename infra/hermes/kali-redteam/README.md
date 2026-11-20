@@ -59,6 +59,27 @@ python3 -B kali_hermes.py --install \
 
 233에서는 식별자와 주소의 마지막 값을 함께233으로 바꾼다. 설정 전 config와 SOUL은 사용자 데이터 폴더의 `backups/capstone-redteam-*`에 보관한다. Hermes가 읽는 공식 파일명은 대문자 `~/.hermes/SOUL.md`다. 실제 템플릿의 두 자리표시자를 호스트별로 치환하고 원문 전체 로드를 확인한다. 동적 패키지 설치는 `security.allow_lazy_installs=false`로 둔다. SOUL 문구는 도구 권한이나 승인 정책을 대신하지 않는다.
 
+## 명령 실행과 한국어 응답
+
+232의 `att`와233의 `attack` 계정은 모두 `/usr/bin/zsh`를 기본 셸로 사용한다. CLI 런처가 있어도 zsh는 `.profile`을 자동으로 읽지 않으므로 `~/.local/bin`을 별도로 PATH에 넣어야 한다. 초기 설치는 기본 셸에 맞춰 zsh의 `.zprofile`·`.zshrc`, bash의 기존 로그인 설정·`.bashrc`에 중복을 막는 설정을 추가한다. 원래 파일의 바이트와 권한을 보존하고 `~/.local/share/capstone-hermes/shell-backups/`에 복구본을 남긴다.
+
+이미 설치한 계정에서는 프로젝트의 다음 명령으로 같은 PATH 등록을 할 수 있다. 패키지나 모델을 다시 설치하지 않는다.
+
+```bash
+./deploy.sh --kali-hermes --register-cli
+```
+
+설정은 새 셸부터 적용된다. 이미 열어 둔 zsh에서는 다음과 같이 읽은 뒤 실행한다. 비대화형 스크립트에서는 `~/.local/bin/hermes`의 절대 경로를 사용한다.
+
+```bash
+source ~/.zshrc
+hermes
+```
+
+두 `~/.hermes/SOUL.md`에는 레드팀 역할을 유지하면서 조사 요약·근거 설명·진행 상황·최종 답변·보고서를 한국어로 작성하도록 명시했다. 명령·코드·경로·IP·포트·제품명과 로그 원문은 그대로 보존하고 해석을 한국어로 덧붙인다. 현재 본문은 각3650자이며 이전3350자 전체 로드 관측과 구분한다. 언어 절 외 기존 지침과 모델 설정은 같고 변경 전 SOUL은 `~/.hermes/backups/capstone-korean-soul-*/`에 보관했다. 실행 중인 Hermes는 새 프로세스로 시작해 갱신된 SOUL을 읽는다.
+
+세 가지 새 zsh 모드에서 명령 경로·버전을 확인했고 사용자는 셸 재시작 뒤 실행된다고 확인했다. 도움말의 `pnpm` 경고와15초 PTY 시작 표본의 준비 미확인은 별도 한계다. 새 모델 질문이나 한국어 답변 품질 검증은 수행하지 않았다. [CLI·SOUL 후속 검증](cli-soul.validation.json)을 이전 설치 결과와 함께 읽는다.
+
 ## 설치 결과와 복구
 
 | 위치 | 용도 |

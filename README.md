@@ -1,5 +1,10 @@
 # Groot_AI_SOC
 
+<!-- kali-cli-soul-20261120 -->
+<a id="kali-cli-soul-20261120"></a>
+Kali232 att·233 attack의 기본 셸은 zsh다. 두 계정에서 Hermes 명령을 찾지 못하던 PATH를 등록했고 사용자가 셸 재시작 후 실행을 확인했다. 두 SOUL에는 레드팀 역할과 한국어 설명·최종 보고를 명시했다. [시작·기존 셸 갱신 방법](infra/hermes/kali-redteam/README.md#명령-실행과-한국어-응답) · [최신 CLI·SOUL 근거](infra/hermes/kali-redteam/cli-soul.validation.json).
+<!-- /kali-cli-soul-20261120 -->
+
 <!-- final-presentation-refresh-20261120 -->
 <a id="final-presentation-refresh-20261120"></a>
 

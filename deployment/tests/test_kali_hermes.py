@@ -2,6 +2,8 @@
 import io
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import tarfile
 import tempfile
 import unittest
@@ -101,6 +103,77 @@ class OfflineAdmission(unittest.TestCase):
                     installer.main()
                 models.assert_not_called()
             self.assertEqual(marker.read_text(),'preserve this configuration')
+
+
+class CliRegistration(unittest.TestCase):
+    def test_zsh_preserves_existing_bytes_and_is_idempotent(self):
+        with tempfile.TemporaryDirectory()as task:
+            home=Path(task).resolve()
+            original=b'# user configuration\nsetopt autocd'
+            rc=home/'.zshrc';rc.write_bytes(original);rc.chmod(0o640)
+            profile=home/'.profile';profile.write_bytes(b'# bash login: preserve\n')
+            result=installer.register_cli_path(home,'/usr/bin/zsh')
+            self.assertEqual({row['file']for row in result['changed']},{'.zprofile','.zshrc'})
+            self.assertEqual(rc.read_bytes(),original+b'\n'+installer.CLI_PATH_BLOCK.encode())
+            self.assertEqual(rc.stat().st_mode&0o777,0o640)
+            self.assertEqual((Path(result['backup'])/'.zshrc').read_bytes(),original)
+            self.assertEqual(profile.read_bytes(),b'# bash login: preserve\n')
+            hashes={name:installer.digest(home/name)for name in ('.zprofile','.zshrc')}
+            self.assertEqual(installer.register_cli_path(home,'/bin/zsh'),{'changed':[],'backup':None})
+            self.assertEqual(hashes,{name:installer.digest(home/name)for name in hashes})
+
+    def test_symlinked_second_profile_rejected_before_first_profile_write(self):
+        with tempfile.TemporaryDirectory()as task:
+            root=Path(task).resolve();home=root/'home';home.mkdir()
+            outside=root/'outside';outside.write_text('preserve')
+            (home/'.zshrc').symlink_to(outside)
+            with self.assertRaisesRegex(ValueError,'symlinked_shell_startup'):
+                installer.register_cli_path(home,'/usr/bin/zsh')
+            self.assertFalse((home/'.zprofile').exists())
+            self.assertFalse((home/'.local').exists())
+            self.assertEqual(outside.read_text(),'preserve')
+
+    def test_modified_managed_block_is_not_silently_replaced(self):
+        with tempfile.TemporaryDirectory()as task:
+            home=Path(task).resolve()
+            rc=home/'.zshrc';rc.write_text('# >>> capstone-hermes user CLI >>>\ncustom\n')
+            with self.assertRaisesRegex(ValueError,'modified_managed_shell_block'):
+                installer.register_cli_path(home,'/bin/zsh')
+            self.assertFalse((home/'.zprofile').exists())
+            self.assertEqual(rc.read_text(),'# >>> capstone-hermes user CLI >>>\ncustom\n')
+
+    def test_bash_uses_existing_login_profile_without_shadowing_it(self):
+        with tempfile.TemporaryDirectory()as task:
+            home=Path(task).resolve()
+            (home/'.bash_login').write_text('# existing bash login\n')
+            (home/'.profile').write_text('# preserve unused profile\n')
+            result=installer.register_cli_path(home,'/usr/bin/bash')
+            self.assertEqual({row['file']for row in result['changed']},{'.bash_login','.bashrc'})
+            self.assertFalse((home/'.bash_profile').exists())
+            self.assertEqual((home/'.profile').read_text(),'# preserve unused profile\n')
+
+    def test_unsupported_shell_fails_without_writes(self):
+        with tempfile.TemporaryDirectory()as task:
+            home=Path(task).resolve()
+            with self.assertRaisesRegex(ValueError,'unsupported_login_shell'):
+                installer.register_cli_path(home,'/usr/bin/fish')
+            self.assertEqual(list(home.iterdir()),[])
+
+    def test_path_block_in_real_shells_preserves_order_and_avoids_duplicates(self):
+        local=str(Path.home()/'.local/bin')
+        for shell in ('zsh','bash'):
+            executable=shutil.which(shell)
+            if not executable:
+                self.fail(shell+' required for PATH block verification')
+            flags=['-f','-c']if shell=='zsh'else['--noprofile','--norc','-c']
+            for before,expected in [('/usr/bin:/bin',local+':/usr/bin:/bin'),
+                                    ('/usr/bin:'+local+':/bin','/usr/bin:'+local+':/bin')]:
+                with self.subTest(shell=shell,before=before):
+                    command=installer.CLI_PATH_BLOCK*2+'printf "%s\\n" "$PATH"'
+                    result=subprocess.run([executable,*flags,command],capture_output=True,text=True,
+                                          timeout=10,env=dict(os.environ,PATH=before))
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    self.assertEqual(result.stdout.strip(),expected)
 
 
 if __name__=='__main__':

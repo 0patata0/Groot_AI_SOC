@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- kali-cli-soul-20261120 -->
+<a id="kali-cli-soul-20261120"></a>
+[CLI·한국어 SOUL 현황](STATUS_HISTORY.md#kali-cli-soul-20261120) · [적용·백업](DEPLOYMENT_HISTORY.md#kali-cli-soul-20261120) · [진단·미검증](DIAGNOSTIC_HISTORY.md#kali-cli-soul-20261120) · [마감 범위](PLAN_HISTORY.md#kali-cli-soul-20261120)
+<!-- /kali-cli-soul-20261120 -->
+
 <!-- goal-input-wait-20261120 -->
 <a id="goal-input-wait-20261120"></a>
 [전체 목표의 확인 범위·입력 대기](STATUS_HISTORY.md#goal-input-wait-20261120) · [재개 조건과 실제 승인 대기](PLAN_HISTORY.md#goal-input-wait-20261120) · [영상 검색 범위 정정·공식asset대조](DIAGNOSTIC_HISTORY.md#goal-input-wait-20261120)

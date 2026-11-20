@@ -1,5 +1,21 @@
 # 설치·웹 정책 이력
 
+<!-- kali-cli-soul-20261120 -->
+<a id="kali-cli-soul-20261120"></a>
+## 2026-11-20 두 Kali의 사용자 CLI·한국어 SOUL 반영
+
+두 Kali 계정의 기본 셸은 zsh다. Hermes 런처는 설치되어 있었지만 zsh의 PATH에 ~/.local/bin이 없어 명령을 찾지 못했다. 각 계정의 .zprofile과 .zshrc에 중복을 막는 PATH 설정을 추가하고 원래 설정을 백업했다. 사용자는 셸을 재시작한 뒤 명령이 실행된다고 확인했다.
+
+사용자 요청에 따라 두 서버의 SOUL.md에 한국어 응답 절을 추가했다. 레드팀 Hermes의 조사 요약, 근거 설명, 진행 상황, 최종 답변과 보고서는 한국어로 작성하도록 명시했다. 명령·코드·경로·IP·포트·고유명사와 로그 원문은 보존하고 해석을 한국어로 덧붙인다. 기존 역할·중단 상태·승인 조건은 그대로 보존했다.
+
+| 호스트·계정 | 셸 백업 | SOUL 백업·반영 SHA |
+|---|---|---|
+| 232 att | `/home/att/.local/share/capstone-hermes/shell-backups/639df8bcf0ef4ce5bf188d41a2892e96` | `/home/att/.hermes/backups/capstone-korean-soul-fb742b95e66c413da449e060d39725d6/SOUL.md` · `44fa36d902872ac9dbeb792e4572b7981d1fdab948044ac3476ea408c0a070f5` |
+| 233 attack | `/home/attack/.local/share/capstone-hermes/shell-backups/d24860e234934ef69afab6e232ff6715` | `/home/attack/.hermes/backups/capstone-korean-soul-3d159ff08d15475db7129a49a9c8885d/SOUL.md` · `a68566019896f40e08dde813aa9f2c0ac9ca545354f75cc2f7fb2a71a99a5615` |
+
+기본 로그인 셸·모델·config.yaml·CLI 런처와 설치 영수증은 바꾸지 않았다. 신규 .zprofile은0600, 기존 .zshrc는0644와 원래 바이트를 보존한 뒤 설정을 추가했다. SOUL도0600이며 언어 절을 제외한 원문 전체가 변경 전과 같다. 새 패키지·Mac 설치·서버 반입 staging 없이 검수한 Python 소스를 메모리에서 실행했다. 미래 초기 설치와 기존 설치의 --register-cli는 같은 정본을 사용한다. [코드·검증값·반영 범위](../infra/hermes/kali-redteam/cli-soul.validation.json).
+<!-- /kali-cli-soul-20261120 -->
+
 <!-- kali-scenario-file-import-20261120 -->
 <a id="kali-scenario-file-import-20261120"></a>
 | 요청 파일 반입 | 실제 확인 |

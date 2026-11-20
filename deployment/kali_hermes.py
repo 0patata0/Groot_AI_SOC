@@ -14,6 +14,7 @@ import platform
 import pwd
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tarfile
@@ -27,6 +28,13 @@ COMMIT='ae2a81ccc00e9b7c06301523e5bb09608397149c'
 INSTALLER='https://raw.githubusercontent.com/NousResearch/hermes-agent/'+COMMIT+'/scripts/install.sh'
 INSTALLER_SHA256='c73dad4dcf7c9ecadb98578e28cc763d23d7be3fa1b513545319038795493214'
 RELEASE='v0.23.2'
+CLI_PATH_BLOCK='''# >>> capstone-hermes user CLI >>>
+case ":${PATH-}:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin${PATH:+:$PATH}" ;;
+esac
+# <<< capstone-hermes user CLI <<<
+'''
 
 
 def digest(path):
@@ -221,6 +229,78 @@ def need(value,reason):
         raise ValueError(reason)
 
 
+def register_cli_path(home,shell):
+    """Preserve user startup files and register the CLI for their login shell."""
+    home=Path(home)
+    need(home==home.resolve()and home.is_dir()and home.stat().st_uid==os.getuid(),
+         'owned_shell_home_required')
+    shell=Path(shell).name
+    if shell=='zsh':
+        names=('.zprofile','.zshrc')
+    elif shell=='bash':
+        login=next((name for name in ('.bash_profile','.bash_login','.profile')
+                    if (home/name).exists()or(home/name).is_symlink()),'.profile')
+        names=(login,'.bashrc')
+    else:
+        raise ValueError('unsupported_login_shell_for_cli_registration')
+    updates=[]
+    for name in names:
+        path=home/name
+        need(not path.is_symlink(),'symlinked_shell_startup')
+        exists=path.exists()
+        mode=0o600
+        before=b''
+        if exists:
+            info=path.stat()
+            need(stat.S_ISREG(info.st_mode)and info.st_uid==os.getuid()and info.st_size<=1048576,
+                 'owned_regular_shell_startup_required')
+            before=path.read_bytes()
+            mode=stat.S_IMODE(info.st_mode)
+        start=b'# >>> capstone-hermes user CLI >>>'
+        end=b'# <<< capstone-hermes user CLI <<<'
+        block=CLI_PATH_BLOCK.encode()
+        if start in before or end in before:
+            need(before.count(start)==before.count(end)==1 and before.count(block)==1,
+                 'modified_managed_shell_block_requires_review')
+            continue
+        after=before+(b'\n'if before and not before.endswith(b'\n')else b'')+block
+        updates.append((path,exists,mode,before,after))
+    if not updates:
+        return {'changed':[],'backup':None}
+    parent=home
+    for name in ('.local','share','capstone-hermes','shell-backups'):
+        parent=parent/name
+        need(not parent.is_symlink(),'symlinked_shell_backup_parent')
+        parent.mkdir(mode=0o700,exist_ok=True)
+        need(parent.is_dir()and parent.stat().st_uid==os.getuid(),'owned_shell_backup_required')
+    backup=parent/uuid.uuid4().hex
+    backup.mkdir(mode=0o700)
+    rows=[]
+    for path,exists,mode,before,after in updates:
+        if exists:
+            saved=backup/path.name
+            saved.write_bytes(before)
+            saved.chmod(0o600)
+        row={'file':path.name,'existed':exists,'mode':oct(mode),
+             'before_sha256':hashlib.sha256(before).hexdigest()if exists else None,
+             'after_sha256':hashlib.sha256(after).hexdigest()}
+        rows.append(row)
+    (backup/'manifest.json').write_text(json.dumps({'files':rows},indent=2)+'\n')
+    (backup/'manifest.json').chmod(0o600)
+    for path,exists,mode,before,after in updates:
+        need(not path.is_symlink()and path.exists()==exists
+             and(not exists or path.read_bytes()==before),'shell_startup_changed_concurrently')
+        temporary=path.with_name(path.name+'.capstone-'+uuid.uuid4().hex)
+        try:
+            with temporary.open('xb')as stream:
+                os.fchmod(stream.fileno(),mode)
+                stream.write(after)
+            os.replace(temporary,path)
+        finally:
+            temporary.unlink(missing_ok=True)
+    return {'changed':rows,'backup':str(backup)}
+
+
 def endpoint(value):
     url=urllib.parse.urlsplit(value)
     need(url.scheme in ('http','https')and url.hostname and not url.username and not url.password
@@ -292,6 +372,7 @@ def main():
     action=parser.add_mutually_exclusive_group(required=True)
     action.add_argument('--install',action='store_true')
     action.add_argument('--verify',action='store_true')
+    action.add_argument('--register-cli',action='store_true')
     action.add_argument('--list-models',action='store_true')
     action.add_argument('--configure',action='store_true')
     action.add_argument('--prepare-bundle',action='store_true')
@@ -338,18 +419,19 @@ def main():
     user,home=local_user()
     data=home/'.hermes'
     cli=home/'.local/bin/hermes'
-    if args.install or args.configure or args.verify:
+    if args.install or args.configure or args.verify or args.register_cli:
         need(not data.is_symlink()and(not data.exists()or data.is_dir()and data.stat().st_uid==os.getuid()),
              'owned_hermes_data_required')
     if args.install:
         install_offline(args.offline_bundle,args.sha256,home)
-    if args.install or args.verify or args.configure:
+    if args.install or args.verify or args.configure or args.register_cli:
         need(cli.is_file()and os.access(cli,os.X_OK),'hermes_launcher_missing')
         observed=json.loads((home/'.local/share/capstone-hermes'/RELEASE/'capstone-install.json').read_text())
         need(observed.get('source_commit')==COMMIT,'hermes_source_commit_mismatch')
         version=checked([str(cli),'--version']).decode().strip()
     else:
         version=None
+    shell_path=register_cli_path(home,user.pw_shell)if args.install or args.register_cli else None
     inventory=models(base)if base else []
     if args.configure:
         need(args.model in {row['name']for row in inventory},'model_not_in_live_inventory')
@@ -380,6 +462,7 @@ def main():
             'version':version,'api_base_url':base,'models':inventory,
             'configured_model':args.model if args.configure else None,'inference_requests':0,
             'context_length':args.context_length if args.configure else None,
+            'shell_path':shell_path,
             'soul_sha256':digest(data/'SOUL.md')if args.configure and args.soul_template else None}
     print(json.dumps(result,ensure_ascii=False,sort_keys=True))
 

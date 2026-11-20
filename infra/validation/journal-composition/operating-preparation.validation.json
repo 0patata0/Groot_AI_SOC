@@ -702,5 +702,13 @@
     "status": "current_application_contract_regressions_passed_operating_unapplied_refreeze_required",
     "old_failures_and_plan_retained_as_historical_observation": true,
     "old_review_plan_must_be_refrozen_after_source_changes": true
+  },
+  "operating_refreeze_followup": {
+    "artifact": "operating-refreeze.validation.json",
+    "review_release_id": "807ea69fe0f040618726f94e91bcfad1",
+    "review_plan_sha256": "0a3de6ee7dc20b041a7af97cee9e0241420584f03bee0f57fca02d6ab9221b16",
+    "historical_results_preserved": true,
+    "operating_approval_or_deployment": false,
+    "scope": "Current operator and permanent reader proof are separate from these historical application/preparation results."
   }
 }

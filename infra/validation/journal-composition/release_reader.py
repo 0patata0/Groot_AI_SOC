@@ -21,10 +21,12 @@ def _release_normal_gate():
     _need(observed in (('staged','baseline','observed',None),
                       ('rolled_back','baseline','observed',None),
                       ('confirmed','candidate','observed','application-severity-v1')),'normal_reads_quiesced')
+    return value['generation']
 '''
 
 
-def build(original,expected_sha256,*,host,release_id,source_contract_sha256):
+def build(original,expected_sha256,*,host,release_id,source_contract_sha256,
+          normal_reader=None,normal_reader_sha256=None):
     if hashlib.sha256((HERE/'reader_bridge.py').read_bytes()).hexdigest()!=BASE_SHA:
         raise ValueError('bridge_source_changed')
     bridge.contract.request({'schema':1,'host':host,'release_id':release_id})
@@ -38,11 +40,37 @@ def build(original,expected_sha256,*,host,release_id,source_contract_sha256):
            and isinstance(last.value.func,ast.Attribute)and last.value.func.attr=='main'
            and isinstance(last.value.func.value,ast.Name)and last.value.func.value.id=='original'
            and not last.value.args and not last.value.keywords):raise ValueError('bridge_main_shape')
-    main.body.insert(-1,ast.Expr(ast.Call(ast.Name('_release_normal_gate',ast.Load()),[],[])))
+    if normal_reader is None:
+        if normal_reader_sha256 is not None:raise ValueError('normal_reader_digest')
+        main.body.insert(-1,ast.Expr(ast.Call(ast.Name('_release_normal_gate',ast.Load()),[],[])))
+    else:
+        if not isinstance(normal_reader,bytes)or not 0<len(normal_reader)<=131072\
+                or hashlib.sha256(normal_reader).hexdigest()!=normal_reader_sha256:
+            raise ValueError('normal_reader_digest')
+        ast.parse(normal_reader)
+        main.body[-1:] = ast.parse('''
+if _release_normal_gate()=='candidate':
+    original=_normal_reader()
+    original.incoming=lambda:raw
+original.main()
+''').body
     index=next(i for i,n in enumerate(tree.body)if isinstance(n,ast.If)
                and isinstance(n.test,ast.Compare)and isinstance(n.test.left,ast.Name)and n.test.left.id=='__name__')
     bound={'host':host,'release_id':release_id,'source_contract_sha256':source_contract_sha256}
     additions=ast.parse('_BOUND_RELEASE='+repr(bound)+'\n'+GATE).body
+    if normal_reader is not None:
+        import base64
+        additions+=ast.parse('''
+_NORMAL_READER=ENCODED
+_NORMAL_SHA=DIGEST
+def _normal_reader():
+    raw=base64.b64decode(_NORMAL_READER,validate=True)
+    _need(hashlib.sha256(raw).hexdigest()==_NORMAL_SHA,'normal_reader_changed')
+    module=types.ModuleType('fixed_candidate_reader');module.__file__=__file__
+    exec(compile(raw,'pinned-normal-reader','exec'),module.__dict__)
+    return module
+'''.replace('ENCODED',repr(base64.b64encode(normal_reader).decode()),1)
+   .replace('DIGEST',repr(normal_reader_sha256),1)).body
     tree.body[index:index]=additions;ast.fix_missing_locations(tree)
     source=(ast.unparse(tree)+'\n').encode();ast.parse(source)
     return source

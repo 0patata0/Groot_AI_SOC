@@ -53,6 +53,24 @@ class SourceTransaction(unittest.TestCase):
         fs=self.prepare();fs.install_barriers();row=next(r for r in self.rows if r['target']==m.READER)
         self.assertEqual(fs.read_stored('backups',row['before_sha256']),self.before[m.READER])
 
+    def test_final_reader_persists_after_candidate_cleanup_and_repeat_does_not_write(self):
+        fs=self.prepare();fs.install_barriers();fs.apply();normal=b'fixed normal reader\n';digest=m.sha(normal)
+        fs.finish_barriers(normal,digest)
+        self.assertEqual(self.bytes()[m.READER],normal)
+        self.assertEqual(self.bytes()[m.MCP_LAUNCHER],self.before[m.MCP_LAUNCHER])
+        with patch.object(fs,'replace',side_effect=AssertionError('duplicate finalization write')):
+            self.assertEqual(fs.finish_barriers(normal,digest),0)
+
+    def test_changed_final_reader_payload_or_foreign_live_reader_prevents_all_cleanup_writes(self):
+        fs=self.prepare();fs.install_barriers();fs.apply();normal=b'fixed normal reader\n';before=self.bytes()
+        with self.assertRaisesRegex(ValueError,'normal_reader_payload_changed'):fs.finish_barriers(normal,'a'*64)
+        self.assertEqual(self.bytes(),before)
+        path=fs.root/m.READER.lstrip('/');path.chmod(0o750);path.write_bytes(b'foreign');path.chmod(0o550)
+        before=self.bytes()
+        with patch.object(fs,'replace',side_effect=AssertionError('preflight before all writes')):
+            with self.assertRaisesRegex(ValueError,'target_bytes_changed'):fs.finish_barriers(normal,m.sha(normal))
+        self.assertEqual(self.bytes(),before)
+
     def test_core_apply_requires_reader_barrier_first(self):
         fs=self.prepare();before=self.bytes()
         with self.assertRaisesRegex(m.Refused,'partial_apply_requires_restore'):fs.apply()

@@ -1,5 +1,15 @@
 # 조정 배포를 위한 상태 대조와 재개 판정
 
+<!-- operating-payload-refreeze-20261120 -->
+완료된 resume은 기존 영수증 alias와 원래 nonce·plan·host·immutable SHA, 새 peer 근거와 현재 서비스/컨테이너를 확인한 뒤 같은 상태를 반환한다. 서비스 상태가 달라지거나 영수증이 바뀌면 새 intent를 만들지 않고 거절한다. 기존 pending resume의 응답 유실 복구와 완료된 요청의 재확인을 구분한다.
+
+임시 reader는 baseline에서 기존 프로토콜을, 확정한 candidate에서 SHA로 고정한 새 정상 프로토콜을 실행한다. 인수를 마친 candidate 정리는 정상 reader를 설치하고 MCP launcher를 원복한다. baseline 정리는 기존 reader와 launcher를 복구한다. 최종 current는 정상 reader의 실제 SHA·소유자·권한도 대조한다.50경로·정상 reader3개·helper19·control39·보호51을 같은 plan/bundle에 결속한다.
+
+
+
+[현재 전체 실행기](OPERATING_REVIEW.md)
+<!-- /operating-payload-refreeze-20261120 -->
+
 소스·캐시·봇의 버전이 서로 다른 채로 재개되는 것을 막는 읽기 전용 대조를 [조정 실행기](COORDINATOR.md)와 연결했다. 정리·현재 설치 검증의 격리 회귀도 끝났지만 운영 서버에는 아직 설치하지 않았다. 기존8파일과 동결 원장의 바이트를 보존했다. [기존 검증](witness-validation.json) · [소스 고정](witness-manifest.json) · [현재 상태](../../../STATUS.md).
 
 ## 구현한 기능

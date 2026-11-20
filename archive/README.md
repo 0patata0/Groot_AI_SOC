@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+재개 영수증·영구 reader·50경로 후보와 실패/정리 근거를 보존했다. [현황](STATUS_HISTORY.md#operating-payload-refreeze-20261120) · [계획](PLAN_HISTORY.md#operating-payload-refreeze-20261120) · [설계](DESIGN_ALTERNATIVES.md#operating-payload-refreeze-20261120) · [진단](DIAGNOSTIC_HISTORY.md#operating-payload-refreeze-20261120) · [반입](DEPLOYMENT_HISTORY.md#operating-payload-refreeze-20261120)
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 전체 운영 후보의 세 결함·현재 계약7개·Mac1,652/10생략·Linux1,739/0생략과 운영 미적용 범위를 보존했다. [현황](STATUS_HISTORY.md#operating-application-review-20261120) · [계획](PLAN_HISTORY.md#operating-application-review-20261120) · [설계](DESIGN_ALTERNATIVES.md#operating-application-review-20261120) · [진단](DIAGNOSTIC_HISTORY.md#operating-application-review-20261120) · [격리 반입·정리](DEPLOYMENT_HISTORY.md#operating-application-review-20261120)

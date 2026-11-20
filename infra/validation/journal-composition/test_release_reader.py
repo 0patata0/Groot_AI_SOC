@@ -74,5 +74,25 @@ class ReaderGate(unittest.TestCase):
         with self.assertRaises(ValueError):m.build(ORIGINAL,'e'*64,host='b',release_id='a'*32,source_contract_sha256=self.digest)
         self.assertEqual(hashlib.sha256((m.HERE/'reader_bridge.py').read_bytes()).hexdigest(),m.BASE_SHA)
 
+    def test_confirmed_candidate_uses_the_pinned_normal_protocol_and_baseline_keeps_original(self):
+        normal=b'def incoming():return b""\ndef main():pass\n'
+        raw=b'{"inventory":{"host":"b"}}';calls=[]
+        source=m.build(ORIGINAL,self.sha,host='b',release_id='a'*32,source_contract_sha256=self.digest,
+                       normal_reader=normal,normal_reader_sha256=hashlib.sha256(normal).hexdigest())
+        mod=types.ModuleType('candidate_protocol');mod.__file__='candidate-protocol'
+        exec(compile(source,'candidate-protocol','exec'),mod.__dict__)
+        for candidate in (False,True):
+            before=types.SimpleNamespace(incoming=lambda:raw,main=lambda:calls.append('before'))
+            after=types.SimpleNamespace(main=lambda:calls.append('after'))
+            value=self.result('confirmed','candidate','application-severity-v1')if candidate else self.result()
+            with patch.object(mod,'_base',return_value=before),patch.object(mod,'_normal_reader',return_value=after),patch.object(mod,'_client',return_value=value),patch.object(sys,'argv',['reader']):mod.main()
+            if candidate:self.assertEqual(after.incoming(),raw)
+        self.assertEqual(calls,['before','after'])
+
+    def test_changed_normal_protocol_digest_is_rejected(self):
+        with self.assertRaisesRegex(ValueError,'normal_reader_digest'):
+            m.build(ORIGINAL,self.sha,host='b',release_id='a'*32,source_contract_sha256=self.digest,
+                    normal_reader=ORIGINAL,normal_reader_sha256='e'*64)
+
 
 if __name__=='__main__':unittest.main()

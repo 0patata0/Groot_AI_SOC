@@ -1,5 +1,25 @@
 # 현황 이력
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+## 2026-11-20 재개 영수증과 정상 reader 후보 고정
+
+실제 완료 재개 결함과 B의 history 전용 reader를 보완했다.50개 경로와 정상 reader3개·helper19·control39·보호51을 결속했다. Mac270/생략0·보류 판정20·생성기7·수정 전2실패·공식91→138/상시 증가0과 Native 결과를 별도 보존한다. 운영 승인·적용·실제 MCP/양봇 인수는0이다.
+
+[현재 근거](../infra/validation/journal-composition/operating-refreeze.validation.json)
+
+| 최종 확인 | 결과 |
+| --- | --- |
+| Mac / Linux 회귀 | 각각15군270검사·생략0·같은32소스 SHA |
+| Linux 신원 | UID/GID50123·보조그룹0·168.907초·15개 로그 보존 |
+| Native | bootstrap·정상 완료·부분 적용 후 baseline 완료·보류/유실/중단 복구·각 A/B/C verified |
+| reader | B 기존 inventory 거절 → candidate observed → 정리 후 observed·다른 호스트/임의 경로 거절 |
+| 실제 운영 대조 | 13:51 KST·65소스/보호51 SHA·소유자·권한·같은 모델/컨테이너 |
+| 정리 | 서버 자체9작업의 root/input/unit 부재·Mac4,598파일/116,539,015B 제거 |
+| 운영 승인·적용·모델/MCP·공격·학습 | 0 |
+
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 ## 2026-11-20 전체 운영 후보의 실제 결함 보완과 현재 계약 검사

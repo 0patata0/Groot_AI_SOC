@@ -31,11 +31,14 @@
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 <a id="operating-application-review-20261120"></a>
-전체 후보의 세 결함을 보완하고 현재 계약·거절 반례를 검사했다. Mac 1,652실행/의존성10생략과 기존 Hermes Linux 1,739실행/생략0은 통과했으며 운영 적용은 하지 않았다. 수정 전 코드에서 같은 반례가 실패하는 근거와 과거 시험 원본을 보존한다.
+<a id="operating-payload-refreeze-20261120"></a>
+50개 경로의 변경안에 정상 reader의 원문과 재개 영수증 검증을 결속했다. Mac270검사·생략0·수정 전2실패·공식 Harness² 구조91→138을 확인했다. 잠금 보류·완료 응답 유실 모의·durable intent 직후 SIGKILL은 별도 PID1의 root CLI로 구분하고, 승인 없는 쓰기 재시도는 허용하지 않는다. Native의 최종 결과는 별도 원장으로 확인한다.
 
-다음 작업에서 새 소스로 50대상 전체 payload·실제 영수증·reader/MCP 결속·스키마 차이·복구 조건을 다시 고정한다. 이전 b895353a 검토안은 새 후보의 승인에 사용할 수 없다. 검토와 정확 승인 후 관리자231 경유 적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정/복구·정리/current 순서로 인수한다. 새 Native·실제 재부팅/장기 복구·backup75 상태/intent·전체 OS 승인·관리 주소 정책과 논문 목차 91불일치·독립 재구현·새OS 전체 설치·최종 발표는 남아 있다. 공격·학습·발표자료 추가 제작 중단을 유지한다.
+새 검토안의 정확 승인 후 관리자231 경유 반입·적용→새 수집→실제 MCP→Hermes·Ollama 새 채팅→확정 또는 복구→정리/current를 확인해야 한다. 합성 소비자와 합성 인수 근거는 실제 운영 인수를 대신하지 않는다. 실제 재부팅/장기 복구·전체 OS 승인·관리 주소 정책·논문 목차91불일치·독립 재구현·새OS 전체 설치·최종 발표는 계속 남는다. 공격·학습·발표자료 추가 제작 중단과 Kali 오프라인 설치 완료를 유지한다.
 
-[현재 검사와 남은 인수 조건](infra/validation/journal-composition/current-application.validation.json)
+[변경안](infra/validation/journal-composition/OPERATING_REVIEW.md) · [근거와 미수행](infra/validation/journal-composition/operating-refreeze.validation.json)
+
+[Mac/Linux270·Native4경로·최종 대조·정리](STATUS.md#operating-payload-refreeze-20261120)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- presentation-preserve-user-20261119 -->

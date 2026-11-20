@@ -22,6 +22,7 @@ _atomic_spec=importlib.util.spec_from_file_location('release_storage_atomic',Pat
 atomic=importlib.util.module_from_spec(_atomic_spec);_atomic_spec.loader.exec_module(atomic)
 FIXED=frozenset({'plan.json','bundle.json','approval.json','revert-approval.json','baseline.json','witness.json',
     'quiescence.json','verification.json','confirmation.json','resume.json','rollback.json',
+    'resume-candidate.json','resume-baseline.json',
     'revert-fence.json','revert.json','cleanup.json','current-release.json','acceptance.json','completion.json','cleanup-decision.json','cleanup-grant.json'})
 MAX_ARTIFACT=2*1024*1024
 

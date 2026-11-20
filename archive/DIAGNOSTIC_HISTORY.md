@@ -1,5 +1,21 @@
 # 진단 탐색 이력
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+## 2026-11-20 Native 중 발견한 재개 결함과 검증 전제 오류
+
+초기 case 등록 누락과 축소한 metadata의 runtime_health.py 누락으로 Native가 역할 시작 전에 실패했다. 원본/정리를 보존하고 case 목록과65경로 의존 입력을 맞췄다. 다음에는 세 fault 관측 후 실제 resume에서 immutable_fact_changed가 발생했다. 기존 완료 영수증을 재사용하도록 보완하고 동일2반례의 수정 전 실패를 확인했다. 후속 검증은 백업을 시작하지 않은 A/C에도 before.sqlite3를 요구해 실패했다. 이 경로는 불변 rollback·quiescence 영수증의 legacy 보존을 검사하고 백업된 경로는 실제 백업/복구 근거를 계속 요구한다. 어느 실패도 운영 적용 성공으로 바꾸지 않았다.
+
+[현재 근거](../infra/validation/journal-composition/operating-refreeze.validation.json)
+
+| 후속 관측 | 결과 |
+| --- | --- |
+| complete-candidate-final-r2 | candidate inventory observed·completion_status host_operation_busy75·실패 원문 보존 |
+| 검증기 읽기 관측 | status/completion_status/current만 최대6회 추가·쓰기 재시도0·관측20검사 통과 |
+| 동일 후보 최종 | complete-candidate / operation-outcomes / bootstrap / complete-baseline 모두 A/B/C verified |
+
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 ## 2026-11-20 세 코드 결함·과거 단정7개·Linux 집계 오류

@@ -4,6 +4,7 @@ Operating source bytes are copied only on the same server into the disposable
 test input. Operating configuration, keys, chat databases and journals are not
 copied. The cache, consumers, initial provenance and approval are test fixtures.
 """
+import ast
 import base64
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -194,8 +195,11 @@ def populate(root, role, source, output, pinmap, inputs, release_id, backend):
                      'after_sha256':digest(after[target]),'uid':observed.get('uid',0),
                      'gid':observed.get('gid',0),'mode':observed.get('mode',0o644)})
     contract = files.contract.source_contract(role,release_id,rows)
+    normal_reader=base64.b64decode(inputs['normal_readers'][role],validate=True)
+    ast.parse(normal_reader)
     after[files.READER] = readers.build(before[files.READER],digest(before[files.READER]),
-        host=role,release_id=release_id,source_contract_sha256=contract)
+        host=role,release_id=release_id,source_contract_sha256=contract,
+        normal_reader=normal_reader,normal_reader_sha256=digest(normal_reader))
     rows.append({'target':files.READER,'before_sha256':digest(before[files.READER]),
                  'after_sha256':digest(after[files.READER]),'uid':0,'gid':GROUP,'mode':0o550})
     if role == 'b':
@@ -217,6 +221,7 @@ def populate(root, role, source, output, pinmap, inputs, release_id, backend):
     diagnostic_gid = inputs['live_metadata'][role][files.READER]['gid']
     need(type(diagnostic_gid) is int and 0 < diagnostic_gid < 65534, 'observed_diagnostic_group_required')
     for target in ('/opt/capstone-diagnostics/runtime_health.py','/opt/capstone-diagnostics/host_inventory.py',
+                   '/opt/capstone-diagnostics/read-system-diagnostics.py',
                    '/opt/capstone-diagnostics/read-snapshot','/etc/systemd/system/capstone-journal-reader.service',
                    '/etc/systemd/system/capstone-system-diagnostics.timer'):
         observed = inputs['live_metadata'][role][target]
@@ -279,6 +284,7 @@ def populate(root, role, source, output, pinmap, inputs, release_id, backend):
     (root/'var/lib/capstone-journal-release'/release_id).chmod(0o700)
     for name in plans.HELPERS:
         put(root,storage+'/'+name,(source/name).read_bytes(),0o600)
+    put(root,storage+'/normal-reader.py',normal_reader,0o600)
     for raw in after.values():
         put(root,storage+'/candidates/'+digest(raw)+'.data',raw,0o600)
     if role == 'b':
@@ -300,7 +306,7 @@ def populate(root, role, source, output, pinmap, inputs, release_id, backend):
     ready = {'schema':1,'host':role,'release_id':release_id,'rows':sorted(rows,key=lambda row:row['target']),
              'diagnostic_gid':GROUP,'reader_uid':GROUP,'mcp_uid':MCP if role=='b'else None,
              'machine_sha256':digest((root/'etc/machine-id').read_bytes()),
-             'previous_current_sha256':None,'receipt_changes':changes,
+             'previous_current_sha256':None,'normal_reader_sha256':digest(normal_reader),'receipt_changes':changes,
              'cache_origin':'synthetic fixed-schema native integration input; not operating A/B/C records'}
     protected = {}
     for target in plans.PROTECTED[role]:

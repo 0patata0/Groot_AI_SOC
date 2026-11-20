@@ -1,5 +1,14 @@
 # 설계 대안 이력
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+## 2026-11-20 임시 중계와 영구 정상 reader의 분리
+
+기존 read-system-diagnostics.py가 barrier인 사실을 놓친51경로 중복 후보는 row_count에서 거절됐다. core 목록을 늘려 같은 경로를 중복 등록하지 않고50개 경로에 임시 중계 after와 정상 reader의 최종 SHA를 별도로 결속했다. private normal-reader.py와 plan/bundle의 digest를 확인하며 candidate 정리 후에도 새 기능을 남긴다. baseline 복구는 원본을 유지한다. 완료 resume은 새 nonce를 만들지 않고 원래 영수증을 대조한다.
+
+[현재 근거](../infra/validation/journal-composition/operating-refreeze.validation.json)
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 ## 2026-11-20 완료 영수증의 허용 범위와 명제별 불확실성

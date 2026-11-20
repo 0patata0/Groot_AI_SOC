@@ -1,0 +1,882 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-20T13:53:33.694973+09:00",
+  "status": "exact_full_payload_native_QA_complete_awaiting_fresh_protected_approval_not_deployed",
+  "source_code_commit": "2f56a932695a5168673a0289f3f825b73f99cb5d",
+  "source_provenance": "Application bytes from pinned Git; current operator helpers and producer independently SHA pinned. New source publication pending.",
+  "source_files_sha256": {
+    "infra/validation/journal-composition/release_files.py": "fc18e37bfaafaf440f81dfaeea3bbb5cb7af39336110f3a42807e85263af7ad0",
+    "infra/validation/journal-composition/release_reader.py": "61d4a09c8ad1cd2ae353c917cd94e65650c15777058a0849e984b0f53c4a8c66",
+    "infra/validation/journal-composition/release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
+    "infra/validation/journal-composition/release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+    "infra/validation/journal-composition/release_services.py": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801",
+    "infra/validation/journal-composition/release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
+    "infra/validation/journal-composition/release_storage.py": "f62b7d842bcf98551d169058b6d7b1f1b62e49f71b70d18cd932a340e7bc1b28",
+    "infra/validation/journal-composition/release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
+    "infra/validation/journal-composition/release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
+    "infra/validation/journal-composition/release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
+    "infra/validation/journal-composition/release_lifecycle.py": "2180643e80bf11b246f203e30c42aa6f5c21f1a88952cac7bb1b6ac13d9e624d",
+    "infra/validation/journal-composition/release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
+    "infra/validation/journal-composition/release_plan.py": "d336946aaf6c7f09dfc6020ae1264a7482d46d33e7869dd9ec6adaea109e2027",
+    "infra/validation/journal-composition/release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
+    "infra/validation/journal-composition/test_release_files.py": "fde028cbf33a9d1945c14060e979e3303d2df94a4144a0c7f40e4f7219f9c39b",
+    "infra/validation/journal-composition/test_release_reader.py": "c4ae6e545e8b9a243d5f067873ff6a779375def10e0283c22bdd9174a8c1b468",
+    "infra/validation/journal-composition/test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
+    "infra/validation/journal-composition/test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
+    "infra/validation/journal-composition/test_release_services.py": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7",
+    "infra/validation/journal-composition/test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
+    "infra/validation/journal-composition/test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
+    "infra/validation/journal-composition/test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
+    "infra/validation/journal-composition/test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
+    "infra/validation/journal-composition/test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
+    "infra/validation/journal-composition/test_release_lifecycle.py": "8e0ce959fb2e21acc22a0f0186d92a1088b6c361cd72255430c9674868519df3",
+    "infra/validation/journal-composition/test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
+    "infra/validation/journal-composition/test_release_plan.py": "d9a6077c777f5a63c0b79dc4e92c6b01014cbb91fc09ccf184ac6c6767724197",
+    "infra/validation/journal-composition/test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+    "infra/validation/journal-composition/check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+    "infra/validation/journal-composition/run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+    "infra/validation/journal-composition/release_completion.py": "c5e39ce1e4d2680e07e826bb643d1a0029ae57ee6249f5da540ed1c0c4181519",
+    "infra/validation/journal-composition/test_release_completion.py": "f9596c307cc7b151d50dfd27eb0f9ba4eb77a7ab0b2a79a210fded328f376165",
+    "infra/validation/journal-composition/coordinator-manifest.json": "e9d5c2e642941dbd9aa23c10f2bc0f392a65fc74daa2c26f4d489c39fcdcb09e",
+    "infra/validation/journal-composition/witness-manifest.json": "ad45c3b5b443ce4fe37cfa1fcf15e262885ccefae00827f12ff760697136f52f",
+    "infra/validation/journal-composition/prepare_payload.py": "4173ae694618a2086561e004b8e1141067311265e53fd868f30f94ad76e57857",
+    "infra/validation/journal-composition/test_prepare_payload.py": "f1a82b8cc78dde0e8962787a9f64a3d73a6c272e8fda43abe1b2aa4926994424",
+    "infra/validation/journal-composition/validate_full_native.py": "2129a0353e174c8ac66aeb71fc86cba8772c84d37a78e7ca45fa800fa8ded279",
+    "infra/validation/journal-composition/private_full_native_probe.py": "1ad018e8b9ed63e532e8ccc93226f68d643b469ce8e2d49df3a0c83e347627d3",
+    "infra/validation/journal-composition/private_full_fixture.py": "41bb13924120a3fe53480ac071bf9af233e024f5de1e480f9d2a0b38b7ae559d",
+    "infra/validation/journal-composition/test_full_native_observation.py": "77783647150cecfb4de6ebf74c78dcc9fc07594619d909314273f61d2dff5adf",
+    "infra/validation/journal-composition/run_operating_regressions.py": "7bafe63d39cf03a2301a6be1517dfdd14cb13227942ed470ba3d728ac83abf70"
+  },
+  "review_plan": {
+    "release_id": "807ea69fe0f040618726f94e91bcfad1",
+    "plan_sha256": "0a3de6ee7dc20b041a7af97cee9e0241420584f03bee0f57fca02d6ab9221b16",
+    "plan_file_sha256": "03dcc24c0577c1ab976535ba68c6c8d913218f59c0ec982732504b86de034416",
+    "bundle_file_sha256": "8a48b4689b75ff0f633163ab851fb6e1cf1388ce8da71fadaf427249c6e58258",
+    "target_counts": {
+      "a": 7,
+      "b": 36,
+      "c": 7
+    },
+    "protected_counts": {
+      "a": 13,
+      "b": 30,
+      "c": 8
+    },
+    "helper_count": 19,
+    "control_documents": 39,
+    "normal_reader_sha256": {
+      "a": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+      "b": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+      "c": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3"
+    }
+  },
+  "static_payload": {
+    "manifest_sha256": "5ce38d8b638c4ea33cee1c761c350afe81f134b8939d7d83ccc4eef43398c1dd",
+    "target_counts": {
+      "a": 6,
+      "b": 32,
+      "c": 6
+    },
+    "normal_readers": {
+      "a": {
+        "source": "infra/mcp/read-system-diagnostics.py",
+        "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3"
+      },
+      "b": {
+        "source": "infra/mcp/read-system-diagnostics.py",
+        "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3"
+      },
+      "c": {
+        "source": "infra/mcp/read-system-diagnostics.py",
+        "sha256": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3"
+      }
+    },
+    "unique_blobs": 24,
+    "bytes": 2104764,
+    "input_source_sha256": {
+      "deployment/soc_diagnostics.py": "1c5c604b8636d5f8d47cd61691157cfe2f663bf0c084b8207a6331c7c57fdcf9",
+      "infra/hermes/chat_contract.py": "62bf832c4b194966726edc1a62eb54b8b128db7e247477a653d43d2557a89d17",
+      "infra/hermes/query-completion/__init__.py": "fcb86634a3f52b3af9a0f0f40ac277088c0d5693ad715943a22fd2014291f513",
+      "infra/hermes/query-completion/alignment.py": "bbb938d546d2ced5cadb970faf76d527a5395ef36b36dbb297d3c18b4bc9fe47",
+      "infra/hermes/read_contract.py": "597c1e5cce4f9f14cc780be3057f4a2cd1d4d6d21aa36b2bf9a8622348a8b04d",
+      "infra/hermes/review_channel_worker.py": "1ee66cdd161c87eaeddb75abdba49c48f1b21655ab4b4fc91f78a2c43ada5205",
+      "infra/hermes/skills/soc-investigate/SKILL.md": "00fcf6abe47a638fe12f90cbddaed97e93c3c151bb480746e6a01b3be7337a4d",
+      "infra/hermes/skills/soc-query/SKILL.md": "d6027a48a51877212bd414f5dfac098db80b906db575f0f29d030f3e19d01232",
+      "infra/hermes/soc_management_controller.py": "3ed03fb7717381e5a065fcc83dda836e766f77d103e012895d92e17541273089",
+      "infra/hermes/soc_management_run.py": "67a91b4bde70a2a1aa1ce38a3f2dd51e0998a57793eb5f1c10c458f00293fa97",
+      "infra/hermes/workflow_contract.py": "5ce616f0efe4ffef6343bf2e232d09aa39d95ab6218b2c672b57b91ad15ceb07",
+      "infra/mcp/diagnostic_history.py": "71d242a9b9e4e26845e4df14a7bcb891f023b412e75cd275f47779dc6afc077b",
+      "infra/mcp/diagnostic_journal.py": "002ee71d913fc9de13b7a9a09246879a798af94e2a1376f3ecbfea062c9666ac",
+      "infra/mcp/diagnostic_journal_native.py": "1940fe0d2d17ec8abd6e5c7e57f6d51b5c45fe97154534d68f3e66b1f8ed7209",
+      "infra/mcp/read-system-diagnostics.py": "ab1410845fa6ce375bd6346b6442c8049b0de3704b3e4c4a397ef960e03207f3",
+      "infra/mcp/system-diagnostics-mcp.py": "81bb24ffa355646ca2d19cd99f2b694f45430c03f3d35bc20b7aab41094a695a",
+      "infra/mcp/system_diagnostics.py": "24aa6d5fb7c9558d96c6f54bc61023ac830cb29321eb422aac60963a367fd09c",
+      "infra/ollama-trial/harness.py": "c37c7016c03660527a05b4543a601ecc5b934cd199b4272da49e269658fd43f0",
+      "infra/ollama-trial/runtime.py": "1adf674375ae7f7ee25d04ccb48b71812218f3d554766c82403ac7798b920c76"
+    },
+    "producer_sha256": "4173ae694618a2086561e004b8e1141067311265e53fd868f30f94ad76e57857"
+  },
+  "receipts": {
+    "count": 2,
+    "changes": 10,
+    "preexisting_source_drift": 0,
+    "calculated_on_B_in_memory": true,
+    "raw_receipts_exported": false
+  },
+  "regressions": {
+    "mac": {
+      "complete": true,
+      "tests": 270,
+      "skipped": 0,
+      "source_unchanged": true,
+      "source_sha256": {
+        "release_files.py": "fc18e37bfaafaf440f81dfaeea3bbb5cb7af39336110f3a42807e85263af7ad0",
+        "release_reader.py": "61d4a09c8ad1cd2ae353c917cd94e65650c15777058a0849e984b0f53c4a8c66",
+        "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
+        "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+        "release_services.py": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801",
+        "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
+        "release_storage.py": "f62b7d842bcf98551d169058b6d7b1f1b62e49f71b70d18cd932a340e7bc1b28",
+        "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
+        "release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
+        "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
+        "release_lifecycle.py": "2180643e80bf11b246f203e30c42aa6f5c21f1a88952cac7bb1b6ac13d9e624d",
+        "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
+        "release_plan.py": "d336946aaf6c7f09dfc6020ae1264a7482d46d33e7869dd9ec6adaea109e2027",
+        "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
+        "test_release_files.py": "fde028cbf33a9d1945c14060e979e3303d2df94a4144a0c7f40e4f7219f9c39b",
+        "test_release_reader.py": "c4ae6e545e8b9a243d5f067873ff6a779375def10e0283c22bdd9174a8c1b468",
+        "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
+        "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
+        "test_release_services.py": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7",
+        "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
+        "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980",
+        "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
+        "test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
+        "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
+        "test_release_lifecycle.py": "8e0ce959fb2e21acc22a0f0186d92a1088b6c361cd72255430c9674868519df3",
+        "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
+        "test_release_plan.py": "d9a6077c777f5a63c0b79dc4e92c6b01014cbb91fc09ccf184ac6c6767724197",
+        "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+        "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+        "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+        "release_completion.py": "c5e39ce1e4d2680e07e826bb643d1a0029ae57ee6249f5da540ed1c0c4181519",
+        "test_release_completion.py": "f9596c307cc7b151d50dfd27eb0f9ba4eb77a7ab0b2a79a210fded328f376165"
+      }
+    },
+    "linux": {
+      "complete": true,
+      "tests": 270,
+      "skipped": 0,
+      "source_unchanged": true,
+      "source_sha256": {
+        "check_coordinator_structure.py": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3",
+        "release_atomic.py": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24",
+        "release_cache.py": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74",
+        "release_completion.py": "c5e39ce1e4d2680e07e826bb643d1a0029ae57ee6249f5da540ed1c0c4181519",
+        "release_controls.py": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3",
+        "release_files.py": "fc18e37bfaafaf440f81dfaeea3bbb5cb7af39336110f3a42807e85263af7ad0",
+        "release_helpers.py": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2",
+        "release_lifecycle.py": "2180643e80bf11b246f203e30c42aa6f5c21f1a88952cac7bb1b6ac13d9e624d",
+        "release_mcp_launcher.py": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f",
+        "release_plan.py": "d336946aaf6c7f09dfc6020ae1264a7482d46d33e7869dd9ec6adaea109e2027",
+        "release_processes.py": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613",
+        "release_reader.py": "61d4a09c8ad1cd2ae353c917cd94e65650c15777058a0849e984b0f53c4a8c66",
+        "release_runtime.py": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b",
+        "release_services.py": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801",
+        "release_state.py": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e",
+        "release_storage.py": "f62b7d842bcf98551d169058b6d7b1f1b62e49f71b70d18cd932a340e7bc1b28",
+        "run_coordinator_regressions.py": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01",
+        "test_release_atomic.py": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f",
+        "test_release_cache.py": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e",
+        "test_release_completion.py": "f9596c307cc7b151d50dfd27eb0f9ba4eb77a7ab0b2a79a210fded328f376165",
+        "test_release_controls.py": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c",
+        "test_release_files.py": "fde028cbf33a9d1945c14060e979e3303d2df94a4144a0c7f40e4f7219f9c39b",
+        "test_release_helpers.py": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce",
+        "test_release_lifecycle.py": "8e0ce959fb2e21acc22a0f0186d92a1088b6c361cd72255430c9674868519df3",
+        "test_release_mcp_launcher.py": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469",
+        "test_release_plan.py": "d9a6077c777f5a63c0b79dc4e92c6b01014cbb91fc09ccf184ac6c6767724197",
+        "test_release_processes.py": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6",
+        "test_release_reader.py": "c4ae6e545e8b9a243d5f067873ff6a779375def10e0283c22bdd9174a8c1b468",
+        "test_release_runtime.py": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48",
+        "test_release_services.py": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7",
+        "test_release_state.py": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5",
+        "test_release_storage.py": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980"
+      },
+      "platform": "linux",
+      "python": "3.12.3",
+      "identity": {
+        "egid": 50123,
+        "euid": 50123,
+        "gid": 50123,
+        "supplementary_groups": [],
+        "uid": 50123
+      },
+      "elapsed_seconds": 168.90731397399213,
+      "profile_logs": 15
+    },
+    "focused": {
+      "full_native_observation": {
+        "tests": 20,
+        "exit": 0,
+        "source_sha256": "77783647150cecfb4de6ebf74c78dcc9fc07594619d909314273f61d2dff5adf",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "0e73b611c6bb988fe31effbdf59fb2eadfa0640760f05c5f80ada8a05e6489b6"
+      },
+      "prepare_payload": {
+        "tests": 7,
+        "exit": 0,
+        "source_sha256": "f1a82b8cc78dde0e8962787a9f64a3d73a6c272e8fda43abe1b2aa4926994424",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "0a0a9d5a2fd49b6ab1246a008ecb46a7198815cd2951a3a43bacb5028958177f"
+      }
+    },
+    "prefixed_resume_control": {
+      "old_source_sha256": "eccb3085b048bf1fde3d444fd2e3158077ebbed87316843a27c8ce3495894e50",
+      "current_test_sha256": "8e0ce959fb2e21acc22a0f0186d92a1088b6c361cd72255430c9674868519df3",
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "all_expected_immutable_fact_changed": true,
+      "scope": "Only old lifecycle implementation with the current 50 distinct-path fixtures and the same new tests; no operating deployment"
+    }
+  },
+  "official_harness2": {
+    "framework_commit": "6868817518876de8fd170c6a8354daca273b6191",
+    "before": {
+      "always_on_chars": 16917,
+      "n_files": 91,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 76,
+      "plugins": 0
+    },
+    "candidate": {
+      "always_on_chars": 16917,
+      "n_files": 138,
+      "skills": 5,
+      "sub_agents": 0,
+      "scripts": 76,
+      "plugins": 0
+    },
+    "diff": {
+      "added": [
+        "scripts/native-payload/a/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+        "scripts/native-payload/a/etc/systemd/system/capstone-system-diagnostics.service",
+        "scripts/native-payload/a/final-normal-reader.py",
+        "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_history.py",
+        "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_journal.py",
+        "scripts/native-payload/a/opt/capstone-diagnostics/diagnostic_journal_native.py",
+        "scripts/native-payload/a/opt/capstone-diagnostics/system_diagnostics.py",
+        "scripts/native-payload/b/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+        "scripts/native-payload/b/etc/systemd/system/capstone-system-diagnostics.service",
+        "scripts/native-payload/b/final-normal-reader.py",
+        "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_history.py",
+        "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_journal.py",
+        "scripts/native-payload/b/opt/capstone-diagnostics/diagnostic_journal_native.py",
+        "scripts/native-payload/b/opt/capstone-diagnostics/system_diagnostics.py",
+        "scripts/native-payload/b/opt/capstone-management/skill-soc-investigate.md",
+        "scripts/native-payload/b/opt/capstone-management/skill-soc-query.md",
+        "scripts/native-payload/b/opt/capstone-management/soc_management_controller.py",
+        "scripts/native-payload/b/opt/capstone-management/soc_management_run.py",
+        "scripts/native-payload/b/opt/capstone-management/workflow_contract.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/chat_contract.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/grounding.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/harness.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/query_grounding.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/read_contract.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/runtime.py",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/skill-soc-investigate.md",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/skill-soc-query.md",
+        "scripts/native-payload/b/opt/capstone-ollama-trial/workflow_contract.py",
+        "scripts/native-payload/b/opt/capstone-review-chat/review_channel_worker.py",
+        "scripts/native-payload/b/opt/hermes-data/management-code/run.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/alignment.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/read_contract.py",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/skill-soc-query.md",
+        "scripts/native-payload/b/opt/hermes-data/plugins/groot-query-completion/workflow_contract.py",
+        "scripts/native-payload/b/opt/mcp/system-diagnostics-mcp.py",
+        "scripts/native-payload/c/etc/systemd/system/capstone-diagnostic-history-backfill.service",
+        "scripts/native-payload/c/etc/systemd/system/capstone-system-diagnostics.service",
+        "scripts/native-payload/c/final-normal-reader.py",
+        "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_history.py",
+        "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_journal.py",
+        "scripts/native-payload/c/opt/capstone-diagnostics/diagnostic_journal_native.py",
+        "scripts/native-payload/c/opt/capstone-diagnostics/system_diagnostics.py"
+      ],
+      "removed": [],
+      "modified": [],
+      "always_on_char_delta": 0
+    },
+    "validator_source_sha256": {
+      "validate_full_native.py": "2129a0353e174c8ac66aeb71fc86cba8772c84d37a78e7ca45fa800fa8ded279",
+      "private_full_fixture.py": "41bb13924120a3fe53480ac071bf9af233e024f5de1e480f9d2a0b38b7ae559d",
+      "private_full_native_probe.py": "1ad018e8b9ed63e532e8ccc93226f68d643b469ce8e2d49df3a0c83e347627d3",
+      "private_apply_crash.py": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80",
+      "check_full_native_structure.py": "ae87402e05ed15aedfbed0b2e643759380b0aa9b55c3528ccdea74b71fce8ff5",
+      "test_full_native_observation.py": "77783647150cecfb4de6ebf74c78dcc9fc07594619d909314273f61d2dff5adf"
+    },
+    "operator_manifest_sha256": "e9d5c2e642941dbd9aa23c10f2bc0f392a65fc74daa2c26f4d489c39fcdcb09e"
+  },
+  "native": {
+    "complete-candidate": {
+      "status": "verified",
+      "evidence_sha256": "f45380d5fbdc9ccdecf9aed08b36875a13b966eb9529b554d66c89aea25b6e79",
+      "validator_input_pins": {
+        "release_status.py": {
+          "bytes": 17563,
+          "sha256": "b01569aad326288adbe634d14626debbfe359c623369d1f46bea5690acb3a5a4"
+        },
+        "reader_bridge.py": {
+          "bytes": 6107,
+          "sha256": "062b675e3398eb75a323e2618a34c549396ffee7927c7ff04a2318702b9adede"
+        },
+        "cohort_guard.py": {
+          "bytes": 5989,
+          "sha256": "b6ee448e01576bf7b8a868f2d9bedd6b9872eac2b762be94de50dbf1f239548e"
+        },
+        "test_release_status.py": {
+          "bytes": 11399,
+          "sha256": "790517785aac917bb4568db16c2b055e2960fbbcf6508ab05466da4b1092978e"
+        },
+        "test_reader_bridge.py": {
+          "bytes": 7262,
+          "sha256": "8e00b5cd237cd68205626abe5f20a65e78d9b4b9d1223022fa07cad5a08d81a5"
+        },
+        "test_release_ipc.py": {
+          "bytes": 4242,
+          "sha256": "4c36d68c976eea4119816d1460451561c05ac24b4083290ad84a8f1e1ca1a473"
+        },
+        "test_cohort_guard.py": {
+          "bytes": 6981,
+          "sha256": "e79db78bc081a549c741565a844ff2854b1fb14df85bdf1b6a773b1be88771e1"
+        },
+        "check_release_structure.py": {
+          "bytes": 3725,
+          "sha256": "2df9f77ae5ad42d52794300df112e6dd387debcd6f639749770759809156908d"
+        },
+        "cache_transaction.py": {
+          "bytes": 12439,
+          "sha256": "a4960a44c08b335c0f09b55f30c1c2e0a294c1c7f3c7e78e313f7d1788c59864"
+        },
+        "test_cache_transaction.py": {
+          "bytes": 13341,
+          "sha256": "039e59dd9ecc19027ab988eb9139251e04cce7462ef1a911e55379b41b3b03cc"
+        },
+        "release_files.py": {
+          "bytes": 14552,
+          "sha256": "fc18e37bfaafaf440f81dfaeea3bbb5cb7af39336110f3a42807e85263af7ad0"
+        },
+        "release_reader.py": {
+          "bytes": 4065,
+          "sha256": "61d4a09c8ad1cd2ae353c917cd94e65650c15777058a0849e984b0f53c4a8c66"
+        },
+        "release_mcp_launcher.py": {
+          "bytes": 1178,
+          "sha256": "2c756611eda84785c63a0eca71eb4b68fce9c9528a12ad3c07d64abaacea154f"
+        },
+        "release_state.py": {
+          "bytes": 12136,
+          "sha256": "e097ff8e8900679b8c2a629a6813cfb1c6c55e0993709ab865a4c84ae03f7a2e"
+        },
+        "release_services.py": {
+          "bytes": 19105,
+          "sha256": "a2a976d81c0e3e7bd1320005faffda3b17e5fef1736a570c6d194990da52a801"
+        },
+        "release_controls.py": {
+          "bytes": 9977,
+          "sha256": "4ccf2b9891108437c795368cb5341adb21441060ab288c880facbbac38fc5eb3"
+        },
+        "release_storage.py": {
+          "bytes": 8988,
+          "sha256": "f62b7d842bcf98551d169058b6d7b1f1b62e49f71b70d18cd932a340e7bc1b28"
+        },
+        "release_helpers.py": {
+          "bytes": 8599,
+          "sha256": "fe61fc4708f20df2915e397986d1569e9491e7b9273cd617faa8171209e7afd2"
+        },
+        "release_processes.py": {
+          "bytes": 6886,
+          "sha256": "913de2353859fd042e9dd3433baca46290fd9746390176e59b8fef10405b5613"
+        },
+        "release_cache.py": {
+          "bytes": 3601,
+          "sha256": "4bf7483a2dea0389c52da31f82836fe197bd1d49795b5f0442cc360c03769a74"
+        },
+        "release_lifecycle.py": {
+          "bytes": 31620,
+          "sha256": "2180643e80bf11b246f203e30c42aa6f5c21f1a88952cac7bb1b6ac13d9e624d"
+        },
+        "release_atomic.py": {
+          "bytes": 1597,
+          "sha256": "9c3935d76fef86f75484a4b303e3be6b13bf370ca084bea2e501648ceb9f3c24"
+        },
+        "release_plan.py": {
+          "bytes": 10087,
+          "sha256": "d336946aaf6c7f09dfc6020ae1264a7482d46d33e7869dd9ec6adaea109e2027"
+        },
+        "release_runtime.py": {
+          "bytes": 14032,
+          "sha256": "d795688673eea513544f8b434c7f14156f6e37b5f79586bc9238e601845a324b"
+        },
+        "test_release_files.py": {
+          "bytes": 12489,
+          "sha256": "fde028cbf33a9d1945c14060e979e3303d2df94a4144a0c7f40e4f7219f9c39b"
+        },
+        "test_release_reader.py": {
+          "bytes": 6464,
+          "sha256": "c4ae6e545e8b9a243d5f067873ff6a779375def10e0283c22bdd9174a8c1b468"
+        },
+        "test_release_mcp_launcher.py": {
+          "bytes": 2142,
+          "sha256": "93baafe615c9a082bd909382ddfa10bc285b42da7446df3f9c03c16d27ad3469"
+        },
+        "test_release_state.py": {
+          "bytes": 11826,
+          "sha256": "7d1b72efc0a49856483e73648718113244f403515114ea2eb4245bc749e8a9b5"
+        },
+        "test_release_services.py": {
+          "bytes": 17204,
+          "sha256": "72784e3c3c789d06b939abc7ca2405ebd005eccdcd415591973366bfc230a6b7"
+        },
+        "test_release_controls.py": {
+          "bytes": 6401,
+          "sha256": "47a876b0043bfba17ce7098dccc459d9faff799b2ab9d3c7a34d32db141acb7c"
+        },
+        "test_release_storage.py": {
+          "bytes": 8138,
+          "sha256": "f5b7148bd59d5fe38603fe35998b16bd11c860f6b515eb640308f109840aa980"
+        },
+        "test_release_helpers.py": {
+          "bytes": 8999,
+          "sha256": "eb1f8d8cf1086ad320d81343cbec946d4f0b9754d25ddab9b1b6af2d2b3c98ce"
+        },
+        "test_release_processes.py": {
+          "bytes": 6314,
+          "sha256": "f6b771a85324614ab29f6b76f3a7fa49401e18fc0a257075691d45e6706e1ea6"
+        },
+        "test_release_cache.py": {
+          "bytes": 1197,
+          "sha256": "31b7cd520171cea512d8b66db98b9f5bae40b87fa8513bacc42be2fbb28c9d6e"
+        },
+        "test_release_lifecycle.py": {
+          "bytes": 20696,
+          "sha256": "8e0ce959fb2e21acc22a0f0186d92a1088b6c361cd72255430c9674868519df3"
+        },
+        "test_release_atomic.py": {
+          "bytes": 3063,
+          "sha256": "15dfec2b52e337b843b929022e8d8cc9176fd00d6b3de87d97c33052c99a316f"
+        },
+        "test_release_plan.py": {
+          "bytes": 8275,
+          "sha256": "d9a6077c777f5a63c0b79dc4e92c6b01014cbb91fc09ccf184ac6c6767724197"
+        },
+        "test_release_runtime.py": {
+          "bytes": 5212,
+          "sha256": "db88aee2240e654781f30ab39cbeaed105ce4296b5adc8933880845a806cdc48"
+        },
+        "check_coordinator_structure.py": {
+          "bytes": 5192,
+          "sha256": "9286e7e3e9d7bf349d9a6f3ab1e9b19f70ba75a90892c575a4a5f2306d1b62e3"
+        },
+        "run_coordinator_regressions.py": {
+          "bytes": 4980,
+          "sha256": "0ee2153e3ec3e9ccfe8a78b221788752e5cff5bf1437f0217fc57687d9290f01"
+        },
+        "release_completion.py": {
+          "bytes": 18788,
+          "sha256": "c5e39ce1e4d2680e07e826bb643d1a0029ae57ee6249f5da540ed1c0c4181519"
+        },
+        "test_release_completion.py": {
+          "bytes": 15788,
+          "sha256": "f9596c307cc7b151d50dfd27eb0f9ba4eb77a7ab0b2a79a210fded328f376165"
+        },
+        "coordinator-manifest.json": {
+          "bytes": 7687,
+          "sha256": "e9d5c2e642941dbd9aa23c10f2bc0f392a65fc74daa2c26f4d489c39fcdcb09e"
+        },
+        "witness-manifest.json": {
+          "bytes": 2284,
+          "sha256": "ad45c3b5b443ce4fe37cfa1fcf15e262885ccefae00827f12ff760697136f52f"
+        },
+        "validate_private_pid1.py": {
+          "bytes": 32154,
+          "sha256": "65935aaf67e456db739193064087acb994742bef77a79e44f1d79119e073ecb8"
+        },
+        "validate_private_backends.py": {
+          "bytes": 15538,
+          "sha256": "9867227db61f3a75c9039173e14283da18cc0da27461dae87d3dc6b016588aa7"
+        },
+        "private_backend_probe.py": {
+          "bytes": 10945,
+          "sha256": "a00b4a3f6f29c5036c261a42d7ff3750b89bb1570ef0e2a90d41df830037a06b"
+        },
+        "private_full_fixture.py": {
+          "bytes": 19381,
+          "sha256": "41bb13924120a3fe53480ac071bf9af233e024f5de1e480f9d2a0b38b7ae559d"
+        },
+        "private_full_native_probe.py": {
+          "bytes": 46343,
+          "sha256": "1ad018e8b9ed63e532e8ccc93226f68d643b469ce8e2d49df3a0c83e347627d3"
+        },
+        "private_apply_crash.py": {
+          "bytes": 11140,
+          "sha256": "b420d6c9116cfd706e214774f50a6f5a62acf3731c18a871e1df7e4f9bfe0a80"
+        },
+        "validate_full_native.py": {
+          "bytes": 34708,
+          "sha256": "2129a0353e174c8ac66aeb71fc86cba8772c84d37a78e7ca45fa800fa8ded279"
+        },
+        "full-input.json": {
+          "bytes": 6326879,
+          "sha256": "c7ea52dd5a27bcee4bb7e752dcd1d45ad1a64aa0bc21e341301e4ae1b10ef906"
+        }
+      },
+      "roles": {
+        "a": "verified",
+        "b": "verified",
+        "c": "verified"
+      },
+      "host_namespaces_unchanged": true,
+      "role_cgroups_empty": true,
+      "workspace_removed": true,
+      "input_source_sha_unchanged": true,
+      "memory_peak_bytes": 444026880,
+      "pids_peak": 106,
+      "real_MCP_or_bot_acceptance": false,
+      "actual_host_reboot": false,
+      "B_inventory_before_denied": true,
+      "B_inventory_candidate_status": "observed",
+      "B_inventory_final_status": "observed",
+      "other_host_and_arbitrary_path_denied": true,
+      "prepared_receipt_binding": {
+        "count": 2,
+        "matches_observed_operating_receipt_transform": true,
+        "raw_receipts_exported": false
+      }
+    },
+    "operation-outcomes": {
+      "status": "verified",
+      "evidence_sha256": "e7cb0a66852c73ef25ac1999def20dfb54203e8d21081011963bdc8dddac76d6",
+      "validator_input_manifest_sha256": "b46295dbdd66ad8fe1d20072cb605722775d2e5fc7f518abd7411c3f40e28f94",
+      "roles": {
+        "a": "verified",
+        "b": "verified",
+        "c": "verified"
+      },
+      "host_namespaces_unchanged": true,
+      "role_cgroups_empty": true,
+      "workspace_removed": true,
+      "input_source_sha_unchanged": true,
+      "memory_peak_bytes": 378163200,
+      "pids_peak": 112,
+      "real_MCP_or_bot_acceptance": false,
+      "actual_host_reboot": false,
+      "prepared_receipt_binding": {
+        "count": 2,
+        "matches_observed_operating_receipt_transform": true,
+        "raw_receipts_exported": false
+      },
+      "outcomes": {
+        "a": {
+          "outcome": "not_started_observed",
+          "write_retry_authorized": false
+        },
+        "b": {
+          "outcome": "completion_recorded_do_not_repeat",
+          "write_retry_authorized": false
+        },
+        "c": {
+          "outcome": "pending_requires_recovery",
+          "write_retry_authorized": false
+        }
+      },
+      "automatic_mutation_retries": 0
+    },
+    "bootstrap": {
+      "status": "verified",
+      "evidence_sha256": "6f8daa312ec0a82ec309058ac93dd6264b1befb478f489e3fa9be44bc13ebd61",
+      "validator_input_manifest_sha256": "b46295dbdd66ad8fe1d20072cb605722775d2e5fc7f518abd7411c3f40e28f94",
+      "roles": {
+        "a": "verified",
+        "b": "verified",
+        "c": "verified"
+      },
+      "host_namespaces_unchanged": true,
+      "role_cgroups_empty": true,
+      "workspace_removed": true,
+      "input_source_sha_unchanged": true,
+      "memory_peak_bytes": 409075712,
+      "pids_peak": 107,
+      "real_MCP_or_bot_acceptance": false,
+      "actual_host_reboot": false,
+      "prepared_receipt_binding": {
+        "count": 2,
+        "matches_observed_operating_receipt_transform": true,
+        "raw_receipts_exported": false
+      }
+    },
+    "complete-baseline": {
+      "status": "verified",
+      "evidence_sha256": "1508bbcdc86b94d46b437a6f1685e7294bd39a6e97dde5f002a8f70b8192c1c2",
+      "validator_input_manifest_sha256": "b46295dbdd66ad8fe1d20072cb605722775d2e5fc7f518abd7411c3f40e28f94",
+      "roles": {
+        "a": "verified",
+        "b": "verified",
+        "c": "verified"
+      },
+      "host_namespaces_unchanged": true,
+      "role_cgroups_empty": true,
+      "workspace_removed": true,
+      "input_source_sha_unchanged": true,
+      "memory_peak_bytes": 387727360,
+      "pids_peak": 126,
+      "real_MCP_or_bot_acceptance": false,
+      "actual_host_reboot": false,
+      "prepared_receipt_binding": {
+        "count": 2,
+        "matches_observed_operating_receipt_transform": true,
+        "raw_receipts_exported": false
+      }
+    }
+  },
+  "historical_application_replay": {
+    "artifact": "current-application.validation.json",
+    "source_commit": "2f56a932695a5168673a0289f3f825b73f99cb5d",
+    "mac_tests": 1652,
+    "mac_dependency_skips": 10,
+    "linux_tests": 1739,
+    "linux_skipped": 0,
+    "not_rerun_as_full_campaign_for_new_operator": true,
+    "application_runtime_source_changes_this_unit": 0
+  },
+  "early_failures": [
+    {
+      "case": "r1",
+      "result": "unregistered operation-outcomes own-case guard, no role mutation"
+    },
+    {
+      "case": "r2",
+      "result": "metadata omitted unchanged dependencies, no role operations"
+    },
+    {
+      "case": "r3",
+      "result": "all fault outcomes observed then actual completed-resume immutable_fact_changed"
+    },
+    {
+      "case": "overlap-refused",
+      "result": "reader core/barrier overlap row_count, no Native run or approval"
+    },
+    {
+      "case": "operation-outcomes-final-r1",
+      "result": "faults and resume passed, cache assertion demanded nonexistent backup for intentionally unstarted A/C"
+    },
+    {
+      "case": "complete-candidate-final-r2",
+      "result": "candidate reader passed, completion_status host_operation_busy75 retained as failure"
+    }
+  ],
+  "invalidated_review_plans": [
+    "b895353ab469351f78608f1b92635cb72062b2a694ba54dd073cc0b94fdd935a",
+    "f7c99fc56a9c07c7b76f39319593024f9a3181359969f08c44d4b4d47c0fbb96"
+  ],
+  "live": {
+    "observed_at_kst": "2026-11-20T13:51:36+09:00",
+    "route": "Mac-admin231-A-B/C",
+    "source_paths": 65,
+    "protected_paths": 51,
+    "models_changed": 0,
+    "container_identity_changed": false,
+    "final_readback": {
+      "hosts": {
+        "a": {
+          "observed_at_kst": "2026-11-20T13:51:35.492941+09:00",
+          "sources": 12,
+          "protected": 13,
+          "source_sha_and_metadata_unchanged": true,
+          "models_and_original_container_unchanged": true,
+          "coordinator_base_absent": true
+        },
+        "b": {
+          "observed_at_kst": "2026-11-20T13:51:35.976425+09:00",
+          "sources": 41,
+          "protected": 30,
+          "source_sha_and_metadata_unchanged": true,
+          "models_and_original_container_unchanged": true,
+          "coordinator_base_absent": true
+        },
+        "c": {
+          "observed_at_kst": "2026-11-20T13:51:35.762716+09:00",
+          "sources": 12,
+          "protected": 8,
+          "source_sha_and_metadata_unchanged": true,
+          "models_and_original_container_unchanged": true,
+          "coordinator_base_absent": true
+        }
+      },
+      "owned_jobs": {
+        "jobs": [
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-42806a5281b9",
+            "input": "/run/capstone-full-input-7xr7rt1y",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-05a2a2353ead",
+            "input": "/run/capstone-full-input-jxv8cr0e",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-1261ac9dd563",
+            "input": "/run/capstone-full-input-132zgqlu",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-bb9395c5e288",
+            "input": "/run/capstone-full-input-71e0ejns",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-ed163a49025c",
+            "input": "/run/capstone-full-input-nvqlwyr0",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-ed04cb38211e",
+            "input": "/run/capstone-full-input-nry6upnt",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-b9d557b144d1",
+            "input": "/run/capstone-full-input-y_5tpr20",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-8ddceae02fe3",
+            "input": "/run/capstone-full-input-8o38o_kh",
+            "all_paths_absent": true
+          },
+          {
+            "unit": {
+              "MainPID": "0",
+              "ControlGroup": "",
+              "LoadState": "not-found",
+              "ActiveState": "inactive"
+            },
+            "workspace": "/run/capstone-pid1-32ce265b8d18",
+            "input": "/run/capstone-full-input-dmc6b5ag",
+            "all_paths_absent": true
+          }
+        ],
+        "count": 9,
+        "other_private_PID1_paths": [],
+        "operating_changes": 0
+      },
+      "operating_writes": 0,
+      "models": 0,
+      "all_source_paths": 65,
+      "all_protected_paths": 51
+    }
+  },
+  "limits": [
+    "Synthetic cache, consumers, keys and explicit synthetic acceptance inside owned PID1 only.",
+    "Actual host reboot, long recovery/soak, operating collector/MCP/Hermes/Ollama semantic acceptance not performed.",
+    "No automatic mutating retries after75 or unknown acknowledgement; only bounded status/completion_status/current observations.",
+    "No operating approval or deployment, new packages, model calls, attacks, scenarios or training.",
+    "Mac/Linux fixture test executions overlap inherited cases; not independent incident accuracy or latency measurements.",
+    "Paper91 TOC mismatches and final presentation remain open; existing presentation artifacts preserved."
+  ],
+  "cleanup": {
+    "server_owned_jobs": 9,
+    "server_all_roots_inputs_units_absent": true,
+    "server_other_PID1_paths": [],
+    "Mac": {
+      "at_kst": "2026-11-20T13:52:51.952196+09:00",
+      "root": "/private/tmp/capstone-payload-refreeze-20261120-p7zdzvke",
+      "files": 4598,
+      "bytes": 116539015,
+      "process_check": "escalated exact-path ps returned only the two diagnostic commands, no worker",
+      "server_jobs_terminal_and_absent": 9,
+      "results_and_failure_logs_preserved": true,
+      "preserved": [
+        "project sources and all evidence",
+        "G_Harness2",
+        "humanize-korean install and run",
+        "existing user files outside exact owned tmp root"
+      ],
+      "ps_initial_sandbox_denial": "retried with explicit escalation and inspected exact path",
+      "removed": true
+    }
+  },
+  "review": {
+    "skill": "review-agent",
+    "mode": "primary read-only defect-first review",
+    "findings": 0,
+    "semgrep": "not run; no Mac installation"
+  },
+  "humanize": {
+    "run_id": "2026-11-20-006-fe65",
+    "route": "light",
+    "change_rate_percent": 0.2,
+    "grade": "B",
+    "self_check": "6/6",
+    "gate_exit": 0,
+    "numeric_fact_followup": "observation test count19→20 after added negative retry boundary"
+  },
+  "publication": {
+    "state": "unpublished"
+  }
+}

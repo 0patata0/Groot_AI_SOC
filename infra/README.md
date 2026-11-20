@@ -3,9 +3,12 @@
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 <a id="operating-application-review-20261120"></a>
-운영 반입 후보의 세 결함을 보완하고 query1.19.153으로 고정했다. Mac 1,652실행/의존성10생략·기존 Hermes Linux 1,739실행/생략0을 확인했다. 12:23 KST 관리자 경유 운영 65경로·보호 45경로와 모델/컨테이너는 같았다. 이전 50대상 검토안의 갱신·정확 승인·운영 인수는 남아 있다.
+<a id="operating-payload-refreeze-20261120"></a>
+운영 후보는50경로·helper19·제어39·보호51을 결속한다. 정상 reader3개를 별도로 고정해 후보 확정 중과 정리 후에 같은 inventory·journal 프로토콜을 사용한다. 완료된 resume은 원래 영수증과 현재 자원을 확인하고 새 작업을 만들지 않는다. Mac270검사·생략0과 공식 구조 검사를 확인했으며 운영 적용·실제 MCP/양봇 인수는 남아 있다.
 
-[반입·현재 검사](validation/journal-composition/README.md#operating-application-review-20261120) · [검증 원장](validation/journal-composition/current-application.validation.json)
+[검사·변경안](validation/journal-composition/OPERATING_REVIEW.md) · [검증 원장](validation/journal-composition/operating-refreeze.validation.json)
+
+[Mac/Linux270·Native4경로·최종 대조·정리](../STATUS.md#operating-payload-refreeze-20261120)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- kali-hermes-offline-20261120 -->

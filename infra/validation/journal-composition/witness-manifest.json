@@ -23,5 +23,10 @@
     "scripts/operator_test_cohort_guard.py": "test_cohort_guard.py",
     "scripts/operator_check_release_structure.py": "check_release_structure.py"
   },
-  "scope": "Source witness, temporary forced-reader relay, pure coherent-proof gate and validation. Does not include the full operator coordinator, service fencing, exact approval or operating deployment."
+  "scope": "Source witness, temporary forced-reader relay, pure coherent-proof gate and validation. Does not include the full operator coordinator, service fencing, exact approval or operating deployment.",
+  "previous_source_pins": {
+    "commit": "2f56a932695a5168673a0289f3f825b73f99cb5d",
+    "manifest_sha256": "e42296de7b89989b6b5379d8c1cf3cb916bd7c7bc44c25ecf1b09d4b9f3e755b"
+  },
+  "source_update_note": "Normal reader is a separately pinned permanent payload; source footprint stays disjoint from temporary reader barriers. Runtime health and inventory dependencies are protected."
 }

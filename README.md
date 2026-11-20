@@ -14,9 +14,12 @@ Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 �
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 <a id="operating-application-review-20261120"></a>
-운영 반입 후보에서 SDK 식별 조회 영수증 누락·센서 수치의 잘못된 불확실성 처리·비율의 호스트 오인을 보완했다. 원본 시험과 현재 계약의 차이를 명시하고 Mac 1,652실행/10생략·기존 Hermes Linux 1,739실행/생략0을 확인했다. query1.19.153은 운영 미적용 후보이며 이전 50대상 계획은 새 소스로 다시 고정해야 한다.
+<a id="operating-payload-refreeze-20261120"></a>
+운영 후보에서 재개가 끝난 작업을 다시 시작하려던 결함과 B의 기존 reader에 빠진 inventory·journal 처리를 보완했다.50개 경로와 별도 정상 reader 원문을 고정하고 Mac270검사·생략0·수정 전2실패·공식 구조 검사를 확인했다. 운영 적용과 실제 MCP/양봇 인수는 남아 있다. Kali232·233의 오프라인 설치·40B 설정은 앞선 완료 상태를 유지한다.
 
-[현재 상태](STATUS.md#operating-application-review-20261120) · [검사 방법·한계](infra/validation/journal-composition/README.md#operating-application-review-20261120)
+[현재 상태](STATUS.md#operating-payload-refreeze-20261120) · [변경안·검증 범위](infra/validation/journal-composition/OPERATING_REVIEW.md)
+
+[Mac/Linux270·Native4경로·최종 대조·정리](STATUS.md#operating-payload-refreeze-20261120)
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- panel-content-20261119 -->

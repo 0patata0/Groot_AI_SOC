@@ -40,7 +40,12 @@ class Completion:
         outcome=self.outcome();state=self.ctl.state()
         need(state['pending']is None or state['pending']['name']in ('completion_prepare','cleanup'),'completion_pending_operation')
         need(self.ctl.core_is('after_sha256'if outcome=='candidate'else'before_sha256'),'completion_core_changed')
-        self.files.check('before_sha256','after_sha256')
+        for row in self.files.rows:
+            raw,_=self.files.read_target(row);actual=hashlib.sha256(raw).hexdigest()if raw is not None else None
+            allowed={row['before_sha256'],row['after_sha256']}
+            if row['target']==source.READER and outcome=='candidate':
+                allowed.add(self.ctl.plan['hosts'][self.host]['normal_reader_sha256'])
+            need(actual in allowed,'target_bytes_changed')
         need(not any(self.ctl.controls.fenced(name)for name in self.ctl.controls.markers),'completion_still_fenced')
         need(self.w.cache()=={'status':'observed','source_filter_policy':'application-severity-v1'if outcome=='candidate'else None},'completion_cache_policy')
         before=self.ctl.baseline()['units'];now=self.ctl.native.snapshot()
@@ -149,7 +154,8 @@ class Completion:
         for row in self.files.rows:
             key='before_sha256'if row['target']in source.BARRIERS[self.host]or outcome=='baseline'else'after_sha256'
             raw,meta=self.files.read_target(row);actual=hashlib.sha256(raw).hexdigest()if raw is not None else None
-            need(actual==row[key],'current_source_changed')
+            expected=self.ctl.plan['hosts'][self.host]['normal_reader_sha256']if outcome=='candidate'and row['target']==source.READER else row[key]
+            need(actual==expected,'current_source_changed')
             rows[row['target']]=None if meta is None else {'sha256':actual,'uid':row['uid'],'gid':row['gid'],'mode':row['mode']}
         return rows
 
@@ -157,7 +163,8 @@ class Completion:
         state=self.ctl.state();outcome=self.outcome();rows={}
         for row in self.files.rows:
             key='before_sha256'if row['target']in source.BARRIERS[self.host]or outcome=='baseline'else'after_sha256'
-            rows[row['target']]=None if row[key]is None else {'sha256':row[key],'uid':row['uid'],'gid':row['gid'],'mode':row['mode']}
+            expected=self.ctl.plan['hosts'][self.host]['normal_reader_sha256']if outcome=='candidate'and row['target']==source.READER else row[key]
+            rows[row['target']]=None if expected is None else {'sha256':expected,'uid':row['uid'],'gid':row['gid'],'mode':row['mode']}
         return {'schema':1,'host':self.host,'release_id':self.files.release_id,'plan_sha256':self.store.plan,
             'bundle_sha256':digest(self.store.read('bundle.json')),'source_commit':self.ctl.plan['source_commit'],
             'outcome':outcome,'installed':rows,'protected':self.ctl.plan['hosts'][self.host]['protected'],
@@ -192,7 +199,10 @@ class Completion:
                 except FileNotFoundError:raw=None
                 need(raw is None or raw==expected,'foreign_control_file')
             nonce=pending['nonce']if retry else self.journal.begin('cleanup',now=self.ctl.clock())
-            self.files.restore_barriers()
+            if self.outcome()=='candidate':
+                self.files.finish_barriers(self.ctl.contract.normal_reader(self.files),
+                    self.ctl.plan['hosts'][self.host]['normal_reader_sha256'])
+            else:self.files.restore_barriers()
             if not self.ctl.state()['facts'].get('helpers_disarmed'):
                 self.ctl.helpers.disarm(finishing=True);self.journal.mark(now=self.ctl.clock(),helpers_disarmed=True)
             self.ctl.helpers.stopped(finishing=True);self.ctl.controls.remove_documents()

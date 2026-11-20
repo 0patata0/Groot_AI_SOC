@@ -19,6 +19,8 @@ class PlanTests(unittest.TestCase):
 
     def test_full_bundle_binds_all_payloads_helpers_and_generated_controls(self):
         bundle=self.plan.bundle();self.assertEqual(sum(map(len,bundle['payloads'].values())),50)
+        self.assertIn('/opt/capstone-diagnostics/read-system-diagnostics.py',bundle['payloads']['b'])
+        self.assertEqual(bundle['normal_readers'],{h:v['normal_reader_sha256']for h,v in self.value['hosts'].items()})
         self.assertEqual(len(bundle['helpers']),19);self.assertEqual(sum(map(len,bundle['controls'].values())),39)
         self.assertEqual(bundle['plan_sha256'],self.plan.sha256);proof=self.plan.verify(self.ctl.files)
         self.assertTrue(proof['isolated_filesystem']);self.assertEqual(proof['helpers_verified'],19)
@@ -71,6 +73,24 @@ class PlanTests(unittest.TestCase):
         path=self.ctl.files.root/'opt/hermes-data/config.yaml';path.write_bytes(b'external fixture configuration')
         with self.assertRaisesRegex(ValueError,'protected_state_changed'):self.plan.verify(self.ctl.files)
         self.plan.verify(self.ctl.files,protected=False);self.assertEqual(path.read_bytes(),b'external fixture configuration')
+
+    def test_unchanged_code_dependencies_are_pinned_and_not_treated_as_payload(self):
+        reader='/opt/capstone-diagnostics/read-system-diagnostics.py'
+        for host in 'abc':
+            protected=self.value['hosts'][host]['protected']
+            self.assertIn('/opt/capstone-diagnostics/runtime_health.py',protected)
+            self.assertIn('/opt/capstone-diagnostics/host_inventory.py',protected)
+            self.assertNotIn(reader,protected)
+            files=self.fixture.nodes[host]['files'];path=files.root/'opt/capstone-diagnostics/runtime_health.py'
+            path.write_bytes(b'external code dependency')
+            with self.assertRaisesRegex(ValueError,'protected_state_changed'):self.plan.verify(files)
+            self.assertEqual(path.read_bytes(),b'external code dependency')
+
+    def test_permanent_reader_digest_and_private_payload_cannot_be_substituted(self):
+        changed=copy.deepcopy(self.value);changed['hosts']['b']['normal_reader_sha256']='bad'
+        with self.assertRaisesRegex(ValueError,'plan_normal_reader_digest'):m.Plan(changed)
+        path=self.ctl.files.storage/'normal-reader.py';path.write_bytes(b'changed normal reader')
+        with self.assertRaisesRegex(ValueError,'normal_reader_payload_changed'):self.plan.verify(self.ctl.files)
 
     def test_operator_code_change_or_permissions_are_refused(self):
         path=self.ctl.files.storage/'release_lifecycle.py';before=path.read_bytes();path.write_bytes(b'unapproved helper')

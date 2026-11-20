@@ -60,6 +60,14 @@ class StaticPayload(unittest.TestCase):
         with self.assertRaisesRegex(m.binding.Refused, 'management_command_source'):
             m.build(read, 'b' * 40)
 
+    def test_normal_reader_is_separately_pinned_for_candidate_and_final_cleanup(self):
+        raw=(m.ROOT/m.NORMAL_READER).read_bytes()
+        self.assertIn(b"set(value) == {'inventory'}",raw)
+        self.assertIn(b"reader.query_local(value, target[0])",raw)
+        self.assertEqual(set(self.manifest['normal_readers']),set('abc'))
+        self.assertTrue(all(row['sha256']==m.sha(raw)for row in self.manifest['normal_readers'].values()))
+        self.assertTrue(all('/opt/capstone-diagnostics/read-system-diagnostics.py'not in items for items in self.payloads.values()))
+
     def test_generator_shape_and_git_source_scope_are_bounded(self):
         raw = (m.ROOT / m.GENERATOR).read_bytes()
         with self.assertRaisesRegex(m.contract.Refused, 'unit_generator_source_shape'):

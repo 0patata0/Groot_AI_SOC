@@ -155,7 +155,7 @@ class CompletionTests(unittest.TestCase):
         with patch.object(self.b.store,'relinquish',side_effect=OSError('lost ownership release')):
             with self.assertRaises(OSError):self.b.cleanup()
         self.assertTrue(self.b.ctl.state()['facts']['cleanup_complete']);self.f.offset=timedelta(minutes=20)
-        with patch.object(self.b.files,'restore_barriers',side_effect=AssertionError('duplicate protected operation')):
+        with patch.object(self.b.files,'finish_barriers',side_effect=AssertionError('duplicate protected operation')):
             self.b.cleanup()
         self.assertEqual(self.b.current()['status'],'verified')
 
@@ -182,6 +182,16 @@ class CompletionTests(unittest.TestCase):
         row=next(r for r in self.b.files.rows if r['target']not in m.source.BARRIERS['b']and r['after_sha256'])
         path=self.b.files.target(row);path.write_bytes(b'foreign current code')
         with self.assertRaisesRegex(ValueError,'completion_core_changed'):self.b.current()
+
+    def test_permanent_reader_survives_cleanup_and_current_detects_its_drift(self):
+        self.candidate();self.authorized();self.b.cleanup()
+        expected=self.b.ctl.contract.normal_reader(self.b.files)
+        path=self.b.files.root/m.source.READER.lstrip('/')
+        self.assertEqual(path.read_bytes(),expected)
+        self.assertNotEqual(m.digest({'bytes':expected.hex()}),m.digest({'bytes':self.f.nodes['b']['fixture'].before[m.source.READER].hex()}))
+        value=self.b.current();self.assertEqual(value['installed'][m.source.READER]['sha256'],self.b.ctl.plan['hosts']['b']['normal_reader_sha256'])
+        path.chmod(0o750);path.write_bytes(b'foreign reader');path.chmod(0o550)
+        with self.assertRaisesRegex(ValueError,'target_bytes_changed'):self.b.current()
 
     def test_new_cache_observations_do_not_invalidate_source_receipt(self):
         self.candidate();self.authorized();self.b.cleanup()

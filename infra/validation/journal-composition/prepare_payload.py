@@ -36,6 +36,7 @@ UNITS = frozenset(('/etc/systemd/system/capstone-system-diagnostics.service',
 CONTROLLER = '/opt/capstone-management/soc_management_controller.py'
 GATE = '/opt/capstone-management/soc_management_run.py'
 GENERATOR = 'deployment/soc_diagnostics.py'
+NORMAL_READER = 'infra/mcp/read-system-diagnostics.py'
 
 
 def source_map():
@@ -145,7 +146,9 @@ def build(read_source, source_commit):
                                'after_sha256': sha(raw), 'transform': 'unit_documents', 'role': name})
         need(set(payloads[role]) == contract.TARGETS[role] - RECEIPTS, 'static_payload_footprint')
         rows[role].sort(key=lambda row: row['target'])
-    unique = {sha(raw): raw for values in payloads.values() for raw in values.values()}
+    normal = read(NORMAL_READER)
+    unique = {sha(normal): normal}
+    unique.update({sha(raw): raw for values in payloads.values() for raw in values.values()})
     need(sum(map(len, unique.values())) <= 8 * 1024 * 1024, 'static_payload_total_bound')
     manifest = {'schema': 1, 'source_commit': source_commit,
                 'scope': 'static payload only; no approval or operating deployment',
@@ -153,7 +156,7 @@ def build(read_source, source_commit):
                 'management_binding_sha256': sha(Path(binding.__file__).read_bytes()),
                 'source_contract_sha256': sha(Path(contract.__file__).read_bytes()),
                 'source_files_sha256': {path: sha(raw) for path, raw in sorted(inputs.items())},
-                'hosts': rows, 'payload_files': len(unique), 'payload_bytes': sum(map(len, unique.values())),
+                'hosts': rows, 'normal_readers': {h: {'source': NORMAL_READER, 'sha256': sha(normal)} for h in 'abc'}, 'payload_files': len(unique), 'payload_bytes': sum(map(len, unique.values())),
                 'excluded': ['two live integrity receipts', 'three bound reader barriers', 'one bound MCP launcher']}
     return payloads, manifest
 
@@ -161,7 +164,7 @@ def build(read_source, source_commit):
 def git_reader(repository, source_commit):
     repository = Path(repository).resolve()
     need(re.fullmatch('[0-9a-f]{40}', source_commit) is not None, 'source_commit')
-    allowed = {GENERATOR} | {path for mapping in source_map().values() for path in mapping.values()}
+    allowed = {GENERATOR, NORMAL_READER} | {path for mapping in source_map().values() for path in mapping.values()}
 
     def read(path):
         need(path in allowed, 'source_not_in_catalog')
@@ -230,6 +233,10 @@ def main():
             if not target.exists():
                 with target.open('xb') as stream:
                     stream.write(raw)
+    normal = git_reader(args.repository, args.source_commit)(NORMAL_READER)
+    assert sha(normal) == manifest['normal_readers']['b']['sha256']
+    normal_path = args.output / (sha(normal) + '.data')
+    if not normal_path.exists(): normal_path.write_bytes(normal)
     (args.output / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps({'static_targets': {role: len(rows) for role, rows in manifest['hosts'].items()},
                       'payload_files': manifest['payload_files'], 'payload_bytes': manifest['payload_bytes'],

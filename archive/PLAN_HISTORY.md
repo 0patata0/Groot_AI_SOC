@@ -1,5 +1,14 @@
 # 계획 이력
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+## 2026-11-20 변경 묶음 재고정 후 정확 승인 대기
+
+기존 b895353a와 f7c99fc5 계획을 새 승인에 사용하지 않는다. 새 release807ea69f/plan0a3de6ee 검토 후 정확 승인·관리자 경유 반입/적용·수집/MCP/양봇·확정/복구·정리/current 순서로 진행해야 한다. 합성 Native 인수와 실제 운영 인수를 구분하며 전체 목표와 논문 목차91·최종 발표는 미완료다.
+
+[현재 근거](../infra/validation/journal-composition/operating-refreeze.validation.json)
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 ## 2026-11-20 기능 검토에서 정확 후보 재고정으로 진행

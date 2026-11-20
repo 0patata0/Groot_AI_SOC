@@ -81,6 +81,9 @@ def unprivileged_regressions():
         evidence={'returncode':process.returncode,'identity':identity,'timed_out':timed_out,
                   'elapsed_seconds':time.monotonic()-started,
                   'stdout':stdout.decode(),'stderr':stderr.decode(),'result':result}
+        logs={path.name:path.read_bytes()for path in sorted(output.glob('*.log'))}
+        need(sum(map(len,logs.values()))<=524288,'regression_profile_logs_bound')
+        evidence['profile_logs']={name:raw.decode(errors='replace')for name,raw in logs.items()}
         if timed_out or process.returncode!=0:
             evidence['profile_log_tails']={path.name:path.read_bytes()[-8192:].decode(errors='replace')
                                           for path in sorted(output.glob('*.log'))}
@@ -260,6 +263,134 @@ def native(operation,proofs=None,deadline=None):
     return result
 
 
+def inventory_reader_observation(candidate):
+    """Use the actual B CLI as its mapped unprivileged reader, inside this PID1."""
+    need(type(candidate)is bool and ROLE=='b'and
+         Path('/proc/self/uid_map').read_text().split()==['0','0','65536'],
+         'owned_inventory_reader_scope')
+    def one(arguments):
+        raw=json.dumps({'inventory':arguments},sort_keys=True).encode()
+        p=subprocess.run(['/usr/bin/python3','-I','-B','/opt/capstone-diagnostics/read-system-diagnostics.py'],
+            input=raw,capture_output=True,env=ENV,timeout=5,user=50123,group=50123,extra_groups=[])
+        need(len(p.stdout)<=65536 and len(p.stderr)<=8192,'owned_inventory_reader_bound')
+        return {'returncode':p.returncode,'reply':json.loads(p.stdout)if p.stdout.strip()else None,
+                'stderr':p.stderr.decode(errors='replace')[:2048]}
+    request={'host':'b','view':'services','limit':1,'offset':0};reply=one(request)
+    if candidate:
+        body=reply['reply']
+        need(reply['returncode']==0 and isinstance(body,dict)and body.get('host')=='b'
+             and body.get('view')=='services'and body.get('limit')==1 and body.get('offset')==0
+             and body.get('status')in ('observed','unavailable')and isinstance(body.get('rows'),list)
+             and len(body['rows'])<=1,'owned_candidate_reader_inventory')
+        other=one({**request,'host':'a'})
+        path=one({'host':'b','view':'service_details','unit':'/etc/shadow'})
+        need(other['returncode']!=0 and path['returncode']!=0,'owned_inventory_reader_scope_denial')
+        return {'returncode':0,'request':request,'candidate_reply':reply,
+                'other_host_denied':True,'arbitrary_path_denied':True,'operating_query':False}
+    need(reply['returncode']!=0 and reply['reply']is None,'owned_legacy_reader_inventory_denial')
+    return {'returncode':0,'request':request,'legacy_reply':reply,'expected_denial':True,
+            'operating_query':False}
+
+
+def operation_snapshot():
+    """Read validated intent/receipts in this owned root, without an OS action."""
+    need(Path('/proc/self/uid_map').read_text().split()==['0','0','65536'],
+         'owned_operation_observation_scope')
+    spec=importlib.util.spec_from_file_location('owned_outcome_runtime',RUNTIME)
+    runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+    context=runtime.Context(ROLE,RELEASE,PLAN_SHA);ctl=context.lifecycle
+    ctl.contract.verify(ctl.files)
+    state,digest=ctl.journal.read();receipts=[]
+    paths=sorted(STORE.glob('operation-*.json'));need(len(paths)<=64,'owned_operation_receipt_bound')
+    for path in paths:
+        need(re.fullmatch(r'operation-[0-9a-f]{32}\.json',path.name),'owned_operation_receipt_name')
+        raw=ctl.store.read_path(path);value=json.loads(raw)
+        need(set(value)=={'schema','host','release_id','plan_sha256','nonce','operation','at_kst','evidence','isolated_filesystem'}
+             and type(value['schema'])is int and value['schema']==1 and value['host']==ROLE
+             and value['release_id']==RELEASE and value['plan_sha256']==PLAN_SHA
+             and path.name=='operation-'+value['nonce']+'.json'and value['isolated_filesystem']is False,
+             'owned_operation_receipt_identity')
+        if value['operation']=='backup':
+            receipts.append({'nonce':value['nonce'],'sha256':hashlib.sha256(raw).hexdigest(),
+                             'operation':'backup','at_kst':value['at_kst']})
+    core=ctl.core_is('before_sha256');cache=ctl.cache.inspect(ctl.cache.path,live=True)[2]['sha256']
+    _,after=ctl.journal.read();need(digest==after,'owned_operation_observation_changed')
+    return {'state':state,'state_sha256':digest,'backup_receipts':receipts,
+            'core_before':core,'cache_sha256':cache}
+
+
+def operation_outcomes():
+    """One write request per role; inspect busy/lost-ack/interrupted outcomes."""
+    before=operation_snapshot();need(before['state']['phase']=='quiesced'
+         and before['state']['pending']is None,'owned_backup_precondition')
+    observation={'scope':'owned-root-backup-outcome','write_requests':1,'before':before}
+    if ROLE=='a':
+        holder_code='''import fcntl,os,stat,sys
+from pathlib import Path
+assert Path('/proc/self/uid_map').read_text().split()==['0','0','65536']
+fd=os.open('/var/lib/capstone-journal-release/.host.lock',os.O_RDWR|os.O_NOFOLLOW)
+st=os.fstat(fd)
+assert stat.S_ISREG(st.st_mode)and st.st_nlink==1 and st.st_uid==st.st_gid==0 and stat.S_IMODE(st.st_mode)==0o600
+fcntl.flock(fd,fcntl.LOCK_EX)
+sys.stdout.buffer.write(b'held\\n');sys.stdout.buffer.flush()
+assert sys.stdin.buffer.read(1)==b'1'
+os.close(fd)
+'''
+        holder=subprocess.Popen(['/usr/bin/python3','-I','-B','-c',holder_code],stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=ENV,start_new_session=True)
+        try:
+            need(select.select([holder.stdout],[],[],5)[0]and holder.stdout.readline()==b'held\n',
+                 'owned_host_lock_holder_ready')
+            observation.update(scenario='host_busy',attempt=native('backup'))
+        finally:
+            try:holder.stdin.write(b'1');holder.stdin.flush();holder.stdin.close();holder.stdin=None
+            except OSError:pass
+            try:stdout,stderr=holder.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                os.killpg(holder.pid,signal.SIGKILL);stdout,stderr=holder.communicate(timeout=3)
+            need(holder.returncode==0 and not stdout and not stderr,'owned_host_lock_holder_finished')
+        observation['after']=operation_snapshot()
+    elif ROLE=='b':
+        # Keep the real result in evidence, then model a caller that did not
+        # receive it. Inspection must not dispatch a second backup request.
+        attempt=native('backup');after=operation_snapshot()
+        observation.update(scenario='lost_ack',ack_loss_simulated=True,attempt=attempt,after=after)
+    else:
+        need(ROLE=='c','owned_backup_fault_role')
+        source=ast.parse((CODE/'private_full_native_probe.py').read_text())
+        snapshot=ast.unparse(next(node for node in source.body
+                                 if isinstance(node,ast.FunctionDef)and node.name=='operation_snapshot'))
+        trace='''import hashlib,importlib.util,json,os,re,runpy,signal,sys
+from pathlib import Path
+'''
+        trace+='\n'.join(name+'='+repr(value)for name,value in
+            (('ROLE',ROLE),('RELEASE',RELEASE),('PLAN_SHA',PLAN_SHA)))+'\n'
+        trace+='STORE=Path('+repr(str(STORE))+');RUNTIME=Path('+repr(str(RUNTIME))+')\n'
+        trace+='def need(value,reason):\n if not value:raise RuntimeError(reason)\n'+snapshot+'\n'
+        trace+='''def interrupt(frame,event,result):
+ if event=='return'and frame.f_code.co_filename==str(STORE/'release_state.py')and frame.f_code.co_name=='begin'and frame.f_locals.get('name')=='backup':
+  sys.settrace(None)
+  observed=operation_snapshot()
+  need(observed['state']['pending']['nonce']==result,'owned_backup_intent_nonce')
+  fd=os.open('/proof/backup-intent-fault.json',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+  with os.fdopen(fd,'w')as stream:
+   json.dump({'nonce':result,'snapshot':observed},stream,sort_keys=True);stream.flush();os.fsync(stream.fileno())
+  os.kill(os.getpid(),signal.SIGKILL)
+ return interrupt
+sys.argv=[str(RUNTIME),'--host',ROLE,'--release-id',RELEASE,'--plan-sha256',PLAN_SHA,'--operation','backup']
+sys.settrace(interrupt)
+runpy.run_path(str(RUNTIME),run_name='__main__')
+raise RuntimeError('owned_backup_intent_not_interrupted')
+'''
+        attempt=command(['/usr/bin/python3','-I','-B','-c',trace],timeout=20)
+        fault=json.loads((OUT/'backup-intent-fault.json').read_text())
+        observation.update(scenario='interrupted_intent',attempt=attempt,
+                           fault_nonce=fault['nonce'],after=fault['snapshot'])
+    save('operation-outcomes.json',observation)
+    return {'returncode':0,'observation':observation,'automatic_mutation_retries':0,
+            'operating_host_changes':False}
+
+
 def peer_readonly_diagnostics():
     """Observe only this synthetic root; never replace the fixed peers gate."""
     need(ROLE in ('a','b') and Path('/proc/self/uid_map').read_text().split()==['0','0','65536'],
@@ -437,7 +568,6 @@ def assert_restored_cache():
     # of demanding that those subsequent observations be erased again.
     cache_module=load('cache_transaction.py')
     cache=cache_module.Cache(ROLE,NODE['diagnostic_gid'],STORE/'cache')
-    baseline,before=cache.saved('before')
     current,_,observed=cache.inspect(cache.path,live=True)
     state=json.loads((STORE/'state.json').read_bytes())
     facts=state['facts']
@@ -456,20 +586,35 @@ def assert_restored_cache():
          and receipt['operation']=='rollback' and receipt['isolated_filesystem'] is False,
          'rollback_operation_receipt_binding')
     proof=receipt['evidence']['cache']
-    need(receipt['evidence']['sources_before'] is True and proof['baseline_sha256']==before['sha256']
-         and before['sha256']==hashlib.sha256(baseline).hexdigest(),
-         'rollback_cache_baseline_receipt_mismatch')
+    need(receipt['evidence']['sources_before'] is True,'rollback_source_receipt_required')
+    if facts.get('cache_backup'):
+        baseline,before=cache.saved('before')
+        need(proof['baseline_sha256']==before['sha256']
+             and before['sha256']==hashlib.sha256(baseline).hexdigest(),
+             'rollback_cache_baseline_receipt_mismatch')
+        baseline_sha256=before['sha256']
+    else:
+        # Busy/intent-only backup never made a cache backup. Prove the
+        # original legacy cache was preserved, rather than inventing a
+        # successful restore or demanding a nonexistent backup artifact.
+        quiescence=json.loads((STORE/'quiescence.json').read_bytes())['cache']
+        need(proof.get('changed')is False and proof.get('legacy_cache_preserved')is True
+             and proof.get('sha256')==quiescence['sha256']
+             and quiescence['metadata'].get('source_filter_policy')is None,
+             'unbacked_legacy_cache_preservation_receipt_required')
+        baseline_sha256=quiescence['sha256']
     need(observed['metadata'].get('source_filter_policy') is None,'resumed_cache_must_remain_legacy')
-    if proof['post_preserved']:
+    if proof.get('post_preserved'):
         _,post=cache.saved('after')
         need(post['sha256']==proof['post_sha256'],'post_cache_preservation_receipt_mismatch')
     if proof['changed']:
         need(json.loads((STORE/'cache/restored.json').read_bytes())==proof,
              'actual_cache_restore_receipt_required')
-    return {'cache_restoration_checkpoint_verified':True,'baseline_cache_sha256':before['sha256'],
-            'rollback_receipt_sha256':receipt_hash,'candidate_cache_preserved':proof['post_preserved'],
+    return {'cache_restoration_checkpoint_verified':True,'cache_was_backed_up':bool(facts.get('cache_backup')),
+            'baseline_cache_sha256':baseline_sha256,
+            'rollback_receipt_sha256':receipt_hash,'candidate_cache_preserved':bool(proof.get('post_preserved')),
             'current_cache_sha256':observed['sha256'],
-            'current_cache_equals_baseline':hashlib.sha256(current).hexdigest()==before['sha256'],
+            'current_cache_equals_baseline':hashlib.sha256(current).hexdigest()==baseline_sha256,
             'current_source_filter_policy':None}
 
 
@@ -560,7 +705,7 @@ try:
     ready['namespaces']={name:os.readlink('/proc/self/ns/'+name)for name in ('user','mnt','pid','net','uts','ipc','cgroup')}
     save('ready.json',ready)
     finish=False
-    for sequence in range(1,40):
+    for sequence in range(1,65):
         instruction=OUT/('control-%02d.json'%sequence)
         end=time.monotonic()+240
         while not instruction.exists():
@@ -570,7 +715,8 @@ try:
         operation=request['operation']
         need(operation in {'install_plan','initialize','prepare','arm','quiesce','backup','apply','apply_partial',
              'verify','confirm','resume','rollback','status','peers','assert_restored','assert_candidate',
-             'completion_denied','peers_denied','collection_reference','regressions','acceptance_fixture',
+             'completion_denied','peers_denied','collection_reference','regressions','acceptance_fixture','operation_outcomes',
+             'reader_inventory_baseline','reader_inventory_candidate',
              'completion_prepare','completion_status','cleanup_decide','cleanup_authorize','cleanup','current',
              'current_pointer_denied','assert_completed','finish'},'fixed_test_operation')
         if operation=='install_plan':
@@ -612,6 +758,10 @@ try:
             result=collection_reference_diagnostic()
         elif operation=='regressions':
             result=unprivileged_regressions()
+        elif operation=='operation_outcomes':
+            result=operation_outcomes()
+        elif operation in ('reader_inventory_baseline','reader_inventory_candidate'):
+            result=inventory_reader_observation(operation=='reader_inventory_candidate')
         elif operation=='acceptance_fixture':
             result=acceptance_fixture()
         elif operation=='current_pointer_denied':

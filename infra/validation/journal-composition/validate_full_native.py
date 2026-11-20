@@ -36,6 +36,8 @@ base=backend.base
 base.__file__=__file__
 fixture=module('private_full_fixture.py')
 KST=timezone(timedelta(hours=9))
+CASES=('bootstrap','partial','deadline','confirmed','operation-outcomes',
+       'complete-candidate','complete-baseline')
 EXTRA=('validate_private_backends.py','private_full_fixture.py','private_apply_crash.py',
        'private_full_native_probe.py','validate_full_native.py','full-input.json')
 
@@ -134,7 +136,76 @@ def retryable_status_observation(reply):
             value.get('reason')in ('host_operation_busy','operation_busy'))
 
 
+def proof_read_retry(operation,reply):
+    """Only fixed reads may repeat after a validated transient observation."""
+    return operation in ('status','completion_status','current')and retryable_status_observation(reply)
+
+
+def operation_outcome_observation(record):
+    """Classify owned fault evidence, without granting any mutation retry.
+
+    The PID1 probe validates journal/receipt files with the unchanged root
+    libraries. These are test observations, never an operating approval or
+    an instruction to repeat backup after a lost acknowledgement.
+    """
+    unknown={'outcome':'unverified','write_retry_authorized':False}
+    if not isinstance(record,dict) or record.get('scope')!='owned-root-backup-outcome':
+        return unknown
+    if type(record.get('write_requests'))is not int or record['write_requests']!=1:
+        return unknown
+    snapshots=[record.get(key)for key in ('before','after')]
+    if not all(isinstance(item,dict)for item in snapshots):return unknown
+    before,after=snapshots
+    for item in snapshots:
+        state=item.get('state')
+        if not isinstance(state,dict) or item.get('state_sha256')!=base.sha(
+                json.dumps(state,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()):
+            return unknown
+        if not(item.get('core_before')is True and isinstance(item.get('cache_sha256'),str)
+                and re.fullmatch('[0-9a-f]{64}',item['cache_sha256'])
+                and isinstance(item.get('backup_receipts'),list)):
+            return unknown
+    first,last=before['state'],after['state']
+    if not(first.get('host')in ('a','b','c')and isinstance(first.get('release_id'),str)
+            and re.fullmatch('[0-9a-f]{32}',first['release_id'])
+            and isinstance(first.get('plan_sha256'),str)and re.fullmatch('[0-9a-f]{64}',first['plan_sha256'])):
+        return unknown
+    if any(first.get(key)!=last.get(key)for key in ('host','release_id','plan_sha256')):
+        return unknown
+    if first.get('phase')!='quiesced' or first.get('pending')is not None:
+        return unknown
+    if before['cache_sha256']!=after['cache_sha256'] or before['backup_receipts']:
+        return unknown
+    attempt=record.get('attempt')
+    if not isinstance(attempt,dict):return unknown
+    scenario=record.get('scenario')
+    if scenario=='host_busy':
+        if retryable_status_observation(attempt) and before==after:
+            return {'outcome':'not_started_observed','write_retry_authorized':False}
+    elif scenario=='lost_ack':
+        reply=attempt.get('reply');receipts=after['backup_receipts']
+        if (attempt.get('returncode')==0 and isinstance(reply,dict)
+                and reply.get('operation')=='backup' and reply.get('result')==last
+                and last.get('phase')=='backed_up' and last.get('pending')is None
+                and last.get('facts',{}).get('source_backup')is True
+                and last.get('facts',{}).get('cache_backup')is True
+                and len(receipts)==1 and record.get('ack_loss_simulated')is True):
+            return {'outcome':'completion_recorded_do_not_repeat','write_retry_authorized':False}
+    elif scenario=='interrupted_intent':
+        pending=last.get('pending')
+        if (attempt.get('returncode')==-signal.SIGKILL and attempt.get('reply')is None
+                and last.get('phase')=='quiesced' and isinstance(pending,dict)
+                and pending.get('name')=='backup' and pending.get('from_phase')=='quiesced'
+                and pending.get('to_phase')=='backed_up'
+                and pending.get('nonce')==record.get('fault_nonce')
+                and isinstance(pending.get('nonce'),str)and re.fullmatch('[0-9a-f]{32}',pending['nonce'])
+                and not last.get('facts',{}).get('cache_backup') and not after['backup_receipts']):
+            return {'outcome':'pending_requires_recovery','write_retry_authorized':False}
+    return unknown
+
+
 def start(case):
+    base.require(isinstance(case,str)and case in CASES,'owned_full_test_case')
     base.require(os.getuid()==os.geteuid()==0 and os.sys.platform=='linux','linux_root_required')
     base.require(Path('/run/systemd/system').is_dir(),'host_system_manager_required')
     pinmap=pins()
@@ -184,8 +255,7 @@ def start(case):
 
 def own(root):
     path,owner=base.own_root(root)
-    base.require(owner['schema']==1 and owner['case'] in
-                 ('bootstrap','partial','deadline','confirmed','complete-candidate','complete-baseline'),
+    base.require(owner['schema']==1 and owner['case']in CASES,
                  'owned_full_test_identity')
     base.require(owner['validator_sha256']==base.sha((path/'code/validate_full_native.py').read_bytes()),'owned_validator_changed')
     return path,owner
@@ -280,7 +350,7 @@ def supervisor(root):
                     raise RuntimeError('private_boot_'+role+'_'+boot.read_text()[:256])
             base.require(time.monotonic()<end,'owned_observation_deadline')
             time.sleep(.03)
-    def rpc(operation,roles='abc',proofs=None,**extra):
+    def rpc(operation,roles='abc',proofs=None,_observations=0,**extra):
         paths=[]
         for role in roles:
             sequence[role]+=1
@@ -289,14 +359,18 @@ def supervisor(root):
             paths.append(children[role]['output']/('reply-%02d.json'%sequence[role]))
         wait(paths,220 if operation=='regressions'else 60 if operation=='apply_partial'else 35)
         replies={role:json.loads(path.read_text())for role,path in zip(roles,paths)}
-        if operation=='status':
+        if operation in ('status','completion_status','current'):
             for reply in replies.values():
-                reply['observation_retry_required']=retryable_status_observation(reply)
+                reply['observation_retry_required']=proof_read_retry(operation,reply)
         result['steps'].append({'operation':operation,'roles':list(roles),'replies':replies})
         for role,reply in replies.items():
             base.require(reply['returncode']==0 or reply.get('expected_denial') or
-                         operation=='status' and reply['observation_retry_required'],
+                         reply.get('observation_retry_required')is True,
                          'fixed_entry_'+role+'_'+operation+'_'+str(reply.get('reply',{}))[:160])
+        if operation in ('completion_status','current')and any(r.get('observation_retry_required')for r in replies.values()):
+            base.require(_observations<6,'fixed_read_observation_deadline')
+            time.sleep(.1)
+            return rpc(operation,roles=roles,proofs=proofs,_observations=_observations+1,**extra)
         return replies
     try:
         log=(root/'network-controller.log').open('xb')
@@ -326,7 +400,18 @@ def supervisor(root):
             os.write(aw,b'1');os.close(aw)
         wait([item['output']/'ready.json'for item in children.values()],40)
         ready={role:json.loads(item['output'].joinpath('ready.json').read_text())for role,item in children.items()}
-        fields=('rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected','previous_current_sha256')
+        if 'expected_receipt_after'in inputs:
+            expected=inputs['expected_receipt_after']
+            base.require(isinstance(expected,dict)and set(expected)=={
+                '/etc/capstone-ollama-trial/receipt.json','/etc/capstone-review-chat/receipt.json'}
+                and all(isinstance(d,str)and re.fullmatch('[0-9a-f]{64}',d)for d in expected.values()),
+                'owned_prepared_receipt_contract')
+            prepared={row['target']:row['after_sha256']for row in ready['b']['rows']}
+            base.require(all(prepared.get(path)==digest for path,digest in inputs['expected_receipt_after'].items()),
+                         'owned_prepared_receipt_binding')
+            result['prepared_receipt_binding']={'count':len(inputs['expected_receipt_after']),
+                'matches_observed_operating_receipt_transform':True,'raw_receipts_exported':False}
+        fields=('rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected','previous_current_sha256','normal_reader_sha256')
         plans=fixture.load('release_plan.py')
         source=fixture.load('release_files.py')
         value={'schema':1,'release_id':owner['release_id'],'source_commit':inputs['source_commit'],
@@ -341,9 +426,11 @@ def supervisor(root):
                   'approved_at_kst':(now-timedelta(seconds=1)).isoformat(),
                   'expires_at_kst':(now+timedelta(minutes=5)).isoformat(),'reference':'owned-native-integration-only'}
         rpc('install_plan',plan=value,plan_sha256=plan.sha256,approval=approval)
-        deadline=now+timedelta(seconds=75 if owner['case']=='deadline'else 150)
+        deadline=now+timedelta(seconds=75 if owner['case']in ('deadline','operation-outcomes')else 150)
         rpc('initialize',deadline_kst=deadline.isoformat())
         rpc('prepare')
+        if owner['case']in ('operation-outcomes','complete-candidate'):
+            result['B_legacy_inventory_reader']=rpc('reader_inventory_baseline',roles='b')['b']
         proofs=rpc('peers',roles='a')['a']['reply']['result']
         result['authenticated_initial_source_proofs']=proofs
         b_proofs=rpc('peers',roles='b')['b']['reply']['result']
@@ -358,13 +445,25 @@ def supervisor(root):
         if owner['case']!='bootstrap':
             rpc('arm',proofs=proofs)
             rpc('quiesce')
-            rpc('backup')
-            proofs=rpc('peers',roles='a')['a']['reply']['result']
-            if owner['case']in ('partial','complete-baseline'):
-                rpc('apply_partial',proofs=proofs)
+            if owner['case']=='operation-outcomes':
+                outcomes=rpc('operation_outcomes')
+                expected={'a':'not_started_observed','b':'completion_recorded_do_not_repeat',
+                          'c':'pending_requires_recovery'}
+                result['operation_outcomes']={}
+                for role,reply in outcomes.items():
+                    observed=operation_outcome_observation(reply['observation'])
+                    base.require(observed['outcome']==expected[role]and
+                                 observed['write_retry_authorized']is False,
+                                 'owned_operation_outcome_'+role)
+                    result['operation_outcomes'][role]=observed
             else:
-                rpc('apply',proofs=proofs)
-                rpc('verify')
+                rpc('backup')
+                proofs=rpc('peers',roles='a')['a']['reply']['result']
+                if owner['case']in ('partial','complete-baseline'):
+                    rpc('apply_partial',proofs=proofs)
+                else:
+                    rpc('apply',proofs=proofs)
+                    rpc('verify')
             if owner['case']in ('confirmed','complete-candidate'):
                 for role in 'acb':
                     proofs=rpc('peers',roles='a')['a']['reply']['result']
@@ -373,6 +472,8 @@ def supervisor(root):
                     proofs=rpc('peers',roles='a')['a']['reply']['result']
                     rpc('resume',roles=role,proofs=proofs)
                 rpc('assert_candidate')
+                if owner['case']=='complete-candidate':
+                    result['B_candidate_inventory_reader']=rpc('reader_inventory_candidate',roles='b')['b']
                 proofs=rpc('peers',roles='a')['a']['reply']['result']
                 rpc('completion_denied',proofs=proofs)
             else:
@@ -401,6 +502,8 @@ def supervisor(root):
                 rpc('cleanup_authorize',proofs={h:r['reply']['result']for h,r in decided.items()})
                 rpc('cleanup')
                 rpc('current')
+                if owner['case']=='complete-candidate':
+                    result['B_final_inventory_reader']=rpc('reader_inventory_candidate',roles='b')['b']
                 rpc('current_pointer_denied')
                 rpc('cleanup')
                 rpc('assert_completed')
@@ -488,8 +591,7 @@ def main():
     mode.add_argument('--collect-owned',type=Path)
     mode.add_argument('--supervisor',type=Path,help=argparse.SUPPRESS)
     mode.add_argument('--network-controller',type=Path,help=argparse.SUPPRESS)
-    parser.add_argument('--case',choices=('bootstrap','partial','deadline','confirmed',
-                                        'complete-candidate','complete-baseline'))
+    parser.add_argument('--case',choices=CASES)
     args=parser.parse_args()
     base.require(bool(args.case)==args.start_owned,'case_only_for_start')
     if args.start_owned:

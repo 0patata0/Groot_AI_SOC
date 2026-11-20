@@ -76,34 +76,26 @@ DOCX 내보내기의 목차 탭600pt 때문에 쪽번호가 용지 밖으로 나
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 <a id="operating-application-review-20261120"></a>
-전체 후보 검토에서 실제 결함 세 가지를 보완했다. SDK가 완료한 지연 식별 조회의 영수증을 누락하던 문제, 뒤 필드의 미확인 문구가 앞의 근거 없는 센서 수치를 지우던 문제, a:b 같은 비율을 호스트로 읽던 문제다. 조회 도구의 일반 노출이나 명시적 요청 범위를 늘리지 않았고 현재 소스의 query 버전은 1.19.153이다. 운영 서버에는 아직 반영하지 않았다.
+<a id="operating-payload-refreeze-20261120"></a>
+운영 후보 검증 중 실제 재개 결함과 B reader의 누락을 보완했다. 이미 재개가 끝난 요청은 원래 nonce·영수증·현재 서비스와 컨테이너를 대조하고 새 작업 없이 반환한다. B의 기존 reader에는 inventory·journal 분기가 없어 시험 중의 임시 중계와 완료 후 남길 정상 reader를 구분했다. 정상 reader의 원문 SHA를 plan/bundle에 결속하고 후보 확정 중과 완료 정리 후 모두 같은 프로토콜을 사용한다. baseline 복구에서는 원래 reader를 보존한다.
 
-원본 시험 파일은 보존했다. 과거 기대값과 달랐던 7개 단정은 현재 계약을 검사하는 별도 어댑터로 대조했다. 실제 대상 43개·같은 요청의 조회 범위·행 ID·현재 상태와 과거 이력의 구분·구조화된 미확인 결과 및 거절 반례를 검사한다. 같은 어댑터와 반례를 수정 전 코드에 적용하면 세 결함이 다시 실패한다. 기대값 변경과 실제 코드 수정을 별도 근거로 남겼다.
+실제 변경 경로는 A7/B36/C7의50개이며 helper19·제어 문서39개다. 별도 정상 reader3개는 같은 SHA ab141084의 원문을 호스트별 private normal-reader.py에 반입한다. 보호 경로51개(A13/B30/C8)는 변경하지 않는 runtime_health.py·host_inventory.py6개를 포함한다. 이 경로의 소유자·권한·SHA를 대조한다. 기존 경로에 core와 barrier를 중복 등록한51경로 시도는 검사에서 거절됐고 승인·Native 실행·운영 적용은0이었다.
 
-| 현재 검증 | 결과와 범위 |
+Mac15군270검사·생략0과 보류/유실 판정20검사, 반입 생성기7검사를 확인했다. 수정 전 재개 로직은 동일2반례에서 immutable_fact_changed로 실패한다. 공식 Harness² 구조는91→138구성·상시16,917자 증가0이다. 현재 소스로 실행한 Native 결과와 정리 근거는 검증 원장에 구분한다. 앞선 앱32군 Mac1,652/10생략·Linux1,739/0생략은 이전2f56a932 판본의 근거이며 이번 소스 전체를 다시 검사한 수치로 사용하지 않는다.
+
+새 검토 release807ea69fe0f040618726f94e91bcfad1·plan0a3de6ee7dc20b041a7af97cee9e0241420584f03bee0f57fca02d6ab9221b16을 보관한다. 과거 b895353a·f7c99fc5 계획은 새 승인에 쓰지 않는다. 13:28 KST 관리자231 경유로 운영65경로·모델 설정·같은 컨테이너를 확인했다. 새 패키지·승인 파일·운영 적용·실제 모델/MCP·채팅 게시·공격·학습은0이다. 정확 승인과 운영 수집/MCP/양봇 인수, 실제 재부팅/장기 복구·전체 OS 승인·관리 주소 정책·논문 목차91불일치·독립 재구현·새OS 전체 설치·최종 발표는 남아 있다.
+
+[현재 검증](infra/validation/journal-composition/operating-refreeze.validation.json) · [변경·인수 조건](infra/validation/journal-composition/OPERATING_REVIEW.md) · [이전 앱 검증](infra/validation/journal-composition/current-application.validation.json)
+
+| 최종 확인 | 결과 |
 | --- | --- |
-| 고정 소스 | 기준 f7d0ff40·2,484파일·8개 변경 파일 SHA·두 환경 동일 manifest |
-| Mac | 32군·1,652실행·실패0·기존 의존성10생략 |
-| 기존 Hermes Linux | 32군·1,739실행·실패0·생략0·Python3.13.5 |
-| 격리 | UID/GID50123·보조그룹[50123]·CapEff0·NoNewPrivs1·네트워크 없음 |
-| 공식 Harness² | 37→41구성·4추가/4수정·상시16,917자 증가0 |
-| 이전 조정 실행기 | 같은32핀의 Mac/Linux259검사 재사용·이번 운영 적용 증거 아님 |
-| 정리 | Mac5,110파일/168,240,807B·B5,110파일·자체 컨테이너2/익명 볼륨2 부재 |
-
-첫 Linux 실행은 모든 시험이 통과했으나 실행기의 예상 개수를 148로 적어 실제 152와 달라 집계에서 실패했다. 원본 152개 시험의 목록·SHA를 확인해 실행기만 수정하고 최종 결과를 다시 검증했다. 첫 실패와 모든 로그를 보존한다. 위 수치는 중복을 포함한 개발 검사 횟수이며 독립 사건 수·모델 정확도·응답시간 보장이 아니다.
-
-12:23 KST 관리자231 경유로 운영 65경로·보호 45경로의 SHA/소유자/권한과 기존 모델 설정·컨테이너가 같음을 재확인했다. 새 패키지 설치·모델 추론·실제 MCP 호출·채팅 게시·운영 적용·공격·학습은 0이다. 이전 b895353a 계획은 수정 전 검토 자료다. 다음에는 새 소스의 전체 payload와 영수증·스키마·복구를 다시 고정해 검토하고 정확 승인을 받은 뒤 운영 인수를 진행해야 한다. 실제 수집/MCP/두 봇·새 Native/재부팅/장기 복구·backup75 intent·논문 목차 91불일치·독립 재구현·새OS 전체 설치·최종 발표는 남아 있다.
-
-[현재 검증 원장](infra/validation/journal-composition/current-application.validation.json) · [이전 반입 준비](infra/validation/journal-composition/operating-preparation.validation.json) · [실패 이력](archive/DIAGNOSTIC_HISTORY.md#operating-application-review-20261120)
-
-| 이번 내용 게시 | 확인 값 |
-| --- | --- |
-| 내용 커밋·공개 범위 | `85be519de8ae6687feee9dfc1936076cd46a7117`·24파일 |
-| 실제 원격 main 일치 | `2026-11-20T12:37:54.438328+09:00` |
-| 게시 전 검사 | 추적2485·위험경로0·기존10/신규0·24파일 staged 바이트 일치 |
-| 문서 검수 | light·변경0.6%·B·6/6·gate0·수치 소실0 |
-| 결함 검토 | 설치된 review-agent 절차·No findings.·Semgrep 미수행 |
-| 운영 범위 | 적용·모델·실제 MCP·채팅·공격·학습0·전체 목표 active |
+| Mac / Linux 회귀 | 각각15군270검사·생략0·같은32소스 SHA |
+| Linux 신원 | UID/GID50123·보조그룹0·168.907초·15개 로그 보존 |
+| Native | bootstrap·정상 완료·부분 적용 후 baseline 완료·보류/유실/중단 복구·각 A/B/C verified |
+| reader | B 기존 inventory 거절 → candidate observed → 정리 후 observed·다른 호스트/임의 경로 거절 |
+| 실제 운영 대조 | 13:51 KST·65소스/보호51 SHA·소유자·권한·같은 모델/컨테이너 |
+| 정리 | 서버 자체9작업의 root/input/unit 부재·Mac4,598파일/116,539,015B 제거 |
+| 운영 승인·적용·모델/MCP·공격·학습 | 0 |
 
 <!-- /coordinator-operating-preparation-20261120 -->
 

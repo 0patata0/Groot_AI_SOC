@@ -959,5 +959,13 @@
     "self_checks": "6/6",
     "gate_exit_code": 0,
     "numeric_sequences_and_codes_preserved": true
+  },
+  "operating_refreeze_followup": {
+    "artifact": "operating-refreeze.validation.json",
+    "review_release_id": "807ea69fe0f040618726f94e91bcfad1",
+    "review_plan_sha256": "0a3de6ee7dc20b041a7af97cee9e0241420584f03bee0f57fca02d6ab9221b16",
+    "historical_results_preserved": true,
+    "operating_approval_or_deployment": false,
+    "scope": "Current operator and permanent reader proof are separate from these historical application/preparation results."
   }
 }

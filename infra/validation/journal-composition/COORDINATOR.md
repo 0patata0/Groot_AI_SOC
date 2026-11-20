@@ -3,13 +3,14 @@
 <!-- coordinator-operating-preparation-20261120 -->
 <a id="coordinator-operating-preparation-20261120"></a>
 <a id="operating-application-review-20261120"></a>
-50대상 검토안을 검사하면서 SDK 영수증 누락·센서 수치의 잘못된 불확실성 처리·비율의 호스트 오인을 보완했다. 원본 시험을 보존한 현재 계약 검사와 수정 전 코드 반례를 확인했다. 동일 manifest의 Mac 1,652실행/10생략·Linux 1,739실행/생략0은 통과했으며 운영 적용은 0이다.
+<a id="operating-payload-refreeze-20261120"></a>
+완료된 resume은 기존 영수증 alias와 원래 nonce·plan·host·immutable SHA, 새 peer 근거와 현재 서비스/컨테이너를 확인한 뒤 같은 상태를 반환한다. 서비스 상태가 달라지거나 영수증이 바뀌면 새 intent를 만들지 않고 거절한다. 기존 pending resume의 응답 유실 복구와 완료된 요청의 재확인을 구분한다.
 
-조정 실행기 자체의 32소스 핀과 보조42핀은 이전과 같아 Mac/Linux259 결과를 해당 범위에서 재사용한다. query1.19.153과 공통 계약·SDK가 바뀌었으므로 b895353a 계획의 payload·영수증·관리 실행 원문 결속을 새 소스로 다시 고정해야 한다. 과거 승인이나 합성 인수로 대체할 수 없다. 실제 0755 보호 메타데이터의 정확 대조도 유지한다.
+임시 reader는 baseline에서 기존 프로토콜을, 확정한 candidate에서 SHA로 고정한 새 정상 프로토콜을 실행한다. 인수를 마친 candidate 정리는 정상 reader를 설치하고 MCP launcher를 원복한다. baseline 정리는 기존 reader와 launcher를 복구한다. 최종 current는 정상 reader의 실제 SHA·소유자·권한도 대조한다.50경로·정상 reader3개·helper19·control39·보호51을 같은 plan/bundle에 결속한다.
 
-12:23 KST 운영 65경로·보호 45경로와 계정·모델 설정·컨테이너가 같고 coordinator 운영 기반 경로는 없었다. 정확 전체 승인·실제 수집/MCP/두 봇 인수·새 Native·실제 재부팅/장기 복구·backup75 상태/intent는 남아 있다. 공식 Harness² 37→41구성과 앞선 조정/검증기 구조 통과는 운영 인수의 증거로 표시하지 않는다.
+[새 변경안](OPERATING_REVIEW.md) · [검증·실패·한계](operating-refreeze.validation.json)
 
-[현재 기능 검증](current-application.validation.json) · [이전 50대상 관측과 반입 준비](operating-preparation.validation.json)
+이하 예전 단계의 수치와 미완료 표시는 당시 기록이며 현재 결과는 위 원장을 따른다.
 <!-- /coordinator-operating-preparation-20261120 -->
 
 <!-- coordinator-private-backends-20261119 -->

@@ -126,10 +126,13 @@ class FileSet:
                 need(sha(raw)==row['before_sha256'],'target_changed_during_backup');self.put('backups',raw)
         self.check('before_sha256');return self.payloads('backups','before_sha256')
 
-    def replace(self,row,data,expected):
+    def replace(self,row,data,expected,*,normal_reader_sha256=None):
         raw,original=self.read_target(row);need((sha(raw)if raw is not None else None)==expected,'target_changed_before_replace')
         need(isinstance(data,bytes)and 0<len(data)<=contract.MAX_SOURCE,'candidate_bound')
-        need(sha(data)in (row['before_sha256'],row['after_sha256']),'replacement_not_in_plan')
+        if normal_reader_sha256 is not None:
+            need(row['target']==READER and isinstance(normal_reader_sha256,str)
+                 and contract.HEX.fullmatch(normal_reader_sha256),'normal_reader_replacement_scope')
+        need(sha(data)in (row['before_sha256'],row['after_sha256'],normal_reader_sha256),'replacement_not_in_plan')
         path=self.target(row);parent=self.witness.directory(path.parent);name='.release-'+uuid.uuid4().hex;created=False
         try:
             fd=os.open(name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=parent);created=True
@@ -219,4 +222,24 @@ class FileSet:
         for row,current in zip(self.rows,values):
             if row['target']not in BARRIERS[self.host]or current==row['before_sha256']:continue
             self.replace(row,data[row['before_sha256']],row['after_sha256']);count+=1
+        return count
+
+    def finish_barriers(self,normal_reader,normal_reader_sha256):
+        """Install the plan-pinned permanent reader after all-host acceptance."""
+        need(isinstance(normal_reader,bytes)and 0<len(normal_reader)<=131072
+             and sha(normal_reader)==normal_reader_sha256,'normal_reader_payload_changed')
+        values=[]
+        for row in self.rows:
+            raw,_=self.read_target(row);current=sha(raw)if raw is not None else None
+            allowed={row['before_sha256'],row['after_sha256']}
+            if row['target']==READER:allowed.add(normal_reader_sha256)
+            need(current in allowed,'target_bytes_changed');values.append(current)
+        data=self.payloads('backups','before_sha256');count=0
+        for row,current in zip(self.rows,values):
+            if row['target']not in BARRIERS[self.host]:continue
+            final=normal_reader_sha256 if row['target']==READER else row['before_sha256']
+            if current==final:continue
+            raw=normal_reader if row['target']==READER else data[final]
+            self.replace(row,raw,current,normal_reader_sha256=normal_reader_sha256 if row['target']==READER else None)
+            count+=1
         return count

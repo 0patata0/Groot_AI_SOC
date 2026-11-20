@@ -76,7 +76,7 @@ class LifecycleTests(unittest.TestCase):
                 path=fs.storage/name;path.write_bytes((HERE/name).read_bytes());path.chmod(0o600)
             self.nodes[host]={'fixture':f,'files':fs,'legacy':legacy,'native':native,'backend':backend,'helper_backend':hb,'process_backend':pb,
                 'host_plan':{'rows':fs.rows,'machine_sha256':plan_module.sha(machine),'diagnostic_gid':os.getgid(),'reader_uid':77,
-                    'mcp_uid':88 if host=='b'else None,'container':container,'protected':protected,'previous_current_sha256':None}}
+                    'mcp_uid':88 if host=='b'else None,'container':container,'protected':protected,'previous_current_sha256':None,'normal_reader_sha256':plan_module.sha(('# permanent normal reader '+host+'\n').encode())}}
             if host=='b':
                 (fs.root/'etc/mcp/system-diagnostics').mkdir(parents=True,mode=0o750,exist_ok=True)
                 for relative in ('var/lib/capstone-review-chat/queue.sqlite','var/lib/capstone-ollama-trial/chat/queue.sqlite'):
@@ -89,6 +89,7 @@ class LifecycleTests(unittest.TestCase):
         self.plan_sha=m.digest(plan)
         for host,n in self.nodes.items():
             fs=n['files'];store=store_module.Store(fs,self.plan_sha);bundle=plan_module.Plan(plan).bundle()
+            (fs.storage/'normal-reader.py').write_bytes(('# permanent normal reader '+host+'\n').encode());(fs.storage/'normal-reader.py').chmod(0o600)
             store.immutable('plan.json',plan);store.immutable('bundle.json',bundle)
             now=datetime.now(m.c.KST);approval={'schema':1,'release_id':fs.release_id,'plan_sha256':self.plan_sha,
                 'bundle_sha256':m.digest(bundle),'decision':'approved','approved_at_kst':(now-timedelta(seconds=1)).isoformat(),
@@ -189,6 +190,44 @@ class LifecycleTests(unittest.TestCase):
         self.nodes['b']['backend'].calls=[];self.b.execute('resume',proofs=self.proofs())
         self.assertIsNone(self.b.state()['pending'])
         self.assertFalse(any(args[1]=='start'for args,_ in self.nodes['b']['backend'].calls))
+
+    def assert_completed_resume_is_read_only(self):
+        before=self.b.state();raw=self.b.journal.path.read_bytes();cache=self.b.cache.path.read_bytes()
+        artifacts={p.name:p.read_bytes()for p in self.b.files.storage.glob('operation-*.json')}
+        self.nodes['b']['backend'].calls=[];self.nodes['b']['helper_backend'].calls=[]
+        result=self.b.execute('resume',proofs=self.proofs())
+        self.assertEqual(result,before);self.assertEqual(self.b.journal.path.read_bytes(),raw)
+        self.assertEqual(self.b.cache.path.read_bytes(),cache)
+        self.assertEqual({p.name:p.read_bytes()for p in self.b.files.storage.glob('operation-*.json')},artifacts)
+        for backend in (self.nodes['b']['backend'],self.nodes['b']['helper_backend']):
+            self.assertFalse(any(args[1]in ('start','stop','update','enable','disable','daemon-reload')
+                                 for args,_ in backend.calls))
+
+    def test_completed_candidate_resume_does_not_create_another_intent_or_start(self):
+        self.confirmed();self.resume();self.assert_completed_resume_is_read_only()
+
+    def test_completed_baseline_resume_preserves_later_legacy_observations(self):
+        self.applied();self.step('rollback');self.resume()
+        self.nodes['b']['legacy'].mutate('INSERT INTO events VALUES(?,?,?,?)',
+                                       ('later-after-resume',3500000,'example.service','{}'))
+        self.assert_completed_resume_is_read_only()
+
+    def test_completed_resume_cannot_repair_drift_or_create_a_pending_intent(self):
+        self.confirmed();self.resume();before=self.b.journal.path.read_bytes()
+        backend=self.nodes['b']['backend'];backend.rows['capstone-review-chat.service']['ActiveState']='inactive'
+        backend.calls=[]
+        with self.assertRaisesRegex(ValueError,'completed_resume_services_changed'):
+            self.b.execute('resume',proofs=self.proofs())
+        self.assertEqual(self.b.journal.path.read_bytes(),before)
+        self.assertFalse(any(args[1]=='start'for args,_ in backend.calls))
+
+    def test_completed_resume_requires_its_original_immutable_receipt(self):
+        self.confirmed();self.resume();before=self.b.journal.path.read_bytes()
+        alias=self.b.files.storage/'resume-candidate.json';saved=self.b.store.read(alias.name)
+        saved['nonce']='0'*32;alias.write_bytes(m.c.canonical(saved))
+        with self.assertRaisesRegex(ValueError,'completed_resume_receipt_changed'):
+            self.b.execute('resume',proofs=self.proofs())
+        self.assertEqual(self.b.journal.path.read_bytes(),before)
 
     def test_partial_confirmation_does_not_allow_local_revert(self):
         self.confirmed();self.b.execute('revert_fence')

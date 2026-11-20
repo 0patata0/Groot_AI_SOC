@@ -67,7 +67,7 @@ def profiles(environment):
          'command': {'kind': 'unittest', 'arguments': ['tests.test_soc_management']}, 'mac_tests': 49, 'hermes_tests': 49},
         {'group': 'payload-producer', 'cwd': '.',
          'command': {'kind': 'script', 'origin': 'root', 'path': 'infra/validation/journal-composition/test_prepare_payload.py'},
-         'mac_tests': 6, 'hermes_tests': 6},
+         'mac_tests': 7, 'hermes_tests': 7},
     ]
     assert len(rows) == len({row['group'] for row in rows}) == 32
     return rows

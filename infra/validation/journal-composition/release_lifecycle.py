@@ -315,6 +315,30 @@ class Lifecycle:
         self.journal.mark(now=self.clock(),revert_authorization_sha256=authorization)
         nonce=self.journal.begin('revert',now=self.clock());return self.restore(nonce,'revert')
 
+    def completed_resume(self,value,candidate,baseline):
+        """Verify a completed receipt and current resources without a new intent."""
+        key='resume_sha256'if candidate else'baseline_resume_sha256'
+        name='resume-candidate.json'if candidate else'resume-baseline.json'
+        need(value['pending']is None,'completed_resume_pending')
+        saved=self.store.read(name)
+        need(isinstance(saved,dict)and set(saved)=={'schema','host','release_id','plan_sha256','nonce',
+             'operation','at_kst','evidence','isolated_filesystem'}and type(saved['schema'])is int and saved['schema']==1
+             and saved['host']==self.host and saved['release_id']==self.files.release_id
+             and saved['plan_sha256']==self.store.plan and saved['operation']=='resume'
+             and isinstance(saved['nonce'],str)and c.RELEASE.fullmatch(saved['nonce'])
+             and saved['isolated_filesystem']is self.w.fixture and digest(saved)==value['facts'].get(key)
+             and self.store.read('operation-'+saved['nonce']+'.json')==saved,
+             'completed_resume_receipt_changed')
+        need(isinstance(saved['evidence'],dict)and saved['evidence'].get('intent')==
+             ('resume_candidate'if candidate else'resume_baseline'),'completed_resume_receipt_scope')
+        need(not any(self.controls.fenced(name)for name in self.controls.markers),'completed_resume_fence_changed')
+        current=self.native.snapshot()
+        need(all(before['ActiveState']!='active'or current[name]['ActiveState']=='active'
+             for name,before in baseline['units'].items()),'completed_resume_services_changed')
+        if self.host=='b':
+            need(self.native.require_original_container()['pid']>1,'completed_resume_container_changed')
+        return value
+
     def resume(self,proofs):
         value=self.state();pending=value['pending']
         need(pending is None or pending['name']=='resume','outcome_requires_inspection')
@@ -324,6 +348,8 @@ class Lifecycle:
         gate=self.coherent(proofs,'resume_candidate'if candidate else 'resume_baseline')
         if candidate:self.files.check('after_sha256')
         else:need(self.core_is('before_sha256'),'baseline_core_required')
+        if value['facts'].get('services_resumed'if candidate else'baseline_services_resumed'):
+            return self.completed_resume(value,candidate,baseline)
         nonce=pending['nonce']if pending else self.journal.begin('resume',now=self.clock())
         self.controls.unfence('collection');self.native.resume_original('collection',baseline['units'])
         self.controls.unfence('consumer')
@@ -331,6 +357,8 @@ class Lifecycle:
         self.native.resume_original('consumer',baseline['units'])
         if self.host=='b':self.native.resume_container()
         receipt=self._record(nonce,'resume',gate)
+        self.store.immutable('resume-candidate.json'if candidate else'resume-baseline.json',
+                             self.store.read('operation-'+nonce+'.json'))
         if candidate:self.journal.finish(nonce,now=self.clock(),services_resumed=True,resume_sha256=receipt)
         else:self.journal.finish(nonce,now=self.clock(),baseline_services_resumed=True,baseline_resume_sha256=receipt)
         return self.state()

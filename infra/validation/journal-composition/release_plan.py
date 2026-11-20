@@ -34,6 +34,8 @@ PROTECTED={h:COMMON_PROTECTED|({'/etc/nftables.conf'}if h=='a'else{
     '/opt/hermes-data/SOUL.md','/opt/hermes-data/config.yaml','/opt/hermes-data/management/config.yaml',
     '/etc/mcp/system-diagnostics.json','/etc/mcp/system-diagnostics/known_hosts'}if h=='b'else set())for h in c.TARGETS}
 for _host in PROTECTED:
+    PROTECTED[_host]|={
+        '/opt/capstone-diagnostics/runtime_health.py','/opt/capstone-diagnostics/host_inventory.py'}-source.TARGETS[_host]
     PROTECTED[_host]|={str(Path('/etc/systemd/system')/name)for values in services.catalog(_host).values()
                        for name in values if str(Path('/etc/systemd/system')/name)not in source.TARGETS[_host]}
 PROTECTED['b']|={'/etc/systemd/system/capstone-management.service.d/10-timeout.conf'}
@@ -61,7 +63,8 @@ class Plan:
         hosts=value['hosts'];need(isinstance(hosts,dict)and set(hosts)==set(c.TARGETS),'plan_hosts')
         self.cohort=cohort.Cohort(value['cohort']);need(self.cohort.release_id==value['release_id'],'plan_cohort_release')
         for host,item in hosts.items():
-            need(isinstance(item,dict)and set(item)=={'rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected','previous_current_sha256'},'plan_host_shape')
+            need(isinstance(item,dict)and set(item)=={'rows','machine_sha256','diagnostic_gid','reader_uid','mcp_uid','container','protected','previous_current_sha256','normal_reader_sha256'},'plan_host_shape')
+            need(isinstance(item['normal_reader_sha256'],str)and c.HEX.fullmatch(item['normal_reader_sha256']),'plan_normal_reader_digest')
             previous=item['previous_current_sha256']
             need(previous is None or isinstance(previous,str)and c.HEX.fullmatch(previous),'plan_previous_current_digest')
             need(isinstance(item['machine_sha256'],str)and c.HEX.fullmatch(item['machine_sha256'])
@@ -96,10 +99,19 @@ class Plan:
     def bundle(self):
         return {'schema':1,'release_id':self.value['release_id'],'plan_sha256':self.sha256,'helpers':self.value['helpers'],
             'payloads':{h:{r['target']:r['after_sha256']for r in item['rows']}for h,item in self.value['hosts'].items()},
+            'normal_readers':{h:item['normal_reader_sha256']for h,item in self.value['hosts'].items()},
             'controls':{h:{str(p):sha(raw)for p,raw in control.documents(h,self.value['release_id'],self.sha256).items()}for h in c.TARGETS}}
+
+    def normal_reader(self,files):
+        raw,meta=files.witness.read(files.storage/'normal-reader.py',limit=131072)
+        need(sha(raw)==self.value['hosts'][files.host]['normal_reader_sha256']and
+             (meta.st_uid,meta.st_gid,stat.S_IMODE(meta.st_mode))==
+             (files.witness.owner,os.getgid()if files.witness.fixture else 0,0o600),'normal_reader_payload_changed')
+        return raw
 
     def verify(self,files,*,protected=True):
         need(files.release_id==self.value['release_id']and files.rows==self.value['hosts'][files.host]['rows'],'plan_file_binding')
+        self.normal_reader(files)
         w=files.witness;host=self.value['hosts'][files.host]
         need(w.fixture or HERE.resolve()==files.storage,'private_operator_code_required')
         if not w.fixture:

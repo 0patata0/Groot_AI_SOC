@@ -1,5 +1,14 @@
 # 설치·웹 정책 이력
 
+<!-- operating-payload-refreeze-20261120 -->
+<a id="operating-payload-refreeze-20261120"></a>
+## 2026-11-20 소스만 반입한 별도 PID1 검증
+
+기존 도구가 있는 B의 별도 PID1에 고정 소스52입력만 반입했다. 운영 설정·키·실제 캐시/대화 DB·패키지·모델을 반입하지 않았다. 각 Native 실행의 종단 상태·호스트 namespace·코드 SHA·자체 cgroup과52입력 정리를 확인한다. Kali 오프라인 설치는 앞선 완료 영수증을 유지하며 재설치하지 않았다.
+
+[현재 근거](../infra/validation/journal-composition/operating-refreeze.validation.json)
+<!-- /operating-payload-refreeze-20261120 -->
+
 <!-- operating-application-review-20261120 -->
 <a id="operating-application-review-20261120"></a>
 ## 2026-11-20 현재 후보 격리 검사·운영 미적용

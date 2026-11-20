@@ -4,16 +4,21 @@
 <a id="final-presentation-refresh-20261120"></a>
 기존 20장 발표자료를 최종발표/에서 이어서 갱신했다. 11/18 복합 조사 6대화와 후속 3대화의 기존 차트를 보존하고 11/19 서비스 조회 4대화, 11/20 운영 후보 검증을 별도 표와 부록에 연결했다. SOC 35B와 Kali의 별도 40B·공격 중단 상태를 구분한다. 논문은 동결했고 이후 결과는 발표와 별도 기록에만 반영한다. 본문 16장·부록 4장·계획 685초이며 실제 리허설과 학교 시간·형식은 미확정이다.
 
-| 출력 검수 | 실제 확인 |
+시연 영상은16번 슬라이드에 배치할 계획이다. 영상90초와 앞뒤 설명10초를 배정하고 앞부분 설명에서60초를 줄여 전체685초 계획을 유지한다. 학교 배정 시간은 미확정이며 실제 촬영본 길이와 리허설 결과에 맞춰 다시 조정한다. 현재 작업 폴더에서 영상 원본은 찾지 못했으므로 촬영과 영상 삽입·재생 검증은 남아 있다.
+
+| 추가 준비·현재 검수 | 실제 확인 |
 |---|---|
-| 발표 | 20장·본문16/부록4·계획685초 |
-| 편집 구조 | 표14·차트2·literal workbook2·메모20 |
-| 내용 | PPTX256텍스트/셀·PDF287줄·누락0·용지 밖 글자0 |
-| 화면 | 원본20/최종PDF20 직접 검수·미수정14장 SDK PNG SHA 동일 |
-| 본문·원본 보존 | 동결 논문9SHA·발표자료/ 전체 원본·10/30 HTML 원본 보존 |
-| 임시 정리 | 277파일·25,872,276B·임시PPTX8 제거·작업 폴더 부재 |
-| 문장 검수 | standard1.56%·B·6/6; gate1은 문장 정렬 오탐·당위 원문 보존·finalizer accept |
-| 미수행 | 실제 PowerPoint/Keynote·발표 기기/리허설·학교 시간/형식·12/1 발표 |
+| 사용 프로그램 | PowerPoint·사용자 확정·이 Mac에는 없음 |
+| 영상 | 16번 촬영 구성·영상90초/전후설명10초·실제 원본/내장/재생은 미완료 |
+| 전체 시간 | 본문16/부록4·685초 계획에 영상 포함·실제 리허설 미수행 |
+| 이번 출력 | 20장·표14·차트2·메모20·256필드/287줄 누락0 |
+| 화면 차이 | 16번 전후 직접 검수·나머지19쪽은 같은 Poppler로 원본/새PDF RGB 동일 |
+| PowerPoint 글꼴 | 원형 Apple SD Gothic Neo·PPTX 글꼴 내장0·대체/줄바꿈은 실제 기기에서 확인 |
+| 접속 | 16:37 관리자 경유 TLS1.3·CA/호스트 검증·HTTP200/OK; 새 MCP/채팅 시험0 |
+| 시각 | A/B/C 동기화 보고·관리자 미동기, Mac 대비53.263~61.613초 지연 구간 |
+| 보존·정리 | 논문9SHA·다른23변경 보존·임시138파일/13,404,369B·PPTX4 제거 |
+| 문장 | light0.1%·B·6/6·gate0; 원문/중간 산출물 보존 |
+| 승인·중단 | 운영 후보·시각 보정안 승인 대기·공격/시나리오/학습 중단 유지 |
 
 <a id="kali-scenario-file-import-20261120"></a>
 
@@ -26,10 +31,10 @@
 | 목적지 확인 | 233 att 계정 부재 확인 후 사용자가 기존 attack 홈을 선택 |
 | 범위 | 파일 복사·소유/크기/SHA 대조·임시 파일 부재; 새 계정·권한 정책·시나리오 실행·서비스 변경0 |
 
-[현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
+[영상 구성·후속 접속 관측](archive/STATUS_HISTORY.md#presentation-video-plan-20261120) · [현황 이력](archive/STATUS_HISTORY.md#final-presentation-refresh-20261120) · [검수 범위](archive/DIAGNOSTIC_HISTORY.md#final-presentation-refresh-20261120) · [Kali 반입](archive/DEPLOYMENT_HISTORY.md#kali-scenario-file-import-20261120)
 
 
-| 기록 게시 | 확인 값 |
+| 이전 판본 기록 게시 | 확인 값 |
 |---|---|
 | 내용 커밋 | `3007500882aa14dcd2b0caf1b1f417ed918365db`·공개9문서 |
 | 실제 원격 main 일치 | `2026-11-20T16:25:02.297477+09:00` |

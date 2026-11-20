@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- presentation-video-plan-20261120 -->
+<a id="presentation-video-plan-20261120"></a>
+[PowerPoint 대상·시연 영상 구성과 접속 준비](STATUS_HISTORY.md#presentation-video-plan-20261120) · [시간 배정과 남은 촬영·재생](PLAN_HISTORY.md#presentation-video-plan-20261120) · [기존 구조 유지](DESIGN_ALTERNATIVES.md#presentation-video-plan-20261120) · [화면·시각·확인 한계](DIAGNOSTIC_HISTORY.md#presentation-video-plan-20261120)
+<!-- /presentation-video-plan-20261120 -->
+
 <!-- final-presentation-refresh-20261120 -->
 <a id="final-presentation-refresh-20261120"></a>
 최종발표/에서 기존 20장 이어서 갱신·날짜별 근거와 승인 대기 구분·동결 논문 보존

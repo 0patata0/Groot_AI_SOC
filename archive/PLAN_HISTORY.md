@@ -1,5 +1,12 @@
 # 계획 이력
 
+<!-- presentation-workspace-cleanup-20261120 -->
+<a id="presentation-workspace-cleanup-20261120"></a>
+현재 논문 목차·쪽번호와 같은 판본의 로컬 동기화까지만 마감한 뒤 논문을 동결한다. 사용자가 보고한 제출 완료와 로컬 검수 완료를 구분한다. 후속 검증은 별도 기록에 남기고 발표 준비는 루트 최종발표/에서 기존 자료를 이어서 작업한다.
+
+임시 발표자료 삭제 요청을 조사했으며 확인 가능한 임시 경로에는 대상이 없었다. 다른 발표자료와 검증 복구본은 보존한다. 운영 후보의 정확 승인 대기와 공격·시나리오·학습 중단은 유지한다. [현재 상태](../STATUS.md#presentation-workspace-cleanup-20261120)를 기준으로 읽는다.
+<!-- /presentation-workspace-cleanup-20261120 -->
+
 <!-- operating-payload-refreeze-20261120 -->
 <a id="operating-payload-refreeze-20261120"></a>
 ## 2026-11-20 변경 묶음 재고정 후 정확 승인 대기

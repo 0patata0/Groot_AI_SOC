@@ -1,5 +1,12 @@
 # Agentic SOC 실행 계획
 
+<!-- presentation-workspace-cleanup-20261120 -->
+<a id="presentation-workspace-cleanup-20261120"></a>
+현재 논문 목차·쪽번호와 같은 판본의 로컬 동기화까지만 마감한 뒤 논문을 동결한다. 사용자가 보고한 제출 완료와 로컬 검수 완료를 구분한다. 후속 검증은 별도 기록에 남기고 발표 준비는 루트 최종발표/에서 기존 자료를 이어서 작업한다.
+
+임시 발표자료 삭제 요청을 조사했으며 확인 가능한 임시 경로에는 대상이 없었다. 다른 발표자료와 검증 복구본은 보존한다. 운영 후보의 정확 승인 대기와 공격·시나리오·학습 중단은 유지한다. [현재 상태](STATUS.md#presentation-workspace-cleanup-20261120)를 기준으로 읽는다.
+<!-- /presentation-workspace-cleanup-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 두 Kali의 오프라인 설치·40B 연결·SOUL 로드·무도구 실제 응답을 확인했다. 이후에는 사용자가 시험 재개를 명시한 범위에서 기존 시나리오·스크립트·PCAP·실행 결과를 먼저 역분석하고 확장한다. 새로운 공격 송신은 아직 수행하지 않는다. 실제 결과는 프로젝트의 scenarios/actual_scenario.md 한 원장에 합치며 Kali의 보고서 경로는 그 원장을 대신하지 않는다.

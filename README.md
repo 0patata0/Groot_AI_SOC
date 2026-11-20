@@ -1,5 +1,10 @@
 # Groot_AI_SOC
 
+<!-- presentation-workspace-cleanup-20261120 -->
+<a id="presentation-workspace-cleanup-20261120"></a>
+논문은 사용자가 보고한 최종 제출 이후 현재 진행 중인 목차·쪽번호와 로컬 동기화까지만 마감하고 동결한다. 후속 결과는 별도 기록에 남긴다. 발표자료는 루트 최종발표/에서 기존 자료를 이어서 작업하며 확인 가능한 임시 경로에는 삭제할 발표자료가 없었다. [현재 범위와 남은 검수](STATUS.md#presentation-workspace-cleanup-20261120)를 기준으로 아래 과거 기록과 구분한다.
+<!-- /presentation-workspace-cleanup-20261120 -->
+
 <!-- kali-hermes-offline-20261120 -->
 <a id="kali-hermes-offline-20261120"></a>
 Kali232·233의 레드팀 Hermes를 오프라인으로 설치하고 DGX111의 동일40B 가중치를 Hermes용65536컨텍스트 태그로 연결했다. 두 SOUL의 역할·원본 분석·피드백 절차와 공격 중단 상태를 적용하고 무도구 실제 응답을 확인했다. 기존 공격 시험은 재개하지 않았다. 초기 진입점은 deploy.sh --kali-hermes이며 [반입·설치·모델·복구 절차](infra/hermes/kali-redteam/README.md)와 [실제 검증 범위](infra/hermes/kali-redteam/validation.json)를 따른다.

@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- presentation-workspace-cleanup-20261120 -->
+<a id="presentation-workspace-cleanup-20261120"></a>
+논문 제출 이후의 작업 범위와 임시 발표자료 조사를 기록했다. [현황](STATUS_HISTORY.md#presentation-workspace-cleanup-20261120) · [계획](PLAN_HISTORY.md#presentation-workspace-cleanup-20261120) · [조사 범위](DIAGNOSTIC_HISTORY.md#presentation-workspace-cleanup-20261120)
+<!-- /presentation-workspace-cleanup-20261120 -->
+
 <!-- operating-payload-refreeze-20261120 -->
 <a id="operating-payload-refreeze-20261120"></a>
 재개 영수증·영구 reader·50경로 후보와 실패/정리 근거를 보존했다. [현황](STATUS_HISTORY.md#operating-payload-refreeze-20261120) · [계획](PLAN_HISTORY.md#operating-payload-refreeze-20261120) · [설계](DESIGN_ALTERNATIVES.md#operating-payload-refreeze-20261120) · [진단](DIAGNOSTIC_HISTORY.md#operating-payload-refreeze-20261120) · [반입](DEPLOYMENT_HISTORY.md#operating-payload-refreeze-20261120)

@@ -1,5 +1,10 @@
 # Groot_AI_SOC
 
+<!-- presentation-thesis-structure-20261121 -->
+<a id="presentation-thesis-structure-20261121"></a>
+최종발표의 기존20장을 동결 논문과 같은5장 흐름으로 정리했다. 관련 기술·로그 파이프라인과 실험의 평가 기준을 설명하고 실제 결과11~15장, 시연15장, 결론16장으로 연결한다. 기존 수치와 날짜·미확인, 원본·이전본을 보존한다. 발표 산출물은 최종발표/의 로컬 PPTX·PDF·대본·17번 구성표이며 Git 제외다. [진행 현황](STATUS.md#presentation-thesis-structure-20261121).
+<!-- /presentation-thesis-structure-20261121 -->
+
 <!-- kali-cli-soul-20261120 -->
 <a id="kali-cli-soul-20261120"></a>
 Kali232 att·233 attack의 기본 셸은 zsh다. 두 계정에서 Hermes 명령을 찾지 못하던 PATH를 등록했고 사용자가 셸 재시작 후 실행을 확인했다. 두 SOUL에는 레드팀 역할과 한국어 설명·최종 보고를 명시했다. [시작·기존 셸 갱신 방법](infra/hermes/kali-redteam/README.md#명령-실행과-한국어-응답) · [최신 CLI·SOUL 근거](infra/hermes/kali-redteam/cli-soul.validation.json).

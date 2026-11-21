@@ -1,5 +1,18 @@
 # 진단 탐색 이력
 
+<!-- presentation-thesis-structure-20261121 -->
+<a id="presentation-thesis-structure-20261121"></a>
+## 2026-11-21 발표 재배치의 출력·범위 검증
+
+공식 출력 검증과20쪽 개별 화면 검수를 마쳤다. 표14·차트2·새 literal workbook2·메모20, 텍스트/셀256개와PDF논리줄280개의 누락0·페이지 밖 글자0이다. 원본 그림 바이트와 기존 결과 수치를 유지했고 실제 PowerPoint·영상 삽입/재생·리허설은 미검증이다. source20과final20을각각개별확인했으며자동검사를시각검수로대신하지않았다.
+
+원본슬라이드매핑은1,2,3,4,5,6,7,8,11,14,9,10,12,13,16,15,17,18,19,20이다. 표시쪽번호/제목/메모와실제export순서를대조했고차트의실제소유쪽은13·14이다. 기존수치·날짜·부정/승인조건을보존했다. humanize001-4dfe standard진단→monolith→gate0,변경1.69%·B·6/6·서법3→3·경고0이다. 원문과진단·최종·게이트원장을보존했다.
+
+일부사전조회와첫빌드는경로오타로실패했으며첫빌드는출력디렉터리를만들기전에ENOENT로중단됐다. 올바른프로젝트내경로로수정한r1은공식package/font/layout/native차트/표/workbook·first-party import를통과했다. 기존Codex번들Node와artifact-tool2.8.59 SDK·Python·LibreOffice·Poppler만사용했고dependency-loader도구는현재목록에없어사용했다고표시하지않았다. 새패키지설치0이다.
+
+원본28파일과논문9SHA를검증한뒤자체임시99파일10,419,640B·PPTX4와검사용helper1개를제거했다. 정식review-agent미제공·작성기매핑/문법과실제산출물수동검토,Semgrep/Harness²재실행없음이며하네스나운영코드변경이아니다. [상태](STATUS_HISTORY.md#presentation-thesis-structure-20261121).
+<!-- /presentation-thesis-structure-20261121 -->
+
 <!-- kali-cli-soul-20261120 -->
 <a id="kali-cli-soul-20261120"></a>
 ## 2026-11-20 명령 검색과 SOUL 변경의 검증 경계

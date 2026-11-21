@@ -1,5 +1,10 @@
 # 과거 기록과 복원 안내
 
+<!-- presentation-thesis-structure-20261121 -->
+<a id="presentation-thesis-structure-20261121"></a>
+[논문5장에 맞춘 발표](STATUS_HISTORY.md#presentation-thesis-structure-20261121) · [구성 선택](DESIGN_ALTERNATIVES.md#presentation-thesis-structure-20261121) · [검수·정리](DIAGNOSTIC_HISTORY.md#presentation-thesis-structure-20261121) · [후속 준비](PLAN_HISTORY.md#presentation-thesis-structure-20261121)
+<!-- /presentation-thesis-structure-20261121 -->
+
 <!-- kali-cli-soul-20261120 -->
 <a id="kali-cli-soul-20261120"></a>
 [CLI·한국어 SOUL 현황](STATUS_HISTORY.md#kali-cli-soul-20261120) · [적용·백업](DEPLOYMENT_HISTORY.md#kali-cli-soul-20261120) · [진단·미검증](DIAGNOSTIC_HISTORY.md#kali-cli-soul-20261120) · [마감 범위](PLAN_HISTORY.md#kali-cli-soul-20261120)
